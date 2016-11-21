@@ -7,7 +7,7 @@
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions.LifetimeScoping;
+    using SimpleInjector.Lifestyles;
 
     [TestClass]
     public class ContainerOptionsTests
@@ -612,7 +612,7 @@
         public void DefaultLifestyle_ChangedMultipleTimesBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
         {
             // Arrange
-            var expectedLifestyle = new LifetimeScopeLifestyle();
+            var expectedLifestyle = new ThreadScopedLifestyle();
 
             var options = GetContainerOptions();
 
@@ -676,7 +676,7 @@
         public void DefaultScopedLifestyle_ChangedBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
         {
             // Arrange
-            var expectedLifestyle = new LifetimeScopeLifestyle();
+            var expectedLifestyle = new ThreadScopedLifestyle();
 
             var options = GetContainerOptions();
 
@@ -692,12 +692,12 @@
         public void DefaultScopedLifestyle_ChangedMultipleTimesBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
         {
             // Arrange
-            var expectedLifestyle = new LifetimeScopeLifestyle();
+            var expectedLifestyle = new ThreadScopedLifestyle();
 
             var options = GetContainerOptions();
 
             // Act
-            options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
             options.DefaultScopedLifestyle = expectedLifestyle;
 
             // Assert
@@ -714,7 +714,7 @@
             container.RegisterSingleton<object>("The first registration.");
 
             // Act
-            Action action = () => container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            Action action = () => container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(

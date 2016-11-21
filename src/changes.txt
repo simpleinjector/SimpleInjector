@@ -9,9 +9,14 @@ Version 4.0.0 (v4.0 RTM)
 		 RegisterPerWcfOperation, GetCurrentWcfOperationScope, RegisterLifetimeScope, GetCurrentLifetimeScope
 		 and GetCurrentExecutionContextScope. (fixes #304)
 		-[Core] Lifestyle.Length property made public. (fixes #245)
+		-[Core] LifetimeScopeLifestyle deprecated. (fixes #299)
+		-[Core] ExecutionContextScopeLifestyle deprecated. (fixes #299)
+		-[Core] WebApiRequestLifestyle deprecated. (fixes #331)
 
 	Improvements/Changes:
 		-[Core] Removed all methods that were marked [obsolete(true)] since v3.0. (fixes #305)
+		-[Core] ThreadScopedLifestyle added to core library as replacement of LifetimeScopeLifestyle. (fixes #299)
+		-[Core] AsyncScopedLifestyle added to core library as replacement of ExecutionContextScopeLifestyle. (fixes #299)
 
 
 Version 3.3.0 (v3.3.0 RTM)

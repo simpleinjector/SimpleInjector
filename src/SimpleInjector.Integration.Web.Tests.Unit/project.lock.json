@@ -341,12 +341,12 @@
       },
       "SimpleInjector/4.0.0": {
         "type": "project",
-        "framework": ".NETFramework,Version=v4.5",
+        "framework": ".NETFramework,Version=v4.5.1",
         "compile": {
-          "net45/SimpleInjector.dll": {}
+          "net451/SimpleInjector.dll": {}
         },
         "runtime": {
-          "net45/SimpleInjector.dll": {}
+          "net451/SimpleInjector.dll": {}
         }
       },
       "SimpleInjector.Core.Tests.Unit/1.0.0": {
@@ -355,27 +355,16 @@
         "dependencies": {
           "NUnit": "3.4.1",
           "SimpleInjector": "1.0.0",
-          "SimpleInjector.Extensions.LifetimeScoping": "1.0.0",
           "dotnet-test-nunit": "3.4.0-beta-2"
         },
+        "frameworkAssemblies": [
+          "System.Linq.Expressions"
+        ],
         "compile": {
           "net451/SimpleInjector.Core.Tests.Unit.dll": {}
         },
         "runtime": {
           "net451/SimpleInjector.Core.Tests.Unit.dll": {}
-        }
-      },
-      "SimpleInjector.Extensions.LifetimeScoping/4.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0",
-        "dependencies": {
-          "SimpleInjector": "1.0.0"
-        },
-        "compile": {
-          "net40/SimpleInjector.Extensions.LifetimeScoping.dll": {}
-        },
-        "runtime": {
-          "net40/SimpleInjector.Extensions.LifetimeScoping.dll": {}
         }
       },
       "SimpleInjector.Integration.Web/4.0.0": {
@@ -712,12 +701,12 @@
       },
       "SimpleInjector/4.0.0": {
         "type": "project",
-        "framework": ".NETFramework,Version=v4.5",
+        "framework": ".NETFramework,Version=v4.5.1",
         "compile": {
-          "net45/SimpleInjector.dll": {}
+          "net451/SimpleInjector.dll": {}
         },
         "runtime": {
-          "net45/SimpleInjector.dll": {}
+          "net451/SimpleInjector.dll": {}
         }
       },
       "SimpleInjector.Core.Tests.Unit/1.0.0": {
@@ -726,27 +715,16 @@
         "dependencies": {
           "NUnit": "3.4.1",
           "SimpleInjector": "1.0.0",
-          "SimpleInjector.Extensions.LifetimeScoping": "1.0.0",
           "dotnet-test-nunit": "3.4.0-beta-2"
         },
+        "frameworkAssemblies": [
+          "System.Linq.Expressions"
+        ],
         "compile": {
           "net451/SimpleInjector.Core.Tests.Unit.dll": {}
         },
         "runtime": {
           "net451/SimpleInjector.Core.Tests.Unit.dll": {}
-        }
-      },
-      "SimpleInjector.Extensions.LifetimeScoping/4.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.0",
-        "dependencies": {
-          "SimpleInjector": "1.0.0"
-        },
-        "compile": {
-          "net40/SimpleInjector.Extensions.LifetimeScoping.dll": {}
-        },
-        "runtime": {
-          "net40/SimpleInjector.Extensions.LifetimeScoping.dll": {}
         }
       },
       "SimpleInjector.Integration.Web/4.0.0": {
@@ -1363,11 +1341,6 @@
       "type": "project",
       "path": "../SimpleInjector.Core.Tests.Unit/project.json",
       "msbuildProject": "../SimpleInjector.Core.Tests.Unit/SimpleInjector.Core.Tests.Unit.xproj"
-    },
-    "SimpleInjector.Extensions.LifetimeScoping/4.0.0": {
-      "type": "project",
-      "path": "../SimpleInjector.Extensions.LifetimeScoping/project.json",
-      "msbuildProject": "../SimpleInjector.Extensions.LifetimeScoping/SimpleInjector.Extensions.LifetimeScoping.xproj"
     },
     "SimpleInjector.Integration.Web/4.0.0": {
       "type": "project",

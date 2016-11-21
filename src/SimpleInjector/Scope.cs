@@ -38,6 +38,7 @@ namespace SimpleInjector
         private const int MaxRecursion = 100;
 
         private readonly object syncRoot = new object();
+        private readonly ScopeManager manager;
 
         private Dictionary<object, object> items;
         private Dictionary<Registration, object> cachedInstances;
@@ -60,6 +61,14 @@ namespace SimpleInjector
             this.Container = container;
         }
 
+        internal Scope(Container container, ScopeManager manager, Scope parentScope) : this(container)
+        {
+            Requires.IsNotNull(manager, nameof(manager));
+
+            this.ParentScope = parentScope;
+            this.manager = manager;
+        }
+
         private enum DisposeState
         {
             Alive,
@@ -70,6 +79,10 @@ namespace SimpleInjector
         /// <summary>Gets the container instance that this scope belongs to.</summary>
         /// <value>The <see cref="Container"/> instance.</value>
         public Container Container { get; }
+
+        internal bool Disposed => this.state == DisposeState.Disposed;
+
+        internal Scope ParentScope { get; }
 
         /// <summary>Gets an instance of the given <typeparamref name="TService"/> for the current scope.</summary>
         /// <typeparam name="TService">The type of the service to resolve.</typeparam>
@@ -308,6 +321,8 @@ namespace SimpleInjector
                         this.cachedInstances = null;
                         this.scopeEndActions = null;
                         this.disposables = null;
+
+                        this.manager?.RemoveScope(this);
                     }
                 }
             }

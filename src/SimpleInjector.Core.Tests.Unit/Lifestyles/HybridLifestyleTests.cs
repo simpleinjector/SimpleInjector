@@ -4,7 +4,6 @@
     using System.Linq;
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Extensions.LifetimeScoping;
 
     [TestClass]
     public class HybridLifestyleTests

@@ -8,7 +8,6 @@
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions;
 
     [TestClass]
     public class DecoratorTests

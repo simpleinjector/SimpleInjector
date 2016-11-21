@@ -2,7 +2,6 @@
 {
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Extensions;
 
     [TestClass]
     public class LifestyleTests

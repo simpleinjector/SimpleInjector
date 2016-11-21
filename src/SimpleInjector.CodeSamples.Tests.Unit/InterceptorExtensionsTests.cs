@@ -2,7 +2,6 @@
 {
     using System;
     using System.Linq;
-    using Extensions.LifetimeScoping;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Tests.Unit;
 

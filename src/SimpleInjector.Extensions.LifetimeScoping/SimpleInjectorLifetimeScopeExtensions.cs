@@ -25,7 +25,7 @@
 namespace SimpleInjector
 {
     using System;
-    using SimpleInjector.Advanced;
+    using Lifestyles;
     using SimpleInjector.Extensions.LifetimeScoping;
 
     /// <summary>
@@ -33,8 +33,8 @@ namespace SimpleInjector
     /// </summary>
     public static partial class SimpleInjectorLifetimeScopeExtensions
     {
-        private static readonly object ManagerKey = new object();
-        
+        private static readonly ScopedLifestyle Lifestyle = new ThreadScopedLifestyle();
+
         /// <summary>
         /// Begins a new lifetime scope for the given <paramref name="container"/> on the current thread. 
         /// Services, registered with 
@@ -57,11 +57,11 @@ namespace SimpleInjector
         /// }
         /// ]]></code>
         /// </example>
+        [Obsolete("This lifestyle is obsolete. Please use SimpleInjector.Lifestyles." + 
+            "ThreadScopedLifestyle.BeginScope(Container) instead.", error: false)]
         public static Scope BeginLifetimeScope(this Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            return container.GetLifetimeScopeManager().BeginLifetimeScope();
+            return ThreadScopedLifestyle.BeginScope(container);
         }
 
         /// <summary>
@@ -90,13 +90,7 @@ namespace SimpleInjector
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static Scope GetCurrentLifetimeScope(this Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            return container.GetLifetimeScopeManager().CurrentScope;
+            return Lifestyle.GetCurrentScope(container);
         }
-
-        // This method will never return null.
-        internal static LifetimeScopeManager GetLifetimeScopeManager(this Container container) => 
-            container.GetOrSetItem(ManagerKey, (c, key) => new LifetimeScopeManager(c));
     }
 }

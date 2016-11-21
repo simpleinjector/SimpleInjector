@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014 Simple Injector Contributors
+ * Copyright (c) 2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -20,23 +20,45 @@
 */
 #endregion
 
-namespace SimpleInjector.Extensions.ExecutionContextScoping
+namespace System.Threading
 {
-    using System;
+#if NET45
+    using System.Security;
+    using System.Threading;
+    using System.Runtime.Remoting.Messaging;
 
-    internal static class Requires
+    internal sealed class AsyncLocal<T>
     {
-        internal static void IsNotNull(object instance, string paramName)
+        private readonly string key = Guid.NewGuid().ToString("N").Substring(0, 12);
+
+        public T Value
         {
-            if (instance == null)
+            get
             {
-                ThrowArgumentNullException(paramName);
+                var wrapper = (AsyncScopeWrapper)CallContext.LogicalGetData(this.key);
+
+                return wrapper != null ? wrapper.Value : default(T);
+            }
+            set
+            {
+                var wrapper = value == null ? null : new AsyncScopeWrapper(value);
+
+                CallContext.LogicalSetData(this.key, wrapper);
+
             }
         }
 
-        private static void ThrowArgumentNullException(string paramName)
+        [Serializable]
+        internal sealed class AsyncScopeWrapper : MarshalByRefObject
         {
-            throw new ArgumentNullException(paramName);
+            [NonSerialized]
+            internal readonly T Value;
+
+            internal AsyncScopeWrapper(T value)
+            {
+                this.Value = value;
+            }
         }
     }
+#endif
 }

@@ -50,6 +50,24 @@
           "lib/net40/Newtonsoft.Json.dll": {}
         }
       },
+      "System.ComponentModel/4.0.0": {
+        "type": "package",
+        "compile": {
+          "ref/net45/_._": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        }
+      },
+      "System.Runtime/4.0.0": {
+        "type": "package",
+        "compile": {
+          "ref/net45/_._": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        }
+      },
       "SimpleInjector/4.0.0": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
@@ -58,19 +76,6 @@
         },
         "runtime": {
           "net45/SimpleInjector.dll": {}
-        }
-      },
-      "SimpleInjector.Extensions.ExecutionContextScoping/4.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.5",
-        "dependencies": {
-          "SimpleInjector": "1.0.0"
-        },
-        "compile": {
-          "net45/SimpleInjector.Extensions.ExecutionContextScoping.dll": {}
-        },
-        "runtime": {
-          "net45/SimpleInjector.Extensions.ExecutionContextScoping.dll": {}
         }
       }
     }
@@ -136,24 +141,100 @@
         "lib/winrt45/Newtonsoft.Json.xml"
       ]
     },
+    "System.ComponentModel/4.0.0": {
+      "sha512": "BzpLdSi++ld7rJLOOt5f/G9GxujP202bBgKORsHcGV36rLB0mfSA2h8chTMoBzFhgN7TE14TmJ2J7Q1RyNCTAw==",
+      "type": "package",
+      "path": "System.ComponentModel/4.0.0",
+      "files": [
+        "System.ComponentModel.4.0.0.nupkg.sha512",
+        "System.ComponentModel.nuspec",
+        "lib/dotnet/System.ComponentModel.dll",
+        "lib/net45/_._",
+        "lib/netcore50/System.ComponentModel.dll",
+        "lib/win8/_._",
+        "lib/wp80/_._",
+        "lib/wpa81/_._",
+        "ref/dotnet/System.ComponentModel.dll",
+        "ref/dotnet/System.ComponentModel.xml",
+        "ref/dotnet/de/System.ComponentModel.xml",
+        "ref/dotnet/es/System.ComponentModel.xml",
+        "ref/dotnet/fr/System.ComponentModel.xml",
+        "ref/dotnet/it/System.ComponentModel.xml",
+        "ref/dotnet/ja/System.ComponentModel.xml",
+        "ref/dotnet/ko/System.ComponentModel.xml",
+        "ref/dotnet/ru/System.ComponentModel.xml",
+        "ref/dotnet/zh-hans/System.ComponentModel.xml",
+        "ref/dotnet/zh-hant/System.ComponentModel.xml",
+        "ref/net45/_._",
+        "ref/netcore50/System.ComponentModel.dll",
+        "ref/netcore50/System.ComponentModel.xml",
+        "ref/win8/_._",
+        "ref/wp80/_._",
+        "ref/wpa81/_._"
+      ]
+    },
+    "System.Runtime/4.0.0": {
+      "sha512": "Uq9epame8hEqJlj4KaWb67dDJvj4IM37jRFGVeFbugRdPz48bR0voyBhrbf3iSa2tAmlkg4lsa6BUOL9iwlMew==",
+      "type": "package",
+      "path": "System.Runtime/4.0.0",
+      "files": [
+        "License.rtf",
+        "System.Runtime.4.0.0.nupkg.sha512",
+        "System.Runtime.nuspec",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net45/_._",
+        "lib/win8/_._",
+        "lib/wp80/_._",
+        "lib/wpa81/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/dotnet/System.Runtime.dll",
+        "ref/dotnet/System.Runtime.xml",
+        "ref/dotnet/de/System.Runtime.xml",
+        "ref/dotnet/es/System.Runtime.xml",
+        "ref/dotnet/fr/System.Runtime.xml",
+        "ref/dotnet/it/System.Runtime.xml",
+        "ref/dotnet/ja/System.Runtime.xml",
+        "ref/dotnet/ko/System.Runtime.xml",
+        "ref/dotnet/ru/System.Runtime.xml",
+        "ref/dotnet/zh-hans/System.Runtime.xml",
+        "ref/dotnet/zh-hant/System.Runtime.xml",
+        "ref/net45/_._",
+        "ref/netcore50/System.Runtime.dll",
+        "ref/netcore50/System.Runtime.xml",
+        "ref/netcore50/de/System.Runtime.xml",
+        "ref/netcore50/es/System.Runtime.xml",
+        "ref/netcore50/fr/System.Runtime.xml",
+        "ref/netcore50/it/System.Runtime.xml",
+        "ref/netcore50/ja/System.Runtime.xml",
+        "ref/netcore50/ko/System.Runtime.xml",
+        "ref/netcore50/ru/System.Runtime.xml",
+        "ref/netcore50/zh-hans/System.Runtime.xml",
+        "ref/netcore50/zh-hant/System.Runtime.xml",
+        "ref/win8/_._",
+        "ref/wp80/_._",
+        "ref/wpa81/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._"
+      ]
+    },
     "SimpleInjector/4.0.0": {
       "type": "project",
       "path": "../SimpleInjector/project.json",
       "msbuildProject": "../SimpleInjector/SimpleInjector.xproj"
-    },
-    "SimpleInjector.Extensions.ExecutionContextScoping/4.0.0": {
-      "type": "project",
-      "path": "../SimpleInjector.Extensions.ExecutionContextScoping/project.json",
-      "msbuildProject": "../SimpleInjector.Extensions.ExecutionContextScoping/SimpleInjector.Extensions.ExecutionContextScoping.xproj"
     }
   },
   "projectFileDependencyGroups": {
     "": [
-      "SimpleInjector",
-      "SimpleInjector.Extensions.ExecutionContextScoping"
+      "SimpleInjector"
     ],
     ".NETFramework,Version=v4.5": [
-      "Microsoft.AspNet.WebApi.Core >= 4.0.20710"
+      "Microsoft.AspNet.WebApi.Core >= 4.0.20710",
+      "System.ComponentModel >= 4.0.0",
+      "System.Runtime >= 4.0.0"
     ]
   },
   "tools": {},

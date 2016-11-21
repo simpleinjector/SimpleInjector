@@ -3,15 +3,15 @@
   "buildOptions": {
     "copyToOutput": {
       "include": [ "App.config" ]
-    }
+    },
+    "warningsAsErrors": true
   },
   "dependencies": {
     "NUnit": "3.4.1",
     "dotnet-test-nunit": "3.4.0-beta-2",
     "SimpleInjector": { "target": "project" },
     "SimpleInjector.Core.Tests.Unit": { "target": "project" },
-    "SimpleInjector.CodeSamples": { "target": "project" },
-    "SimpleInjector.Extensions.LifetimeScoping": { "target": "project" }
+    "SimpleInjector.CodeSamples": { "target": "project" }
   },
   "testRunner": "nunit",
   "runtimes": {

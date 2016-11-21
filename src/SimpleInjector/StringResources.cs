@@ -34,7 +34,7 @@ namespace SimpleInjector
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
     {
-        internal static bool UseFullyQualifiedTypeNames { get; set; } = false;
+        internal static bool UseFullyQualifiedTypeNames = false;
 
         // Assembly.Location only exists in .NETStandard1.5 and up, .NET4.0 and PCL, but we only compile
         // against .NETStandard1.0 and .NETStandard1.3. We don't want to add an extra build directly, solely

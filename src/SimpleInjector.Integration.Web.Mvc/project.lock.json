@@ -68,7 +68,7 @@
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "Microsoft.Web.Infrastructure": "1.0.0",
-          "SimpleInjector": "1.0.0"
+          "SimpleInjector": "(, )"
         },
         "frameworkAssemblies": [
           "System.Web"

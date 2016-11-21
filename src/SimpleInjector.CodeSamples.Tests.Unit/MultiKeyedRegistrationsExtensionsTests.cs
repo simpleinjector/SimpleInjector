@@ -3,7 +3,6 @@
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    using SimpleInjector.Extensions;
     using SimpleInjector.Tests.Unit;
 
     [TestClass]

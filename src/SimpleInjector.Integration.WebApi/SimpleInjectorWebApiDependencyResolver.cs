@@ -28,7 +28,7 @@ namespace SimpleInjector.Integration.WebApi
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dependencies;
-    using SimpleInjector.Extensions.ExecutionContextScoping;
+    using Lifestyles;
 
     /// <summary>
     /// Provides additional options for creating the <see cref="SimpleInjectorWebApiDependencyResolver"/>.
@@ -37,14 +37,14 @@ namespace SimpleInjector.Integration.WebApi
     {
         /// <summary>
         /// When <see cref="IDependencyResolver.BeginScope"/> is called, an ambient 
-        /// <see cref="ExecutionContextScopeLifestyle"/> scope is used, if one already exists. Otherwise, it 
-        /// creates a new <see cref="ExecutionContextScopeLifestyle"/> scope before returning. 
+        /// <see cref="AsyncScopedLifestyle"/> scope is used, if one already exists. Otherwise, it 
+        /// creates a new <see cref="AsyncScopedLifestyle"/> scope before returning. 
         /// This is the default value.
         /// </summary>
         UseAmbientScope,
 
         /// <summary>
-        /// A new <see cref="ExecutionContextScopeLifestyle"/> scope  is always created by 
+        /// A new <see cref="AsyncScopedLifestyle"/> scope  is always created by 
         /// <see cref="IDependencyResolver.BeginScope"/> before returning.
         /// </summary>
         RequiresNew
@@ -93,14 +93,14 @@ namespace SimpleInjector.Integration.WebApi
     /// </example>
     public sealed class SimpleInjectorWebApiDependencyResolver : IDependencyResolver
     {
-        private readonly ExecutionContextScopeLifestyle scopedLifestyle = new ExecutionContextScopeLifestyle();
+        private readonly AsyncScopedLifestyle scopedLifestyle = new AsyncScopedLifestyle();
         private readonly Container container;
         private readonly DependencyResolverScopeOption scopeOption;
         private readonly Scope scope;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleInjectorWebApiDependencyResolver"/> class with
-        /// the default scope option (i.e. to use an ambient <see cref="ExecutionContextScopeLifestyle"/> 
+        /// the default scope option (i.e. to use an ambient <see cref="AsyncScopedLifestyle"/> 
         /// scope if one already exists).
         /// </summary>
         /// <param name="container">The container.</param>
@@ -142,7 +142,7 @@ namespace SimpleInjector.Integration.WebApi
 
             if (beginScope)
             {
-                this.scope = container.BeginExecutionContextScope();
+                this.scope = AsyncScopedLifestyle.BeginScope(container);
             }
         }
 

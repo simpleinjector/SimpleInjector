@@ -23,6 +23,7 @@
 namespace SimpleInjector.Extensions.ExecutionContextScoping
 {
     using System;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the lifetime of an explicitly defined scope using the
@@ -45,14 +46,15 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
     /// }
     /// ]]></code>
     /// </example>
-    public class ExecutionContextScopeLifestyle : ScopedLifestyle
+    [Obsolete("This lifestyle is obsolete. Please use SimpleInjector.Lifestyles.AsyncScopedLifestyle instead.", error: false)]
+    public class ExecutionContextScopeLifestyle : AsyncScopedLifestyle
     {
         /// <summary>Initializes a new instance of the <see cref="ExecutionContextScopeLifestyle"/> class.
         /// The created and cached instance will be disposed when the created 
         /// <see cref="Scope"/> instance gets disposed and when the created object implements 
         /// <see cref="IDisposable"/>.
         /// </summary>
-        public ExecutionContextScopeLifestyle() : base("Execution Context Scope")
+        public ExecutionContextScopeLifestyle()
         {
         }
 
@@ -77,7 +79,7 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         /// Initializes a new instance of the <see cref="ExecutionContextScopeLifestyle"/> class.
         /// </summary>
         /// <param name="name">The user friendly name of this lifestyle.</param>
-        protected ExecutionContextScopeLifestyle(string name) : base(name)
+        protected ExecutionContextScopeLifestyle(string name)
         {
         }
 
@@ -90,34 +92,11 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         [Obsolete("This constructor overload has been deprecated. " +
             "Please use ExecutionContextScopeLifestyle(string) instead.",
             error: true)]
-        protected ExecutionContextScopeLifestyle(string name, bool disposeInstanceWhenScopeEnds) : base(name)
+        protected ExecutionContextScopeLifestyle(string name, bool disposeInstanceWhenScopeEnds)
         {
             throw new NotSupportedException(
                 "This constructor overload has been deprecated. " +
                 "Please use ExecutionContextScopeLifestyle(string) instead.");
-        }
-
-        /// <summary>
-        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
-        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
-        /// </summary>
-        /// <param name="container">The container instance that is related to the scope to return.</param>
-        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        protected override Scope GetCurrentScopeCore(Container container) => 
-            container.GetExecutionContextScopeManager().CurrentScope;
-
-        /// <summary>
-        /// Creates a delegate that upon invocation return the current <see cref="Scope"/> for this
-        /// lifestyle and the given <paramref name="container"/>, or null when the delegate is executed outside
-        /// the context of such scope.
-        /// </summary>
-        /// <param name="container">The container for which the delegate gets created.</param>
-        /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
-        protected override Func<Scope> CreateCurrentScopeProvider(Container container)
-        {
-            var manager = container.GetExecutionContextScopeManager();
-
-            return () => manager.CurrentScope;
         }
     }
 }

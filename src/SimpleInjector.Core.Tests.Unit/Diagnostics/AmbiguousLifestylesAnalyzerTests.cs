@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Lifestyles;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Extensions.LifetimeScoping;
     using SimpleInjector.Tests.Unit;
 
     [TestClass]
@@ -97,18 +97,18 @@
         {
             // Arrange
             string expectedMessage1 = @"
-                The registration for IFoo (Lifetime Scope) maps to the same implementation (FooBar) as the 
+                The registration for IFoo (Thread Scoped) maps to the same implementation (FooBar) as the 
                 registrations for IFooExt (Singleton) and IBarExt (Singleton) do"
                 .TrimInside();
 
             string expectedMessage2 = @"
                 The registration for IFooExt (Singleton) maps to the same implementation (FooBar) as the 
-                registrations for IFoo (Lifetime Scope) and IBar (Lifetime Scope) do"
+                registrations for IFoo (Thread Scoped) and IBar (Thread Scoped) do"
                 .TrimInside();
 
             var container = new Container();
 
-            var transientFooBar = new LifetimeScopeLifestyle().CreateRegistration<FooBar>(container);
+            var transientFooBar = new ThreadScopedLifestyle().CreateRegistration<FooBar>(container);
             var singletonFooBar = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
 
             container.AddRegistration(typeof(IFoo), transientFooBar);
@@ -142,7 +142,7 @@
             var container = new Container();
 
             container.Register<IFoo, FooBar>(Lifestyle.Transient);
-            container.Register<IBar, FooBar>(new LifetimeScopeLifestyle());
+            container.Register<IBar, FooBar>(new ThreadScopedLifestyle());
             container.Register<IFooExt, FooBar>(Lifestyle.Singleton);
 
             container.Verify(VerificationOption.VerifyOnly);
@@ -163,8 +163,8 @@
             // Arrange
             var container = new Container();
 
-            var scopedFooBar1 = new LifetimeScopeLifestyle().CreateRegistration<FooBar>(container);
-            var scopedFooBar2 = new LifetimeScopeLifestyle().CreateRegistration<FooBar>(container);
+            var scopedFooBar1 = new ThreadScopedLifestyle().CreateRegistration<FooBar>(container);
+            var scopedFooBar2 = new ThreadScopedLifestyle().CreateRegistration<FooBar>(container);
 
             container.AddRegistration(typeof(IFoo), scopedFooBar1);
             container.AddRegistration(typeof(IBar), scopedFooBar1);
@@ -190,8 +190,8 @@
             // Arrange
             var container = new Container();
 
-            container.Register<IFoo, FooBar>(new LifetimeScopeLifestyle());
-            container.Register<IBar, FooBar>(new LifetimeScopeLifestyle());
+            container.Register<IFoo, FooBar>(new ThreadScopedLifestyle());
+            container.Register<IBar, FooBar>(new ThreadScopedLifestyle());
 
             container.Verify(VerificationOption.VerifyOnly);
 

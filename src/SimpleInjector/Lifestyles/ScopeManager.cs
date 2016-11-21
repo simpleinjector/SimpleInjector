@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2016 Simple Injector Contributors
+ * Copyright (c) 2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -20,41 +20,39 @@
 */
 #endregion
 
-namespace SimpleInjector.Extensions.LifetimeScoping
+namespace SimpleInjector.Lifestyles
 {
-    using System.Diagnostics.CodeAnalysis;
-    using System.Threading;
+    using System;
 
-    // This class will be registered as singleton within a container, allowing each container (if the
-    // application -for some reason- has multiple containers) to have it's own set of lifetime scopes, without
-    // influencing other scopes from other containers.
-    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
-        Justification = "A LifetimeScopeManager instance is stored as singleton in a Container instance, " +
-            "but the container itself does not implement IDisposable, and will never dispose any instances " +
-            "it contains. Letting LifetimeScopeManager therefore does not help and when the application " +
-            "creates multiple Containers (that go out of scope before the AppDomain is stopped), we must " +
-            "rely on the garbage collector calling the Finalize method of the ThreadLocal<T>.")]
-    internal sealed class LifetimeScopeManager
+    internal sealed class ScopeManager
     {
-        // Here we use .NET 4.0 ThreadLocal instead of the [ThreadStatic] attribute, to allow each container
-        // to have it's own set of scopes.
-        private readonly ThreadLocal<LifetimeScope> threadLocalScopes = new ThreadLocal<LifetimeScope>();
+        private readonly Container container;
+        private readonly Func<Scope> scopeRetriever;
+        private readonly Action<Scope> scopeReplacer;
 
-        internal LifetimeScopeManager(Container container)
+        internal ScopeManager(Container container, Func<Scope> scopeRetriever, Action<Scope> scopeReplacer)
         {
             Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(scopeRetriever, nameof(scopeRetriever));
+            Requires.IsNotNull(scopeReplacer, nameof(scopeReplacer));
 
-            this.Container = container;
+            this.container = container;
+            this.scopeRetriever = scopeRetriever;
+            this.scopeReplacer = scopeReplacer;
         }
 
-        internal Container Container { get; }
+        internal Scope CurrentScope => this.GetCurrentScopeWithAutoCleanup();
 
-        internal LifetimeScope CurrentScope => this.GetCurrentScopeWithAutoCleanup();
+        private Scope CurrentScopeInternal
+        {
+            get { return this.scopeRetriever(); }
+            set { this.scopeReplacer(value); }
+        }
 
-        internal LifetimeScope BeginLifetimeScope() => 
-            this.threadLocalScopes.Value = new LifetimeScope(this, parentScope: this.CurrentScope);
+        internal Scope BeginScope() =>
+            this.CurrentScopeInternal = new Scope(this.container, this, this.GetCurrentScopeWithAutoCleanup());
 
-        internal void RemoveLifetimeScope(LifetimeScope scope)
+        internal void RemoveScope(Scope scope)
         {
             // If the scope is not the current scope or one of its ancestors, this means that either one of
             // the scope's parents have already been disposed, or the scope is disposed on a completely
@@ -63,36 +61,36 @@ namespace SimpleInjector.Extensions.LifetimeScoping
             // either be disposed or does not belong to the current execution context).
             if (this.IsScopeInLocalChain(scope))
             {
-                this.threadLocalScopes.Value = scope.ParentScope;
+                this.CurrentScopeInternal = scope.ParentScope;
             }
         }
 
         // Determines whether this instance is the currently registered lifetime scope or an ancestor of it.
-        private bool IsScopeInLocalChain(LifetimeScope scope)
+        private bool IsScopeInLocalChain(Scope scope)
         {
-            var currentScope = this.threadLocalScopes.Value;
+            Scope localScope = this.CurrentScopeInternal;
 
-            while (currentScope != null)
+            while (localScope != null)
             {
-                if (object.ReferenceEquals(scope, currentScope))
+                if (object.ReferenceEquals(scope, localScope))
                 {
                     return true;
                 }
 
-                currentScope = currentScope.ParentScope;
+                localScope = localScope.ParentScope;
             }
 
             return false;
         }
 
-        private LifetimeScope GetCurrentScopeWithAutoCleanup()
+        private Scope GetCurrentScopeWithAutoCleanup()
         {
-            var scope = this.threadLocalScopes.Value;
+            Scope scope = this.CurrentScopeInternal;
 
             // When the current scope is disposed, make the parent scope the current.
             while (scope != null && scope.Disposed)
             {
-                this.threadLocalScopes.Value = scope = scope.ParentScope;
+                this.CurrentScopeInternal = scope = scope.ParentScope;
             }
 
             return scope;

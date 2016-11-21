@@ -3,7 +3,7 @@
     using System;
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Extensions.LifetimeScoping;
+    using SimpleInjector.Lifestyles;
 
     [TestClass]
     public class LifestyleScopedTests
@@ -31,7 +31,7 @@
         {
             // Arrange
             var container = new Container();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             // Act
             container.Register<RealTimeProvider>(Lifestyle.Scoped);
@@ -42,7 +42,7 @@
         {
             // Arrange
             var container = new Container();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             container.Register<RealTimeProvider>(Lifestyle.Scoped);
 
@@ -58,11 +58,11 @@
         {
             // Arrange
             var container = new Container();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             container.Register<RealTimeProvider>(Lifestyle.Scoped);
 
-            using (container.BeginLifetimeScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 // Act
                 container.GetInstance<RealTimeProvider>();
@@ -73,7 +73,7 @@
         public void InstanceProducerLifestyle_ForAScopedRegistration_HasTheExpectedDefaultScopedLifestyle()
         {
             // Arrange
-            var expectedLifestyle = new LifetimeScopeLifestyle();
+            var expectedLifestyle = new ThreadScopedLifestyle();
 
             var container = new Container();
             container.Options.DefaultScopedLifestyle = expectedLifestyle;
@@ -95,7 +95,7 @@
             // Arrange
             var container = new Container();
 
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             var expectedLifestyle = Lifestyle.CreateHybrid(
                 () => true,
@@ -118,7 +118,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
             var hybridLifestyle = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Scoped);
 
             // class RealUserService(IUserRepository)
@@ -135,7 +135,7 @@
             // Arrange
             var container = new Container();
 
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             // class RealUserService(IUserRepository)
             container.Register<UserServiceBase, RealUserService>(Lifestyle.Transient);
@@ -152,7 +152,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "the instance is requested outside the context of a Lifetime Scope",
+                "the instance is requested outside the context of a Thread Scoped",
                 action);
         }
 
@@ -162,7 +162,7 @@
             // Arrange
             var container = new Container();
 
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             // class RealUserService(IUserRepository)
             container.Register<UserServiceBase, RealUserService>(Lifestyle.Transient);
@@ -239,7 +239,7 @@
         public void ScopedProxyLifestyleCreateRegistration_Always_WrapsTheScopeOfDefaultScopedLifestyle()
         {
             // Arrange
-            var expectedLifestyle = new LifetimeScopeLifestyle();
+            var expectedLifestyle = new ThreadScopedLifestyle();
 
             var container = new Container();
 

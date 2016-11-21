@@ -2,11 +2,10 @@
 {
     using System;
     using System.Linq;
+    using Lifestyles;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics.Analyzers;
     using SimpleInjector.Diagnostics.Debugger;
-    using SimpleInjector.Extensions;
-    using SimpleInjector.Extensions.LifetimeScoping;
     using SimpleInjector.Tests.Unit;
 
     public static class RegistrationExtensions
@@ -105,7 +104,7 @@
             // Arrange
             var container = new Container();
 
-            container.Register<IPlugin, DisposablePlugin>(new LifetimeScopeLifestyle());
+            container.Register<IPlugin, DisposablePlugin>(new ThreadScopedLifestyle());
 
             container.Verify();
 

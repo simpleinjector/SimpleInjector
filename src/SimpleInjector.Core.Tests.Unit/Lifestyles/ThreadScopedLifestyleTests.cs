@@ -1,4 +1,4 @@
-﻿namespace SimpleInjector.Extensions.ExecutionContextScoping.Tests.Unit
+﻿namespace SimpleInjector.Core.Tests.Unit.Lifestyles
 {
     using System;
     using System.Collections.Generic;
@@ -7,42 +7,24 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading.Tasks;
+    using Lifestyles;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
     using SimpleInjector.Tests.Unit;
 
     [TestClass]
-    public class SimpleInjectorExecutionContextScopeExtensionsTests
+    public class ThreadScopedLifestyleTests
     {
         [TestMethod]
-        public void Async_ExecutionContextScope_Nesting()
-        {
-            var container = new Container();
-
-            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
-
-            DisposableCommand cmd;
-            using (container.BeginExecutionContextScope())
-            {
-                // Act
-                cmd = container.GetInstance<DisposableCommand>();
-                Outer(container, cmd).Wait();
-
-                Assert.IsFalse(cmd.HasBeenDisposed);
-            }
-
-            Assert.IsTrue(cmd.HasBeenDisposed);
-        }
-
-        [TestMethod]
-        public void GetInstance_RegistrationUsingExecutionContextScopeLifestyle_Succeeds()
+        public void GetInstance_RegistrationUsingThreadScopedLifestyle_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new ThreadScopedLifestyle());
 
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 // Act
                 container.GetInstance<ICommand>();
@@ -50,14 +32,14 @@
         }
 
         [TestMethod]
-        public void GetInstance_RegistrationUsingFuncExecutionContextScopeLifestyle_Succeeds()
+        public void GetInstance_RegistrationUsingFuncThreadScopedLifestyle_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand>(() => new ConcreteCommand(), new ExecutionContextScopeLifestyle());
+            container.Register<ICommand>(() => new ConcreteCommand(), new ThreadScopedLifestyle());
 
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 // Act
                 container.GetInstance<ICommand>();
@@ -65,37 +47,35 @@
         }
 
         [TestMethod]
-        public void BeginExecutionContextScope_WithoutAnyExecutionContextScopeRegistrations_Succeeds()
+        public void BeginLifetimeScope_WithoutAnyLifetimeScopeRegistrations_Succeeds()
         {
             // Arrange
             var container = new Container();
 
             // Act
-            using (var scope = container.BeginExecutionContextScope())
+            using (var scope = ThreadScopedLifestyle.BeginScope(container))
             {
                 container.GetInstance<ConcreteCommand>();
             }
         }
 
         [TestMethod]
-        public void BeginExecutionContextScope_WithoutAnyExecutionContextScopeRegistrations_Succeeds2()
+        public void BeginLifetimeScope_WithoutAnyLifetimeScopeRegistrationsAndWithoutExplicitlyEnablingLifetimeScoping_Succeeds()
         {
             // Arrange
             var container = new Container();
 
             // Act
-            using (container.BeginExecutionContextScope())
-            {
-            }
+            ThreadScopedLifestyle.BeginScope(container);
         }
 
         [TestMethod]
-        public void ContainerVerify_WithExecutionContextScopeRegistrationInOpenGeneric_Succeeds()
+        public void Verify_WithLifetimeScopeRegistrationInOpenGenericAndWithoutExplicitlyEnablingLifetimeScoping_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            container.Register(typeof(IGeneric<>), typeof(Generic<>), new ExecutionContextScopeLifestyle());
+            container.Register(typeof(IGeneric<>), typeof(Generic<>), new ThreadScopedLifestyle());
 
             container.Register<ClassDependingOn<IGeneric<int>>>();
 
@@ -104,12 +84,12 @@
         }
 
         [TestMethod]
-        public void ContainerVerify_WithHybridExecutionContextScopeRegistrationInOpenGeneric_Succeeds()
+        public void Verify_WithHybridLifetimeScopeRegistrationInOpenGenericAndWithoutExplicitlyEnablingLifetimeScoping_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            var hybrid = Lifestyle.CreateHybrid(() => false, new ExecutionContextScopeLifestyle(), new ExecutionContextScopeLifestyle());
+            var hybrid = Lifestyle.CreateHybrid(() => false, new ThreadScopedLifestyle(), new ThreadScopedLifestyle());
 
             container.Register(typeof(IGeneric<>), typeof(Generic<>), hybrid);
 
@@ -118,22 +98,23 @@
             // Act
             container.Verify();
         }
-        
+
         [TestMethod]
-        public void GetCurrentExecutionContextScope_InsideANestedExecutionContextScope_ReturnsTheInnerMostScope()
+        public void GetCurrentLifetimeScope_InsideANestedLifetimeScope_ReturnsTheInnerMostScope()
         {
             // Arrange
             var container = new Container();
-            container.Options.DefaultScopedLifestyle = new ExecutionContextScopeLifestyle();
 
-            using (Scope outerScope = container.BeginExecutionContextScope())
+            var lifestyle = new ThreadScopedLifestyle();
+
+            using (var outerScope = ThreadScopedLifestyle.BeginScope(container))
             {
-                using (Scope innerScope = container.BeginExecutionContextScope())
+                using (var innerScope = ThreadScopedLifestyle.BeginScope(container))
                 {
                     Assert.IsFalse(object.ReferenceEquals(outerScope, innerScope), "Test setup failed.");
 
                     // Act
-                    Scope currentScope = Lifestyle.Scoped.GetCurrentScope(container);
+                    var currentScope = lifestyle.GetCurrentScope(container);
 
                     // Assert
                     Assert.IsTrue(object.ReferenceEquals(innerScope, currentScope));
@@ -142,17 +123,17 @@
         }
 
         [TestMethod]
-        public void GetInstance_WithoutExecutionContextScope_ThrowsExpectedException()
+        public void GetInstance_WithoutLifetimeScope_ThrowsExpectedException()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new ThreadScopedLifestyle());
 
             try
             {
                 // Act
-                container.GetInstance<ICommand>();
+                var firstInstance = container.GetInstance<ICommand>();
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -160,33 +141,21 @@
             catch (ActivationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains(
-                    "The ICommand is registered as 'Execution Context Scope' lifestyle, but the instance is requested " +
-                    "outside the context of a Execution Context Scope."),
+                    "The ICommand is registered as 'Lifetime Scope' lifestyle, but the instance is requested " +
+                    "outside the context of a Lifetime Scope."),
                     "Actual message: " + ex.Message);
             }
         }
 
         [TestMethod]
-        public void ContainerVerify_WithoutExecutionContextScope_Succeeds()
+        public void GetInstance_WithinLifetimeScope_ReturnsInstanceOfExpectedType()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new ThreadScopedLifestyle());
 
-            // Act
-            container.Verify();
-        }
-
-        [TestMethod]
-        public void GetInstance_WithinExecutionContextScope_ReturnsInstanceOfExpectedType()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
-
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 // Act
                 var actualInstance = container.GetInstance<ICommand>();
@@ -197,14 +166,14 @@
         }
 
         [TestMethod]
-        public void GetInstance_CalledMultipleTimesWithinSingleExecutionContextScope_ReturnsASingleInstance()
+        public void GetInstance_CalledMultipleTimesWithinSingleLifetimeScope_ReturnsASingleInstance()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new ThreadScopedLifestyle());
 
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 // Act
                 var firstInstance = container.GetInstance<ICommand>();
@@ -216,19 +185,19 @@
         }
 
         [TestMethod]
-        public void GetInstance_CalledWithinNestedSingleExecutionContextScopes_ReturnsAnInstancePerScope()
+        public void GetInstance_CalledWithinNestedSingleLifetimeScopes_ReturnsAnInstancePerScope()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new ThreadScopedLifestyle());
 
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 // Act
                 var firstInstance = container.GetInstance<ICommand>();
 
-                using (container.BeginExecutionContextScope())
+                using (ThreadScopedLifestyle.BeginScope(container))
                 {
                     var secondInstance = container.GetInstance<ICommand>();
 
@@ -239,19 +208,19 @@
         }
 
         [TestMethod]
-        public void GetInstance_CalledWithinSameExecutionContextScopeWithOtherScopesInBetween_ReturnsASingleInstance()
+        public void GetInstance_CalledWithinSameLifetimeScopeWithOtherScopesInBetween_ReturnsASingleInstance()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new ThreadScopedLifestyle());
 
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 // Act
                 var firstInstance = container.GetInstance<ICommand>();
 
-                using (container.BeginExecutionContextScope())
+                using (ThreadScopedLifestyle.BeginScope(container))
                 {
                     container.GetInstance<ICommand>();
                 }
@@ -264,17 +233,17 @@
         }
 
         [TestMethod]
-        public void ExecutionContextScopeDispose_RegisterExecutionContextScopeWithDisposal_EnsuresInstanceGetDisposedAfterExecutionContextScopeEnds()
+        public void LifetimeScopeDispose_RegisterLifetimeScopeWithDisposal_EnsuresInstanceGetDisposedAfterLifetimeScopeEnds()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<DisposableCommand>(new ThreadScopedLifestyle());
 
             DisposableCommand command;
 
             // Act
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 command = container.GetInstance<DisposableCommand>();
             }
@@ -284,7 +253,7 @@
         }
 
         [TestMethod]
-        public void ExecutionContextScopeDispose_TransientDisposableObject_DoesNotDisposeInstanceAfterExecutionContextScopeEnds()
+        public void LifetimeScopeDispose_TransientDisposableObject_DoesNotDisposeInstanceAfterLifetimeScopeEnds()
         {
             // Arrange
             var container = new Container();
@@ -295,40 +264,41 @@
             DisposableCommand command;
 
             // Act
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 command = container.GetInstance<DisposableCommand>();
             }
 
             // Assert
             Assert.IsFalse(command.HasBeenDisposed,
-                "The execution scope should not dispose objects that are not explicitly marked as such, since " +
+                "The lifetime scope should not dispose objects that are not explicitly marked as such, since " +
                 "this would allow the scope to accidentally dispose singletons.");
         }
 
         [TestMethod]
-        public void ExecutionContextScopeDispose_WithInstanceExplicitlyRegisteredForDisposal_DisposesThatInstance()
+        public void LifetimeScopeDispose_WithInstanceExplicitlyRegisteredForDisposal_DisposesThatInstance()
         {
             // Arrange
             var container = new Container();
-            var scopedLifestyle = new ExecutionContextScopeLifestyle();
+
+            var lifestyle = new ThreadScopedLifestyle();
 
             // Transient
             container.Register<ICommand, DisposableCommand>();
 
             container.RegisterInitializer<DisposableCommand>(instance =>
             {
-                Scope scope = scopedLifestyle.GetCurrentScope(container);
+                Scope scope = lifestyle.GetCurrentScope(container);
 
-                // The following line explicitly registers the transient DisposableCommand for disposal when
-                // the execution context scope ends.
+                // The following line explictly registers the transient DisposableCommand for disposal when
+                // the lifetime scope ends.
                 scope.RegisterForDisposal(instance);
             });
 
             DisposableCommand command;
 
             // Act
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 command = container.GetInstance<DisposableCommand>();
             }
@@ -344,52 +314,46 @@
             // Arrange
             var container = new Container();
 
-            // Act
-            using (var scope = container.BeginExecutionContextScope())
+            using (var scope = ThreadScopedLifestyle.BeginScope(container))
             {
-                try
-                {
-                    scope.RegisterForDisposal(null);
+                // Act
+                Action action = () => scope.RegisterForDisposal(null);
 
-                    Assert.Fail("Exception expected.");
-                }
-                catch (ArgumentNullException)
-                {
-                    // This exception is expected.
-                }
+                // Assert
+                AssertThat.Throws<ArgumentNullException>(action);
             }
         }
 
         [TestMethod]
-        public void ExecutionContextScopeDispose_OnExecutionContextScopedObject_EnsuresInstanceGetDisposedAfterExecutionContextScope()
+        public void LifetimeScopeDispose_OnLifetimeScopedObject_EnsuresInstanceGetDisposedAfterLifetimeScope()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, DisposableCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<ICommand, DisposableCommand>(new ThreadScopedLifestyle());
 
             DisposableCommand command;
 
             // Act
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 command = container.GetInstance<ICommand>() as DisposableCommand;
             }
 
             // Assert
-            Assert.IsTrue(command.HasBeenDisposed, "The execution scoped instance was expected to be disposed.");
+            Assert.IsTrue(command.HasBeenDisposed, "The lifetime scoped instance was expected to be disposed.");
         }
 
         [TestMethod]
-        public void GetInstance_OnExecutionContextScopedObject_WillNotBeDisposedDuringExecutionContextScope()
+        public void GetInstance_OnLifetimeScopedObject_WillNotBeDisposedDuringLifetimeScope()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<DisposableCommand>(new ThreadScopedLifestyle());
 
             // Act
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 var command = container.GetInstance<DisposableCommand>();
 
@@ -399,19 +363,19 @@
         }
 
         [TestMethod]
-        public void GetInstance_WithinAExecutionContextScope_NeverDisposesASingleton()
+        public void GetInstance_WithinALifetimeScope_NeverDisposesASingleton()
         {
             // Arrange
             var container = new Container();
 
             container.Register<DisposableCommand>(Lifestyle.Singleton);
 
-            container.Register<ICommand, DisposableCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<ICommand, DisposableCommand>(new ThreadScopedLifestyle());
 
             DisposableCommand singleton;
 
             // Act
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 singleton = container.GetInstance<DisposableCommand>();
             }
@@ -421,17 +385,17 @@
         }
 
         [TestMethod]
-        public void ExecutionContextScopeDispose_RegisteredConcereteWithExplicitDisposal_DisposesThatInstance()
+        public void LifetimeScopeDispose_RegisteredConcerete_DisposesThatInstance()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<DisposableCommand>(new ThreadScopedLifestyle());
 
             DisposableCommand instanceToDispose;
 
             // Act
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 instanceToDispose = container.GetInstance<DisposableCommand>();
             }
@@ -441,17 +405,17 @@
         }
 
         [TestMethod]
-        public void ExecutionContextScopeDispose_RegisteredWithExplicitDisposal_DisposesThatInstance()
+        public void LifetimeScopeDispose_Registered_DisposesThatInstance()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<IDisposable, DisposableCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<IDisposable, DisposableCommand>(new ThreadScopedLifestyle());
 
             DisposableCommand instanceToDispose;
 
             // Act
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 instanceToDispose = container.GetInstance<IDisposable>() as DisposableCommand;
             }
@@ -461,17 +425,17 @@
         }
 
         [TestMethod]
-        public void GetInstance_CalledMultipleTimesOnAExecutionContextScopeServiceWithinASingleScope_DisposesThatInstanceOnce()
+        public void GetInstance_CalledMultipleTimesOnALifetimeScopeServiceWithinASingleScope_DisposesThatInstanceOnce()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<DisposableCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<DisposableCommand>(new ThreadScopedLifestyle());
 
             DisposableCommand command;
 
             // Act
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 command = container.GetInstance<DisposableCommand>();
 
@@ -484,22 +448,21 @@
         }
 
         [TestMethod]
-        public void GetInstance_ResolveMultipleExecutionContextScopedServicesWithStrangeEqualsImplementations_CorrectlyDisposesAllInstances()
+        public void GetInstance_ResolveMultipleLifetimeScopedServicesWithStrangeEqualsImplementations_CorrectlyDisposesAllInstances()
         {
             // Arrange
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
-            var lifestyle = new ExecutionContextScopeLifestyle();
-
-            container.Register<DisposableCommandWithOverriddenEquality1>(lifestyle);
-            container.Register<DisposableCommandWithOverriddenEquality2>(lifestyle);
+            container.Register<DisposableCommandWithOverriddenEquality1>(Lifestyle.Scoped);
+            container.Register<DisposableCommandWithOverriddenEquality2>(Lifestyle.Scoped);
 
             // Act
             DisposableCommandWithOverriddenEquality1 command1;
             DisposableCommandWithOverriddenEquality2 command2;
 
             // Act
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 command1 = container.GetInstance<DisposableCommandWithOverriddenEquality1>();
                 command2 = container.GetInstance<DisposableCommandWithOverriddenEquality2>();
@@ -521,7 +484,7 @@
         }
 
         [TestMethod]
-        public void RegisterExecutionContextScope_CalledAfterInitialization_ThrowsExpectedException()
+        public void RegisterLifetimeScope_CalledAfterInitialization_ThrowsExpectedException()
         {
             // Arrange
             var container = new Container();
@@ -532,7 +495,7 @@
             try
             {
                 // Act
-                container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
+                container.Register<ICommand, ConcreteCommand>(new ThreadScopedLifestyle());
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -545,142 +508,34 @@
         }
 
         [TestMethod]
-        public void BeginExecutionContextScope_WithNullArgument_ThrowsExpectedException()
+        public void BeginLifetimeScope_WithNullArgument_ThrowsExpectedException()
         {
             // Act
-            Action action = () =>
-                SimpleInjectorExecutionContextScopeExtensions.BeginExecutionContextScope(null);
+            Action action = () => ThreadScopedLifestyle.BeginScope(null);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
         }
-        
+
+        // This behavior has changed; we used to disallow this and throw an exception. Disposing a lifetime
+        // scope on a different thread however is not necessarily a problem, so we removed this limitation.
         [TestMethod]
-        public void GetInstance_ExecutionContextScopedInstanceWithInitializer_CallsInitializerOncePerExecutionContextScope()
-        {
-            // Arrange
-            int initializerCallCount = 0;
-
-            var container = new Container();
-
-            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
-
-            container.RegisterInitializer<ICommand>(command => { initializerCallCount++; });
-
-            using (container.BeginExecutionContextScope())
-            {
-                // Act
-                container.GetInstance<ICommand>();
-                container.GetInstance<ICommand>();
-            }
-
-            // Assert
-            Assert.AreEqual(1, initializerCallCount, "The initializer for ICommand is expected to get fired once.");
-        }
-
-        [TestMethod]
-        public void GetInstance_ExecutionContextScopedFuncInstanceWithInitializer_CallsInitializerOncePerExecutionContextScope()
-        {
-            // Arrange
-            int initializerCallCount = 0;
-
-            var container = new Container();
-
-            container.Register<ICommand>(() => new ConcreteCommand(), new ExecutionContextScopeLifestyle());
-
-            container.RegisterInitializer<ICommand>(command => { initializerCallCount++; });
-
-            using (container.BeginExecutionContextScope())
-            {
-                // Act
-                container.GetInstance<ICommand>();
-                container.GetInstance<ICommand>();
-            }
-
-            // Assert
-            Assert.AreEqual(1, initializerCallCount, "The initializer for ICommand is expected to get fired once.");
-        }
-
-        [TestMethod]
-        public void GetInstance_OnDecoratedExecutionContextScopedInstance_WrapsTheInstanceWithTheDecorator()
+        public void LifetimeScopeDispose_ExecutedOnDifferentThreadThanItWasStarted_DoesNotThrowExceptionException()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
+            var scope = ThreadScopedLifestyle.BeginScope(container);
 
-            container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
-
-            using (container.BeginExecutionContextScope())
-            {
-                // Act
-                ICommand instance = container.GetInstance<ICommand>();
-
-                // Assert
-                AssertThat.IsInstanceOfType(typeof(CommandDecorator), instance);
-
-                var decorator = (CommandDecorator)instance;
-
-                AssertThat.IsInstanceOfType(typeof(ConcreteCommand), decorator.DecoratedInstance);
-            }
+            // Act
+            Task.Factory.StartNew(() => scope.Dispose()).Wait();
         }
 
         [TestMethod]
-        public void GetInstance_CalledTwiceInOneScopeForDecoratedExecutionContextScopedInstance_WrapsATransientDecoratorAroundAExecutionContextScopedInstance()
+        public void LifetimeScope_TwoScopedRegistationsForTheSameServiceType_CreatesTwoInstances()
         {
             // Arrange
-            var container = new Container();
-
-            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
-
-            container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
-
-            using (container.BeginExecutionContextScope())
-            {
-                // Act
-                var decorator1 = (CommandDecorator)container.GetInstance<ICommand>();
-                var decorator2 = (CommandDecorator)container.GetInstance<ICommand>();
-
-                // Assert
-                Assert.IsFalse(object.ReferenceEquals(decorator1, decorator2),
-                    "The decorator should be transient.");
-
-                Assert.IsTrue(object.ReferenceEquals(decorator1.DecoratedInstance, decorator2.DecoratedInstance),
-                    "The decorated instance should be scoped per execution context. It seems to be transient.");
-            }
-        }
-
-        [TestMethod]
-        public void GetInstance_CalledTwiceInOneScopeForDecoratedExecutionContextScopedInstance2_WrapsATransientDecoratorAroundAExecutionContextScopedInstance()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Same as previous test, but now with RegisterDecorator called first.
-            container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
-
-            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
-
-            using (container.BeginExecutionContextScope())
-            {
-                // Act
-                var decorator1 = (CommandDecorator)container.GetInstance<ICommand>();
-                var decorator2 = (CommandDecorator)container.GetInstance<ICommand>();
-
-                // Assert
-                Assert.IsFalse(object.ReferenceEquals(decorator1, decorator2),
-                    "The decorator should be transient but seems to have a scoped lifestyle.");
-
-                Assert.IsTrue(object.ReferenceEquals(decorator1.DecoratedInstance, decorator2.DecoratedInstance),
-                    "The decorated instance should be scoped per execution context. It seems to be transient.");
-            }
-        }
-
-        [TestMethod]
-        public void ExecutionContextScope_TwoScopedRegistationsForTheSameServiceType_CreatesTwoInstances()
-        {
-            // Arrange
-            var lifestyle = new ExecutionContextScopeLifestyle();
+            var lifestyle = new ThreadScopedLifestyle();
 
             var container = new Container();
 
@@ -690,7 +545,7 @@
             container.AppendToCollection(typeof(ICommand), reg1);
             container.AppendToCollection(typeof(ICommand), reg2);
 
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 // Act
                 var commands = container.GetAllInstances<ICommand>().Cast<DisposableCommand>().ToArray();
@@ -701,12 +556,12 @@
         }
 
         [TestMethod]
-        public void ExecutionContextScopeDispose_TwoScopedRegistationsForTheSameServiceType_DisposesBothInstances()
+        public void LifetimeScopeDispose_TwoScopedRegistationsForTheSameServiceType_DisposesBothInstances()
         {
             // Arrange
             var disposedInstances = new HashSet<object>();
 
-            var lifestyle = new ExecutionContextScopeLifestyle();
+            var lifestyle = new ThreadScopedLifestyle();
 
             var container = new Container();
 
@@ -716,7 +571,7 @@
             container.AppendToCollection(typeof(ICommand), reg1);
             container.AppendToCollection(typeof(ICommand), reg2);
 
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 var commands = container.GetAllInstances<ICommand>().Cast<DisposableCommand>().ToArray();
 
@@ -733,12 +588,12 @@
         }
 
         [TestMethod]
-        public void ContainerVerify_WithWhenScopeEndsRegistration_Succeeds()
+        public void Verify_WithWhenScopeEndsRegistration_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            var lifestyle = new ExecutionContextScopeLifestyle();
+            var lifestyle = new ThreadScopedLifestyle();
 
             container.Register<ICommand, DisposableCommand>(lifestyle);
 
@@ -752,14 +607,14 @@
         }
 
         [TestMethod]
-        public void ExecutionContextScopeDispose_WithWhenScopeEndsRegistration_CallsTheRegisteredAction()
+        public void LifetimeScopeDispose_WithWhenScopeEndsRegistration_CallsTheRegisteredAction()
         {
             // Arrange
             int actionCallCount = 0;
 
             var container = new Container();
 
-            var lifestyle = new ExecutionContextScopeLifestyle();
+            var lifestyle = new ThreadScopedLifestyle();
 
             container.Register<DisposableCommand, DisposableCommand>(lifestyle);
 
@@ -768,16 +623,11 @@
                 lifestyle.WhenScopeEnds(container, () => { actionCallCount++; });
             });
 
-            var scope = container.BeginExecutionContextScope();
-            
-            try
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 container.GetInstance<DisposableCommand>();
-            }
-            finally
-            {
+
                 // Act
-                scope.Dispose();
             }
 
             // Assert
@@ -785,70 +635,25 @@
         }
 
         [TestMethod]
-        public void ExecutionContextScopeDispose_WithWhenScopeEndsRegistration_CallsTheRegisteredActionBeforeCallingDispose()
-        {
-            // Arrange
-            bool delegateHasBeenCalled = false;
-            DisposableCommand instanceToDispose = null;
-
-            var container = new Container();
-
-            var lifestyle = new ExecutionContextScopeLifestyle();
-
-            container.Register<DisposableCommand, DisposableCommand>(lifestyle);
-
-            container.RegisterInitializer<DisposableCommand>(command =>
-            {
-                lifestyle.WhenScopeEnds(container, () =>
-                {
-                    Assert.IsFalse(command.HasBeenDisposed,
-                        "The action should be called before disposing the instance, because users are " +
-                        "to use those instances.");
-                    delegateHasBeenCalled = true;
-                });
-            });
-
-            var scope = container.BeginExecutionContextScope();
-            
-            try
-            {
-                instanceToDispose = container.GetInstance<DisposableCommand>();
-            }
-            finally
-            {
-                // Act
-                scope.Dispose();
-            }
-
-            // Assert
-            Assert.IsTrue(delegateHasBeenCalled, "Delegate is expected to be called.");
-        }
-
-        [TestMethod]
-        public void ExecutionContextScopeDispose_WithTransientRegisteredForDisposal_DisposesThatInstance()
+        public void LifetimeScopeDispose_WithTransientRegisteredForDisposal_DisposesThatInstance()
         {
             // Arrange
             DisposableCommand transientInstanceToDispose = null;
 
             var container = new Container();
 
-            var lifestyle = new ExecutionContextScopeLifestyle();
+            var lifestyle = new ThreadScopedLifestyle();
 
             container.RegisterInitializer<DisposableCommand>(command =>
             {
                 lifestyle.RegisterForDisposal(container, command);
             });
 
-            var scope = container.BeginExecutionContextScope();
-
-            try
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 transientInstanceToDispose = container.GetInstance<DisposableCommand>();
-            }
-            finally
-            {
+
                 // Act
-                scope.Dispose();
             }
 
             // Assert
@@ -859,12 +664,10 @@
         public void WhenScopeEnds_NullContainerArgument_ThrowsException()
         {
             // Arrange
-            Container invalidArgument = null;
-
-            var lifestyle = new ExecutionContextScopeLifestyle();
+            var lifestyle = new ThreadScopedLifestyle();
 
             // Act
-            Action action = () => lifestyle.WhenScopeEnds(invalidArgument, () => { });
+            Action action = () => lifestyle.WhenScopeEnds(null, () => { });
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -874,26 +677,24 @@
         public void WhenScopeEnds_NullActionArgument_ThrowsException()
         {
             // Arrange
-            Action invalidArgument = null;
-
-            var lifestyle = new ExecutionContextScopeLifestyle();
+            var lifestyle = new ThreadScopedLifestyle();
 
             // Act
-            Action action = () => lifestyle.WhenScopeEnds(new Container(), invalidArgument);
+            Action action = () => lifestyle.WhenScopeEnds(new Container(), null);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        public void WhenScopeEnds_CalledOutOfTheContextOfAExecutionContextScope_ThrowsException()
+        public void WhenScopeEnds_CalledOutOfTheContextOfALifetimeScope_ThrowsException()
         {
             // Arrange
-            var lifestyle = new ExecutionContextScopeLifestyle();
+            var lifestyle = new ThreadScopedLifestyle();
 
             var container = new Container();
 
-            container.Register<ConcreteCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<ConcreteCommand>(lifestyle);
 
             try
             {
@@ -906,7 +707,7 @@
             catch (InvalidOperationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains(
-                    "This method can only be called within the context of an active Execution Context Scope."),
+                    "This method can only be called within the context of an active Lifetime Scope."),
                     "Actual: " + ex.Message);
             }
         }
@@ -925,6 +726,7 @@
             var actualOrderOfDisposal = new List<Type>();
 
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             // Outer, Middle and Inner all depend on Func<object> and call it when disposed.
             // This way we can check in which order the instances are disposed.
@@ -933,13 +735,11 @@
             // Outer depends on Middle that depends on Inner. 
             // Registration is deliberately made in a different order to prevent that the order of
             // registration might influence the order of disposing.
-            var lifestyle = new ExecutionContextScopeLifestyle();
+            container.Register<Middle>(Lifestyle.Scoped);
+            container.Register<Inner>(Lifestyle.Scoped);
+            container.Register<Outer>(Lifestyle.Scoped);
 
-            container.Register<Middle>(lifestyle);
-            container.Register<Inner>(lifestyle);
-            container.Register<Outer>(lifestyle);
-
-            var scope = container.BeginExecutionContextScope();
+            Scope scope = ThreadScopedLifestyle.BeginScope(container);
 
             try
             {
@@ -977,6 +777,7 @@
             var actualOrderOfDisposal = new List<Type>();
 
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             // Allow PropertyDependency to be injected as property on Inner 
             container.Options.PropertySelectionBehavior = new InjectProperties<ImportAttribute>();
@@ -988,14 +789,12 @@
             // Middle depends on Inner that depends on property PropertyDependency. 
             // Registration is deliberately made in a different order to prevent that the order of
             // registration might influence the order of disposing.
-            var lifestyle = new ExecutionContextScopeLifestyle();
-
-            container.Register<PropertyDependency>(lifestyle);
-            container.Register<Middle>(lifestyle);
-            container.Register<Inner>(lifestyle);
+            container.Register<PropertyDependency>(Lifestyle.Scoped);
+            container.Register<Middle>(Lifestyle.Scoped);
+            container.Register<Inner>(Lifestyle.Scoped);
 
             // Act
-            var scope = container.BeginExecutionContextScope();
+            Scope scope = ThreadScopedLifestyle.BeginScope(container);
 
             try
             {
@@ -1020,111 +819,20 @@
         }
 
         [TestMethod]
-        public void GetCurrentExecutionContextScope_AfterMiddleScopeDisposedWhileInnerScopeNotDisposed_ReturnsOuterScope()
-        {
-            // Arrange
-            var container = new Container();
-            var lifestyle = new ExecutionContextScopeLifestyle();
-
-            var instanceToDispose = new DisposableCommand();
-
-            container.Register<DisposableCommand>(lifestyle);
-
-            using (Scope outerScope = container.BeginExecutionContextScope())
-            {
-                Scope middleScope = container.BeginExecutionContextScope();
-
-                Scope innerScope = container.BeginExecutionContextScope();
-
-                middleScope.Dispose();
-
-                // Act
-                Scope actualScope = lifestyle.GetCurrentScope(container);
-
-                // Assert
-                Assert.AreSame(outerScope, actualScope);
-            }
-        }
-
-        [TestMethod]
-        public void GetCurrentExecutionContextScope_DisposingTheMiddleScopeBeforeInnerScope_ReturnsOuterScope()
-        {
-            // Arrange
-            var container = new Container();
-            var lifestyle = new ExecutionContextScopeLifestyle();
-
-            var instanceToDispose = new DisposableCommand();
-
-            container.Register<DisposableCommand>(lifestyle);
-
-            using (Scope outerScope = container.BeginExecutionContextScope())
-            {
-                Scope middleScope = container.BeginExecutionContextScope();
-
-                Scope innerScope = container.BeginExecutionContextScope();
-
-                middleScope.Dispose();
-                innerScope.Dispose();
-
-                // Act
-                Scope actualScope = lifestyle.GetCurrentScope(container);
-
-                // Assert
-                Assert.AreSame(outerScope, actualScope,
-                    "Since the middle scope is already disposed, the current scope should be the outer.");
-            }
-        }
-
-        [TestMethod]
-        public void GetCurrentExecutionContextScope_DisposingAnInnerScope_ShouldNeverCauseToBeSetToInnerScope()
-        {
-            // Arrange
-            var container = new Container();
-            container.Options.DefaultScopedLifestyle = new ExecutionContextScopeLifestyle();
-
-            var instanceToDispose = new DisposableCommand();
-
-            container.Register<DisposableCommand>(Lifestyle.Scoped);
-
-            using (Scope outerScope = container.BeginExecutionContextScope())
-            {
-                Scope outerMiddleScope = container.BeginExecutionContextScope();
-
-                Scope innerMiddleScope = container.BeginExecutionContextScope();
-
-                Scope innerScope = container.BeginExecutionContextScope();
-
-                // This will cause GetCurrentExecutionContextScope to become outerScope.
-                outerMiddleScope.Dispose();
-
-                // This should not cause BeginExecutionContextScope to change
-                innerScope.Dispose();
-
-                // Act
-                Scope actualScope = Lifestyle.Scoped.GetCurrentScope(container);
-
-                // Assert
-                Assert.AreSame(outerScope, actualScope,
-                    "Even though the inner middle scope never got disposed, the inner scope should not " +
-                    "this scope upon disposal. The outer scope should retain focus.");
-            }
-        }
-
-        [TestMethod]
         public void GetInstance_WithPossibleObjectGraphOptimizableRegistration_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, DisposableCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<ICommand, DisposableCommand>(new ThreadScopedLifestyle());
 
             container.Register<ClassDependingOn<ICommand>>();
 
             // This registration can be optimized to prevent ICommand from being requested more than once from
-            // the ExecutionContextScopeLifestyleRegistration.GetInstance
+            // the ThreadScopedLifestyleRegistration.GetInstance
             container.Register<ClassDependingOn<ClassDependingOn<ICommand>, ClassDependingOn<ICommand>>>();
 
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 // Act
                 var instance =
@@ -1138,91 +846,133 @@
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new ExecutionContextScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new ThreadScopedLifestyle());
 
             var factory = Expression.Lambda<Func<ICommand>>(
                 container.GetRegistration(typeof(ICommand)).BuildExpression())
                 .Compile();
 
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 // Act
                 factory();
             }
         }
-     
+
+        [TestMethod]
+        public void GetCurrentLifetimeScope_AfterMiddleScopeDisposedWhileInnerScopeNotDisposed_ReturnsOuterScope()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
+
+            var instanceToDispose = new DisposableCommand();
+
+            using (var outerScope = ThreadScopedLifestyle.BeginScope(container))
+            {
+                var middleScope = ThreadScopedLifestyle.BeginScope(container);
+
+                var innerScope = ThreadScopedLifestyle.BeginScope(container);
+
+                middleScope.Dispose();
+
+                // Act
+                Scope actualScope = Lifestyle.Scoped.GetCurrentScope(container);
+
+                string scopeName =
+                    object.ReferenceEquals(actualScope, null) ? "null" :
+                    object.ReferenceEquals(actualScope, innerScope) ? "inner" :
+                    object.ReferenceEquals(actualScope, middleScope) ? "middle" :
+                    object.ReferenceEquals(actualScope, outerScope) ? "outer" :
+                    "other";
+
+                // Assert
+                Assert.AreSame(outerScope, actualScope, "Expected: outer. Actual: " + scopeName + " scope.");
+            }
+        }
+
+        [TestMethod]
+        public void GetCurrentLifetimeScope_DisposingTheMiddleScopeBeforeInnerScope_ReturnsOuterScope()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
+
+            var instanceToDispose = new DisposableCommand();
+
+            using (Scope outerScope = ThreadScopedLifestyle.BeginScope(container))
+            {
+                Scope middleScope = ThreadScopedLifestyle.BeginScope(container);
+
+                Scope innerScope = ThreadScopedLifestyle.BeginScope(container);
+
+                middleScope.Dispose();
+                innerScope.Dispose();
+
+                // Act
+                Scope actualScope = Lifestyle.Scoped.GetCurrentScope(container);
+
+                // Assert
+                Assert.AreSame(outerScope, actualScope,
+                    "Since the middle scope is already disposed, the current scope should be the outer.");
+            }
+        }
+
+        [TestMethod]
+        public void GetCurrentLifetimeScope_DisposingAnInnerScope_ShouldNeverCauseToBeSetToInnerScope()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
+
+            var instanceToDispose = new DisposableCommand();
+
+            using (var outerScope = ThreadScopedLifestyle.BeginScope(container))
+            {
+                var outerMiddleScope = ThreadScopedLifestyle.BeginScope(container);
+
+                var innerMiddleScope = ThreadScopedLifestyle.BeginScope(container);
+
+                var innerScope = ThreadScopedLifestyle.BeginScope(container);
+
+                // This will cause GetCurrentLifetimeScope to become outerScope.
+                outerMiddleScope.Dispose();
+
+                // This should not cause BeginLifetimeScope to change
+                innerScope.Dispose();
+
+                // Act
+                Scope actualScope = Lifestyle.Scoped.GetCurrentScope(container);
+
+                // Assert
+                Assert.AreSame(outerScope, actualScope,
+                    "Even though the inner middle scope never got disposed, the inner scope should not " +
+                    "this scope upon disposal. The outer scope should retain focus.");
+            }
+        }
+
         [TestMethod]
         public void Dispose_ObjectRegisteredForDisposalUsingRequestedCurrentLifetimeScope_DisposesThatInstance()
         {
             // Arrange
             var container = new Container();
-            container.Options.DefaultScopedLifestyle = new ExecutionContextScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             var instanceToDispose = new DisposableCommand();
 
-            container.Register<DisposableCommand>(Lifestyle.Scoped);
+            container.Register<DisposableCommand>(new ThreadScopedLifestyle());
 
-            using (container.BeginExecutionContextScope())
+            using (ThreadScopedLifestyle.BeginScope(container))
             {
                 var command = container.GetInstance<DisposableCommand>();
 
-                command.Disposing += s =>
-                {
-                    Lifestyle.Scoped.RegisterForDisposal(container, instanceToDispose);
-                };
+                command.Disposing += s => Lifestyle.Scoped.RegisterForDisposal(container, instanceToDispose);
 
                 // Act
             }
 
             // Assert
             Assert.IsTrue(instanceToDispose.HasBeenDisposed);
-        }
-        
-        private static async Task Inner(Container container, ICommand command)
-        {
-            DisposableCommand cmd1, cmd2;
-
-            await Task.Yield();
-
-            cmd1 = container.GetInstance<DisposableCommand>();
-            Assert.AreSame(command, cmd1);
-
-            using (container.BeginExecutionContextScope())
-            {
-                // Act
-                cmd2 = container.GetInstance<DisposableCommand>();
-
-                Assert.AreNotSame(command, cmd2);
-                Assert.IsFalse(cmd2.HasBeenDisposed);
-            }
-
-            Assert.IsTrue(cmd2.HasBeenDisposed);
-        }
-
-        private static async Task Outer(Container container, ICommand command)
-        {
-            DisposableCommand cmd1, cmd2;
-
-            await Task.Yield();
-
-            cmd1 = container.GetInstance<DisposableCommand>();
-            Assert.AreSame(command, cmd1);
-
-            using (container.BeginExecutionContextScope())
-            {
-                // Act
-                cmd2 = container.GetInstance<DisposableCommand>();
-                Assert.AreNotSame(command, cmd2);
-
-                var t1 = Inner(container, cmd2);
-                var t2 = Inner(container, cmd2);
-
-                await Task.WhenAll(t1, t2).ConfigureAwait(false);
-                Assert.IsFalse(cmd2.HasBeenDisposed);
-            }
-
-            Assert.IsFalse(cmd1.HasBeenDisposed);
-            Assert.IsTrue(cmd2.HasBeenDisposed);
         }
 
         public class ConcreteCommand : ICommand
@@ -1293,9 +1043,15 @@
             {
             }
 
-            public override int GetHashCode() => this.HashCode;
+            public override int GetHashCode()
+            {
+                return this.HashCode;
+            }
 
-            public override bool Equals(object obj) => this.GetHashCode() == obj.GetHashCode();
+            public override bool Equals(object obj)
+            {
+                return this.GetHashCode() == obj.GetHashCode();
+            }
         }
 
         public class CommandDecorator : ICommand
@@ -1305,7 +1061,7 @@
                 this.DecoratedInstance = decorated;
             }
 
-            public ICommand DecoratedInstance { get; }
+            public ICommand DecoratedInstance { get; private set; }
 
             public void Execute()
             {
@@ -1355,7 +1111,7 @@
     public class PropertyDependency : DisposableBase
     {
         public PropertyDependency(Action<object> disposing)
-            : base(disposing)
+        : base(disposing)
         {
             Debug.WriteLine(this.GetType().Name + " created.");
         }
@@ -1368,6 +1124,27 @@
         protected DisposableBase(Action<object> disposing)
         {
             this.disposing = disposing;
+        }
+
+        public void Dispose()
+        {
+            this.disposing(this);
+        }
+    }
+
+    public class DisposableLogger : ILogger, IDisposable
+    {
+        private static readonly Action<DisposableLogger> Empty = l => { };
+
+        private readonly Action<DisposableLogger> disposing;
+
+        public DisposableLogger(Action<DisposableLogger> disposing = null)
+        {
+            this.disposing = disposing ?? Empty;
+        }
+
+        public void Log(string message)
+        {
         }
 
         public void Dispose()

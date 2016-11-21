@@ -6,8 +6,8 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Extensions.LifetimeScoping;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Lifestyles;
 
     [TestClass]
     public class ScopedLifestyleTests
@@ -898,7 +898,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register<ServiceDependingOn<Scope>>(new LifetimeScopeLifestyle());
+            container.Register<ServiceDependingOn<Scope>>(new ThreadScopedLifestyle());
 
             // Act
             container.Verify();
@@ -942,9 +942,9 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
-            Scope activeScope = container.BeginLifetimeScope();
+            Scope activeScope = ThreadScopedLifestyle.BeginScope(container);
 
             // Act
             Scope injectedScope = container.GetInstance<ServiceDependingOn<Scope>>().Dependency;
@@ -958,9 +958,9 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
-            Scope activeScope = container.BeginLifetimeScope();
+            Scope activeScope = ThreadScopedLifestyle.BeginScope(container);
 
             // Act
             var resolvedScope = container.GetInstance<Scope>();
@@ -975,7 +975,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            Scope activeScope = container.BeginLifetimeScope();
+            Scope activeScope = ThreadScopedLifestyle.BeginScope(container);
 
             // Act
             Action action = () => container.GetInstance<ServiceDependingOn<Scope>>();
@@ -995,7 +995,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            Scope activeScope = container.BeginLifetimeScope();
+            Scope activeScope = ThreadScopedLifestyle.BeginScope(container);
 
             // Act
             Action action = () => container.GetInstance<Scope>();
@@ -1028,7 +1028,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             // Act
             Action action = () => container.GetInstance<ServiceDependingOn<Scope>>();
@@ -1042,7 +1042,7 @@
         public void MethodUnderTest_Scenario_Behavior()
         {
             var container = ContainerFactory.New();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             container.Register<ServiceDependingOn<Scope>>();
 

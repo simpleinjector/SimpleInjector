@@ -4,6 +4,7 @@
   "targets": {
     ".NETFramework,Version=v4.0": {},
     ".NETFramework,Version=v4.5": {},
+    ".NETFramework,Version=v4.5.1": {},
     ".NETStandard,Version=v1.0": {
       "Microsoft.NETCore.Platforms/1.0.1": {
         "type": "package",
@@ -3843,6 +3844,7 @@
     "": [],
     ".NETFramework,Version=v4.0": [],
     ".NETFramework,Version=v4.5": [],
+    ".NETFramework,Version=v4.5.1": [],
     ".NETStandard,Version=v1.0": [
       "NETStandard.Library >= 1.6.0",
       "System.ComponentModel >= 4.0.1"

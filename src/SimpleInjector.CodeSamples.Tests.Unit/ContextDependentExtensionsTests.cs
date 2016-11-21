@@ -5,7 +5,6 @@
     using System.Runtime.Remoting.Proxies;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Lifestyles;
     using SimpleInjector.Tests.Unit;
 

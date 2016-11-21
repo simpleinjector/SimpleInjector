@@ -1,5 +1,8 @@
 ﻿{
   "version": "1.0.0-*",
+  "buildOptions": {
+    "warningsAsErrors": true
+  },
 
   "dependencies": {
     "NUnit": "3.4.1",

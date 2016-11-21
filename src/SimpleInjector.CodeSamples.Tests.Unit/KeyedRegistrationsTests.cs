@@ -6,7 +6,6 @@
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Tests.Unit;
 
     [TestClass]

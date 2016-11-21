@@ -23,7 +23,7 @@
 namespace SimpleInjector.Integration.WebApi
 {
     using System;
-    using SimpleInjector.Extensions.ExecutionContextScoping;
+    using Lifestyles;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single ASP.NET Web API Request.
@@ -39,13 +39,16 @@ namespace SimpleInjector.Integration.WebApi
     /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(Lifestyle.Scoped);
     /// ]]></code>
     /// </example>
-    public sealed class WebApiRequestLifestyle : ExecutionContextScopeLifestyle
+    [Obsolete("WebApiRequestLifestyle has been deprecated. " +
+        "Please use SimpleInjector.Lifestyles.AsyncScopedLifestyle instead.",
+        error: false)]
+    public sealed class WebApiRequestLifestyle : AsyncScopedLifestyle
     {
         /// <summary>Initializes a new instance of the <see cref="WebApiRequestLifestyle"/> class.
         /// The created and cached instance will be disposed when the Web API request ends, and when the 
         /// created object implements <see cref="IDisposable"/>.
         /// </summary>
-        public WebApiRequestLifestyle() : base("Web API Request")
+        public WebApiRequestLifestyle()
         {
         }
 

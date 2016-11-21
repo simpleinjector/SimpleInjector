@@ -1,9 +1,8 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using System;
+    using Lifestyles;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Extensions;
-    using SimpleInjector.Extensions.LifetimeScoping;
 
     [TestClass]
     public class DisposableTransientLifestyleTests
@@ -25,11 +24,11 @@
 
             var container = new Container();
 
-            var lifestyle = new DisposableTransientLifestyle(new LifetimeScopeLifestyle());
+            var lifestyle = new DisposableTransientLifestyle(new ThreadScopedLifestyle());
 
             container.Register<IUserRepository, DisposableUserRepository>(lifestyle);
 
-            var scope = container.BeginLifetimeScope();
+            var scope = ThreadScopedLifestyle.BeginScope(container);
 
             instanceToDispose = (DisposableUserRepository)container.GetInstance<IUserRepository>();
 
@@ -51,11 +50,11 @@
 
             var container = new Container();
 
-            var lifestyle = new DisposableTransientLifestyle(new LifetimeScopeLifestyle());
+            var lifestyle = new DisposableTransientLifestyle(new ThreadScopedLifestyle());
 
             container.Register<IUserRepository, DisposableUserRepository>(lifestyle);
 
-            var scope = container.BeginLifetimeScope();
+            var scope = ThreadScopedLifestyle.BeginScope(container);
 
             instanceToDispose1 = (DisposableUserRepository)container.GetInstance<IUserRepository>();
             instanceToDispose2 = (DisposableUserRepository)container.GetInstance<IUserRepository>();
@@ -77,11 +76,11 @@
 
             var container = new Container();
 
-            var lifestyle = new DisposableTransientLifestyle(new LifetimeScopeLifestyle());
+            var lifestyle = new DisposableTransientLifestyle(new ThreadScopedLifestyle());
 
             container.Register<IUserRepository, DisposableUserRepository>(Lifestyle.Transient);
 
-            var scope = container.BeginLifetimeScope();
+            var scope = ThreadScopedLifestyle.BeginScope(container);
 
             instanceToDispose = (DisposableUserRepository)container.GetInstance<IUserRepository>();
 
@@ -103,14 +102,14 @@
             // Call to EnableTransientDisposal is needed in case open-generic.
             DisposableTransientLifestyle.EnableForContainer(container);
 
-            var lifestyle = new DisposableTransientLifestyle(new LifetimeScopeLifestyle());
+            var lifestyle = new DisposableTransientLifestyle(new ThreadScopedLifestyle());
 
             // NOTE: Open-generic types are special, because they are resolved through unregistered type
             // resolution. This test will fail if the DisposableTransientLifestyle registers the initializer
             // lazily.
             container.Register(typeof(IValidator<>), typeof(DisposableValidator<>), lifestyle);
 
-            var scope = container.BeginLifetimeScope();
+            var scope = ThreadScopedLifestyle.BeginScope(container);
 
             instanceToDispose = (DisposableValidator<object>)container.GetInstance<IValidator<object>>();
 
@@ -130,7 +129,7 @@
 
             var container = new Container();
 
-            var lifestyle = new DisposableTransientLifestyle(new LifetimeScopeLifestyle());
+            var lifestyle = new DisposableTransientLifestyle(new ThreadScopedLifestyle());
 
             container.Register<IUserRepository, DisposableUserRepository>(lifestyle);
 
@@ -159,11 +158,11 @@
             DisposableTransientLifestyle.EnableForContainer(container);
             DisposableTransientLifestyle.EnableForContainer(container);
 
-            var lifestyle = new DisposableTransientLifestyle(new LifetimeScopeLifestyle());
+            var lifestyle = new DisposableTransientLifestyle(new ThreadScopedLifestyle());
 
             container.Register<IUserRepository, DisposableUserRepository>(lifestyle);
 
-            var scope = container.BeginLifetimeScope();
+            var scope = ThreadScopedLifestyle.BeginScope(container);
 
             instanceToDispose = (DisposableUserRepository)container.GetInstance<IUserRepository>();
 
@@ -182,7 +181,7 @@
             // Arrange
             var container = new Container();
 
-            var lifestyle = new DisposableTransientLifestyle(new LifetimeScopeLifestyle());
+            var lifestyle = new DisposableTransientLifestyle(new ThreadScopedLifestyle());
 
             container.Register(typeof(IValidator<>), typeof(DisposableValidator<>), lifestyle);
 

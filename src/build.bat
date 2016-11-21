@@ -257,7 +257,7 @@ del Releases\temp\.gitignore /s /q
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\SimpleInjector.Integration.WebApi.WebHost.QuickStart.%named_version_Integration_WebApi%.zip"
 rmdir Releases\temp /s /q
 
-ren "%CD%\Releases\v%named_version%\.NET\*.zip" "*.nupkg"
+ren "%CD%\Releases\v%named_version%\*.zip" "*.nupkg"
 
 
 echo Done!

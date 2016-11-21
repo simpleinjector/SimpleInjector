@@ -4,7 +4,6 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Tests.Unit;
 
     [TestClass]

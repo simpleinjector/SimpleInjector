@@ -1,30 +1,39 @@
 ﻿{
   "version": "1.0.0-*",
   "buildOptions": {
-    "keyFile": "../SimpleInjector.snk"
+    "keyFile": "../SimpleInjector.snk",
+    "warningsAsErrors": true
   },
 
   "testRunner": "nunit",
 
   "dependencies": {
     "NUnit": "3.4.1",
-    "dotnet-test-nunit": "3.4.0-beta-2",
-    "SimpleInjector": { "target": "project" },
-    "SimpleInjector.Extensions.LifetimeScoping": { "target": "project" }
+    "dotnet-test-nunit": "3.4.0-beta-2"
   },
   "runtimes": {
     "win10-x86": {}
   },
   "frameworks": {
-    "netcoreapp1.6": {
-      "imports": "portable-net45+win8",
+    //"netcoreapp1.6": {
+    //  "imports": "portable-net45+win8",
+    //  "dependencies": {
+    //    "NETStandard.Library": "1.6.0",
+    //    "SimpleInjector": { "target": "project" },
+    //    "SimpleInjector.Extensions.LifetimeScoping": { "target": "project" },
+    //    "Microsoft.NETCore.App": {
+    //      "version": "1.0.0-*",
+    //      "type": "platform"
+    //    }
+    //  }
+    //},
+    "net451": {
       "dependencies": {
-        "Microsoft.NETCore.App": {
-          "version": "1.0.0-*",
-          "type": "platform"
-        }
+        "SimpleInjector": { "target": "project" }
+      },
+      "frameworkAssemblies": {
+        "System.Linq.Expressions": "4.0.0.0"
       }
-    },
-    "net451": {}
+    }
   }
 }

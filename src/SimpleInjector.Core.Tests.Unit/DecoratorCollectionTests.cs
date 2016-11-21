@@ -8,7 +8,6 @@
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions;
 
     /// <summary>
     /// This set of tests test whether individual items of registered collections are correctly decorated.

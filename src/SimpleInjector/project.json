@@ -2,7 +2,9 @@
   "version": "4.0.0",
   "buildOptions": {
     "keyFile": "../SimpleInjector.snk",
-    "xmlDoc": true
+    "xmlDoc": true,
+    "define": [],
+    "warningsAsErrors": true
   },
 
   "frameworks": {
@@ -18,7 +20,12 @@
         "System.ComponentModel": "4.0.1"
       }
     },
-    "net40": { },
-    "net45": { }
+    "net40": {},
+    "net45": {},
+    "net451": {
+      "buildOptions": {
+        "define": ["NET45"]
+      }
+    }
   }
 }

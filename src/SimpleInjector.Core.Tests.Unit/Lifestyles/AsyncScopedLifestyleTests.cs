@@ -1,4 +1,4 @@
-﻿namespace SimpleInjector.Extensions.LifetimeScoping.Tests.Unit
+﻿namespace SimpleInjector.Extensions.ExecutionContextScoping.Tests.Unit
 {
     using System;
     using System.Collections.Generic;
@@ -7,22 +7,43 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading.Tasks;
+    using Lifestyles;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
     using SimpleInjector.Tests.Unit;
 
     [TestClass]
-    public class SimpleInjectorLifetimeScopeExtensionsTests
+    public class AsyncScopedLifestyleTests
     {
         [TestMethod]
-        public void GetInstance_RegistrationUsingLifetimeScopeLifestyle_Succeeds()
+        public void Async_AsyncScopedLifestyle_Nesting()
+        {
+            var container = new Container();
+
+            container.Register<DisposableCommand>(new AsyncScopedLifestyle());
+
+            DisposableCommand cmd;
+            using (AsyncScopedLifestyle.BeginScope(container))
+            {
+                // Act
+                cmd = container.GetInstance<DisposableCommand>();
+                Outer(container, cmd).Wait();
+
+                Assert.IsFalse(cmd.HasBeenDisposed);
+            }
+
+            Assert.IsTrue(cmd.HasBeenDisposed);
+        }
+
+        [TestMethod]
+        public void GetInstance_RegistrationUsingAsyncScopedLifestyle_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
 
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 // Act
                 container.GetInstance<ICommand>();
@@ -30,14 +51,14 @@
         }
 
         [TestMethod]
-        public void GetInstance_RegistrationUsingFuncLifetimeScopeLifestyle_Succeeds()
+        public void GetInstance_RegistrationUsingFuncAsyncScopedLifestyle_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand>(() => new ConcreteCommand(), new LifetimeScopeLifestyle());
+            container.Register<ICommand>(() => new ConcreteCommand(), new AsyncScopedLifestyle());
 
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 // Act
                 container.GetInstance<ICommand>();
@@ -45,35 +66,37 @@
         }
 
         [TestMethod]
-        public void BeginLifetimeScope_WithoutAnyLifetimeScopeRegistrations_Succeeds()
+        public void BeginScope_WithoutAnyAsyncScopedLifestyleRegistrations_Succeeds()
         {
             // Arrange
             var container = new Container();
 
             // Act
-            using (var scope = container.BeginLifetimeScope())
+            using (var scope = AsyncScopedLifestyle.BeginScope(container))
             {
                 container.GetInstance<ConcreteCommand>();
             }
         }
 
         [TestMethod]
-        public void BeginLifetimeScope_WithoutAnyLifetimeScopeRegistrationsAndWithoutExplicitlyEnablingLifetimeScoping_Succeeds()
+        public void BeginScope_WithoutAnyAsyncScopedLifestyleRegistrations_Succeeds2()
         {
             // Arrange
             var container = new Container();
 
             // Act
-            container.BeginLifetimeScope();
+            using (AsyncScopedLifestyle.BeginScope(container))
+            {
+            }
         }
-        
+
         [TestMethod]
-        public void Verify_WithLifetimeScopeRegistrationInOpenGenericAndWithoutExplicitlyEnablingLifetimeScoping_Succeeds()
+        public void ContainerVerify_WithAsyncScopedLifestyleRegistrationInOpenGeneric_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            container.Register(typeof(IGeneric<>), typeof(Generic<>), new LifetimeScopeLifestyle());
+            container.Register(typeof(IGeneric<>), typeof(Generic<>), new AsyncScopedLifestyle());
 
             container.Register<ClassDependingOn<IGeneric<int>>>();
 
@@ -82,12 +105,12 @@
         }
 
         [TestMethod]
-        public void Verify_WithHybridLifetimeScopeRegistrationInOpenGenericAndWithoutExplicitlyEnablingLifetimeScoping_Succeeds()
+        public void ContainerVerify_WithHybridAsyncScopedLifestyleRegistrationInOpenGeneric_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            var hybrid = Lifestyle.CreateHybrid(() => false, new LifetimeScopeLifestyle(), new LifetimeScopeLifestyle());
+            var hybrid = Lifestyle.CreateHybrid(() => false, new AsyncScopedLifestyle(), new AsyncScopedLifestyle());
 
             container.Register(typeof(IGeneric<>), typeof(Generic<>), hybrid);
 
@@ -98,21 +121,20 @@
         }
 
         [TestMethod]
-        public void GetCurrentLifetimeScope_InsideANestedLifetimeScope_ReturnsTheInnerMostScope()
+        public void GetCurrentAsyncScopedLifestyle_InsideANestedAsyncScopedLifestyle_ReturnsTheInnerMostScope()
         {
             // Arrange
             var container = new Container();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
-            var lifestyle = new LifetimeScopeLifestyle();
-
-            using (var outerScope = container.BeginLifetimeScope())
+            using (Scope outerScope = AsyncScopedLifestyle.BeginScope(container))
             {
-                using (var innerScope = container.BeginLifetimeScope())
+                using (Scope innerScope = AsyncScopedLifestyle.BeginScope(container))
                 {
                     Assert.IsFalse(object.ReferenceEquals(outerScope, innerScope), "Test setup failed.");
 
                     // Act
-                    var currentScope = lifestyle.GetCurrentScope(container);
+                    Scope currentScope = Lifestyle.Scoped.GetCurrentScope(container);
 
                     // Assert
                     Assert.IsTrue(object.ReferenceEquals(innerScope, currentScope));
@@ -121,17 +143,17 @@
         }
 
         [TestMethod]
-        public void GetInstance_WithoutLifetimeScope_ThrowsExpectedException()
+        public void GetInstance_WithoutAsyncScopedLifestyle_ThrowsExpectedException()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
 
             try
             {
                 // Act
-                var firstInstance = container.GetInstance<ICommand>();
+                container.GetInstance<ICommand>();
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -139,21 +161,33 @@
             catch (ActivationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains(
-                    "The ICommand is registered as 'Lifetime Scope' lifestyle, but the instance is requested " +
-                    "outside the context of a Lifetime Scope."),
+                    "The ICommand is registered as 'Execution Context Scope' lifestyle, but the instance is requested " +
+                    "outside the context of a Execution Context Scope."),
                     "Actual message: " + ex.Message);
             }
         }
 
         [TestMethod]
-        public void GetInstance_WithinLifetimeScope_ReturnsInstanceOfExpectedType()
+        public void ContainerVerify_WithoutAsyncScopedLifestyle_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
 
-            using (container.BeginLifetimeScope())
+            // Act
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void GetInstance_WithinAsyncScopedLifestyle_ReturnsInstanceOfExpectedType()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
+
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 // Act
                 var actualInstance = container.GetInstance<ICommand>();
@@ -164,14 +198,14 @@
         }
 
         [TestMethod]
-        public void GetInstance_CalledMultipleTimesWithinSingleLifetimeScope_ReturnsASingleInstance()
+        public void GetInstance_CalledMultipleTimesWithinSingleAsyncScopedLifestyle_ReturnsASingleInstance()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
 
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 // Act
                 var firstInstance = container.GetInstance<ICommand>();
@@ -183,19 +217,19 @@
         }
 
         [TestMethod]
-        public void GetInstance_CalledWithinNestedSingleLifetimeScopes_ReturnsAnInstancePerScope()
+        public void GetInstance_CalledWithinNestedSingleAsyncScopedLifestyles_ReturnsAnInstancePerScope()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
 
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 // Act
                 var firstInstance = container.GetInstance<ICommand>();
 
-                using (container.BeginLifetimeScope())
+                using (AsyncScopedLifestyle.BeginScope(container))
                 {
                     var secondInstance = container.GetInstance<ICommand>();
 
@@ -206,19 +240,19 @@
         }
 
         [TestMethod]
-        public void GetInstance_CalledWithinSameLifetimeScopeWithOtherScopesInBetween_ReturnsASingleInstance()
+        public void GetInstance_CalledWithinSameAsyncScopedLifestyleWithOtherScopesInBetween_ReturnsASingleInstance()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
 
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 // Act
                 var firstInstance = container.GetInstance<ICommand>();
 
-                using (container.BeginLifetimeScope())
+                using (AsyncScopedLifestyle.BeginScope(container))
                 {
                     container.GetInstance<ICommand>();
                 }
@@ -231,17 +265,17 @@
         }
 
         [TestMethod]
-        public void LifetimeScopeDispose_RegisterLifetimeScopeWithDisposal_EnsuresInstanceGetDisposedAfterLifetimeScopeEnds()
+        public void AsyncScopedLifestyleDispose_RegisterAsyncScopedLifestyleWithDisposal_EnsuresInstanceGetDisposedAfterAsyncScopedLifestyleEnds()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<DisposableCommand>(new LifetimeScopeLifestyle());
+            container.Register<DisposableCommand>(new AsyncScopedLifestyle());
 
             DisposableCommand command;
 
             // Act
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 command = container.GetInstance<DisposableCommand>();
             }
@@ -251,7 +285,7 @@
         }
 
         [TestMethod]
-        public void LifetimeScopeDispose_TransientDisposableObject_DoesNotDisposeInstanceAfterLifetimeScopeEnds()
+        public void AsyncScopedLifestyleDispose_TransientDisposableObject_DoesNotDisposeInstanceAfterAsyncScopedLifestyleEnds()
         {
             // Arrange
             var container = new Container();
@@ -262,41 +296,40 @@
             DisposableCommand command;
 
             // Act
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 command = container.GetInstance<DisposableCommand>();
             }
 
             // Assert
             Assert.IsFalse(command.HasBeenDisposed,
-                "The lifetime scope should not dispose objects that are not explicitly marked as such, since " +
+                "The execution scope should not dispose objects that are not explicitly marked as such, since " +
                 "this would allow the scope to accidentally dispose singletons.");
         }
 
         [TestMethod]
-        public void LifetimeScopeDispose_WithInstanceExplicitlyRegisteredForDisposal_DisposesThatInstance()
+        public void AsyncScopedLifestyleDispose_WithInstanceExplicitlyRegisteredForDisposal_DisposesThatInstance()
         {
             // Arrange
             var container = new Container();
-
-            var lifestyle = new LifetimeScopeLifestyle();
+            var scopedLifestyle = new AsyncScopedLifestyle();
 
             // Transient
             container.Register<ICommand, DisposableCommand>();
 
             container.RegisterInitializer<DisposableCommand>(instance =>
             {
-                Scope scope = lifestyle.GetCurrentScope(container);
+                Scope scope = scopedLifestyle.GetCurrentScope(container);
 
-                // The following line explictly registers the transient DisposableCommand for disposal when
-                // the lifetime scope ends.
+                // The following line explicitly registers the transient DisposableCommand for disposal when
+                // the execution context scope ends.
                 scope.RegisterForDisposal(instance);
             });
 
             DisposableCommand command;
 
             // Act
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 command = container.GetInstance<DisposableCommand>();
             }
@@ -312,46 +345,52 @@
             // Arrange
             var container = new Container();
 
-            using (var scope = container.BeginLifetimeScope())
+            // Act
+            using (var scope = AsyncScopedLifestyle.BeginScope(container))
             {
-                // Act
-                Action action = () => scope.RegisterForDisposal(null);
+                try
+                {
+                    scope.RegisterForDisposal(null);
 
-                // Assert
-                AssertThat.Throws<ArgumentNullException>(action);
+                    Assert.Fail("Exception expected.");
+                }
+                catch (ArgumentNullException)
+                {
+                    // This exception is expected.
+                }
             }
         }
 
         [TestMethod]
-        public void LifetimeScopeDispose_OnLifetimeScopedObject_EnsuresInstanceGetDisposedAfterLifetimeScope()
+        public void AsyncScopedLifestyleDispose_OnAsyncScopedLifestyledObject_EnsuresInstanceGetDisposedAfterAsyncScopedLifestyle()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, DisposableCommand>(new LifetimeScopeLifestyle());
+            container.Register<ICommand, DisposableCommand>(new AsyncScopedLifestyle());
 
             DisposableCommand command;
 
             // Act
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 command = container.GetInstance<ICommand>() as DisposableCommand;
             }
 
             // Assert
-            Assert.IsTrue(command.HasBeenDisposed, "The lifetime scoped instance was expected to be disposed.");
+            Assert.IsTrue(command.HasBeenDisposed, "The execution scoped instance was expected to be disposed.");
         }
 
         [TestMethod]
-        public void GetInstance_OnLifetimeScopedObject_WillNotBeDisposedDuringLifetimeScope()
+        public void GetInstance_OnAsyncScopedLifestyledObject_WillNotBeDisposedDuringAsyncScopedLifestyle()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<DisposableCommand>(new LifetimeScopeLifestyle());
+            container.Register<DisposableCommand>(new AsyncScopedLifestyle());
 
             // Act
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 var command = container.GetInstance<DisposableCommand>();
 
@@ -361,19 +400,19 @@
         }
 
         [TestMethod]
-        public void GetInstance_WithinALifetimeScope_NeverDisposesASingleton()
+        public void GetInstance_WithinAAsyncScopedLifestyle_NeverDisposesASingleton()
         {
             // Arrange
             var container = new Container();
 
             container.Register<DisposableCommand>(Lifestyle.Singleton);
 
-            container.Register<ICommand, DisposableCommand>(new LifetimeScopeLifestyle());
+            container.Register<ICommand, DisposableCommand>(new AsyncScopedLifestyle());
 
             DisposableCommand singleton;
 
             // Act
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 singleton = container.GetInstance<DisposableCommand>();
             }
@@ -383,37 +422,37 @@
         }
 
         [TestMethod]
-        public void LifetimeScopeDispose_RegisteredConcerete_DisposesThatInstance()
+        public void AsyncScopedLifestyleDispose_RegisteredConcereteWithExplicitDisposal_DisposesThatInstance()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<DisposableCommand>(new LifetimeScopeLifestyle());
+            container.Register<DisposableCommand>(new AsyncScopedLifestyle());
 
             DisposableCommand instanceToDispose;
 
             // Act
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 instanceToDispose = container.GetInstance<DisposableCommand>();
             }
-            
+
             // Assert
             Assert.IsTrue(instanceToDispose.HasBeenDisposed);
         }
-        
+
         [TestMethod]
-        public void LifetimeScopeDispose_Registered_DisposesThatInstance()
+        public void AsyncScopedLifestyleDispose_RegisteredWithExplicitDisposal_DisposesThatInstance()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<IDisposable, DisposableCommand>(new LifetimeScopeLifestyle());
+            container.Register<IDisposable, DisposableCommand>(new AsyncScopedLifestyle());
 
             DisposableCommand instanceToDispose;
 
             // Act
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 instanceToDispose = container.GetInstance<IDisposable>() as DisposableCommand;
             }
@@ -423,17 +462,17 @@
         }
 
         [TestMethod]
-        public void GetInstance_CalledMultipleTimesOnALifetimeScopeServiceWithinASingleScope_DisposesThatInstanceOnce()
+        public void GetInstance_CalledMultipleTimesOnAAsyncScopedLifestyleServiceWithinASingleScope_DisposesThatInstanceOnce()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<DisposableCommand>(new LifetimeScopeLifestyle());
+            container.Register<DisposableCommand>(new AsyncScopedLifestyle());
 
             DisposableCommand command;
 
             // Act
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 command = container.GetInstance<DisposableCommand>();
 
@@ -446,21 +485,22 @@
         }
 
         [TestMethod]
-        public void GetInstance_ResolveMultipleLifetimeScopedServicesWithStrangeEqualsImplementations_CorrectlyDisposesAllInstances()
+        public void GetInstance_ResolveMultipleAsyncScopedLifestyledServicesWithStrangeEqualsImplementations_CorrectlyDisposesAllInstances()
         {
             // Arrange
             var container = new Container();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
 
-            container.Register<DisposableCommandWithOverriddenEquality1>(Lifestyle.Scoped);
-            container.Register<DisposableCommandWithOverriddenEquality2>(Lifestyle.Scoped);
+            var lifestyle = new AsyncScopedLifestyle();
+
+            container.Register<DisposableCommandWithOverriddenEquality1>(lifestyle);
+            container.Register<DisposableCommandWithOverriddenEquality2>(lifestyle);
 
             // Act
             DisposableCommandWithOverriddenEquality1 command1;
             DisposableCommandWithOverriddenEquality2 command2;
 
             // Act
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 command1 = container.GetInstance<DisposableCommandWithOverriddenEquality1>();
                 command2 = container.GetInstance<DisposableCommandWithOverriddenEquality2>();
@@ -475,14 +515,14 @@
             string assertMessage =
                 "Dispose is expected to be called on this command, even when it contains a GetHashCode and " +
                 "Equals implementation that is totally screwed up, since storing disposable objects, " +
-                "should be completely independant to this implementation. ";
+                "should be completely independent to this implementation. ";
 
             Assert.AreEqual(1, command1.DisposeCount, assertMessage + "command1");
             Assert.AreEqual(1, command2.DisposeCount, assertMessage + "command2");
         }
 
         [TestMethod]
-        public void RegisterLifetimeScope_CalledAfterInitialization_ThrowsExpectedException()
+        public void RegisterAsyncScopedLifestyle_CalledAfterInitialization_ThrowsExpectedException()
         {
             // Arrange
             var container = new Container();
@@ -493,7 +533,7 @@
             try
             {
                 // Act
-                container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
+                container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -506,34 +546,141 @@
         }
 
         [TestMethod]
-        public void BeginLifetimeScope_WithNullArgument_ThrowsExpectedException()
+        public void BeginScope_WithNullArgument_ThrowsExpectedException()
         {
             // Act
-            Action action = () => SimpleInjectorLifetimeScopeExtensions.BeginLifetimeScope(null);
+            Action action = () => AsyncScopedLifestyle.BeginScope(null);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
         }
 
-        // This behavior has changed; we used to disallow this and throw an exception. Disposing a lifetime
-        // scope on a different thread however is not necessarily a problem, so we removed this limitation.
         [TestMethod]
-        public void LifetimeScopeDispose_ExecutedOnDifferentThreadThanItWasStarted_DoesNotThrowExceptionException()
+        public void GetInstance_AsyncScopedLifestyledInstanceWithInitializer_CallsInitializerOncePerAsyncScopedLifestyle()
+        {
+            // Arrange
+            int initializerCallCount = 0;
+
+            var container = new Container();
+
+            container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
+
+            container.RegisterInitializer<ICommand>(command => { initializerCallCount++; });
+
+            using (AsyncScopedLifestyle.BeginScope(container))
+            {
+                // Act
+                container.GetInstance<ICommand>();
+                container.GetInstance<ICommand>();
+            }
+
+            // Assert
+            Assert.AreEqual(1, initializerCallCount, "The initializer for ICommand is expected to get fired once.");
+        }
+
+        [TestMethod]
+        public void GetInstance_AsyncScopedLifestyledFuncInstanceWithInitializer_CallsInitializerOncePerAsyncScopedLifestyle()
+        {
+            // Arrange
+            int initializerCallCount = 0;
+
+            var container = new Container();
+
+            container.Register<ICommand>(() => new ConcreteCommand(), new AsyncScopedLifestyle());
+
+            container.RegisterInitializer<ICommand>(command => { initializerCallCount++; });
+
+            using (AsyncScopedLifestyle.BeginScope(container))
+            {
+                // Act
+                container.GetInstance<ICommand>();
+                container.GetInstance<ICommand>();
+            }
+
+            // Assert
+            Assert.AreEqual(1, initializerCallCount, "The initializer for ICommand is expected to get fired once.");
+        }
+
+        [TestMethod]
+        public void GetInstance_OnDecoratedAsyncScopedLifestyledInstance_WrapsTheInstanceWithTheDecorator()
         {
             // Arrange
             var container = new Container();
 
-            var scope = container.BeginLifetimeScope();
+            container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
 
-            // Act
-            Task.Factory.StartNew(() => scope.Dispose()).Wait();
+            container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
+
+            using (AsyncScopedLifestyle.BeginScope(container))
+            {
+                // Act
+                ICommand instance = container.GetInstance<ICommand>();
+
+                // Assert
+                AssertThat.IsInstanceOfType(typeof(CommandDecorator), instance);
+
+                var decorator = (CommandDecorator)instance;
+
+                AssertThat.IsInstanceOfType(typeof(ConcreteCommand), decorator.DecoratedInstance);
+            }
         }
-        
+
         [TestMethod]
-        public void LifetimeScope_TwoScopedRegistationsForTheSameServiceType_CreatesTwoInstances()
+        public void GetInstance_CalledTwiceInOneScopeForDecoratedAsyncScopedLifestyledInstance_WrapsATransientDecoratorAroundAAsyncScopedLifestyledInstance()
         {
             // Arrange
-            var lifestyle = new LifetimeScopeLifestyle();
+            var container = new Container();
+
+            container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
+
+            container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
+
+            using (AsyncScopedLifestyle.BeginScope(container))
+            {
+                // Act
+                var decorator1 = (CommandDecorator)container.GetInstance<ICommand>();
+                var decorator2 = (CommandDecorator)container.GetInstance<ICommand>();
+
+                // Assert
+                Assert.IsFalse(object.ReferenceEquals(decorator1, decorator2),
+                    "The decorator should be transient.");
+
+                Assert.IsTrue(object.ReferenceEquals(decorator1.DecoratedInstance, decorator2.DecoratedInstance),
+                    "The decorated instance should be scoped per execution context. It seems to be transient.");
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_CalledTwiceInOneScopeForDecoratedAsyncScopedLifestyledInstance2_WrapsATransientDecoratorAroundAAsyncScopedLifestyledInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Same as previous test, but now with RegisterDecorator called first.
+            container.RegisterDecorator(typeof(ICommand), typeof(CommandDecorator));
+
+            container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
+
+            using (AsyncScopedLifestyle.BeginScope(container))
+            {
+                // Act
+                var decorator1 = (CommandDecorator)container.GetInstance<ICommand>();
+                var decorator2 = (CommandDecorator)container.GetInstance<ICommand>();
+
+                // Assert
+                Assert.IsFalse(object.ReferenceEquals(decorator1, decorator2),
+                    "The decorator should be transient but seems to have a scoped lifestyle.");
+
+                Assert.IsTrue(object.ReferenceEquals(decorator1.DecoratedInstance, decorator2.DecoratedInstance),
+                    "The decorated instance should be scoped per execution context. It seems to be transient.");
+            }
+        }
+
+        [TestMethod]
+        public void AsyncScopedLifestyle_TwoScopedRegistationsForTheSameServiceType_CreatesTwoInstances()
+        {
+            // Arrange
+            var lifestyle = new AsyncScopedLifestyle();
 
             var container = new Container();
 
@@ -543,7 +690,7 @@
             container.AppendToCollection(typeof(ICommand), reg1);
             container.AppendToCollection(typeof(ICommand), reg2);
 
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 // Act
                 var commands = container.GetAllInstances<ICommand>().Cast<DisposableCommand>().ToArray();
@@ -554,26 +701,26 @@
         }
 
         [TestMethod]
-        public void LifetimeScopeDispose_TwoScopedRegistationsForTheSameServiceType_DisposesBothInstances()
+        public void AsyncScopedLifestyleDispose_TwoScopedRegistationsForTheSameServiceType_DisposesBothInstances()
         {
             // Arrange
             var disposedInstances = new HashSet<object>();
 
-            var lifestyle = new LifetimeScopeLifestyle();
+            var lifestyle = new AsyncScopedLifestyle();
 
             var container = new Container();
 
             var reg1 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
             var reg2 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
-            
+
             container.AppendToCollection(typeof(ICommand), reg1);
             container.AppendToCollection(typeof(ICommand), reg2);
 
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 var commands = container.GetAllInstances<ICommand>().Cast<DisposableCommand>().ToArray();
 
-                Assert.AreNotSame(commands[0], commands[1], "Test setup failed.");      
+                Assert.AreNotSame(commands[0], commands[1], "Test setup failed.");
 
                 commands[0].Disposing += sender => disposedInstances.Add(sender);
                 commands[1].Disposing += sender => disposedInstances.Add(sender);
@@ -586,12 +733,12 @@
         }
 
         [TestMethod]
-        public void Verify_WithWhenScopeEndsRegistration_Succeeds()
+        public void ContainerVerify_WithWhenScopeEndsRegistration_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            var lifestyle = new LifetimeScopeLifestyle();
+            var lifestyle = new AsyncScopedLifestyle();
 
             container.Register<ICommand, DisposableCommand>(lifestyle);
 
@@ -605,14 +752,14 @@
         }
 
         [TestMethod]
-        public void LifetimeScopeDispose_WithWhenScopeEndsRegistration_CallsTheRegisteredAction()
+        public void AsyncScopedLifestyleDispose_WithWhenScopeEndsRegistration_CallsTheRegisteredAction()
         {
             // Arrange
             int actionCallCount = 0;
 
             var container = new Container();
 
-            var lifestyle = new LifetimeScopeLifestyle();
+            var lifestyle = new AsyncScopedLifestyle();
 
             container.Register<DisposableCommand, DisposableCommand>(lifestyle);
 
@@ -621,37 +768,87 @@
                 lifestyle.WhenScopeEnds(container, () => { actionCallCount++; });
             });
 
-            using (container.BeginLifetimeScope())
+            var scope = AsyncScopedLifestyle.BeginScope(container);
+
+            try
             {
                 container.GetInstance<DisposableCommand>();
-
+            }
+            finally
+            {
                 // Act
+                scope.Dispose();
             }
 
             // Assert
-            Assert.AreEqual(1, actionCallCount, "Delegate is expected to be called exactly once.");            
+            Assert.AreEqual(1, actionCallCount, "Delegate is expected to be called exactly once.");
         }
-     
+
         [TestMethod]
-        public void LifetimeScopeDispose_WithTransientRegisteredForDisposal_DisposesThatInstance()
+        public void AsyncScopedLifestyleDispose_WithWhenScopeEndsRegistration_CallsTheRegisteredActionBeforeCallingDispose()
+        {
+            // Arrange
+            bool delegateHasBeenCalled = false;
+            DisposableCommand instanceToDispose = null;
+
+            var container = new Container();
+
+            var lifestyle = new AsyncScopedLifestyle();
+
+            container.Register<DisposableCommand, DisposableCommand>(lifestyle);
+
+            container.RegisterInitializer<DisposableCommand>(command =>
+            {
+                lifestyle.WhenScopeEnds(container, () =>
+                {
+                    Assert.IsFalse(command.HasBeenDisposed,
+                        "The action should be called before disposing the instance, because users are " +
+                        "to use those instances.");
+                    delegateHasBeenCalled = true;
+                });
+            });
+
+            var scope = AsyncScopedLifestyle.BeginScope(container);
+
+            try
+            {
+                instanceToDispose = container.GetInstance<DisposableCommand>();
+            }
+            finally
+            {
+                // Act
+                scope.Dispose();
+            }
+
+            // Assert
+            Assert.IsTrue(delegateHasBeenCalled, "Delegate is expected to be called.");
+        }
+
+        [TestMethod]
+        public void AsyncScopedLifestyleDispose_WithTransientRegisteredForDisposal_DisposesThatInstance()
         {
             // Arrange
             DisposableCommand transientInstanceToDispose = null;
 
             var container = new Container();
 
-            var lifestyle = new LifetimeScopeLifestyle();
+            var lifestyle = new AsyncScopedLifestyle();
 
             container.RegisterInitializer<DisposableCommand>(command =>
             {
                 lifestyle.RegisterForDisposal(container, command);
             });
 
-            using (container.BeginLifetimeScope())
+            var scope = AsyncScopedLifestyle.BeginScope(container);
+
+            try
             {
                 transientInstanceToDispose = container.GetInstance<DisposableCommand>();
-
+            }
+            finally
+            {
                 // Act
+                scope.Dispose();
             }
 
             // Assert
@@ -662,10 +859,12 @@
         public void WhenScopeEnds_NullContainerArgument_ThrowsException()
         {
             // Arrange
-            var lifestyle = new LifetimeScopeLifestyle();
+            Container invalidArgument = null;
+
+            var lifestyle = new AsyncScopedLifestyle();
 
             // Act
-            Action action = () => lifestyle.WhenScopeEnds(null, () => { });
+            Action action = () => lifestyle.WhenScopeEnds(invalidArgument, () => { });
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -675,24 +874,26 @@
         public void WhenScopeEnds_NullActionArgument_ThrowsException()
         {
             // Arrange
-            var lifestyle = new LifetimeScopeLifestyle();
+            Action invalidArgument = null;
+
+            var lifestyle = new AsyncScopedLifestyle();
 
             // Act
-            Action action = () => lifestyle.WhenScopeEnds(new Container(), null);
+            Action action = () => lifestyle.WhenScopeEnds(new Container(), invalidArgument);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        public void WhenScopeEnds_CalledOutOfTheContextOfALifetimeScope_ThrowsException()
+        public void WhenScopeEnds_CalledOutOfTheContextOfAAsyncScopedLifestyle_ThrowsException()
         {
             // Arrange
-            var lifestyle = new LifetimeScopeLifestyle();
+            var lifestyle = new AsyncScopedLifestyle();
 
             var container = new Container();
 
-            container.Register<ConcreteCommand>(lifestyle);
+            container.Register<ConcreteCommand>(new AsyncScopedLifestyle());
 
             try
             {
@@ -705,7 +906,7 @@
             catch (InvalidOperationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains(
-                    "This method can only be called within the context of an active Lifetime Scope."),
+                    "This method can only be called within the context of an active Execution Context Scope."),
                     "Actual: " + ex.Message);
             }
         }
@@ -724,7 +925,6 @@
             var actualOrderOfDisposal = new List<Type>();
 
             var container = new Container();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
 
             // Outer, Middle and Inner all depend on Func<object> and call it when disposed.
             // This way we can check in which order the instances are disposed.
@@ -733,11 +933,13 @@
             // Outer depends on Middle that depends on Inner. 
             // Registration is deliberately made in a different order to prevent that the order of
             // registration might influence the order of disposing.
-            container.Register<Middle>(Lifestyle.Scoped);
-            container.Register<Inner>(Lifestyle.Scoped);
-            container.Register<Outer>(Lifestyle.Scoped);
+            var lifestyle = new AsyncScopedLifestyle();
 
-            Scope scope = container.BeginLifetimeScope();
+            container.Register<Middle>(lifestyle);
+            container.Register<Inner>(lifestyle);
+            container.Register<Outer>(lifestyle);
+
+            var scope = AsyncScopedLifestyle.BeginScope(container);
 
             try
             {
@@ -775,7 +977,6 @@
             var actualOrderOfDisposal = new List<Type>();
 
             var container = new Container();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
 
             // Allow PropertyDependency to be injected as property on Inner 
             container.Options.PropertySelectionBehavior = new InjectProperties<ImportAttribute>();
@@ -787,12 +988,14 @@
             // Middle depends on Inner that depends on property PropertyDependency. 
             // Registration is deliberately made in a different order to prevent that the order of
             // registration might influence the order of disposing.
-            container.Register<PropertyDependency>(Lifestyle.Scoped);
-            container.Register<Middle>(Lifestyle.Scoped);
-            container.Register<Inner>(Lifestyle.Scoped);
+            var lifestyle = new AsyncScopedLifestyle();
+
+            container.Register<PropertyDependency>(lifestyle);
+            container.Register<Middle>(lifestyle);
+            container.Register<Inner>(lifestyle);
 
             // Act
-            Scope scope = container.BeginLifetimeScope();
+            var scope = AsyncScopedLifestyle.BeginScope(container);
 
             try
             {
@@ -817,20 +1020,111 @@
         }
 
         [TestMethod]
+        public void GetCurrentAsyncScopedLifestyle_AfterMiddleScopeDisposedWhileInnerScopeNotDisposed_ReturnsOuterScope()
+        {
+            // Arrange
+            var container = new Container();
+            var lifestyle = new AsyncScopedLifestyle();
+
+            var instanceToDispose = new DisposableCommand();
+
+            container.Register<DisposableCommand>(lifestyle);
+
+            using (Scope outerScope = AsyncScopedLifestyle.BeginScope(container))
+            {
+                Scope middleScope = AsyncScopedLifestyle.BeginScope(container);
+
+                Scope innerScope = AsyncScopedLifestyle.BeginScope(container);
+
+                middleScope.Dispose();
+
+                // Act
+                Scope actualScope = lifestyle.GetCurrentScope(container);
+
+                // Assert
+                Assert.AreSame(outerScope, actualScope);
+            }
+        }
+
+        [TestMethod]
+        public void GetCurrentAsyncScopedLifestyle_DisposingTheMiddleScopeBeforeInnerScope_ReturnsOuterScope()
+        {
+            // Arrange
+            var container = new Container();
+            var lifestyle = new AsyncScopedLifestyle();
+
+            var instanceToDispose = new DisposableCommand();
+
+            container.Register<DisposableCommand>(lifestyle);
+
+            using (Scope outerScope = AsyncScopedLifestyle.BeginScope(container))
+            {
+                Scope middleScope = AsyncScopedLifestyle.BeginScope(container);
+
+                Scope innerScope = AsyncScopedLifestyle.BeginScope(container);
+
+                middleScope.Dispose();
+                innerScope.Dispose();
+
+                // Act
+                Scope actualScope = lifestyle.GetCurrentScope(container);
+
+                // Assert
+                Assert.AreSame(outerScope, actualScope,
+                    "Since the middle scope is already disposed, the current scope should be the outer.");
+            }
+        }
+
+        [TestMethod]
+        public void GetCurrentAsyncScopedLifestyle_DisposingAnInnerScope_ShouldNeverCauseToBeSetToInnerScope()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            var instanceToDispose = new DisposableCommand();
+
+            container.Register<DisposableCommand>(Lifestyle.Scoped);
+
+            using (Scope outerScope = AsyncScopedLifestyle.BeginScope(container))
+            {
+                Scope outerMiddleScope = AsyncScopedLifestyle.BeginScope(container);
+
+                Scope innerMiddleScope = AsyncScopedLifestyle.BeginScope(container);
+
+                Scope innerScope = AsyncScopedLifestyle.BeginScope(container);
+
+                // This will cause GetCurrentAsyncScopedLifestyle to become outerScope.
+                outerMiddleScope.Dispose();
+
+                // This should not cause BeginScope to change
+                innerScope.Dispose();
+
+                // Act
+                Scope actualScope = Lifestyle.Scoped.GetCurrentScope(container);
+
+                // Assert
+                Assert.AreSame(outerScope, actualScope,
+                    "Even though the inner middle scope never got disposed, the inner scope should not " +
+                    "this scope upon disposal. The outer scope should retain focus.");
+            }
+        }
+
+        [TestMethod]
         public void GetInstance_WithPossibleObjectGraphOptimizableRegistration_Succeeds()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, DisposableCommand>(new LifetimeScopeLifestyle());
+            container.Register<ICommand, DisposableCommand>(new AsyncScopedLifestyle());
 
             container.Register<ClassDependingOn<ICommand>>();
 
             // This registration can be optimized to prevent ICommand from being requested more than once from
-            // the LifetimeScopeLifestyleRegistration.GetInstance
+            // the AsyncScopedLifestyleRegistration.GetInstance
             container.Register<ClassDependingOn<ClassDependingOn<ICommand>, ClassDependingOn<ICommand>>>();
 
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 // Act
                 var instance =
@@ -844,133 +1138,91 @@
             // Arrange
             var container = new Container();
 
-            container.Register<ICommand, ConcreteCommand>(new LifetimeScopeLifestyle());
+            container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
 
             var factory = Expression.Lambda<Func<ICommand>>(
                 container.GetRegistration(typeof(ICommand)).BuildExpression())
                 .Compile();
 
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 // Act
                 factory();
             }
         }
-                
-        [TestMethod]
-        public void GetCurrentLifetimeScope_AfterMiddleScopeDisposedWhileInnerScopeNotDisposed_ReturnsOuterScope()
-        {
-            // Arrange
-            var container = new Container();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
 
-            var instanceToDispose = new DisposableCommand();
-
-            using (var outerScope = container.BeginLifetimeScope())
-            {
-                var middleScope = container.BeginLifetimeScope();
-
-                var innerScope = container.BeginLifetimeScope();
-
-                middleScope.Dispose();
-
-                // Act
-                Scope actualScope = Lifestyle.Scoped.GetCurrentScope(container);
-
-                string scopeName =
-                    object.ReferenceEquals(actualScope, null) ? "null" :
-                    object.ReferenceEquals(actualScope, innerScope) ? "inner" :
-                    object.ReferenceEquals(actualScope, middleScope) ? "middle" :
-                    object.ReferenceEquals(actualScope, outerScope) ? "outer" : 
-                    "other";
-
-                // Assert
-                Assert.AreSame(outerScope, actualScope, "Expected: outer. Actual: " + scopeName + " scope.");
-            }
-        }
-
-        [TestMethod]
-        public void GetCurrentLifetimeScope_DisposingTheMiddleScopeBeforeInnerScope_ReturnsOuterScope()
-        {
-            // Arrange
-            var container = new Container();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
-
-            var instanceToDispose = new DisposableCommand();
-
-            using (Scope outerScope = container.BeginLifetimeScope())
-            {
-                Scope middleScope = container.BeginLifetimeScope();
-
-                Scope innerScope = container.BeginLifetimeScope();
-
-                middleScope.Dispose();
-                innerScope.Dispose();
-
-                // Act
-                Scope actualScope = Lifestyle.Scoped.GetCurrentScope(container);
-
-                // Assert
-                Assert.AreSame(outerScope, actualScope,
-                    "Since the middle scope is already disposed, the current scope should be the outer.");
-            }
-        }
-
-        [TestMethod]
-        public void GetCurrentLifetimeScope_DisposingAnInnerScope_ShouldNeverCauseToBeSetToInnerScope()
-        {
-            // Arrange
-            var container = new Container();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
-
-            var instanceToDispose = new DisposableCommand();
-
-            using (var outerScope = container.BeginLifetimeScope())
-            {
-                var outerMiddleScope = container.BeginLifetimeScope();
-
-                var innerMiddleScope = container.BeginLifetimeScope();
-
-                var innerScope = container.BeginLifetimeScope();
-
-                // This will cause GetCurrentLifetimeScope to become outerScope.
-                outerMiddleScope.Dispose();
-
-                // This should not cause BeginLifetimeScope to change
-                innerScope.Dispose();
-
-                // Act
-                Scope actualScope = Lifestyle.Scoped.GetCurrentScope(container);
-
-                // Assert
-                Assert.AreSame(outerScope, actualScope,
-                    "Even though the inner middle scope never got disposed, the inner scope should not " +
-                    "this scope upon disposal. The outer scope should retain focus.");
-            }
-        }
-        
         [TestMethod]
         public void Dispose_ObjectRegisteredForDisposalUsingRequestedCurrentLifetimeScope_DisposesThatInstance()
         {
             // Arrange
             var container = new Container();
-            container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
             var instanceToDispose = new DisposableCommand();
 
-            container.Register<DisposableCommand>(new LifetimeScopeLifestyle());
+            container.Register<DisposableCommand>(Lifestyle.Scoped);
 
-            using (container.BeginLifetimeScope())
+            using (AsyncScopedLifestyle.BeginScope(container))
             {
                 var command = container.GetInstance<DisposableCommand>();
 
-                command.Disposing += s => Lifestyle.Scoped.RegisterForDisposal(container, instanceToDispose);
+                command.Disposing += s =>
+                {
+                    Lifestyle.Scoped.RegisterForDisposal(container, instanceToDispose);
+                };
 
                 // Act
             }
 
             // Assert
             Assert.IsTrue(instanceToDispose.HasBeenDisposed);
+        }
+
+        private static async Task Inner(Container container, ICommand command)
+        {
+            DisposableCommand cmd1, cmd2;
+
+            await Task.Yield();
+
+            cmd1 = container.GetInstance<DisposableCommand>();
+            Assert.AreSame(command, cmd1);
+
+            using (AsyncScopedLifestyle.BeginScope(container))
+            {
+                // Act
+                cmd2 = container.GetInstance<DisposableCommand>();
+
+                Assert.AreNotSame(command, cmd2);
+                Assert.IsFalse(cmd2.HasBeenDisposed);
+            }
+
+            Assert.IsTrue(cmd2.HasBeenDisposed);
+        }
+
+        private static async Task Outer(Container container, ICommand command)
+        {
+            DisposableCommand cmd1, cmd2;
+
+            await Task.Yield();
+
+            cmd1 = container.GetInstance<DisposableCommand>();
+            Assert.AreSame(command, cmd1);
+
+            using (AsyncScopedLifestyle.BeginScope(container))
+            {
+                // Act
+                cmd2 = container.GetInstance<DisposableCommand>();
+                Assert.AreNotSame(command, cmd2);
+
+                var t1 = Inner(container, cmd2);
+                var t2 = Inner(container, cmd2);
+
+                await Task.WhenAll(t1, t2).ConfigureAwait(false);
+                Assert.IsFalse(cmd2.HasBeenDisposed);
+            }
+
+            Assert.IsFalse(cmd1.HasBeenDisposed);
+            Assert.IsTrue(cmd2.HasBeenDisposed);
         }
 
         public class ConcreteCommand : ICommand
@@ -1041,15 +1293,9 @@
             {
             }
 
-            public override int GetHashCode()
-            {
-                return this.HashCode;
-            }
+            public override int GetHashCode() => this.HashCode;
 
-            public override bool Equals(object obj)
-            {
-                return this.GetHashCode() == obj.GetHashCode();
-            }
+            public override bool Equals(object obj) => this.GetHashCode() == obj.GetHashCode();
         }
 
         public class CommandDecorator : ICommand
@@ -1059,13 +1305,13 @@
                 this.DecoratedInstance = decorated;
             }
 
-            public ICommand DecoratedInstance { get; private set; }
+            public ICommand DecoratedInstance { get; }
 
             public void Execute()
             {
             }
         }
-        
+
         private sealed class InjectProperties<TAttribute> : IPropertySelectionBehavior
             where TAttribute : Attribute
         {
@@ -1122,27 +1368,6 @@
         protected DisposableBase(Action<object> disposing)
         {
             this.disposing = disposing;
-        }
-
-        public void Dispose()
-        {
-            this.disposing(this);
-        }
-    }
-
-    public class DisposableLogger : ILogger, IDisposable
-    {
-        private static readonly Action<DisposableLogger> Empty = l => { };
-
-        private readonly Action<DisposableLogger> disposing;
-
-        public DisposableLogger(Action<DisposableLogger> disposing = null)
-        {
-            this.disposing = disposing ?? Empty;
-        }
-
-        public void Log(string message)
-        {
         }
 
         public void Dispose()

@@ -3,6 +3,10 @@
     using System;
     using System.Collections.Generic;
 
+    public sealed class ImportAttribute : Attribute
+    {
+    }
+
     public interface IDuplicate
     {
     }

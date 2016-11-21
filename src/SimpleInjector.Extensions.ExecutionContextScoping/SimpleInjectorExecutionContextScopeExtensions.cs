@@ -28,15 +28,13 @@
 namespace SimpleInjector.Extensions.ExecutionContextScoping
 {
     using System;
-    using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Extension methods for enabling execution context scoping for the Simple Injector.
     /// </summary>
     public static class SimpleInjectorExecutionContextScopeExtensions
     {
-        private static readonly object ManagerKey = new object();
-  
         /// <summary>
         /// Begins a new execution context scope for the given <paramref name="container"/>. 
         /// Services, registered using the <see cref="ExecutionContextScopeLifestyle"/> are cached during the 
@@ -56,11 +54,11 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         /// }
         /// ]]></code>
         /// </example>
+        [Obsolete("BeginExecutionContextScope is obsolete. Please use SimpleInjector.Lifestyles." +
+            "AsyncScopedLifestyle.BeginScope(Container) instead.", error: false)]
         public static Scope BeginExecutionContextScope(this Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            return container.GetExecutionContextScopeManager().BeginExecutionContextScope();
+            return AsyncScopedLifestyle.BeginScope(container);
         }
 
         /// <summary>
@@ -72,13 +70,9 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static Scope GetCurrentExecutionContextScope(this Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            return container.GetExecutionContextScopeManager().CurrentScope;
+            throw new NotSupportedException(
+                "GetCurrentExecutionContextScope has been deprecated. " +
+                "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.");
         }
-
-        // This method will never return null.
-        internal static ExecutionContextScopeManager GetExecutionContextScopeManager(this Container container) => 
-            container.GetOrSetItem(ManagerKey, (c, key) => new ExecutionContextScopeManager(c));
     }
 }
