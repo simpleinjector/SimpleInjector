@@ -19,7 +19,14 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] AsyncScopedLifestyle added to core library as replacement of ExecutionContextScopeLifestyle. (fixes #299)
 
 
-Version 3.3.0 (v3.3.0 RTM)
+Version 3.3.1 (v3.3.1 RTM) 2016-11-23
+
+	Bug fixes:
+		-[Core] PredicateContext.Consumer.ServiceType property contained incorrect value when the 
+		 parent/consumer of a conditional registration was an open-generic registration. (fixes #333)
+
+
+Version 3.3.0 (v3.3.0 RTM) 2016-11-21
 
 	Improvements/Changes:
 		-[Core] Marked ContainerOptions.ResolveUnregisteredCollections obsolete. (fixes #303)
