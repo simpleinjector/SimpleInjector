@@ -399,6 +399,9 @@ namespace SimpleInjector
 
         private Expression BuildNewExpression(Type serviceType, Type implementationType)
         {
+            // HACK: Fixes #333. In case of a generic registration, the serviceType might be same as implementationType.
+            serviceType = this.GetCurrentProducer()?.ServiceType ?? serviceType;
+
             ConstructorInfo constructor =
                 this.Container.Options.SelectConstructor(serviceType, implementationType);
 
