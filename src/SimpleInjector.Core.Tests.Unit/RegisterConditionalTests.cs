@@ -1460,6 +1460,48 @@
             Assert.AreEqual(expectedValue, service.Dependency);
         }
         
+        [TestMethod]
+        public void GetInstance_PredicateContextForOpenGenericConsumer_ContainsTheExpectedConsumerInfo()
+        {
+            // Arrange
+            InjectionConsumerInfo actualConsumer = null;
+
+            var container = ContainerFactory.New();
+
+            container.Register(typeof(IGeneric<>), typeof(GenericTypeWithLoggerDependency<>), Lifestyle.Transient);
+
+            RegisterConditionalConstant<ILogger>(container, new NullLogger(), 
+                c => { actualConsumer = c.Consumer; return true; });
+
+            // Act
+            container.GetInstance<IGeneric<int>>();
+
+            // Assert
+            AssertThat.AreEqual(typeof(IGeneric<int>), actualConsumer.ServiceType);
+            AssertThat.AreEqual(typeof(GenericTypeWithLoggerDependency<int>), actualConsumer.ImplementationType);
+        }
+
+        [TestMethod]
+        public void GetInstance_PredicateContextForGenericConsumer_ContainsTheExpectedConsumerInfo()
+        {
+            // Arrange
+            InjectionConsumerInfo actualConsumer = null;
+
+            var container = ContainerFactory.New();
+
+            container.Register<IGeneric<int>, GenericTypeWithLoggerDependency<int>>(Lifestyle.Singleton);
+
+            RegisterConditionalConstant<ILogger>(container, new NullLogger(), 
+                c => { actualConsumer = c.Consumer; return true; });
+
+            // Act
+            container.GetInstance<IGeneric<int>>();
+
+            // Assert
+            AssertThat.AreEqual(typeof(IGeneric<int>), actualConsumer.ServiceType);
+            AssertThat.AreEqual(typeof(GenericTypeWithLoggerDependency<int>), actualConsumer.ImplementationType);
+        }
+
         private static void RegisterConditionalConstant<T>(Container container, T constant,
             Predicate<PredicateContext> predicate)
         {

@@ -41,6 +41,13 @@
     {
     }
 
+    public class GenericTypeWithLoggerDependency<T> : IGeneric<T>
+    {
+        public GenericTypeWithLoggerDependency(ILogger logger)
+        {
+        }
+    }
+
     public class IntAndFloatGeneric : IGeneric<int>, IGeneric<float>
     {
     }
