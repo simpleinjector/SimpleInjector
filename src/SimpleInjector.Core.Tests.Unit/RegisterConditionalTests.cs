@@ -1464,21 +1464,22 @@
         public void GetInstance_PredicateContextForOpenGenericConsumer_ContainsTheExpectedConsumerInfo()
         {
             // Arrange
-            InjectionConsumerInfo actualConsumer = null;
+            var actualConsumers = new List<InjectionConsumerInfo>();
 
             var container = ContainerFactory.New();
 
             container.Register(typeof(IGeneric<>), typeof(GenericTypeWithLoggerDependency<>), Lifestyle.Transient);
 
             RegisterConditionalConstant<ILogger>(container, new NullLogger(), 
-                c => { actualConsumer = c.Consumer; return true; });
+                c => { actualConsumers.Add(c.Consumer); return true; });
 
             // Act
             container.GetInstance<IGeneric<int>>();
 
             // Assert
-            AssertThat.AreEqual(typeof(IGeneric<int>), actualConsumer.ServiceType);
-            AssertThat.AreEqual(typeof(GenericTypeWithLoggerDependency<int>), actualConsumer.ImplementationType);
+            Assert.IsTrue(actualConsumers.Any());
+            Assert.IsTrue(actualConsumers.All(c => c.ServiceType == typeof(IGeneric<int>)));
+            Assert.IsTrue(actualConsumers.All(c => c.ImplementationType == typeof(GenericTypeWithLoggerDependency<int>)));
         }
 
         [TestMethod]
