@@ -1,5 +1,5 @@
 ﻿{
-  "version": "3.2.3",
+  "version": "3.3.0",
   "buildOptions": {
     "keyFile": "../SimpleInjector.snk",
     "xmlDoc": true
