@@ -1,5 +1,5 @@
 ﻿{
-  "version": "3.2.1",
+  "version": "3.3.0",
   "buildOptions": {
     "keyFile": "../SimpleInjector.snk",
     "xmlDoc": true
@@ -25,8 +25,8 @@
   "dependencies": {
     "Microsoft.AspNetCore.Http.Abstractions": "1.0.0",
     "NuSpec.ReferenceGenerator": "2.0.0-beta-bld14",
-    "SimpleInjector": "3.2.0",
-    "SimpleInjector.Extensions.ExecutionContextScoping": "3.2.0"
+    "SimpleInjector": "3.3.0",
+    "SimpleInjector.Extensions.ExecutionContextScoping": "3.3.0"
   },
   "scripts": {
     "postcompile": [

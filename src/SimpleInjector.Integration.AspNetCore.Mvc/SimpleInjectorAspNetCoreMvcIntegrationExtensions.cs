@@ -28,10 +28,14 @@ namespace SimpleInjector
     using System.Linq;
     using System.Reflection;
     using Diagnostics;
+    using Integration.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ApplicationParts;
     using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.AspNetCore.Mvc.Internal;
+    using Microsoft.AspNetCore.Mvc.Razor;
+    using Microsoft.AspNetCore.Mvc.Razor.Internal;
     using Microsoft.AspNetCore.Mvc.ViewComponents;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -115,6 +119,37 @@ namespace SimpleInjector
             RegisterViewComponentTypes(container, componentTypes);
         }
 
+        /// <summary>
+        /// Registers a custom <see cref="SimpleInjectorTagHelperActivator"/> that allows the resolval of
+        /// tag helpers using the <paramref name="container"/>. In case no <paramref name="applicationTypeSelector"/>
+        /// is supplied, the custom tag helper activator will forward the creation of tag helpers that are not
+        /// located in a "Microsoft*" namespace to Simple Injector.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> the custom tag helper activator should
+        /// be registered in.</param>
+        /// <param name="container">The container tag helpers should be resolved from.</param>
+        /// <param name="applicationTypeSelector">An optional predicate that allows specifying which types
+        /// should be resolved by Simple Injector (true) and which should be resolved by the framework (false).
+        /// When not specified, all tag helpers whose namespace does not start with "Microsoft" will be forwarded
+        /// to the Simple Injector container.</param>
+        public static void AddSimpleInjectorTagHelperActivation(this IServiceCollection services, Container container,
+            Predicate<Type> applicationTypeSelector = null)
+        {
+            if (services == null) throw new ArgumentNullException(nameof(services));
+            if (container == null) throw new ArgumentNullException(nameof(container));
+
+            // There are tag helpers OOTB in MVC. Letting the application container try to create them will fail
+            // because of the dependencies these tag helpers have. This means that OOTB tag helpers need to remain
+            // created by the framework's DefaultTagHelperActivator, hence the selector predicate.
+            applicationTypeSelector =
+                applicationTypeSelector ?? (type => !type.GetTypeInfo().Namespace.StartsWith("Microsoft"));
+
+            services.AddSingleton<ITagHelperActivator>(p => new SimpleInjectorTagHelperActivator(
+                container,
+                applicationTypeSelector,
+                new DefaultTagHelperActivator(p.GetRequiredService<ITypeActivatorCache>())));
+        }
+        
         private static void RegisterControllerTypes(this Container container, IEnumerable<Type> types)
         {
             foreach (Type type in types.ToArray())
