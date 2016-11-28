@@ -85,19 +85,6 @@
         "runtime": {
           "net451/SimpleInjector.dll": {}
         }
-      },
-      "SimpleInjector.Extensions.ExecutionContextScoping/4.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v4.5",
-        "dependencies": {
-          "SimpleInjector": "(, )"
-        },
-        "compile": {
-          "net45/SimpleInjector.Extensions.ExecutionContextScoping.dll": {}
-        },
-        "runtime": {
-          "net45/SimpleInjector.Extensions.ExecutionContextScoping.dll": {}
-        }
       }
     },
     ".NETStandard,Version=v1.6": {
@@ -1307,20 +1294,6 @@
         },
         "runtime": {
           "netstandard1.3/SimpleInjector.dll": {}
-        }
-      },
-      "SimpleInjector.Extensions.ExecutionContextScoping/4.0.0": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.0",
-          "SimpleInjector": "(, )"
-        },
-        "compile": {
-          "netstandard1.3/SimpleInjector.Extensions.ExecutionContextScoping.dll": {}
-        },
-        "runtime": {
-          "netstandard1.3/SimpleInjector.Extensions.ExecutionContextScoping.dll": {}
         }
       }
     }
@@ -4525,19 +4498,13 @@
       "type": "project",
       "path": "../SimpleInjector/project.json",
       "msbuildProject": "../SimpleInjector/SimpleInjector.xproj"
-    },
-    "SimpleInjector.Extensions.ExecutionContextScoping/4.0.0": {
-      "type": "project",
-      "path": "../SimpleInjector.Extensions.ExecutionContextScoping/project.json",
-      "msbuildProject": "../SimpleInjector.Extensions.ExecutionContextScoping/SimpleInjector.Extensions.ExecutionContextScoping.xproj"
     }
   },
   "projectFileDependencyGroups": {
     "": [
       "Microsoft.AspNetCore.Http.Abstractions >= 1.0.0",
       "NuSpec.ReferenceGenerator >= 2.0.0-beta-bld14",
-      "SimpleInjector >= 3.2.0",
-      "SimpleInjector.Extensions.ExecutionContextScoping >= 3.2.0"
+      "SimpleInjector"
     ],
     ".NETFramework,Version=v4.5.1": [],
     ".NETStandard,Version=v1.6": []

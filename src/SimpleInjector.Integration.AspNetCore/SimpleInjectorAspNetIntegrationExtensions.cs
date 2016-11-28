@@ -22,8 +22,9 @@
 
 namespace SimpleInjector
 {
+    using System;
+    using Lifestyles;
     using Microsoft.AspNetCore.Builder;
-    using SimpleInjector.Extensions.ExecutionContextScoping;
 
     /// <summary>
     /// Extension methods for integrating Simple Injector with ASP.NET applications.
@@ -37,12 +38,19 @@ namespace SimpleInjector
         public static void UseSimpleInjectorAspNetRequestScoping(this IApplicationBuilder applicationBuilder,
             Container container)
         {
-            Requires.IsNotNull(applicationBuilder, nameof(applicationBuilder));
-            Requires.IsNotNull(container, nameof(container));
+            if (applicationBuilder == null)
+            {
+                throw new ArgumentNullException(nameof(applicationBuilder));
+            }
+
+            if (container == null)
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
 
             applicationBuilder.Use(async (context, next) =>
             {
-                using (container.BeginExecutionContextScope())
+                using (AsyncScopedLifestyle.BeginScope(container))
                 {
                     await next();
                 }
