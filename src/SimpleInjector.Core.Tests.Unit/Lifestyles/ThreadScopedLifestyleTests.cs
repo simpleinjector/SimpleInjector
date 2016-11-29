@@ -140,10 +140,10 @@
             }
             catch (ActivationException ex)
             {
-                Assert.IsTrue(ex.Message.Contains(
-                    "The ICommand is registered as 'Lifetime Scope' lifestyle, but the instance is requested " +
-                    "outside the context of a Lifetime Scope."),
-                    "Actual message: " + ex.Message);
+                AssertThat.ExceptionMessageContains(
+                    "The ICommand is registered as 'Thread Scoped' lifestyle, but the instance is requested " +
+                    "outside the context of an active (Thread Scoped) scope.",
+                    ex);
             }
         }
 
@@ -707,7 +707,7 @@
             catch (InvalidOperationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains(
-                    "This method can only be called within the context of an active Lifetime Scope."),
+                    "This method can only be called within the context of an active (Thread Scoped) scope."),
                     "Actual: " + ex.Message);
             }
         }

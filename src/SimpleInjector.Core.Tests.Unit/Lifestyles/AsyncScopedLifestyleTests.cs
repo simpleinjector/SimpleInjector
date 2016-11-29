@@ -160,10 +160,10 @@
             }
             catch (ActivationException ex)
             {
-                Assert.IsTrue(ex.Message.Contains(
-                    "The ICommand is registered as 'Execution Context Scope' lifestyle, but the instance is requested " +
-                    "outside the context of a Execution Context Scope."),
-                    "Actual message: " + ex.Message);
+                AssertThat.ExceptionMessageContains(
+                    "The ICommand is registered as 'Async Scoped' lifestyle, but the instance is requested " +
+                    "outside the context of an active (Async Scoped) scope.",
+                    ex);
             }
         }
 
@@ -906,7 +906,7 @@
             catch (InvalidOperationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains(
-                    "This method can only be called within the context of an active Execution Context Scope."),
+                    "This method can only be called within the context of an active (Async Scoped) scope."),
                     "Actual: " + ex.Message);
             }
         }

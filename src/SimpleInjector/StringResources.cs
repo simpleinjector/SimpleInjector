@@ -548,7 +548,7 @@ namespace SimpleInjector
             ScopedLifestyle lifestyle) =>
             string.Format(CultureInfo.InvariantCulture,
                 "The {0} is registered as '{1}' lifestyle, but the instance is requested outside the " +
-                "context of a {1}.",
+                "context of an active ({1}) scope.",
                 serviceType.TypeName(),
                 lifestyle.Name);
 

@@ -136,7 +136,7 @@
             // Arrange
             string expectedMessage = @"
                 The registration for IFoo (Transient) maps to the same implementation (FooBar) as the 
-                registrations for IBar (Lifetime Scope) and IFooExt (Singleton) do"
+                registrations for IBar (Thread Scoped) and IFooExt (Singleton) do"
                 .TrimInside();
 
             var container = new Container();

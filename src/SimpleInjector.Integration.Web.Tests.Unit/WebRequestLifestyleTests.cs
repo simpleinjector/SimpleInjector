@@ -75,7 +75,7 @@ namespace SimpleInjector.Integration.Web.Tests.Unit
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "This method can only be called within the context of an active Web Request.", action);
+                "This method can only be called within the context of an active (Web Request) scope.", action);
         }
 
         [TestMethod]

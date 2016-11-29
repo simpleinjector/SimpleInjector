@@ -152,7 +152,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "the instance is requested outside the context of a Thread Scoped",
+                "the instance is requested outside the context of an active (Thread Scoped) scope",
                 action);
         }
 
