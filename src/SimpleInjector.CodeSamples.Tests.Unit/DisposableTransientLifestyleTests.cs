@@ -125,7 +125,7 @@
         {
             // Arrange
             const string ExpectedExceptionMessage =
-                "This method can only be called within the context of an active Lifetime Scope";
+                "This method can only be called within the context of an active (Thread Scoped) scope.";
 
             var container = new Container();
 

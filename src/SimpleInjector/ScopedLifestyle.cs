@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -85,15 +85,7 @@ namespace SimpleInjector
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(action, nameof(action));
 
-            var scope = this.GetCurrentScope(container);
-
-            if (scope == null)
-            {
-                throw new InvalidOperationException(
-                    StringResources.ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(this.Name));
-            }
-
-            scope.WhenScopeEnds(action);
+            this.GetCurrentScopeOrThrow(container).WhenScopeEnds(action);
         }
 
         /// <summary>
@@ -111,15 +103,7 @@ namespace SimpleInjector
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(disposable, nameof(disposable));
 
-            var scope = this.GetCurrentScope(container);
-
-            if (scope == null)
-            {
-                throw new InvalidOperationException(
-                    StringResources.ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(this.Name));
-            }
-
-            scope.RegisterForDisposal(disposable);
+            this.GetCurrentScopeOrThrow(container).RegisterForDisposal(disposable);
         }
 
         /// <summary>
@@ -132,10 +116,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, nameof(container));
 
-            // If we are running verification in the current thread, we prefer returning a verification scope
-            // over a real active scope (issue #95).
-            return container.GetVerificationOrResolveScopeForCurrentThread()
-                ?? this.GetCurrentScopeCore(container);
+            return this.GetCurrentScopeInternal(container);
         }
 
         /// <summary>
@@ -201,6 +182,38 @@ namespace SimpleInjector
             Requires.IsNotNull(container, nameof(container));
 
             return new ScopedRegistration<TService, TImplementation>(this, container, this.disposeInstances);
+        }
+
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+        private Scope GetCurrentScopeOrThrow(Container container)
+        {
+            Scope scope = this.GetCurrentScopeInternal(container);
+
+            if (scope == null)
+            {
+                ThrowThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope();
+            }
+
+            return scope;
+        }
+
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+        private Scope GetCurrentScopeInternal(Container container)
+        {
+            // If we are running verification in the current thread, we prefer returning a verification scope
+            // over a real active scope (issue #95).
+            return container.GetVerificationOrResolveScopeForCurrentThread()
+                ?? this.GetCurrentScopeCore(container);
+        }
+
+        private void ThrowThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope()
+        {
+            throw new InvalidOperationException(
+                StringResources.ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(this));
         }
     }
 }

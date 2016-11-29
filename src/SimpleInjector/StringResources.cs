@@ -552,10 +552,11 @@ namespace SimpleInjector
                 serviceType.TypeName(),
                 lifestyle.Name);
 
-        internal static string ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(string lifestyleName) =>
+        internal static string ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(
+            ScopedLifestyle lifestyle) =>
             string.Format(CultureInfo.InvariantCulture,
-                "This method can only be called within the context of an active {0}.",
-                lifestyleName);
+                "This method can only be called within the context of an active ({0}) scope.",
+                lifestyle.Name);
 
         internal static string DecoratorFactoryReturnedNull(Type serviceType) =>
             string.Format(CultureInfo.InvariantCulture,
