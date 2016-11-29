@@ -3,18 +3,20 @@
   "buildOptions": {
     "warningsAsErrors": true
   },
+
+  "testRunner": "mstest",
+
   "dependencies": {
-    "NUnit": "3.4.1",
-    "dotnet-test-nunit": "3.4.0-beta-2",
+    "MSTest.TestFramework": "1.0.7-preview",
+    "dotnet-test-mstest": "1.1.2-preview",
     "SimpleInjector": { "target": "project" },
-    "SimpleInjector.Core.Tests.Unit": { "target": "project" },
-    "SimpleInjector.CodeSamples": { "target": "project" }
+    "SimpleInjector.CodeSamples": { "target": "project" },
+    "SimpleInjector.Core.Tests.Unit": { "target": "project" }
   },
-  "testRunner": "nunit",
   "runtimes": {
     "win10-x86": {}
   },
   "frameworks": {
-    "net451" : { }
+    "net451": {}
   }
 }

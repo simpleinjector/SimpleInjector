@@ -3,19 +3,24 @@
   "version": 2,
   "targets": {
     ".NETFramework,Version=v4.5.1": {
-      "dotnet-test-nunit/3.4.0-beta-2": {
+      "dotnet-test-mstest/1.1.2-preview": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.DependencyModel": "1.0.0",
-          "Microsoft.Extensions.Testing.Abstractions": "1.0.0-preview2-003121",
-          "Microsoft.NETCore.Platforms": "1.0.1",
-          "NUnit.Portable.Agent": "3.4.0-beta-2"
+          "MSTest.ObjectModel": "1.0.1-preview",
+          "MSTest.TestAdapter.Dotnet": "1.1.5-preview",
+          "Microsoft.Extensions.Testing.Abstractions": "1.0.0-preview2-003121"
         },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "System",
+          "System.Core",
+          "mscorlib"
+        ],
         "compile": {
-          "lib/net451/dotnet-test-nunit.exe": {}
+          "lib/net451/dotnet-test-mstest.exe": {}
         },
         "runtime": {
-          "lib/net451/dotnet-test-nunit.exe": {}
+          "lib/net451/dotnet-test-mstest.exe": {}
         }
       },
       "Microsoft.DiaSymReader/1.0.8": {
@@ -114,15 +119,6 @@
           "lib/net451/Microsoft.Extensions.Testing.Abstractions.dll": {}
         }
       },
-      "Microsoft.NETCore.Platforms/1.0.1": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard1.0/_._": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/_._": {}
-        }
-      },
       "Microsoft.Web.Infrastructure/1.0.0": {
         "type": "package",
         "compile": {
@@ -130,6 +126,41 @@
         },
         "runtime": {
           "lib/net40/Microsoft.Web.Infrastructure.dll": {}
+        }
+      },
+      "MSTest.ObjectModel/1.0.1-preview": {
+        "type": "package",
+        "compile": {
+          "lib/net20/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll": {}
+        },
+        "runtime": {
+          "lib/net20/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll": {}
+        }
+      },
+      "MSTest.TestAdapter.Dotnet/1.1.5-preview": {
+        "type": "package",
+        "compile": {
+          "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll": {},
+          "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll": {},
+          "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll": {},
+          "lib/net451/msdia140typelib_clr0200.dll": {}
+        },
+        "runtime": {
+          "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll": {},
+          "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll": {},
+          "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll": {},
+          "lib/net451/msdia140typelib_clr0200.dll": {}
+        }
+      },
+      "MSTest.TestFramework/1.0.7-preview": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll": {},
+          "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.dll": {}
+        },
+        "runtime": {
+          "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll": {},
+          "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.dll": {}
         }
       },
       "Newtonsoft.Json/9.0.1": {
@@ -237,39 +268,6 @@
           "lib/net45/NuGet.Versioning.dll": {}
         }
       },
-      "NUnit/3.4.1": {
-        "type": "package",
-        "compile": {
-          "lib/net45/nunit.framework.dll": {}
-        },
-        "runtime": {
-          "lib/net45/nunit.framework.dll": {}
-        }
-      },
-      "NUnit.Portable.Agent/3.4.0-beta-2": {
-        "type": "package",
-        "frameworkAssemblies": [
-          "System.Globalization",
-          "System.Linq",
-          "System.ObjectModel",
-          "System.Reflection",
-          "System.Reflection.Extensions",
-          "System.Runtime",
-          "System.Runtime.Extensions",
-          "System.Runtime.Serialization.Primitives",
-          "System.Text.RegularExpressions",
-          "System.Threading",
-          "System.Xml",
-          "System.Xml.Linq",
-          "System.Xml.XDocument"
-        ],
-        "compile": {
-          "lib/net45/NUnit.Portable.Agent.dll": {}
-        },
-        "runtime": {
-          "lib/net45/NUnit.Portable.Agent.dll": {}
-        }
-      },
       "System.Collections.Immutable/1.2.0": {
         "type": "package",
         "compile": {
@@ -353,9 +351,9 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
-          "NUnit": "3.4.1",
+          "MSTest.TestFramework": "1.0.7-preview",
           "SimpleInjector": "1.0.0",
-          "dotnet-test-nunit": "3.4.0-beta-2"
+          "dotnet-test-mstest": "1.1.2-preview"
         },
         "frameworkAssemblies": [
           "System.Linq.Expressions"
@@ -386,19 +384,24 @@
       }
     },
     ".NETFramework,Version=v4.5.1/win10-x86": {
-      "dotnet-test-nunit/3.4.0-beta-2": {
+      "dotnet-test-mstest/1.1.2-preview": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.DependencyModel": "1.0.0",
-          "Microsoft.Extensions.Testing.Abstractions": "1.0.0-preview2-003121",
-          "Microsoft.NETCore.Platforms": "1.0.1",
-          "NUnit.Portable.Agent": "3.4.0-beta-2"
+          "MSTest.ObjectModel": "1.0.1-preview",
+          "MSTest.TestAdapter.Dotnet": "1.1.5-preview",
+          "Microsoft.Extensions.Testing.Abstractions": "1.0.0-preview2-003121"
         },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "System",
+          "System.Core",
+          "mscorlib"
+        ],
         "compile": {
-          "lib/net451/dotnet-test-nunit.exe": {}
+          "lib/net451/dotnet-test-mstest.exe": {}
         },
         "runtime": {
-          "lib/net451/dotnet-test-nunit.exe": {}
+          "lib/net451/dotnet-test-mstest.exe": {}
         }
       },
       "Microsoft.DiaSymReader/1.0.8": {
@@ -416,10 +419,7 @@
         }
       },
       "Microsoft.DiaSymReader.Native/1.4.0-rc2": {
-        "type": "package",
-        "native": {
-          "runtimes/win-x86/native/Microsoft.DiaSymReader.Native.x86.dll": {}
-        }
+        "type": "package"
       },
       "Microsoft.DotNet.InternalAbstractions/1.0.0": {
         "type": "package",
@@ -474,15 +474,6 @@
           "lib/net451/Microsoft.Extensions.Testing.Abstractions.dll": {}
         }
       },
-      "Microsoft.NETCore.Platforms/1.0.1": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard1.0/_._": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/_._": {}
-        }
-      },
       "Microsoft.Web.Infrastructure/1.0.0": {
         "type": "package",
         "compile": {
@@ -490,6 +481,41 @@
         },
         "runtime": {
           "lib/net40/Microsoft.Web.Infrastructure.dll": {}
+        }
+      },
+      "MSTest.ObjectModel/1.0.1-preview": {
+        "type": "package",
+        "compile": {
+          "lib/net20/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll": {}
+        },
+        "runtime": {
+          "lib/net20/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll": {}
+        }
+      },
+      "MSTest.TestAdapter.Dotnet/1.1.5-preview": {
+        "type": "package",
+        "compile": {
+          "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll": {},
+          "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll": {},
+          "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll": {},
+          "lib/net451/msdia140typelib_clr0200.dll": {}
+        },
+        "runtime": {
+          "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll": {},
+          "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll": {},
+          "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll": {},
+          "lib/net451/msdia140typelib_clr0200.dll": {}
+        }
+      },
+      "MSTest.TestFramework/1.0.7-preview": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll": {},
+          "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.dll": {}
+        },
+        "runtime": {
+          "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll": {},
+          "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.dll": {}
         }
       },
       "Newtonsoft.Json/9.0.1": {
@@ -597,39 +623,6 @@
           "lib/net45/NuGet.Versioning.dll": {}
         }
       },
-      "NUnit/3.4.1": {
-        "type": "package",
-        "compile": {
-          "lib/net45/nunit.framework.dll": {}
-        },
-        "runtime": {
-          "lib/net45/nunit.framework.dll": {}
-        }
-      },
-      "NUnit.Portable.Agent/3.4.0-beta-2": {
-        "type": "package",
-        "frameworkAssemblies": [
-          "System.Globalization",
-          "System.Linq",
-          "System.ObjectModel",
-          "System.Reflection",
-          "System.Reflection.Extensions",
-          "System.Runtime",
-          "System.Runtime.Extensions",
-          "System.Runtime.Serialization.Primitives",
-          "System.Text.RegularExpressions",
-          "System.Threading",
-          "System.Xml",
-          "System.Xml.Linq",
-          "System.Xml.XDocument"
-        ],
-        "compile": {
-          "lib/net45/NUnit.Portable.Agent.dll": {}
-        },
-        "runtime": {
-          "lib/net45/NUnit.Portable.Agent.dll": {}
-        }
-      },
       "System.Collections.Immutable/1.2.0": {
         "type": "package",
         "compile": {
@@ -713,9 +706,9 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
-          "NUnit": "3.4.1",
+          "MSTest.TestFramework": "1.0.7-preview",
           "SimpleInjector": "1.0.0",
-          "dotnet-test-nunit": "3.4.0-beta-2"
+          "dotnet-test-mstest": "1.1.2-preview"
         },
         "frameworkAssemblies": [
           "System.Linq.Expressions"
@@ -747,16 +740,16 @@
     }
   },
   "libraries": {
-    "dotnet-test-nunit/3.4.0-beta-2": {
-      "sha512": "ImRqxsZMFzn+bM33emu5ZMzIUe8GOHPxdA2NkUIsawWd4YjvcFzdIo5iNuejlY0lw1M+RMwRbpd/cKkhKft52g==",
+    "dotnet-test-mstest/1.1.2-preview": {
+      "sha512": "YzzunZLKa3kSjVv8MwT09GNtfz4sYm9yQRDsmo1xVfrkHnMXvqt88GarBlVtKDKt9SDwfX1nCOnAxc/Wk3Esfg==",
       "type": "package",
-      "path": "dotnet-test-nunit/3.4.0-beta-2",
+      "path": "dotnet-test-mstest/1.1.2-preview",
       "files": [
-        "dotnet-test-nunit.3.4.0-beta-2.nupkg.sha512",
-        "dotnet-test-nunit.nuspec",
-        "lib/net451/dotnet-test-nunit.exe",
-        "lib/netcoreapp1.0/dotnet-test-nunit.dll",
-        "lib/netcoreapp1.0/dotnet-test-nunit.runtimeconfig.json"
+        "dotnet-test-mstest.1.1.2-preview.nupkg.sha512",
+        "dotnet-test-mstest.nuspec",
+        "lib/net451/dotnet-test-mstest.exe",
+        "lib/netcoreapp1.0/dotnet-test-mstest.dll",
+        "lib/netcoreapp1.0/dotnet-test-mstest.runtimeconfig.json"
       ]
     },
     "Microsoft.DiaSymReader/1.0.8": {
@@ -834,19 +827,6 @@
         "lib/netstandard1.6/Microsoft.Extensions.Testing.Abstractions.dll"
       ]
     },
-    "Microsoft.NETCore.Platforms/1.0.1": {
-      "sha512": "2G6OjjJzwBfNOO8myRV/nFrbTw5iA+DEm0N+qUqhrOmaVtn4pC77h38I1jsXGw5VH55+dPfQsqHD0We9sCl9FQ==",
-      "type": "package",
-      "path": "Microsoft.NETCore.Platforms/1.0.1",
-      "files": [
-        "Microsoft.NETCore.Platforms.1.0.1.nupkg.sha512",
-        "Microsoft.NETCore.Platforms.nuspec",
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "lib/netstandard1.0/_._",
-        "runtime.json"
-      ]
-    },
     "Microsoft.Web.Infrastructure/1.0.0": {
       "sha512": "FNmvLn5m2LTU/Rs2KWVo0SIIh9Ek+U0ojex7xeDaSHw/zgEP77A8vY5cVWgUtBGS8MJfDGNn8rpXJWEIQaPwTg==",
       "type": "package",
@@ -855,6 +835,132 @@
         "Microsoft.Web.Infrastructure.1.0.0.nupkg.sha512",
         "Microsoft.Web.Infrastructure.nuspec",
         "lib/net40/Microsoft.Web.Infrastructure.dll"
+      ]
+    },
+    "MSTest.ObjectModel/1.0.1-preview": {
+      "sha512": "p94x245t1kqcz1D2mxvYeUuUnn2rPKodhftkzeexk14gjJrXxbHatMLnI3MQRnpAH/C/biiluQRJM2TwvVb8jQ==",
+      "type": "package",
+      "path": "MSTest.ObjectModel/1.0.1-preview",
+      "files": [
+        "MSTest.ObjectModel.1.0.1-preview.nupkg.sha512",
+        "MSTest.ObjectModel.nuspec",
+        "lib/dotnet/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll",
+        "lib/net20/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"
+      ]
+    },
+    "MSTest.TestAdapter.Dotnet/1.1.5-preview": {
+      "sha512": "r5DNx1EhhvYPv2MjidzMXvgDJcvj8l+j8Ae5/2hVTTS7U1d8xqYVP/5iMG7XDY5sjXzdqNE5jAtaPKbnMQwUQg==",
+      "type": "package",
+      "path": "MSTest.TestAdapter.Dotnet/1.1.5-preview",
+      "files": [
+        "MSTest.TestAdapter.Dotnet.1.1.5-preview.nupkg.sha512",
+        "MSTest.TestAdapter.Dotnet.nuspec",
+        "lib/dotnet/Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll",
+        "lib/dotnet/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll",
+        "lib/dotnet/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll",
+        "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll",
+        "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll",
+        "lib/net451/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll",
+        "lib/net451/msdia140typelib_clr0200.dll"
+      ]
+    },
+    "MSTest.TestFramework/1.0.7-preview": {
+      "sha512": "w2Ehf6iKdaX4zikL/KSEwUq2e+GnDPG9tJTgzuq5Ry+FBy8djatwURtwcre97M/fGPf+BSuMtVuuWDH9TpPX7Q==",
+      "type": "package",
+      "path": "MSTest.TestFramework/1.0.7-preview",
+      "files": [
+        "MSTest.TestFramework.1.0.7-preview.nupkg.sha512",
+        "MSTest.TestFramework.nuspec",
+        "lib/dotnet/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll",
+        "lib/dotnet/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/dotnet/Microsoft.VisualStudio.TestPlatform.TestFramework.dll",
+        "lib/dotnet/cs/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/cs/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/dotnet/de/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/de/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/dotnet/es/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/es/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/dotnet/fr/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/fr/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/dotnet/it/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/it/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/dotnet/ja/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/ja/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/dotnet/ko/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/ko/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/dotnet/pl/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/pl/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/dotnet/pt/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/pt/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/dotnet/ru/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/ru/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/dotnet/tr/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/tr/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/dotnet/zh-Hans/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/zh-Hans/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/dotnet/zh-Hant/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/dotnet/zh-Hant/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll",
+        "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/Microsoft.VisualStudio.TestPlatform.TestFramework.dll",
+        "lib/net45/cs/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/cs/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/de/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/de/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/es/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/es/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/fr/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/fr/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/it/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/it/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/ja/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/ja/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/ko/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/ko/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/pl/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/pl/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/pt/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/pt/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/ru/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/ru/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/tr/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/tr/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/zh-Hans/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/zh-Hans/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/net45/zh-Hant/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/net45/zh-Hant/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll",
+        "lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.TestFramework.dll",
+        "lib/netcoreapp1.0/cs/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/cs/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/de/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/de/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/es/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/es/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/fr/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/fr/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/it/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/it/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/ja/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/ja/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/ko/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/ko/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/pl/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/pl/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/pt/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/pt/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/ru/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/ru/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/tr/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/tr/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/zh-Hans/Microsoft.VisualStudio.TestPlatform.TestFramework.XML",
+        "lib/netcoreapp1.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.XML",
+        "lib/netcoreapp1.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.TestFramework.XML"
       ]
     },
     "Newtonsoft.Json/9.0.1": {
@@ -972,42 +1078,6 @@
         "lib/net45/NuGet.Versioning.xml",
         "lib/netstandard1.0/NuGet.Versioning.dll",
         "lib/netstandard1.0/NuGet.Versioning.xml"
-      ]
-    },
-    "NUnit/3.4.1": {
-      "sha512": "G/9h/ENn8+GvT5DvBqVNrUhIWuxtAr0/oVGN2ljKVUw50EAZYBzeWSy9s6nqMswaQACpQzljql1sWQ/peE2eJg==",
-      "type": "package",
-      "path": "NUnit/3.4.1",
-      "files": [
-        "CHANGES.txt",
-        "LICENSE.txt",
-        "NOTICES.txt",
-        "NUnit.3.4.1.nupkg.sha512",
-        "NUnit.nuspec",
-        "lib/dotnet/nunit.framework.dll",
-        "lib/dotnet/nunit.framework.xml",
-        "lib/net20/NUnit.System.Linq.dll",
-        "lib/net20/nunit.framework.dll",
-        "lib/net20/nunit.framework.xml",
-        "lib/net35/nunit.framework.dll",
-        "lib/net35/nunit.framework.xml",
-        "lib/net40/nunit.framework.dll",
-        "lib/net40/nunit.framework.xml",
-        "lib/net45/nunit.framework.dll",
-        "lib/net45/nunit.framework.xml",
-        "lib/portable-net45+win8+wp8+wpa81+Xamarin.Mac+MonoAndroid10+MonoTouch10+Xamarin.iOS10/nunit.framework.dll",
-        "lib/portable-net45+win8+wp8+wpa81+Xamarin.Mac+MonoAndroid10+MonoTouch10+Xamarin.iOS10/nunit.framework.xml"
-      ]
-    },
-    "NUnit.Portable.Agent/3.4.0-beta-2": {
-      "sha512": "91XarG692I/gCwDi3d1k5tRc1J4mPo6l6nHrYRKWSgc9M2a0SX1YNS/uJwth3bXQEn+499mdZ02NTuvJstRq1A==",
-      "type": "package",
-      "path": "NUnit.Portable.Agent/3.4.0-beta-2",
-      "files": [
-        "NUnit.Portable.Agent.3.4.0-beta-2.nupkg.sha512",
-        "NUnit.Portable.Agent.nuspec",
-        "lib/net45/NUnit.Portable.Agent.dll",
-        "lib/netstandard1.3/NUnit.Portable.Agent.dll"
       ]
     },
     "System.Collections.Immutable/1.2.0": {
@@ -1350,11 +1420,11 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "NUnit >= 3.4.1",
+      "MSTest.TestFramework >= 1.0.7-preview",
       "SimpleInjector",
       "SimpleInjector.Core.Tests.Unit",
       "SimpleInjector.Integration.Web",
-      "dotnet-test-nunit >= 3.4.0-beta-2"
+      "dotnet-test-mstest >= 1.1.2-preview"
     ],
     ".NETFramework,Version=v4.5.1": [
       "System.Linq.Expressions >= 4.0.0",
