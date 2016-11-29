@@ -1,9 +1,6 @@
 ﻿{
   "version": "1.0.0-*",
   "buildOptions": {
-    "copyToOutput": {
-      "include": [ "App.config" ]
-    },
     "warningsAsErrors": true
   },
   "dependencies": {

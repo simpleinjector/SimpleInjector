@@ -1177,10 +1177,10 @@
   "projectFileDependencyGroups": {
     "": [
       "NUnit >= 3.4.1",
+      "SimpleInjector",
       "dotnet-test-nunit >= 3.4.0-beta-2"
     ],
     ".NETFramework,Version=v4.5.1": [
-      "SimpleInjector",
       "System.Linq.Expressions >= 4.0.0"
     ]
   },

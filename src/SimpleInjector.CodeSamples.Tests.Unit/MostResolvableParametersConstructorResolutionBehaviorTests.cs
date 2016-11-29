@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
     using System.Configuration;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -134,13 +135,13 @@
         public void GetInstance_ContainerWithOverriddenConstructorInjectionBehavior_ResolvesInstanceSuccessfully()
         {
             // Arrange
-            string expectedConnectionString = ConfigurationManager.ConnectionStrings["cs1"].ConnectionString;
+            string expectedConnectionString = "fooBar";
 
             Container container = CreateContainerWithMostResolvableParametersConstructorResolutionBehavior();
 
             // The ConnectionStringsConvention overrides the ConstructorInjectionBehavior and allows resolving
             // constructor arguments of type string that are postfixed with 'ConnectionString'.
-            container.Options.RegisterParameterConvention(new ConnectionStringsConvention());
+            container.Options.RegisterParameterConvention(new ConnectionStringsConvention(name => expectedConnectionString));
 
             // Act
             // TypeWithConnectionStringConstructorArgument contains 1 ctor with a 'string cs1ConnectionString'

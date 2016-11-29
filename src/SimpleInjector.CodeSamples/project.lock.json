@@ -69,7 +69,6 @@
       "System.Linq >= 4.0.0"
     ],
     ".NETFramework,Version=v4.5": [
-      "System.Configuration >= 4.0.0",
       "System.Linq.Expressions >= 4.0.0",
       "System.Reflection >= 4.0.0",
       "System.Runtime >= 4.0.0"

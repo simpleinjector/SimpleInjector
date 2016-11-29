@@ -6,7 +6,6 @@
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq.Expressions;
-    using System.Reflection;
     using System.Runtime.InteropServices;
     using SimpleInjector.Advanced;
 
@@ -60,9 +59,18 @@
         }
     }
 
+    // Example usage:
+    // new ConnectionStringsConvention(name => ConfigurationManager.ConnectionStrings[name]?.ConnectionString)
     public class ConnectionStringsConvention : IParameterConvention
     {
         private const string ConnectionStringPostFix = "ConnectionString";
+
+        private readonly Func<string, string> connectionStringRetriever;
+
+        public ConnectionStringsConvention(Func<string, string> connectionStringRetriever)
+        {
+            this.connectionStringRetriever = connectionStringRetriever;
+        }
 
         [DebuggerStepThrough]
         public bool CanResolve(InjectionTargetInfo target)
@@ -83,7 +91,7 @@
         [DebuggerStepThrough]
         public Expression BuildExpression(InjectionConsumerInfo consumer)
         {
-            string connectionString = GetConnectionString(consumer.Target);
+            string connectionString = this.GetConnectionString(consumer.Target);
 
             return Expression.Constant(connectionString, typeof(string));
         }
@@ -91,31 +99,40 @@
         [DebuggerStepThrough]
         private void VerifyConfigurationFile(InjectionTargetInfo target)
         {
-            GetConnectionString(target);
+            this.GetConnectionString(target);
         }
 
         [DebuggerStepThrough]
-        private static string GetConnectionString(InjectionTargetInfo target)
+        private string GetConnectionString(InjectionTargetInfo target)
         {
             string name = target.Name.Substring(0,
                 target.Name.LastIndexOf(ConnectionStringPostFix));
 
-            var settings = ConfigurationManager.ConnectionStrings[name];
+            var connectionString = this.connectionStringRetriever(name);
 
-            if (settings == null)
+            if (connectionString == null)
             {
                 throw new ActivationException(
                     "No connection string with name '" + name + "' could be found in the " + 
                     "application's configuration file.");
             }
 
-            return settings.ConnectionString;
+            return connectionString;
         }
     }
 
+    // Example usage:
+    // new AppSettingsConvention(key => ConfigurationManager.AppSettings[key]);
     public class AppSettingsConvention : IParameterConvention
     {
         private const string AppSettingsPostFix = "AppSetting";
+
+        private readonly Func<string, string> appSettingRetriever;
+
+        public AppSettingsConvention(Func<string, string> appSettingRetriever)
+        {
+            this.appSettingRetriever = appSettingRetriever;
+        }
 
         [DebuggerStepThrough]
         public bool CanResolve(InjectionTargetInfo target)
@@ -138,7 +155,7 @@
         [DebuggerStepThrough]
         public Expression BuildExpression(InjectionConsumerInfo consumer)
         {
-            object valueToInject = GetAppSettingValue(consumer.Target);
+            object valueToInject = this.GetAppSettingValue(consumer.Target);
 
             return Expression.Constant(valueToInject, consumer.Target.TargetType);
         }
@@ -146,16 +163,16 @@
         [DebuggerStepThrough]
         private void VerifyConfigurationFile(InjectionTargetInfo target)
         {
-            GetAppSettingValue(target);
+            this.GetAppSettingValue(target);
         }
 
         [DebuggerStepThrough]
-        private static object GetAppSettingValue(InjectionTargetInfo target)
+        private object GetAppSettingValue(InjectionTargetInfo target)
         {
             string key = target.Name.Substring(0,
                 target.Name.LastIndexOf(AppSettingsPostFix));
 
-            string configurationValue = ConfigurationManager.AppSettings[key];
+            string configurationValue = this.appSettingRetriever(key); // ConfigurationManager.AppSettings[key];
 
             if (configurationValue != null)
             {
@@ -170,7 +187,7 @@
                 "application's configuration file.");
         }
     }
-
+    
     // Using optional parameters in constructor arguments is highly discouraged. 
     // This code is merely an example.
     public class OptionalParameterConvention : IParameterConvention

@@ -344,11 +344,10 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
-          "SimpleInjector": "(, )",
+          "SimpleInjector": "1.0.0",
           "System.Linq": "4.0.0"
         },
         "frameworkAssemblies": [
-          "System.Configuration",
           "System.Linq.Expressions",
           "System.Reflection",
           "System.Runtime"
@@ -365,7 +364,7 @@
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
           "NUnit": "3.4.1",
-          "SimpleInjector": "(, )",
+          "SimpleInjector": "1.0.0",
           "dotnet-test-nunit": "3.4.0-beta-2"
         },
         "frameworkAssemblies": [
@@ -698,11 +697,10 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
-          "SimpleInjector": "(, )",
+          "SimpleInjector": "1.0.0",
           "System.Linq": "4.0.0"
         },
         "frameworkAssemblies": [
-          "System.Configuration",
           "System.Linq.Expressions",
           "System.Reflection",
           "System.Runtime"
@@ -719,7 +717,7 @@
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
           "NUnit": "3.4.1",
-          "SimpleInjector": "(, )",
+          "SimpleInjector": "1.0.0",
           "dotnet-test-nunit": "3.4.0-beta-2"
         },
         "frameworkAssemblies": [

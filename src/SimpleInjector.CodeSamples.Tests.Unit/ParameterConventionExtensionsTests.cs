@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
     using System.Configuration;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Tests.Unit;
@@ -8,11 +9,29 @@
     [TestClass]
     public class ParameterConventionExtensionsTests
     {
+        private static readonly Dictionary<string, string> ConnectionStrings =
+           new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+           {
+               ["cs1"] = "Some Connection String 1",
+               ["cs2"] = "Some Connection String 2",
+           };
+
+        private static readonly Dictionary<string, string> AppSettings =
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["as1"] = "Some App Settings value 1",
+                ["as2"] = "8573842a-769c-4302-a85d-88d141fab3e5",
+            };
+
+        private static string GetAppSetting(string key) => AppSettings.ContainsKey(key) ? AppSettings[key] : null;
+        private static string GetConnectionString(string name) =>
+            ConnectionStrings.ContainsKey(name) ? ConnectionStrings[name] : null;
+
         [TestMethod]
         public void ConnectionStringsConvention_RegisteringTypeWithConnectionStringParameter_Succeeds()
         {
             // Arrange
-            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention(GetConnectionString));
 
             // Act
             container.Register<TypeWithConnectionStringConstructorArgument>();
@@ -22,9 +41,9 @@
         public void ConnectionStringsConvention_ResolvingTypeWithConnectionStringParameter_InjectsExpectedValue()
         {
             // Arrange
-            string expectedConnectionString = ConfigurationManager.ConnectionStrings["cs1"].ConnectionString;
+            string expectedConnectionString = GetConnectionString("cs1");
 
-            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention(GetConnectionString));
 
             // Act
             var instance = container.GetInstance<TypeWithConnectionStringConstructorArgument>();
@@ -37,9 +56,9 @@
         public void ConnectionStringsConvention_ResolvingTypeWithConnectionStringProperty_InjectsExpectedValue()
         {
             // Arrange
-            string expectedConnectionString = ConfigurationManager.ConnectionStrings["cs1"].ConnectionString;
+            string expectedConnectionString = GetConnectionString("cs1");
 
-            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention(GetConnectionString));
 
             container.Options.EnablePropertyAutoWiring();
 
@@ -57,7 +76,7 @@
         public void ConnectionStringsConvention_RegisteringTypeWithIntParameterWhichNameEndsWithConnectionString_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention(GetConnectionString));
 
             try
             {
@@ -80,7 +99,7 @@
         public void ConnectionStringsConvention_ResolvingTypeWithIntParameterWhichNameEndsWithConnectionString_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention(GetConnectionString));
 
             try
             {
@@ -103,7 +122,7 @@
         public void ConnectionStringsConvention_RegisteringTypeWithNonExistingConnectionStringParameter_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention(GetConnectionString));
 
             try
             {
@@ -124,7 +143,7 @@
         public void ConnectionStringsConvention_ResolvingTypeWithNonExistingConnectionStringParameter_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConventions(new ConnectionStringsConvention());
+            var container = CreateContainerWithConventions(new ConnectionStringsConvention(GetConnectionString));
 
             try
             {
@@ -145,7 +164,8 @@
         public void AppSettingsConvention_RegisteringTypeWithStringAppSettingParameter_Succeeds()
         {
             // Arrange
-            var container = CreateContainerWithConventions(new AppSettingsConvention());
+            // example: new AppSettingsConvention(key => ConfigurationManager.AppSettings[key]);
+            var container = CreateContainerWithConventions(new AppSettingsConvention(GetAppSetting));
 
             // Act
             container.Register<TypeWithAppSettingsStringConstructorArgument>();
@@ -155,9 +175,9 @@
         public void AppSettingsConvention_ResolvingTypeWithStringAppSettingParameter_InjectsExpectedValue()
         {
             // Arrange
-            string expectedAppSetting = ConfigurationManager.AppSettings["as1"];
+            string expectedAppSetting = AppSettings["as1"];
 
-            var container = CreateContainerWithConventions(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention(GetAppSetting));
 
             // Act
             var instance = container.GetInstance<TypeWithAppSettingsStringConstructorArgument>();
@@ -170,7 +190,7 @@
         public void AppSettingsConvention_RegisteringTypeWithGuidAppSettingParameter_Succeeds()
         {
             // Arrange
-            var container = CreateContainerWithConventions(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention(GetAppSetting));
 
             // Act
             container.Register<TypeWithAppSettingsStringConstructorArgument>();
@@ -180,9 +200,9 @@
         public void AppSettingsConvention_ResolvingTypeWithGuidAppSettingParameter_InjectsExpectedValue()
         {
             // Arrange
-            Guid expectedAppSetting = Guid.Parse(ConfigurationManager.AppSettings["as2"]);
+            Guid expectedAppSetting = Guid.Parse(AppSettings["as2"]);
 
-            var container = CreateContainerWithConventions(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention(GetAppSetting));
 
             // Act
             var instance = container.GetInstance<TypeWithAppSettingsGuidConstructorArgument>();
@@ -195,7 +215,7 @@
         public void AppSettingsConvention_RegisteringTypeWithReferenceTypeParameterWhichNameEndsWithAppSetting_Succeeds()
         {
             // Arrange
-            var container = CreateContainerWithConventions(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention(GetAppSetting));
 
             // Act
             // This type depends on an reference type and since reference types are not handled by the
@@ -208,7 +228,7 @@
         public void AppSettingsConvention_ResolvingTypeWithReferenceTypeParameterWhichNameEndsWithConnectionString_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConventions(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention(GetAppSetting));
 
             try
             {
@@ -231,7 +251,7 @@
         public void AppSettingsConvention_RegisteringTypeWithNonExistingAppSettingsParameter_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConventions(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention(GetAppSetting));
 
             try
             {
@@ -251,7 +271,7 @@
         public void AppSettingsConvention_ResolvingTypeWithNonExistingConnectionStringParameter_FailsWithExpectedException()
         {
             // Arrange
-            var container = CreateContainerWithConventions(new AppSettingsConvention());
+            var container = CreateContainerWithConventions(new AppSettingsConvention(GetAppSetting));
 
             try
             {
@@ -272,8 +292,8 @@
         {
             // Arrange
             var container = CreateContainerWithConventions(
-                new ConnectionStringsConvention(),
-                new AppSettingsConvention());
+                new ConnectionStringsConvention(GetConnectionString),
+                new AppSettingsConvention(GetAppSetting));
 
             // Act
             container.Register<TypeWithBothConnectionStringAndAppSettingsConstructorArguments>();
@@ -283,12 +303,12 @@
         public void MultipleParameterConventions_ResolveATypeWithMultipleConventionBasedParameters_InjectsExpectedParameters()
         {
             // Arrange
-            string expectedConnectionString = ConfigurationManager.ConnectionStrings["cs1"].ConnectionString;
-            string expectedAppSetting = ConfigurationManager.AppSettings["as2"];
+            string expectedConnectionString = ConnectionStrings["cs1"];
+            string expectedAppSetting = AppSettings["as2"];
 
             var container = CreateContainerWithConventions(
-                new ConnectionStringsConvention(),
-                new AppSettingsConvention());
+                new ConnectionStringsConvention(GetConnectionString),
+                new AppSettingsConvention(GetAppSetting));
 
             // Act
             var instance =

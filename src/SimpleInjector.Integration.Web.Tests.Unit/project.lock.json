@@ -354,7 +354,7 @@
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
           "NUnit": "3.4.1",
-          "SimpleInjector": "(, )",
+          "SimpleInjector": "1.0.0",
           "dotnet-test-nunit": "3.4.0-beta-2"
         },
         "frameworkAssemblies": [
@@ -372,7 +372,7 @@
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "Microsoft.Web.Infrastructure": "1.0.0",
-          "SimpleInjector": "(, )"
+          "SimpleInjector": "1.0.0"
         },
         "frameworkAssemblies": [
           "System.Web"
@@ -714,7 +714,7 @@
         "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
           "NUnit": "3.4.1",
-          "SimpleInjector": "(, )",
+          "SimpleInjector": "1.0.0",
           "dotnet-test-nunit": "3.4.0-beta-2"
         },
         "frameworkAssemblies": [
@@ -732,7 +732,7 @@
         "framework": ".NETFramework,Version=v4.0",
         "dependencies": {
           "Microsoft.Web.Infrastructure": "1.0.0",
-          "SimpleInjector": "(, )"
+          "SimpleInjector": "1.0.0"
         },
         "frameworkAssemblies": [
           "System.Web"

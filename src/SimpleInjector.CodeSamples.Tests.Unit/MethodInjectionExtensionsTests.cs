@@ -121,6 +121,7 @@
             }
         }
 
+#pragma warning disable RCS1102 // Mark class as static.
         public class ClassWithStaticInjectionMethod
         {
             [Inject]
@@ -128,6 +129,7 @@
             {
             }
         }
+#pragma warning restore RCS1102 // Mark class as static.
 
         public sealed class ContextualLogger : ILogger
         {
