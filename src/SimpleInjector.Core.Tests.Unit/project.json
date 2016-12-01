@@ -1,7 +1,7 @@
 ﻿{
   "version": "1.0.0-*",
   "buildOptions": {
-    "keyFile": "../SimpleInjector.snk",
+    "keyFile": "../fake.snk",
     "warningsAsErrors": true
   },
 
