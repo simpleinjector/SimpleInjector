@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,15 +23,14 @@
 namespace SimpleInjector.Lifestyles
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
 
     internal sealed class HybridLifestyle : Lifestyle
     {
-        private readonly Func<bool> lifestyleSelector;
+        private readonly Predicate<Container> lifestyleSelector;
         private readonly Lifestyle trueLifestyle;
         private readonly Lifestyle falseLifestyle;
 
-        internal HybridLifestyle(Func<bool> lifestyleSelector, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
+        internal HybridLifestyle(Predicate<Container> lifestyleSelector, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
             : base("Hybrid " + GetHybridName(trueLifestyle) + " / " + GetHybridName(falseLifestyle))
         {
             this.lifestyleSelector = lifestyleSelector;
@@ -75,7 +74,9 @@ namespace SimpleInjector.Lifestyles
 
         protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
         {
-            return new HybridRegistration(typeof(TService), typeof(TImplementation), this.lifestyleSelector,
+            Func<bool> test = () => this.lifestyleSelector(container);
+
+            return new HybridRegistration(typeof(TService), typeof(TImplementation), test,
                 this.trueLifestyle.CreateRegistration<TService, TImplementation>(container),
                 this.falseLifestyle.CreateRegistration<TService, TImplementation>(container),
                 this, container);
@@ -84,9 +85,11 @@ namespace SimpleInjector.Lifestyles
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {
-            return new HybridRegistration(typeof(TService), typeof(TService), this.lifestyleSelector,
-                this.trueLifestyle.CreateRegistration<TService>(instanceCreator, container),
-                this.falseLifestyle.CreateRegistration<TService>(instanceCreator, container),
+            Func<bool> test = () => this.lifestyleSelector(container);
+
+            return new HybridRegistration(typeof(TService), typeof(TService), test,
+                this.trueLifestyle.CreateRegistration(instanceCreator, container),
+                this.falseLifestyle.CreateRegistration(instanceCreator, container),
                 this, container);
         }
 

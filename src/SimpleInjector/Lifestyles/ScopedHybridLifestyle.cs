@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,15 +23,14 @@
 namespace SimpleInjector.Lifestyles
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
 
     internal sealed class ScopedHybridLifestyle : ScopedLifestyle
     {
-        private readonly Func<bool> selector;
+        private readonly Predicate<Container> selector;
         private readonly ScopedLifestyle trueLifestyle;
         private readonly ScopedLifestyle falseLifestyle;
 
-        internal ScopedHybridLifestyle(Func<bool> lifestyleSelector, ScopedLifestyle trueLifestyle,
+        internal ScopedHybridLifestyle(Predicate<Container> lifestyleSelector, ScopedLifestyle trueLifestyle,
             ScopedLifestyle falseLifestyle)
             : base("Hybrid " + GetHybridName(trueLifestyle) + " / " + GetHybridName(falseLifestyle))
         {
@@ -39,8 +38,6 @@ namespace SimpleInjector.Lifestyles
             this.trueLifestyle = trueLifestyle;
             this.falseLifestyle = falseLifestyle;
         }
-
-        private ScopedLifestyle CurrentLifestyle => this.selector() ? this.trueLifestyle : this.falseLifestyle;
 
         internal override int ComponentLength(Container container) => 
             Math.Max(
@@ -66,11 +63,14 @@ namespace SimpleInjector.Lifestyles
             // falseProvider. That behavior would be completely flawed, because that would burn the lifestyle
             // that is active during the compilation of the InstanceProducer's delegate right into that
             // delegate making the other lifestyle unavailable.
-            return () => selector() ? trueProvider() : falseProvider();
+            return () => selector(container) ? trueProvider() : falseProvider();
         }
 
         protected override Scope GetCurrentScopeCore(Container container) =>
-            this.CurrentLifestyle.GetCurrentScope(container);
+            this.CurrentLifestyle(container).GetCurrentScope(container);
+
+        private ScopedLifestyle CurrentLifestyle(Container container) => 
+            this.selector(container) ? this.trueLifestyle : this.falseLifestyle;
 
         private static string GetHybridName(Lifestyle lifestyle) => HybridLifestyle.GetHybridName(lifestyle);
     }

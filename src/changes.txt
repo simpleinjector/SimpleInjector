@@ -17,6 +17,8 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] Removed all methods that were marked [obsolete(true)] since v3.0. (fixes #305)
 		-[Core] ThreadScopedLifestyle added to core library as replacement of LifetimeScopeLifestyle. (fixes #299)
 		-[Core] AsyncScopedLifestyle added to core library as replacement of ExecutionContextScopeLifestyle. (fixes #299)
+		-[Core] New Lifestyle.CreateHybrid overloads added for ScopedLifestyles that remove the need to supply
+		 an lifestyleSelector delegate. (fixes #341)
 
 	Project Changes:
 		-Projects for SimpleInjector.dll merged into one single project.
@@ -25,6 +27,7 @@ Version 4.0.0 (v4.0 RTM)
 		-Projects for SimpleInjector.Extensions.LifetimeScoping.dll merged into one single project.
 		-Moved from NUnit to MSTest, since MSTest now supports .NET Core projects and will run cross-platform
 		 and NUnit is very unreliable under .NET Core.
+		-Allowed the projects to compile in the absence of the real strong name key.
 
 
 Version 3.3.1 (v3.3.1 RTM) 2016-11-23

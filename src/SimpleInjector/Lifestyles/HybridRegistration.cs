@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -26,14 +26,12 @@ namespace SimpleInjector.Lifestyles
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
 
     internal sealed class HybridRegistration : Registration
     {
         private readonly Type serviceType;
-        private readonly Type implementationType;
         private readonly Func<bool> test;
         private readonly Registration trueRegistration;
         private readonly Registration falseRegistration;
@@ -44,13 +42,13 @@ namespace SimpleInjector.Lifestyles
             : base(lifestyle, container)
         {
             this.serviceType = serviceType;
-            this.implementationType = implementationType;
+            this.ImplementationType = implementationType;
             this.test = test;
             this.trueRegistration = trueRegistration;
             this.falseRegistration = falseRegistration;
         }
 
-        public override Type ImplementationType => this.implementationType;
+        public override Type ImplementationType { get; }
 
         public override Expression BuildExpression()
         {
