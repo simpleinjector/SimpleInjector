@@ -34,7 +34,7 @@ namespace SimpleInjector
         /// <summary>Wraps an ASP.NET request in a execution context scope.</summary>
         /// <param name="applicationBuilder">The ASP.NET application builder instance that references all
         /// framework components.</param>
-        /// <param name="container"></param>
+        /// <param name="container">The container.</param>
         public static void UseSimpleInjectorAspNetRequestScoping(this IApplicationBuilder applicationBuilder,
             Container container)
         {
