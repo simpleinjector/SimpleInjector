@@ -33,10 +33,10 @@ namespace SimpleInjector.Lifestyles
     /// the created scope gets disposed. 
     /// </summary>
     /// <example>
-    /// The following example shows the usage of the <b>LifetimeScopeLifestyle</b> class:
+    /// The following example shows the usage of the <b>ThreadScopedLifestyle</b> class:
     /// <code lang="cs"><![CDATA[
     /// var container = new Container();
-    /// container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
+    /// container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
     /// 
     /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(Lifestyle.Scoped);
     /// 
