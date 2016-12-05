@@ -193,7 +193,7 @@ namespace SimpleInjector
 
             if (scope == null)
             {
-                ThrowThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope();
+                this.ThrowThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope();
             }
 
             return scope;
