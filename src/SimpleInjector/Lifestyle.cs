@@ -137,8 +137,8 @@ namespace SimpleInjector
         internal static readonly Lifestyle Unknown = new UnknownLifestyle();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private static readonly MethodInfo OpenCreateRegistrationTServiceTImplementationMethod =
-            GetMethod(lifestyle => lifestyle.CreateRegistration<object, object>(null));
+        private static readonly MethodInfo OpenCreateRegistrationTConcreteMethod =
+            GetMethod(lifestyle => lifestyle.CreateRegistration<object>(null));
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly MethodInfo OpenCreateRegistrationTServiceFuncMethod =
@@ -480,7 +480,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
             where TService : class
         {
-            return new InstanceProducer<TService>(this.CreateRegistration<TService, TImplementation>(container));
+            return new InstanceProducer<TService>(this.CreateRegistration<TImplementation>(container));
         }
 
         /// <summary>
@@ -498,8 +498,13 @@ namespace SimpleInjector
         public InstanceProducer<TService> CreateProducer<TService>(Type implementationType, Container container)
             where TService : class
         {
-            return new InstanceProducer<TService>(
-                this.CreateRegistration(typeof(TService), implementationType, container));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(container, nameof(container));
+
+            Requires.ServiceIsAssignableFromImplementation(typeof(TService), implementationType,
+                nameof(implementationType));
+
+            return new InstanceProducer<TService>(this.CreateRegistration(implementationType, container));
         }
 
         /// <summary>
@@ -518,6 +523,9 @@ namespace SimpleInjector
         public InstanceProducer<TService> CreateProducer<TService>(Func<TService> instanceCreator,
             Container container) where TService : class
         {
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+            Requires.IsNotNull(container, nameof(container));
+
             return new InstanceProducer<TService>(this.CreateRegistration(instanceCreator, container));
         }
 
@@ -535,8 +543,11 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         public InstanceProducer CreateProducer(Type serviceType, Type implementationType, Container container)
         {
-            return new InstanceProducer(serviceType,
-                this.CreateRegistration(serviceType, implementationType, container));
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(container, nameof(container));
+
+            return new InstanceProducer(serviceType, this.CreateRegistration(implementationType, container));
         }
 
         /// <summary>
@@ -554,27 +565,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, nameof(container));
 
-            return this.CreateRegistrationCore<TConcrete, TConcrete>(container);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <typeparam name="TImplementation">The concrete type that will be created.</typeparam>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
-        /// reference (Nothing in VB).</exception>
-        public Registration CreateRegistration<TService, TImplementation>(Container container)
-            where TImplementation : class, TService
-            where TService : class
-        {
-            Requires.IsNotNull(container, nameof(container));
-
-            return this.CreateRegistrationCore<TService, TImplementation>(container);
+            return this.CreateRegistrationCore<TConcrete>(container);
         }
 
         /// <summary>
@@ -618,41 +609,14 @@ namespace SimpleInjector
         public Registration CreateRegistration(Type concreteType, Container container)
         {
             Requires.IsNotNull(concreteType, nameof(concreteType));
-            Requires.IsNotOpenGenericType(concreteType, nameof(concreteType));
-
-            return this.CreateRegistration(concreteType, concreteType, container);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <paramref name="implementationType"/> with the caching as specified by this lifestyle.
-        /// This method might fail when run in a partial trust sandbox when <paramref name="implementationType"/>
-        /// is an internal type.
-        /// </summary>
-        /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.</param>
-        /// <param name="implementationType">The concrete type that will be registered.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null 
-        /// reference (Nothing in VB).</exception>
-        public Registration CreateRegistration(Type serviceType, Type implementationType, Container container)
-        {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(implementationType, nameof(implementationType));
             Requires.IsNotNull(container, nameof(container));
 
-            Requires.IsReferenceType(serviceType, nameof(serviceType));
-            Requires.IsReferenceType(implementationType, nameof(implementationType));
+            Requires.IsReferenceType(concreteType, nameof(concreteType));
 
-            Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
-            Requires.IsNotOpenGenericType(implementationType, nameof(implementationType));
+            Requires.IsNotOpenGenericType(concreteType, nameof(concreteType));
 
-            Requires.ServiceIsAssignableFromImplementation(serviceType, implementationType,
-                nameof(implementationType));
-
-            var closedCreateRegistrationMethod = OpenCreateRegistrationTServiceTImplementationMethod
-                .MakeGenericMethod(serviceType, implementationType);
+            var closedCreateRegistrationMethod = OpenCreateRegistrationTConcreteMethod
+                .MakeGenericMethod(concreteType);
 
             try
             {
@@ -660,8 +624,8 @@ namespace SimpleInjector
             }
             catch (MemberAccessException ex)
             {
-                throw BuildUnableToResolveTypeDueToSecurityConfigException(implementationType, ex,
-                    nameof(implementationType));
+                throw BuildUnableToResolveTypeDueToSecurityConfigException(concreteType, ex,
+                    nameof(concreteType));
             }
         }
 
@@ -708,10 +672,10 @@ namespace SimpleInjector
 
         internal virtual int DependencyLength(Container container) => this.Length;
 
-        internal Registration CreateRegistration(Type serviceType, Type implementationType,
-            Container container, params OverriddenParameter[] overriddenParameters)
+        internal Registration CreateRegistration(Type concreteType, Container container, 
+            params OverriddenParameter[] overriddenParameters)
         {
-            var registration = this.CreateRegistration(serviceType, implementationType, container);
+            var registration = this.CreateRegistration(concreteType, container);
 
             registration.SetParameterOverrides(overriddenParameters);
 
@@ -723,7 +687,6 @@ namespace SimpleInjector
         /// creates a new <see cref="Registration"/> instance defining the creation of the
         /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
         /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
@@ -733,9 +696,8 @@ namespace SimpleInjector
         /// to create and return a new <see cref="Registration"/>. Note that you should <b>always</b> create
         /// a new <see cref="Registration"/> instance. They should never be cached.
         /// </remarks>
-        protected abstract Registration CreateRegistrationCore<TService, TImplementation>(Container container)
-            where TImplementation : class, TService
-            where TService : class;
+        protected abstract Registration CreateRegistrationCore<TImplementation>(Container container)
+            where TImplementation : class;
 
         /// <summary>
         /// When overridden in a derived class, 

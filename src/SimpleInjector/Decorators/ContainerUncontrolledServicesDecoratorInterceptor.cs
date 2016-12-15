@@ -83,13 +83,11 @@ namespace SimpleInjector.Decorators
 
         internal void SetDecorator(Type decorator)
         {
-            this.decoratorConstructor =
-                this.Container.Options.SelectConstructor(this.e.RegisteredServiceType, decorator);
+            this.decoratorConstructor = this.Container.Options.SelectConstructor(decorator);
 
             if (object.ReferenceEquals(this.Lifestyle, this.Container.SelectionBasedLifestyle))
             {
-                this.Lifestyle =
-                    this.Container.Options.SelectLifestyle(this.e.RegisteredServiceType, decorator);
+                this.Lifestyle = this.Container.Options.SelectLifestyle(decorator);
             }
 
             // The actual decorator could be different. TODO: must... write... test... for... this.

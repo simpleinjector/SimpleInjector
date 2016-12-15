@@ -417,7 +417,7 @@ namespace SimpleInjector
 
             try
             {
-                var constructor = this.SelectConstructor(serviceType, implementationType);
+                var constructor = this.SelectConstructor(implementationType);
 
                 this.DependencyInjectionBehavior.Verify(serviceType, constructor);
             }
@@ -429,14 +429,14 @@ namespace SimpleInjector
             return errorMessage == null;
         }
 
-        internal ConstructorInfo SelectConstructor(Type serviceType, Type implementationType)
+        internal ConstructorInfo SelectConstructor(Type implementationType)
         {
-            var constructor = this.ConstructorResolutionBehavior.GetConstructor(serviceType, implementationType);
+            var constructor = this.ConstructorResolutionBehavior.GetConstructor(implementationType);
 
             if (constructor == null)
             {
                 throw new ActivationException(StringResources.ConstructorResolutionBehaviorReturnedNull(
-                    this.ConstructorResolutionBehavior, serviceType, implementationType));
+                    this.ConstructorResolutionBehavior, implementationType));
             }
 
             return constructor;
@@ -457,14 +457,14 @@ namespace SimpleInjector
             return expression;
         }
 
-        internal Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
+        internal Lifestyle SelectLifestyle(Type implementationType)
         {
-            var lifestyle = this.LifestyleSelectionBehavior.SelectLifestyle(serviceType, implementationType);
+            var lifestyle = this.LifestyleSelectionBehavior.SelectLifestyle(implementationType);
 
             if (lifestyle == null)
             {
                 throw new ActivationException(StringResources.LifestyleSelectionBehaviorReturnedNull(
-                    this.LifestyleSelectionBehavior, serviceType, implementationType));
+                    this.LifestyleSelectionBehavior, implementationType));
             }
 
             return lifestyle;

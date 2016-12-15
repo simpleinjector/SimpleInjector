@@ -177,7 +177,7 @@ namespace SimpleInjector
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+        protected override Registration CreateRegistrationCore<TImplementation>(Container container)
         {
             Requires.IsNotNull(container, nameof(container));
 

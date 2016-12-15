@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014 Simple Injector Contributors
+ * Copyright (c) 2014-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -35,10 +35,9 @@ namespace SimpleInjector.Advanced
     public interface ILifestyleSelectionBehavior
     {
         /// <summary>Selects the lifestyle based on the supplied type information.</summary>
-        /// <param name="serviceType">Type of the abstraction that is registered.</param>
         /// <param name="implementationType">Type of the implementation to that is registered.</param>
         /// <returns>The suited <see cref="Lifestyle"/> for the given type.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either one of the arguments is a null reference.</exception>
-        Lifestyle SelectLifestyle(Type serviceType, Type implementationType);
+        Lifestyle SelectLifestyle(Type implementationType);
     }
 }

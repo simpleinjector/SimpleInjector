@@ -379,14 +379,12 @@ namespace SimpleInjector
                 nameof(ContainerOptions.DependencyInjectionBehavior));
 
         internal static string ConstructorResolutionBehaviorReturnedNull(
-            IConstructorResolutionBehavior selectionBehavior, Type serviceType, Type implementationType) =>
+            IConstructorResolutionBehavior selectionBehavior, Type implementationType) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The {0} that was registered through Container.{5}.{6} returned a null reference after " +
-                "its {7}(Type, Type) method was supplied with values '{1}' for serviceType and '{2}' for " +
-                "implementationType. {3}.{7} implementations should never return null, but should throw " +
-                "a {4} with an expressive message instead.",
+                "The {0} that was registered through Container.{4}.{5} returned a null reference after " +
+                "its {6} method was supplied with implementationType '{1}'. {2}.{6} implementations " +
+                "should never return null, but should throw a {3} with an expressive message instead.",
                 selectionBehavior.GetType().TypeName(),
-                serviceType.TypeName(),
                 implementationType.TypeName(),
                 nameof(IConstructorResolutionBehavior),
                 typeof(ActivationException).FullName,
@@ -395,13 +393,12 @@ namespace SimpleInjector
                 nameof(IConstructorResolutionBehavior.GetConstructor));
 
         internal static string LifestyleSelectionBehaviorReturnedNull(
-            ILifestyleSelectionBehavior selectionBehavior, Type serviceType, Type implementationType) =>
+            ILifestyleSelectionBehavior selectionBehavior, Type implementationType) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The {0} that was registered through Container.{4}.{5} returned a null reference after " +
-                "its {6}(Type, Type) method was supplied with values '{1}' for serviceType and '{2}' for " +
-                "implementationType. {3}.{6} implementations should never return null.",
+                "The {0} that was registered through Container.{3}.{4} returned a null reference after " +
+                "its {5} method was supplied with implementationType '{1}'. {2}.{5} implementations " +
+                "should never return null.",
                 selectionBehavior.GetType().TypeName(),
-                serviceType.TypeName(),
                 implementationType.TypeName(),
                 nameof(ILifestyleSelectionBehavior),
                 nameof(Container.Options),
