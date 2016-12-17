@@ -12,6 +12,13 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] LifetimeScopeLifestyle deprecated. (fixes #299)
 		-[Core] ExecutionContextScopeLifestyle deprecated. (fixes #299)
 		-[Core] WebApiRequestLifestyle deprecated. (fixes #331)
+		-[Core] Registration.BuildExpression() signature changed to BuildExpression(InstanceProducer). (fixes #320)
+		-[Core] Registration.BuildTransientExpression<TService>(Func<TService>) signature changed to
+			BuildTransientExpression<TService>(InstanceProducer, Func<TService>). (fixes #320)
+		-[Core] Registration.BuildTransientDelegate<TService>(Func<TService>) signature changed to
+			BuildTransientDelegate<TService>(InstanceProducer, Func<TService>). (fixes #320)
+		-[Core] Registration.BuildTransientDelegate<TService, TImplementation>() signature changed to
+			BuildTransientDelegate<TService, TImplementation>(InstanceProducer). (fixes #320)
 
 	Improvements/Changes:
 		-[Core] Removed all methods that were marked [obsolete(true)] since v3.0. (fixes #305)

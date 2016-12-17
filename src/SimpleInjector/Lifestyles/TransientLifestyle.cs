@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -58,7 +58,8 @@ namespace SimpleInjector.Lifestyles
 
             public override Type ImplementationType => typeof(TService);
 
-            public override Expression BuildExpression() => this.BuildTransientExpression(this.instanceCreator);
+            public override Expression BuildExpression(InstanceProducer producer) => 
+                this.BuildTransientExpression(producer, this.instanceCreator);
         }
 
         private class TransientLifestyleRegistration<TService, TImplementation> : Registration
@@ -72,7 +73,8 @@ namespace SimpleInjector.Lifestyles
 
             public override Type ImplementationType => typeof(TImplementation);
 
-            public override Expression BuildExpression() => this.BuildTransientExpression<TService, TImplementation>();
+            public override Expression BuildExpression(InstanceProducer producer) => 
+                this.BuildTransientExpression<TService, TImplementation>(producer);
         }
     }
 }

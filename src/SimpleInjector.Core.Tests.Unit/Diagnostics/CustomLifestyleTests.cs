@@ -178,8 +178,8 @@
 
                 public override Type ImplementationType => typeof(TImplementation);
 
-                public override Expression BuildExpression() => 
-                    this.BuildTransientExpression<TService, TImplementation>();
+                public override Expression BuildExpression(InstanceProducer producer) => 
+                    this.BuildTransientExpression<TService, TImplementation>(producer);
             }
         }
     }

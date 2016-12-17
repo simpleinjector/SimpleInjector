@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -71,38 +71,38 @@ namespace SimpleInjector.Lifestyles
 
             public Func<TService> InstanceCreator { get; set; }
 
-            protected override Func<TService> BuildTransientDelegate() => 
-                this.BuildTransientDelegate(this.InstanceCreator);
+            protected override Func<TService> BuildTransientDelegate(InstanceProducer producer) => 
+                this.BuildTransientDelegate(producer, this.InstanceCreator);
         }
 
         private class CustomRegistration<TService, TImplementation> : Registration
             where TImplementation : class, TService
             where TService : class
         {
-            private Lazy<Func<object>> lazyLifestyleApplier;
+            private readonly CreateLifestyleApplier lifestyleApplierFactory;
 
             public CustomRegistration(CreateLifestyleApplier lifestyleApplierFactory, 
                 Lifestyle lifestyle, Container container) : base(lifestyle, container)
             {
-                Func<Func<object>> initializer = () =>
-                {
-                    Func<TImplementation> transientInstanceCreator = this.BuildTransientDelegate();
-                    return lifestyleApplierFactory(() => transientInstanceCreator());
-                };
-
-                this.lazyLifestyleApplier = new Lazy<Func<object>>(initializer);
+                this.lifestyleApplierFactory = lifestyleApplierFactory;
             }
 
             public override Type ImplementationType => typeof(TImplementation);
 
-            public override Expression BuildExpression() => 
+            public override Expression BuildExpression(InstanceProducer producer) => 
                 Expression.Convert(
                     Expression.Invoke(
-                        Expression.Constant(this.lazyLifestyleApplier.Value)),
+                        Expression.Constant(this.CreateInstanceCreator(producer))),
                     typeof(TService));
 
-            protected virtual Func<TImplementation> BuildTransientDelegate() => 
-                this.BuildTransientDelegate<TService, TImplementation>();
+            protected virtual Func<TImplementation> BuildTransientDelegate(InstanceProducer producer) => 
+                this.BuildTransientDelegate<TService, TImplementation>(producer);
+
+            private Func<object> CreateInstanceCreator(InstanceProducer producer)
+            {
+                Func<TImplementation> transientInstanceCreator = this.BuildTransientDelegate(producer);
+                return this.lifestyleApplierFactory(() => transientInstanceCreator());
+            }
         }
     }
 }

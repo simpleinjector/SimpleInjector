@@ -86,10 +86,12 @@ namespace SimpleInjector.Lifestyles
 
         private sealed class SingletonInstanceLifestyleRegistration : Registration
         {
+            private readonly object locker = new object();
             private readonly object originalInstance;
             private readonly Type serviceType;
             private readonly Type implementationType;
-            private readonly Lazy<object> initializedInstance;
+
+            private ConstantExpression expression;
 
             internal SingletonInstanceLifestyleRegistration(Type serviceType, Type implementationType, 
                 object instance, Lifestyle lifestyle, Container container)
@@ -98,21 +100,33 @@ namespace SimpleInjector.Lifestyles
                 this.originalInstance = instance;
                 this.serviceType = serviceType;
                 this.implementationType = implementationType;
-
-                // Default lazy behavior ensures that the initializer is guaranteed to be called just once.
-                this.initializedInstance = new Lazy<object>(this.GetInjectedInterceptedAndInitializedInstance);
             }
 
             public override Type ImplementationType => this.implementationType;
 
-            public override Expression BuildExpression() => 
-                Expression.Constant(this.initializedInstance.Value, this.serviceType);
+            public override Expression BuildExpression(InstanceProducer producer)
+            {
+                if (this.expression == null)
+                {
+                    lock (this.locker)
+                    {
+                        if (this.expression == null)
+                        {
+                            this.expression = Expression.Constant(
+                                this.GetInjectedInterceptedAndInitializedInstance(producer),
+                                this.serviceType);
+                        }
+                    }
+                }
 
-            private object GetInjectedInterceptedAndInitializedInstance()
+                return this.expression;
+            }
+
+            private object GetInjectedInterceptedAndInitializedInstance(InstanceProducer producer)
             {
                 try
                 {
-                    return this.GetInjectedInterceptedAndInitializedInstanceInternal();
+                    return this.GetInjectedInterceptedAndInitializedInstanceInternal(producer);
                 }
                 catch (MemberAccessException ex)
                 {
@@ -121,13 +135,13 @@ namespace SimpleInjector.Lifestyles
                 }
             }
 
-            private object GetInjectedInterceptedAndInitializedInstanceInternal()
+            private object GetInjectedInterceptedAndInitializedInstanceInternal(InstanceProducer producer)
             {
                 Expression expression = Expression.Constant(this.originalInstance, this.serviceType);
 
                 expression = this.WrapWithPropertyInjector(this.serviceType, this.serviceType, expression);
                 expression = this.InterceptInstanceCreation(this.serviceType, this.serviceType, expression);
-                expression = this.WrapWithInitializer(this.serviceType, this.serviceType, expression);
+                expression = this.WrapWithInitializer(producer, this.serviceType, this.serviceType, expression);
 
                 var initializer = Expression.Lambda(expression).Compile();
 
@@ -152,8 +166,8 @@ namespace SimpleInjector.Lifestyles
 
             public override Type ImplementationType => typeof(TService);
 
-            protected override Expression BuildTransientExpression() => 
-                this.BuildTransientExpression(this.instanceCreator);
+            protected override Expression BuildTransientExpression(InstanceProducer producer) => 
+                this.BuildTransientExpression(producer, this.instanceCreator);
         }
 
         private class SingletonLifestyleRegistration<TService, TImplementation>
@@ -168,33 +182,49 @@ namespace SimpleInjector.Lifestyles
 
             public override Type ImplementationType => typeof(TImplementation);
 
-            protected override Expression BuildTransientExpression() => 
-                this.BuildTransientExpression<TService, TImplementation>();
+            protected override Expression BuildTransientExpression(InstanceProducer producer) => 
+                this.BuildTransientExpression<TService, TImplementation>(producer);
         }
 
         private abstract class SingletonLifestyleRegistrationBase<TService> : Registration 
             where TService : class
         {
-            private readonly Lazy<TService> lazyInstance;
+            private readonly object locker = new object();
+
+            private ConstantExpression expression;
 
             protected SingletonLifestyleRegistrationBase(Lifestyle lifestyle, Container container)
                 : base(lifestyle, container)
+            {
+            }
+
+            public override Expression BuildExpression(InstanceProducer producer)
             {
                 // Even though the InstanceProducer takes a lock before calling Registration.BuildExpression
                 // we want to be very sure that there will never be more than one instance of a singleton
                 // created. Since the same Registration instance can be used by multiple InstanceProducers,
                 // we absolutely need this protection.
-                this.lazyInstance = new Lazy<TService>(this.CreateInstanceWithNullCheck);
+                if (this.expression == null)
+                {
+                    lock (this.locker)
+                    {
+                        if (this.expression == null)
+                        {
+                            this.expression = Expression.Constant(
+                                this.CreateInstanceWithNullCheck(producer),
+                                typeof(TService));
+                        }
+                    }
+                }
+
+                return this.expression;
             }
 
-            public override Expression BuildExpression() => 
-                Expression.Constant(this.lazyInstance.Value, typeof(TService));
+            protected abstract Expression BuildTransientExpression(InstanceProducer producer);
 
-            protected abstract Expression BuildTransientExpression();
-
-            private TService CreateInstanceWithNullCheck()
+            private TService CreateInstanceWithNullCheck(InstanceProducer producer)
             {
-                var expression = this.BuildTransientExpression();
+                var expression = this.BuildTransientExpression(producer);
 
                 Func<TService> func = CompileExpression(expression);
 
