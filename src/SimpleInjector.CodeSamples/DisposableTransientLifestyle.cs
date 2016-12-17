@@ -83,7 +83,8 @@
             }
 
             public override Type ImplementationType => typeof(TService);
-            public override Expression BuildExpression() => this.BuildTransientExpression(this.instanceCreator);
+            public override Expression BuildExpression(InstanceProducer producer) => 
+                this.BuildTransientExpression(producer, this.instanceCreator);
         }
 
         private class DisposableRegistration<TService, TImpl> : DisposableRegistration
@@ -93,7 +94,8 @@
             internal DisposableRegistration(ScopedLifestyle s, Lifestyle l, Container c) : base(s, l, c) { }
 
             public override Type ImplementationType => typeof(TImpl);
-            public override Expression BuildExpression() => this.BuildTransientExpression<TService, TImpl>();
+            public override Expression BuildExpression(InstanceProducer producer) => 
+                this.BuildTransientExpression<TService, TImpl>(producer);
         }
 
         private abstract class DisposableRegistration : Registration

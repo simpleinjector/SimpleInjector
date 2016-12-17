@@ -47,9 +47,9 @@
 
             public Func<TService> InstanceCreator { get; set; }
 
-            public override Func<TService> BuildTransientInstanceCreator()
+            public override Func<TService> BuildTransientInstanceCreator(InstanceProducer producer)
             {
-                return this.BuildTransientDelegate(this.InstanceCreator);
+                return this.BuildTransientDelegate(producer, this.InstanceCreator);
             }
         }
 
@@ -71,19 +71,19 @@
                 get { return typeof(TImplementation); }
             }
 
-            public override Expression BuildExpression()
+            public override Expression BuildExpression(InstanceProducer producer)
             {
                 if (this.instanceCreator == null)
                 {
-                    this.instanceCreator = this.BuildTransientInstanceCreator();
+                    this.instanceCreator = this.BuildTransientInstanceCreator(producer);
                 }
 
                 return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstance"));
             }
 
-            public virtual Func<TService> BuildTransientInstanceCreator()
+            public virtual Func<TService> BuildTransientInstanceCreator(InstanceProducer producer)
             {
-                return this.BuildTransientDelegate<TService, TImplementation>();
+                return this.BuildTransientDelegate<TService, TImplementation>(producer);
             }
 
             public TService GetInstance()

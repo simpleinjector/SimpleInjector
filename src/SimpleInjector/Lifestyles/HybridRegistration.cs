@@ -50,9 +50,8 @@ namespace SimpleInjector.Lifestyles
 
         public override Type ImplementationType { get; }
 
-        public override Expression BuildExpression()
+        public override Expression BuildExpression(InstanceProducer producer)
         {
-            InstanceProducer producer = this.GetCurrentProducer();
             Expression trueExpression = this.trueRegistration.BuildExpression(producer);
             Expression falseExpression = this.falseRegistration.BuildExpression(producer);
 
