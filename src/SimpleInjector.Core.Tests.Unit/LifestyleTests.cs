@@ -332,8 +332,7 @@
             Lifestyle lifestyle = Lifestyle.Transient;
 
             // Act
-            Action action = () => lifestyle.CreateRegistration(typeof(ICommandHandler<>), 
-                typeof(StubCommandHandler), container);
+            Action action = () => lifestyle.CreateRegistration(typeof(StubCommandHandler), container);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
@@ -350,7 +349,7 @@
             Lifestyle lifestyle = Lifestyle.Transient;
 
             // Act
-            Action action = () => lifestyle.CreateRegistration(typeof(int), typeof(int), container);
+            Action action = () => lifestyle.CreateRegistration(typeof(int), container);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
@@ -366,13 +365,13 @@
             Lifestyle lifestyle = Lifestyle.Transient;
 
             // Act
-            Action action = () => lifestyle.CreateRegistration(typeof(object), typeof(NullCommandHandler<>), container);
+            Action action = () => lifestyle.CreateRegistration(typeof(NullCommandHandler<>), container);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
                 "The supplied type NullCommandHandler<T> is an open generic type.",
                 action);
-            AssertThat.ThrowsWithParamName("implementationType", action);
+            AssertThat.ThrowsWithParamName("concreteType", action);
         }
 
         [TestMethod]
@@ -404,8 +403,7 @@
                 get { throw new NotImplementedException(); }
             }
 
-            protected override Registration CreateRegistrationCore<TService, TImplementation>(
-                Container container)
+            protected override Registration CreateRegistrationCore<TConcrete>(Container container)
             {
                 throw new NotImplementedException();
             }

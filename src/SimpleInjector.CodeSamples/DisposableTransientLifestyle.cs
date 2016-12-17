@@ -33,8 +33,8 @@
             }
         }
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container c) =>
-            new DisposableRegistration<TService, TImplementation>(this.scopedLifestyle, this, c);
+        protected override Registration CreateRegistrationCore<TConcrete>(Container c) =>
+            new DisposableRegistration<TConcrete>(this.scopedLifestyle, this, c, null);
 
         protected override Registration CreateRegistrationCore<TService>(Func<TService> ic, Container c) =>
             new DisposableRegistration<TService>(this.scopedLifestyle, this, c, ic);
@@ -60,54 +60,45 @@
             container.RegisterInitializer(RegisterForDisposal, ShouldApplyInitializer);
 
         private static bool ShouldApplyInitializer(InitializationContext context) => 
-            context.Registration is DisposableRegistration;
+            context.Registration is IDisposableRegistration;
 
         private static void RegisterForDisposal(InstanceInitializationData data)
         {
-            IDisposable instance = data.Instance as IDisposable;
+            var instance = data.Instance as IDisposable;
 
             if (instance != null)
             {
-                var registation = (DisposableRegistration)data.Context.Registration;
-                registation.ScopedLifestyle.RegisterForDisposal(registation.Container, instance);
+                var registation = (IDisposableRegistration)data.Context.Registration;
+                registation.ScopedLifestyle.RegisterForDisposal(data.Context.Registration.Container, instance);
             }
         }
 
-        private sealed class DisposableRegistration<TService> : DisposableRegistration where TService : class
+        private interface IDisposableRegistration
         {
-            private readonly Func<TService> instanceCreator;
+            ScopedLifestyle ScopedLifestyle { get; }
+        }
 
-            internal DisposableRegistration(ScopedLifestyle s, Lifestyle l, Container c, Func<TService> ic) : base(s, l, c)
+        private sealed class DisposableRegistration<TImpl> : Registration, IDisposableRegistration 
+            where TImpl : class
+        {
+            private readonly Func<TImpl> instanceCreator;
+
+            internal DisposableRegistration(ScopedLifestyle s, Lifestyle l, Container c, Func<TImpl> ic) : base(l, c)
             {
                 this.instanceCreator = ic;
-            }
-
-            public override Type ImplementationType => typeof(TService);
-            public override Expression BuildExpression(InstanceProducer producer) => 
-                this.BuildTransientExpression(producer, this.instanceCreator);
-        }
-
-        private class DisposableRegistration<TService, TImpl> : DisposableRegistration
-            where TImpl : class, TService
-            where TService : class
-        {
-            internal DisposableRegistration(ScopedLifestyle s, Lifestyle l, Container c) : base(s, l, c) { }
-
-            public override Type ImplementationType => typeof(TImpl);
-            public override Expression BuildExpression(InstanceProducer producer) => 
-                this.BuildTransientExpression<TService, TImpl>(producer);
-        }
-
-        private abstract class DisposableRegistration : Registration
-        {
-            internal readonly ScopedLifestyle ScopedLifestyle;
-
-            protected DisposableRegistration(ScopedLifestyle s, Lifestyle l, Container c) : base(l, c)
-            {
                 this.ScopedLifestyle = s;
 
                 DisposableTransientLifestyle.TryEnableTransientDisposalOrThrow(c);
             }
+
+            public override Type ImplementationType => typeof(TImpl);
+
+            public ScopedLifestyle ScopedLifestyle { get; }
+
+            public override Expression BuildExpression(InstanceProducer producer) =>
+                this.instanceCreator == null
+                    ? this.BuildTransientExpression(producer)
+                    : this.BuildTransientExpression(producer, this.instanceCreator);
         }
     }
 }

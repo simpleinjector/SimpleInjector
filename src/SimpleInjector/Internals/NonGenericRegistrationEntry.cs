@@ -317,8 +317,7 @@ namespace SimpleInjector.Internals
             private InstanceProducer CreateNewProducerFor(PredicateContext context) =>
                 new InstanceProducer(
                     this.serviceType,
-                    this.lifestyle.CreateRegistration(context.ServiceType, context.ImplementationType, 
-                        this.container),
+                    this.lifestyle.CreateRegistration(context.ImplementationType, this.container),
                     this.predicate);
         }
     }

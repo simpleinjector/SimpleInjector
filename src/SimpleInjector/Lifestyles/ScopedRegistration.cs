@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014 Simple Injector Contributors
+ * Copyright (c) 2014-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -24,19 +24,17 @@ namespace SimpleInjector.Lifestyles
 {
     using System;
     using System.Linq.Expressions;
-    using System.Reflection;
 
-    internal sealed class ScopedRegistration<TService, TImplementation> : Registration
-        where TImplementation : class, TService
-        where TService : class
+    internal sealed class ScopedRegistration<TImplementation> : Registration
+        where TImplementation : class
     {
-        private readonly Func<TService> userSuppliedInstanceCreator;
+        private readonly Func<TImplementation> userSuppliedInstanceCreator;
 
         private Func<Scope> scopeFactory;
-        private Func<TService> instanceCreator;
+        private Func<TImplementation> instanceCreator;
 
         internal ScopedRegistration(ScopedLifestyle lifestyle, Container container,
-            bool registerForDisposal, Func<TService> instanceCreator)
+            bool registerForDisposal, Func<TImplementation> instanceCreator)
             : this(lifestyle, container, registerForDisposal)
         {
             this.userSuppliedInstanceCreator = instanceCreator;
@@ -53,7 +51,7 @@ namespace SimpleInjector.Lifestyles
 
         public new ScopedLifestyle Lifestyle => (ScopedLifestyle)base.Lifestyle;
 
-        internal Func<TService> InstanceCreator => this.instanceCreator;
+        internal Func<TImplementation> InstanceCreator => this.instanceCreator;
 
         internal bool RegisterForDisposal { get; }
 
@@ -76,9 +74,9 @@ namespace SimpleInjector.Lifestyles
         // is most cases not be called. It will however be called when the expression that is built by
         // this instance will get compiled by someone else than the core library. That's why this method
         // is still important.
-        public TService GetInstance() => Scope.GetInstance(this, this.scopeFactory());
+        public TImplementation GetInstance() => Scope.GetInstance(this, this.scopeFactory());
 
-        private Func<TService> BuildInstanceCreator(InstanceProducer producer)
+        private Func<TImplementation> BuildInstanceCreator(InstanceProducer producer)
         {
             if (this.userSuppliedInstanceCreator != null)
             {
@@ -86,7 +84,7 @@ namespace SimpleInjector.Lifestyles
             }
             else
             {
-                return this.BuildTransientDelegate<TService, TImplementation>(producer);
+                return (Func<TImplementation>)this.BuildTransientDelegate(producer);
             }
         }
     }

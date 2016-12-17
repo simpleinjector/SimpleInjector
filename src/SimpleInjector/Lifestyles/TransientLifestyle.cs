@@ -33,9 +33,9 @@ namespace SimpleInjector.Lifestyles
 
         public override int Length => 1;
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+        protected override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
-            return new TransientLifestyleRegistration<TService, TImplementation>(this, container);
+            return new TransientLifestyleRegistration<TConcrete>(this, container);
         }
 
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
@@ -44,37 +44,24 @@ namespace SimpleInjector.Lifestyles
             return new TransientLifestyleRegistration<TService>(this, container, instanceCreator);
         }
 
-        private sealed class TransientLifestyleRegistration<TService> : Registration
-            where TService : class
+        private sealed class TransientLifestyleRegistration<TImplementation> : Registration
+            where TImplementation : class
         {
-            private readonly Func<TService> instanceCreator;
+            private readonly Func<TImplementation> instanceCreator;
 
             public TransientLifestyleRegistration(Lifestyle lifestyle, Container container, 
-                Func<TService> instanceCreator)
+                Func<TImplementation> instanceCreator = null)
                 : base(lifestyle, container)
             {
                 this.instanceCreator = instanceCreator;
             }
 
-            public override Type ImplementationType => typeof(TService);
-
-            public override Expression BuildExpression(InstanceProducer producer) => 
-                this.BuildTransientExpression(producer, this.instanceCreator);
-        }
-
-        private class TransientLifestyleRegistration<TService, TImplementation> : Registration
-            where TImplementation : class, TService
-            where TService : class
-        {
-            internal TransientLifestyleRegistration(Lifestyle lifestyle, Container container)
-                : base(lifestyle, container)
-            {
-            }
-
             public override Type ImplementationType => typeof(TImplementation);
 
-            public override Expression BuildExpression(InstanceProducer producer) => 
-                this.BuildTransientExpression<TService, TImplementation>(producer);
+            public override Expression BuildExpression(InstanceProducer producer) =>
+                this.instanceCreator == null
+                    ? this.BuildTransientExpression(producer)
+                    : this.BuildTransientExpression(producer, this.instanceCreator);
         }
     }
 }

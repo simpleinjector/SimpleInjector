@@ -37,6 +37,9 @@ namespace SimpleInjector.Internals
         private static readonly ConstructorInfo LazyScopeConstructor =
             Helpers.GetConstructor(() => new LazyScope(null, null));
 
+        private static readonly MethodInfo CreateConstantValueDelegateMethod = 
+            Helpers.GetGenericMethodDefinition(() => CreateConstantValueDelegate<object>(null));
+
         // Compile the expression. If the expression is compiled in a dynamic assembly, the compiled delegate
         // is called (to ensure that it will run, because it tends to fail now and then) and the created
         // instance is returned through the out parameter. Note that NO created instance will be returned when
@@ -55,6 +58,12 @@ namespace SimpleInjector.Internals
         internal static Delegate CompileExpression(Type resultType, Container container, Expression expression,
             Dictionary<Expression, InvocationExpression> reducedNodes = null)
         {
+            if (expression is ConstantExpression)
+            {
+                return (Delegate)CreateConstantValueDelegateMethod.MakeGenericMethod(resultType)
+                    .Invoke(null, new[] { expression });
+            }
+
             // Reduce the size of the object graph to prevent the CLR from throwing stack overflow exceptions.
             expression = ReduceObjectGraphSize(expression, container, reducedNodes);
 
@@ -105,8 +114,9 @@ namespace SimpleInjector.Internals
         static partial void TryCompileInDynamicAssembly(Type resultType, Expression expression,
             ref Delegate compiledLambda);
 
+        // This method is public; is called using reflection.
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Func<TResult> CreateConstantValueDelegate<TResult>(Expression expression)
+        public static Func<TResult> CreateConstantValueDelegate<TResult>(Expression expression)
         {
             object value = ((ConstantExpression)expression).Value;
 
@@ -179,7 +189,7 @@ namespace SimpleInjector.Internals
 
         private static NewExpression CreateNewLazyScopedRegistration(Registration registration)
         {
-            var type = typeof(LazyScopedRegistration<,>)
+            Type type = typeof(LazyScopedRegistration<>)
                 .MakeGenericType(registration.GetType().GetGenericArguments());
 
             return Expression.New(
@@ -318,7 +328,7 @@ namespace SimpleInjector.Internals
                 {
                     Type type = registration.GetType();
 
-                    if (type.IsGenericType() && type.GetGenericTypeDefinition() == typeof(ScopedRegistration<,>))
+                    if (type.IsGenericType() && type.GetGenericTypeDefinition() == typeof(ScopedRegistration<>))
                     {
                         return registration;
                     }
@@ -395,7 +405,7 @@ namespace SimpleInjector.Internals
                 this.Registration = registration;
                 this.OriginalExpression = originalExpression;
 
-                this.lazyScopeRegistrationType = typeof(LazyScopedRegistration<,>)
+                this.lazyScopeRegistrationType = typeof(LazyScopedRegistration<>)
                     .MakeGenericType(this.Registration.GetType().GetGenericArguments());
             }
 

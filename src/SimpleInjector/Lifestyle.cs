@@ -501,6 +501,7 @@ namespace SimpleInjector
             Requires.IsNotNull(implementationType, nameof(implementationType));
             Requires.IsNotNull(container, nameof(container));
 
+            Requires.IsNotOpenGenericType(implementationType, nameof(implementationType));
             Requires.ServiceIsAssignableFromImplementation(typeof(TService), implementationType,
                 nameof(implementationType));
 
@@ -546,6 +547,7 @@ namespace SimpleInjector
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(implementationType, nameof(implementationType));
             Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotOpenGenericType(implementationType, nameof(implementationType));
 
             return new InstanceProducer(serviceType, this.CreateRegistration(implementationType, container));
         }
@@ -685,9 +687,9 @@ namespace SimpleInjector
         /// <summary>
         /// When overridden in a derived class, 
         /// creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
+        /// specified <typeparamref name="TConcrete"/> with the caching as specified by this lifestyle.
         /// </summary>
-        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
@@ -696,8 +698,8 @@ namespace SimpleInjector
         /// to create and return a new <see cref="Registration"/>. Note that you should <b>always</b> create
         /// a new <see cref="Registration"/> instance. They should never be cached.
         /// </remarks>
-        protected abstract Registration CreateRegistrationCore<TImplementation>(Container container)
-            where TImplementation : class;
+        protected abstract Registration CreateRegistrationCore<TConcrete>(Container container)
+            where TConcrete : class;
 
         /// <summary>
         /// When overridden in a derived class, 

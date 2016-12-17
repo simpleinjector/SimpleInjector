@@ -30,21 +30,19 @@ namespace SimpleInjector.Advanced.Internal
     /// This is an internal type. Only depend on this type when you want to be absolutely sure a future 
     /// version of the framework will break your code.
     /// </summary>
-    /// <typeparam name="TService">Service type.</typeparam>
     /// <typeparam name="TImplementation">Implementation type.</typeparam>
     [EditorBrowsable(EditorBrowsableState.Never)]
     [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes",
         Justification = "This struct is not intended for public use.")]
-    public struct LazyScopedRegistration<TService, TImplementation>
-        where TImplementation : class, TService
-        where TService : class
+    public struct LazyScopedRegistration<TImplementation>
+        where TImplementation : class
     {
         private readonly Registration registration;
 
-        private TService instance;
+        private TImplementation instance;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LazyScopedRegistration{TService, TImplementation}"/> 
+        /// Initializes a new instance of the <see cref="LazyScopedRegistration{TImplementation}"/> 
         /// struct.</summary>
         /// <param name="registration">The registration.</param>
         public LazyScopedRegistration(Registration registration)
@@ -56,7 +54,7 @@ namespace SimpleInjector.Advanced.Internal
         /// <summary>Gets the lazily initialized instance for the of the current LazyScopedRegistration.</summary>
         /// <param name="scope">The scope that is used to retrieve the instance.</param>
         /// <returns>The cached instance.</returns>
-        public TService GetInstance(Scope scope)
+        public TImplementation GetInstance(Scope scope)
         {
             // NOTE: Never pass several scope instances into the GetInstance method of a single
             // LazyScopedRegistration. That would break shit. The scope is passed in here because:
@@ -68,7 +66,7 @@ namespace SimpleInjector.Advanced.Internal
             if (this.instance == null)
             {
                 this.instance =
-                    Scope.GetInstance((ScopedRegistration<TService, TImplementation>)this.registration, scope);
+                    Scope.GetInstance((ScopedRegistration<TImplementation>)this.registration, scope);
             }
 
             return this.instance;

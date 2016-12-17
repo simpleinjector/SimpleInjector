@@ -51,27 +51,26 @@
     {
         private readonly Container container;
         private readonly IConstructorResolutionBehavior baseBehavior;
-        private readonly Dictionary<object, ConstructorInfo> constructors;
+        private readonly Dictionary<Type, ConstructorInfo> constructors;
 
         public ConstructorSelectorConvention(Container container,
             IConstructorResolutionBehavior baseBehavior)
         {
             this.container = container;
             this.baseBehavior = baseBehavior;
-            this.constructors = new Dictionary<object, ConstructorInfo>();
+            this.constructors = new Dictionary<Type, ConstructorInfo>();
         }
 
-        ConstructorInfo IConstructorResolutionBehavior.GetConstructor(Type serviceType,
-            Type implementationType)
+        ConstructorInfo IConstructorResolutionBehavior.GetConstructor(Type implementationType)
         {
             ConstructorInfo constructor;
 
-            if (this.constructors.TryGetValue(CreateKey(serviceType, implementationType), out constructor))
+            if (this.constructors.TryGetValue(implementationType, out constructor))
             {
                 return constructor;
             }
 
-            return this.baseBehavior.GetConstructor(serviceType, implementationType);
+            return this.baseBehavior.GetConstructor(implementationType);
         }
 
         public void Register<TConcrete>(IConstructorSelector selector)
@@ -104,12 +103,7 @@
         {
             var constructor = selector.GetConstructor(typeof(TImplementation));
 
-            this.constructors[CreateKey(typeof(TService), typeof(TImplementation))] = constructor;
-        }
-
-        private static object CreateKey(Type serviceType, Type implementationType)
-        {
-            return new { serviceType, implementationType };
+            this.constructors[typeof(TImplementation)] = constructor;
         }
     }
 }

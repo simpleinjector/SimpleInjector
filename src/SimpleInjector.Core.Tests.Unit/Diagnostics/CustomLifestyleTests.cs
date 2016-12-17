@@ -158,8 +158,8 @@
 
             public override int Length { get; }
 
-            protected override Registration CreateRegistrationCore<TService, TImplementation>(Container c) => 
-                new FakeRegistration<TService, TImplementation>(this, c);
+            protected override Registration CreateRegistrationCore<TConcrete>(Container c) => 
+                new FakeRegistration<TConcrete>(this, c);
 
             protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
                 Container container)
@@ -167,9 +167,8 @@
                 throw new NotImplementedException();
             }
 
-            private sealed class FakeRegistration<TService, TImplementation> : Registration
-                where TImplementation : class, TService
-                where TService : class
+            private sealed class FakeRegistration<TImplementation> : Registration 
+                where TImplementation : class
             {
                 public FakeRegistration(Lifestyle lifestyle, Container container)
                     : base(lifestyle, container)
@@ -179,7 +178,7 @@
                 public override Type ImplementationType => typeof(TImplementation);
 
                 public override Expression BuildExpression(InstanceProducer producer) => 
-                    this.BuildTransientExpression<TService, TImplementation>(producer);
+                    this.BuildTransientExpression(producer);
             }
         }
     }

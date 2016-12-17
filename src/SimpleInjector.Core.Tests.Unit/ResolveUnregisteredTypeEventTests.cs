@@ -592,7 +592,7 @@ namespace SimpleInjector.Tests.Unit
             container.Register<ComponentDependingOn<IUserRepository>>();
             container.RegisterSingleton<ServiceDependingOn<IUserRepository>>();
 
-            var r = Lifestyle.Singleton.CreateRegistration<IUserRepository, SqlUserRepository>(container);
+            var r = Lifestyle.Singleton.CreateRegistration<SqlUserRepository>(container);
 
             container.ResolveUnregisteredType += (s, e) =>
             {

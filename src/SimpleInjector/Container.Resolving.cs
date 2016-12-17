@@ -563,7 +563,7 @@ namespace SimpleInjector
                 return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), () =>
                 {
                     var registration =
-                        this.SelectionBasedLifestyle.CreateRegistration<TConcrete, TConcrete>(this);
+                        this.SelectionBasedLifestyle.CreateRegistration<TConcrete>(this);
 
                     return BuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), registration);
                 });
@@ -582,7 +582,7 @@ namespace SimpleInjector
 
             return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(type, () =>
             {
-                var registration = this.SelectionBasedLifestyle.CreateRegistration(type, type, this);
+                var registration = this.SelectionBasedLifestyle.CreateRegistration(type, this);
 
                 return BuildInstanceProducerForConcreteUnregisteredType(type, registration);
             });

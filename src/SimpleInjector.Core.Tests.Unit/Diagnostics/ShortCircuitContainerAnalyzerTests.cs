@@ -98,8 +98,7 @@
             // Arrange
             var container = new Container();
 
-            var registration = Lifestyle.Singleton
-                .CreateRegistration<ImplementsBothInterfaces, ImplementsBothInterfaces>(container);
+            var registration = Lifestyle.Singleton.CreateRegistration<ImplementsBothInterfaces>(container);
 
             container.AddRegistration(typeof(IService1), registration);
             container.AddRegistration(typeof(IService2), registration);
@@ -126,8 +125,7 @@
             // Arrange
             var container = new Container();
 
-            var registration = Lifestyle.Singleton
-                .CreateRegistration<ImplementsBothInterfaces, ImplementsBothInterfaces>(container);
+            var registration = Lifestyle.Singleton.CreateRegistration<ImplementsBothInterfaces>(container);
 
             container.AddRegistration(typeof(IService1), registration);
             container.AddRegistration(typeof(IService2), registration);

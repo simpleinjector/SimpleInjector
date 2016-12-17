@@ -261,10 +261,9 @@ namespace SimpleInjector
             GC.SuppressFinalize(this);
         }
 
-        internal static TService GetInstance<TService, TImplementation>(
-            ScopedRegistration<TService, TImplementation> registration, Scope scope)
-            where TImplementation : class, TService
-            where TService : class
+        internal static TImplementation GetInstance<TImplementation>(
+            ScopedRegistration<TImplementation> registration, Scope scope)
+            where TImplementation : class
         {
             if (scope == null)
             {
@@ -393,10 +392,9 @@ namespace SimpleInjector
             }
         }
 
-        private static TService GetScopelessInstance<TService, TImplementation>(
-            ScopedRegistration<TService, TImplementation> registration)
-            where TImplementation : class, TService
-            where TService : class
+        private static TImplementation GetScopelessInstance<TImplementation>(
+            ScopedRegistration<TImplementation> registration)
+            where TImplementation : class
         {
             if (registration.Container.IsVerifying())
             {
@@ -405,14 +403,13 @@ namespace SimpleInjector
 
             throw new ActivationException(
                 StringResources.TheServiceIsRequestedOutsideTheContextOfAScopedLifestyle(
-                    typeof(TService),
+                    typeof(TImplementation),
                     registration.Lifestyle));
         }
 
-        private TService GetInstanceInternal<TService, TImplementation>(
-            ScopedRegistration<TService, TImplementation> registration)
-            where TService : class
-            where TImplementation : class, TService
+        private TImplementation GetInstanceInternal<TImplementation>(
+            ScopedRegistration<TImplementation> registration)
+            where TImplementation : class
         {
             lock (this.syncRoot)
             {
@@ -429,23 +426,22 @@ namespace SimpleInjector
                 object instance;
 
                 return !cacheIsEmpty && this.cachedInstances.TryGetValue(registration, out instance)
-                    ? (TService)instance
+                    ? (TImplementation)instance
                     : this.CreateAndCacheInstance(registration);
             }
         }
 
-        private TService CreateAndCacheInstance<TService, TImplementation>(
-            ScopedRegistration<TService, TImplementation> registration)
-            where TService : class
-            where TImplementation : class, TService
+        private TImplementation CreateAndCacheInstance<TImplementation>(
+            ScopedRegistration<TImplementation> registration)
+            where TImplementation : class
         {
-            TService service = registration.InstanceCreator.Invoke();
+            TImplementation instance = registration.InstanceCreator.Invoke();
 
-            this.cachedInstances[registration] = service;
+            this.cachedInstances[registration] = instance;
 
             if (registration.RegisterForDisposal)
             {
-                var disposable = service as IDisposable;
+                var disposable = instance as IDisposable;
 
                 if (disposable != null)
                 {
@@ -453,7 +449,7 @@ namespace SimpleInjector
                 }
             }
 
-            return service;
+            return instance;
         }
 
 #if !NET40

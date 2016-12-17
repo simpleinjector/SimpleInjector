@@ -539,8 +539,8 @@
 
             var container = new Container();
 
-            var reg1 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
-            var reg2 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
+            var reg1 = lifestyle.CreateRegistration<DisposableCommand>(container);
+            var reg2 = lifestyle.CreateRegistration<DisposableCommand>(container);
 
             container.AppendToCollection(typeof(ICommand), reg1);
             container.AppendToCollection(typeof(ICommand), reg2);
@@ -565,8 +565,8 @@
 
             var container = new Container();
 
-            var reg1 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
-            var reg2 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
+            var reg1 = lifestyle.CreateRegistration<DisposableCommand>(container);
+            var reg2 = lifestyle.CreateRegistration<DisposableCommand>(container);
 
             container.AppendToCollection(typeof(ICommand), reg1);
             container.AppendToCollection(typeof(ICommand), reg2);

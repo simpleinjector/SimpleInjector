@@ -133,7 +133,8 @@
 
         public static void ExceptionContainsParamName(string expectedParamName, ArgumentException exception)
         {
-            string assertMessage = "Exception does not contain parameter with name: " + expectedParamName;
+            string assertMessage = "Exception does not contain parameter with name: " + expectedParamName +
+                ". Exception message: " + exception.Message;
 
 #if !SILVERLIGHT
             Assert.AreEqual(expectedParamName, exception.ParamName, assertMessage);

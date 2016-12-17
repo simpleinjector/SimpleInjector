@@ -243,7 +243,7 @@ namespace SimpleInjector
                 baseType.GetGenericTypeDefinition() == serviceType.GetGenericTypeDefinition())
             select baseType;
 
-        internal static Action<T> CreateAction<T>(object action)
+        public static Action<T> CreateAction<T>(object action)
         {
             Type actionArgumentType = action.GetType().GetGenericArguments()[0];
 

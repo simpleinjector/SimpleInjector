@@ -30,8 +30,7 @@
             container.Register<RealTimeProvider>();
 
             // Assert
-            Assert.AreSame(typeof(RealTimeProvider), behavior.SuppliedArguments.ServiceType);
-            Assert.AreSame(typeof(RealTimeProvider), behavior.SuppliedArguments.ImplementationType);
+            Assert.AreSame(typeof(RealTimeProvider), behavior.SuppliedImplementationType);
         }
 
         [TestMethod]
@@ -47,8 +46,7 @@
             container.Register<ITimeProvider, RealTimeProvider>();
 
             // Assert
-            Assert.AreSame(typeof(ITimeProvider), behavior.SuppliedArguments.ServiceType);
-            Assert.AreSame(typeof(RealTimeProvider), behavior.SuppliedArguments.ImplementationType);
+            Assert.AreSame(typeof(RealTimeProvider), behavior.SuppliedImplementationType);
         }
 
         [TestMethod]
@@ -64,8 +62,7 @@
             container.Register<ITimeProvider>(() => new RealTimeProvider());
 
             // Assert
-            Assert.AreSame(typeof(ITimeProvider), behavior.SuppliedArguments.ServiceType);
-            Assert.AreSame(typeof(ITimeProvider), behavior.SuppliedArguments.ImplementationType);
+            Assert.AreSame(typeof(ITimeProvider), behavior.SuppliedImplementationType);
         }
 
         [TestMethod]
@@ -81,8 +78,7 @@
             container.Register(typeof(RealTimeProvider));
 
             // Assert
-            Assert.AreSame(typeof(RealTimeProvider), behavior.SuppliedArguments.ServiceType);
-            Assert.AreSame(typeof(RealTimeProvider), behavior.SuppliedArguments.ImplementationType);
+            Assert.AreSame(typeof(RealTimeProvider), behavior.SuppliedImplementationType);
         }
 
         [TestMethod]
@@ -98,8 +94,7 @@
             container.Register(typeof(ITimeProvider), typeof(RealTimeProvider));
 
             // Assert
-            Assert.AreSame(typeof(ITimeProvider), behavior.SuppliedArguments.ServiceType);
-            Assert.AreSame(typeof(RealTimeProvider), behavior.SuppliedArguments.ImplementationType);
+            Assert.AreSame(typeof(RealTimeProvider), behavior.SuppliedImplementationType);
         }
 
         [TestMethod]
@@ -115,8 +110,7 @@
             container.Register(typeof(ITimeProvider), () => new RealTimeProvider());
 
             // Assert
-            Assert.AreSame(typeof(ITimeProvider), behavior.SuppliedArguments.ServiceType);
-            Assert.AreSame(typeof(ITimeProvider), behavior.SuppliedArguments.ImplementationType);
+            Assert.AreSame(typeof(ITimeProvider), behavior.SuppliedImplementationType);
         }
 
         [TestMethod]
@@ -486,34 +480,23 @@
                 this.selector = lifestyleSelector;
             }
 
-            public Lifestyle SelectLifestyle(Type service, Type impl) => this.selector(impl);
+            public Lifestyle SelectLifestyle(Type impl) => this.selector(impl);
         }
 
         public class FakeLifestyleSelectionBehavior : ILifestyleSelectionBehavior
         {
-            private List<LifestyleArguments> suppliedArgumentCollection = new List<LifestyleArguments>();
+            private List<Type> suppliedImplementationTypes = new List<Type>();
 
-            public LifestyleArguments SuppliedArguments => this.suppliedArgumentCollection.Single();
+            public Type SuppliedImplementationType => this.suppliedImplementationTypes.Single();
 
-            public Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
+            public Lifestyle SelectLifestyle(Type implementationType)
             {
                 if (implementationType != typeof(Container))
                 {
-                    this.suppliedArgumentCollection.Add(new LifestyleArguments
-                    {
-                        ServiceType = serviceType,
-                        ImplementationType = implementationType,
-                    });
+                    this.suppliedImplementationTypes.Add(implementationType);
                 }
 
                 return Lifestyle.Transient;
-            }
-
-            public class LifestyleArguments
-            {
-                public Type ServiceType { get; set; }
-
-                public Type ImplementationType { get; set; }
             }
         }
 

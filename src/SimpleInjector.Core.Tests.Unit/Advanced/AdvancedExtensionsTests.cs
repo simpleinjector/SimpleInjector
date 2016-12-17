@@ -100,7 +100,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Arrange
             var container = ContainerFactory.New();
 
-            var registration = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl>(container);
+            var registration = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
 
             container.AppendToCollection(typeof(IPlugin), registration);
 
@@ -117,8 +117,8 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Arrange
             var container = ContainerFactory.New();
 
-            var registration1 = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl>(container);
-            var registration2 = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl2>(container);
+            var registration1 = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
+            var registration2 = Lifestyle.Transient.CreateRegistration<PluginImpl2>(container);
 
             container.AppendToCollection(typeof(IPlugin), registration1);
             container.AppendToCollection(typeof(IPlugin), registration2);
@@ -139,7 +139,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             container.RegisterCollection<IPlugin>(new[] { typeof(PluginImpl) });
 
-            var registration = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl2>(container);
+            var registration = Lifestyle.Transient.CreateRegistration<PluginImpl2>(container);
 
             container.AppendToCollection(typeof(IPlugin), registration);
 
@@ -157,8 +157,8 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Arrange
             var container = ContainerFactory.New();
 
-            var registration1 = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl>(container);
-            var registration2 = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl2>(container);
+            var registration1 = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
+            var registration2 = Lifestyle.Transient.CreateRegistration<PluginImpl2>(container);
 
             container.RegisterCollection(typeof(IPlugin), new[] { registration1 });
 
@@ -178,8 +178,8 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Arrange
             var container = ContainerFactory.New();
 
-            var registration1 = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl>(container);
-            var registration2 = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl2>(container);
+            var registration1 = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
+            var registration2 = Lifestyle.Transient.CreateRegistration<PluginImpl2>(container);
 
             container.AppendToCollection(typeof(IPlugin), registration1);
 
@@ -202,7 +202,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             container.RegisterCollection<IPlugin>(containerUncontrolledCollection);
 
-            var registration = Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl>(container);
+            var registration = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
 
             // Act
             Action action = () => container.AppendToCollection(typeof(IPlugin), registration);
@@ -586,6 +586,6 @@ namespace SimpleInjector.Tests.Unit.Advanced
         }
 
         private static Registration CreateRegistration(Container container) =>
-            Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl>(container);
+            Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
     }
 }

@@ -215,8 +215,8 @@
             // Arrange
             var container = new Container();
 
-            var fooReg = Lifestyle.Singleton.CreateRegistration<IFoo, FooBar>(container);
-            var barReg = Lifestyle.Singleton.CreateRegistration<IBar, FooBar>(container);
+            var fooReg = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
+            var barReg = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
 
             container.AddRegistration(typeof(IFoo), fooReg);
             container.AddRegistration(typeof(IBar), barReg);

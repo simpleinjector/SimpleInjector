@@ -49,7 +49,7 @@
             behavior.RegisterFactoryProduct(typeof(TService), typeof(TImplementation));
 
             lifestyle = lifestyle ?? container.Options.LifestyleSelectionBehavior
-                .SelectLifestyle(typeof(TService), typeof(TImplementation));
+                .SelectLifestyle(typeof(TImplementation));
 
             container.Register<TService, TImplementation>(lifestyle);
         }

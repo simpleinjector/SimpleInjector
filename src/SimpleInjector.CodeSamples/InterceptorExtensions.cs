@@ -63,8 +63,7 @@ namespace SimpleInjector.CodeSamples
             where TInterceptor : class, IInterceptor {
             RequiresIsNotNull(container, nameof(container));
             RequiresIsNotNull(predicate, nameof(predicate));
-            container.Options.ConstructorResolutionBehavior.GetConstructor(
-                typeof(TInterceptor), typeof(TInterceptor));
+            container.Options.ConstructorResolutionBehavior.GetConstructor(typeof(TInterceptor));
 
             var interceptWith = new InterceptionHelper() {
                 BuildInterceptorExpression =
