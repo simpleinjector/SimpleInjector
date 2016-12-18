@@ -15,10 +15,12 @@
     public sealed class ConstructorSelector : IConstructorSelector
     {
         public static readonly IConstructorSelector MostParameters =
-            new ConstructorSelector(type => type.GetConstructors().OrderByDescending(c => c.GetParameters().Length).First());
+            new ConstructorSelector(type => type.GetConstructors()
+                .OrderByDescending(c => c.GetParameters().Length).First());
 
         public static readonly IConstructorSelector LeastParameters =
-            new ConstructorSelector(type => type.GetConstructors().OrderBy(c => c.GetParameters().Length).First());
+            new ConstructorSelector(type => type.GetConstructors()
+                .OrderBy(c => c.GetParameters().Length).First());
 
         private readonly Func<Type, ConstructorInfo> selector;
 
@@ -76,7 +78,7 @@
         public void Register<TConcrete>(IConstructorSelector selector)
             where TConcrete : class
         {
-            this.RegisterExplicitConstructor<TConcrete, TConcrete>(selector);
+            this.RegisterExplicitConstructor<TConcrete>(selector);
 
             this.container.Register<TConcrete, TConcrete>();
         }
@@ -85,7 +87,7 @@
             where TService : class
             where TImplementation : class, TService
         {
-            this.RegisterExplicitConstructor<TService, TImplementation>(selector);
+            this.RegisterExplicitConstructor<TImplementation>(selector);
 
             this.container.Register<TService, TImplementation>();
         }
@@ -94,14 +96,14 @@
             where TService : class
             where TImplementation : class, TService
         {
-            this.RegisterExplicitConstructor<TService, TImplementation>(selector);
+            this.RegisterExplicitConstructor<TImplementation>(selector);
 
             this.container.Register<TService, TImplementation>(lifestyle);
         }
 
-        private void RegisterExplicitConstructor<TService, TImplementation>(IConstructorSelector selector)
+        private void RegisterExplicitConstructor<TImplementation>(IConstructorSelector selector)
         {
-            var constructor = selector.GetConstructor(typeof(TImplementation));
+            ConstructorInfo constructor = selector.GetConstructor(typeof(TImplementation));
 
             this.constructors[typeof(TImplementation)] = constructor;
         }

@@ -31,7 +31,11 @@
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {
-            if (instanceCreator == null) throw new ArgumentNullException(nameof(instanceCreator));
+            if (instanceCreator == null)
+            {
+                throw new ArgumentNullException(nameof(instanceCreator));
+            }
+
             return new PerThreadRegistration<TService>(this, container, instanceCreator);
         }
 
@@ -51,8 +55,7 @@
             }
 
             public override Type ImplementationType => typeof(TImplementation);
-
-
+            
             public override Expression BuildExpression(InstanceProducer producer)
             {
                 if (this.instanceProducer == null)

@@ -114,9 +114,8 @@ namespace SimpleInjector.Internals
         static partial void TryCompileInDynamicAssembly(Type resultType, Expression expression,
             ref Delegate compiledLambda);
 
-        // This method is public; is called using reflection.
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public static Func<TResult> CreateConstantValueDelegate<TResult>(Expression expression)
+        private static Func<TResult> CreateConstantValueDelegate<TResult>(Expression expression)
         {
             object value = ((ConstantExpression)expression).Value;
 
@@ -146,7 +145,7 @@ namespace SimpleInjector.Internals
         //
         //     return new HomeController(
         //         value1.GetInstance(scope1.Value), // Hits ThreadLocal, hits dictionary
-        //         new SomeQueryHandler(value1.GetInstance(scope1.Value)),
+        //         new SomeQueryHandler(value1.GetInstance(scope1.Value)), // hits local cache
         //         new SomeCommandHandler(value2.GetInstance(scope1.Value))); // Hits dictionary
         // };
         private static Expression OptimizeExpression(Container container, Expression expression,

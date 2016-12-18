@@ -19,6 +19,11 @@
             this.scopedLifestyle = scopedLifestyle;
         }
 
+        private interface IDisposableRegistration
+        {
+            ScopedLifestyle ScopedLifestyle { get; }
+        }
+
         public override int Length => Transient.Length;
 
         public static void EnableForContainer(Container container)
@@ -71,11 +76,6 @@
                 var registation = (IDisposableRegistration)data.Context.Registration;
                 registation.ScopedLifestyle.RegisterForDisposal(data.Context.Registration.Container, instance);
             }
-        }
-
-        private interface IDisposableRegistration
-        {
-            ScopedLifestyle ScopedLifestyle { get; }
         }
 
         private sealed class DisposableRegistration<TImpl> : Registration, IDisposableRegistration 

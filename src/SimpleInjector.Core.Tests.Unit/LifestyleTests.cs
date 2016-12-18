@@ -325,23 +325,6 @@
         }
 
         [TestMethod]
-        public void CreateRegistration_SuppliedWithOpenGenericServiceType_ThrowsExpectedException()
-        {
-            // Arrange
-            Container container = new Container();
-            Lifestyle lifestyle = Lifestyle.Transient;
-
-            // Act
-            Action action = () => lifestyle.CreateRegistration(typeof(StubCommandHandler), container);
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The supplied type ICommandHandler<TCommand> is an open generic type.",
-                action);
-            AssertThat.ThrowsWithParamName("serviceType", action);
-        }
-
-        [TestMethod]
         public void CreateRegistration_CalledWithValueType_ThrowsExpectedException()
         {
             // Arrange

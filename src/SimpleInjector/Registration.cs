@@ -100,6 +100,8 @@ namespace SimpleInjector
         /// <param name="producer">The  producer that is requesting the construction of the expression.
         /// The value can be null.</param>
         /// <returns>An <see cref="Expression"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="producer"/> is a null 
+        /// reference.</exception>
         public abstract Expression BuildExpression(InstanceProducer producer);
 
         /// <summary>
@@ -232,7 +234,7 @@ namespace SimpleInjector
             {
                 return Expression.Convert(
                     BuildExpressionWithInstanceInitializer<object>(expression, initializer),
-                    serviceType);
+                    implementationType);
             }
 
             return expression;
@@ -248,18 +250,19 @@ namespace SimpleInjector
         /// that are applicable to the given <typeparamref name="TService"/> (if any).
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
-        /// <param name="producer">The  producer that is requesting the construction of the delegate.
-        /// The value can be null.</param>
+        /// <param name="producer">The instance producer that is requesting the construction of the delegate.</param>
         /// <param name="instanceCreator">
         /// The delegate supplied by the user that allows building or creating new instances.</param>
         /// <returns>A <see cref="Func{T}"/> delegate.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         protected Func<TService> BuildTransientDelegate<TService>(InstanceProducer producer,
             Func<TService> instanceCreator)
             where TService : class
         {
+            Requires.IsNotNull(producer, nameof(producer));
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
-            Expression expression = this.BuildTransientExpression<TService>(producer, instanceCreator);
+            Expression expression = this.BuildTransientExpression(producer, instanceCreator);
 
             // NOTE: The returned delegate could still return null (caused by the ExpressionBuilding event),
             // but I don't feel like protecting us against such an obscure user bug.
@@ -275,9 +278,13 @@ namespace SimpleInjector
         /// <see cref="SimpleInjector.Container.RegisterInitializer{TService}">initializers</see> 
         /// that are applicable to the given <see cref="ImplementationType"/> (if any).
         /// </summary>
+        /// <param name="producer">The instance producer that is requesting the construction of the delegate.</param>
         /// <returns>A <see cref="Func{T}"/> delegate.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         protected Func<object> BuildTransientDelegate(InstanceProducer producer)
         {
+            Requires.IsNotNull(producer, nameof(producer));
+
             Expression expression = this.BuildTransientExpression(producer);
 
             return (Func<object>)this.BuildDelegate(expression);
@@ -293,14 +300,16 @@ namespace SimpleInjector
         /// applicable to the given <typeparamref name="TService"/> (if any).
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
-        /// <param name="producer">The  producer that is requesting the construction of the expression.
-        /// The value can be null.</param>
+        /// <param name="producer">The  producer that is requesting the construction of the expression.</param>
         /// <param name="instanceCreator">
         /// The delegate supplied by the user that allows building or creating new instances.</param>
         /// <returns>An <see cref="Expression"/>.</returns>
-        protected Expression BuildTransientExpression<TService>(InstanceProducer producer, Func<TService> instanceCreator)
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
+        protected Expression BuildTransientExpression<TService>(InstanceProducer producer, 
+            Func<TService> instanceCreator)
             where TService : class
         {
+            Requires.IsNotNull(producer, nameof(producer));
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
             Expression expression = Expression.Invoke(Expression.Constant(instanceCreator));
@@ -322,9 +331,9 @@ namespace SimpleInjector
         /// <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> that are applicable 
         /// to the InstanceProducer's <see cref="InstanceProducer.ServiceType">ServiceType</see> (if any).
         /// </summary>
-        /// <param name="producer">The  producer that is requesting the construction of the expression.
-        /// The value can be null.</param>
+        /// <param name="producer">The instance producer that is requesting the construction of the expression.</param>
         /// <returns>An <see cref="Expression"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         protected Expression BuildTransientExpression(InstanceProducer producer)
         {
             Requires.IsNotNull(producer, nameof(producer));
@@ -338,7 +347,7 @@ namespace SimpleInjector
             return this.ReplacePlaceHoldersWithOverriddenParameters(expression);
         }
 
-        internal Action<object> BuildInstanceInitializer(InstanceProducer producer)
+        private Action<object> BuildInstanceInitializer(InstanceProducer producer)
         {
             Type type = this.ImplementationType;
 
@@ -515,23 +524,6 @@ namespace SimpleInjector
             return Expression.Invoke(Expression.Constant(nullChecker), expression);
         }
 
-        //private Expression WrapWithInitializer<TImplementation>(InstanceProducer producer, Expression expression)
-        //    where TImplementation : class
-        //{
-        //    var context = new InitializationContext(producer, this);
-
-        //    Action<TImplementation> initializer = this.Container.GetInitializer<TImplementation>(context);
-
-        //    if (initializer != null)
-        //    {
-        //        // It's not possible to return a Expression that is as heavily optimized as the newExpression
-        //        // simply is, because the instance initializer must be called as well.
-        //        return BuildExpressionWithInstanceInitializer<TImplementation>(expression, initializer);
-        //    }
-
-        //    return expression;
-        //}
-
         private static Expression BuildExpressionWithInstanceInitializer<TImplementation>(
             Expression newExpression, Action<TImplementation> instanceInitializer)
             where TImplementation : class
@@ -543,15 +535,7 @@ namespace SimpleInjector
                 return instance;
             };
 
-            try
-            {
-                return Expression.Invoke(Expression.Constant(instanceCreatorWithInitializer), newExpression);
-            }
-            catch (Exception ex)
-            {
-                throw new ActivationException(
-                    StringResources.TheInitializersCouldNotBeApplied(typeof(TImplementation), ex), ex);
-            }
+            return Expression.Invoke(Expression.Constant(instanceCreatorWithInitializer), newExpression);
         }
 
         private Delegate BuildDelegate(Expression expression)

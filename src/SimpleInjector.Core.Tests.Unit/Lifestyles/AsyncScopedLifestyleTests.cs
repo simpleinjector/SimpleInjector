@@ -160,9 +160,10 @@
             }
             catch (ActivationException ex)
             {
-                AssertThat.ExceptionMessageContains(
-                    "The ICommand is registered as 'Async Scoped' lifestyle, but the instance is requested " +
-                    "outside the context of an active (Async Scoped) scope.",
+                AssertThat.ExceptionMessageContains(@"
+                    The ConcreteCommand is registered as 'Async Scoped' lifestyle, but the instance is
+                    requested outside the context of an active (Async Scoped) scope."
+                    .TrimInside(),
                     ex);
             }
         }
@@ -1223,13 +1224,6 @@
 
             Assert.IsFalse(cmd1.HasBeenDisposed);
             Assert.IsTrue(cmd2.HasBeenDisposed);
-        }
-
-        public class ConcreteCommand : ICommand
-        {
-            public void Execute()
-            {
-            }
         }
 
         public class Generic<T> : IGeneric<T>

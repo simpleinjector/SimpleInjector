@@ -89,15 +89,15 @@ namespace SimpleInjector.Lifestyles
         private sealed class SingletonInstanceLifestyleRegistration : Registration
         {
             private readonly object locker = new object();
-            private readonly object originalInstance;
 
-            private object interceptedInstance;
+            private object instance;
+            private bool initialized;
 
             internal SingletonInstanceLifestyleRegistration(Type implementationType, 
                 object instance, Container container)
                 : base(Lifestyle.Singleton, container)
             {
-                this.originalInstance = instance;
+                this.instance = instance;
                 this.ImplementationType = implementationType;
             }
 
@@ -109,27 +109,28 @@ namespace SimpleInjector.Lifestyles
                 // because this implementation type might be internal, and this can cause problems in partial 
                 // trust.
                 return Expression.Constant(
-                    this.GetInterceptedInstance(producer),
+                    this.GetInitializedInstance(producer),
                     producer.ServiceType);
             }
 
-            private object GetInterceptedInstance(InstanceProducer producer)
+            private object GetInitializedInstance(InstanceProducer producer)
             {
-                if (this.interceptedInstance == null)
+                if (!this.initialized)
                 {
                     lock (this.locker)
                     {
-                        if (this.interceptedInstance == null)
+                        if (!this.initialized)
                         {
                             // TODO: It's wrong to use the InstanceProducer to build up the instance, because there could be
                             // multiple InstanceProducers for this instance.
-                            this.interceptedInstance =
-                                this.GetInjectedInterceptedAndInitializedInstance(producer);
+                            this.instance = this.GetInjectedInterceptedAndInitializedInstance(producer);
                         }
                     }
+
+                    this.initialized = true;
                 }
 
-                return this.interceptedInstance;
+                return this.instance;
             }
 
             private object GetInjectedInterceptedAndInitializedInstance(InstanceProducer producer)
@@ -147,11 +148,21 @@ namespace SimpleInjector.Lifestyles
 
             private object GetInjectedInterceptedAndInitializedInstanceInternal(InstanceProducer producer)
             {
-                Expression expression = Expression.Constant(this.originalInstance, producer.ServiceType);
+                Expression expression = Expression.Constant(this.instance, producer.ServiceType);
 
-                expression = this.WrapWithPropertyInjector(producer.ServiceType, this.ImplementationType, expression);
-                expression = this.InterceptInstanceCreation(producer.ServiceType, this.ImplementationType, expression);
-                expression = this.WrapWithInitializer(producer, producer.ServiceType, this.ImplementationType, expression);
+                // NOTE: We pass on producer.ServiceType as the implementation type for the following three
+                // methods. This will the initialization to be only done based on information of the service
+                // type; not on that of the implementation. Although now the initialization could be 
+                // incomplete, this behavior is consistent with the initialization of 
+                // Register<TService>(Func<TService>, Lifestyle), which doesn't have the proper static type
+                // information available to use the implementation type.
+                // TODO: This behavior should be reconsidered, because now it is incompatible with
+                // Register<TService, TImplementation>(Lifestyle). So the question is, do we consider
+                // RegisterSingleton<TService>(TService) to be similar to Register<TService>(Func<TService>)
+                // or to Register<TService, TImplementation>()? See: #353.
+                expression = this.WrapWithPropertyInjector(producer.ServiceType, producer.ServiceType, expression);
+                expression = this.InterceptInstanceCreation(producer.ServiceType, producer.ServiceType, expression);
+                expression = this.WrapWithInitializer(producer, producer.ServiceType, producer.ServiceType, expression);
 
                 Delegate initializer = Expression.Lambda(expression).Compile();
 
