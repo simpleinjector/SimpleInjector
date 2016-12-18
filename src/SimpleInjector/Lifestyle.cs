@@ -23,6 +23,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
@@ -571,6 +572,27 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// This overload has been deprecated. Please call <see cref="CreateRegistrationCore{TConcrete}(Container)"/>
+        /// instead.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be created.</typeparam>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
+        /// reference (Nothing in VB).</exception>
+        [Obsolete("This overload has been deprecated. Please call CreateRegistration<TConcrete>(Container) instead.",
+            error: false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Registration CreateRegistration<TService, TImplementation>(Container container)
+            where TImplementation : class, TService
+            where TService : class
+        {
+            return this.CreateRegistration<TImplementation>(container);
+        }
+
+        /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
         /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
         /// with the caching as specified by this lifestyle.
@@ -629,6 +651,27 @@ namespace SimpleInjector
                 throw BuildUnableToResolveTypeDueToSecurityConfigException(concreteType, ex,
                     nameof(concreteType));
             }
+        }
+
+        /// <summary>
+        /// This overload has been deprecated. Please call <see cref="CreateRegistration(Type, Container)"/>
+        /// instead.
+        /// </summary>
+        /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.</param>
+        /// <param name="implementationType">The concrete type that will be registered.</param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null 
+        /// reference (Nothing in VB).</exception>
+        [Obsolete("This overload has been deprecated. Please call CreateRegistration(Type, Container) instead.", 
+            error: false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Registration CreateRegistration(Type serviceType, Type implementationType, Container container)
+        {
+            Requires.IsNotNull(implementationType, nameof(implementationType));
+
+            return this.CreateRegistration(implementationType, container);
         }
 
         /// <summary>
