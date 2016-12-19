@@ -242,23 +242,22 @@ namespace SimpleInjector.Decorators
 
         private sealed class ContainerControlledCollectionRegistration : Registration
         {
-            private readonly Type serviceType;
-
             internal ContainerControlledCollectionRegistration(Type serviceType,
                 IContainerControlledCollection collection, Container container)
                 : base(Lifestyle.Singleton, container)
             {
                 this.Collection = collection;
-                this.serviceType = serviceType;
+                this.ImplementationType = serviceType;
             }
 
-            public override Type ImplementationType => this.serviceType;
+            public override Type ImplementationType { get; }
 
             internal override bool MustBeVerified => !this.Collection.AllProducersVerified;
 
             internal IContainerControlledCollection Collection { get; }
 
-            public override Expression BuildExpression() => Expression.Constant(this.Collection, this.serviceType);
+            public override Expression BuildExpression(InstanceProducer producer) => 
+                Expression.Constant(this.Collection, this.ImplementationType);
 
             internal override KnownRelationship[] GetRelationshipsCore() => 
                 base.GetRelationshipsCore().Concat(this.Collection.GetRelationships()).ToArray();

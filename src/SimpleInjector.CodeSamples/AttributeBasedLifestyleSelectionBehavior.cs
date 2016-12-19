@@ -27,10 +27,9 @@
     {
         private const CreationPolicy DefaultPolicy = CreationPolicy.Transient;
 
-        public Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
+        public Lifestyle SelectLifestyle(Type implementationType)
         {
-            var attribute = implementationType.GetCustomAttribute<CreationPolicyAttribute>()
-                ?? serviceType.GetCustomAttribute<CreationPolicyAttribute>();
+            var attribute = implementationType.GetCustomAttribute<CreationPolicyAttribute>();
 
             var policy = attribute == null ? DefaultPolicy : attribute.Policy;
 

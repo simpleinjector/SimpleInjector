@@ -37,7 +37,7 @@
 
         public void Register(Type implementationType, TKey key, Lifestyle lifestyle)
         {
-            this.Register(lifestyle.CreateRegistration(typeof(TService), implementationType, this.container), key);
+            this.Register(lifestyle.CreateRegistration(implementationType, this.container), key);
         }
         
         public void Register(Func<TService> instanceCreator, TKey key)
@@ -79,7 +79,7 @@
         private Lifestyle GetDefaultLifestyle(Type implementationType)
         {
             return this.container.Options.LifestyleSelectionBehavior
-                .SelectLifestyle(typeof(TService), implementationType);
+                .SelectLifestyle(implementationType);
         }
     }
 }

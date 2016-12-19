@@ -7,26 +7,13 @@
     public class DefaultConstructorResolutionBehaviorTests
     {
         [TestMethod]
-        public void GetConstructor_WithNullArgument1_ThrowsException()
-        {
-            // Arrange
-            var behavior = GetContainerOptions().ConstructorResolutionBehavior;
-
-            // Act
-            Action action = () => behavior.GetConstructor(null, typeof(TypeWithSinglePublicDefaultConstructor));
-
-            // Assert
-            AssertThat.Throws<ArgumentNullException>(action);
-        }
-
-        [TestMethod]
         public void GetConstructor_WithNullArgument2_ThrowsException()
         {
             // Arrange
             var behavior = GetContainerOptions().ConstructorResolutionBehavior;
 
             // Act
-            Action action = () => behavior.GetConstructor(typeof(TypeWithSinglePublicDefaultConstructor), null);
+            Action action = () => behavior.GetConstructor(null);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
@@ -39,8 +26,7 @@
             var behavior = GetContainerOptions().ConstructorResolutionBehavior;
 
             // Act
-            var constructor = behavior.GetConstructor(typeof(TypeWithSinglePublicDefaultConstructor),
-                typeof(TypeWithSinglePublicDefaultConstructor));
+            var constructor = behavior.GetConstructor(typeof(TypeWithSinglePublicDefaultConstructor));
 
             // Assert
             Assert.IsNotNull(constructor, "The constructor was expected to be returned.");
@@ -55,8 +41,7 @@
             try
             {
                 // Act
-                behavior.GetConstructor(typeof(TypeWithMultiplePublicConstructors),
-                    typeof(TypeWithMultiplePublicConstructors));
+                behavior.GetConstructor(typeof(TypeWithMultiplePublicConstructors));
 
                 // Assert
                 Assert.Fail("Exception expected.");
@@ -76,8 +61,7 @@
             var behavior = GetContainerOptions().ConstructorResolutionBehavior;
 
             // Act
-            Action action = () => behavior.GetConstructor(typeof(TypeWithSingleInternalConstructor),
-                typeof(TypeWithSingleInternalConstructor));
+            Action action = () => behavior.GetConstructor(typeof(TypeWithSingleInternalConstructor));
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
@@ -91,9 +75,6 @@
 
         private class TypeWithSinglePublicDefaultConstructor
         {
-            public TypeWithSinglePublicDefaultConstructor()
-            {
-            }
         }
 
         private class TypeWithMultiplePublicConstructors

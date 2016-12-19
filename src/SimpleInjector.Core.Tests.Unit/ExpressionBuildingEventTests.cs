@@ -140,41 +140,6 @@
         }
 
         [TestMethod]
-        public void GetInstance_ExpressionBuildingEventChangesTheTypeOfTheExpression_ThrowsExpressiveExceptionWhenApplyingInitializer()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            // Register a transient instance
-            container.Register<IUserRepository, SqlUserRepository>();
-
-            container.RegisterInitializer<object>(instance => { });
-
-            container.ExpressionBuilding += (sender, e) =>
-            {
-                if (e.RegisteredServiceType == typeof(IUserRepository))
-                {
-                    // Replace the expression with a different type (this is incorrect behavior).
-                    e.Expression = Expression.Constant(new InMemoryUserRepository());
-                }
-            };
-
-            try
-            {
-                // Act
-                container.GetInstance<IUserRepository>();
-
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.ExceptionMessageContains(
-                    "The initializer(s) for type SqlUserRepository could not be applied.", ex);
-            }
-        }
-
-        [TestMethod]
         public void GetInstance_ExpressionReplacedOnNonRootType_ReturnsTheExpectedTypeAndLifeStyle()
         {
             // Arrange
@@ -188,7 +153,7 @@
                 if (e.RegisteredServiceType == typeof(IUserRepository))
                 {
                     // Replace the expression with a singleton
-                    e.Expression = Expression.Constant(new InMemoryUserRepository());
+                    e.Expression = Expression.Constant(new SqlUserRepository());
                 }
             };
 
@@ -197,7 +162,6 @@
             var actual2 = container.GetInstance<RealUserService>().Repository;
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(InMemoryUserRepository), actual1);
             Assert.IsTrue(object.ReferenceEquals(actual1, actual2),
                 "We registered an ConstantExpression. We would the registration to be a singleton.");
         }
@@ -640,7 +604,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.ExceptionMessageContains(
-                    "The registered delegate for type IUserRepository returned null.", ex);
+                    "The registered delegate for type SqlUserRepository returned null.", ex);
             }
         }
         
@@ -668,7 +632,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.ExceptionMessageContains(
-                    "Error occurred while trying to build a delegate for type IUserRepository using " + 
+                    "Error occurred while trying to build a delegate for type SqlUserRepository using " + 
                     "the expression", ex);
             }
         }

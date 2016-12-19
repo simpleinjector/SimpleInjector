@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -37,12 +37,11 @@ namespace SimpleInjector.Advanced
         /// Gets the given <paramref name="implementationType"/>'s constructor that can be used by the 
         /// container to create that instance.
         /// </summary>
-        /// <param name="serviceType">Type of the abstraction that is requested.</param>
         /// <param name="implementationType">Type of the implementation to find a suitable constructor for.</param>
         /// <returns>
         /// The <see cref="ConstructorInfo"/>. This method never returns null.
         /// </returns>
         /// <exception cref="ActivationException">Thrown when no suitable constructor could be found.</exception>
-        ConstructorInfo GetConstructor(Type serviceType, Type implementationType);
+        ConstructorInfo GetConstructor(Type implementationType);
     }
 }

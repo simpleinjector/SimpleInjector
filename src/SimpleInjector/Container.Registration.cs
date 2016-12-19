@@ -1156,7 +1156,7 @@ namespace SimpleInjector
             this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TService), typeof(TImplementation),
                 implementationTypeParamName);
 
-            var registration = lifestyle.CreateRegistration<TService, TImplementation>(this);
+            var registration = lifestyle.CreateRegistration<TImplementation>(this);
 
             this.AddRegistration(typeof(TService), registration);
         }
@@ -1185,7 +1185,7 @@ namespace SimpleInjector
                 Requires.ServiceIsAssignableFromImplementation(serviceType, implementationType,
                     implementationTypeParamName);
 
-                var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
+                var registration = lifestyle.CreateRegistration(implementationType, this);
 
                 this.AddRegistration(serviceType, registration);
             }

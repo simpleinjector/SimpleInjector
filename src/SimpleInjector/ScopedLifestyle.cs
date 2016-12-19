@@ -165,23 +165,22 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
             Requires.IsNotNull(container, nameof(container));
 
-            return new ScopedRegistration<TService, TService>(this, container, this.disposeInstances, instanceCreator);
+            return new ScopedRegistration<TService>(this, container, this.disposeInstances, instanceCreator);
         }
 
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
+        /// specified <typeparamref name="TConcrete"/> with the caching as specified by this lifestyle.
         /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
+        /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+        protected override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
             Requires.IsNotNull(container, nameof(container));
 
-            return new ScopedRegistration<TService, TImplementation>(this, container, this.disposeInstances);
+            return new ScopedRegistration<TConcrete>(this, container, this.disposeInstances);
         }
 
 #if !NET40

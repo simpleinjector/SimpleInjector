@@ -75,7 +75,7 @@
             container.RegisterSingleton<ILogger>(logger);
             container.RegisterCollection<ICommand>(new[]
             {
-                Lifestyle.Transient.CreateRegistration(typeof(ICommand), typeof(ConcreteCommand), container),
+                Lifestyle.Transient.CreateRegistration(typeof(ConcreteCommand), container),
                 Lifestyle.Transient.CreateRegistration(typeof(ConcreteCommand), container),
             });
 

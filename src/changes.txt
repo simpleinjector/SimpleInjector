@@ -12,6 +12,24 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] LifetimeScopeLifestyle deprecated. (fixes #299)
 		-[Core] ExecutionContextScopeLifestyle deprecated. (fixes #299)
 		-[Core] WebApiRequestLifestyle deprecated. (fixes #331)
+		-[Core] Registration.BuildExpression() signature changed to BuildExpression(InstanceProducer). (fixes #320)
+		-[Core] Registration.BuildTransientExpression<TService>(Func<TService>) signature changed to
+		 BuildTransientExpression<TService>(InstanceProducer, Func<TService>). (fixes #320)
+		-[Core] Registration.BuildTransientExpression<TService, TImplementation>() signature changed to
+		 BuildTransientExpression(InstanceProducer). (fixes #320)
+		-[Core] Registration.BuildTransientDelegate<TService>(Func<TService>) signature changed to
+		 BuildTransientDelegate<TService>(InstanceProducer, Func<TService>). (fixes #320)
+		-[Core] Registration.BuildTransientDelegate<TService, TImplementation>() signature changed to
+         BuildTransientDelegate(InstanceProducer). (fixes #320 / #345)
+		-[Core] IConstructorResolutionBehavior.GetConstructor(Type, Type) signature changed to
+		 GetConstructor(Type). (fixes #345)
+		-[Core] ILifestyleSelectionBehavior.SelectLifestyle(Type, Type) signature changed to
+		 SelectLifestyle(Type). (fixes #345)
+		-[Core] Lifestyle.CreateRegistration<TService, TImplementation>(Container) removed. (fixes #345)
+		-[Core] Lifestyle.CreateRegistration(Type, Type, Container) signature changes to
+		 CreateRegistration(Type, Container). (fixed #345)
+		-[Core] Lifestyle.CreateRegistrationCore<TService, TImplementation>(Container) signature changes to
+		 CreateRegistrationCore<TImplementation>(Container). (fixes #345)
 
 	Improvements/Changes:
 		-[Core] Removed all methods that were marked [obsolete(true)] since v3.0. (fixes #305)

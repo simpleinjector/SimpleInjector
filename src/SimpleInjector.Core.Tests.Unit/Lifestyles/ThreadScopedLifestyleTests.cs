@@ -140,9 +140,10 @@
             }
             catch (ActivationException ex)
             {
-                AssertThat.ExceptionMessageContains(
-                    "The ICommand is registered as 'Thread Scoped' lifestyle, but the instance is requested " +
-                    "outside the context of an active (Thread Scoped) scope.",
+                AssertThat.ExceptionMessageContains(@"
+                    The ConcreteCommand is registered as 'Thread Scoped' lifestyle, but the instance is 
+                    requested outside the context of an active (Thread Scoped) scope."
+                    .TrimInside(),
                     ex);
             }
         }
@@ -539,8 +540,8 @@
 
             var container = new Container();
 
-            var reg1 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
-            var reg2 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
+            var reg1 = lifestyle.CreateRegistration<DisposableCommand>(container);
+            var reg2 = lifestyle.CreateRegistration<DisposableCommand>(container);
 
             container.AppendToCollection(typeof(ICommand), reg1);
             container.AppendToCollection(typeof(ICommand), reg2);
@@ -565,8 +566,8 @@
 
             var container = new Container();
 
-            var reg1 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
-            var reg2 = lifestyle.CreateRegistration<ICommand, DisposableCommand>(container);
+            var reg1 = lifestyle.CreateRegistration<DisposableCommand>(container);
+            var reg2 = lifestyle.CreateRegistration<DisposableCommand>(container);
 
             container.AppendToCollection(typeof(ICommand), reg1);
             container.AppendToCollection(typeof(ICommand), reg2);
@@ -973,13 +974,6 @@
 
             // Assert
             Assert.IsTrue(instanceToDispose.HasBeenDisposed);
-        }
-
-        public class ConcreteCommand : ICommand
-        {
-            public void Execute()
-            {
-            }
         }
 
         public class Generic<T> : IGeneric<T>

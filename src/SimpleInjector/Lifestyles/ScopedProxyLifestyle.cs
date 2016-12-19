@@ -42,8 +42,8 @@ namespace SimpleInjector.Lifestyles
         protected override Scope GetCurrentScopeCore(Container container) => 
             GetDefaultScopedLifestyle(container).GetCurrentScope(container);
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container) =>
-            GetDefaultScopedLifestyle(container).CreateRegistration<TService, TImplementation>(container);
+        protected override Registration CreateRegistrationCore<TConcrete>(Container container) =>
+            GetDefaultScopedLifestyle(container).CreateRegistration<TConcrete>(container);
 
         protected override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) => 
             GetDefaultScopedLifestyle(c).CreateRegistration<TService>(creator, c);
