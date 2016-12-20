@@ -969,7 +969,7 @@
 
         private sealed class AlternativeDependencyInjectionBehavior : IDependencyInjectionBehavior
         {
-            public Expression BuildExpression(InjectionConsumerInfo consumer)
+            public InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer)
             {
                 throw new NotImplementedException();
             }

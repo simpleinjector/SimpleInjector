@@ -442,19 +442,19 @@ namespace SimpleInjector
             return constructor;
         }
 
-        internal Expression BuildParameterExpression(InjectionConsumerInfo consumer)
+        internal InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer)
         {
-            Expression expression = this.DependencyInjectionBehavior.BuildExpression(consumer);
+            InstanceProducer producer = this.DependencyInjectionBehavior.GetInstanceProducerFor(consumer);
 
-            // Expression will only be null if a user created a custom IConstructorInjectionBehavior that
+            // Producer will only be null if a user created a custom IConstructorInjectionBehavior that
             // returned null.
-            if (expression == null)
+            if (producer == null)
             {
                 throw new ActivationException(StringResources.DependencyInjectionBehaviorReturnedNull(
                     this.DependencyInjectionBehavior));
             }
 
-            return expression;
+            return producer;
         }
 
         internal Lifestyle SelectLifestyle(Type implementationType)

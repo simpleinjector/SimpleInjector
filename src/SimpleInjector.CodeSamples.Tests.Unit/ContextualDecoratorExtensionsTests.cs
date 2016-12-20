@@ -245,21 +245,6 @@
             container.Options.EnableContextualDecoratorSupport();
         }
 
-        [TestMethod]
-        public void EnableContextualDecoratorSupport_RegisteredTwice_Fails()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Options.EnableContextualDecoratorSupport();
-
-            // Act
-            Action action = () => container.Options.EnableContextualDecoratorSupport();
-
-            // Assert
-            AssertThat.Throws<InvalidOperationException>(action);
-        }
-
         public sealed class Consumer<TDependency>
         {
             public readonly TDependency Dependency;

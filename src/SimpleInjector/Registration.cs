@@ -395,18 +395,25 @@ namespace SimpleInjector
             // makes it easier for developers (and maintainers) to read the stack trace.
             var parameters = new List<Expression>();
 
+            var knownRelationships = new List<InstanceProducer>();
+
             foreach (ParameterInfo parameter in constructor.GetParameters())
             {
                 var consumer = new InjectionConsumerInfo(serviceType, implementationType, parameter);
-                Expression constructorParameter = this.BuildConstructorParameterFor(consumer);
+                Expression constructorParameter = this.GetPlaceHolderFor(consumer);
+
+                if (constructorParameter == null)
+                {
+                    InstanceProducer producer = this.Container.Options.GetInstanceProducerFor(consumer);
+                    knownRelationships.Add(producer);
+                    constructorParameter = producer.BuildExpression();
+                }
+                    
                 parameters.Add(constructorParameter);
             }
 
             return parameters.ToArray();
         }
-
-        private Expression BuildConstructorParameterFor(InjectionConsumerInfo consumer) =>
-            this.GetPlaceHolderFor(consumer) ?? this.Container.Options.BuildParameterExpression(consumer);
 
         private ConstantExpression GetPlaceHolderFor(InjectionConsumerInfo consumer) =>
             this.GetOverriddenParameterFor(consumer.Target.Parameter).PlaceHolder;

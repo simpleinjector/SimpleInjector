@@ -30,6 +30,8 @@ Version 4.0.0 (v4.0 RTM)
 		 CreateRegistration(Type, Container). (fixed #345)
 		-[Core] Lifestyle.CreateRegistrationCore<TService, TImplementation>(Container) signature changes to
 		 CreateRegistrationCore<TImplementation>(Container). (fixes #345)
+		-[Core] IDependencyInjectionBehavior.BuildExpression method replace with
+		 GetInstanceProducerFor(InjectionConsumerInfo) that returns an InstanceProducer. (fixes #346)
 
 	Improvements/Changes:
 		-[Core] Removed all methods that were marked [obsolete(true)] since v3.0. (fixes #305)
@@ -37,6 +39,7 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] AsyncScopedLifestyle added to core library as replacement of ExecutionContextScopeLifestyle. (fixes #299)
 		-[Core] New Lifestyle.CreateHybrid overloads added for ScopedLifestyles that remove the need to supply
 		 an lifestyleSelector delegate. (fixes #341)
+		-[Core] InstanceProducer.FromExpression() added. (fixes #346)
 
 	Project Changes:
 		-Projects for SimpleInjector.dll merged into one single project.

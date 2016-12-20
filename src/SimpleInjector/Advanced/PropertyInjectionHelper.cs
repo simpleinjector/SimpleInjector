@@ -196,7 +196,7 @@ namespace SimpleInjector.Advanced
         {
             var consumer = new InjectionConsumerInfo(this.serviceType, this.implementationType, property);
 
-            return this.container.Options.DependencyInjectionBehavior.BuildExpression(consumer);
+            return this.container.Options.GetInstanceProducerFor(consumer).BuildExpression();
         }
 
         private static Type GetFuncType(PropertyInfo[] properties, Type injecteeType)

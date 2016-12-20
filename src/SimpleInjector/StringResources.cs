@@ -364,14 +364,15 @@ namespace SimpleInjector
 
         internal static string DependencyInjectionBehaviorReturnedNull(IDependencyInjectionBehavior behavior) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The {0} that was registered through the Container.{3}.{4} property, returned a null " +
-                "reference after its BuildExpression() method. {1}.BuildExpression implementations should " +
-                "never return null, but should throw a {2} with an expressive message instead.",
+                "The {0} that was registered through the Container.{1}.{2} property, returned a null " +
+                "reference from its {3} method. {4}.{3} implementations should never return null, but " +
+                "should throw an {5} with an expressive message instead.",
                 behavior.GetType().TypeName(),
-                nameof(IDependencyInjectionBehavior),
-                typeof(ActivationException).FullName,
                 nameof(Container.Options),
-                nameof(ContainerOptions.DependencyInjectionBehavior));
+                nameof(ContainerOptions.DependencyInjectionBehavior),
+                nameof(IDependencyInjectionBehavior.GetInstanceProducerFor),
+                nameof(IDependencyInjectionBehavior),
+                typeof(ActivationException).FullName);
 
         internal static string ConstructorResolutionBehaviorReturnedNull(
             IConstructorResolutionBehavior selectionBehavior, Type implementationType) =>

@@ -38,7 +38,7 @@
             where TImplementation : class, TService
             where TService : class
         {
-            var behavior = GetBehavior(container);
+            AutomaticParameterizedFactoriesHelper behavior = GetBehavior(container);
 
             if (behavior == null)
             {
@@ -233,24 +233,27 @@
                 }
             }
 
-            Expression IDependencyInjectionBehavior.BuildExpression(InjectionConsumerInfo consumer)
+            InstanceProducer IDependencyInjectionBehavior.GetInstanceProducerFor(InjectionConsumerInfo consumer)
             {
-                var local = this.FindThreadLocal(consumer.Target);
+                ThreadLocal<object> local = this.FindThreadLocal(consumer.Target);
 
                 if (local != null)
                 {
                     if (consumer.Target.TargetType.IsValueType && this.container.IsVerifying())
                     {
                         throw new InvalidOperationException(
-                            "You can't use Verify() is the factory product contains value types.");
+                            "You can't use Verify() if the factory product contains value types.");
                     }
 
-                    return Expression.Convert(
-                        Expression.Property(Expression.Constant(local), "Value"),
-                        consumer.Target.TargetType);
+                    return InstanceProducer.FromExpression(
+                        consumer.Target.TargetType,
+                        Expression.Convert(
+                            Expression.Property(Expression.Constant(local), "Value"),
+                            consumer.Target.TargetType),
+                        this.container);
                 }
 
-                return this.originalBehavior.BuildExpression(consumer);
+                return this.originalBehavior.GetInstanceProducerFor(consumer);
             }
 
             // Called by RegisterFactory<TFactory>

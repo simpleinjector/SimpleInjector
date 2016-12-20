@@ -1501,9 +1501,37 @@
             AssertThat.AreEqual(typeof(GenericTypeWithLoggerDependency<int>), actualConsumer.ImplementationType);
         }
 
-        // see: https://github.com/simpleinjector/SimpleInjector/issues/346
+        // Tests: #346
         [TestMethod]
-        public void GetInstance_ResolvingAbstractionForComponentThatDependsOnConditionalRegistration_CallsPredicateOnce()
+        public void GetInstance_ResolvingComponentWithConditionalDependency_CallsPredicateOnce()
+        {
+            // Arrange
+            int expectedPredicateCallCount = 1;
+
+            var container = new Container();
+
+            container.Register<IX, XDependingOn<ILogger>>();
+
+            int actualPredicateCallCount = 0;
+
+            container.RegisterConditional<ILogger, Logger<int>>(c =>
+            {
+                actualPredicateCallCount++;
+                return true;
+            });
+
+            // Act
+            container.GetInstance<IX>();
+
+            // Assert
+            Assert.AreEqual(expectedPredicateCallCount, actualPredicateCallCount,
+                "Under normal conditions, the predicate for a conditional registrations should run just " +
+                "once per registration.");
+        }
+
+        // Tests: #346
+        [TestMethod]
+        public void GetInstance_ResolvingComponentWithPropertyForConditionalRegistration_CallsPredicateOnce()
         {
             // Arrange
             int expectedPredicateCallCount = 1;
@@ -1531,7 +1559,7 @@
                 "once per registration.");
         }
 
-        // see: https://github.com/simpleinjector/SimpleInjector/issues/346
+        // Tests: #346
         [TestMethod]
         public void GetInstance_ResolvingOpenGenericThatDependsOnConditionalRegistration_CallsPredicateOnce()
         {
@@ -1581,7 +1609,8 @@
                 this.real = real;
             }
 
-            public Expression BuildExpression(InjectionConsumerInfo c) => this.real.BuildExpression(c);
+            public InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo c) => 
+                this.real.GetInstanceProducerFor(c);
 
             public void Verify(InjectionConsumerInfo consumer)
             {

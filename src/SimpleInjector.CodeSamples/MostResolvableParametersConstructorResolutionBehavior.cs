@@ -71,8 +71,8 @@
         {
             try
             {
-                this.container.Options.DependencyInjectionBehavior.BuildExpression(
-                    new InjectionConsumerInfo(implementationType, implementationType, parameter));
+                var info = new InjectionConsumerInfo(implementationType, implementationType, parameter);
+                this.container.Options.DependencyInjectionBehavior.GetInstanceProducerFor(info);
 
                 return true;
             }
