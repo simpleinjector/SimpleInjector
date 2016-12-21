@@ -235,16 +235,6 @@
             }
         }
 
-        [TestMethod]
-        public void EnableContextualDecoratorSupport_RegisteredOnce_Succeeds()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            container.Options.EnableContextualDecoratorSupport();
-        }
-
         public sealed class Consumer<TDependency>
         {
             public readonly TDependency Dependency;

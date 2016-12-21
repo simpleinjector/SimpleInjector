@@ -40,6 +40,7 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] New Lifestyle.CreateHybrid overloads added for ScopedLifestyles that remove the need to supply
 		 an lifestyleSelector delegate. (fixes #341)
 		-[Core] InstanceProducer.FromExpression() added. (fixes #346)
+		-[Core] Prevented registered predicates (using RegisterConditional) from always being called twice. (fixes #346)
 
 	Project Changes:
 		-Projects for SimpleInjector.dll merged into one single project.

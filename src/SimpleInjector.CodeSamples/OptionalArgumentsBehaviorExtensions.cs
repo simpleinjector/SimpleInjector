@@ -37,10 +37,10 @@
 
         private InstanceProducer TryCreateInstanceProducer(ParameterInfo parameter) =>
             parameter != null && IsOptional(parameter) && !this.CanBeResolved(parameter)
-                ? this.CreateOptionalProducer(parameter)
+                ? this.CreateConstantValueProducer(parameter)
                 : null;
 
-        private InstanceProducer CreateOptionalProducer(ParameterInfo parameter) =>
+        private InstanceProducer CreateConstantValueProducer(ParameterInfo parameter) =>
             InstanceProducer.FromExpression(
                 parameter.ParameterType, 
                 Expression.Constant(parameter.DefaultValue, parameter.ParameterType), 
