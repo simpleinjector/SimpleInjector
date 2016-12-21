@@ -361,10 +361,10 @@
                 from property in instance.GetType().GetProperties()
                 let value = property.GetValue(instance, null)
                 where value == null
-                select property;
+                select property.Name;
 
             Assert.IsFalse(uninjectedProperties.Any(),
-                "Property: " + uninjectedProperties.FirstOrDefault() + " was not injected.");
+                "Properties " + string.Join(" + ", uninjectedProperties) + " were not injected.");
         }
 
         public class ServiceWithProperty<TDependency> : IService

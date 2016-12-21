@@ -140,8 +140,10 @@ namespace SimpleInjector
             this.instanceCreator = this.BuildAndReplaceInstanceCreatorAndCreateFirstInstance;
         }
 
+        // Flagging the registration with WrapsInstanceCreationDelegate prevents false diagnostic warnings.
         private InstanceProducer(Type serviceType, Expression expression, Container container)
-            : this(serviceType, new ExpressionRegistration(expression, container))
+            : this(serviceType,
+                  new ExpressionRegistration(expression, container) { WrapsInstanceCreationDelegate = true })
         {
             // Overrides earlier set value. This prevents ExpressionBuilt from being applied.
             this.lazyExpression = Helpers.ToLazy(expression);

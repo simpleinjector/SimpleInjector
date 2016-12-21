@@ -54,7 +54,7 @@ namespace SimpleInjector
         private readonly HashSet<KnownRelationship> knownRelationships = new HashSet<KnownRelationship>();
 
         private HashSet<DiagnosticType> suppressions;
-        private Dictionary<object, OverriddenParameter> overriddenParameters;
+        private ParameterDictionary<OverriddenParameter> overriddenParameters;
         private Action<object> instanceInitializer;
 
         /// <summary>
@@ -204,9 +204,10 @@ namespace SimpleInjector
         }
 
         // This method should only be called by the Lifestyle base class and the HybridRegistration.
-        internal virtual void SetParameterOverrides(IEnumerable<OverriddenParameter> parameters)
+        internal virtual void SetParameterOverrides(IEnumerable<OverriddenParameter> overrides)
         {
-            this.overriddenParameters = parameters.ToDictionary(p => GetParameterKey(p.Parameter));
+            this.overriddenParameters = 
+                new ParameterDictionary<OverriddenParameter>(overrides, keySelector: p => p.Parameter);
         }
 
         // Wraps the expression with a delegate that injects the properties.
@@ -378,62 +379,66 @@ namespace SimpleInjector
         {
             ConstructorInfo constructor = this.Container.Options.SelectConstructor(this.ImplementationType);
 
-            NewExpression expression = Expression.New(constructor,
-                this.BuildConstructorParameters(producer.ServiceType, this.ImplementationType, constructor));
+            ParameterDictionary<DependencyData> parameters = this.BuildConstructorParameters(
+                producer.ServiceType, this.ImplementationType, constructor);
 
-            this.AddConstructorParametersAsKnownRelationship(producer.ServiceType, this.ImplementationType, constructor);
+            var arguments = parameters.Values.Select(v => v.Expression);
+
+            NewExpression expression = Expression.New(constructor, arguments);
+
+            this.AddRelationships(constructor, parameters);
 
             return expression;
         }
 
-        private Expression[] BuildConstructorParameters(Type serviceType, Type implementationType,
+        private ParameterDictionary<DependencyData> BuildConstructorParameters(Type serviceType, Type implementationType, 
             ConstructorInfo constructor)
         {
             // NOTE: We used to use a LINQ query here (which is cleaner code), but we reverted back to using
             // a foreach statement to clean up the stack trace, since this is a very common code path to
             // show up in the stack trace and preventing showing up the Enumerable and Buffer`1 calls here
             // makes it easier for developers (and maintainers) to read the stack trace.
-            var parameters = new List<Expression>();
-
-            var knownRelationships = new List<InstanceProducer>();
+            var parameters = new ParameterDictionary<DependencyData>();
 
             foreach (ParameterInfo parameter in constructor.GetParameters())
             {
                 var consumer = new InjectionConsumerInfo(serviceType, implementationType, parameter);
-                Expression constructorParameter = this.GetPlaceHolderFor(consumer);
+                Expression expression = this.GetPlaceHolderFor(parameter);
+                InstanceProducer producer = null;
 
-                if (constructorParameter == null)
+                if (expression == null)
                 {
-                    InstanceProducer producer = this.Container.Options.GetInstanceProducerFor(consumer);
-                    knownRelationships.Add(producer);
-                    constructorParameter = producer.BuildExpression();
+                    producer = this.Container.Options.GetInstanceProducerFor(consumer);
+                    expression = producer.BuildExpression();
                 }
-                    
-                parameters.Add(constructorParameter);
+
+                parameters.Add(parameter, new DependencyData(parameter, expression, producer));
             }
 
-            return parameters.ToArray();
+            return parameters;
         }
 
-        private ConstantExpression GetPlaceHolderFor(InjectionConsumerInfo consumer) =>
-            this.GetOverriddenParameterFor(consumer.Target.Parameter).PlaceHolder;
+        private ConstantExpression GetPlaceHolderFor(ParameterInfo parameter) =>
+            this.GetOverriddenParameterFor(parameter).PlaceHolder;
 
         private Expression WrapWithPropertyInjectorInternal(Type serviceType, Type implementationType,
-            Expression expression)
+            Expression expressionToWrap)
         {
-            var properties = this.GetPropertiesToInject(serviceType, implementationType);
+            PropertyInfo[] properties = this.GetPropertiesToInject(serviceType, implementationType);
 
             if (properties.Any())
             {
                 PropertyInjectionHelper.VerifyProperties(properties);
 
-                expression = PropertyInjectionHelper.BuildPropertyInjectionExpression(
-                    this.Container, serviceType, implementationType, properties, expression);
+                var data = PropertyInjectionHelper.BuildPropertyInjectionExpression(
+                    this.Container, serviceType, implementationType, properties, expressionToWrap);
 
-                this.AddPropertiesAsKnownRelationships(serviceType, implementationType, properties);
+                expressionToWrap = data.Expression;
+
+                this.AddRelationships(implementationType, data.Producers);
             }
 
-            return expression;
+            return expressionToWrap;
         }
 
         private PropertyInfo[] GetPropertiesToInject(Type serviceType, Type implementationType)
@@ -458,8 +463,8 @@ namespace SimpleInjector
                 {
                     expression = SubExpressionReplacer.Replace(
                         expressionToAlter: expression,
-                        subExpressionToFind: overriddenParameter.PlaceHolder,
-                        replacementExpression: overriddenParameter.Expression);
+                        nodeToFind: overriddenParameter.PlaceHolder,
+                        replacementNode: overriddenParameter.Expression);
                 }
             }
 
@@ -470,46 +475,15 @@ namespace SimpleInjector
         {
             if (this.overriddenParameters != null)
             {
-                object key = GetParameterKey(parameter);
+                OverriddenParameter overriddenParameter;
 
-                if (this.overriddenParameters.ContainsKey(key))
+                if (this.overriddenParameters.TryGetValue(parameter, out overriddenParameter))
                 {
-                    return this.overriddenParameters[key];
+                    return overriddenParameter;
                 }
             }
 
             return new OverriddenParameter();
-        }
-
-        private void AddConstructorParametersAsKnownRelationship(Type serviceType, Type implementationType,
-            ConstructorInfo constructor)
-        {
-            // We have to suppress the overridden parameter since this might result in a wrong relationship.
-            var dependencyTypes =
-                from parameter in constructor.GetParameters()
-                let type = parameter.ParameterType
-                let overriddenProducer = this.GetOverriddenParameterFor(parameter).Producer
-                let context = new InjectionConsumerInfo(serviceType, implementationType, parameter)
-                let instanceProducer =
-                    overriddenProducer ?? this.Container.GetRegistrationEvenIfInvalid(type, context)
-                where instanceProducer != null
-                select instanceProducer;
-
-            this.AddRelationships(constructor.DeclaringType, dependencyTypes);
-        }
-
-        private void AddPropertiesAsKnownRelationships(Type serviceType, Type implementationType,
-            IEnumerable<PropertyInfo> properties)
-        {
-            var dependencies =
-                from property in properties
-                let dependencyType = property.PropertyType
-                let context = new InjectionConsumerInfo(serviceType, implementationType, property)
-                let instanceProducer = this.Container.GetRegistrationEvenIfInvalid(dependencyType, context)
-                where instanceProducer != null
-                select instanceProducer;
-
-            this.AddRelationships(implementationType, dependencies);
         }
 
         private void AddRelationships(Type implementationType, IEnumerable<InstanceProducer> dependencies)
@@ -522,6 +496,15 @@ namespace SimpleInjector
             {
                 this.AddRelationship(relationship);
             }
+        }
+
+        private void AddRelationships(ConstructorInfo constructor, ParameterDictionary<DependencyData> parameters)
+        {
+            var knownRelationships =
+                from dependency in parameters.Values
+                select dependency.Producer ?? this.GetOverriddenParameterFor(dependency.Parameter).Producer;
+
+            this.AddRelationships(constructor.DeclaringType, knownRelationships);
         }
 
         private static Expression WrapWithNullChecker<TService>(Expression expression)
@@ -570,9 +553,18 @@ namespace SimpleInjector
             return instance;
         }
 
-        // HACK: ParameterInfo is not guaranteed to be unique (while Type and MemberBase are). This caused 
-        // the bug described in #323. By creating this key, we can match multiple PatereterInfo objects that
-        // reference the same parameter.
-        private static object GetParameterKey(ParameterInfo param) => new { param.Name, param.Member };
+        private struct DependencyData
+        {
+            public readonly ParameterInfo Parameter;
+            public readonly InstanceProducer Producer;
+            public readonly Expression Expression;
+
+            public DependencyData(ParameterInfo parameter, Expression expression, InstanceProducer producer)
+            {
+                this.Parameter = parameter;
+                this.Expression = expression;
+                this.Producer = producer;
+            }
+        }
     }
 }
