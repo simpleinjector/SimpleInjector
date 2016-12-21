@@ -84,7 +84,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            var registration = Lifestyle.Transient.CreateRegistration<OneAndTwo, OneAndTwo>(container);
+            var registration = Lifestyle.Transient.CreateRegistration<OneAndTwo>(container);
 
             container.AddRegistration(typeof(IOne), registration);
             container.AddRegistration(typeof(ITwo), registration);

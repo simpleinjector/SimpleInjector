@@ -166,7 +166,7 @@ namespace SimpleInjector
             }
             else
             {
-                var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
+                var registration = lifestyle.CreateRegistration(implementationType, this);
                 this.RegisterConditional(serviceType, registration, predicate);
             }
         }

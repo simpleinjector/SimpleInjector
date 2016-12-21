@@ -74,29 +74,6 @@
             // Assert
             Assert.AreEqual(MultipleConstructorsCommand.MostParametersConstructor, command.ConstructorType);
         }
-                
-        [TestMethod]
-        public void GetInstance_ConcreteTypeRegisteredWithTwoDifferentKeys_ResolvesThatTypeWithTheDifferentConstructors()
-        {
-            // Arrange
-            var container = new Container();
-
-            var convention = container.RegisterConstructorSelectorConvention();
-
-            container.Register<ILogger, NullLogger>(Lifestyle.Singleton);
-            container.Register<ISomeDependency, SomeDependency>(Lifestyle.Singleton);
-
-            convention.Register<ICommand, MultipleConstructorsCommand>(ConstructorSelector.MostParameters);
-            convention.Register<MultipleConstructorsCommand>(ConstructorSelector.LeastParameters);
-
-            // Act
-            var command1 = (MultipleConstructorsCommand)container.GetInstance<ICommand>();
-            var command2 = container.GetInstance<MultipleConstructorsCommand>();
-
-            // Assert
-            Assert.AreEqual(MultipleConstructorsCommand.MostParametersConstructor, command1.ConstructorType);
-            Assert.AreEqual(MultipleConstructorsCommand.LeastParametersConstructor, command2.ConstructorType);
-        }
 
         private sealed class MultipleConstructorsCommand : ICommand
         {

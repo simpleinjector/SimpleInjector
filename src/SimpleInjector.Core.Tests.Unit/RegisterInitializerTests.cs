@@ -292,7 +292,7 @@
 
             // Assert
             Assert.IsFalse(initializerWasCalled,
-                "Since only ICommand is 'staticly' available information, the initializer for " +
+                "Since only ICommand is 'statically' available information, the initializer for " +
                 "ConcreteCommand should never fire. Although the performance hit would be a one-time hit, " +
                 "users would expect this behavior to be the same as when registering a transient.");
         }
@@ -314,7 +314,7 @@
 
             // Assert
             Assert.IsFalse(initializerWasCalled,
-                "Since only ICommand is 'staticly' available information, the initializer for " +
+                "Since only ICommand is 'statically' available information, the initializer for " +
                 "ConcreteCommand should never fire. Although the performance hit would be a one-time hit, " +
                 "users would expect this behavior to be the same as when registering a transient.");
         }

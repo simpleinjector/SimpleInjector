@@ -316,7 +316,7 @@ namespace SimpleInjector
                 where Helpers.IsConcreteType(type)
                 where options.IncludeGenericTypeDefinitions || !type.IsGenericTypeDefinition()
                 where Helpers.ServiceIsAssignableFromImplementation(serviceType, type)
-                let ctor = this.SelectImplementationTypeConstructorOrNull(serviceType, type)
+                let ctor = this.SelectImplementationTypeConstructorOrNull(type)
                 where ctor == null || options.IncludeDecorators || !Helpers.IsDecorator(serviceType, ctor)
                 where ctor == null || options.IncludeComposites || !Helpers.IsComposite(serviceType, ctor)
                 select type;
@@ -341,15 +341,15 @@ namespace SimpleInjector
 
         private bool IsDecorator(Type openGenericServiceType, Type implemenationType)
         {
-            var ctor = this.SelectImplementationTypeConstructorOrNull(openGenericServiceType, implemenationType);
+            var ctor = this.SelectImplementationTypeConstructorOrNull(implemenationType);
             return ctor != null && Helpers.IsDecorator(openGenericServiceType, ctor);
         }
 
-        private ConstructorInfo SelectImplementationTypeConstructorOrNull(Type serviceType, Type implementationType)
+        private ConstructorInfo SelectImplementationTypeConstructorOrNull(Type implementationType)
         {
             try
             {
-                return this.Options.SelectConstructor(serviceType, implementationType);
+                return this.Options.SelectConstructor(implementationType);
             }
             catch (ActivationException)
             {

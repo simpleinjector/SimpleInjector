@@ -325,7 +325,7 @@
 
             // Act
             var registration =
-                expectedLifestyle.CreateRegistration<IUserRepository, SqlUserRepository>(container);
+                expectedLifestyle.CreateRegistration<SqlUserRepository>(container);
 
             // Assert
             Assert.AreEqual(expectedLifestyle, registration.Lifestyle);
@@ -342,7 +342,7 @@
 
             // Act
             var registration =
-                expectedLifestyle.CreateRegistration<IUserRepository, SqlUserRepository>(container);
+                expectedLifestyle.CreateRegistration<SqlUserRepository>(container);
 
             // Assert
             Assert.AreEqual(expectedLifestyle, registration.Lifestyle);
@@ -683,15 +683,15 @@
                 return base.GetCurrentScopeCore(container);
             }
 
-            protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+            protected override Registration CreateRegistrationCore<TConcrete>(Container container)
             {
-                return this.realLifestyle.CreateRegistration<TService, TImplementation>(container);
+                return this.realLifestyle.CreateRegistration<TConcrete>(container);
             }
 
             protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
                 Container container)
             {
-                return this.realLifestyle.CreateRegistration<TService>(instanceCreator, container);
+                return this.realLifestyle.CreateRegistration(instanceCreator, container);
             }
         }
     }

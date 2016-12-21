@@ -44,9 +44,9 @@ namespace SimpleInjector.Internals
         }
 
         internal static Expression Replace(Expression expressionToAlter,
-            ConstantExpression subExpressionToFind, Expression replacementExpression)
+            ConstantExpression nodeToFind, Expression replacementNode)
         {
-            var visitor = new SubExpressionReplacer(subExpressionToFind, replacementExpression);
+            var visitor = new SubExpressionReplacer(nodeToFind, replacementNode);
 
             return visitor.Visit(expressionToAlter);
         }

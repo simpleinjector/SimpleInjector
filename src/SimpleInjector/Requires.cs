@@ -315,8 +315,7 @@ namespace SimpleInjector
         internal static void IsDecorator(Container container, Type serviceType, Type decoratorType,
             string paramName)
         {
-            ConstructorInfo decoratorConstructor =
-                container.Options.SelectConstructor(serviceType, decoratorType);
+            ConstructorInfo decoratorConstructor = container.Options.SelectConstructor(decoratorType);
 
             Requires.DecoratesServiceType(serviceType, decoratorConstructor, paramName);
         }

@@ -37,7 +37,7 @@
         }
 
         [TestMethod]
-        public void CreateRegistrationTServiceTImplementation_Always_ThrowsException()
+        public void CreateRegistrationTImplementation_Always_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -45,7 +45,7 @@
             try
             {
                 // Act
-                Lifestyle.Unknown.CreateRegistration<object, string>(container);
+                Lifestyle.Unknown.CreateRegistration<string>(container);
 
                 // Assert
                 Assert.Fail("Exception expected.");
