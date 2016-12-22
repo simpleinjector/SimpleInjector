@@ -2602,27 +2602,6 @@
         }
     }
 
-    public static class TypeExtensions
-    {
-        public static Type MakePartialOpenGenericType(this Type type, Type firstArgument = null,
-            Type secondArgument = null)
-        {
-            var arguments = type.GetGenericArguments();
-
-            if (firstArgument != null)
-            {
-                arguments[0] = firstArgument;
-            }
-
-            if (secondArgument != null)
-            {
-                arguments[1] = secondArgument;
-            }
-
-            return type.MakeGenericType(arguments);
-        }
-    }
-
     internal class RelationshipInfo
     {
         public Type ImplementationType { get; set; }

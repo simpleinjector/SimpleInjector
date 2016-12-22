@@ -844,8 +844,8 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             Assert.AreEqual(
-                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
-                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+                expected: string.Join(", ", expectedHandlerTypes.Select(TypeExtensions.ToFriendlyName)),
+                actual: string.Join(", ", actualHandlerTypes.Select(TypeExtensions.ToFriendlyName)));
         }
 
         [TestMethod]
@@ -884,8 +884,8 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             Assert.AreEqual(
-                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
-                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+                expected: expectedHandlerTypes.ToFriendlyNamesText(),
+                actual: actualHandlerTypes.ToFriendlyNamesText());
         }
 
         [TestMethod]
@@ -921,8 +921,8 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             Assert.AreEqual(
-                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
-                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+                expected: expectedHandlerTypes.ToFriendlyNamesText(),
+                actual: actualHandlerTypes.ToFriendlyNamesText());
         }
 
         [TestMethod]
@@ -960,8 +960,8 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             Assert.AreEqual(
-                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
-                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+                expected: expectedHandlerTypes.ToFriendlyNamesText(),
+                actual: actualHandlerTypes.ToFriendlyNamesText());
         }
 
         [TestMethod]
@@ -1526,7 +1526,7 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             Assert.IsTrue(expectedHandlerTypes.SequenceEqual(actualHandlerTypes),
-                "Actual: " + actualHandlerTypes.Select(Types.ToFriendlyName).ToCommaSeparatedText());
+                "Actual: " + actualHandlerTypes.Select(t => t.ToFriendlyName()).ToCommaSeparatedText());
         }
 
         [TestMethod]
@@ -1603,7 +1603,7 @@ namespace SimpleInjector.Tests.Unit
                 register generic types by supplying the RegisterAll(Type, Type[]) overload as follows:
                 container.RegisterManyForOpenGeneric(type, container.RegisterAll, assemblies)."
                 .TrimInside() +
-                "Actual: " + actualHandlerTypes.Select(Types.ToFriendlyName).ToCommaSeparatedText());
+                "Actual: " + actualHandlerTypes.ToFriendlyNamesText());
         }
 
         // This is a regression test for bug: 21000.

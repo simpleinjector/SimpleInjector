@@ -75,8 +75,6 @@ namespace SimpleInjector
             return genericTypeDefinition.ToFriendlyName(fullyQualifiedName, CSharpFriendlyNameArgumentFormatter);
         }
 
-        internal static string ToFriendlyName(this Type type) => type.ToFriendlyName(fullyQualifiedName: false);
-
         internal static string ToFriendlyName(this Type type, bool fullyQualifiedName)
         {
             Requires.IsNotNull(type, nameof(type));
