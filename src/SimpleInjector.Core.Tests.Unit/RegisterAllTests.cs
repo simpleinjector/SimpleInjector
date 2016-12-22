@@ -1526,7 +1526,7 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             Assert.IsTrue(expectedHandlerTypes.SequenceEqual(actualHandlerTypes),
-                "Actual: " + actualHandlerTypes.Select(Helpers.ToFriendlyName).ToCommaSeparatedText());
+                "Actual: " + actualHandlerTypes.Select(Types.ToFriendlyName).ToCommaSeparatedText());
         }
 
         [TestMethod]
@@ -1603,7 +1603,7 @@ namespace SimpleInjector.Tests.Unit
                 register generic types by supplying the RegisterAll(Type, Type[]) overload as follows:
                 container.RegisterManyForOpenGeneric(type, container.RegisterAll, assemblies)."
                 .TrimInside() +
-                "Actual: " + actualHandlerTypes.Select(Helpers.ToFriendlyName).ToCommaSeparatedText());
+                "Actual: " + actualHandlerTypes.Select(Types.ToFriendlyName).ToCommaSeparatedText());
         }
 
         // This is a regression test for bug: 21000.

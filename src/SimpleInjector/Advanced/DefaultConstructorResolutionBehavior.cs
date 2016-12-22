@@ -44,7 +44,7 @@ namespace SimpleInjector.Advanced
 
         private static void VerifyTypeIsConcrete(Type implementationType)
         {
-            if (!Helpers.IsConcreteType(implementationType))
+            if (!Types.IsConcreteType(implementationType))
             {
                 // About arrays: While array types are in fact concrete, we cannot create them and creating 
                 // them would be pretty useless.

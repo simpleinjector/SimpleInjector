@@ -162,7 +162,7 @@ namespace SimpleInjector.Decorators
         internal static Type GetDecoratingBaseType(Type serviceType, ConstructorInfo decoratorConstructor)
         {
             var decoratorInterfaces =
-                from abstraction in Helpers.GetBaseTypeCandidates(serviceType, decoratorConstructor.DeclaringType)
+                from abstraction in Types.GetBaseTypeCandidates(serviceType, decoratorConstructor.DeclaringType)
                 where decoratorConstructor.GetParameters()
                     .Any(parameter => IsDecorateeParameter(parameter.ParameterType, abstraction))
                 select abstraction;

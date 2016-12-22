@@ -65,9 +65,9 @@
                 The supplied type {0} is not an open generic type. Supply this method with the open generic 
                 type {1} to register all available implementations of this type, or call 
                 RegisterCollection(Type, IEnumerable<Assembly>) either with the open or closed version of 
-                that type to register a collection of instances based on that type.".TrimInside(), 
-                Helpers.ToFriendlyName(typeof(IService<int, int>)),
-                Helpers.ToCSharpFriendlyName(typeof(IService<,>))),
+                that type to register a collection of instances based on that type.".TrimInside(),
+                typeof(IService<int, int>).ToFriendlyName(),
+                Types.ToCSharpFriendlyName(typeof(IService<,>))),
                 action);
         }
         
@@ -103,8 +103,8 @@
                 type {1} to register all available implementations of this type, or call 
                 RegisterCollection(Type, IEnumerable<Type>) either with the open or closed version of 
                 that type to register a collection of instances based on that type.".TrimInside(),
-                Helpers.ToFriendlyName(typeof(IService<int, int>)),
-                Helpers.ToCSharpFriendlyName(typeof(IService<,>))),
+                typeof(IService<int, int>).ToFriendlyName(),
+                Types.ToCSharpFriendlyName(typeof(IService<,>))),
                 action);
         }
 

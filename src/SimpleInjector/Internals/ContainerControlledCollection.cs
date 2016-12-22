@@ -237,7 +237,7 @@ namespace SimpleInjector.Internals
 
         private InstanceProducer CreateNewExternalProducer(Type implementationType)
         {
-            if (!Helpers.IsConcreteConstructableType(implementationType))
+            if (!Types.IsConcreteConstructableType(implementationType))
             {
                 // This method will throw an (expressive) exception since implementationType is not concrete.
                 this.container.GetRegistration(implementationType, throwOnFailure: true);

@@ -128,7 +128,7 @@ namespace SimpleInjector.Diagnostics.Debugger
 
                 // This flattens the hierarchy when there is just one item in the group.
                 return new DebuggerViewItem(
-                    name: Helpers.ToFriendlyName(producer.ServiceType),
+                    name: producer.ServiceType.ToFriendlyName(),
                     description: producer.DebuggerDisplay,
                     value: producersForGroup[0]);
             }
@@ -155,14 +155,14 @@ namespace SimpleInjector.Diagnostics.Debugger
             }
 
             return new DebuggerViewItem(
-                name: Helpers.ToFriendlyName(groupType),
+                name: groupType.ToFriendlyName(),
                 description: "Count = " + producersForGroup.Length,
                 value: childGroups);
         }
 
         private static DebuggerViewItem BuildNonGenericGroup(Type closedType, InstanceProducer[] producersForGroup) => 
             new DebuggerViewItem(
-                name: Helpers.ToFriendlyName(closedType),
+                name: closedType.ToFriendlyName(),
                 description: "Count = " + producersForGroup.Length,
                 value: producersForGroup.ToArray());
     }

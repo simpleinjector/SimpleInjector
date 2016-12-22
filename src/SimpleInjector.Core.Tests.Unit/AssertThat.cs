@@ -283,6 +283,6 @@
             }
         }
 
-        private static string ToFriendlyName(Type type) => Helpers.ToFriendlyName(type);
+        private static string ToFriendlyName(Type type) => Types.ToFriendlyName(type);
     }
 }

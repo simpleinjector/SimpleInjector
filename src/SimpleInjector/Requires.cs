@@ -111,7 +111,7 @@ namespace SimpleInjector
         [DebuggerStepThrough]
         internal static void IsNotAnAmbiguousType(Type type, string paramName)
         {
-            if (Helpers.IsAmbiguousType(type))
+            if (Types.IsAmbiguousType(type))
             {
                 throw new ArgumentException(StringResources.TypeIsAmbiguous(type), paramName);
             }
@@ -184,7 +184,7 @@ namespace SimpleInjector
             Type implementation, string paramName)
         {
             if (service != implementation &&
-                !Helpers.ServiceIsAssignableFromImplementation(service, implementation))
+                !Types.ServiceIsAssignableFromImplementation(service, implementation))
             {
                 throw new ArgumentException(
                     StringResources.SuppliedTypeDoesNotInheritFromOrImplement(service, implementation),
@@ -197,7 +197,7 @@ namespace SimpleInjector
         {
             var invalidType = (
                 from type in typesToRegister
-                where !Helpers.ServiceIsAssignableFromImplementation(serviceType, type)
+                where !Types.ServiceIsAssignableFromImplementation(serviceType, type)
                 where !typeCanBeServiceType || type != serviceType
                 select type)
                 .FirstOrDefault();
@@ -411,7 +411,7 @@ namespace SimpleInjector
                 // confusing to the user.
                 // At this point we know that the decorator type implements an service type in some way
                 // (either open or closed), so we this call will return at least one record.
-                serviceType = Helpers.GetBaseTypeCandidates(serviceType, constructor.DeclaringType).First();
+                serviceType = Types.GetBaseTypeCandidates(serviceType, constructor.DeclaringType).First();
 
                 ThrowMustContainTheServiceTypeAsArgument(serviceType, constructor, paramName);
             }

@@ -874,7 +874,7 @@ namespace SimpleInjector
                     "{2}" +
                     "Please see https://simpleinjector.org/asmld for more information about this " +
                     "problem and how to solve it.",
-                    Helpers.ToCSharpFriendlyName(duplicateAssemblyLookalike, fullyQualifiedName: true),
+                    Types.ToCSharpFriendlyName(duplicateAssemblyLookalike, fullyQualifiedName: true),
                     serviceType.GetAssembly().FullName,
                     BuildAssemblyLocationMessage(serviceType, duplicateAssemblyLookalike));
             }
@@ -925,6 +925,6 @@ namespace SimpleInjector
         private static string TypeName(this Type type) => type.ToFriendlyName(UseFullyQualifiedTypeNames);
 
         private static string CSharpFriendlyName(Type type) =>
-            Helpers.ToCSharpFriendlyName(type, UseFullyQualifiedTypeNames);
+            Types.ToCSharpFriendlyName(type, UseFullyQualifiedTypeNames);
     }
 }

@@ -313,12 +313,12 @@ namespace SimpleInjector
                 from assembly in assemblies.Distinct()
                 where !assembly.IsDynamic
                 from type in GetTypesFromAssembly(assembly)
-                where Helpers.IsConcreteType(type)
+                where Types.IsConcreteType(type)
                 where options.IncludeGenericTypeDefinitions || !type.IsGenericTypeDefinition()
-                where Helpers.ServiceIsAssignableFromImplementation(serviceType, type)
+                where Types.ServiceIsAssignableFromImplementation(serviceType, type)
                 let ctor = this.SelectImplementationTypeConstructorOrNull(type)
-                where ctor == null || options.IncludeDecorators || !Helpers.IsDecorator(serviceType, ctor)
-                where ctor == null || options.IncludeComposites || !Helpers.IsComposite(serviceType, ctor)
+                where ctor == null || options.IncludeDecorators || !Types.IsDecorator(serviceType, ctor)
+                where ctor == null || options.IncludeComposites || !Types.IsComposite(serviceType, ctor)
                 select type;
 
             return types.ToArray();
@@ -342,7 +342,7 @@ namespace SimpleInjector
         private bool IsDecorator(Type openGenericServiceType, Type implemenationType)
         {
             var ctor = this.SelectImplementationTypeConstructorOrNull(implemenationType);
-            return ctor != null && Helpers.IsDecorator(openGenericServiceType, ctor);
+            return ctor != null && Types.IsDecorator(openGenericServiceType, ctor);
         }
 
         private ConstructorInfo SelectImplementationTypeConstructorOrNull(Type implementationType)
