@@ -262,6 +262,9 @@
         {
             Assert.IsNotNull(actualTypes);
 
+            expectedTypes = expectedTypes.ToArray();
+            actualTypes = actualTypes.ToArray();
+
             if (!expectedTypes.SequenceEqual(actualTypes))
             {
                 Assert.Fail("The sequences did not match.\nExpected list: {0}.\nActual list: {1}",

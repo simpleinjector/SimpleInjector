@@ -123,15 +123,15 @@ namespace SimpleInjector
         }
 
         // Return a list of all base types T inherits, all interfaces T implements and T itself.
-        internal static Type[] GetTypeHierarchyFor(Type type)
+        internal static ICollection<Type> GetTypeHierarchyFor(Type type)
         {
-            var types = new List<Type>();
+            var types = new List<Type>(4);
 
             types.Add(type);
             types.AddRange(GetBaseTypes(type));
             types.AddRange(type.GetInterfaces());
 
-            return types.ToArray();
+            return types;
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace SimpleInjector
             }
 
             // PERF: We don't use LINQ to prevent unneeded memory allocations.
-            // Unfortunately we can't prevent memory allocations while calling GetInstances() :-(
+            // Unfortunately we can't prevent memory allocations while calling GetInterfaces() :-(
             foreach (Type interfaceType in implementation.GetInterfaces())
             {
                 if (IsGenericImplementationOf(interfaceType, service))

@@ -844,8 +844,8 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             Assert.AreEqual(
-                expected: string.Join(", ", expectedHandlerTypes.Select(TypeExtensions.ToFriendlyName)),
-                actual: string.Join(", ", actualHandlerTypes.Select(TypeExtensions.ToFriendlyName)));
+                expected: string.Join(", ", expectedHandlerTypes.Select(TypesExtensions.ToFriendlyName)),
+                actual: string.Join(", ", actualHandlerTypes.Select(TypesExtensions.ToFriendlyName)));
         }
 
         [TestMethod]
