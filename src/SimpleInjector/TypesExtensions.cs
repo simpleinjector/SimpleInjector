@@ -41,14 +41,50 @@ namespace SimpleInjector
         public static string ToFriendlyName(this Type type) => type.ToFriendlyName(fullyQualifiedName: false);
 
         /// <summary>
-        /// Returns true is the <paramref name="type"/> is assignable from a closed version of the supplied
-        /// <paramref name="closedGenericType"/>.
+        /// Returns true is the current <paramref name="type"/> is assignable from a closed version of the 
+        /// supplied <paramref name="genericTypeDefinition"/>. This method returns true when either 
+        /// <paramref name="type"/> itself, one of its base classes or one of its implemented interfaces is a
+        /// closed version of <paramref name="genericTypeDefinition"/>; otherwise false.
         /// </summary>
         /// <param name="type">The type to check.</param>
-        /// <param name="closedGenericType">The generic type definition to match.</param>
+        /// <param name="genericTypeDefinition">The generic type definition to match.</param>
         /// <returns>True when type is assignable; otherwise false.</returns>
-        public static bool IsClosedTypeOf(this Type type, Type closedGenericType) =>
-            GetClosedTypesOfInternal(type, closedGenericType).Any();
+        public static bool IsClosedTypeOf(this Type type, Type genericTypeDefinition) =>
+            GetClosedTypesOfInternal(type, genericTypeDefinition).Any();
+
+        /// <summary>
+        /// Gets the single closed version of <paramref name="genericTypeDefinition"/> that is assignable from
+        /// the current <paramref name="type"/>. In case none or multiple matching closed types are found,
+        /// and exception is thrown.
+        /// </summary>
+        /// <param name="type">The type to check.</param>
+        /// <param name="genericTypeDefinition">The generic type definition to match.</param>
+        /// <returns>The matching closed type.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="genericTypeDefinition"/> is not
+        /// a generic type or when none of the the base classes or implemented interfaces of </exception>
+        /// <exception cref="InvalidOperationException">Thrown when multiple matching closed generic types
+        /// are found.</exception>
+        public static Type GetClosedTypeOf(this Type type, Type genericTypeDefinition)
+        {
+            Type[] types = GetClosedTypesOfInternal(type, genericTypeDefinition).ToArray();
+
+            if (types.Length == 0)
+            {
+                throw new ArgumentException(
+                    StringResources.TypeIsNotAssignableFromOpenGenericType(type, genericTypeDefinition),
+                    nameof(type));
+            }
+            
+            if (types.Length > 1)
+            {
+                throw new InvalidOperationException(
+                    StringResources.MultipleClosedTypesAreAssignableFromType(type, genericTypeDefinition,
+                        types, nameof(TypesExtensions.GetClosedTypesOf)));
+            }
+
+            return types[0];
+        }
 
         /// <summary>
         /// Gets the list of closed versions of <paramref name="genericTypeDefinition"/> that are assignable

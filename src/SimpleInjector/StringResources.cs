@@ -92,6 +92,24 @@ namespace SimpleInjector
                 NoteThatSkippedDecoratorsWereFound(serviceType, skippedDecorators),
                 NoteThatTypeLookalikesAreFound(serviceType, lookalikes));
 
+        internal static string MultipleClosedTypesAreAssignableFromType(Type type, Type genericTypeDefinition, 
+            Type[] types, string otherMethod) =>
+            string.Format(CultureInfo.InvariantCulture,
+                "Your request is ambiguous. " +
+                "There are multiple closed version of {0} that are assignable from {1}, namely: {2}. " +
+                "Use {3} instead to get this list of closed types to select the proper type.",
+                genericTypeDefinition.TypeName(),
+                type.TypeName(),
+                types.Select(TypeName).ToCommaSeparatedText(),
+                otherMethod);
+
+        internal static string TypeIsNotAssignableFromOpenGenericType(Type type, Type genericTypeDefinition) =>
+            string.Format(CultureInfo.InvariantCulture,
+                "None of the base classes or implemented interfaces of {0}, nor {0} itself are a closed " +
+                "type of {1}.",
+                type.TypeName(),
+                genericTypeDefinition.TypeName());
+
         internal static string OpenGenericTypesCanNotBeResolved(Type serviceType) =>
             string.Format(CultureInfo.InvariantCulture,
                 "The request for type {0} is invalid because it is an open generic type: it is only " +

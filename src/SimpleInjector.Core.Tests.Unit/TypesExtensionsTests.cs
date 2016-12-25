@@ -84,4 +84,43 @@
 
         private static int HashCode(Type type) => type.GetHashCode();
     }
+
+    [TestClass]
+    public class TypeExtensions_GetClosedTypeOf_Tests : TypesExtensionsTests
+    {
+        [TestMethod] public void Returns_1() => _(typeof(IX<int>), typeof(IX<>), expected: typeof(IX<int>) );
+        [TestMethod] public void Returns_2() => _(typeof(IntX), typeof(IX<>), expected: typeof(IX<int>) );
+        [TestMethod] public void Returns_3() => _(typeof(GenX<int>), typeof(IX<>), expected: typeof(IX<int>));
+
+        [TestMethod] public void Throws_1() => _<InvalidOperationException>(typeof(IntFloatX), typeof(IX<>));
+        [TestMethod] public void Throws_2() => _<ArgEx>(typeof(NoX), typeof(IX<>));
+        [TestMethod] public void Throws_3() => _<ArgEx>(typeof(IX<int>), typeof(GenX<>));
+
+        [TestMethod]
+        public void GetClosedTypeOf_AmbiquousRequest_ThrowsExceptionWithExpectedMessage()
+        {
+            // Act
+            Action action = () => typeof(IntFloatX).GetClosedTypeOf(typeof(IX<>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                Your request is ambiguous. There are multiple closed version of TypesExtensionsTests.IX<T> 
+                that are assignable from TypesExtensionsTests.IntFloatX, namely: 
+                TypesExtensionsTests.IX<Int32> and TypesExtensionsTests.IX<Single>. Use GetClosedTypesOf 
+                instead to get this list of closed types to select the proper type."
+                .TrimInside(),
+                action);
+        }
+
+        private static void _(Type type, Type genericTypeDefinition, Type expected)
+        {
+            Type actual = type.GetClosedTypeOf(genericTypeDefinition);
+
+            AssertThat.AreEqual(expected, actual);
+        }
+
+        private static void _<T>(Type type, Type genericType) where T : Exception =>
+            AssertThat.Throws<T>(() => type.GetClosedTypeOf(genericType));
+
+    }
 }
