@@ -5,7 +5,6 @@
     using System.Runtime.Remoting.Proxies;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics;
-    using SimpleInjector.Lifestyles;
     using SimpleInjector.Tests.Unit;
 
     [TestClass]
@@ -53,9 +52,7 @@
             var handler = container.GetInstance<RepositoryThatDependsOnLogger>();
 
             // Assert
-            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), handler.Logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), handler.Logger.Context.ImplementationType);
-            //// Assert.IsNull(handler.Logger.Context.Parent);
         }
 
         [TestMethod]
@@ -72,7 +69,6 @@
             var handler = container.GetInstance<RepositoryThatDependsOnLogger>();
 
             // Assert
-            Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), handler.Logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), handler.Logger.Context.ImplementationType);
         }
         
@@ -90,7 +86,6 @@
             var handler = container.GetInstance<IRepository>() as RepositoryThatDependsOnLogger;
 
             // Assert
-            Assert.AreEqual(typeof(IRepository), handler.Logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), handler.Logger.Context.ImplementationType);
         }
 
@@ -106,7 +101,6 @@
             var logger = container.GetInstance<IContextualLogger>() as ContextualLogger;
 
             // Assert
-            Assert.AreEqual(null, logger.Context.ServiceType);
             Assert.AreEqual(null, logger.Context.ImplementationType);
         }
 
@@ -126,7 +120,6 @@
             // Assert
             var logger = service.InjectedRepository.Logger;
 
-            Assert.AreEqual(typeof(IRepository), logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), logger.Context.ImplementationType);
         }
 
@@ -149,7 +142,6 @@
             // Assert
             var logger = service.InjectedRepository.Logger;
 
-            Assert.AreEqual(typeof(IRepository), logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), logger.Context.ImplementationType);
         }
 
@@ -172,7 +164,6 @@
 
             // Assert
             Assert_IsIntercepted(repository);
-            Assert.AreEqual(typeof(IRepository), repository.Logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), repository.Logger.Context.ImplementationType);
         }
 
@@ -193,7 +184,6 @@
 
             // Assert
             Assert_IsIntercepted(repository);
-            Assert.AreEqual(typeof(IRepository), repository.Logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), repository.Logger.Context.ImplementationType);
         }
 
@@ -217,7 +207,6 @@
 
             // Assert
             Assert_IsIntercepted(repository.Logger);
-            Assert.AreEqual(typeof(IRepository), repository.Logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), repository.Logger.Context.ImplementationType);
         }
 
@@ -238,7 +227,6 @@
             var repository = container.GetInstance<IRepository>();
 
             // Assert
-            Assert.AreEqual(typeof(IRepository), repository.Logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), repository.Logger.Context.ImplementationType);
         }
 
@@ -259,7 +247,6 @@
             var repository = container.GetInstance<IRepository>();
 
             // Assert
-            Assert.AreEqual(typeof(IRepository), repository.Logger.Context.ServiceType);
             Assert.AreEqual(typeof(RepositoryThatDependsOnLogger), repository.Logger.Context.ImplementationType);
         }
 
@@ -280,7 +267,6 @@
             var decorator = (ServiceDecoratorWithLoggerDependency)container.GetInstance<IService>();
 
             // Assert
-            Assert.AreEqual(typeof(IService), decorator.Logger.Context.ServiceType);
             Assert.AreEqual(typeof(ServiceDecoratorWithLoggerDependency), decorator.Logger.Context.ImplementationType);
         }
 
@@ -303,7 +289,6 @@
             var decorator = (ServiceDecoratorWithLoggerDependency)controller.Service;
 
             // Assert
-            Assert.AreEqual(typeof(IService), decorator.Logger.Context.ServiceType);
             Assert.AreEqual(typeof(ServiceDecoratorWithLoggerDependency), decorator.Logger.Context.ImplementationType);
         }
 

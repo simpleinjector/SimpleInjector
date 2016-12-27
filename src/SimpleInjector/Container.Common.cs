@@ -348,7 +348,7 @@ namespace SimpleInjector
         {
             if (this.expressionBuilding != null)
             {
-                var e = new ExpressionBuildingEventArgs(serviceType, implementationType,
+                var e = new ExpressionBuildingEventArgs(implementationType,
                     instanceCreatorExpression, registration.Lifestyle);
 
                 var relationships = new KnownRelationshipCollection(registration.GetRelationships().ToList());

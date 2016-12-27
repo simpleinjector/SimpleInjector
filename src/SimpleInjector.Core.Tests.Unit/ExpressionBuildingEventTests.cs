@@ -20,44 +20,6 @@
             void Write(string message);
         }
 
-        // NOTE: This test is the example code of the XML documentation of the Container.ExpressionBuilding event.
-        [TestMethod]
-        public void TestExpressionBuilding()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            container.Register<ILogger, ConsoleLogger>(Lifestyle.Singleton);
-            container.Register<IValidator<Order>, OrderValidator>();
-            container.Register<IValidator<Customer>, CustomerValidator>();
-
-            // Intercept the creation of IValidator<T> instances and wrap them in a MonitoringValidator<T>:
-            container.ExpressionBuilding += (sender, e) =>
-            {
-                if (e.RegisteredServiceType.IsGenericType() &&
-                    e.RegisteredServiceType.GetGenericTypeDefinition() == typeof(IValidator<>))
-                {
-                    var decoratorType = typeof(MonitoringValidator<>)
-                        .MakeGenericType(e.RegisteredServiceType.GetGenericArguments());
-
-                    // Wrap the IValidator<T> in a MonitoringValidator<T>.
-                    e.Expression = Expression.New(decoratorType.GetConstructors()[0], new Expression[]
-                    {
-                        e.Expression,
-                        container.GetRegistration(typeof(ILogger)).BuildExpression(),
-                    });
-                }
-            };
-
-            // Act
-            var orderValidator = container.GetInstance<IValidator<Order>>();
-            var customerValidator = container.GetInstance<IValidator<Customer>>();
-
-            // Assert
-            AssertThat.IsInstanceOfType(typeof(MonitoringValidator<Order>), orderValidator);
-            AssertThat.IsInstanceOfType(typeof(MonitoringValidator<Customer>), customerValidator);
-        }
-
         // This test verifies the core difference between ExpressionBuilding and ExpressionBuilt
         [TestMethod]
         public void GetInstance_OnInstanceRegisteredAsSingleton_ExpressionBuildingGetsFiredWithNewExpression()
@@ -71,7 +33,7 @@
 
             container.ExpressionBuilding += (sender, e) =>
             {
-                if (e.RegisteredServiceType == typeof(IUserRepository))
+                if (e.KnownImplementationType == typeof(SqlUserRepository))
                 {
                     actualExpression = e.Expression;
                 }
@@ -99,7 +61,7 @@
 
             container.ExpressionBuilding += (sender, e) =>
             {
-                Assert.AreEqual(e.RegisteredServiceType, typeof(IUserRepository), "Test setup fail.");
+                Assert.AreEqual(e.KnownImplementationType, typeof(SqlUserRepository), "Test setup fail.");
                 actualBuildingExpression = e.Expression;
             };
 
@@ -122,7 +84,7 @@
 
             container.ExpressionBuilding += (sender, e) =>
             {
-                if (e.RegisteredServiceType == typeof(IUserRepository))
+                if (e.KnownImplementationType == typeof(SqlUserRepository))
                 {
                     // Replace the expression with a singleton
                     e.Expression = Expression.Constant(new SqlUserRepository());
@@ -150,7 +112,7 @@
 
             container.ExpressionBuilding += (sender, e) =>
             {
-                if (e.RegisteredServiceType == typeof(IUserRepository))
+                if (e.KnownImplementationType == typeof(SqlUserRepository))
                 {
                     // Replace the expression with a singleton
                     e.Expression = Expression.Constant(new SqlUserRepository());
@@ -179,7 +141,7 @@
 
             container.ExpressionBuilding += (sender, e) =>
             {
-                if (e.RegisteredServiceType == typeof(IUserRepository))
+                if (e.KnownImplementationType == typeof(SqlUserRepository))
                 {
                     actualCallCount++;
                 }
@@ -207,7 +169,7 @@
 
             container.ExpressionBuilding += (sender, e) =>
             {
-                if (e.RegisteredServiceType == typeof(IUserRepository))
+                if (e.KnownImplementationType == typeof(SqlUserRepository))
                 {
                     actualCallCount++;
                 }
@@ -235,7 +197,7 @@
 
             container.ExpressionBuilding += (sender, e) =>
             {
-                if (e.RegisteredServiceType == typeof(IUserRepository))
+                if (e.KnownImplementationType == typeof(SqlUserRepository))
                 {
                     actualCallCount++;
                 }
@@ -283,7 +245,7 @@
 
             container.ExpressionBuilding += (sender, e) =>
             {
-                if (e.RegisteredServiceType == typeof(IUserRepository))
+                if (e.KnownImplementationType == typeof(SqlUserRepository))
                 {
                     actualCallCount++;
                 }
@@ -310,7 +272,7 @@
 
             container.ExpressionBuilding += (sender, e) =>
             {
-                if (e.RegisteredServiceType == typeof(IUserRepository))
+                if (e.KnownImplementationType == typeof(SqlUserRepository))
                 {
                     actualCallCount++;
                 }
@@ -339,7 +301,7 @@
 
             container.ExpressionBuilding += (sender, e) =>
             {
-                if (e.RegisteredServiceType == typeof(IUserRepository))
+                if (e.KnownImplementationType == typeof(IUserRepository))
                 {
                     actualCallCount++;
                 }
@@ -396,7 +358,7 @@
 
             container.ExpressionBuilding += (sender, e) =>
             {
-                if (e.RegisteredServiceType == typeof(SqlUserRepository))
+                if (e.KnownImplementationType == typeof(SqlUserRepository))
                 {
                     actualCallCount++;
                 }
@@ -422,7 +384,7 @@
 
             container.ExpressionBuilding += (sender, e) =>
             {
-                if (e.RegisteredServiceType == typeof(IUserRepository))
+                if (e.KnownImplementationType == typeof(SqlUserRepository))
                 {
                     actualCallCount++;
                 }
@@ -451,7 +413,7 @@
 
             container.ExpressionBuilding += (sender, e) =>
             {
-                if (e.RegisteredServiceType == typeof(IUserRepository))
+                if (e.KnownImplementationType == typeof(SqlUserRepository))
                 {
                     actualCallCount++;
                 }
@@ -537,7 +499,6 @@
         {
             // Arrange
             var eventArgs = new ExpressionBuildingEventArgs(
-                typeof(IPlugin),
                 typeof(PluginImpl), 
                 Expression.Constant(new PluginImpl()),
                 Lifestyle.Transient);
@@ -647,7 +608,7 @@
 
             container.ExpressionBuilding += (s, e) =>
             {
-                if (e.RegisteredServiceType == typeof(IUserRepository))
+                if (e.KnownImplementationType == typeof(SqlUserRepository))
                 {
                     e.KnownRelationships.Add(new KnownRelationship(typeof(object), Lifestyle.Transient,
                         container.GetRegistration(typeof(Container))));

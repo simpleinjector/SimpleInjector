@@ -88,8 +88,8 @@
     [TestClass]
     public class TypeExtensions_GetClosedTypeOf_Tests : TypesExtensionsTests
     {
-        [TestMethod] public void Returns_1() => _(typeof(IX<int>), typeof(IX<>), expected: typeof(IX<int>) );
-        [TestMethod] public void Returns_2() => _(typeof(IntX), typeof(IX<>), expected: typeof(IX<int>) );
+        [TestMethod] public void Returns_1() => _(typeof(IX<int>), typeof(IX<>), expected: typeof(IX<int>));
+        [TestMethod] public void Returns_2() => _(typeof(IntX), typeof(IX<>), expected: typeof(IX<int>));
         [TestMethod] public void Returns_3() => _(typeof(GenX<int>), typeof(IX<>), expected: typeof(IX<int>));
 
         [TestMethod] public void Throws_1() => _<InvalidOperationException>(typeof(IntFloatX), typeof(IX<>));
