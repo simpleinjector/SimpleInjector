@@ -121,6 +121,5 @@
 
         private static void _<T>(Type type, Type genericType) where T : Exception =>
             AssertThat.Throws<T>(() => type.GetClosedTypeOf(genericType));
-
     }
 }

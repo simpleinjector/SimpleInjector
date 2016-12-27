@@ -22,12 +22,12 @@
 
 namespace SimpleInjector
 {
+    // NOTE: Although 'TypeExtensions' would be a more obvious name, there is already such type in .NET.
+    // Using that same name would easily cause conflicts.
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    // NOTE: Although 'TypeExtensions' would be a more obvious name, there is already such type in .NET.
-    // Using that same name would easily cause conflicts.
     /// <summary>Useful extensions on <see cref="Type"/>.</summary>
     public static class TypesExtensions
     {
@@ -41,8 +41,8 @@ namespace SimpleInjector
         public static string ToFriendlyName(this Type type) => type.ToFriendlyName(fullyQualifiedName: false);
 
         /// <summary>
-        /// Returns true is the current <paramref name="type"/> is assignable from a closed version of the 
-        /// supplied <paramref name="genericTypeDefinition"/>. This method returns true when either 
+        /// Returns true is there is a closed version of the supplied <paramref name="genericTypeDefinition"/>
+        /// that is assignable from the current <paramref name="type"/>. This method returns true when either 
         /// <paramref name="type"/> itself, one of its base classes or one of its implemented interfaces is a
         /// closed version of <paramref name="genericTypeDefinition"/>; otherwise false.
         /// </summary>
@@ -53,16 +53,18 @@ namespace SimpleInjector
             GetClosedTypesOfInternal(type, genericTypeDefinition).Any();
 
         /// <summary>
-        /// Gets the single closed version of <paramref name="genericTypeDefinition"/> that is assignable from
-        /// the current <paramref name="type"/>. In case none or multiple matching closed types are found,
-        /// and exception is thrown.
+        /// Gets the single closed version of <paramref name="genericTypeDefinition"/> that the current 
+        /// <paramref name="type"/> is assignable from. In case none or multiple matching closed types are 
+        /// found, and exception is thrown. Example: When <paramref name="type"/> is a type 
+        /// <b>class X : IX&lt;int&gt;, IFoo&lt;string&gt;</b> and <paramref name="genericTypeDefinition"/> 
+        /// is type <b>IX&lt;T&gt;</b>: this method will return type <b>IX&lt;int&gt;</b>.
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="genericTypeDefinition">The generic type definition to match.</param>
         /// <returns>The matching closed type.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="genericTypeDefinition"/> is not
-        /// a generic type or when none of the the base classes or implemented interfaces of </exception>
+        /// a generic type or when none of the base classes or implemented interfaces of </exception>
         /// <exception cref="InvalidOperationException">Thrown when multiple matching closed generic types
         /// are found.</exception>
         public static Type GetClosedTypeOf(this Type type, Type genericTypeDefinition)
@@ -87,11 +89,10 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Gets the list of closed versions of <paramref name="genericTypeDefinition"/> that are assignable
-        /// from <paramref name="type"/>. Example: When <paramref name="type"/> is a type <b>X</b> that
-        /// implements interfaces <b>IX&lt;int&gt;</b> and <b>IFoo&lt;string&gt;</b>, and 
-        /// <paramref name="genericTypeDefinition"/> is type <b>IX&lt;T&gt;</b>, than this method will
-        /// return type <b>IX&lt;int&gt;</b>.
+        /// Gets the list of closed versions of <paramref name="genericTypeDefinition"/> that the current
+        /// <paramref name="type"/> is assignable from. Example: When <paramref name="type"/> is a type 
+        /// <b>class X : IX&lt;int&gt;, IFoo&lt;string&gt;</b> and <paramref name="genericTypeDefinition"/> 
+        /// is type <b>IX&lt;T&gt;</b>: this method will return type <b>IX&lt;int&gt;</b>.
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="genericTypeDefinition">The generic type definition to match.</param>
