@@ -629,7 +629,7 @@ namespace SimpleInjector
         {
             string errorMesssage;
 
-            return this.Options.IsConstructableType(concreteType, concreteType, out errorMesssage);
+            return this.Options.IsConstructableType(concreteType, out errorMesssage);
         }
 
         // We're registering a service type after 'locking down' the container here and that means that the
@@ -709,7 +709,7 @@ namespace SimpleInjector
             string exceptionMessage;
 
             // Since we are at this point, we know the concreteType is NOT constructable.
-            this.Options.IsConstructableType(concreteType, concreteType, out exceptionMessage);
+            this.Options.IsConstructableType(concreteType, out exceptionMessage);
 
             throw new ActivationException(
                 StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType, this.HasRegistrations)

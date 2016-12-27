@@ -33,6 +33,7 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] IDependencyInjectionBehavior.BuildExpression method replace with
 		 GetInstanceProducerFor(InjectionConsumerInfo) that returns an InstanceProducer. (fixes #346)
 		-[Core] ExpressionBuilding.RegisteredServiceType removed. (fixes #348)
+		-[Core] InjectionConsumerInfo.ServiceType removed. (fixes #348)
 
 	Improvements/Changes:
 		-[Core] Removed all methods that were marked [obsolete(true)] since v3.0. (fixes #305)

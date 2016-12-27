@@ -221,6 +221,12 @@ namespace SimpleInjector
                 return expressionToWrap;
             }
 
+            if (typeof(Container).IsAssignableFrom(implementationType))
+            {
+                // Don't inject properties on the registration for the Container itself.
+                return expressionToWrap;
+            }
+
             return this.WrapWithPropertyInjectorInternal(serviceType, implementationType, expressionToWrap);
         }
 
@@ -380,7 +386,7 @@ namespace SimpleInjector
             ConstructorInfo constructor = this.Container.Options.SelectConstructor(this.ImplementationType);
 
             ParameterDictionary<DependencyData> parameters = this.BuildConstructorParameters(
-                producer.ServiceType, this.ImplementationType, constructor);
+                this.ImplementationType, constructor);
 
             var arguments = parameters.Values.Select(v => v.Expression);
 
@@ -391,7 +397,7 @@ namespace SimpleInjector
             return expression;
         }
 
-        private ParameterDictionary<DependencyData> BuildConstructorParameters(Type serviceType, Type implementationType, 
+        private ParameterDictionary<DependencyData> BuildConstructorParameters(Type implementationType, 
             ConstructorInfo constructor)
         {
             // NOTE: We used to use a LINQ query here (which is cleaner code), but we reverted back to using
@@ -402,7 +408,7 @@ namespace SimpleInjector
 
             foreach (ParameterInfo parameter in constructor.GetParameters())
             {
-                var consumer = new InjectionConsumerInfo(serviceType, implementationType, parameter);
+                var consumer = new InjectionConsumerInfo(implementationType, parameter);
                 Expression expression = this.GetPlaceHolderFor(parameter);
                 InstanceProducer producer = null;
 
@@ -431,7 +437,7 @@ namespace SimpleInjector
                 PropertyInjectionHelper.VerifyProperties(properties);
 
                 var data = PropertyInjectionHelper.BuildPropertyInjectionExpression(
-                    this.Container, serviceType, implementationType, properties, expressionToWrap);
+                    this.Container, implementationType, properties, expressionToWrap);
 
                 expressionToWrap = data.Expression;
 
@@ -449,7 +455,6 @@ namespace SimpleInjector
 
             return (
                 from property in candidates
-                where serviceType != typeof(Container)
                 where propertySelector.SelectProperty(serviceType, property)
                 select property)
                 .ToArray();

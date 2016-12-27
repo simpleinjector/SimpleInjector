@@ -1153,7 +1153,7 @@ namespace SimpleInjector
 
             Requires.IsNotAnAmbiguousType(typeof(TService), serviceTypeParamName);
 
-            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TService), typeof(TImplementation),
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TImplementation),
                 implementationTypeParamName);
 
             var registration = lifestyle.CreateRegistration<TImplementation>(this);
@@ -1173,7 +1173,7 @@ namespace SimpleInjector
             
             Requires.IsNotAnAmbiguousType(serviceType, serviceTypeParamName);
 
-            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(serviceType, implementationType,
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(implementationType,
                 implementationTypeParamName);
 
             if (serviceType.ContainsGenericParameters())
@@ -1191,12 +1191,12 @@ namespace SimpleInjector
             }
         }
 
-        private void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type serviceType, 
+        private void ThrowArgumentExceptionWhenTypeIsNotConstructable(
             Type implementationType, string parameterName)
         {
             string message;
 
-            bool constructable = this.Options.IsConstructableType(serviceType, implementationType, out message);
+            bool constructable = this.Options.IsConstructableType(implementationType, out message);
 
             if (!constructable)
             {

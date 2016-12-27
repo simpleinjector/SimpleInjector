@@ -411,15 +411,15 @@ namespace SimpleInjector
             return string.Join(", ", descriptions);
         }
 
-        internal bool IsConstructableType(Type serviceType, Type implementationType, out string errorMessage)
+        internal bool IsConstructableType(Type implementationType, out string errorMessage)
         {
             errorMessage = null;
 
             try
             {
-                var constructor = this.SelectConstructor(implementationType);
+                ConstructorInfo constructor = this.SelectConstructor(implementationType);
 
-                this.DependencyInjectionBehavior.Verify(serviceType, constructor);
+                this.DependencyInjectionBehavior.Verify(constructor);
             }
             catch (ActivationException ex)
             {

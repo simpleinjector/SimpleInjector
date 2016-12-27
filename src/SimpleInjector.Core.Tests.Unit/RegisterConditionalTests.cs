@@ -544,7 +544,7 @@
             var container = ContainerFactory.New();
 
             container.RegisterConditional(typeof(ILogger), typeof(NullLogger), Lifestyle.Singleton,
-                c => c.Consumer.ServiceType == typeof(ServiceWithDependency<ILogger>));
+                c => c.Consumer.ImplementationType == typeof(ServiceWithDependency<ILogger>));
 
             // Fallback registration
             container.RegisterConditional(typeof(ILogger), typeof(ConsoleLogger), Lifestyle.Singleton, c => !c.Handled);
@@ -662,7 +662,7 @@
             var container = ContainerFactory.New();
 
             container.RegisterConditional<IPlugin, PluginImpl>(Lifestyle.Singleton,
-                c => c.Consumer.ServiceType == typeof(ServiceWithDependency<IPlugin>));
+                c => c.Consumer.ImplementationType == typeof(ServiceWithDependency<IPlugin>));
 
             container.RegisterConditional<IPlugin, PluginImpl2>(Lifestyle.Singleton, c => !c.Handled);
 
@@ -1476,7 +1476,6 @@
             container.GetInstance<IGeneric<int>>();
 
             // Assert
-            Assert.IsTrue(actualConsumer.ServiceType == typeof(IGeneric<int>));
             Assert.IsTrue(actualConsumer.ImplementationType == typeof(GenericTypeWithLoggerDependency<int>));
         }
 
@@ -1497,7 +1496,6 @@
             container.GetInstance<IGeneric<int>>();
 
             // Assert
-            AssertThat.AreEqual(typeof(IGeneric<int>), actualConsumer.ServiceType);
             AssertThat.AreEqual(typeof(GenericTypeWithLoggerDependency<int>), actualConsumer.ImplementationType);
         }
 

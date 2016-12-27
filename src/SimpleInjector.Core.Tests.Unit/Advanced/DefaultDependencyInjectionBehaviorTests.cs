@@ -64,7 +64,6 @@
 
             var consumer = new InjectionConsumerInfo(
                 constructor.DeclaringType,
-                constructor.DeclaringType,
                 constructor.GetParameters().Single());
 
             try
@@ -98,7 +97,6 @@
                 typeof(TypeWithSinglePublicConstructorWithStringTypeParameter).GetConstructors().Single();
 
             var consumer = new InjectionConsumerInfo(
-                constructor.DeclaringType,
                 constructor.DeclaringType,
                 constructor.GetParameters().Single());
 

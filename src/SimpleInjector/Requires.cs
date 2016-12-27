@@ -218,12 +218,12 @@ namespace SimpleInjector
             ServiceIsAssignableFromImplementations(serviceType, typesToRegister, paramName, typeCanBeServiceType);
         }
 
-        internal static void ImplementationHasSelectableConstructor(Container container, Type serviceType,
+        internal static void ImplementationHasSelectableConstructor(Container container,
             Type implementationType, string paramName)
         {
             string message;
 
-            if (!container.Options.IsConstructableType(serviceType, implementationType, out message))
+            if (!container.Options.IsConstructableType(implementationType, out message))
             {
                 throw new ArgumentException(message, paramName);
             }

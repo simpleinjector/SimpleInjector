@@ -157,7 +157,7 @@ namespace SimpleInjector
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType), nameof(implementationType));
 
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, implementationType, nameof(serviceType));
-            Requires.ImplementationHasSelectableConstructor(this, serviceType, implementationType, nameof(implementationType));
+            Requires.ImplementationHasSelectableConstructor(this, implementationType, nameof(implementationType));
             Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, implementationType, nameof(implementationType));
 
             if (serviceType.ContainsGenericParameters())

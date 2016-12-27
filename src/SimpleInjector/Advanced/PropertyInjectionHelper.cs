@@ -57,21 +57,19 @@ namespace SimpleInjector.Advanced
             });
 
         private readonly Container container;
-        private readonly Type serviceType;
         private readonly Type implementationType;
 
-        internal PropertyInjectionHelper(Container container, Type serviceType, Type implementationType)
+        internal PropertyInjectionHelper(Container container, Type implementationType)
         {
             this.container = container;
-            this.serviceType = serviceType;
             this.implementationType = implementationType;
         }
 
         internal static PropertyInjectionData BuildPropertyInjectionExpression(
-            Container container, Type serviceType, Type implementationType, PropertyInfo[] properties,
+            Container container, Type implementationType, PropertyInfo[] properties,
             Expression expressionToWrap)
         {
-            var helper = new PropertyInjectionHelper(container, serviceType, implementationType);
+            var helper = new PropertyInjectionHelper(container, implementationType);
 
             return helper.BuildPropertyInjectionExpression(expressionToWrap, properties);
         }
@@ -204,7 +202,7 @@ namespace SimpleInjector.Advanced
 
         private InstanceProducer GetPropertyExpression(PropertyInfo property)
         {
-            var consumer = new InjectionConsumerInfo(this.serviceType, this.implementationType, property);
+            var consumer = new InjectionConsumerInfo(this.implementationType, property);
 
             return this.container.Options.GetInstanceProducerFor(consumer);
         }
