@@ -1595,7 +1595,7 @@
 
         private sealed class InjectAllProperties : IPropertySelectionBehavior
         {
-            public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo) => true;
+            public bool SelectProperty(PropertyInfo propertyInfo) => true;
         }
 
         private sealed class VerficationlessInjectionBehavior : IDependencyInjectionBehavior

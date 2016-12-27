@@ -34,6 +34,8 @@ Version 4.0.0 (v4.0 RTM)
 		 GetInstanceProducerFor(InjectionConsumerInfo) that returns an InstanceProducer. (fixes #346)
 		-[Core] ExpressionBuilding.RegisteredServiceType removed. (fixes #348)
 		-[Core] InjectionConsumerInfo.ServiceType removed. (fixes #348)
+		-[Core] IPropertySelectionBehavior.SelectProperty(Type, PropertyInfo) replaced with
+		 SelectProperty(PropertyInfo) method. (fixes #348).
 
 	Improvements/Changes:
 		-[Core] Removed all methods that were marked [obsolete(true)] since v3.0. (fixes #305)

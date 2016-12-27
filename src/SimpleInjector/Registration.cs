@@ -227,7 +227,7 @@ namespace SimpleInjector
                 return expressionToWrap;
             }
 
-            return this.WrapWithPropertyInjectorInternal(serviceType, implementationType, expressionToWrap);
+            return this.WrapWithPropertyInjectorInternal(implementationType, expressionToWrap);
         }
 
         internal Expression WrapWithInitializer(InstanceProducer producer, Type serviceType,
@@ -427,10 +427,10 @@ namespace SimpleInjector
         private ConstantExpression GetPlaceHolderFor(ParameterInfo parameter) =>
             this.GetOverriddenParameterFor(parameter).PlaceHolder;
 
-        private Expression WrapWithPropertyInjectorInternal(Type serviceType, Type implementationType,
+        private Expression WrapWithPropertyInjectorInternal(Type implementationType,
             Expression expressionToWrap)
         {
-            PropertyInfo[] properties = this.GetPropertiesToInject(serviceType, implementationType);
+            PropertyInfo[] properties = this.GetPropertiesToInject(implementationType);
 
             if (properties.Any())
             {
@@ -447,17 +447,13 @@ namespace SimpleInjector
             return expressionToWrap;
         }
 
-        private PropertyInfo[] GetPropertiesToInject(Type serviceType, Type implementationType)
+        private PropertyInfo[] GetPropertiesToInject(Type implementationType)
         {
             var propertySelector = this.Container.Options.PropertySelectionBehavior;
 
             var candidates = PropertyInjectionHelper.GetCandidateInjectionPropertiesFor(implementationType);
 
-            return (
-                from property in candidates
-                where propertySelector.SelectProperty(serviceType, property)
-                select property)
-                .ToArray();
+            return candidates.Where(propertySelector.SelectProperty).ToArray();
         }
 
         private Expression ReplacePlaceHoldersWithOverriddenParameters(Expression expression)

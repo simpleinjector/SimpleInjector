@@ -29,18 +29,12 @@
             }
 
             [DebuggerStepThrough]
-            public bool SelectProperty(Type type, PropertyInfo property)
-            {
-                return this.IsImplicitInjectable(property) || 
-                    this.core.SelectProperty(type, property);
-            }
+            public bool SelectProperty(PropertyInfo p) => 
+                this.IsImplicitInjectable(p) || this.core.SelectProperty(p);
 
             [DebuggerStepThrough]
-            private bool IsImplicitInjectable(PropertyInfo property)
-            {
-                return IsInjectableProperty(property) && 
-                    this.IsAvailableService(property.PropertyType);
-            }
+            private bool IsImplicitInjectable(PropertyInfo p) =>
+                IsInjectableProperty(p) && this.IsAvailableService(p.PropertyType);
 
             [DebuggerStepThrough]
             private static bool IsInjectableProperty(PropertyInfo property)
@@ -51,10 +45,8 @@
             }
 
             [DebuggerStepThrough]
-            private bool IsAvailableService(Type serviceType)
-            {
-                return this.options.Container.GetRegistration(serviceType) != null;
-            }
+            private bool IsAvailableService(Type type) => 
+                this.options.Container.GetRegistration(type) != null;
         }
     }
 }

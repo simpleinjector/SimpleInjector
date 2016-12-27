@@ -393,10 +393,12 @@
             public TDependency Dependency { get; private set; }
         }
 
+#pragma warning disable RCS1102 // Mark class as static.
         public class ServiceWithStaticPropertyDependency<TDependency>
         {
             public static TDependency Dependency { get; set; }
         }
+#pragma warning restore RCS1102 // Mark class as static.
 
         public class ServiceWithTwoPropertiesOfSameType<TDependency>
         {
@@ -481,7 +483,7 @@
                 this.selector = selector;
             }
 
-            public bool SelectProperty(Type serviceType, PropertyInfo property) => this.selector(property);
+            public bool SelectProperty(PropertyInfo property) => this.selector(property);
         }
     }
 }

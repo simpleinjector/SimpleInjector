@@ -885,14 +885,12 @@
         public void PropertySelectionBehaviorSelectProperty_WithDefaultConfiguration_ReturnsFalse()
         {
             // Arrange
-            Type serviceType = typeof(ClassWithLoggerProperty);
-
             PropertyInfo property = GetProperty<ClassWithLoggerProperty>(c => c.Logger);
 
             var options = GetContainerOptions();
 
             // Act
-            var result = options.PropertySelectionBehavior.SelectProperty(serviceType, property);
+            var result = options.PropertySelectionBehavior.SelectProperty(property);
 
             // Assert
             Assert.IsFalse(result);
@@ -982,7 +980,7 @@
 
         private sealed class AlternativePropertySelectionBehavior : IPropertySelectionBehavior
         {
-            public bool SelectProperty(Type serviceType, PropertyInfo property)
+            public bool SelectProperty(PropertyInfo property)
             {
                 throw new NotImplementedException();
             }

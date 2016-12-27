@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -37,6 +37,6 @@ namespace SimpleInjector.Advanced
         // 3. In general, property injection should not be used. Constructor injection should be used, and
         //    if a constructor gets too many parameters (constructor over-injection), this is an
         //    indication of a violation of the Single Responsibility Principle.
-        public bool SelectProperty(Type serviceType, PropertyInfo propertyInfo) => false;
+        public bool SelectProperty(PropertyInfo propertyInfo) => false;
     }
 }
