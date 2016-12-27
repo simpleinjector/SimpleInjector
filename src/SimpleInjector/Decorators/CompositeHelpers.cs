@@ -55,7 +55,7 @@ namespace SimpleInjector.Decorators
         {
             // This list can only contain serviceType and closed and partially closed versions of serviceType.
             var baseTypeCandidates = 
-                Helpers.GetBaseTypeCandidates(serviceType, compositeConstructor.DeclaringType);
+                Types.GetBaseTypeCandidates(serviceType, compositeConstructor.DeclaringType);
 
             var compositeInterfaces =
                 from baseTypeCandidate in baseTypeCandidates
@@ -70,7 +70,7 @@ namespace SimpleInjector.Decorators
                 .Any(parameter => IsCompositeParameter(parameter, serviceType));
 
         private static bool IsCompositeParameter(ParameterInfo parameter, Type serviceType) =>
-            Helpers.IsGenericCollectionType(parameter.ParameterType) &&
+            Types.IsGenericCollectionType(parameter.ParameterType) &&
                 parameter.ParameterType.GetGenericArguments()[0] == serviceType;
     }
 }

@@ -17,7 +17,7 @@
             var behavior = GetContainerOptions().DependencyInjectionBehavior;
 
             // Act
-            Action action = () => behavior.BuildExpression(null);
+            Action action = () => behavior.GetInstanceProducerFor(null);
 
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentNullException>("consumer", action);
@@ -31,7 +31,7 @@
 
             container.Options.DependencyInjectionBehavior = new FakeDependencyInjectionBehavior
             {
-                ExpressionToReturn = null
+                ProducerToReturn = null
             };
 
             container.Register<IUserRepository, SqlUserRepository>();
@@ -134,9 +134,9 @@
 
         private sealed class FakeDependencyInjectionBehavior : IDependencyInjectionBehavior
         {
-            public Expression ExpressionToReturn { get; set; }
+            public InstanceProducer ProducerToReturn { get; set; }
 
-            public Expression BuildExpression(InjectionConsumerInfo consumer) => this.ExpressionToReturn;
+            public InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo c) => this.ProducerToReturn;
 
             public void Verify(InjectionConsumerInfo consumer)
             {

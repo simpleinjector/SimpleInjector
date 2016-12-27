@@ -1710,10 +1710,10 @@
             var container = ContainerFactory.New();
 
             var prod1 = new InstanceProducer(serviceType,
-                Lifestyle.Transient.CreateRegistration(serviceType, typeof(PluginImpl), container));
+                Lifestyle.Transient.CreateRegistration(typeof(PluginImpl), container));
 
             var prod2 = new InstanceProducer(serviceType,
-                Lifestyle.Transient.CreateRegistration(serviceType, typeof(PluginImpl2), container));
+                Lifestyle.Transient.CreateRegistration(typeof(PluginImpl2), container));
 
             container.RegisterDecorator(serviceType, typeof(PluginDecorator), context =>
             {
@@ -2599,27 +2599,6 @@
 
         public void Handle(TCommand command)
         {
-        }
-    }
-
-    public static class TypeExtensions
-    {
-        public static Type MakePartialOpenGenericType(this Type type, Type firstArgument = null,
-            Type secondArgument = null)
-        {
-            var arguments = type.GetGenericArguments();
-
-            if (firstArgument != null)
-            {
-                arguments[0] = firstArgument;
-            }
-
-            if (secondArgument != null)
-            {
-                arguments[1] = secondArgument;
-            }
-
-            return type.MakeGenericType(arguments);
         }
     }
 

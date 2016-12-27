@@ -83,13 +83,11 @@ namespace SimpleInjector.Decorators
 
         internal void SetDecorator(Type decorator)
         {
-            this.decoratorConstructor =
-                this.Container.Options.SelectConstructor(this.e.RegisteredServiceType, decorator);
+            this.decoratorConstructor = this.Container.Options.SelectConstructor(decorator);
 
             if (object.ReferenceEquals(this.Lifestyle, this.Container.SelectionBasedLifestyle))
             {
-                this.Lifestyle =
-                    this.Container.Options.SelectLifestyle(this.e.RegisteredServiceType, decorator);
+                this.Lifestyle = this.Container.Options.SelectLifestyle(decorator);
             }
 
             // The actual decorator could be different. TODO: must... write... test... for... this.
@@ -160,7 +158,7 @@ namespace SimpleInjector.Decorators
             var overriddenParameters = this.CreateOverriddenParameters(decorateeExpression);
 
             // Create the decorator as transient. Caching is applied later on.
-            return Lifestyle.Transient.CreateRegistration(this.registeredServiceType,
+            return Lifestyle.Transient.CreateRegistration(
                 this.decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
         }
 

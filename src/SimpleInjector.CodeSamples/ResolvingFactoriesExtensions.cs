@@ -91,7 +91,7 @@
                 var factoryArguments = genericArguments.Take(genericArguments.Length - 1).ToArray();
 
                 var constructor = container.Options.ConstructorResolutionBehavior
-                    .GetConstructor(componentType, componentType);
+                    .GetConstructor(componentType);
 
                 var parameters = (
                     from factoryArgumentType in factoryArguments

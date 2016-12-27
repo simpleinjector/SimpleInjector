@@ -21,7 +21,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            var registration = Lifestyle.Singleton.CreateRegistration<Implementation, Implementation>(container);
+            var registration = Lifestyle.Singleton.CreateRegistration<Implementation>(container);
 
             container.AddRegistration(typeof(IService1), registration);
             container.AddRegistration(typeof(IService2), registration);
@@ -42,7 +42,7 @@
             var otherContainer = ContainerFactory.New();
 
             var registrationFromAnotherContainer =
-                Lifestyle.Singleton.CreateRegistration<Implementation, Implementation>(otherContainer);
+                Lifestyle.Singleton.CreateRegistration<Implementation>(otherContainer);
 
             // Act
             Action action = 

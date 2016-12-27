@@ -413,7 +413,7 @@ namespace SimpleInjector
                 Type elementType = serviceType.GetElementType();
 
                 // We don't auto-register collections for ambiguous types.
-                if (elementType.IsValueType() || Helpers.IsAmbiguousType(elementType))
+                if (elementType.IsValueType() || Types.IsAmbiguousType(elementType))
                 {
                     return null;
                 }
@@ -486,13 +486,13 @@ namespace SimpleInjector
 
         private InstanceProducer TryBuildInstanceProducerForCollection(Type serviceType)
         {
-            if (!Helpers.IsGenericCollectionType(serviceType))
+            if (!Types.IsGenericCollectionType(serviceType))
             {
                 return null;
             }
 
             // We don't auto-register collections for ambiguous types.
-            if (Helpers.IsAmbiguousOrValueType(serviceType.GetGenericArguments()[0]))
+            if (Types.IsAmbiguousOrValueType(serviceType.GetGenericArguments()[0]))
             {
                 return null;
             }
@@ -563,7 +563,7 @@ namespace SimpleInjector
                 return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), () =>
                 {
                     var registration =
-                        this.SelectionBasedLifestyle.CreateRegistration<TConcrete, TConcrete>(this);
+                        this.SelectionBasedLifestyle.CreateRegistration<TConcrete>(this);
 
                     return BuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), registration);
                 });
@@ -582,7 +582,7 @@ namespace SimpleInjector
 
             return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(type, () =>
             {
-                var registration = this.SelectionBasedLifestyle.CreateRegistration(type, type, this);
+                var registration = this.SelectionBasedLifestyle.CreateRegistration(type, this);
 
                 return BuildInstanceProducerForConcreteUnregisteredType(type, registration);
             });
@@ -678,7 +678,7 @@ namespace SimpleInjector
 
         private void ThrowMissingInstanceProducerException(Type serviceType)
         {
-            if (Helpers.IsConcreteConstructableType(serviceType))
+            if (Types.IsConcreteConstructableType(serviceType))
             {
                 this.ThrowNotConstructableException(serviceType);
             }
@@ -693,12 +693,12 @@ namespace SimpleInjector
         }
 
         private bool ContainsOneToOneRegistrationForCollectionType(Type collectionServiceType) =>
-            Helpers.IsGenericCollectionType(collectionServiceType) && 
+            Types.IsGenericCollectionType(collectionServiceType) && 
                 this.ContainsExplicitRegistrationFor(collectionServiceType.GetGenericArguments()[0]);
 
         // NOTE: MakeGenericType will fail for IEnumerable<T> when T is a pointer.
         private bool ContainsCollectionRegistrationFor(Type serviceType) =>
-            !Helpers.IsGenericCollectionType(serviceType) && !serviceType.IsPointer &&
+            !Types.IsGenericCollectionType(serviceType) && !serviceType.IsPointer &&
                 this.ContainsExplicitRegistrationFor(typeof(IEnumerable<>).MakeGenericType(serviceType));
 
         private bool ContainsExplicitRegistrationFor(Type serviceType) =>

@@ -402,7 +402,7 @@
 
             public override Type ImplementationType => typeof(TImplementation);
 
-            public override Expression BuildExpression()
+            public override Expression BuildExpression(InstanceProducer producer)
             {
                 throw new NotImplementedException();
             }
@@ -442,15 +442,15 @@
 
             public override int Length => this.realLifestyle.ComponentLength(null);
 
-            protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+            protected override Registration CreateRegistrationCore<TConcrete>(Container container)
             {
-                return this.realLifestyle.CreateRegistration<TService, TImplementation>(container);
+                return this.realLifestyle.CreateRegistration<TConcrete>(container);
             }
 
             protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
                 Container container)
             {
-                return this.realLifestyle.CreateRegistration<TService>(instanceCreator, container);
+                return this.realLifestyle.CreateRegistration(instanceCreator, container);
             }
         }
     }
@@ -464,8 +464,8 @@
 
         public override int Length { get; }
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container c) => 
-            Transient.CreateRegistration<TService, TImplementation>(c);
+        protected override Registration CreateRegistrationCore<TConcrete>(Container c) => 
+            Transient.CreateRegistration<TConcrete>(c);
 
         protected override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) => 
             Transient.CreateRegistration(creator, c);

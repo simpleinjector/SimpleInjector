@@ -90,7 +90,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         private static string BuildRelationshipDescription(Type implementationType, int numberOfDependencies) =>
             string.Format(CultureInfo.InvariantCulture,
                 "{0} has {1} dependencies which might indicate a SRP violation.",
-                Helpers.ToFriendlyName(implementationType),
+                implementationType.ToFriendlyName(),
                 numberOfDependencies);
 
         private static string ViolationPlural(int count) => count == 1 ? "violation" : "violations";

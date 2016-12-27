@@ -81,7 +81,7 @@ namespace SimpleInjector.Internals
             var items = this.GetItemsFor(serviceType);
 
             return serviceType.IsGenericType()
-                ? Helpers.GetClosedGenericImplementationsFor(serviceType, items)
+                ? Types.GetClosedGenericImplementationsFor(serviceType, items)
                 : items.ToArray();
         }
 

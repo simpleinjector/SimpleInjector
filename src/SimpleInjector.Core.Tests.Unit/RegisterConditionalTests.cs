@@ -223,9 +223,9 @@
         [TestMethod]
         public void RegisterOpenGeneric_TwoEquivalentImplementationsWithValidPredicate_UpdateHandledProperty()
         {
+            // Arrange
             bool handled = false;
 
-            // Arrange
             var container = ContainerFactory.New();
             container.RegisterConditional(typeof(IOpenGenericWithPredicate<>), typeof(OpenGenericWithPredicate1<>),
                 Lifestyle.Transient, c =>
@@ -1095,9 +1095,8 @@
                 c => c.ImplementationType.GetGenericArguments().Single().Namespace.StartsWith("System"));
 
             // Act
-            var result1 = container.GetInstance<IOpenGenericWithPredicate<long>>();
-            Action action = () =>
-                container.GetInstance<IOpenGenericWithPredicate<int>>();
+            container.GetInstance<IOpenGenericWithPredicate<long>>();
+            Action action = () => container.GetInstance<IOpenGenericWithPredicate<int>>();
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
@@ -1277,7 +1276,7 @@
         public void GetInstance_ResolvingAbstractionForComponentThatDependsOnConditionalRegistration_ContextGetsSuppliedWithActualImplementation()
         {
             // Arrange
-            var contexts = new List<PredicateContext>();
+            PredicateContext context = null;
 
             var container = new Container();
 
@@ -1287,7 +1286,7 @@
 
             container.RegisterConditional<ILogger, Logger<int>>(c =>
             {
-                contexts.Add(c);
+                context = c;
                 return true;
             });
 
@@ -1295,7 +1294,7 @@
             container.GetInstance<INonGenericService>();
 
             // Assert
-            Assert.AreEqual(typeof(ServiceWithProperty<ILogger>), contexts.First().Consumer.ImplementationType);
+            Assert.AreEqual(typeof(ServiceWithProperty<ILogger>), context.Consumer.ImplementationType);
         }
 
         [TestMethod]
@@ -1464,22 +1463,21 @@
         public void GetInstance_PredicateContextForOpenGenericConsumer_ContainsTheExpectedConsumerInfo()
         {
             // Arrange
-            var actualConsumers = new List<InjectionConsumerInfo>();
+            InjectionConsumerInfo actualConsumer = null;
 
             var container = ContainerFactory.New();
 
             container.Register(typeof(IGeneric<>), typeof(GenericTypeWithLoggerDependency<>), Lifestyle.Transient);
 
             RegisterConditionalConstant<ILogger>(container, new NullLogger(), 
-                c => { actualConsumers.Add(c.Consumer); return true; });
+                c => { actualConsumer = c.Consumer; return true; });
 
             // Act
             container.GetInstance<IGeneric<int>>();
 
             // Assert
-            Assert.IsTrue(actualConsumers.Any());
-            Assert.IsTrue(actualConsumers.All(c => c.ServiceType == typeof(IGeneric<int>)));
-            Assert.IsTrue(actualConsumers.All(c => c.ImplementationType == typeof(GenericTypeWithLoggerDependency<int>)));
+            Assert.IsTrue(actualConsumer.ServiceType == typeof(IGeneric<int>));
+            Assert.IsTrue(actualConsumer.ImplementationType == typeof(GenericTypeWithLoggerDependency<int>));
         }
 
         [TestMethod]
@@ -1501,6 +1499,92 @@
             // Assert
             AssertThat.AreEqual(typeof(IGeneric<int>), actualConsumer.ServiceType);
             AssertThat.AreEqual(typeof(GenericTypeWithLoggerDependency<int>), actualConsumer.ImplementationType);
+        }
+
+        // Tests: #346
+        [TestMethod]
+        public void GetInstance_ResolvingComponentWithConditionalDependency_CallsPredicateOnce()
+        {
+            // Arrange
+            int expectedPredicateCallCount = 1;
+
+            var container = new Container();
+
+            container.Register<IX, XDependingOn<ILogger>>();
+
+            int actualPredicateCallCount = 0;
+
+            container.RegisterConditional<ILogger, Logger<int>>(c =>
+            {
+                actualPredicateCallCount++;
+                return true;
+            });
+
+            // Act
+            container.GetInstance<IX>();
+
+            // Assert
+            Assert.AreEqual(expectedPredicateCallCount, actualPredicateCallCount,
+                "Under normal conditions, the predicate for a conditional registrations should run just " +
+                "once per registration.");
+        }
+
+        // Tests: #346
+        [TestMethod]
+        public void GetInstance_ResolvingComponentWithPropertyForConditionalRegistration_CallsPredicateOnce()
+        {
+            // Arrange
+            int expectedPredicateCallCount = 1;
+
+            var container = new Container();
+
+            container.Options.PropertySelectionBehavior = new InjectAllProperties();
+
+            container.Register<INonGenericService, ServiceWithProperty<ILogger>>();
+
+            int actualPredicateCallCount = 0;
+
+            container.RegisterConditional<ILogger, Logger<int>>(c =>
+            {
+                actualPredicateCallCount++;
+                return true;
+            });
+
+            // Act
+            container.GetInstance<INonGenericService>();
+
+            // Assert
+            Assert.AreEqual(expectedPredicateCallCount, actualPredicateCallCount,
+                "Under normal conditions, the predicate for a conditional registrations should run just " +
+                "once per registration.");
+        }
+
+        // Tests: #346
+        [TestMethod]
+        public void GetInstance_ResolvingOpenGenericThatDependsOnConditionalRegistration_CallsPredicateOnce()
+        {
+            // Arrange
+            int expectedPredicateCallCount = 1;
+
+            var container = ContainerFactory.New();
+
+            container.Register(typeof(IGeneric<>), typeof(GenericTypeWithLoggerDependency<>), Lifestyle.Transient);
+
+            int actualPredicateCallCount = 0;
+
+            RegisterConditionalConstant<ILogger>(container, new NullLogger(), c => 
+            {
+                actualPredicateCallCount++;
+                return true;
+            });
+
+            // Act
+            container.GetInstance<IGeneric<int>>();
+
+            // Assert
+            Assert.AreEqual(expectedPredicateCallCount, actualPredicateCallCount,
+                "Under normal conditions, the predicate for a conditional registrations should run just " +
+                "once per registration.");
         }
 
         private static void RegisterConditionalConstant<T>(Container container, T constant,
@@ -1525,7 +1609,8 @@
                 this.real = real;
             }
 
-            public Expression BuildExpression(InjectionConsumerInfo c) => this.real.BuildExpression(c);
+            public InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo c) => 
+                this.real.GetInstanceProducerFor(c);
 
             public void Verify(InjectionConsumerInfo consumer)
             {
