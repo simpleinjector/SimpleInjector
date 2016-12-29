@@ -21,12 +21,7 @@
       }
     },
     "net40": {},
-    "net45": {},
-    "net451": {
-      "buildOptions": {
-        "define": [ "NET45" ]
-      }
-    }
+    "net45": {}
   }
   // Enable this to build Simple Injector if the SimpleInjector.snk is missing.
   //,
