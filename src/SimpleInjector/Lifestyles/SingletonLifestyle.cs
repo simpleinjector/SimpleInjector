@@ -159,6 +159,12 @@ namespace SimpleInjector.Lifestyles
                 expression = this.InterceptInstanceCreation(this.ServiceType, expression);
                 expression = this.WrapWithInitializer(this.ServiceType, expression);
 
+                // Optimization: We don't need to compile a delegate in case all we have is a constant.
+                if (expression is ConstantExpression)
+                {
+                    return ((ConstantExpression)expression).Value;
+                }
+
                 Delegate initializer = Expression.Lambda(expression).Compile();
 
                 // This delegate might return a different instance than the originalInstance (caused by a
@@ -198,6 +204,13 @@ namespace SimpleInjector.Lifestyles
                         if (this.interceptedInstance == null)
                         {
                             this.interceptedInstance = this.CreateInstanceWithNullCheck();
+
+                            var disposable = this.interceptedInstance as IDisposable;
+
+                            if (disposable != null)
+                            {
+                                this.Container.RegisterForDisposal(disposable);
+                            }
                         }
                     }
                 }
@@ -217,13 +230,6 @@ namespace SimpleInjector.Lifestyles
                 TImplementation instance = func();
 
                 EnsureInstanceIsNotNull(instance);
-
-                var disposable = instance as IDisposable;
-
-                if (disposable != null)
-                {
-                    this.Container.RegisterForDisposal(disposable);
-                }
 
                 return instance;
             }
