@@ -12,15 +12,10 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] LifetimeScopeLifestyle deprecated. (fixes #299)
 		-[Core] ExecutionContextScopeLifestyle deprecated. (fixes #299)
 		-[Core] WebApiRequestLifestyle deprecated. (fixes #331)
-		-[Core] Registration.BuildExpression() signature changed to BuildExpression(InstanceProducer). (fixes #320)
-		-[Core] Registration.BuildTransientExpression<TService>(Func<TService>) signature changed to
-		 BuildTransientExpression<TService>(InstanceProducer, Func<TService>). (fixes #320)
 		-[Core] Registration.BuildTransientExpression<TService, TImplementation>() signature changed to
-		 BuildTransientExpression(InstanceProducer). (fixes #320)
-		-[Core] Registration.BuildTransientDelegate<TService>(Func<TService>) signature changed to
-		 BuildTransientDelegate<TService>(InstanceProducer, Func<TService>). (fixes #320)
+		 BuildTransientExpression(). (fixes #320)
 		-[Core] Registration.BuildTransientDelegate<TService, TImplementation>() signature changed to
-         BuildTransientDelegate(InstanceProducer). (fixes #320 / #345)
+         BuildTransientDelegate(). (fixes #320 / #345 / #348)
 		-[Core] IConstructorResolutionBehavior.GetConstructor(Type, Type) signature changed to
 		 GetConstructor(Type). (fixes #345)
 		-[Core] ILifestyleSelectionBehavior.SelectLifestyle(Type, Type) signature changed to
@@ -35,7 +30,10 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] ExpressionBuilding.RegisteredServiceType removed. (fixes #348)
 		-[Core] InjectionConsumerInfo.ServiceType removed. (fixes #348)
 		-[Core] IPropertySelectionBehavior.SelectProperty(Type, PropertyInfo) replaced with
-		 SelectProperty(PropertyInfo) method. (fixes #348).
+		 SelectProperty(PropertyInfo) method. (fixes #348)
+		-[Core] Container.RegisterInitializer(Action<InstanceInitializationData>, Predicate<InitializationContext>)
+		 replaced with RegisterInitializer(Action<InstanceInitializationData>, Predicate<InitializerContext>)
+		 method. (fixes #348)
 
 	Improvements/Changes:
 		-[Core] Removed all methods that were marked [obsolete(true)] since v3.0. (fixes #305)
