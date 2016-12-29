@@ -177,8 +177,7 @@
 
                 public override Type ImplementationType => typeof(TImplementation);
 
-                public override Expression BuildExpression(InstanceProducer producer) => 
-                    this.BuildTransientExpression(producer);
+                public override Expression BuildExpression() => this.BuildTransientExpression();
             }
         }
     }

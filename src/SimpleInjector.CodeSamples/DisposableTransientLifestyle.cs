@@ -64,7 +64,7 @@
         private static void AddGlobalDisposableInitializer(Container container) =>
             container.RegisterInitializer(RegisterForDisposal, ShouldApplyInitializer);
 
-        private static bool ShouldApplyInitializer(InitializationContext context) => 
+        private static bool ShouldApplyInitializer(InitializerContext context) => 
             context.Registration is IDisposableRegistration;
 
         private static void RegisterForDisposal(InstanceInitializationData data)
@@ -95,10 +95,10 @@
 
             public ScopedLifestyle ScopedLifestyle { get; }
 
-            public override Expression BuildExpression(InstanceProducer producer) =>
+            public override Expression BuildExpression() =>
                 this.instanceCreator == null
-                    ? this.BuildTransientExpression(producer)
-                    : this.BuildTransientExpression(producer, this.instanceCreator);
+                    ? this.BuildTransientExpression()
+                    : this.BuildTransientExpression(this.instanceCreator);
         }
     }
 }

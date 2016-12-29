@@ -48,18 +48,18 @@ namespace SimpleInjector.Lifestyles
 
         public override Type ImplementationType { get; }
 
-        public override Expression BuildExpression(InstanceProducer producer)
+        public override Expression BuildExpression()
         {
-            Expression trueExpression = this.trueRegistration.BuildExpression(producer);
-            Expression falseExpression = this.falseRegistration.BuildExpression(producer);
+            Expression trueExpression = this.trueRegistration.BuildExpression();
+            Expression falseExpression = this.falseRegistration.BuildExpression();
 
             // Must be called after BuildExpression has been called.
             this.AddRelationships();
 
             return Expression.Condition(
                 test: Expression.Invoke(Expression.Constant(this.test)),
-                ifTrue: Expression.Convert(trueExpression, producer.ServiceType),
-                ifFalse: Expression.Convert(falseExpression, producer.ServiceType));
+                ifTrue: Expression.Convert(trueExpression, this.ImplementationType),
+                ifFalse: Expression.Convert(falseExpression, this.ImplementationType));
         }
 
         internal override void SetParameterOverrides(IEnumerable<OverriddenParameter> overriddenParameters)

@@ -211,7 +211,7 @@
                 action);
         }
 
-        private sealed class InstanceInitializationDataCollection : List<InstanceInitializationData>
+        private sealed class InstanceInitializationDataCollection : List<InstanceInitializationPair>
         {
             private int recursiveCount = 100;
 
@@ -226,7 +226,7 @@
 
                 object instance = instanceProducer();
 
-                this.Add(new InstanceInitializationData(context, instance));
+                this.Add(new InstanceInitializationPair(context, instance));
 
                 return instance;
             }
@@ -243,6 +243,18 @@
 
                 return string.Join(Environment.NewLine, registrations.Select(r => r.ToString()));
             }
+        }
+
+        private sealed class InstanceInitializationPair
+        {
+            public InstanceInitializationPair(InitializationContext context, object instance)
+            {
+                Context = context;
+                Instance = instance;
+            }
+
+            public InitializationContext Context { get; }
+            public object Instance { get; }
         }
 
         private sealed class Interceptor

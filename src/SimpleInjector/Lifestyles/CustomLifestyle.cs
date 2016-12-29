@@ -74,18 +74,18 @@ namespace SimpleInjector.Lifestyles
 
             public override Type ImplementationType => typeof(TImplementation);
 
-            public override Expression BuildExpression(InstanceProducer producer) =>
+            public override Expression BuildExpression() =>
                 Expression.Convert(
                     Expression.Invoke(
-                        Expression.Constant(this.CreateInstanceCreator(producer))),
+                        Expression.Constant(this.CreateInstanceCreator())),
                     typeof(TImplementation));
 
-            private Func<object> CreateInstanceCreator(InstanceProducer producer)
+            private Func<object> CreateInstanceCreator()
             {
                 Func<TImplementation> transientInstanceCreator =
                     this.instanceCreator == null
-                        ? (Func<TImplementation>)this.BuildTransientDelegate(producer)
-                        : this.BuildTransientDelegate(producer, this.instanceCreator);
+                        ? (Func<TImplementation>)this.BuildTransientDelegate()
+                        : this.BuildTransientDelegate(this.instanceCreator);
 
                 return this.lifestyleApplierFactory(() => transientInstanceCreator());
             }

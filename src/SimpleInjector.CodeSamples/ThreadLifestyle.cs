@@ -56,11 +56,11 @@
 
             public override Type ImplementationType => typeof(TImplementation);
             
-            public override Expression BuildExpression(InstanceProducer producer)
+            public override Expression BuildExpression()
             {
                 if (this.instanceProducer == null)
                 {
-                    this.instanceProducer = this.BuildTransientInstanceCreator(producer);
+                    this.instanceProducer = this.BuildTransientInstanceCreator();
                 }
 
                 return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstance"));
@@ -78,10 +78,10 @@
                 return value;
             }
 
-            private Func<TImplementation> BuildTransientInstanceCreator(InstanceProducer producer) =>
+            private Func<TImplementation> BuildTransientInstanceCreator() =>
                 this.instanceCreator == null
-                    ? (Func<TImplementation>)this.BuildTransientDelegate(producer)
-                    : this.BuildTransientDelegate(producer, this.instanceCreator);
+                    ? (Func<TImplementation>)this.BuildTransientDelegate()
+                    : this.BuildTransientDelegate(this.instanceCreator);
         }
     }
 }

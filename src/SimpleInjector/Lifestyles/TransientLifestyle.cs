@@ -58,10 +58,10 @@ namespace SimpleInjector.Lifestyles
 
             public override Type ImplementationType => typeof(TImplementation);
 
-            public override Expression BuildExpression(InstanceProducer producer) =>
+            public override Expression BuildExpression() =>
                 this.instanceCreator == null
-                    ? this.BuildTransientExpression(producer)
-                    : this.BuildTransientExpression(producer, this.instanceCreator);
+                    ? this.BuildTransientExpression()
+                    : this.BuildTransientExpression(this.instanceCreator);
         }
     }
 }

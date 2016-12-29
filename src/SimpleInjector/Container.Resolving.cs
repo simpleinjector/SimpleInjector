@@ -228,12 +228,7 @@ namespace SimpleInjector
             return producerIsValid ? producer : null;
         }
 
-        internal Action<TImplementation> GetInitializer<TImplementation>(InitializationContext context)
-        {
-            return this.GetInitializer<TImplementation>(typeof(TImplementation), context);
-        }
-
-        internal Action<object> GetInitializer(Type implementationType, InitializationContext context)
+        internal Action<object> GetInitializer(Type implementationType, Registration context)
         {
             return this.GetInitializer<object>(implementationType, context);
         }
@@ -256,7 +251,7 @@ namespace SimpleInjector
             return this.GetInstanceProducerForType(serviceType, consumer, buildProducer);
         }
 
-        private Action<T> GetInitializer<T>(Type implementationType, InitializationContext context)
+        private Action<T> GetInitializer<T>(Type implementationType, Registration context)
         {
             Action<T>[] initializersForType = this.GetInstanceInitializersFor<T>(implementationType, context);
 

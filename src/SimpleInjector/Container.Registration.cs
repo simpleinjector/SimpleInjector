@@ -996,7 +996,7 @@ namespace SimpleInjector
         /// </para>
         /// </remarks>
         public void RegisterInitializer(Action<InstanceInitializationData> instanceInitializer,
-            Predicate<InitializationContext> predicate)
+            Predicate<InitializerContext> predicate)
         {
             Requires.IsNotNull(instanceInitializer, nameof(instanceInitializer));
             Requires.IsNotNull(predicate, nameof(predicate));

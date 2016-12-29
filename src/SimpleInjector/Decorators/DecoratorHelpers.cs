@@ -256,7 +256,7 @@ namespace SimpleInjector.Decorators
 
             internal IContainerControlledCollection Collection { get; }
 
-            public override Expression BuildExpression(InstanceProducer producer) => 
+            public override Expression BuildExpression() => 
                 Expression.Constant(this.Collection, this.ImplementationType);
 
             internal override KnownRelationship[] GetRelationshipsCore() => 

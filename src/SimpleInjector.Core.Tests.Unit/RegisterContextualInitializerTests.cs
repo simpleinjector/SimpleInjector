@@ -11,8 +11,8 @@
     [TestClass]
     public class RegisterContextualInitializerTests
     {
-        private static readonly Predicate<InitializationContext> TruePredicate = c => true;
-        private static readonly Predicate<InitializationContext> FalsePredicate = c => true;
+        private static readonly Predicate<InitializerContext> TruePredicate = c => true;
+        private static readonly Predicate<InitializerContext> FalsePredicate = c => true;
 
         [TestMethod]
         public void BuildExpression_ContainerWithoutRegisterInitializerApplied_DoesNotApplyEventToExpression()
@@ -163,7 +163,6 @@
             // Assert
             var actualContext = actualContexts.First().Context;
 
-            Assert.AreSame(producer, actualContext.Producer);
             Assert.AreSame(producer.Registration, actualContext.Registration);
             Assert.AreSame(instance, actualContexts.First().Instance);
         }
@@ -186,7 +185,6 @@
             // Assert
             var actualContext = actualContexts.First().Context;
 
-            Assert.AreSame(container.GetRegistration(typeof(RealTimeProvider)), actualContext.Producer);
             Assert.AreSame(container.GetRegistration(typeof(RealTimeProvider)).Registration, actualContext.Registration);
             Assert.AreSame(instance, actualContexts.First().Instance);
         }
@@ -313,8 +311,7 @@
             // Assert
             Assert.AreEqual(2, actualContexts.Count, "Two event args were expected.");
 
-            Assert.AreSame(producer, actualContexts.First().Context.Producer);
-            Assert.AreSame(producer, actualContexts.Second().Context.Producer);
+            Assert.AreSame(producer.Registration, actualContexts.First().Context.Registration);
 
             Assert.AreEqual(
                 typeof(IEnumerable<ICommandHandler<RealCommand>>), 
@@ -440,11 +437,11 @@
             Assert.AreNotEqual(a, b);
         }
 
-        private static InitializationContext CreateDummyInitializationContext()
+        private static InitializerContext CreateDummyInitializationContext()
         {
             var registration = new ExpressionRegistration(Expression.Constant(null), new Container());
 
-            return new InitializationContext(new InstanceProducer(typeof(object), registration), registration);
+            return new InitializerContext(registration);
         }
     }
 }

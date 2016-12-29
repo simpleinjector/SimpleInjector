@@ -34,10 +34,10 @@
             }
 
             public override Type ImplementationType => typeof(TImpl);
-            public override Expression BuildExpression(InstanceProducer producer) => 
+            public override Expression BuildExpression() =>
                 this.creator == null
-                    ? this.BuildTransientExpression(producer)
-                    : this.BuildTransientExpression(producer, this.creator);
+                    ? this.BuildTransientExpression()
+                    : this.BuildTransientExpression(this.creator);
         }
     }
 }

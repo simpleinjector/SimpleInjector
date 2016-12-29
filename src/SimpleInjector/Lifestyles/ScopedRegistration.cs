@@ -55,13 +55,13 @@ namespace SimpleInjector.Lifestyles
 
         internal bool RegisterForDisposal { get; }
 
-        public override Expression BuildExpression(InstanceProducer producer)
+        public override Expression BuildExpression()
         {
             if (this.instanceCreator == null)
             {
                 this.scopeFactory = this.Lifestyle.CreateCurrentScopeProvider(this.Container);
 
-                this.instanceCreator = this.BuildInstanceCreator(producer);
+                this.instanceCreator = this.BuildInstanceCreator();
             }
 
             return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstance"));
@@ -76,15 +76,15 @@ namespace SimpleInjector.Lifestyles
         // is still important.
         public TImplementation GetInstance() => Scope.GetInstance(this, this.scopeFactory());
 
-        private Func<TImplementation> BuildInstanceCreator(InstanceProducer producer)
+        private Func<TImplementation> BuildInstanceCreator()
         {
             if (this.userSuppliedInstanceCreator != null)
             {
-                return this.BuildTransientDelegate(producer, this.userSuppliedInstanceCreator);
+                return this.BuildTransientDelegate(this.userSuppliedInstanceCreator);
             }
             else
             {
-                return (Func<TImplementation>)this.BuildTransientDelegate(producer);
+                return (Func<TImplementation>)this.BuildTransientDelegate();
             }
         }
     }

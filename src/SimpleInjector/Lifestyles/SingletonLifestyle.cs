@@ -43,12 +43,12 @@ namespace SimpleInjector.Lifestyles
         // (and the extra SingletonInstanceLifestyleRegistration class), we can ensure that the
         // ExpressionBuilding event is called with a ConstantExpression, which is much more intuitive to
         // anyone handling that event.
-        internal static Registration CreateSingleInstanceRegistration(Type serviceType, object instance, 
+        internal static Registration CreateSingleInstanceRegistration(Type serviceType, object instance,
             Container container, Type implementationType = null)
         {
             Requires.IsNotNull(instance, nameof(instance));
 
-            return new SingletonInstanceLifestyleRegistration(implementationType ?? serviceType, 
+            return new SingletonInstanceLifestyleRegistration(serviceType, implementationType ?? serviceType,
                 instance, container);
         }
 
@@ -93,27 +93,24 @@ namespace SimpleInjector.Lifestyles
             private object instance;
             private bool initialized;
 
-            internal SingletonInstanceLifestyleRegistration(Type implementationType, 
+            internal SingletonInstanceLifestyleRegistration(Type serviceType, Type implementationType, 
                 object instance, Container container)
                 : base(Lifestyle.Singleton, container)
             {
                 this.instance = instance;
+                this.ServiceType = serviceType;
                 this.ImplementationType = implementationType;
             }
 
+            public Type ServiceType { get; }
             public override Type ImplementationType { get; }
 
-            public override Expression BuildExpression(InstanceProducer producer)
+            public override Expression BuildExpression()
             {
-                // NOTE: The ConstantExpression should define the service type, not the implementation type, 
-                // because this implementation type might be internal, and this can cause problems in partial 
-                // trust.
-                return Expression.Constant(
-                    this.GetInitializedInstance(producer),
-                    producer.ServiceType);
+                return Expression.Constant(this.GetInitializedInstance(), this.ImplementationType);
             }
 
-            private object GetInitializedInstance(InstanceProducer producer)
+            private object GetInitializedInstance()
             {
                 if (!this.initialized)
                 {
@@ -121,9 +118,7 @@ namespace SimpleInjector.Lifestyles
                     {
                         if (!this.initialized)
                         {
-                            // TODO: It's wrong to use the InstanceProducer to build up the instance, because there could be
-                            // multiple InstanceProducers for this instance.
-                            this.instance = this.GetInjectedInterceptedAndInitializedInstance(producer);
+                            this.instance = this.GetInjectedInterceptedAndInitializedInstance();
                         }
                     }
 
@@ -133,11 +128,11 @@ namespace SimpleInjector.Lifestyles
                 return this.instance;
             }
 
-            private object GetInjectedInterceptedAndInitializedInstance(InstanceProducer producer)
+            private object GetInjectedInterceptedAndInitializedInstance()
             {
                 try
                 {
-                    return this.GetInjectedInterceptedAndInitializedInstanceInternal(producer);
+                    return this.GetInjectedInterceptedAndInitializedInstanceInternal();
                 }
                 catch (MemberAccessException ex)
                 {
@@ -146,9 +141,9 @@ namespace SimpleInjector.Lifestyles
                 }
             }
 
-            private object GetInjectedInterceptedAndInitializedInstanceInternal(InstanceProducer producer)
+            private object GetInjectedInterceptedAndInitializedInstanceInternal()
             {
-                Expression expression = Expression.Constant(this.instance, producer.ServiceType);
+                Expression expression = Expression.Constant(this.instance, this.ImplementationType);
 
                 // NOTE: We pass on producer.ServiceType as the implementation type for the following three
                 // methods. This will the initialization to be only done based on information of the service
@@ -160,9 +155,9 @@ namespace SimpleInjector.Lifestyles
                 // Register<TService, TImplementation>(Lifestyle). So the question is, do we consider
                 // RegisterSingleton<TService>(TService) to be similar to Register<TService>(Func<TService>)
                 // or to Register<TService, TImplementation>()? See: #353.
-                expression = this.WrapWithPropertyInjector(producer.ServiceType, producer.ServiceType, expression);
-                expression = this.InterceptInstanceCreation(producer.ServiceType, producer.ServiceType, expression);
-                expression = this.WrapWithInitializer(producer, producer.ServiceType, producer.ServiceType, expression);
+                expression = this.WrapWithPropertyInjector(this.ServiceType, expression);
+                expression = this.InterceptInstanceCreation(this.ServiceType, expression);
+                expression = this.WrapWithInitializer(this.ServiceType, expression);
 
                 Delegate initializer = Expression.Lambda(expression).Compile();
 
@@ -188,14 +183,10 @@ namespace SimpleInjector.Lifestyles
 
             public override Type ImplementationType => typeof(TImplementation);
 
-            public override Expression BuildExpression(InstanceProducer producer)
-            {
-                return Expression.Constant(
-                    this.GetInterceptedInstance(producer),
-                    typeof(TImplementation));
-            }
+            public override Expression BuildExpression() => 
+                Expression.Constant(this.GetInterceptedInstance(), this.ImplementationType);
 
-            private object GetInterceptedInstance(InstanceProducer producer)
+            private object GetInterceptedInstance()
             {
                 // Even though the InstanceProducer takes a lock before calling Registration.BuildExpression
                 // we need to take a lock here, because multiple InstanceProducer instances could reference
@@ -206,7 +197,7 @@ namespace SimpleInjector.Lifestyles
                     {
                         if (this.interceptedInstance == null)
                         {
-                            this.interceptedInstance = this.CreateInstanceWithNullCheck(producer);
+                            this.interceptedInstance = this.CreateInstanceWithNullCheck();
                         }
                     }
                 }
@@ -214,12 +205,12 @@ namespace SimpleInjector.Lifestyles
                 return this.interceptedInstance;
             }
 
-            private TImplementation CreateInstanceWithNullCheck(InstanceProducer producer)
+            private TImplementation CreateInstanceWithNullCheck()
             {
                 Expression expression =
                     this.instanceCreator == null
-                        ? this.BuildTransientExpression(producer)
-                        : this.BuildTransientExpression(producer, this.instanceCreator);
+                        ? this.BuildTransientExpression()
+                        : this.BuildTransientExpression(this.instanceCreator);
 
                 Func<TImplementation> func = CompileExpression(expression);
 

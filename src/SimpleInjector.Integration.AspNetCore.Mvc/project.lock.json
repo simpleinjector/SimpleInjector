@@ -1022,12 +1022,12 @@
       },
       "SimpleInjector/4.0.0": {
         "type": "project",
-        "framework": ".NETFramework,Version=v4.5.1",
+        "framework": ".NETFramework,Version=v4.5",
         "compile": {
-          "net451/SimpleInjector.dll": {}
+          "net45/SimpleInjector.dll": {}
         },
         "runtime": {
-          "net451/SimpleInjector.dll": {}
+          "net45/SimpleInjector.dll": {}
         }
       },
       "SimpleInjector.Integration.AspNetCore/4.0.0": {
@@ -1036,7 +1036,7 @@
         "dependencies": {
           "Microsoft.AspNetCore.Http.Abstractions": "1.0.0",
           "NuSpec.ReferenceGenerator": "2.0.0-beta-bld14",
-          "SimpleInjector": "(, )"
+          "SimpleInjector": "1.0.0"
         },
         "compile": {
           "net451/SimpleInjector.Integration.AspNetCore.dll": {}
@@ -3597,7 +3597,7 @@
         "dependencies": {
           "Microsoft.AspNetCore.Http.Abstractions": "1.0.0",
           "NuSpec.ReferenceGenerator": "2.0.0-beta-bld14",
-          "SimpleInjector": "(, )"
+          "SimpleInjector": "1.0.0"
         },
         "compile": {
           "netstandard1.6/SimpleInjector.Integration.AspNetCore.dll": {}

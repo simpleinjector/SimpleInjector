@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,6 +23,7 @@
 namespace SimpleInjector.Advanced
 {
     using System;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
@@ -30,30 +31,27 @@ namespace SimpleInjector.Advanced
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="System.Predicate{T}" />
     /// delegate that is that is supplied to the 
-    /// <see cref="ContainerOptions.RegisterResolveInterceptor(ResolveInterceptor, Predicate{InitializationContext})">RegisterResolveInterceptor</see>
-    /// method that takes this delegate. This type contains contextual information about a resolved type and it 
-    /// allows the user to examine the given instance to decide whether the <see cref="ResolveInterceptor"/>
-    /// should be applied or not.
+    /// <see cref="SimpleInjector.Container.RegisterInitializer(Action{InstanceInitializationData}, Predicate{InitializerContext})">RegisterInitializer</see>
+    /// overload that takes this delegate. This type contains contextual information about the creation and it 
+    /// allows the user to examine the given instance to decide whether the instance should be initialized or 
+    /// not.
     /// </summary>
-    [DebuggerDisplay(nameof(InitializationContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
-    public class InitializationContext
+    [DebuggerDisplay(nameof(InitializerContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
+    public class InitializerContext
     {
-        internal InitializationContext(InstanceProducer producer, Registration registration)
+        internal InitializerContext(Registration registration)
         {
-            // producer will be null when a user calls Registration.BuildExpression() directly, instead of
-            // calling InstanceProducer.BuildExpression() or InstanceProducer.GetInstance(). 
             Requires.IsNotNull(registration, nameof(registration));
 
-            this.Producer = producer;
             this.Registration = registration;
         }
 
         /// <summary>
-        /// Gets the <see cref="InstanceProducer"/> that is responsible for the initialization of the created
-        /// instance.
+        /// Gets a null reference. This property has been deprecated.
         /// </summary>
-        /// <value>The <see cref="InstanceProducer"/> or null (Nothing in VB) when the instance producer is
-        /// unknown.</value>
+        /// <value>The null (Nothing in VB).</value>
+        [Obsolete("The Producer property has been deprecated. Please use Registration instead.", error: true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public InstanceProducer Producer { get; }
 
         /// <summary>
@@ -66,10 +64,9 @@ namespace SimpleInjector.Advanced
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal string DebuggerDisplay => 
+        internal string DebuggerDisplay =>
             string.Format(CultureInfo.InvariantCulture,
-                "Producer.ServiceType: {0}, Registration.ImplementationType: {1}",
-                this.Producer.ServiceType.ToFriendlyName(),
+                "Registration.ImplementationType: {0}",
                 this.Registration.ImplementationType.ToFriendlyName());
     }
 }

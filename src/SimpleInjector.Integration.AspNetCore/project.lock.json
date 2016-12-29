@@ -78,12 +78,12 @@
       },
       "SimpleInjector/4.0.0": {
         "type": "project",
-        "framework": ".NETFramework,Version=v4.5.1",
+        "framework": ".NETFramework,Version=v4.5",
         "compile": {
-          "net451/SimpleInjector.dll": {}
+          "net45/SimpleInjector.dll": {}
         },
         "runtime": {
-          "net451/SimpleInjector.dll": {}
+          "net45/SimpleInjector.dll": {}
         }
       }
     },

@@ -83,7 +83,7 @@ namespace SimpleInjector.Decorators
 
         private void ReplaceOriginalExpression(Registration decoratorRegistration)
         {
-            this.e.Expression = decoratorRegistration.BuildExpression(this.e.InstanceProducer);
+            this.e.Expression = decoratorRegistration.BuildExpression();
 
             this.e.ReplacedRegistration = decoratorRegistration;
 

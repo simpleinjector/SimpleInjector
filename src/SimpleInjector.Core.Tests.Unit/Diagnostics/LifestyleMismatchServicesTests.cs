@@ -402,7 +402,7 @@
 
             public override Type ImplementationType => typeof(TImplementation);
 
-            public override Expression BuildExpression(InstanceProducer producer)
+            public override Expression BuildExpression()
             {
                 throw new NotImplementedException();
             }

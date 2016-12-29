@@ -287,6 +287,6 @@
 
         public Expression ExpressionToReturn { get; set; }
 
-        public override Expression BuildExpression(InstanceProducer producer) => this.ExpressionToReturn;
+        public override Expression BuildExpression() => this.ExpressionToReturn;
     }
 }

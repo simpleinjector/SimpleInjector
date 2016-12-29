@@ -48,7 +48,7 @@ namespace SimpleInjector.Lifestyles
 
         public override Type ImplementationType => this.implementationType;
 
-        public override Expression BuildExpression(InstanceProducer producer) => this.expression;
+        public override Expression BuildExpression() => this.expression;
 
         private static Lifestyle GetLifestyleFor(Expression expression)
         {
