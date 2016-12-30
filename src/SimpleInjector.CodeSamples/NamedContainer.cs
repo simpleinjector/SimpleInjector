@@ -25,38 +25,38 @@
             where TImplementation : class, TService
             where TService : class
         {
-            this.Register<TService, TImplementation>(this.SelectLifestyle<TService, TImplementation>(), name);
+            this.Register<TService, TImplementation>(this.SelectLifestyle<TImplementation>(), name);
         }
 
         public void Register<TService, TImplementation>(Lifestyle lifestyle, string name)
             where TImplementation : class, TService
             where TService : class
         {
-            var reg = lifestyle.CreateRegistration<TService, TImplementation>(this);
+            var reg = lifestyle.CreateRegistration<TImplementation>(this);
             this.AddRegistration(typeof(TService), reg, name);
         }
 
         public void Register(Type serviceType, Type implementationType, string name)
         {
-            this.Register(serviceType, implementationType, this.SelectLifestyle(serviceType, implementationType), name);
+            this.Register(serviceType, implementationType, this.SelectLifestyle(implementationType), name);
         }
         
         public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle, string name)
         {
-            var reg = lifestyle.CreateRegistration(serviceType, implementationType, this);
+            var reg = lifestyle.CreateRegistration(implementationType, this);
             this.AddRegistration(serviceType, reg, name);
         }
 
         public void Register<TService>(Func<TService> instanceCreator, string name)
             where TService : class
         {
-            this.Register<TService>(instanceCreator, this.SelectLifestyle(typeof(TService), typeof(TService)), name);
+            this.Register(instanceCreator, this.SelectLifestyle(typeof(TService)), name);
         }
 
         public void Register<TService>(Func<TService> instanceCreator, Lifestyle lifestyle, string name)
             where TService : class
         {
-            var reg = lifestyle.CreateRegistration<TService>(instanceCreator, this);
+            var reg = lifestyle.CreateRegistration(instanceCreator, this);
             this.AddRegistration(typeof(TService), reg, name);
         }
 
@@ -103,14 +103,14 @@
             }
         }
 
-        private Lifestyle SelectLifestyle<TService, TImplementation>()
+        private Lifestyle SelectLifestyle<TImplementation>()
         {
-            return this.SelectLifestyle(typeof(TService), typeof(TImplementation));
+            return this.SelectLifestyle(typeof(TImplementation));
         }
 
-        private Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
+        private Lifestyle SelectLifestyle(Type implementationType)
         {
-            return this.Options.LifestyleSelectionBehavior.SelectLifestyle(serviceType, implementationType);
+            return this.Options.LifestyleSelectionBehavior.SelectLifestyle(implementationType);
         }
     }
 }

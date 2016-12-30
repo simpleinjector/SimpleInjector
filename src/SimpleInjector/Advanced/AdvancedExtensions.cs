@@ -23,7 +23,6 @@
 namespace SimpleInjector.Advanced
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
 
     /// <summary>
@@ -191,12 +190,11 @@ namespace SimpleInjector.Advanced
             container.AppendToCollectionInternal(serviceType, implementationType);
         }
 
-        internal static void Verify(this IDependencyInjectionBehavior behavior, Type serviceType, 
-            ConstructorInfo constructor)
+        internal static void Verify(this IDependencyInjectionBehavior behavior, ConstructorInfo constructor)
         {
-            foreach (var parameter in constructor.GetParameters())
+            foreach (ParameterInfo parameter in constructor.GetParameters())
             {
-                behavior.Verify(new InjectionConsumerInfo(serviceType, constructor.DeclaringType, parameter));
+                behavior.Verify(new InjectionConsumerInfo(constructor.DeclaringType, parameter));
             }
         }
     }

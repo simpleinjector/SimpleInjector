@@ -72,13 +72,13 @@ namespace SimpleInjector.Lifestyles
             return lifestyle.Name;
         }
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+        protected override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
             Func<bool> test = () => this.lifestyleSelector(container);
 
-            return new HybridRegistration(typeof(TService), typeof(TImplementation), test,
-                this.trueLifestyle.CreateRegistration<TService, TImplementation>(container),
-                this.falseLifestyle.CreateRegistration<TService, TImplementation>(container),
+            return new HybridRegistration(typeof(TConcrete), test,
+                this.trueLifestyle.CreateRegistration<TConcrete>(container),
+                this.falseLifestyle.CreateRegistration<TConcrete>(container),
                 this, container);
         }
 
@@ -87,7 +87,7 @@ namespace SimpleInjector.Lifestyles
         {
             Func<bool> test = () => this.lifestyleSelector(container);
 
-            return new HybridRegistration(typeof(TService), typeof(TService), test,
+            return new HybridRegistration(typeof(TService), test,
                 this.trueLifestyle.CreateRegistration(instanceCreator, container),
                 this.falseLifestyle.CreateRegistration(instanceCreator, container),
                 this, container);

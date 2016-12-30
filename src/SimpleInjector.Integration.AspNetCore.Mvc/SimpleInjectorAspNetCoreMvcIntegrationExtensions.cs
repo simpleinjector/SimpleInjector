@@ -180,8 +180,7 @@ namespace SimpleInjector
 
         private static Registration CreateConcreteRegistration(Container container, Type concreteType)
         {
-            var lifestyle =
-                container.Options.LifestyleSelectionBehavior.SelectLifestyle(concreteType, concreteType);
+            var lifestyle = container.Options.LifestyleSelectionBehavior.SelectLifestyle(concreteType);
 
             return lifestyle.CreateRegistration(concreteType, container);
         }

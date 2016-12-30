@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     public interface ICommandHandler<TCommand>
     {
@@ -43,10 +42,6 @@
 
     public class ConcreteCommand : ICommand
     {
-        public ConcreteCommand()
-        {
-        }
-
         public void Execute()
         {
         }
@@ -137,6 +132,16 @@
         public AnotherCommandHandlerDecorator(ICommandHandler<TCommand> decoratee)
         {
             this.Decoratee = decoratee;
+        }
+    }
+
+    public class RealCommandCommandHandlerWithDependency<TDependency> : ICommandHandler<RealCommand>
+    {
+        public readonly TDependency Dependency;
+
+        public RealCommandCommandHandlerWithDependency(TDependency dependency)
+        {
+            this.Dependency = dependency;
         }
     }
 

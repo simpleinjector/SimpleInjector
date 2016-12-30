@@ -30,11 +30,8 @@
             }
 
             [DebuggerStepThrough]
-            public bool SelectProperty(Type serviceType, PropertyInfo property)
-            {
-                return this.IsPropertyDecoratedWithAttribute(property) ||
-                    this.baseBehavior.SelectProperty(serviceType, property);
-            }
+            public bool SelectProperty(PropertyInfo p) => 
+                this.IsPropertyDecoratedWithAttribute(p) || this.baseBehavior.SelectProperty(p);
 
             [DebuggerStepThrough]
             private bool IsPropertyDecoratedWithAttribute(PropertyInfo property)

@@ -133,7 +133,8 @@
 
         public static void ExceptionContainsParamName(string expectedParamName, ArgumentException exception)
         {
-            string assertMessage = "Exception does not contain parameter with name: " + expectedParamName;
+            string assertMessage = "Exception does not contain parameter with name: " + expectedParamName +
+                ". Exception message: " + exception.Message;
 
 #if !SILVERLIGHT
             Assert.AreEqual(expectedParamName, exception.ParamName, assertMessage);
@@ -261,6 +262,9 @@
         {
             Assert.IsNotNull(actualTypes);
 
+            expectedTypes = expectedTypes.ToArray();
+            actualTypes = actualTypes.ToArray();
+
             if (!expectedTypes.SequenceEqual(actualTypes))
             {
                 Assert.Fail("The sequences did not match.\nExpected list: {0}.\nActual list: {1}",
@@ -282,6 +286,6 @@
             }
         }
 
-        private static string ToFriendlyName(Type type) => Helpers.ToFriendlyName(type);
+        private static string ToFriendlyName(Type type) => type.ToFriendlyName();
     }
 }

@@ -39,7 +39,7 @@ namespace SimpleInjector.Lifestyles
 
         internal override int DependencyLength(Container container) => Transient.DependencyLength(container);
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+        protected override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
             throw new InvalidOperationException(
                 "The unknown lifestyle does not allow creation of registrations.");

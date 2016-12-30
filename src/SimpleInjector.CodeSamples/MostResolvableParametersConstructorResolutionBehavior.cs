@@ -29,9 +29,9 @@
         }
 
         [DebuggerStepThrough]
-        public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
+        public ConstructorInfo GetConstructor(Type implementationType)
         {
-            var constructor = this.GetConstructors(serviceType, implementationType).FirstOrDefault();
+            var constructor = this.GetConstructors(implementationType).FirstOrDefault();
 
             if (constructor != null)
             {
@@ -42,7 +42,7 @@
         }
 
         [DebuggerStepThrough]
-        private IEnumerable<ConstructorInfo> GetConstructors(Type service, Type implementation)
+        private IEnumerable<ConstructorInfo> GetConstructors(Type implementation)
         {
             var constructors = implementation.GetConstructors();
 
@@ -54,25 +54,25 @@
                 let parameters = ctor.GetParameters()
                 where this.IsCalledDuringRegistrationPhase
                     || constructors.Length == 1
-                    || ctor.GetParameters().All(p => this.CanBeResolved(p, service, implementation))
+                    || ctor.GetParameters().All(p => this.CanBeResolved(p, implementation))
                 orderby parameters.Length descending
                 select ctor;
         }
 
         [DebuggerStepThrough]
-        private bool CanBeResolved(ParameterInfo parameter, Type serviceType, Type implementationType)
+        private bool CanBeResolved(ParameterInfo parameter, Type implementationType)
         {
             return this.container.GetRegistration(parameter.ParameterType) != null ||
-                this.CanBuildExpression(serviceType, implementationType, parameter);
+                this.CanBuildExpression(implementationType, parameter);
         }
 
         [DebuggerStepThrough]
-        private bool CanBuildExpression(Type serviceType, Type implementationType, ParameterInfo parameter)
+        private bool CanBuildExpression(Type implementationType, ParameterInfo parameter)
         {
             try
             {
-                this.container.Options.DependencyInjectionBehavior.BuildExpression(
-                    new InjectionConsumerInfo(serviceType, implementationType, parameter));
+                var info = new InjectionConsumerInfo(implementationType, parameter);
+                this.container.Options.DependencyInjectionBehavior.GetInstanceProducerFor(info);
 
                 return true;
             }

@@ -9,6 +9,7 @@
 StyleCop.Cache
 *ncrunch*
 coverage/
+*project.lock.json
 
 # Security
 *.snk

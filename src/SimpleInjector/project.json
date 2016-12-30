@@ -21,17 +21,14 @@
       }
     },
     "net40": {},
-    "net45": {},
-    "net451": {
-      "buildOptions": {
-        "define": [ "NET45" ]
-      }
-    }
-  },
-  "scripts": {
-    "precompile": [
-      // Copy the fake.snk to SimpleInjector.snk in case it doesn't exist.
-      "xcopy \"..\\fake.snk\" \"..\\SimpleInjector.*\" /D /Y"
-    ]
+    "net45": {}
   }
+  // Enable this to build Simple Injector if the SimpleInjector.snk is missing.
+  //,
+  //"scripts": {
+  //  "precompile": [
+  //    // Copy the fake.snk to SimpleInjector.snk in case it doesn't exist.
+  //    "xcopy \"..\\fake.snk\" \"..\\SimpleInjector.*\" /D /Y"
+  //  ]
+  //}
 }

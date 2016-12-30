@@ -724,7 +724,7 @@ namespace SimpleInjector.Tests.Unit
 
             IEnumerable<Registration> registrations = new[] 
             { 
-                Lifestyle.Transient.CreateRegistration<IUserRepository, SqlUserRepository>(container)
+                Lifestyle.Transient.CreateRegistration<SqlUserRepository>(container)
             };
 
             container.RegisterCollection(typeof(IUserRepository), registrations);
@@ -743,7 +743,7 @@ namespace SimpleInjector.Tests.Unit
             var container = ContainerFactory.New();
 
             var registration =
-                Lifestyle.Singleton.CreateRegistration<IUserRepository, SqlUserRepository>(container);
+                Lifestyle.Singleton.CreateRegistration<SqlUserRepository>(container);
 
             container.RegisterCollection(typeof(IUserRepository), new[] { registration });
             container.RegisterCollection(typeof(object), new[] { registration });
@@ -764,8 +764,8 @@ namespace SimpleInjector.Tests.Unit
 
             container.RegisterCollection<IPlugin>(new[] 
             { 
-                Lifestyle.Transient.CreateRegistration<PluginImpl, PluginImpl>(container),
-                Lifestyle.Transient.CreateRegistration<IPlugin, PluginImpl2>(container)
+                Lifestyle.Transient.CreateRegistration<PluginImpl>(container),
+                Lifestyle.Transient.CreateRegistration<PluginImpl2>(container)
             });
 
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
@@ -844,8 +844,8 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             Assert.AreEqual(
-                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
-                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+                expected: string.Join(", ", expectedHandlerTypes.Select(TypesExtensions.ToFriendlyName)),
+                actual: string.Join(", ", actualHandlerTypes.Select(TypesExtensions.ToFriendlyName)));
         }
 
         [TestMethod]
@@ -884,8 +884,8 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             Assert.AreEqual(
-                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
-                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+                expected: expectedHandlerTypes.ToFriendlyNamesText(),
+                actual: actualHandlerTypes.ToFriendlyNamesText());
         }
 
         [TestMethod]
@@ -921,8 +921,8 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             Assert.AreEqual(
-                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
-                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+                expected: expectedHandlerTypes.ToFriendlyNamesText(),
+                actual: actualHandlerTypes.ToFriendlyNamesText());
         }
 
         [TestMethod]
@@ -960,8 +960,8 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             Assert.AreEqual(
-                expected: string.Join(", ", expectedHandlerTypes.Select(TestHelpers.ToFriendlyName)),
-                actual: string.Join(", ", actualHandlerTypes.Select(TestHelpers.ToFriendlyName)));
+                expected: expectedHandlerTypes.ToFriendlyNamesText(),
+                actual: actualHandlerTypes.ToFriendlyNamesText());
         }
 
         [TestMethod]
@@ -1526,7 +1526,7 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             Assert.IsTrue(expectedHandlerTypes.SequenceEqual(actualHandlerTypes),
-                "Actual: " + actualHandlerTypes.Select(Helpers.ToFriendlyName).ToCommaSeparatedText());
+                "Actual: " + actualHandlerTypes.Select(t => t.ToFriendlyName()).ToCommaSeparatedText());
         }
 
         [TestMethod]
@@ -1603,7 +1603,7 @@ namespace SimpleInjector.Tests.Unit
                 register generic types by supplying the RegisterAll(Type, Type[]) overload as follows:
                 container.RegisterManyForOpenGeneric(type, container.RegisterAll, assemblies)."
                 .TrimInside() +
-                "Actual: " + actualHandlerTypes.Select(Helpers.ToFriendlyName).ToCommaSeparatedText());
+                "Actual: " + actualHandlerTypes.ToFriendlyNamesText());
         }
 
         // This is a regression test for bug: 21000.

@@ -140,6 +140,15 @@ namespace SimpleInjector
             this.instanceCreator = this.BuildAndReplaceInstanceCreatorAndCreateFirstInstance;
         }
 
+        // Flagging the registration with WrapsInstanceCreationDelegate prevents false diagnostic warnings.
+        private InstanceProducer(Type serviceType, Expression expression, Container container)
+            : this(serviceType,
+                  new ExpressionRegistration(expression, container) { WrapsInstanceCreationDelegate = true })
+        {
+            // Overrides earlier set value. This prevents ExpressionBuilt from being applied.
+            this.lazyExpression = Helpers.ToLazy(expression);
+        }
+
         /// <summary>
         /// Gets the <see cref="Lifestyle"/> for this registration. The returned lifestyle can differ from the
         /// lifestyle that is used during the registration. This can happen for instance when the registration
@@ -214,6 +223,25 @@ namespace SimpleInjector
             this.wrappedProducers == null
                 ? new[] { this }
                 : this.wrappedProducers.Concat(new[] { this });
+
+        /// <summary>
+        /// Creates a new <see cref="InstanceProducer"/> based on the given <paramref name="serviceType"/> 
+        /// and <paramref name="expression"/> where the <paramref name="expression"/> will be used as-is;
+        /// no interception (using <see cref="Container.ExpressionBuilt">ExpressionBuilt</see>) such as
+        /// decorators will be applied.
+        /// </summary>
+        /// <param name="serviceType">The service type for which this instance is created.</param>
+        /// <param name="expression">The expression that describes the instance to be produced.</param>
+        /// <param name="container">The <see cref="Container"/> instance for this registration.</param>
+        /// <returns>A new <see cref="InstanceProducer"/> that describes the expression.</returns>
+        public static InstanceProducer FromExpression(Type serviceType, Expression expression, Container container)
+        {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(expression, nameof(expression));
+            Requires.IsNotNull(container, nameof(container));
+
+            return new InstanceProducer(serviceType, expression, container);
+        }
 
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance. Will never return null.</returns>
@@ -489,7 +517,7 @@ namespace SimpleInjector
             // We must lock the container, because not locking could lead to race conditions.
             this.Container.LockContainer();
 
-            var expression = this.Registration.BuildExpression(this);
+            var expression = this.Registration.BuildExpression();
 
             if (expression == null)
             {

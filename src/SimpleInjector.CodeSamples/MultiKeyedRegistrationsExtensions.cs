@@ -15,7 +15,7 @@
             where TService1 : class
             where TService2 : class
         {
-            var registration = lifestyle.CreateRegistration<TImplementation, TImplementation>(container);
+            var registration = lifestyle.CreateRegistration<TImplementation>(container);
 
             container.AddRegistration(typeof(TService1), registration);
             container.AddRegistration(typeof(TService2), registration);
@@ -28,7 +28,7 @@
             where TService2 : class
             where TService3 : class
         {
-            var registration = lifestyle.CreateRegistration<TImplementation, TImplementation>(container);
+            var registration = lifestyle.CreateRegistration<TImplementation>(container);
 
             container.AddRegistration(typeof(TService1), registration);
             container.AddRegistration(typeof(TService2), registration);

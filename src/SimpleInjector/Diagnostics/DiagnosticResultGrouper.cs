@@ -86,7 +86,7 @@ namespace SimpleInjector.Diagnostics
             return new DiagnosticGroup(
                 diagnosticType: this.analyzer.DiagnosticType,
                 groupType: groupType,
-                name: Helpers.ToFriendlyName(groupType),
+                name: groupType.ToFriendlyName(),
                 description: this.analyzer.GetGroupDescription(results),
                 children: childGroups,
                 results: groupResults);
@@ -96,7 +96,7 @@ namespace SimpleInjector.Diagnostics
             new DiagnosticGroup(
                 diagnosticType: this.analyzer.DiagnosticType,
                 groupType: closedType,
-                name: Helpers.ToFriendlyName(closedType),
+                name: closedType.ToFriendlyName(),
                 description: this.analyzer.GetGroupDescription(results),
                 children: Enumerable.Empty<DiagnosticGroup>(),
                 results: results);

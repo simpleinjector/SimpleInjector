@@ -129,7 +129,7 @@ namespace SimpleInjector
 
             bool singleton = attribute?.InstanceContextMode == InstanceContextMode.Single;
 
-            return singleton ? Lifestyle.Singleton : behavior.SelectLifestyle(wcfServiceType, wcfServiceType);
+            return singleton ? Lifestyle.Singleton : behavior.SelectLifestyle(wcfServiceType);
         }
 
         private static IEnumerable<Type> GetExportedTypes(Assembly assembly)

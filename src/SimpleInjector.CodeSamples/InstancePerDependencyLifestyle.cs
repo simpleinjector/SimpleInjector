@@ -16,37 +16,28 @@
         // component, while allowing instances to depend on singletons.
         public override int Length => Singleton.Length;
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(
-            Container container) => 
-            new InstancePerDependencyRegistration<TService, TImplementation>(this, container);
+        protected override Registration CreateRegistrationCore<TConcrete>(Container container) => 
+            new InstancePerDependencyRegistration<TConcrete>(this, container);
 
         protected override Registration CreateRegistrationCore<TService>(
             Func<TService> instanceCreator, Container container) => 
             new InstancePerDependencyRegistration<TService>(this, container, instanceCreator);
 
-        private class InstancePerDependencyRegistration<T> : Registration where T : class
+        private class InstancePerDependencyRegistration<TImpl> : Registration where TImpl : class
         {
-            private readonly Func<T> creator;
+            private readonly Func<TImpl> creator;
 
             public InstancePerDependencyRegistration(Lifestyle lifestyle, Container container, 
-                Func<T> creator) : base(lifestyle, container)
+                Func<TImpl> creator = null) : base(lifestyle, container)
             {
                 this.creator = creator;
             }
 
-            public override Type ImplementationType => typeof(T);
-            public override Expression BuildExpression() => 
-                this.BuildTransientExpression(this.creator);
-        }
-
-        private class InstancePerDependencyRegistration<T, TImpl> : Registration
-            where T : class where TImpl : class, T
-        {
-            public InstancePerDependencyRegistration(Lifestyle lifestyle, Container container)
-                : base(lifestyle, container) { }
             public override Type ImplementationType => typeof(TImpl);
             public override Expression BuildExpression() =>
-                this.BuildTransientExpression<T, TImpl>();
+                this.creator == null
+                    ? this.BuildTransientExpression()
+                    : this.BuildTransientExpression(this.creator);
         }
     }
 }

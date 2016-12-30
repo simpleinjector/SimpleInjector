@@ -9,9 +9,31 @@ Version 4.0.0 (v4.0 RTM)
 		 RegisterPerWcfOperation, GetCurrentWcfOperationScope, RegisterLifetimeScope, GetCurrentLifetimeScope
 		 and GetCurrentExecutionContextScope. (fixes #304)
 		-[Core] Lifestyle.Length property made public. (fixes #245)
-		-[Core] LifetimeScopeLifestyle deprecated. (fixes #299)
-		-[Core] ExecutionContextScopeLifestyle deprecated. (fixes #299)
-		-[Core] WebApiRequestLifestyle deprecated. (fixes #331)
+		-[LifetimeScoping] LifetimeScopeLifestyle deprecated. (fixes #299)
+		-[ExecutionContextScoping] ExecutionContextScopeLifestyle deprecated. (fixes #299)
+		-[WebApi] WebApiRequestLifestyle deprecated. (fixes #331)
+		-[Core] Registration.BuildTransientExpression<TService, TImplementation>() signature changed to
+		 BuildTransientExpression(). (fixes #320)
+		-[Core] Registration.BuildTransientDelegate<TService, TImplementation>() signature changed to
+         BuildTransientDelegate(). (fixes #320 / #345 / #348)
+		-[Core] IConstructorResolutionBehavior.GetConstructor(Type, Type) signature changed to
+		 GetConstructor(Type). (fixes #345)
+		-[Core] ILifestyleSelectionBehavior.SelectLifestyle(Type, Type) signature changed to
+		 SelectLifestyle(Type). (fixes #345)
+		-[Core] Lifestyle.CreateRegistration<TService, TImplementation>(Container) removed. (fixes #345)
+		-[Core] Lifestyle.CreateRegistration(Type, Type, Container) signature changes to
+		 CreateRegistration(Type, Container). (fixed #345)
+		-[Core] Lifestyle.CreateRegistrationCore<TService, TImplementation>(Container) signature changes to
+		 CreateRegistrationCore<TImplementation>(Container). (fixes #345)
+		-[Core] IDependencyInjectionBehavior.BuildExpression method replace with
+		 GetInstanceProducerFor(InjectionConsumerInfo) that returns an InstanceProducer. (fixes #346)
+		-[Core] ExpressionBuilding.RegisteredServiceType removed. (fixes #348)
+		-[Core] InjectionConsumerInfo.ServiceType removed. (fixes #348)
+		-[Core] IPropertySelectionBehavior.SelectProperty(Type, PropertyInfo) replaced with
+		 SelectProperty(PropertyInfo) method. (fixes #348)
+		-[Core] Container.RegisterInitializer(Action<InstanceInitializationData>, Predicate<InitializationContext>)
+		 replaced with RegisterInitializer(Action<InstanceInitializationData>, Predicate<InitializerContext>)
+		 method. (fixes #348)
 
 	Improvements/Changes:
 		-[Core] Removed all methods that were marked [obsolete(true)] since v3.0. (fixes #305)
@@ -19,6 +41,10 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] AsyncScopedLifestyle added to core library as replacement of ExecutionContextScopeLifestyle. (fixes #299)
 		-[Core] New Lifestyle.CreateHybrid overloads added for ScopedLifestyles that remove the need to supply
 		 an lifestyleSelector delegate. (fixes #341)
+		-[Core] InstanceProducer.FromExpression() added. (fixes #346)
+		-[Core] Prevented registered predicates (using RegisterConditional) from always being called twice. (fixes #346)
+		-[Core] TypesExtensions class added with three useful extension methods on Type: ToFriendlyName,
+		 IsClosedTypeOf, GetClosedTypeOf and GetClosedTypesOf methods. (fixes #358)
 
 	Project Changes:
 		-Projects for SimpleInjector.dll merged into one single project.

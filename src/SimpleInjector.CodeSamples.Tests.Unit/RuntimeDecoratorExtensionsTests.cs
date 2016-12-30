@@ -124,7 +124,7 @@
                 this.lifestyle = lifestyle;
             }
 
-            public Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
+            public Lifestyle SelectLifestyle(Type implementationType)
             {
                 return this.lifestyle;
             }

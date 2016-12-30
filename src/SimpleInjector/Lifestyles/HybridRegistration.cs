@@ -31,17 +31,15 @@ namespace SimpleInjector.Lifestyles
 
     internal sealed class HybridRegistration : Registration
     {
-        private readonly Type serviceType;
         private readonly Func<bool> test;
         private readonly Registration trueRegistration;
         private readonly Registration falseRegistration;
 
-        public HybridRegistration(Type serviceType, Type implementationType, Func<bool> test,
+        public HybridRegistration(Type implementationType, Func<bool> test,
             Registration trueRegistration, Registration falseRegistration,
             Lifestyle lifestyle, Container container)
             : base(lifestyle, container)
         {
-            this.serviceType = serviceType;
             this.ImplementationType = implementationType;
             this.test = test;
             this.trueRegistration = trueRegistration;
@@ -52,17 +50,16 @@ namespace SimpleInjector.Lifestyles
 
         public override Expression BuildExpression()
         {
-            InstanceProducer producer = this.GetCurrentProducer();
-            Expression trueExpression = this.trueRegistration.BuildExpression(producer);
-            Expression falseExpression = this.falseRegistration.BuildExpression(producer);
+            Expression trueExpression = this.trueRegistration.BuildExpression();
+            Expression falseExpression = this.falseRegistration.BuildExpression();
 
             // Must be called after BuildExpression has been called.
             this.AddRelationships();
 
             return Expression.Condition(
                 test: Expression.Invoke(Expression.Constant(this.test)),
-                ifTrue: Expression.Convert(trueExpression, this.serviceType),
-                ifFalse: Expression.Convert(falseExpression, this.serviceType));
+                ifTrue: Expression.Convert(trueExpression, this.ImplementationType),
+                ifFalse: Expression.Convert(falseExpression, this.ImplementationType));
         }
 
         internal override void SetParameterOverrides(IEnumerable<OverriddenParameter> overriddenParameters)

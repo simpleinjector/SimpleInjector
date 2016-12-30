@@ -633,7 +633,7 @@ namespace SimpleInjector
 
             Requires.ServiceTypeIsNotClosedWhenImplementationIsOpen(serviceType, decoratorType);
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, decoratorType, nameof(serviceType));
-            Requires.ImplementationHasSelectableConstructor(this, serviceType, decoratorType, nameof(decoratorType));
+            Requires.ImplementationHasSelectableConstructor(this, decoratorType, nameof(decoratorType));
             Requires.IsDecorator(this, serviceType, decoratorType, nameof(decoratorType));
             Requires.DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(serviceType, decoratorType, nameof(decoratorType));
             Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, decoratorType, nameof(decoratorType));

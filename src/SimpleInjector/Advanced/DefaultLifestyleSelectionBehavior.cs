@@ -37,9 +37,8 @@ namespace SimpleInjector.Advanced
 
         private Lifestyle Lifestyle => this.options.DefaultLifestyle;
 
-        public Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
+        public Lifestyle SelectLifestyle(Type implementationType)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(implementationType, nameof(implementationType));
 
             return this.Lifestyle;

@@ -20,83 +20,68 @@
         {
         }
 
-        // Greater than Lifetime Scope, and WCF operation, but smaller than Singleton.
+        // Greater than Lifetime Scope, but smaller than Singleton.
         public override int Length => Lifestyle.Singleton.Length - 1;
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+        protected override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
-            return new PerThreadRegistration<TService, TImplementation>(this, container);
+            return new PerThreadRegistration<TConcrete>(this, container);
         }
 
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {
-            return new PerThreadRegistration<TService>(this, container)
+            if (instanceCreator == null)
             {
-                InstanceCreator = instanceCreator
-            };
+                throw new ArgumentNullException(nameof(instanceCreator));
+            }
+
+            return new PerThreadRegistration<TService>(this, container, instanceCreator);
         }
 
-        private sealed class PerThreadRegistration<TService> : PerThreadRegistration<TService, TService>
-            where TService : class
+        private sealed class PerThreadRegistration<TImplementation> : Registration
+            where TImplementation : class
         {
-            public PerThreadRegistration(Lifestyle lifestyle, Container container)
+            private readonly ThreadLocal<TImplementation> threadSpecificCache = new ThreadLocal<TImplementation>();
+            private readonly Func<TImplementation> instanceCreator;
+
+            private Func<TImplementation> instanceProducer;
+
+            public PerThreadRegistration(Lifestyle lifestyle, Container container, 
+                Func<TImplementation> instanceCreator = null)
                 : base(lifestyle, container)
             {
+                this.instanceCreator = instanceCreator;
             }
 
-            public Func<TService> InstanceCreator { get; set; }
-
-            public override Func<TService> BuildTransientInstanceCreator()
-            {
-                return this.BuildTransientDelegate(this.InstanceCreator);
-            }
-        }
-
-        private class PerThreadRegistration<TService, TImplementation> : Registration
-            where TService : class
-            where TImplementation : class, TService
-        {
-            private readonly ThreadLocal<TService> threadSpecificCache = new ThreadLocal<TService>();
-
-            private Func<TService> instanceCreator;
-
-            public PerThreadRegistration(Lifestyle lifestyle, Container container)
-                : base(lifestyle, container)
-            {
-            }
-
-            public override Type ImplementationType
-            {
-                get { return typeof(TImplementation); }
-            }
-
+            public override Type ImplementationType => typeof(TImplementation);
+            
             public override Expression BuildExpression()
             {
-                if (this.instanceCreator == null)
+                if (this.instanceProducer == null)
                 {
-                    this.instanceCreator = this.BuildTransientInstanceCreator();
+                    this.instanceProducer = this.BuildTransientInstanceCreator();
                 }
 
                 return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstance"));
             }
 
-            public virtual Func<TService> BuildTransientInstanceCreator()
+            public TImplementation GetInstance()
             {
-                return this.BuildTransientDelegate<TService, TImplementation>();
-            }
-
-            public TService GetInstance()
-            {
-                TService value = this.threadSpecificCache.Value;
+                TImplementation value = this.threadSpecificCache.Value;
 
                 if (value == null)
                 {
-                    this.threadSpecificCache.Value = value = this.instanceCreator();
+                    this.threadSpecificCache.Value = value = this.instanceProducer();
                 }
 
                 return value;
             }
+
+            private Func<TImplementation> BuildTransientInstanceCreator() =>
+                this.instanceCreator == null
+                    ? (Func<TImplementation>)this.BuildTransientDelegate()
+                    : this.BuildTransientDelegate(this.instanceCreator);
         }
     }
 }

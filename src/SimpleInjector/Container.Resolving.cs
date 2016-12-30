@@ -228,12 +228,7 @@ namespace SimpleInjector
             return producerIsValid ? producer : null;
         }
 
-        internal Action<TImplementation> GetInitializer<TImplementation>(InitializationContext context)
-        {
-            return this.GetInitializer<TImplementation>(typeof(TImplementation), context);
-        }
-
-        internal Action<object> GetInitializer(Type implementationType, InitializationContext context)
+        internal Action<object> GetInitializer(Type implementationType, Registration context)
         {
             return this.GetInitializer<object>(implementationType, context);
         }
@@ -256,7 +251,7 @@ namespace SimpleInjector
             return this.GetInstanceProducerForType(serviceType, consumer, buildProducer);
         }
 
-        private Action<T> GetInitializer<T>(Type implementationType, InitializationContext context)
+        private Action<T> GetInitializer<T>(Type implementationType, Registration context)
         {
             Action<T>[] initializersForType = this.GetInstanceInitializersFor<T>(implementationType, context);
 
@@ -413,7 +408,7 @@ namespace SimpleInjector
                 Type elementType = serviceType.GetElementType();
 
                 // We don't auto-register collections for ambiguous types.
-                if (elementType.IsValueType() || Helpers.IsAmbiguousType(elementType))
+                if (elementType.IsValueType() || Types.IsAmbiguousType(elementType))
                 {
                     return null;
                 }
@@ -486,13 +481,13 @@ namespace SimpleInjector
 
         private InstanceProducer TryBuildInstanceProducerForCollection(Type serviceType)
         {
-            if (!Helpers.IsGenericCollectionType(serviceType))
+            if (!Types.IsGenericCollectionType(serviceType))
             {
                 return null;
             }
 
             // We don't auto-register collections for ambiguous types.
-            if (Helpers.IsAmbiguousOrValueType(serviceType.GetGenericArguments()[0]))
+            if (Types.IsAmbiguousOrValueType(serviceType.GetGenericArguments()[0]))
             {
                 return null;
             }
@@ -563,7 +558,7 @@ namespace SimpleInjector
                 return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), () =>
                 {
                     var registration =
-                        this.SelectionBasedLifestyle.CreateRegistration<TConcrete, TConcrete>(this);
+                        this.SelectionBasedLifestyle.CreateRegistration<TConcrete>(this);
 
                     return BuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), registration);
                 });
@@ -582,7 +577,7 @@ namespace SimpleInjector
 
             return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(type, () =>
             {
-                var registration = this.SelectionBasedLifestyle.CreateRegistration(type, type, this);
+                var registration = this.SelectionBasedLifestyle.CreateRegistration(type, this);
 
                 return BuildInstanceProducerForConcreteUnregisteredType(type, registration);
             });
@@ -629,7 +624,7 @@ namespace SimpleInjector
         {
             string errorMesssage;
 
-            return this.Options.IsConstructableType(concreteType, concreteType, out errorMesssage);
+            return this.Options.IsConstructableType(concreteType, out errorMesssage);
         }
 
         // We're registering a service type after 'locking down' the container here and that means that the
@@ -678,7 +673,7 @@ namespace SimpleInjector
 
         private void ThrowMissingInstanceProducerException(Type serviceType)
         {
-            if (Helpers.IsConcreteConstructableType(serviceType))
+            if (Types.IsConcreteConstructableType(serviceType))
             {
                 this.ThrowNotConstructableException(serviceType);
             }
@@ -693,12 +688,12 @@ namespace SimpleInjector
         }
 
         private bool ContainsOneToOneRegistrationForCollectionType(Type collectionServiceType) =>
-            Helpers.IsGenericCollectionType(collectionServiceType) && 
+            Types.IsGenericCollectionType(collectionServiceType) && 
                 this.ContainsExplicitRegistrationFor(collectionServiceType.GetGenericArguments()[0]);
 
         // NOTE: MakeGenericType will fail for IEnumerable<T> when T is a pointer.
         private bool ContainsCollectionRegistrationFor(Type serviceType) =>
-            !Helpers.IsGenericCollectionType(serviceType) && !serviceType.IsPointer &&
+            !Types.IsGenericCollectionType(serviceType) && !serviceType.IsPointer &&
                 this.ContainsExplicitRegistrationFor(typeof(IEnumerable<>).MakeGenericType(serviceType));
 
         private bool ContainsExplicitRegistrationFor(Type serviceType) =>
@@ -709,7 +704,7 @@ namespace SimpleInjector
             string exceptionMessage;
 
             // Since we are at this point, we know the concreteType is NOT constructable.
-            this.Options.IsConstructableType(concreteType, concreteType, out exceptionMessage);
+            this.Options.IsConstructableType(concreteType, out exceptionMessage);
 
             throw new ActivationException(
                 StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType, this.HasRegistrations)

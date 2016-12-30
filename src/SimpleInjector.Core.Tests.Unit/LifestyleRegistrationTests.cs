@@ -249,7 +249,7 @@
         {
             public Predicate<PropertyInfo> Predicate { get; set; }
 
-            public bool SelectProperty(Type serviceType, PropertyInfo property) => this.Predicate(property);
+            public bool SelectProperty(PropertyInfo property) => this.Predicate(property);
         }
     }
 
@@ -263,8 +263,7 @@
 
         public override int Length => Transient.Length;
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(
-            Container container)
+        protected override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
             return this.RegistrationToReturn;
         }
@@ -278,15 +277,13 @@
 
     internal sealed class FakeRegistration : Registration
     {
-        private readonly Type implementationType;
-
         public FakeRegistration(Lifestyle lifestyle, Container container, Type implementationType) 
             : base(lifestyle, container)
         {
-            this.implementationType = implementationType;
+            this.ImplementationType = implementationType;
         }
 
-        public override Type ImplementationType => this.implementationType;
+        public override Type ImplementationType { get; }
 
         public Expression ExpressionToReturn { get; set; }
 

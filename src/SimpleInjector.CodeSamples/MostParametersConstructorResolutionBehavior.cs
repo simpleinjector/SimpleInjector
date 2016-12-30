@@ -13,7 +13,7 @@
     public class MostParametersConstructorResolutionBehavior : IConstructorResolutionBehavior
     {
         [DebuggerStepThrough]
-        public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
+        public ConstructorInfo GetConstructor(Type implementationType)
         {
             ConstructorInfo[] constructors = GetConstructorsWithMostParameters(implementationType);
 

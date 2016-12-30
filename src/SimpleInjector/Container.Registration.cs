@@ -996,7 +996,7 @@ namespace SimpleInjector
         /// </para>
         /// </remarks>
         public void RegisterInitializer(Action<InstanceInitializationData> instanceInitializer,
-            Predicate<InitializationContext> predicate)
+            Predicate<InitializerContext> predicate)
         {
             Requires.IsNotNull(instanceInitializer, nameof(instanceInitializer));
             Requires.IsNotNull(predicate, nameof(predicate));
@@ -1153,10 +1153,10 @@ namespace SimpleInjector
 
             Requires.IsNotAnAmbiguousType(typeof(TService), serviceTypeParamName);
 
-            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TService), typeof(TImplementation),
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TImplementation),
                 implementationTypeParamName);
 
-            var registration = lifestyle.CreateRegistration<TService, TImplementation>(this);
+            var registration = lifestyle.CreateRegistration<TImplementation>(this);
 
             this.AddRegistration(typeof(TService), registration);
         }
@@ -1173,7 +1173,7 @@ namespace SimpleInjector
             
             Requires.IsNotAnAmbiguousType(serviceType, serviceTypeParamName);
 
-            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(serviceType, implementationType,
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(implementationType,
                 implementationTypeParamName);
 
             if (serviceType.ContainsGenericParameters())
@@ -1185,18 +1185,18 @@ namespace SimpleInjector
                 Requires.ServiceIsAssignableFromImplementation(serviceType, implementationType,
                     implementationTypeParamName);
 
-                var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
+                var registration = lifestyle.CreateRegistration(implementationType, this);
 
                 this.AddRegistration(serviceType, registration);
             }
         }
 
-        private void ThrowArgumentExceptionWhenTypeIsNotConstructable(Type serviceType, 
+        private void ThrowArgumentExceptionWhenTypeIsNotConstructable(
             Type implementationType, string parameterName)
         {
             string message;
 
-            bool constructable = this.Options.IsConstructableType(serviceType, implementationType, out message);
+            bool constructable = this.Options.IsConstructableType(implementationType, out message);
 
             if (!constructable)
             {

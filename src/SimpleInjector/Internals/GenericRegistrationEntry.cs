@@ -451,8 +451,7 @@ namespace SimpleInjector.Internals
             }
 
             private Registration CreateNewRegistrationFor(PredicateContext context) =>
-                this.lifestyle.CreateRegistration(context.ImplementationType, context.ImplementationType,
-                    this.container);
+                this.lifestyle.CreateRegistration(context.ImplementationType, this.container);
 
             private bool MatchesPredicate(PredicateContext context) =>
                 this.Predicate != null ? this.Predicate(context) : true;

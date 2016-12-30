@@ -1,8 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using System;
-    using System.ComponentModel;
-    using System.Configuration;
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq.Expressions;
@@ -22,32 +20,24 @@
             IParameterConvention convention)
         {
             options.DependencyInjectionBehavior = new ConventionDependencyInjectionBehavior(
-                options.DependencyInjectionBehavior, convention);
+                options.DependencyInjectionBehavior, convention, options.Container);
         }
 
         private class ConventionDependencyInjectionBehavior : IDependencyInjectionBehavior
         {
             private IDependencyInjectionBehavior decorated;
             private IParameterConvention convention;
+            private Container container;
 
             public ConventionDependencyInjectionBehavior(
-                IDependencyInjectionBehavior decorated, IParameterConvention convention)
+                IDependencyInjectionBehavior decorated, IParameterConvention convention,
+                Container container)
             {
                 this.decorated = decorated;
                 this.convention = convention;
+                this.container = container;
             }
 
-            [DebuggerStepThrough]
-            public Expression BuildExpression(InjectionConsumerInfo consumer)
-            {
-                if (!this.convention.CanResolve(consumer.Target))
-                {
-                    return this.decorated.BuildExpression(consumer);
-                }
-
-                return this.convention.BuildExpression(consumer);
-            }
-            
             [DebuggerStepThrough]
             public void Verify(InjectionConsumerInfo consumer)
             {
@@ -55,6 +45,20 @@
                 {
                     this.decorated.Verify(consumer);
                 }
+            }
+
+            [DebuggerStepThrough]
+            public InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer)
+            {
+                if (!this.convention.CanResolve(consumer.Target))
+                {
+                    return this.decorated.GetInstanceProducerFor(consumer);
+                }
+
+                return InstanceProducer.FromExpression(
+                    serviceType: consumer.Target.TargetType,
+                    expression: this.convention.BuildExpression(consumer),
+                    container: this.container);
             }
         }
     }
@@ -176,7 +180,8 @@
 
             if (configurationValue != null)
             {
-                TypeConverter converter = TypeDescriptor.GetConverter(target.TargetType);
+                System.ComponentModel.TypeConverter converter = 
+                    System.ComponentModel.TypeDescriptor.GetConverter(target.TargetType);
 
                 return converter.ConvertFromString(null,
                     CultureInfo.InvariantCulture, configurationValue);
@@ -211,7 +216,7 @@
         {
             try
             {
-                return this.injectionBehavior.BuildExpression(consumer);
+                return this.injectionBehavior.GetInstanceProducerFor(consumer).BuildExpression();
             }
             catch (ActivationException)
             {
