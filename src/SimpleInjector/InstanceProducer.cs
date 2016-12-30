@@ -93,7 +93,6 @@ namespace SimpleInjector
 
         private readonly object locker = new object();
         private readonly Lazy<Expression> lazyExpression;
-        private readonly InitializationContext initializationContext;
 
         private CyclicDependencyValidator validator;
         private Func<object> instanceCreator;
@@ -130,7 +129,6 @@ namespace SimpleInjector
             this.validator = new CyclicDependencyValidator(registration.ImplementationType);
 
             this.lazyExpression = new Lazy<Expression>(this.BuildExpressionInternal);
-            this.initializationContext = new InitializationContext(this, registration);
 
             if (registerExternalProducer)
             {
@@ -481,7 +479,7 @@ namespace SimpleInjector
             try
             {
                 creator = CompilationHelpers.CompileExpression<object>(this.Container, expression);
-                creator = this.Container.WrapWithResolveInterceptor(this.initializationContext, creator);
+                creator = this.Container.WrapWithResolveInterceptor(this, creator);
             }
             catch (Exception ex)
             {

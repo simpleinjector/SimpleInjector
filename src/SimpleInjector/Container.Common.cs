@@ -158,6 +158,8 @@ namespace SimpleInjector
 
         internal bool HasRegistrations => this.explicitRegistrations.Any() || this.collectionResolvers.Any();
 
+        internal bool HasResolveInterceptors => this.resolveInterceptors.Count > 0;
+
         /// <summary>
         /// Returns an array with the current registrations. This list contains all explicitly registered
         /// types, and all implicitly registered instances. Implicit registrations are  all concrete 
@@ -412,13 +414,18 @@ namespace SimpleInjector
             }
         }
 
-        internal Func<object> WrapWithResolveInterceptor(InitializationContext context, Func<object> producer)
+        internal Func<object> WrapWithResolveInterceptor(InstanceProducer instanceProducer, Func<object> producer)
         {
-            ResolveInterceptor[] interceptors = this.GetResolveInterceptorsFor(context);
-
-            foreach (var interceptor in interceptors)
+            if (this.HasResolveInterceptors)
             {
-                producer = ApplyResolveInterceptor(interceptor, context, producer);
+                var context = new InitializationContext(instanceProducer, instanceProducer.Registration);
+
+                ResolveInterceptor[] interceptors = this.GetResolveInterceptorsFor(context);
+
+                foreach (ResolveInterceptor interceptor in interceptors)
+                {
+                    producer = ApplyResolveInterceptor(interceptor, context, producer);
+                }
             }
 
             return producer;
@@ -515,11 +522,6 @@ namespace SimpleInjector
 
         private ResolveInterceptor[] GetResolveInterceptorsFor(InitializationContext context)
         {
-            if (!this.resolveInterceptors.Any())
-            {
-                return Helpers.Array<ResolveInterceptor>.Empty;
-            }
-
             return (
                 from resolveInterceptor in this.resolveInterceptors
                 where resolveInterceptor.Predicate(context)
