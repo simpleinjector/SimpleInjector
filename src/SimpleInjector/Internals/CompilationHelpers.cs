@@ -40,6 +40,18 @@ namespace SimpleInjector.Internals
         private static readonly MethodInfo CreateConstantValueDelegateMethod = 
             Helpers.GetGenericMethodDefinition(() => CreateConstantValueDelegate<object>(null));
 
+        // NOTE: This method should be public. It is called using reflection.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static Func<TResult> CreateConstantValueDelegate<TResult>(Expression expression)
+        {
+            object value = ((ConstantExpression)expression).Value;
+
+            var singleton = (TResult)value;
+
+            // This lambda will be a tiny little bit faster than a compiled delegate and 
+            return () => singleton;
+        }
+
         // Compile the expression. If the expression is compiled in a dynamic assembly, the compiled delegate
         // is called (to ensure that it will run, because it tends to fail now and then) and the created
         // instance is returned through the out parameter. Note that NO created instance will be returned when
@@ -113,17 +125,6 @@ namespace SimpleInjector.Internals
 
         static partial void TryCompileInDynamicAssembly(Type resultType, Expression expression,
             ref Delegate compiledLambda);
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Func<TResult> CreateConstantValueDelegate<TResult>(Expression expression)
-        {
-            object value = ((ConstantExpression)expression).Value;
-
-            TResult singleton = (TResult)value;
-
-            // This lambda will be a tiny little bit faster than a compiled delegate and 
-            return () => singleton;
-        }
 
         // OptimizeExpression will implement caching of the scopes of ScopedLifestyles which will optimize
         // performance in case multiple scoped registrations are used within a single delegate. Here's an
