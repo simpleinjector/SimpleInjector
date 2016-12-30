@@ -9,9 +9,9 @@ Version 4.0.0 (v4.0 RTM)
 		 RegisterPerWcfOperation, GetCurrentWcfOperationScope, RegisterLifetimeScope, GetCurrentLifetimeScope
 		 and GetCurrentExecutionContextScope. (fixes #304)
 		-[Core] Lifestyle.Length property made public. (fixes #245)
-		-[Core] LifetimeScopeLifestyle deprecated. (fixes #299)
-		-[Core] ExecutionContextScopeLifestyle deprecated. (fixes #299)
-		-[Core] WebApiRequestLifestyle deprecated. (fixes #331)
+		-[LifetimeScoping] LifetimeScopeLifestyle deprecated. (fixes #299)
+		-[ExecutionContextScoping] ExecutionContextScopeLifestyle deprecated. (fixes #299)
+		-[WebApi] WebApiRequestLifestyle deprecated. (fixes #331)
 		-[Core] Registration.BuildTransientExpression<TService, TImplementation>() signature changed to
 		 BuildTransientExpression(). (fixes #320)
 		-[Core] Registration.BuildTransientDelegate<TService, TImplementation>() signature changed to
