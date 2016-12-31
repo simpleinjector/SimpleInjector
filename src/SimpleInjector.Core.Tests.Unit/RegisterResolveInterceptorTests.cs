@@ -249,8 +249,8 @@
         {
             public InstanceInitializationPair(InitializationContext context, object instance)
             {
-                Context = context;
-                Instance = instance;
+                this.Context = context;
+                this.Instance = instance;
             }
 
             public InitializationContext Context { get; }

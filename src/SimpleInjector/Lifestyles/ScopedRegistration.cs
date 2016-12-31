@@ -34,17 +34,15 @@ namespace SimpleInjector.Lifestyles
         private Func<TImplementation> instanceCreator;
 
         internal ScopedRegistration(ScopedLifestyle lifestyle, Container container,
-            bool registerForDisposal, Func<TImplementation> instanceCreator)
-            : this(lifestyle, container, registerForDisposal)
+            Func<TImplementation> instanceCreator)
+            : this(lifestyle, container)
         {
             this.userSuppliedInstanceCreator = instanceCreator;
         }
 
-        internal ScopedRegistration(ScopedLifestyle lifestyle, Container container,
-            bool registerForDisposal)
+        internal ScopedRegistration(ScopedLifestyle lifestyle, Container container)
             : base(lifestyle, container)
         {
-            this.RegisterForDisposal = registerForDisposal;
         }
 
         public override Type ImplementationType => typeof(TImplementation);
@@ -52,8 +50,6 @@ namespace SimpleInjector.Lifestyles
         public new ScopedLifestyle Lifestyle => (ScopedLifestyle)base.Lifestyle;
 
         internal Func<TImplementation> InstanceCreator => this.instanceCreator;
-
-        internal bool RegisterForDisposal { get; }
 
         public override Expression BuildExpression()
         {

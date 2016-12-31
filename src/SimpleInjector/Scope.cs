@@ -439,14 +439,11 @@ namespace SimpleInjector
 
             this.cachedInstances[registration] = instance;
 
-            if (registration.RegisterForDisposal)
-            {
-                var disposable = instance as IDisposable;
+            var disposable = instance as IDisposable;
 
-                if (disposable != null)
-                {
-                    this.RegisterForDisposalInternal(disposable);
-                }
+            if (disposable != null)
+            {
+                this.RegisterForDisposalInternal(disposable);
             }
 
             return instance;

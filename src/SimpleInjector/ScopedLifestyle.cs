@@ -23,6 +23,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Diagnostics;
     using SimpleInjector.Lifestyles;
 
     /// <summary>
@@ -34,14 +35,11 @@ namespace SimpleInjector
     /// </summary>
     public abstract class ScopedLifestyle : Lifestyle
     {
-        private readonly bool disposeInstances;
-
         /// <summary>Initializes a new instance of the <see cref="ScopedLifestyle"/> class.</summary>
         /// <param name="name">The user friendly name of this lifestyle.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB) 
         /// or an empty string.</exception>
-        protected ScopedLifestyle(string name)
-            : this(name, disposeInstances: true)
+        protected ScopedLifestyle(string name) : base(name)
         {
         }
 
@@ -51,10 +49,11 @@ namespace SimpleInjector
         /// disposed or not.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB) 
         /// or an empty string.</exception>
-        protected ScopedLifestyle(string name, bool disposeInstances)
-            : base(name)
+        [Obsolete(
+            "This constructor overload is deprecated. The disposal of instances can't be suppressed anymore", 
+            error: true)]
+        protected ScopedLifestyle(string name, bool disposeInstances) : base(name)
         {
-            this.disposeInstances = disposeInstances;
         }
 
         /// <summary>Gets the length of the lifestyle.</summary>
@@ -165,7 +164,7 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
             Requires.IsNotNull(container, nameof(container));
 
-            return new ScopedRegistration<TService>(this, container, this.disposeInstances, instanceCreator);
+            return new ScopedRegistration<TService>(this, container, instanceCreator);
         }
 
         /// <summary>
@@ -180,7 +179,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, nameof(container));
 
-            return new ScopedRegistration<TConcrete>(this, container, this.disposeInstances);
+            return new ScopedRegistration<TConcrete>(this, container);
         }
 
 #if !NET40
