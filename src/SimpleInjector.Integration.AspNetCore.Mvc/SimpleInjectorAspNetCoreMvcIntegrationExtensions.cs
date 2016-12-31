@@ -135,8 +135,15 @@ namespace SimpleInjector
         public static void AddSimpleInjectorTagHelperActivation(this IServiceCollection services, Container container,
             Predicate<Type> applicationTypeSelector = null)
         {
-            if (services == null) throw new ArgumentNullException(nameof(services));
-            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            if (container == null)
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
 
             // There are tag helpers OOTB in MVC. Letting the application container try to create them will fail
             // because of the dependencies these tag helpers have. This means that OOTB tag helpers need to remain

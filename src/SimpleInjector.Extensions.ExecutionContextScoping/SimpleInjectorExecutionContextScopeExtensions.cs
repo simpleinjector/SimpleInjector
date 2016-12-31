@@ -62,8 +62,10 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         }
 
         /// <summary>
-        /// GetCurrentExecutionContextScope has been deprecated.
+        /// GetCurrentExecutionContextScope has been deprecated. This method throws an exception.
         /// </summary>
+        /// <param name="container">The container.</param>
+        /// <returns>This method throws an exception.</returns>
         [Obsolete("GetCurrentExecutionContextScope has been deprecated. " +
             "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.",
             error: true)]

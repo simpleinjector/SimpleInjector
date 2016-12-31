@@ -23,8 +23,8 @@
                 ["as2"] = "8573842a-769c-4302-a85d-88d141fab3e5",
             };
 
-        private static string GetAppSetting(string key) => AppSettings.ContainsKey(key) ? AppSettings[key] : null;
-        private static string GetConnectionString(string name) =>
+        public static string GetAppSetting(string key) => AppSettings.ContainsKey(key) ? AppSettings[key] : null;
+        public static string GetConnectionString(string name) =>
             ConnectionStrings.ContainsKey(name) ? ConnectionStrings[name] : null;
 
         [TestMethod]

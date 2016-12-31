@@ -22,6 +22,7 @@
 
 namespace SimpleInjector.Integration.AspNetCore.Mvc
 {
+    using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewComponents;
 
     /// <summary>
@@ -43,7 +44,7 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         }
 
         /// <summary>Creates a view component.</summary>
-        /// <param name="context"></param>
+        /// <param name="context">The <see cref="ViewComponentContext"/> for the executing <see cref="ViewComponent"/>.</param>
         /// <returns>A view component instance.</returns>
         public object Create(ViewComponentContext context) =>
             this.container.GetInstance(context.ViewComponentDescriptor.TypeInfo.AsType());
