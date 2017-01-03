@@ -1164,8 +1164,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            // Uses the RegisterAll<T>(IEnumerable<T>) that registers a dynamic list.
-            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Singleton);
 
             // Register the same decorator twice. 
             container.RegisterDecorator(
