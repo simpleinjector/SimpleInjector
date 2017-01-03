@@ -242,7 +242,7 @@
             var provider2 = container.GetInstance<IUserRepository>();
 
             // Assert
-            Assert.IsFalse(object.ReferenceEquals(provider1, provider2),
+            Assert.AreNotSame(provider1, provider2,
                 "Each wrapped lifestyle should get its own instance, even though the hybrid lifestyle " +
                 "wraps two singleton lifestyles.");
         }
