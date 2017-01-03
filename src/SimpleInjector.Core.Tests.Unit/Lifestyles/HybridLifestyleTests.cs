@@ -254,7 +254,7 @@
             int expectedNumberOfCalls = 2;
             int actualNumberOfCalls = 0;
 
-            var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton);
+            var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Singleton, Lifestyle.Transient);
 
             var container = ContainerFactory.New();
 
