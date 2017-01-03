@@ -676,18 +676,20 @@
             var anotherDecorator2 = container.GetInstance<AnotherServiceWithDependency<IPlugin>>().Dependency;
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(PluginDecorator), decorator1, "Service was expected to be decorated");
-            AssertThat.IsInstanceOfType(typeof(PluginDecorator), anotherDecorator1, "Service was expected to be decorated");
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), decorator1, 
+                "Service was expected to be decorated");
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), anotherDecorator1, 
+                "Service was expected to be decorated");
 
             Assert.AreNotSame(decorator1, anotherDecorator1, @"
-                Each conditional registration should get their own decorator, because such decorator can only
+                Each conditional registration should get its own decorator, because such decorator can only
                 point at one particular dependency.");
 
             Assert.AreSame(decorator1, decorator2, "Decorator was expected to be singleton");
             Assert.AreSame(anotherDecorator1, anotherDecorator2, "Decorator was expected to be singleton");
 
-            AssertThat.IsInstanceOfType(typeof(PluginImpl), ((PluginDecorator)decorator1).Decoratee, "Wrong type");
-            AssertThat.IsInstanceOfType(typeof(PluginImpl2), ((PluginDecorator)anotherDecorator1).Decoratee, "Wrong type");
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), ((PluginDecorator)decorator1).Decoratee);
+            AssertThat.IsInstanceOfType(typeof(PluginImpl2), ((PluginDecorator)anotherDecorator1).Decoratee);
         }
 
         [TestMethod]
