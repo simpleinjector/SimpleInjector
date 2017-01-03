@@ -1185,7 +1185,8 @@
             var decorator2 = decorator1.Decorated;
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(TransactionHandlerDecorator<RealCommand>), decorator2, "Since the decorator is registered twice, it should wrap the decoratee twice.");
+            AssertThat.IsInstanceOfType(typeof(TransactionHandlerDecorator<RealCommand>), decorator2, 
+                "Since the decorator is registered twice, it should wrap the decoratee twice.");
 
             var decoratee = ((TransactionHandlerDecorator<RealCommand>)decorator2).Decorated;
 
