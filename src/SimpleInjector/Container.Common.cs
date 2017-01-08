@@ -61,6 +61,9 @@ namespace SimpleInjector
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public partial class Container : IDisposable
     {
+        internal readonly Dictionary<Type, Dictionary<Type, WeakReference>> LifestyleRegistrationCache =
+            new Dictionary<Type, Dictionary<Type, WeakReference>>();
+
         private static long counter;
 
         private readonly object locker = new object();

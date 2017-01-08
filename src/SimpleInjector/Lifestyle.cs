@@ -23,6 +23,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
@@ -142,6 +143,10 @@ namespace SimpleInjector
             GetMethod(lifestyle => lifestyle.CreateRegistration<object>(null));
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private static readonly MethodInfo OpenCreateRegistrationCoreTConcreteMethod =
+            GetMethod(lifestyle => lifestyle.CreateRegistrationCore<object>(null));
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly MethodInfo OpenCreateRegistrationTServiceFuncMethod =
             GetMethod(lifestyle => lifestyle.CreateRegistration<object>(null, null));
 
@@ -167,6 +172,8 @@ namespace SimpleInjector
         /// </summary>
         /// <value>The <see cref="int"/> representing the length of this lifestyle.</value>
         public abstract int Length { get; }
+
+        internal object Key { get; }
 
         /// <summary>
         /// The hybrid lifestyle allows mixing two lifestyles in a single registration. The hybrid will use
@@ -555,12 +562,14 @@ namespace SimpleInjector
 
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TConcrete"/> with the caching as specified by this lifestyle.
+        /// specified <typeparamref name="TConcrete"/> with the caching as specified by this lifestyle,
+        /// or returns an already created <see cref="Registration"/> instance for this container + lifestyle
+        /// + type combination.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        /// <returns>A new or cached <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
         /// reference (Nothing in VB).</exception>
         public Registration CreateRegistration<TConcrete>(Container container)
@@ -568,7 +577,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, nameof(container));
 
-            return this.CreateRegistrationCore<TConcrete>(container);
+            return this.CreateRegistrationInternal<TConcrete>(container, preventTornLifestyles: true);
         }
 
         /// <summary>
@@ -620,7 +629,9 @@ namespace SimpleInjector
 
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <paramref name="concreteType"/> with the caching as specified by this lifestyle.
+        /// specified <paramref name="concreteType"/> with the caching as specified by this lifestyle,
+        /// or returns an already created <see cref="Registration"/> instance for this container + lifestyle
+        /// + type combination.
         /// This method might fail when run in a partial trust sandbox when <paramref name="concreteType"/>
         /// is an internal type.
         /// </summary>
@@ -639,18 +650,7 @@ namespace SimpleInjector
 
             Requires.IsNotOpenGenericType(concreteType, nameof(concreteType));
 
-            var closedCreateRegistrationMethod = OpenCreateRegistrationTConcreteMethod
-                .MakeGenericMethod(concreteType);
-
-            try
-            {
-                return (Registration)closedCreateRegistrationMethod.Invoke(this, new object[] { container });
-            }
-            catch (MemberAccessException ex)
-            {
-                throw BuildUnableToResolveTypeDueToSecurityConfigException(concreteType, ex,
-                    nameof(concreteType));
-            }
+            return this.CreateRegistrationInternal(concreteType, container, preventTornLifestyles: true);
         }
 
         /// <summary>
@@ -717,10 +717,17 @@ namespace SimpleInjector
 
         internal virtual int DependencyLength(Container container) => this.Length;
 
-        internal Registration CreateRegistration(Type concreteType, Container container, 
+        internal Registration CreateRegistrationInternal<TConcrete>(Container container, bool preventTornLifestyles)
+            where TConcrete : class =>
+            preventTornLifestyles
+                ? this.CreateRegistrationFromCache<TConcrete>(container)
+                : this.CreateRegistrationCore<TConcrete>(container);
+
+        internal Registration CreateDecoratorRegistration(Type concreteType, Container container, 
             params OverriddenParameter[] overriddenParameters)
         {
-            var registration = this.CreateRegistration(concreteType, container);
+            Registration registration = 
+                this.CreateRegistrationInternal(concreteType, container, preventTornLifestyles: false);
 
             registration.SetParameterOverrides(overriddenParameters);
 
@@ -764,6 +771,70 @@ namespace SimpleInjector
         protected abstract Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
             where TService : class;
+
+        private Registration CreateRegistrationInternal(Type concreteType, Container container, 
+            bool preventTornLifestyles)
+        {
+            var closedCreateRegistrationMethod = preventTornLifestyles
+                ? OpenCreateRegistrationTConcreteMethod.MakeGenericMethod(concreteType)
+                : OpenCreateRegistrationCoreTConcreteMethod.MakeGenericMethod(concreteType);
+
+            try
+            {
+                return (Registration)closedCreateRegistrationMethod.Invoke(this, new object[] { container });
+            }
+            catch (MemberAccessException ex)
+            {
+                throw BuildUnableToResolveTypeDueToSecurityConfigException(concreteType, ex,
+                    nameof(concreteType));
+            }
+        }
+
+        private Registration CreateRegistrationFromCache<TConcrete>(Container container) where TConcrete : class
+        {
+            lock (container.LifestyleRegistrationCache)
+            {
+                WeakReference weakRegistration =
+                    this.GetLifestyleRegistrationEntryFromCache(typeof(TConcrete), container);
+
+                var registration = (Registration)weakRegistration.Target;
+
+                if (registration == null)
+                {
+                    registration = this.CreateRegistrationCore<TConcrete>(container);
+                    weakRegistration.Target = registration;
+                }
+
+                return registration;
+            }
+        }
+
+        private WeakReference GetLifestyleRegistrationEntryFromCache(Type concreteType, Container container)
+        {
+            var lifestyleCache = container.LifestyleRegistrationCache;
+
+            Dictionary<Type, WeakReference> registrationCache;
+
+            // We cache Registration instances by the Type of their Lifestyle.
+            var lifestyleCacheKey = this.GetType();
+
+            if (!lifestyleCache.TryGetValue(lifestyleCacheKey, out registrationCache))
+            {
+                registrationCache = new Dictionary<Type, WeakReference>(100);
+                lifestyleCache[lifestyleCacheKey] = registrationCache;
+            }
+
+            // The created Registration must be wrapped in a WeakReference, because these instances can
+            // go out of scope, and holding a reference might cause a memory leak.
+            WeakReference weakRegistration;
+
+            if (!registrationCache.TryGetValue(concreteType, out weakRegistration))
+            {
+                registrationCache[concreteType] = weakRegistration = new WeakReference(null);
+            }
+
+            return weakRegistration;
+        }
 
         private static object ConvertDelegateToTypeSafeDelegate(Type serviceType, Func<object> instanceCreator)
         {

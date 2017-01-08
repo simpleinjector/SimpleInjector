@@ -533,62 +533,6 @@
         }
 
         [TestMethod]
-        public void LifetimeScope_TwoScopedRegistationsForTheSameServiceType_CreatesTwoInstances()
-        {
-            // Arrange
-            var lifestyle = new ThreadScopedLifestyle();
-
-            var container = new Container();
-
-            var reg1 = lifestyle.CreateRegistration<DisposableCommand>(container);
-            var reg2 = lifestyle.CreateRegistration<DisposableCommand>(container);
-
-            container.AppendToCollection(typeof(ICommand), reg1);
-            container.AppendToCollection(typeof(ICommand), reg2);
-
-            using (ThreadScopedLifestyle.BeginScope(container))
-            {
-                // Act
-                var commands = container.GetAllInstances<ICommand>().Cast<DisposableCommand>().ToArray();
-
-                // Assert
-                Assert.AreNotSame(commands[0], commands[1], "Two instances were expected.");
-            }
-        }
-
-        [TestMethod]
-        public void LifetimeScopeDispose_TwoScopedRegistationsForTheSameServiceType_DisposesBothInstances()
-        {
-            // Arrange
-            var disposedInstances = new HashSet<object>();
-
-            var lifestyle = new ThreadScopedLifestyle();
-
-            var container = new Container();
-
-            var reg1 = lifestyle.CreateRegistration<DisposableCommand>(container);
-            var reg2 = lifestyle.CreateRegistration<DisposableCommand>(container);
-
-            container.AppendToCollection(typeof(ICommand), reg1);
-            container.AppendToCollection(typeof(ICommand), reg2);
-
-            using (ThreadScopedLifestyle.BeginScope(container))
-            {
-                var commands = container.GetAllInstances<ICommand>().Cast<DisposableCommand>().ToArray();
-
-                Assert.AreNotSame(commands[0], commands[1], "Test setup failed.");
-
-                commands[0].Disposing += sender => disposedInstances.Add(sender);
-                commands[1].Disposing += sender => disposedInstances.Add(sender);
-
-                // Act
-            }
-
-            // Assert
-            Assert.AreEqual(2, disposedInstances.Count, "Two instances were expected to be disposed.");
-        }
-
-        [TestMethod]
         public void Verify_WithWhenScopeEndsRegistration_Succeeds()
         {
             // Arrange

@@ -27,13 +27,14 @@ Version 4.0.0 (v4.0 RTM)
 		 CreateRegistrationCore<TImplementation>(Container). (fixes #345)
 		-[Core] IDependencyInjectionBehavior.BuildExpression method replace with
 		 GetInstanceProducerFor(InjectionConsumerInfo) that returns an InstanceProducer. (fixes #346)
-		-[Core] ExpressionBuilding.RegisteredServiceType removed. (fixes #348)
+		-[Core] ExpressionBuildingEventArgs.RegisteredServiceType removed. (fixes #348)
 		-[Core] InjectionConsumerInfo.ServiceType removed. (fixes #348)
 		-[Core] IPropertySelectionBehavior.SelectProperty(Type, PropertyInfo) replaced with
 		 SelectProperty(PropertyInfo) method. (fixes #348)
 		-[Core] Container.RegisterInitializer(Action<InstanceInitializationData>, Predicate<InitializationContext>)
 		 replaced with RegisterInitializer(Action<InstanceInitializationData>, Predicate<InitializerContext>)
 		 method. (fixes #348)
+		-[Core] Registration instances will now get cached to prevent torn lifestyles. (fixes #219)
 
 	Improvements/Changes:
 		-[Core] Removed all methods that were marked [obsolete(true)] since v3.0. (fixes #305)

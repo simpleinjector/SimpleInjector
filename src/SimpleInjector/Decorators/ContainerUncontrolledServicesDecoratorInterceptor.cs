@@ -157,7 +157,7 @@ namespace SimpleInjector.Decorators
             var overriddenParameters = this.CreateOverriddenParameters(decorateeExpression);
 
             // Create the decorator as transient. Caching is applied later on.
-            return Lifestyle.Transient.CreateRegistration(
+            return Lifestyle.Transient.CreateDecoratorRegistration(
                 this.decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
         }
 
