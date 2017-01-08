@@ -214,7 +214,7 @@
         }
 
         [TestMethod]
-        public void GetInstance_TwoSingletonLifestyles_EachLifestyleGetsItsOwnInstance()
+        public void GetInstance_TwoSingletonLifestyles_ResultsInOneInstance()
         {
             // Arrange
             int callCount = 0;
@@ -242,9 +242,10 @@
             var provider2 = container.GetInstance<IUserRepository>();
 
             // Assert
-            Assert.IsFalse(object.ReferenceEquals(provider1, provider2),
-                "Each wrapped lifestyle should get its own instance, even though the hybrid lifestyle " +
-                "wraps two singleton lifestyles.");
+            Assert.AreSame(provider1, provider2,
+                "Each wrapped lifestyle should get its own instance, except when both sides point at the " +
+                "same lifestyle, because the same Registration instance should be used due to internal " +
+                "lifestyle caching.");
         }
 
         [TestMethod]
@@ -254,7 +255,7 @@
             int expectedNumberOfCalls = 2;
             int actualNumberOfCalls = 0;
 
-            var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton);
+            var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Singleton, Lifestyle.Transient);
 
             var container = ContainerFactory.New();
 

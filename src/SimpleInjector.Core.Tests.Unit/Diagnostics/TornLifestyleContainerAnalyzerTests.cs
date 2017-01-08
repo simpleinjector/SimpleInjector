@@ -8,11 +8,32 @@
     using SimpleInjector.Diagnostics.Debugger;
     using SimpleInjector.Tests.Unit;
 
+    // Note: This test uses the concept of 'uncached' and normal registrations. The normal behavior
+    // is to prevent torn lifestyles by caching registrations. Torn lifestyle warnings will only be reported,
+    // when caching is disabled.
     [TestClass]
     public class TornLifestyleContainerAnalyzerTests
     {
         [TestMethod]
-        public void Analyze_TwoSingletonRegistrationsForTheSameImplementation_ReturnsExpectedWarning()
+        public void Analyze_TwoSingletonRegistrationsForTheSameImplementation_ReturnsNoWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IFoo, FooBar>(Lifestyle.Singleton);
+            container.Register<IBar, FooBar>(Lifestyle.Singleton);
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+
+            // Assert
+            Assert.AreEqual(0, results.Length, Actual(results));
+        }
+
+        [TestMethod]
+        public void Analyze_Uncached_TwoSingletonRegistrationsForTheSameImplementation_ReturnsExpectedWarning()
         {
             // Arrange
             string expectedMessage1 =
@@ -25,8 +46,10 @@
 
             var container = new Container();
 
-            container.Register<IFoo, FooBar>(Lifestyle.Singleton);
-            container.Register<IBar, FooBar>(Lifestyle.Singleton);
+            container.AddRegistration(typeof(IFoo),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+            container.AddRegistration(typeof(IBar),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -40,13 +63,15 @@
         }
 
         [TestMethod]
-        public void Analyze_TwoSingletonRegistrationsForTheSameImplementation_ReturnsSeverityWarning()
+        public void Analyze_Uncached_TwoSingletonRegistrationsForTheSameImplementation_ReturnsSeverityWarning()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<IFoo, FooBar>(Lifestyle.Singleton);
-            container.Register<IBar, FooBar>(Lifestyle.Singleton);
+            container.AddRegistration(typeof(IFoo),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+            container.AddRegistration(typeof(IBar),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -64,6 +89,7 @@
             var container = new Container();
 
             var fooBar = new FooBar();
+
             container.RegisterSingleton<IFoo>(fooBar);
             container.RegisterSingleton<IBar>(fooBar);
 
@@ -77,7 +103,7 @@
         }
 
         [TestMethod]
-        public void Analyze_FourSingletonRegistrationsForTheSameImplementation_ReturnsExpectedWarning()
+        public void Analyze_Uncached_FourSingletonRegistrationsForTheSameImplementation_ReturnsExpectedWarning()
         {
             // Arrange
             string expectedMessage1 =
@@ -98,10 +124,14 @@
 
             var container = new Container();
 
-            container.Register<IFoo, FooBar>(Lifestyle.Singleton);
-            container.Register<IFooExt, FooBar>(Lifestyle.Singleton);
-            container.Register<IBar, FooBar>(Lifestyle.Singleton);
-            container.Register<IBarExt, FooBar>(Lifestyle.Singleton);
+            container.AddRegistration(typeof(IFoo),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+            container.AddRegistration(typeof(IFooExt),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+            container.AddRegistration(typeof(IBar),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+            container.AddRegistration(typeof(IBarExt),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -118,13 +148,9 @@
         }
 
         [TestMethod]
-        public void Analyze_TwoRegistrationsWithSameLifestyleForTheSameImplementation_ReturnsWarning()
+        public void Analyze_TwoRegistrationsWithSameLifestyleForTheSameImplementation_ReturnsNoWarning()
         {
             // Arrange
-            string expectedMessage =
-                "The registration for IFoo maps to the same implementation and lifestyle as the " +
-                "registration for IBar does. They both map to FooBar (Thread Scoped).";
-
             var container = new Container();
 
             container.Register<IFoo, FooBar>(new ThreadScopedLifestyle());
@@ -136,19 +162,19 @@
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
 
             // Assert
-            Assert.AreEqual(2, results.Length, Actual(results));
-
-            Assert_ContainsDescription(results, expectedMessage);
+            Assert.AreEqual(0, results.Length, Actual(results));
         }
-
+        
         [TestMethod]
-        public void Analyze_OneViolationWithSuppressDiagnosticWarningOnOneRegistration_OneWarning()
+        public void Analyze_Uncached_OneViolationWithSuppressDiagnosticWarningOnOneRegistration_OneWarning()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<IFoo, FooBar>(new ThreadScopedLifestyle());
-            container.Register<IBar, FooBar>(new ThreadScopedLifestyle());
+            container.AddRegistration(typeof(IFoo),
+                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+            container.AddRegistration(typeof(IBar),
+                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -164,13 +190,15 @@
         }
 
         [TestMethod]
-        public void Analyze_OneViolationWithSuppressDiagnosticWarningOnTheOtherRegistration_OneWarning()
+        public void Analyze_Uncached_OneViolationWithSuppressDiagnosticWarningOnTheOtherRegistration_OneWarning()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<IFoo, FooBar>(new ThreadScopedLifestyle());
-            container.Register<IBar, FooBar>(new ThreadScopedLifestyle());
+            container.AddRegistration(typeof(IFoo),
+                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+            container.AddRegistration(typeof(IBar),
+                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -186,13 +214,15 @@
         }
 
         [TestMethod]
-        public void Analyze_OneViolationWithSuppressDiagnosticWarningOnBothRegistrations_NoWarning()
+        public void Analyze_Uncached_OneViolationWithSuppressDiagnosticWarningOnBothRegistrations_NoWarning()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<IFoo, FooBar>(new ThreadScopedLifestyle());
-            container.Register<IBar, FooBar>(new ThreadScopedLifestyle());
+            container.AddRegistration(typeof(IFoo),
+                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+            container.AddRegistration(typeof(IBar),
+                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -210,7 +240,7 @@
         }
 
         [TestMethod]
-        public void Analyze_TwoDistinctRegistrationsForSameLifestyle_ReturnsWarning()
+        public void Analyze_TwoDistinctRegistrationsForSameLifestyle_ReturnsNoWarning()
         {
             // Arrange
             var container = new Container();
@@ -227,17 +257,19 @@
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
 
             // Assert
-            Assert.AreEqual(2, results.Length, Actual(results));
+            Assert.AreEqual(0, results.Length, Actual(results));
         }
 
         [TestMethod]
-        public void Analyze_TwoSingletonRegistrationsForTheSameImplementationWithDecoratorApplied_ReturnsWarning()
+        public void Analyze_Uncached_TwoSingletonRegistrationsForTheSameImplementationWithDecoratorApplied_ReturnsWarning()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<IFoo, FooBar>(Lifestyle.Singleton);
-            container.Register<IBar, FooBar>(Lifestyle.Singleton);
+            container.AddRegistration(typeof(IFoo),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+            container.AddRegistration(typeof(IBar),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
 
             container.RegisterDecorator(typeof(IFoo), typeof(FooDecorator), Lifestyle.Singleton);
 
@@ -251,7 +283,7 @@
         }
 
         [TestMethod]
-        public void Analyze_TwoSingletonRegistrationsForTheSameImplementationWithDecoratorsApplied_ReturnsWarning()
+        public void Analyze_TwoSingletonRegistrationsForTheSameImplementationWithDecoratorsApplied_ReturnsNoWarning()
         {
             // Arrange
             var container = new Container();
@@ -268,11 +300,34 @@
             var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
 
             // Assert
+            Assert.AreEqual(0, results.Length, Actual(results));
+        }
+
+        [TestMethod]
+        public void Analyze_Uncached_TwoSingletonRegistrationsForTheSameImplementationWithDecoratorsApplied_ReturnsWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.AddRegistration(typeof(IFoo),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+            container.AddRegistration(typeof(IBar),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+
+            container.RegisterDecorator(typeof(IFoo), typeof(FooDecorator));
+            container.RegisterDecorator(typeof(IBar), typeof(BarDecorator));
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+
+            // Assert
             Assert.AreEqual(2, results.Length, Actual(results));
         }
 
         [TestMethod]
-        public void Analyze_TwoSingletonRegistrationsMappedOnFourServiceTypes_ReturnsExpectedWarnings()
+        public void Analyze_Uncached_TwoSingletonRegistrationsMappedOnFourServiceTypes_ReturnsExpectedWarnings()
         {
             // Arrange
             string expectedMessage1 =
@@ -285,8 +340,8 @@
 
             var container = new Container();
 
-            var fooReg = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
-            var barReg = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
+            var fooReg = Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false);
+            var barReg = Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false);
 
             container.AddRegistration(typeof(IFoo), fooReg);
             container.AddRegistration(typeof(IFooExt), fooReg);
@@ -324,6 +379,28 @@
         }
 
         [TestMethod]
+        public void Analyze_Uncached_TwoTransientRegistrationsForTheSameImplementation_DoesNotReturnsAWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            // This should not result in a warning, because Transients will always return a new instance,
+            // so even though there are multiple registrations, the behavior will be identical.
+            container.AddRegistration(typeof(IFoo),
+                Lifestyle.Transient.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+            container.AddRegistration(typeof(IBar),
+                Lifestyle.Transient.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+
+            container.Verify();
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+
+            // Assert
+            Assert.AreEqual(0, results.Length, Actual(results));
+        }
+
+        [TestMethod]
         public void Analyze_TwoRegistrationsForTheSameImplementationButWithDifferentLifestyles_DoesNotReturnsAWarning()
         {
             // Arrange
@@ -331,6 +408,27 @@
 
             container.Register<IFoo, FooBar>(Lifestyle.Singleton);
             container.Register<IBar, FooBar>(new ThreadScopedLifestyle());
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+
+            // Assert
+            Assert.AreEqual(0, results.Length, Actual(results));
+        }
+
+        [TestMethod]
+        public void Analyze_Uncached_TwoRegistrationsForTheSameImplementationButWithDifferentLifestyles_DoesNotReturnsAWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            // We expect to see ambiguous lifestyle warning though, but that's what we test here.
+            container.AddRegistration(typeof(IFoo),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+            container.AddRegistration(typeof(IBar),
+                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -385,13 +483,15 @@
         }
 
         [TestMethod]
-        public void Analyze_ConfigurationWithViolation_ReturnsTheExpectedDebuggerViewItems()
+        public void Analyze_Uncached_ConfigurationWithViolation_ReturnsTheExpectedDebuggerViewItems()
         {
             // Arrange
             var container = new Container();
 
-            container.Register<IFoo, FooBar>(Lifestyle.Singleton);
-            container.Register<IBar, FooBar>(Lifestyle.Singleton);
+            container.AddRegistration(typeof(IFoo),
+                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+            container.AddRegistration(typeof(IBar),
+                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -450,13 +550,33 @@
         }
 
         [TestMethod]
-        public void Analyze_TwoSingletonRegistrationsForTheSameConcreteType_ReturnsTheExpectedWarning()
+        public void Analyze_TwoSingletonRegistrationsForTheSameConcreteType_ReturnsNoWarning()
         {
             // Arrange
             var container = new Container();
 
             var reg1 = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
             var reg2 = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
+
+            container.RegisterCollection(typeof(IFoo), new[] { reg1, reg2 });
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<TornLifestyleDiagnosticResult>().ToArray();
+
+            // Assert
+            Assert.AreEqual(0, results.Length, Actual(results));
+        }
+
+        [TestMethod]
+        public void Analyze_Uncached_TwoSingletonRegistrationsForTheSameConcreteType_ReturnsTheExpectedWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            var reg1 = Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false);
+            var reg2 = Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false);
 
             container.RegisterCollection(typeof(IFoo), new[] { reg1, reg2 });
 
@@ -491,7 +611,7 @@
 
         // regression: v3.0-beta1 had a bug where this code resulted in a torn lifestyle warning.
         [TestMethod]
-        public void Verify_TwoUniqueComponentsForTheSameAbstractionWithADecorator_DoesNotResultInDiagnosticWarnings()
+        public void Verify_Uncached_TwoUniqueComponentsForTheSameAbstractionWithADecorator_DoesNotResultInDiagnosticWarnings()
         {
             // Arrange
             var container = new Container();
@@ -559,7 +679,7 @@
             Assert.IsTrue(matchingResult.Any(), Actual(results));
         }
 
-        private static string Actual(IEnumerable<DiagnosticResult> results) => 
+        private static string Actual(IEnumerable<DiagnosticResult> results) =>
             "Actual: " + string.Join(" - ", results.Select(r => r.Description));
     }
 }

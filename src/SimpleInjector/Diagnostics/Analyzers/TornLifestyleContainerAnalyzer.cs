@@ -73,7 +73,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             where !producer.Registration.WrapsInstanceCreationDelegate
             group producer by producer.Registration into registrationGroup
             let registration = registrationGroup.Key
-            let key = new { registration.ImplementationType, Lifestyle = registration.Lifestyle.GetType() }
+            let key = new { registration.ImplementationType, Lifestyle = registration.Lifestyle.IdentificationKey }
             group registrationGroup by key into registrationLifestyleGroup
             let hasConflict = registrationLifestyleGroup.Count() > 1
             where hasConflict

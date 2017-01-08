@@ -26,25 +26,6 @@
         }
 
         [TestMethod]
-        public void GetInstance_OnTwoPerThreadInstanceProducersForTheSameServiceType_EachInstanceProducerShouldGetItsOwnCache()
-        {
-            // Arrange
-            var container = new Container();
-
-            Lifestyle threadLifestyle = new ThreadLifestyle();
-
-            var producer1 = threadLifestyle.CreateProducer<ICommand, ConcreteCommand>(container);
-            var producer2 = threadLifestyle.CreateProducer<ICommand, ConcreteCommand>(container);
-
-            // Act
-            ICommand instance1 = producer1.GetInstance();
-            ICommand instance2 = producer2.GetInstance();
-
-            // Assert
-            Assert.AreNotSame(instance1, instance2, "Each instance producer should get its own cache.");
-        }
-
-        [TestMethod]
         public void RegisterPerThread_GetInstanceCalledOnMultipleThreads_ReturnsMultipleInstances()
         {
             // Arrange
