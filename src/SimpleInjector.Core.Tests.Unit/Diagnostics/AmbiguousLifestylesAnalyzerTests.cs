@@ -294,6 +294,33 @@
             GC.KeepAlive(b);
         }
         
+        [TestMethod]
+        public void Verify_TwoRegistrationsForDifferentCustomLifestyleButAndSameImplementation_CausesAmbiguousLifestyleWarning()
+        {
+            // Arrange
+            string expectedMessage = @"
+                The registration for IFoo (Custom1) maps to the same implementation (FooBar)
+                as the registration for IBar (Custom2) does"
+                .TrimInside();
+
+            var lifestyle1 = Lifestyle.CreateCustom("Custom1", creator => creator);
+            var lifestyle2 = Lifestyle.CreateCustom("Custom2", creator => creator);
+
+            var container = new Container();
+
+            container.Register<IFoo, FooBar>(lifestyle1);
+            container.Register<IBar, FooBar>(lifestyle2);
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = Analyzer.Analyze(container);
+
+            // Assert
+            Assert_ContainsDescription(results, expectedMessage);
+            Assert_AllOfType<AmbiguousLifestylesDiagnosticResult>(results);
+        }
+
         private static void Assert_ContainsDescription(IEnumerable<DiagnosticResult> results,
             string expectedDescription)
         {

@@ -159,6 +159,8 @@ namespace SimpleInjector
             Requires.IsNotNullOrEmpty(name, nameof(name));
 
             this.Name = name;
+
+            this.IdentificationKey = new { Type = this.GetType(), Name = name };
         }
 
         /// <summary>Gets the user friendly name of this lifestyle.</summary>
@@ -173,7 +175,7 @@ namespace SimpleInjector
         /// <value>The <see cref="int"/> representing the length of this lifestyle.</value>
         public abstract int Length { get; }
 
-        internal object Key { get; }
+        internal object IdentificationKey { get; }
 
         /// <summary>
         /// The hybrid lifestyle allows mixing two lifestyles in a single registration. The hybrid will use
@@ -815,13 +817,10 @@ namespace SimpleInjector
 
             Dictionary<Type, WeakReference> registrationCache;
 
-            // We cache Registration instances by the Type of their Lifestyle.
-            var lifestyleCacheKey = this.GetType();
-
-            if (!lifestyleCache.TryGetValue(lifestyleCacheKey, out registrationCache))
+            if (!lifestyleCache.TryGetValue(this.IdentificationKey, out registrationCache))
             {
                 registrationCache = new Dictionary<Type, WeakReference>(100);
-                lifestyleCache[lifestyleCacheKey] = registrationCache;
+                lifestyleCache[this.IdentificationKey] = registrationCache;
             }
 
             // The created Registration must be wrapped in a WeakReference, because these instances can
