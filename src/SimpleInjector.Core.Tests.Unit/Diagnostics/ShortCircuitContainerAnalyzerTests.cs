@@ -120,7 +120,7 @@
         }
 
         [TestMethod]
-        public void Analyze_ShortCircuitedRegistrationWithMultipleTypesInOneGroup_Behavior()
+        public void Analyze_ShortCircuitedRegistrationWithMultipleTypesInOneGroup_ReportsExpectedWarning()
         {
             // Arrange
             var container = new Container();
@@ -144,6 +144,45 @@
             Assert.AreEqual("2 short circuited components.", results.Description);
             AssertThat.IsInstanceOfType(typeof(DebuggerViewItem[]), results.Value);
             Assert.AreEqual(2, ((DebuggerViewItem[])results.Value).Length);
+        }
+
+        // Checks #248. 
+        [TestMethod]
+        public void Analyze_ShortCiruitedRegistrationWithSameLifestyle_ReportsExpectedWarning()
+        {
+            // Arrange
+            var container = new Container();
+            
+            container.Register<ILogger, NullLogger>();
+            container.Register<ServiceDependingOn<NullLogger>>();
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = GetShortCircuitedResults(DebuggerGeneralWarningsContainerAnalyzer.Analyze(container)).Single();
+
+            // Assert
+            Assert.AreEqual("ServiceDependingOn<NullLogger>", results.Name);
+        }
+
+        // Regression #248.
+        [TestMethod]
+        public void Analyze_ShortCiruitedRegistrationWithDecorator_ReportsExpectedWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterDecorator<ILogger, LoggerDecorator>();
+            container.Register<ILogger, NullLogger>();
+            container.Register<ServiceDependingOn<NullLogger>>();
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = GetShortCircuitedResults(DebuggerGeneralWarningsContainerAnalyzer.Analyze(container)).Single();
+
+            // Assert
+            Assert.AreEqual("ServiceDependingOn<NullLogger>", results.Name);
         }
 
         private static DebuggerViewItem[] GetShortCircuitedResults(DebuggerViewItem item)

@@ -35,6 +35,7 @@ Version 4.0.0 (v4.0 RTM)
 		 replaced with RegisterInitializer(Action<InstanceInitializationData>, Predicate<InitializerContext>)
 		 method. (fixes #348)
 		-[Core] Registration instances will now get cached to prevent torn lifestyles. (fixes #219)
+		-[Core] Short Circuited Dependency warning will now go off as well for transient registrations (fixes #248)
 
 	Improvements/Changes:
 		-[Core] Removed all methods that were marked [obsolete(true)] since v3.0. (fixes #305)
