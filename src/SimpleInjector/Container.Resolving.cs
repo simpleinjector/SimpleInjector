@@ -59,6 +59,7 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public TService GetInstance<TService>() where TService : class
         {
+            this.ThrowWhenDisposed();
             this.LockContainer();
 
             InstanceProducer instanceProducer;

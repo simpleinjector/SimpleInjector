@@ -92,6 +92,7 @@ namespace SimpleInjector
         private bool locked;
         private string stackTraceThatLockedTheContainer;
         private bool disposed;
+        private string stackTraceThatDisposedTheContainer;
 
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
         private EventHandler<ExpressionBuildingEventArgs> expressionBuilding;
@@ -269,7 +270,13 @@ namespace SimpleInjector
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
-            this.disposed = true;
+
+            if (!this.disposed)
+            {
+                this.disposed = true;
+
+                GetStackTrace(ref this.stackTraceThatDisposedTheContainer);
+            }
         }
 
         internal InstanceProducer[] GetRootRegistrations(bool includeInvalidContainerRegisteredTypes)
@@ -413,6 +420,7 @@ namespace SimpleInjector
         {
             if (this.disposed)
             {
+                // Performance optimization: Throwing moved to another method to allow this method to be in-lined.
                 this.ThrowContainerDisposedException();
             }
         }
@@ -510,7 +518,10 @@ namespace SimpleInjector
 
         private void ThrowContainerDisposedException()
         {
-            throw new ObjectDisposedException(this.GetType().FullName);
+            throw new ObjectDisposedException(
+                objectName: null,
+                message: StringResources.ContainerCanNotBeUsedAfterDisposal(this.GetType(),
+                    this.stackTraceThatDisposedTheContainer));
         }
 
         private static object ThrowWhenResolveInterceptorReturnsNull(object instance)

@@ -61,6 +61,23 @@ namespace SimpleInjector
                 Environment.NewLine + Environment.NewLine + stackTrace;
         }
 
+        internal static string ContainerCanNotBeUsedAfterDisposal(Type type, string stackTrace)
+        {
+            string message = string.Format(CultureInfo.InvariantCulture,
+                "Cannot access a disposed object.{0}Object name: '{1}'.",
+                Environment.NewLine,
+                type.FullName);
+
+            if (stackTrace == null)
+            {
+                return message;
+            }
+
+            return message + Environment.NewLine +
+                "The following stack trace describes the location where the container was disposed:" +
+                Environment.NewLine + Environment.NewLine + stackTrace;
+        }
+
         internal static string DelegateForTypeReturnedNull(Type serviceType) =>
             string.Format(CultureInfo.InvariantCulture,
                 "The registered delegate for type {0} returned null.", serviceType.TypeName());

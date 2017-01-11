@@ -250,6 +250,57 @@
             Assert.IsTrue(instance.Disposed);
         }
 
+        [TestMethod]
+        public void GetInstanceOfType_OnDisposedContainer_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Dispose();
+
+            // Act
+            Action action = () => container.GetInstance<NullLogger>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ObjectDisposedException>(
+                "Cannot access a disposed object.",
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_OnDisposedContainer_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Dispose();
+
+            // Act
+            Action action = () => container.GetInstance(typeof(NullLogger));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ObjectDisposedException>(
+                "Cannot access a disposed object.",
+                action);
+        }
+
+        [TestMethod]
+        public void Register_OnDisposedContainer_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Dispose();
+
+            // Act
+            Action action = () => container.Register<NullLogger>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ObjectDisposedException>(
+                "Cannot access a disposed object.",
+                action);
+        }
+
         public class DisposableService : IDisposable, IService
         {
             public bool Disposed { get; private set; }

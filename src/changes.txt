@@ -48,6 +48,7 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] TypesExtensions class added with three useful extension methods on Type: ToFriendlyName,
 		 IsClosedTypeOf, GetClosedTypeOf and GetClosedTypesOf methods. (fixes #358)
 		-[Core] Container.AddRegistration<TService>(Registration) method added. (fixes #367)
+		-[Core] Stack trace added to exception that gets thrown when container got disposed. (fixes #368)
 
 	Project Changes:
 		-Projects for SimpleInjector.dll merged into one single project.
