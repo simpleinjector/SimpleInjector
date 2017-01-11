@@ -47,6 +47,7 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] Prevented registered predicates (using RegisterConditional) from always being called twice. (fixes #346)
 		-[Core] TypesExtensions class added with three useful extension methods on Type: ToFriendlyName,
 		 IsClosedTypeOf, GetClosedTypeOf and GetClosedTypesOf methods. (fixes #358)
+		-[Core] Container.AddRegistration<TService>(Registration) method added. (fixes #367)
 
 	Project Changes:
 		-Projects for SimpleInjector.dll merged into one single project.

@@ -1005,6 +1005,32 @@ namespace SimpleInjector
 
             this.instanceInitializers.Add(ContextualInstanceInitializer.Create(instanceInitializer, predicate));
         }
+        
+        /// <summary>
+        /// Adds the <paramref name="registration"/> for the supplied <paramtyperef name="TService"/>. This
+        /// method can be used to apply the same <see cref="Registration"/> to multiple different service
+        /// types.
+        /// </summary>
+        /// <typeparam name="TService">The base type or interface to register.</typeparam>
+        /// <param name="registration">The registration that should be stored for the given 
+        /// <paramtyperef name="TService"/>.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramtyperef name="TService"/> is ambiguous, 
+        /// when it is not assignable from the 
+        /// <paramref name="registration"/>'s <see cref="Registration.ImplementationType">ImplementationType</see>
+        /// or when the supplied <paramref name="registration"/> is created for a different 
+        /// <see cref="Container"/> instance.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <paramtyperef name="TService"/> has already been registered.
+        /// </exception>
+        public void AddRegistration<TService>(Registration registration) where TService : class
+        {
+            Requires.IsNotNull(registration, nameof(registration));
+
+            this.AddRegistrationInternal(typeof(TService), registration);
+        }
 
         /// <summary>
         /// Adds the <paramref name="registration"/> for the supplied <paramref name="serviceType"/>. This
@@ -1112,14 +1138,9 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(registration, nameof(registration));
-            Requires.IsRegistrationForThisContainer(this, registration, nameof(registration));
             Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
 
-            this.ThrowWhenContainerIsLockedOrDisposed();
-
-            var producer = new InstanceProducer(serviceType, registration);
-
-            this.AddInstanceProducer(producer);
+            this.AddRegistrationInternal(serviceType, registration);
         }
 
         internal void RegisterExternalProducer(InstanceProducer producer)
@@ -1158,7 +1179,7 @@ namespace SimpleInjector
 
             var registration = lifestyle.CreateRegistration<TImplementation>(this);
 
-            this.AddRegistration(typeof(TService), registration);
+            this.AddRegistrationInternal(typeof(TService), registration);
         }
 
         private void Register(Type serviceType, Type implementationType, Lifestyle lifestyle,
@@ -1187,8 +1208,17 @@ namespace SimpleInjector
 
                 var registration = lifestyle.CreateRegistration(implementationType, this);
 
-                this.AddRegistration(serviceType, registration);
+                this.AddRegistrationInternal(serviceType, registration);
             }
+        }
+
+        private void AddRegistrationInternal(Type serviceType, Registration registration)
+        {
+            Requires.IsRegistrationForThisContainer(this, registration, nameof(registration));
+
+            this.ThrowWhenContainerIsLockedOrDisposed();
+
+            this.AddInstanceProducer(new InstanceProducer(serviceType, registration));
         }
 
         private void ThrowArgumentExceptionWhenTypeIsNotConstructable(
