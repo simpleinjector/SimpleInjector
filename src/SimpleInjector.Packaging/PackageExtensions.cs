@@ -36,6 +36,7 @@ namespace SimpleInjector
     /// </summary>
     public static class PackageExtensions
     {
+        // For more information about why this method was obsoleted, see: #372.
 #if NET40
         /// <summary>
         /// Loads all <see cref="IPackage"/> implementations from assemblies that are currently loaded in the 
@@ -48,6 +49,10 @@ namespace SimpleInjector
         /// <param name="container">The container to which the packages will be applied to.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null
         /// reference.</exception>
+        [Obsolete("RegisterPackages has been deprecated. " +
+            "Please use RegisterPackages(Container, IEnumerable<Assembly>) instead.",
+            error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void RegisterPackages(this Container container)
         {
             var assemblies =
