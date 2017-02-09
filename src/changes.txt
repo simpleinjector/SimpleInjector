@@ -13,9 +13,9 @@ Version 4.0.0 (v4.0 RTM)
 		-[ExecutionContextScoping] ExecutionContextScopeLifestyle deprecated. (fixes #299)
 		-[WebApi] WebApiRequestLifestyle deprecated. (fixes #331)
 		-[Core] Registration.BuildTransientExpression<TService, TImplementation>() signature changed to
-		 BuildTransientExpression(). (fixes #320)
+		 BuildTransientExpression(). (fixes #345)
 		-[Core] Registration.BuildTransientDelegate<TService, TImplementation>() signature changed to
-         BuildTransientDelegate(). (fixes #320 / #345 / #348)
+         BuildTransientDelegate(). (fixes #345 / #348)
 		-[Core] IConstructorResolutionBehavior.GetConstructor(Type, Type) signature changed to
 		 GetConstructor(Type). (fixes #345)
 		-[Core] ILifestyleSelectionBehavior.SelectLifestyle(Type, Type) signature changed to
@@ -59,6 +59,7 @@ Version 4.0.0 (v4.0 RTM)
 		-Moved from NUnit to MSTest, since MSTest now supports .NET Core projects and will run cross-platform
 		 and NUnit is very unreliable under .NET Core.
 		-Allowed the projects to compile in the absence of the real strong name key.
+		-Support for PCL dropped. (fixes #306)
 
 
 Version 3.3.1 (v3.3.1 RTM) 2016-11-23
