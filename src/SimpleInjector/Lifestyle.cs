@@ -583,7 +583,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// This overload has been deprecated. Please call <see cref="CreateRegistrationCore{TConcrete}(Container)"/>
+        /// This overload has been deprecated. Please call <see cref="CreateRegistration{TConcrete}(Container)"/>
         /// instead.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
