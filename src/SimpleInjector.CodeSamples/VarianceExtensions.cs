@@ -16,32 +16,25 @@
         /// be thrown.
         /// </summary>
         /// <param name="ContainerOptions">The options to make the registrations in.</param>
-        public static void AllowToResolveVariantTypes(this ContainerOptions options)
-        {
+        public static void AllowToResolveVariantTypes(this ContainerOptions options) {
             var container = options.Container;
-            container.ResolveUnregisteredType += (sender, e) =>
-            {
+            container.ResolveUnregisteredType += (sender, e) => {
                 Type serviceType = e.UnregisteredServiceType;
 
-                if (!serviceType.IsGenericType || e.Handled)
-                {
+                if (!serviceType.IsGenericType || e.Handled) {
                     return;
                 }
 
                 var registrations = FindAssignableRegistrations(container, serviceType);
 
-                if (!registrations.Any())
-                {
+                if (!registrations.Any()) {
                     // No registration found. We're done.
                 }
-                else if (registrations.Length == 1)
-                {
+                else if (registrations.Length == 1) {
                     // Exactly one registration. Let's map the registration to the 
                     // unregistered service type.
                     e.Register(registrations[0].Registration);
-                }
-                else
-                {
+                } else {
                     var names = string.Join(", ", 
                         registrations.Select(r => string.Format("{0}", r.ServiceType)));
 
@@ -55,8 +48,7 @@
         }
 
         private static InstanceProducer[] FindAssignableRegistrations(Container container, 
-            Type serviceType)
-        {
+            Type serviceType) {
             Type serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
 
             return (

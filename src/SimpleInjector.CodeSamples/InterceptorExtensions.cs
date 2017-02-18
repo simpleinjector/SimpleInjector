@@ -161,13 +161,13 @@ namespace SimpleInjector.CodeSamples
             [DebuggerStepThrough]
             public void OnExpressionBuilt(object sender, ExpressionBuiltEventArgs e) {
                 if (this.Predicate(e.RegisteredServiceType)) {
-                    ThrowIfServiceTypeNotAnInterface(e);
+                    ThrowIfServiceTypeNotInterface(e);
                     e.Expression = this.BuildProxyExpression(e);
                 }
             }
 
             [DebuggerStepThrough]
-            private static void ThrowIfServiceTypeNotAnInterface(ExpressionBuiltEventArgs e) {
+            private static void ThrowIfServiceTypeNotInterface(ExpressionBuiltEventArgs e) {
                 // NOTE: We can only handle interfaces, because
                 // System.Runtime.Remoting.Proxies.RealProxy only supports interfaces.
                 if (!e.RegisteredServiceType.IsInterface) {
@@ -252,8 +252,11 @@ namespace SimpleInjector.CodeSamples
             }
 
             private IMessage InvokeMethodCall(IMethodCallMessage message) {
-                var invocation = 
-                    new Invocation { Proxy = this, Message = message, Arguments = message.Args };
+                var invocation = new Invocation {
+                    Proxy = this,
+                    Message = message,
+                    Arguments = message.Args
+                };
 
                 invocation.Proceeding += () => {
                     invocation.ReturnValue = message.MethodBase.Invoke(
@@ -266,9 +269,9 @@ namespace SimpleInjector.CodeSamples
             }
 
             private IMessage Bypass(IMethodCallMessage message) {
-                object value = message.MethodBase.Invoke(this.realInstance, message.Args);
-
-                return new ReturnMessage(value, message.Args, message.Args.Length, null, message);
+                var args = message.Args;
+                object value = message.MethodBase.Invoke(this.realInstance, args);
+                return new ReturnMessage(value, args, args.Length, null, message);
             }
 
             private class Invocation : IInvocation
