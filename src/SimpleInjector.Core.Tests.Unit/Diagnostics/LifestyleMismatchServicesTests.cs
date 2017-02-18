@@ -470,12 +470,12 @@
 
             public override int Length => this.realLifestyle.ComponentLength(null);
 
-            protected override Registration CreateRegistrationCore<TConcrete>(Container container)
+            protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
             {
                 return this.realLifestyle.CreateRegistration<TConcrete>(container);
             }
 
-            protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
+            protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
                 Container container)
             {
                 return this.realLifestyle.CreateRegistration(instanceCreator, container);
@@ -492,10 +492,10 @@
 
         public override int Length { get; }
 
-        protected override Registration CreateRegistrationCore<TConcrete>(Container c) => 
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container c) => 
             Transient.CreateRegistration<TConcrete>(c);
 
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) => 
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) => 
             Transient.CreateRegistration(creator, c);
     }
 }

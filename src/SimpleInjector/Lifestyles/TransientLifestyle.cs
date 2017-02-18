@@ -33,12 +33,12 @@ namespace SimpleInjector.Lifestyles
 
         public override int Length => 1;
 
-        protected override Registration CreateRegistrationCore<TConcrete>(Container container)
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
             return new TransientLifestyleRegistration<TConcrete>(this, container);
         }
 
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
             return new TransientLifestyleRegistration<TService>(this, container, instanceCreator);

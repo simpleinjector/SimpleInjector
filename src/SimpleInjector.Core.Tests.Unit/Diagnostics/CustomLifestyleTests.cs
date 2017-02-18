@@ -158,10 +158,10 @@
 
             public override int Length { get; }
 
-            protected override Registration CreateRegistrationCore<TConcrete>(Container c) => 
+            protected internal override Registration CreateRegistrationCore<TConcrete>(Container c) => 
                 new FakeRegistration<TConcrete>(this, c);
 
-            protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+            protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
                 Container container)
             {
                 throw new NotImplementedException();

@@ -46,12 +46,12 @@ namespace SimpleInjector.Lifestyles
         // Ensure that this lifestyle can only be safely used with transient components/consumers.
         internal override int DependencyLength(Container container) => Transient.DependencyLength(container);
 
-        protected override Registration CreateRegistrationCore<TConcrete>(Container container)
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
             return new CustomRegistration<TConcrete>(this.lifestyleApplierFactory, this, container);
         }
 
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));

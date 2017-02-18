@@ -39,14 +39,14 @@ namespace SimpleInjector.Lifestyles
         protected internal override Func<Scope> CreateCurrentScopeProvider(Container container) => 
             GetDefaultScopedLifestyle(container).CreateCurrentScopeProvider(container);
 
-        protected override Scope GetCurrentScopeCore(Container container) => 
-            GetDefaultScopedLifestyle(container).GetCurrentScope(container);
-
-        protected override Registration CreateRegistrationCore<TConcrete>(Container container) =>
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
             GetDefaultScopedLifestyle(container).CreateRegistration<TConcrete>(container);
 
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) => 
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) => 
             GetDefaultScopedLifestyle(c).CreateRegistration<TService>(creator, c);
+
+        protected override Scope GetCurrentScopeCore(Container container) =>
+            GetDefaultScopedLifestyle(container).GetCurrentScope(container);
 
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]

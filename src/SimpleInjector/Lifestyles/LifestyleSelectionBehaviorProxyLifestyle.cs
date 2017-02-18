@@ -44,14 +44,14 @@ namespace SimpleInjector.Lifestyles
             get { throw new NotImplementedException(); }
         }
 
-        protected override Registration CreateRegistrationCore<TConcrete>(Container container)
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
             Lifestyle lifestyle = this.options.SelectLifestyle(typeof(TConcrete));
 
             return lifestyle.CreateRegistration<TConcrete>(container);
         }
 
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {
             Lifestyle lifestyle = this.options.SelectLifestyle(typeof(TService));

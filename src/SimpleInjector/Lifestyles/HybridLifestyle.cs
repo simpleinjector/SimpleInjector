@@ -72,7 +72,7 @@ namespace SimpleInjector.Lifestyles
             return lifestyle.Name;
         }
 
-        protected override Registration CreateRegistrationCore<TConcrete>(Container container)
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
             Func<bool> test = () => this.lifestyleSelector(container);
 
@@ -82,7 +82,7 @@ namespace SimpleInjector.Lifestyles
                 this, container);
         }
 
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {
             Func<bool> test = () => this.lifestyleSelector(container);

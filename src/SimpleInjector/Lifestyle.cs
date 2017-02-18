@@ -750,7 +750,7 @@ namespace SimpleInjector
         /// to create and return a new <see cref="Registration"/>. Note that you should <b>always</b> create
         /// a new <see cref="Registration"/> instance. They should never be cached.
         /// </remarks>
-        protected abstract Registration CreateRegistrationCore<TConcrete>(Container container)
+        protected internal abstract Registration CreateRegistrationCore<TConcrete>(Container container)
             where TConcrete : class;
 
         /// <summary>
@@ -770,7 +770,7 @@ namespace SimpleInjector
         /// to create and return a new <see cref="Registration"/>. Note that you should <b>always</b> create
         /// a new <see cref="Registration"/> instance. They should never be cached.
         /// </remarks>
-        protected abstract Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+        protected internal abstract Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
             where TService : class;
 

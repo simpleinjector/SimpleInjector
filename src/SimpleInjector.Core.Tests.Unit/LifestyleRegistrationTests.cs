@@ -263,12 +263,12 @@
 
         public override int Length => Transient.Length;
 
-        protected override Registration CreateRegistrationCore<TConcrete>(Container container)
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
             return this.RegistrationToReturn;
         }
 
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
             return this.RegistrationToReturn;

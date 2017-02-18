@@ -128,6 +128,41 @@ namespace SimpleInjector
         protected internal abstract Func<Scope> CreateCurrentScopeProvider(Container container);
 
         /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
+        /// with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <param name="instanceCreator">A delegate that will create a new instance of 
+        /// <typeparamref name="TService"/> every time it is called.</param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+            Container container)
+        {
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+            Requires.IsNotNull(container, nameof(container));
+
+            return new ScopedRegistration<TService>(this, container, instanceCreator);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TConcrete"/> with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
+        {
+            Requires.IsNotNull(container, nameof(container));
+
+            return new ScopedRegistration<TConcrete>(this, container);
+        }
+
+        /// <summary>
         /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
         /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
         /// </summary>
@@ -145,41 +180,6 @@ namespace SimpleInjector
             Func<Scope> currentScopeProvider = this.CreateCurrentScopeProvider(container);
 
             return currentScopeProvider.Invoke();
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
-        /// with the caching as specified by this lifestyle.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <param name="instanceCreator">A delegate that will create a new instance of 
-        /// <typeparamref name="TService"/> every time it is called.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
-            Container container)
-        {
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-            Requires.IsNotNull(container, nameof(container));
-
-            return new ScopedRegistration<TService>(this, container, instanceCreator);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TConcrete"/> with the caching as specified by this lifestyle.
-        /// </summary>
-        /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        protected override Registration CreateRegistrationCore<TConcrete>(Container container)
-        {
-            Requires.IsNotNull(container, nameof(container));
-
-            return new ScopedRegistration<TConcrete>(this, container);
         }
 
 #if !NET40

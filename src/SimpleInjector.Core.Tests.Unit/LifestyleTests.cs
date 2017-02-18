@@ -305,12 +305,12 @@
                 get { throw new NotImplementedException(); }
             }
 
-            protected override Registration CreateRegistrationCore<TConcrete>(Container container)
+            protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
             {
                 throw new NotImplementedException();
             }
 
-            protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+            protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
                 Container container)
             {
                 throw new NotImplementedException();

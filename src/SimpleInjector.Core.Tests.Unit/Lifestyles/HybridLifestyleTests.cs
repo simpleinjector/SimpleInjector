@@ -678,21 +678,21 @@
                 };
             }
 
-            protected override Scope GetCurrentScopeCore(Container container)
-            {
-                this.GetCurrentScopeCoreCallCount++;
-                return base.GetCurrentScopeCore(container);
-            }
-
-            protected override Registration CreateRegistrationCore<TConcrete>(Container container)
+            protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
             {
                 return this.realLifestyle.CreateRegistration<TConcrete>(container);
             }
 
-            protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+            protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
                 Container container)
             {
                 return this.realLifestyle.CreateRegistration(instanceCreator, container);
+            }
+
+            protected override Scope GetCurrentScopeCore(Container container)
+            {
+                this.GetCurrentScopeCoreCallCount++;
+                return base.GetCurrentScopeCore(container);
             }
         }
     }
