@@ -384,6 +384,34 @@
                 "hybrid lifestyle should be considered to be a transient when evaluated on the child.");
         }
 
+        [TestMethod]
+        public void GetInstance_DecoratorRegisteredTwiceAsSingletonWithTransientDecoratee_FailsDuringVerification()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Transient);
+
+            // Register the same decorator twice. 
+            container.RegisterDecorator(
+                typeof(ICommandHandler<>),
+                typeof(TransactionHandlerDecorator<>),
+                Lifestyle.Singleton);
+
+            container.RegisterDecorator(
+                typeof(ICommandHandler<>),
+                typeof(TransactionHandlerDecorator<>),
+                Lifestyle.Singleton);
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(
+                "(Singleton) depends on ICommandHandler<RealCommand> implemented by StubCommandHandler",
+                action);
+        }
+
         private static KnownRelationship CreateRelationship(Lifestyle parent, Lifestyle child) => 
             new KnownRelationship(
                 implementationType: typeof(RealTimeProvider),
