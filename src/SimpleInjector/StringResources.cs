@@ -109,6 +109,20 @@ namespace SimpleInjector
                 NoteThatSkippedDecoratorsWereFound(serviceType, skippedDecorators),
                 NoteThatTypeLookalikesAreFound(serviceType, lookalikes));
 
+        internal static string KnownImplementationTypeShouldBeAssignableFromExpressionType(
+            Type knownImplementationType, Type currentExpressionType) =>
+            string.Format(CultureInfo.InvariantCulture,
+                "You are trying to set the {0}.{1} property with an Expression instance that has a type " +
+                "of {2}. The expression type however should be a {3} (or a sub type). You can't change " +
+                "the type of the expression using the {4} event. If you need to change the " +
+                "implementation, please use the {5} event instead.",
+                nameof(ExpressionBuildingEventArgs),
+                nameof(ExpressionBuildingEventArgs.Expression),
+                currentExpressionType.TypeName(),
+                knownImplementationType.TypeName(),
+                nameof(Container.ExpressionBuilding),
+                nameof(Container.ExpressionBuilt));
+
         internal static string MultipleClosedTypesAreAssignableFromType(Type type, Type genericTypeDefinition, 
             Type[] types, string otherMethod) =>
             string.Format(CultureInfo.InvariantCulture,

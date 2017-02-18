@@ -51,6 +51,8 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] Container.AddRegistration<TService>(Registration) method added. (fixes #367)
 		-[Core] Stack trace added to exception that gets thrown when container got disposed. (fixes #368)
 		-[Core] Enabled property injection for conditional registrations. (fixes #383)
+		-[Core] Clear exception is thrown when invalid Expression is passed on to 
+		 ExpressionBuildingEventArgs.Expression. (fixes #354)
 
 	Project Changes:
 		-Projects for SimpleInjector.dll merged into one single project.

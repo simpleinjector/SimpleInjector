@@ -100,6 +100,14 @@ namespace SimpleInjector
             {
                 Requires.IsNotNull(value, nameof(value));
 
+                if (!this.KnownImplementationType.IsAssignableFrom(value.Type))
+                {
+                    throw new ArgumentException(
+                        StringResources.KnownImplementationTypeShouldBeAssignableFromExpressionType(
+                            this.KnownImplementationType,
+                            value.Type));
+                }
+
                 this.expression = value;
             }
         }

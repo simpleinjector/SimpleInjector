@@ -509,38 +509,7 @@
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
         }
-
-        [TestMethod]
-        public void GetInstance_ExpressionBuildingWithInvalidExpression_ThrowsAnDescriptiveException()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            container.Register<IUserRepository, SqlUserRepository>();
-
-            container.ExpressionBuilding += (s, e) =>
-            {
-                var invalidExpression = Expression.GreaterThan(Expression.Constant(1), Expression.Constant(1));
-
-                e.Expression = invalidExpression;
-            };
-
-            try
-            {
-                // Act
-                container.GetInstance<IUserRepository>();
-
-                // Assert
-                Assert.Fail("Exception was expected.");
-            }
-            catch (Exception ex)
-            {
-                AssertThat.StringContains(
-                    "Error occurred while trying to build a delegate for type IUserRepository",
-                    ex.Message, "Exception message was not descriptive.");
-            }
-        }
-
+ 
         [TestMethod]
         public void GetInstance_ExpressionBuildingChangedTheRegisterSingleRegistrationToReturnNull_ThrowsExpectedException()
         {
@@ -577,25 +546,21 @@
 
             container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Singleton);
 
+            // Act
             container.ExpressionBuilding += (s, e) =>
-            {
                 e.Expression = Expression.Constant("some string", typeof(string));
-            };
 
-            try
-            {
-                // Act
-                container.GetInstance(typeof(IUserRepository));
+            Action action = () => container.GetInstance(typeof(IUserRepository));
 
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.ExceptionMessageContains(
-                    "Error occurred while trying to build a delegate for type SqlUserRepository using " + 
-                    "the expression", ex);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                You are trying to set the ExpressionBuildingEventArgs.Expression property with an Expression
+                instance that has a type of String. The expression type however should be a 
+                SqlUserRepository (or a sub type). You can't change the type of the expression using the
+                ExpressionBuilding event. If you need to change the implementation, please use the 
+                ExpressionBuilt event instead."
+                .TrimInside(),
+                action);
         }
 
         [TestMethod]
