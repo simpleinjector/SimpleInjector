@@ -2413,16 +2413,6 @@
         public Lifestyle Lifestyle { get; }
     }
 
-    public sealed class FakeLogger : ILogger
-    {
-        public string Message { get; private set; }
-
-        public void Log(string message)
-        {
-            this.Message += message;
-        }
-    }
-
     public class RealCommand
     {
     }

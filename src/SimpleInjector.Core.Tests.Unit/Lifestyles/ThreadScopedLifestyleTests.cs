@@ -1069,22 +1069,13 @@
 
     public class DisposableLogger : ILogger, IDisposable
     {
-        private static readonly Action<DisposableLogger> Empty = l => { };
-
         private readonly Action<DisposableLogger> disposing;
 
         public DisposableLogger(Action<DisposableLogger> disposing = null)
         {
-            this.disposing = disposing ?? Empty;
+            this.disposing = disposing ?? (l => { });
         }
 
-        public void Log(string message)
-        {
-        }
-
-        public void Dispose()
-        {
-            this.disposing(this);
-        }
+        public void Dispose() => this.disposing(this);
     }
 }

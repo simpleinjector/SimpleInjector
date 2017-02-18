@@ -129,7 +129,7 @@
             container.Options.SuppressLifestyleMismatchVerification = true;
 
             // Forces a lifestyle mismatch
-            container.Register<ILogger, FakeLogger>(Lifestyle.Singleton);
+            container.Register<ILogger, LoggerWithConcreteDependencies>(Lifestyle.Singleton);
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -142,6 +142,13 @@
 
             // Assert
             Assert.IsTrue(items.Any(item => item.Name == "Lifestyle Mismatches"));
+        }
+
+        public class LoggerWithConcreteDependencies : ILogger
+        {
+            public LoggerWithConcreteDependencies(ConcreteShizzle shizzle, ConcreteThing thing)
+            {
+            }
         }
     }
 }

@@ -17,7 +17,6 @@
 
     public interface ILogger
     {
-        void Log(string message);
     }
 
     public interface INonGenericService
@@ -75,6 +74,10 @@
     }
 
     public interface IUserRepository
+    {
+    }
+
+    public sealed class FakeLogger : ILogger
     {
     }
 
@@ -234,33 +237,19 @@
 
     public sealed class Logger<T> : ILogger
     {
-        public void Log(string message)
-        {
-        }
     }
 
     public sealed class NullLogger : ILogger
     {
-        public void Log(string message)
-        {
-        }
     }
     
     public sealed class ConsoleLogger : ILogger
     {
-        public void Log(string message)
-        {
-            Console.WriteLine(message);
-        }
     }
 
     public sealed class LoggerDecorator : ILogger
     {
         public LoggerDecorator(ILogger logger)
-        {
-        }
-
-        public void Log(string message)
         {
         }
     }
