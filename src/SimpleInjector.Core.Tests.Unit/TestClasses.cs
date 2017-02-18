@@ -249,8 +249,11 @@
 
     public sealed class LoggerDecorator : ILogger
     {
+        public readonly ILogger Logger;
+
         public LoggerDecorator(ILogger logger)
         {
+            this.Logger = logger;
         }
     }
 

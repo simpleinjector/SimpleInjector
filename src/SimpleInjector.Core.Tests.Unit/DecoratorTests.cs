@@ -8,6 +8,7 @@
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     [TestClass]
     public class DecoratorTests
@@ -2356,6 +2357,46 @@
                 directly or indirectly depending on itself"
                 .TrimInside(),
                 action);
+        }
+
+        [TestMethod]
+        public void GetInstance_TwoRegistrationsForSameServiceWithSingletonDecorator_EachRegistrationGetsItsOwnDecorator()
+        {
+            // Arrange
+            var container = new Container();
+
+            var consoleProducer = Lifestyle.Singleton.CreateProducer<ILogger, ConsoleLogger>(container);
+            var nullProducer = Lifestyle.Singleton.CreateProducer<ILogger, NullLogger>(container);
+
+            container.RegisterDecorator<ILogger, LoggerDecorator>(Lifestyle.Singleton);
+
+            var consoleDecorator = (LoggerDecorator)consoleProducer.GetInstance();
+            var nullDecorator = (LoggerDecorator)nullProducer.GetInstance();
+
+            AssertThat.IsInstanceOfType(typeof(ConsoleLogger), consoleDecorator.Logger);
+            AssertThat.IsInstanceOfType(typeof(NullLogger), nullDecorator.Logger);
+        }
+
+        [TestMethod]
+        public void GetInstance_TwoRegistrationsForSameServiceWithScopedDecorator_EachRegistrationGetsItsOwnDecorator()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
+
+            var consoleProducer = Lifestyle.Scoped.CreateProducer<ILogger, ConsoleLogger>(container);
+            var nullProducer = Lifestyle.Scoped.CreateProducer<ILogger, NullLogger>(container);
+
+            container.RegisterDecorator<ILogger, LoggerDecorator>(Lifestyle.Scoped);
+
+            using (ThreadScopedLifestyle.BeginScope(container))
+            {
+                var consoleDecorator = (LoggerDecorator)consoleProducer.GetInstance();
+                var nullDecorator = (LoggerDecorator)nullProducer.GetInstance();
+
+                AssertThat.IsInstanceOfType(typeof(ConsoleLogger), consoleDecorator.Logger);
+                AssertThat.IsInstanceOfType(typeof(NullLogger), nullDecorator.Logger);
+            }
         }
 
         private static KnownRelationship GetValidRelationship()
