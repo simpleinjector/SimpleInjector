@@ -1009,7 +1009,7 @@
         private sealed class InjectProperties<TAttribute> : IPropertySelectionBehavior
             where TAttribute : Attribute
         {
-            public bool SelectProperty(PropertyInfo p) => p.GetCustomAttribute<TAttribute>() != null;
+            public bool SelectProperty(Type t, PropertyInfo p) => p.GetCustomAttribute<TAttribute>() != null;
         }
     }
 

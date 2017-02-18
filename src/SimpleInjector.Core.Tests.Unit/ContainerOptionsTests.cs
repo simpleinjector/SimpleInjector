@@ -890,7 +890,7 @@
             var options = GetContainerOptions();
 
             // Act
-            var result = options.PropertySelectionBehavior.SelectProperty(property);
+            var result = options.PropertySelectionBehavior.SelectProperty(property.DeclaringType, property);
 
             // Assert
             Assert.IsFalse(result);
@@ -967,7 +967,7 @@
 
         private sealed class AlternativeDependencyInjectionBehavior : IDependencyInjectionBehavior
         {
-            public InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer)
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure)
             {
                 throw new NotImplementedException();
             }
@@ -980,7 +980,7 @@
 
         private sealed class AlternativePropertySelectionBehavior : IPropertySelectionBehavior
         {
-            public bool SelectProperty(PropertyInfo property)
+            public bool SelectProperty(Type implementationType, PropertyInfo property)
             {
                 throw new NotImplementedException();
             }

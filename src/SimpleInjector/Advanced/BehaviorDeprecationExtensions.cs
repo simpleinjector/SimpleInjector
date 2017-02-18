@@ -11,7 +11,7 @@
     {
         private const string DependencyInjectionBehaviorObsoleteMessage =
             "This interface method has been removed. Please call " +
-            nameof(IDependencyInjectionBehavior.GetInstanceProducerFor) + " instead. " +
+            nameof(IDependencyInjectionBehavior.GetInstanceProducer) + " instead. " +
             "In case you need to change the expression while need to return an InstanceProducer, use the " +
             "InstanceProducer." + nameof(InstanceProducer.FromExpression) + " method to wrap the " +
             "expression.";

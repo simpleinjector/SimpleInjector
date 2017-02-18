@@ -41,60 +41,37 @@
             throw new ActivationException(BuildExceptionMessage(implementationType));
         }
 
-        [DebuggerStepThrough]
-        private IEnumerable<ConstructorInfo> GetConstructors(Type implementation)
-        {
-            var constructors = implementation.GetConstructors();
+        // We prevent calling GetRegistration during the registration phase, because at this point not
+        // all dependencies might be registered, and calling GetRegistration would lock the container,
+        // making it impossible to do other registrations.
+        private IEnumerable<ConstructorInfo> GetConstructors(Type implementation) =>
+            from ctor in implementation.GetConstructors()
+            let parameters = ctor.GetParameters()
+            where this.IsCalledDuringRegistrationPhase
+                || implementation.GetConstructors().Length == 1
+                || ctor.GetParameters().All(this.CanBeResolved)
+            orderby parameters.Length descending
+            select ctor;
 
-            // We prevent calling GetRegistration during the registration phase, because at this point not
-            // all dependencies might be registered, and calling GetRegistration would lock the container,
-            // making it impossible to do other registrations.
-            return
-                from ctor in constructors
-                let parameters = ctor.GetParameters()
-                where this.IsCalledDuringRegistrationPhase
-                    || constructors.Length == 1
-                    || ctor.GetParameters().All(p => this.CanBeResolved(p, implementation))
-                orderby parameters.Length descending
-                select ctor;
-        }
+        private bool CanBeResolved(ParameterInfo parameter) =>
+            this.GetInstanceProducerFor(new InjectionConsumerInfo(parameter)) != null;
 
-        [DebuggerStepThrough]
-        private bool CanBeResolved(ParameterInfo parameter, Type implementationType)
-        {
-            return this.container.GetRegistration(parameter.ParameterType) != null ||
-                this.CanBuildExpression(implementationType, parameter);
-        }
+        private InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo info) =>
+            this.container.Options.DependencyInjectionBehavior.GetInstanceProducer(info, false);
 
-        [DebuggerStepThrough]
-        private bool CanBuildExpression(Type implementationType, ParameterInfo parameter)
-        {
-            try
-            {
-                var info = new InjectionConsumerInfo(implementationType, parameter);
-                this.container.Options.DependencyInjectionBehavior.GetInstanceProducerFor(info);
+        private static string BuildExceptionMessage(Type type) =>
+            !type.GetConstructors().Any()
+                ? TypeShouldHaveAtLeastOnePublicConstructor(type)
+                : TypeShouldHaveConstructorWithResolvableTypes(type);
 
-                return true;
-            }
-            catch (ActivationException)
-            {
-                return false;
-            }
-        }
+        private static string TypeShouldHaveAtLeastOnePublicConstructor(Type type) =>
+            string.Format(CultureInfo.InvariantCulture,
+                "For the container to be able to create {0}, it should contain at least one public " +
+                "constructor.", type.ToFriendlyName());
 
-        [DebuggerStepThrough]
-        private static string BuildExceptionMessage(Type type)
-        {
-            if (!type.GetConstructors().Any())
-            {
-                return string.Format(CultureInfo.InvariantCulture,
-                    "For the container to be able to create {0}, it should contain at least one public " +
-                    "constructor.", type);
-            }
-
-            return string.Format(CultureInfo.InvariantCulture,
-                "For the container to be able to create {0}, it should contain a public constructor that " +
-                "only contains parameters that can be resolved.", type);
-        }
+        private static string TypeShouldHaveConstructorWithResolvableTypes(Type type) =>
+            string.Format(CultureInfo.InvariantCulture,
+                "For the container to be able to create {0}, it should contain a public constructor " +
+                "that only contains parameters that can be resolved.", type.ToFriendlyName());
     }
 }

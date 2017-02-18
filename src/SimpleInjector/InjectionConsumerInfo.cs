@@ -24,7 +24,6 @@ namespace SimpleInjector
 {
     using System;
     using System.ComponentModel;
-    using System.Globalization;
     using System.Reflection;
 
     /// <summary>
@@ -36,28 +35,24 @@ namespace SimpleInjector
         internal static readonly InjectionConsumerInfo Root = null;
         
         /// <summary>Initializes a new instance of the <see cref="InjectionConsumerInfo"/> class.</summary>
-        /// <param name="implementationType">The implementation type of the consumer of the component that should be created.</param>
         /// <param name="parameter">The constructor parameter for the created component.</param>
-        public InjectionConsumerInfo(Type implementationType, ParameterInfo parameter)
-            : this(implementationType)
+        public InjectionConsumerInfo(ParameterInfo parameter)
         {
             Requires.IsNotNull(parameter, nameof(parameter));
 
             this.Target = new InjectionTargetInfo(parameter);
+            this.ImplementationType = parameter.Member.DeclaringType;
         }
 
-        internal InjectionConsumerInfo(Type implementationType, PropertyInfo property)
-            : this(implementationType)
+        /// <summary>Initializes a new instance of the <see cref="InjectionConsumerInfo"/> class.</summary>
+        /// <param name="implementationType">The implementation type of the consumer of the component that should be created.</param>
+        /// <param name="property">The property for the created component.</param>
+        public InjectionConsumerInfo(Type implementationType, PropertyInfo property)
         {
+            Requires.IsNotNull(implementationType, nameof(implementationType));
             Requires.IsNotNull(property, nameof(property));
 
             this.Target = new InjectionTargetInfo(property);
-        }
-
-        private InjectionConsumerInfo(Type implementationType)
-        {
-            Requires.IsNotNull(implementationType, nameof(implementationType));
-
             this.ImplementationType = implementationType;
         }
 

@@ -32,8 +32,8 @@
             }
         }
 
-        public InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo c) =>
-            this.TryCreateInstanceProducer(c.Target.Parameter) ?? this.original.GetInstanceProducerFor(c);
+        public InstanceProducer GetInstanceProducer(InjectionConsumerInfo c, bool t) =>
+            this.TryCreateInstanceProducer(c.Target.Parameter) ?? this.original.GetInstanceProducer(c, t);
 
         private InstanceProducer TryCreateInstanceProducer(ParameterInfo parameter) =>
             parameter != null && IsOptional(parameter) && !this.CanBeResolved(parameter)

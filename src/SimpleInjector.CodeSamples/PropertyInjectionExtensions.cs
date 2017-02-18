@@ -73,8 +73,8 @@
                 this.baseBehavior = baseBehavior;
             }
 
-            bool IPropertySelectionBehavior.SelectProperty(PropertyInfo p) => 
-                this.IsPropertyRegisteredForAutowiring(p) || this.baseBehavior.SelectProperty(p);
+            bool IPropertySelectionBehavior.SelectProperty(Type t, PropertyInfo p) => 
+                this.IsPropertyRegisteredForAutowiring(p) || this.baseBehavior.SelectProperty(t, p);
 
             public void AddPropertySelector(Predicate<PropertyInfo> selector) => 
                 this.propertySelectors.Add(selector);

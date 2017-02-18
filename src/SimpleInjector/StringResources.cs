@@ -400,12 +400,13 @@ namespace SimpleInjector
         internal static string DependencyInjectionBehaviorReturnedNull(IDependencyInjectionBehavior behavior) =>
             string.Format(CultureInfo.InvariantCulture,
                 "The {0} that was registered through the Container.{1}.{2} property, returned a null " +
-                "reference from its {3} method. {4}.{3} implementations should never return null, but " +
-                "should throw an {5} with an expressive message instead.",
+                "reference from its {3} method. {4}.{3} implementations should not return null when " +
+                "supplied with throwOnFailure = true, but should throw an {5} with an expressive message " +
+                "instead.",
                 behavior.GetType().TypeName(),
                 nameof(Container.Options),
                 nameof(ContainerOptions.DependencyInjectionBehavior),
-                nameof(IDependencyInjectionBehavior.GetInstanceProducerFor),
+                nameof(IDependencyInjectionBehavior.GetInstanceProducer),
                 nameof(IDependencyInjectionBehavior),
                 typeof(ActivationException).FullName);
 

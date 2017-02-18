@@ -444,7 +444,7 @@ namespace SimpleInjector
 
         internal InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer)
         {
-            InstanceProducer producer = this.DependencyInjectionBehavior.GetInstanceProducerFor(consumer);
+            var producer = this.DependencyInjectionBehavior.GetInstanceProducer(consumer, throwOnFailure: true);
 
             // Producer will only be null if a user created a custom IConstructorInjectionBehavior that
             // returned null.

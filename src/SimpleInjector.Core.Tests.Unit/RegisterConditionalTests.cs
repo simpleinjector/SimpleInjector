@@ -1597,7 +1597,7 @@
 
         private sealed class InjectAllProperties : IPropertySelectionBehavior
         {
-            public bool SelectProperty(PropertyInfo propertyInfo) => true;
+            public bool SelectProperty(Type implementationType, PropertyInfo property) => true;
         }
 
         private sealed class VerficationlessInjectionBehavior : IDependencyInjectionBehavior
@@ -1609,8 +1609,8 @@
                 this.real = real;
             }
 
-            public InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo c) => 
-                this.real.GetInstanceProducerFor(c);
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo c, bool t) => 
+                this.real.GetInstanceProducer(c, t);
 
             public void Verify(InjectionConsumerInfo consumer)
             {

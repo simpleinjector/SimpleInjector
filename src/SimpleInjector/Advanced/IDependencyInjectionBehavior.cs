@@ -48,9 +48,11 @@ namespace SimpleInjector.Advanced
         /// </summary>
         /// <param name="consumer">Contextual information about the consumer where the built dependency is
         /// injected into.</param>
+        /// <param name="throwOnFailure">The indication whether the method should return null or throw
+        /// an exception when the type is not registered.</param>
         /// <returns>An <see cref="InstanceProducer"/> that describes the intend of creating that 
         /// <see cref="InjectionConsumerInfo.Target">Target</see>. This method never returns null.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the argument is a null reference.</exception>
-        InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer);
+        InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure);
     }
 }

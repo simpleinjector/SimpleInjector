@@ -387,7 +387,7 @@ namespace SimpleInjector
 
             foreach (ParameterInfo parameter in constructor.GetParameters())
             {
-                var consumer = new InjectionConsumerInfo(implementationType, parameter);
+                var consumer = new InjectionConsumerInfo(parameter);
                 Expression expression = this.GetPlaceHolderFor(parameter);
                 InstanceProducer producer = null;
 
@@ -432,7 +432,10 @@ namespace SimpleInjector
 
             var candidates = PropertyInjectionHelper.GetCandidateInjectionPropertiesFor(implementationType);
 
-            return candidates.Where(propertySelector.SelectProperty).ToArray();
+            // Optimization: Safes creation of multiple objects in case there are no candidates.
+            return candidates.Length == 0
+                ? candidates
+                : candidates.Where(p => propertySelector.SelectProperty(implementationType, p)).ToArray();
         }
 
         private Expression ReplacePlaceHoldersWithOverriddenParameters(Expression expression)

@@ -145,7 +145,7 @@
                 this.keyedProducerRetriever = keyedProducerRetriever;
             }
 
-            public InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer)
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure)
             {
                 var attribute = consumer.Target.GetCustomAttribute<NamedAttribute>();
 
@@ -154,7 +154,7 @@
                     return this.keyedProducerRetriever(consumer.Target.TargetType, attribute.Name);
                 }
 
-                return this.defaultBehavior.GetInstanceProducerFor(consumer);
+                return this.defaultBehavior.GetInstanceProducer(consumer, throwOnFailure);
             }
 
             public void Verify(InjectionConsumerInfo consumer)

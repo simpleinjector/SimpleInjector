@@ -158,7 +158,7 @@ namespace SimpleInjector.Tests.Unit
 
         private sealed class InjectPropertyOfType<T> : IPropertySelectionBehavior
         {
-            public bool SelectProperty(PropertyInfo prop) => prop.PropertyType == typeof(T);
+            public bool SelectProperty(Type t, PropertyInfo prop) => prop.PropertyType == typeof(T);
         }
 
         [TestMethod]

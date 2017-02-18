@@ -26,11 +26,11 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] Lifestyle.CreateRegistrationCore<TService, TImplementation>(Container) signature changes to
 		 CreateRegistrationCore<TImplementation>(Container). (fixes #345)
 		-[Core] IDependencyInjectionBehavior.BuildExpression method replace with
-		 GetInstanceProducerFor(InjectionConsumerInfo) that returns an InstanceProducer. (fixes #346)
+		 GetInstanceProducer(InjectionConsumerInfo, bool) that returns an InstanceProducer. (fixes #346)
 		-[Core] ExpressionBuildingEventArgs.RegisteredServiceType removed. (fixes #348)
 		-[Core] InjectionConsumerInfo.ServiceType removed. (fixes #348)
-		-[Core] IPropertySelectionBehavior.SelectProperty(Type, PropertyInfo) replaced with
-		 SelectProperty(PropertyInfo) method. (fixes #348)
+		-[Core] IPropertySelectionBehavior.SelectProperty(Type serviceType, PropertyInfo) replaced with
+		 SelectProperty(Type implementationType, PropertyInfo) method. (fixes #348)
 		-[Core] Container.RegisterInitializer(Action<InstanceInitializationData>, Predicate<InitializationContext>)
 		 replaced with RegisterInitializer(Action<InstanceInitializationData>, Predicate<InitializerContext>)
 		 method. (fixes #348)
@@ -50,6 +50,7 @@ Version 4.0.0 (v4.0 RTM)
 		 IsClosedTypeOf, GetClosedTypeOf and GetClosedTypesOf methods. (fixes #358)
 		-[Core] Container.AddRegistration<TService>(Registration) method added. (fixes #367)
 		-[Core] Stack trace added to exception that gets thrown when container got disposed. (fixes #368)
+		-[Core] Enabled property injection for conditional registrations. (fixes #383)
 
 	Project Changes:
 		-Projects for SimpleInjector.dll merged into one single project.

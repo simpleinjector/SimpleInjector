@@ -2,7 +2,6 @@
 {
     using System;
     using System.Linq;
-    using System.Linq.Expressions;
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
@@ -17,7 +16,7 @@
             var behavior = GetContainerOptions().DependencyInjectionBehavior;
 
             // Act
-            Action action = () => behavior.GetInstanceProducerFor(null);
+            Action action = () => behavior.GetInstanceProducer(null, false);
 
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentNullException>("consumer", action);
@@ -62,9 +61,7 @@
             var constructor =
                 typeof(TypeWithSinglePublicConstructorWithValueTypeParameter).GetConstructors().Single();
 
-            var consumer = new InjectionConsumerInfo(
-                constructor.DeclaringType,
-                constructor.GetParameters().Single());
+            var consumer = new InjectionConsumerInfo(constructor.GetParameters().Single());
 
             try
             {
@@ -96,9 +93,7 @@
             var constructor =
                 typeof(TypeWithSinglePublicConstructorWithStringTypeParameter).GetConstructors().Single();
 
-            var consumer = new InjectionConsumerInfo(
-                constructor.DeclaringType,
-                constructor.GetParameters().Single());
+            var consumer = new InjectionConsumerInfo(constructor.GetParameters().Single());
 
             try
             {
@@ -134,7 +129,7 @@
         {
             public InstanceProducer ProducerToReturn { get; set; }
 
-            public InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo c) => this.ProducerToReturn;
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo c, bool f) => this.ProducerToReturn;
 
             public void Verify(InjectionConsumerInfo consumer)
             {

@@ -194,7 +194,7 @@ namespace SimpleInjector.Advanced
         {
             foreach (ParameterInfo parameter in constructor.GetParameters())
             {
-                behavior.Verify(new InjectionConsumerInfo(constructor.DeclaringType, parameter));
+                behavior.Verify(new InjectionConsumerInfo(parameter));
             }
         }
     }

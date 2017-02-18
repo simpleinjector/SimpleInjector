@@ -73,9 +73,9 @@
                 this.defaultBehavior.Verify(consumer);
             }
 
-            public InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer)
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure)
             {
-                InstanceProducer producer = this.defaultBehavior.GetInstanceProducerFor(consumer);
+                InstanceProducer producer = this.defaultBehavior.GetInstanceProducer(consumer, throwOnFailure);
 
                 List<PredicatePair> pairs;
 

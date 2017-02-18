@@ -19,34 +19,29 @@
             : IPropertySelectionBehavior
         {
             private readonly IPropertySelectionBehavior core;
-            private readonly ContainerOptions options;
+            private readonly IDependencyInjectionBehavior injectionBehavior;
 
             internal ImplicitPropertyInjectionBehavior(IPropertySelectionBehavior core,
                 ContainerOptions options)
             {
                 this.core = core;
-                this.options = options;
+                this.injectionBehavior = options.DependencyInjectionBehavior;
             }
 
-            [DebuggerStepThrough]
-            public bool SelectProperty(PropertyInfo p) => 
-                this.IsImplicitInjectable(p) || this.core.SelectProperty(p);
+            public bool SelectProperty(Type t, PropertyInfo p) => 
+                this.IsImplicitInjectable(t, p) || this.core.SelectProperty(t, p);
 
-            [DebuggerStepThrough]
-            private bool IsImplicitInjectable(PropertyInfo p) =>
-                IsInjectableProperty(p) && this.IsAvailableService(p.PropertyType);
+            private bool IsImplicitInjectable(Type t, PropertyInfo p) =>
+                IsInjectableProperty(p) && this.CanBeResolved(t, p);
 
-            [DebuggerStepThrough]
-            private static bool IsInjectableProperty(PropertyInfo property)
-            {
-                MethodInfo setMethod = property.GetSetMethod(nonPublic: false);
+            private static bool IsInjectableProperty(PropertyInfo property) =>
+                property.CanWrite && property.GetSetMethod(nonPublic: false)?.IsStatic == false;
 
-                return setMethod != null && !setMethod.IsStatic && property.CanWrite;
-            }
+            private bool CanBeResolved(Type t, PropertyInfo property) =>
+                this.GetProducer(new InjectionConsumerInfo(t, property)) != null;
 
-            [DebuggerStepThrough]
-            private bool IsAvailableService(Type type) => 
-                this.options.Container.GetRegistration(type) != null;
+            private InstanceProducer GetProducer(InjectionConsumerInfo info) =>
+                this.injectionBehavior.GetInstanceProducer(info, false);
         }
     }
 }

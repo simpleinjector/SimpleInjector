@@ -22,6 +22,7 @@
 
 namespace SimpleInjector.Advanced
 {
+    using System;
     using System.Reflection;
 
     /// <summary>
@@ -35,8 +36,11 @@ namespace SimpleInjector.Advanced
         /// <summary>
         /// Determines whether a property should be injected by the container upon creation of its type.
         /// </summary>
+        /// <param name="implementationType">
+        /// The type being created for which the property should be injected. Note that this might a
+        /// different type than the type on which the property is declared (which might be a base class).</param>
         /// <param name="propertyInfo">The property to check.</param>
         /// <returns>True when the property should be injected.</returns>
-        bool SelectProperty(PropertyInfo propertyInfo);
+        bool SelectProperty(Type implementationType, PropertyInfo propertyInfo);
     }
 }

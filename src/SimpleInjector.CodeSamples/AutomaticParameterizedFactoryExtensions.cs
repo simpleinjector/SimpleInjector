@@ -233,7 +233,8 @@
                 }
             }
 
-            InstanceProducer IDependencyInjectionBehavior.GetInstanceProducerFor(InjectionConsumerInfo consumer)
+            InstanceProducer IDependencyInjectionBehavior.GetInstanceProducer(
+                InjectionConsumerInfo consumer, bool throwOnFailure)
             {
                 ThreadLocal<object> local = this.FindThreadLocal(consumer.Target);
 
@@ -253,7 +254,7 @@
                         this.container);
                 }
 
-                return this.originalBehavior.GetInstanceProducerFor(consumer);
+                return this.originalBehavior.GetInstanceProducer(consumer, throwOnFailure);
             }
 
             // Called by RegisterFactory<TFactory>

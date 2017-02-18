@@ -483,7 +483,7 @@
                 this.selector = selector;
             }
 
-            public bool SelectProperty(PropertyInfo property) => this.selector(property);
+            public bool SelectProperty(Type type, PropertyInfo property) => this.selector(property);
         }
     }
 }

@@ -249,7 +249,7 @@
         {
             public Predicate<PropertyInfo> Predicate { get; set; }
 
-            public bool SelectProperty(PropertyInfo property) => this.Predicate(property);
+            public bool SelectProperty(Type type, PropertyInfo property) => this.Predicate(property);
         }
     }
 
