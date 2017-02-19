@@ -970,60 +970,6 @@
         }
 
         [TestMethod]
-        public void GetInstance_ResolvingAnInstanceDependingOnScopeWithAnActiveLifetimeScopeButNoDefaultScopedLifestyleSet_Throws()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            Scope activeScope = ThreadScopedLifestyle.BeginScope(container);
-
-            // Act
-            Action action = () => container.GetInstance<ServiceDependingOn<Scope>>();
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                you need to either resolve instances directly from the Scope using a Scope.GetInstance
-                overload, or you will have to set the Container.Options.DefaultScopedLifestyle property with
-                the required scoped lifestyle"
-                .TrimInside(),
-                action);
-        }
-
-        [TestMethod]
-        public void GetInstance_RequestingScopeWithActiveLifetimeScopeButNoDefaultScopedLifestyleSet_Throws()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            Scope activeScope = ThreadScopedLifestyle.BeginScope(container);
-
-            // Act
-            Action action = () => container.GetInstance<Scope>();
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                resolve instances directly from the Scope using a Scope.GetInstance
-                overload, or you will have to set the Container.Options.DefaultScopedLifestyle property"
-                .TrimInside(),
-                action);
-        }
-
-        [TestMethod]
-        public void GetInstance_ResolvingAnInstanceDependingOnScopeWithoutAnActiveScopeAndWithoutDefaultScopedLifestyleSet_Throws()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            // Act
-            Action action = () => container.GetInstance<ServiceDependingOn<Scope>>();
-
-            // Act
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "you will have to set the Container.Options.DefaultScopedLifestyle property",
-                action);
-        }
-
-        [TestMethod]
         public void GetInstance_ResolvingAnInstanceDependingOnScopeWithoutAnActiveScopeAndDefaultScopedLifestyleSet_Throws()
         {
             // Arrange
@@ -1048,22 +994,6 @@
 
             // Act
             container.Verify();
-        }
-
-        [TestMethod]
-        public void ScopeGetInstance_ResolvingAnInstanceDependingOnScope_InjectsThatActiveScope()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            var activeScope = new Scope(container);
-
-            // Act
-            var service = activeScope.GetInstance<ServiceDependingOn<Scope>>();
-            Scope injectedScope = service.Dependency;
-
-            // Assert
-            Assert.AreSame(activeScope, injectedScope);
         }
 
         private class DisposablePlugin : IPlugin, IDisposable

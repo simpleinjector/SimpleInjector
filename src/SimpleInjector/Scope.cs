@@ -84,58 +84,6 @@ namespace SimpleInjector
 
         internal Scope ParentScope { get; }
 
-        /// <summary>Gets an instance of the given <typeparamref name="TService"/> for the current scope.</summary>
-        /// <typeparam name="TService">The type of the service to resolve.</typeparam>
-        /// <returns>An instance of the given service type.</returns>
-        public TService GetInstance<TService>() where TService : class
-        {
-            if (this.Container == null)
-            {
-                throw new InvalidOperationException(
-                    "This method can only be called on Scope instances that are related to a Container. " +
-                    "Please use the overloaded constructor of Scope create an instance with a Container.");
-            }
-
-            Scope originalScope = this.Container.CurrentThreadResolveScope;
-
-            try
-            {
-                this.Container.CurrentThreadResolveScope = this;
-                return this.Container.GetInstance<TService>();
-            }
-            finally
-            {
-                this.Container.CurrentThreadResolveScope = originalScope;
-            }
-        }
-
-        /// <summary>Gets an instance of the given <paramref name="serviceType" /> for the current scope.</summary>
-        /// <param name="serviceType">The type of the service to resolve.</param>
-        /// <returns>An instance of the given service type.</returns>
-        public object GetInstance(Type serviceType)
-        {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-
-            if (this.Container == null)
-            {
-                throw new InvalidOperationException(
-                    "This method can only be called on Scope instances that are related to a Container. " +
-                    "Please use the overloaded constructor of Scope create an instance with a Container.");
-            }
-
-            Scope originalScope = this.Container.CurrentThreadResolveScope;
-
-            try
-            {
-                this.Container.CurrentThreadResolveScope = this;
-                return this.Container.GetInstance(serviceType);
-            }
-            finally
-            {
-                this.Container.CurrentThreadResolveScope = originalScope;
-            }
-        }
-
         /// <summary>
         /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
         /// but before the scope disposes any instances.
