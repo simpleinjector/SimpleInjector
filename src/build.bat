@@ -3,7 +3,7 @@
 set version=4.0.0
 set prereleasePostfix=
 set buildNumber=0 
-set copyrightYear=2016
+set copyrightYear=2017
 
 set version_Core=%version%
 set version_Packaging=%version_Core%
@@ -18,9 +18,14 @@ set version_Extensions_ExecutionContextScoping=%version_Core%
 set version_Integration_AspNetCore=%version_Core%
 set version_Integration_AspNetCore_Mvc=%version_Core%
 
-call "%PROGRAMFILES%\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat"
+set vsvars32_bat="%programfiles(x86)%\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat"
+set msbuild="%programfiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe"
 
-set msbuild="%PROGRAMFILES%\MSBuild\14.0\Bin\MSBuild.exe"
+if not exist %vsvars32_bat% goto :vsvars32_bat_missing
+if not exist %msbuild% goto :msbuild_exe_missing
+
+call vsvars32_bat
+
 set buildToolsPath=BuildTools
 set nugetTemplatePath=%buildToolsPath%\NuGet
 set ilmerge=%buildToolsPath%\ILMerge.exe
@@ -60,6 +65,7 @@ set numeric_version_Packaging=%version_Packaging%.%buildNumber%
 
 if exist Releases\v%named_version% goto :release_directory_already_exists
 if not exist SimpleInjector.snk goto :strong_name_key_missing
+
 
 echo BUILDING
 rmdir %targetPathNet% /s /q
@@ -284,3 +290,10 @@ GOTO :EOF
 echo The strong name key SimpleInjector.snk does not exist. You should generate (a fake) one for this build script to work.
 GOTO :EOF
 
+:msbuild_exe_missing
+echo Couldn't locate MSBuild.exe. Expected  it  to be here: %msbuild%
+GOTO :EOF
+
+:vsvars32_bat_missing
+echo Couldn't locate vsvars32.bat. Expected it to be here: %vsvars32_bat%
+GOTO :EOF
