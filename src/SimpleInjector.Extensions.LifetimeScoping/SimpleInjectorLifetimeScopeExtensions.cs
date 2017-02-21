@@ -84,8 +84,8 @@ namespace SimpleInjector
         /// <returns>A new <see cref="Scope"/> instance.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
-        [Obsolete("GetCurrentLifetimeScope has been deprecated. " +
-            "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.",
+        [Obsolete("GetCurrentLifetimeScope has been deprecated. Please use " +
+            "SimpleInjector.Lifestyles.ThreadScopedLifestyle.GetCurrentScope(Container) instead.",
             error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static Scope GetCurrentLifetimeScope(this Container container)
