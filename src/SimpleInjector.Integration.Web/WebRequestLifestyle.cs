@@ -23,7 +23,6 @@
 namespace SimpleInjector.Integration.Web
 {
     using System;
-    using System.Collections.Generic;
     using System.Web;
 
     /// <summary>
@@ -41,7 +40,7 @@ namespace SimpleInjector.Integration.Web
     /// </example>
     public sealed class WebRequestLifestyle : ScopedLifestyle
     {
-        private static readonly object ScopeCacheKey = new object();
+        private static readonly object ScopeKey = new object();
 
         /// <summary>Initializes a new instance of the <see cref="WebRequestLifestyle"/> class. The instance
         /// will ensure that created and cached instance will be disposed after the execution of the web
@@ -89,9 +88,9 @@ namespace SimpleInjector.Integration.Web
         {
             Requires.IsNotNull(context, nameof(context));
 
-            var scopeCache = (HttpContextScopeCache)context.Items[ScopeCacheKey];
+            var scope = (Scope)context.Items[ScopeKey];
 
-            if (scopeCache != null)
+            if (scope != null)
             {
                 // NOTE: We explicitly don't remove the object from the items dictionary, because if anything
                 // is resolved from the container after this point during the request, that would cause the
@@ -99,7 +98,7 @@ namespace SimpleInjector.Integration.Web
                 // application is working, while instead we are failing silently. By not removing the object,
                 // this will cause the Scope to throw an ObjectDisposedException once it is accessed after
                 // this point; effectively making the application to fail fast.
-                scopeCache.Dispose();
+                scope.Dispose();
             }
         }
 
@@ -134,58 +133,19 @@ namespace SimpleInjector.Integration.Web
                 return null;
             }
 
-            var scopeCache = (HttpContextScopeCache)context.Items[ScopeCacheKey];
+            var scope = (Scope)context.Items[ScopeKey];
 
-            if (scopeCache == null)
+            if (scope == null)
             {
-                context.Items[ScopeCacheKey] = scopeCache = new HttpContextScopeCache();
+                // If there are multiple container instances that run on the same request (which is a
+                // strange but valid scenario), all containers will get the same Scope instance for that
+                // request. This behavior is correct and even allows all instances that are registered for
+                // disposal to be disposed in reversed order of creation, independent of the container that
+                // created them.
+                context.Items[ScopeKey] = scope = new Scope();
             }
 
-            return scopeCache.GetOrCreateScopeForContainer(container);
-        }
-
-        private sealed class HttpContextScopeCache
-        {
-            private readonly List<Scope> scopes = new List<Scope>(1);
-
-            public Scope GetOrCreateScopeForContainer(Container container)
-            {
-                foreach (var existingScope in this.scopes)
-                {
-                    // We match by reference; since users might have overridden equality.
-                    if (object.ReferenceEquals(existingScope.Container, container))
-                    {
-                        return existingScope;
-                    }
-                }
-
-                var newScope = new Scope(container);
-
-                this.scopes.Add(newScope);
-
-                return newScope;
-            }
-
-            public void Dispose()
-            {
-                if (this.scopes.Count == 1)
-                {
-                    this.scopes[0].Dispose();
-                }
-                else
-                {
-                    // We add all scopes to a 'master scope'. This master scope will ensure that created scopes
-                    // will be disposed in reverse order of creation and will ensure that all scopes are
-                    // disposed, even when one scope throws an exception during disposal.
-                    using (var masterScope = new Scope())
-                    {
-                        foreach (var scope in this.scopes)
-                        {
-                            masterScope.RegisterForDisposal(scope);
-                        }
-                    }
-                }
-            }
+            return scope;
         }
     }
 }
