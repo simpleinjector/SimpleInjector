@@ -2,7 +2,6 @@
 namespace SimpleInjector.CodeSamples
 {
     using System;
-    using System.Globalization;
     using System.Linq;
     using SimpleInjector;
 
@@ -22,9 +21,7 @@ namespace SimpleInjector.CodeSamples
             container.ResolveUnregisteredType += (sender, e) => {
                 Type serviceType = e.UnregisteredServiceType;
 
-                if (!serviceType.IsGenericType || e.Handled) {
-                    return;
-                }
+                if (!serviceType.IsGenericType || e.Handled) return;
 
                 var registrations = FindAssignableRegistrations(container, serviceType);
 
@@ -37,18 +34,18 @@ namespace SimpleInjector.CodeSamples
                     e.Register(registrations[0].Registration);
                 } else {
                     var names = string.Join(", ", 
-                        registrations.Select(r => string.Format("{0}", r.ServiceType.ToFriendlyName())));
+                        registrations.Select(r => r.ServiceType.ToFriendlyName()));
 
-                    throw new ActivationException(string.Format(CultureInfo.CurrentCulture,
+                    throw new ActivationException(string.Format(
                         "There is an error in the container's configuration. It is impos" + 
                         "sible to resolve type {0}, because there are {1} registrations " + 
                         "that are applicable. Ambiguous registrations: {2}.",
-                        serviceType, registrations.Length, names));
+                        serviceType.ToFriendlyName(), registrations.Length, names));
                 }
             };
         }
 
-        private static InstanceProducer[] FindAssignableRegistrations(Container container, 
+        private static InstanceProducer[] FindAssignableRegistrations(Container container,
             Type serviceType) {
             Type serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
 

@@ -4,22 +4,21 @@
     using System.Reflection;
     using SimpleInjector.Advanced;
 
+    // Attribute for use by the application
     public enum CreationPolicy { Transient, Scoped, Singleton }
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface,
         Inherited = false, AllowMultiple = false)]
-    public sealed class CreationPolicyAttribute : Attribute
-    {
-        public CreationPolicyAttribute(CreationPolicy policy)
-        {
+    public sealed class CreationPolicyAttribute : Attribute {
+        public CreationPolicyAttribute(CreationPolicy policy) {
             this.Policy = policy;
         }
 
         public CreationPolicy Policy { get; }
     }
 
-    public class AttributeBasedLifestyleSelectionBehavior : ILifestyleSelectionBehavior
-    {
+    // Custom lifestyle selection behavior
+    public class AttributeBasedLifestyleSelectionBehavior : ILifestyleSelectionBehavior {
         private const CreationPolicy DefaultPolicy = CreationPolicy.Transient;
 
         public Lifestyle SelectLifestyle(Type type) => ToLifestyle(GetPolicy(type));

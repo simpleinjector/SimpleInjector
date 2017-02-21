@@ -13,31 +13,20 @@
     // Register this as follows:
     // container.Options.ConstructorResolutionBehavior =
     //     new MostResolvableParametersConstructorResolutionBehavior(container);
-    public class MostResolvableParametersConstructorResolutionBehavior : IConstructorResolutionBehavior
-    {
+    public class MostResolvableParametersConstructorResolutionBehavior 
+        : IConstructorResolutionBehavior {
         private readonly Container container;
 
-        public MostResolvableParametersConstructorResolutionBehavior(Container container)
-        {
+        public MostResolvableParametersConstructorResolutionBehavior(Container container) {
             this.container = container;
         }
 
-        private bool IsCalledDuringRegistrationPhase
-        {
-            [DebuggerStepThrough]
-            get { return !this.container.IsLocked(); }
-        }
+        private bool IsCalledDuringRegistrationPhase => !this.container.IsLocked();
 
         [DebuggerStepThrough]
-        public ConstructorInfo GetConstructor(Type implementationType)
-        {
+        public ConstructorInfo GetConstructor(Type implementationType) {
             var constructor = this.GetConstructors(implementationType).FirstOrDefault();
-
-            if (constructor != null)
-            {
-                return constructor;
-            }
-
+            if (constructor != null) return constructor;
             throw new ActivationException(BuildExceptionMessage(implementationType));
         }
 
@@ -56,8 +45,8 @@
         private bool CanBeResolved(ParameterInfo parameter) =>
             this.GetInstanceProducerFor(new InjectionConsumerInfo(parameter)) != null;
 
-        private InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo info) =>
-            this.container.Options.DependencyInjectionBehavior.GetInstanceProducer(info, false);
+        private InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo i) =>
+            this.container.Options.DependencyInjectionBehavior.GetInstanceProducer(i, false);
 
         private static string BuildExceptionMessage(Type type) =>
             !type.GetConstructors().Any()
@@ -66,12 +55,13 @@
 
         private static string TypeShouldHaveAtLeastOnePublicConstructor(Type type) =>
             string.Format(CultureInfo.InvariantCulture,
-                "For the container to be able to create {0}, it should contain at least one public " +
-                "constructor.", type.ToFriendlyName());
+                "For the container to be able to create {0}, it should contain at least " +
+                "one public constructor.", type.ToFriendlyName());
 
         private static string TypeShouldHaveConstructorWithResolvableTypes(Type type) =>
             string.Format(CultureInfo.InvariantCulture,
-                "For the container to be able to create {0}, it should contain a public constructor " +
-                "that only contains parameters that can be resolved.", type.ToFriendlyName());
+                "For the container to be able to create {0}, it should contain a public " +
+                "constructor that only contains parameters that can be resolved.", 
+                type.ToFriendlyName());
     }
 }

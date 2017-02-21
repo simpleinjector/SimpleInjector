@@ -40,13 +40,11 @@ namespace SimpleInjector.CodeSamples
 
     using SimpleInjector;
 
-    public interface IInterceptor
-    {
+    public interface IInterceptor {
         void Intercept(IInvocation invocation);
     }
 
-    public interface IInvocation
-    {
+    public interface IInvocation {
         object InvocationTarget { get; }
         object ReturnValue { get; set; }
         object[] Arguments { get; }
@@ -56,13 +54,10 @@ namespace SimpleInjector.CodeSamples
 
     // Extension methods for interceptor registration
     // NOTE: These extension methods can only intercept interfaces, not abstract types.
-    public static class InterceptorExtensions
-    {
+    public static class InterceptorExtensions {
         public static void InterceptWith<TInterceptor>(this Container container,
             Func<Type, bool> predicate)
             where TInterceptor : class, IInterceptor {
-            RequiresIsNotNull(container, nameof(container));
-            RequiresIsNotNull(predicate, nameof(predicate));
             container.Options.ConstructorResolutionBehavior.GetConstructor(typeof(TInterceptor));
 
             var interceptWith = new InterceptionHelper() {
@@ -76,10 +71,6 @@ namespace SimpleInjector.CodeSamples
 
         public static void InterceptWith(this Container container,
             Func<IInterceptor> interceptorCreator, Func<Type, bool> predicate) {
-            RequiresIsNotNull(container, nameof(container));
-            RequiresIsNotNull(interceptorCreator, nameof(interceptorCreator));
-            RequiresIsNotNull(predicate, nameof(predicate));
-
             var interceptWith = new InterceptionHelper() {
                 BuildInterceptorExpression =
                     e => Expression.Invoke(Expression.Constant(interceptorCreator)),
@@ -92,10 +83,6 @@ namespace SimpleInjector.CodeSamples
         public static void InterceptWith(this Container container,
             Func<ExpressionBuiltEventArgs, IInterceptor> interceptorCreator,
             Func<Type, bool> predicate) {
-            RequiresIsNotNull(container, nameof(container));
-            RequiresIsNotNull(interceptorCreator, nameof(interceptorCreator));
-            RequiresIsNotNull(predicate, nameof(predicate));
-
             var interceptWith = new InterceptionHelper() {
                 BuildInterceptorExpression = e => Expression.Invoke(
                     Expression.Constant(interceptorCreator),
@@ -108,10 +95,6 @@ namespace SimpleInjector.CodeSamples
 
         public static void InterceptWith(this Container container,
             IInterceptor interceptor, Func<Type, bool> predicate) {
-            RequiresIsNotNull(container, nameof(container));
-            RequiresIsNotNull(interceptor, nameof(interceptor));
-            RequiresIsNotNull(predicate, nameof(predicate));
-
             var interceptWith = new InterceptionHelper() {
                 BuildInterceptorExpression = e => Expression.Constant(interceptor),
                 Predicate = predicate
@@ -135,14 +118,7 @@ namespace SimpleInjector.CodeSamples
             return interceptorRegistration.BuildExpression();
         }
 
-        private static void RequiresIsNotNull(object instance, string paramName) {
-            if (instance == null) {
-                throw new ArgumentNullException(paramName);
-            }
-        }
-
-        private class InterceptionHelper
-        {
+        private class InterceptionHelper {
             private static readonly MethodInfo NonGenericInterceptorCreateProxyMethod = (
                 from method in typeof(Interceptor).GetMethods()
                 where method.Name == "CreateProxy"
@@ -150,13 +126,8 @@ namespace SimpleInjector.CodeSamples
                 select method)
                 .Single();
 
-            internal Func<ExpressionBuiltEventArgs, Expression> BuildInterceptorExpression
-            {
-                get;
-                set;
-            }
-
-            internal Func<Type, bool> Predicate { get; set; }
+            internal Func<ExpressionBuiltEventArgs, Expression> BuildInterceptorExpression;
+            internal Func<Type, bool> Predicate;
 
             [DebuggerStepThrough]
             public void OnExpressionBuilt(object sender, ExpressionBuiltEventArgs e) {
@@ -178,7 +149,7 @@ namespace SimpleInjector.CodeSamples
 
             [DebuggerStepThrough]
             private Expression BuildProxyExpression(ExpressionBuiltEventArgs e) {
-                var interceptor = this.BuildInterceptorExpression(e);
+                var expr = this.BuildInterceptorExpression(e);
 
                 // Create call to
                 // (ServiceType)Interceptor.CreateProxy(Type, IInterceptor, object)
@@ -186,11 +157,11 @@ namespace SimpleInjector.CodeSamples
                     Expression.Convert(
                         Expression.Call(NonGenericInterceptorCreateProxyMethod,
                             Expression.Constant(e.RegisteredServiceType, typeof(Type)),
-                            interceptor,
+                            expr,
                             e.Expression),
                         e.RegisteredServiceType);
 
-                if (e.Expression is ConstantExpression && interceptor is ConstantExpression) {
+                if (e.Expression is ConstantExpression && expr is ConstantExpression) {
                     return Expression.Constant(CreateInstance(proxyExpression),
                         e.RegisteredServiceType);
                 }
@@ -211,9 +182,8 @@ namespace SimpleInjector.CodeSamples
 
     public static class Interceptor
     {
-        public static T CreateProxy<T>(IInterceptor interceptor, T realInstance) {
-            return (T)CreateProxy(typeof(T), interceptor, realInstance);
-        }
+        public static T CreateProxy<T>(IInterceptor interceptor, T realInstance) => 
+            (T)CreateProxy(typeof(T), interceptor, realInstance);
 
         [DebuggerStepThrough]
         public static object CreateProxy(Type serviceType, IInterceptor interceptor,
@@ -222,77 +192,53 @@ namespace SimpleInjector.CodeSamples
             return proxy.GetTransparentProxy();
         }
 
-        private sealed class InterceptorProxy : RealProxy
-        {
+        private sealed class InterceptorProxy : RealProxy {
             private static MethodBase GetTypeMethod = typeof(object).GetMethod("GetType");
 
             private object realInstance;
             private IInterceptor interceptor;
 
             [DebuggerStepThrough]
-            public InterceptorProxy(Type classToProxy, object realInstance,
-                IInterceptor interceptor)
+            public InterceptorProxy(Type classToProxy, object obj, IInterceptor interceptor)
                 : base(classToProxy) {
-                this.realInstance = realInstance;
+                this.realInstance = obj;
                 this.interceptor = interceptor;
             }
 
             public override IMessage Invoke(IMessage msg) {
                 if (msg is IMethodCallMessage) {
                     var message = (IMethodCallMessage)msg;
-
-                    if (object.ReferenceEquals(message.MethodBase, GetTypeMethod)) {
-                        return this.Bypass(message);
-                    } else {
-                        return this.InvokeMethodCall(message);
-                    }
+                    return object.ReferenceEquals(message.MethodBase, GetTypeMethod)
+                        ? this.Bypass(message)
+                        : this.InvokeMethodCall(message);
                 }
 
                 return msg;
             }
 
-            private IMessage InvokeMethodCall(IMethodCallMessage message) {
-                var invocation = new Invocation {
-                    Proxy = this,
-                    Message = message,
-                    Arguments = message.Args
-                };
-
-                invocation.Proceeding += () => {
-                    invocation.ReturnValue = message.MethodBase.Invoke(
-                        this.realInstance, invocation.Arguments);
-                };
-
-                this.interceptor.Intercept(invocation);
-                return new ReturnMessage(invocation.ReturnValue, invocation.Arguments,
-                    invocation.Arguments.Length, null, message);
+            private IMessage InvokeMethodCall(IMethodCallMessage msg) {
+                var i = new Invocation { Proxy = this, Message = msg, Arguments = msg.Args };
+                i.Proceeding = () => 
+                    i.ReturnValue = msg.MethodBase.Invoke(this.realInstance, i.Arguments);
+                this.interceptor.Intercept(i);
+                return new ReturnMessage(i.ReturnValue, i.Arguments,
+                    i.Arguments.Length, null, msg);
             }
 
-            private IMessage Bypass(IMethodCallMessage message) {
-                var args = message.Args;
-                object value = message.MethodBase.Invoke(this.realInstance, args);
-                return new ReturnMessage(value, args, args.Length, null, message);
+            private IMessage Bypass(IMethodCallMessage msg) {
+                object value = msg.MethodBase.Invoke(this.realInstance, msg.Args);
+                return new ReturnMessage(value, msg.Args, msg.Args.Length, null, msg);
             }
 
-            private class Invocation : IInvocation
-            {
-                public event Action Proceeding;
+            private class Invocation : IInvocation {
+                public Action Proceeding;
                 public InterceptorProxy Proxy { get; set; }
                 public object[] Arguments { get; set; }
                 public IMethodCallMessage Message { get; set; }
                 public object ReturnValue { get; set; }
-
-                public object InvocationTarget {
-                    get { return this.Proxy.realInstance; }
-                }
-
-                public void Proceed() {
-                    this.Proceeding();
-                }
-
-                public MethodBase GetConcreteMethod() {
-                    return this.Message.MethodBase;
-                }
+                public object InvocationTarget => this.Proxy.realInstance;
+                public void Proceed() => this.Proceeding();
+                public MethodBase GetConcreteMethod() => this.Message.MethodBase;
             }
         }
     }
