@@ -9,9 +9,7 @@
     // harmful. It should not be used in web applications, because ASP.NET can finish a request on a different
     // thread. This can cause a Per Thread instance to be used from another thread, which can cause all sorts 
     // of race conditions. Even letting transient component depend on a per-thread component can cause trouble.
-    // Instead of using Per Thread lifestyle, use one of the 'scoped' lifestyles instead (that is Per Web 
-    // Request, Per WCF Operation, and Lifetime Scope) or register a singleton and make sure that it is 
-    // thread-safe.
+    // Instead of using Per Thread lifestyle, use ThreadScopedLifestyle instead.
     public sealed class ThreadLifestyle : Lifestyle
     {
         public static readonly Lifestyle Instance = new ThreadLifestyle();
@@ -20,7 +18,7 @@
         {
         }
 
-        // Greater than Lifetime Scope, but smaller than Singleton.
+        // Greater than Scope, but smaller than Singleton.
         public override int Length => Lifestyle.Singleton.Length - 1;
 
         protected override Registration CreateRegistrationCore<TConcrete>(Container container)

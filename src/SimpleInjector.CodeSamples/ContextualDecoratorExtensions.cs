@@ -36,11 +36,12 @@
 
             Predicate<DecoratorPredicateContext> predicateToReplace = c =>
             {
-                throw new InvalidOperationException("Conditional decorator " + decoratorType.FullName +
-                    " hasn't been applied to type " + c.ServiceType.FullName + ". Make sure that all " +
-                    "registered decorators that wrap this decorator are transient and don't depend on " +
-                    "Func<" + c.ServiceType.FullName + "> and that " + c.ServiceType + " is not resolved " +
-                    "as root type.");
+                throw new InvalidOperationException(
+                    "Conditional decorator " + decoratorType.ToFriendlyName() + " hasn't been applied to " +
+                    "type " + c.ServiceType.ToFriendlyName() + ". Make sure that all registered " +
+                    "decorators that wrap this decorator are transient and don't depend on " +
+                    "Func<" + c.ServiceType.ToFriendlyName() + "> and that " + 
+                    c.ServiceType.ToFriendlyName() + " is not resolved as root type.");
             };
 
             container.RegisterRuntimeDecorator(serviceType, decoratorType, predicateToReplace);
@@ -97,9 +98,9 @@
                 if (!visitor.AllContextualDecoratorsApplied)
                 {
                     throw new InvalidOperationException("Couldn't apply the contextual decorator " +
-                        visitor.UnappliedDecorators.Last().FullName + ". Make sure that all registered " +
-                        "decorators that wrap this decorator are transient and don't depend on " +
-                        "Func<" + target.TargetType.FullName + ">.");
+                        visitor.UnappliedDecorators.Last().ToFriendlyName() + ". Make sure that all " +
+                        "registered decorators that wrap this decorator are transient and don't depend on " +
+                        "Func<" + target.TargetType.ToFriendlyName() + ">.");
                 }
 
                 return InstanceProducer.FromExpression(target.TargetType, expression, this.container);

@@ -204,7 +204,7 @@
             catch (Exception ex)
             {
                 AssertThat.StringContains(
-                    "Couldn't apply the contextual decorator " + typeof(CommandHandlerDecorator<>).FullName,
+                    "Couldn't apply the contextual decorator CommandHandlerDecorator<TCommand>",
                     ex.Message);
 
                 AssertThat.StringContains(

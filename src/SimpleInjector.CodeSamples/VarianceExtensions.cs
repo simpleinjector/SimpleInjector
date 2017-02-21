@@ -37,7 +37,7 @@ namespace SimpleInjector.CodeSamples
                     e.Register(registrations[0].Registration);
                 } else {
                     var names = string.Join(", ", 
-                        registrations.Select(r => string.Format("{0}", r.ServiceType)));
+                        registrations.Select(r => string.Format("{0}", r.ServiceType.ToFriendlyName())));
 
                     throw new ActivationException(string.Format(CultureInfo.CurrentCulture,
                         "There is an error in the container's configuration. It is impos" + 

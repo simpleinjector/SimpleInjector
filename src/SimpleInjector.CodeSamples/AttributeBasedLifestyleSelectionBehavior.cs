@@ -4,14 +4,9 @@
     using System.Reflection;
     using SimpleInjector.Advanced;
 
-    public enum CreationPolicy 
-    {
-        Transient, 
-        Scoped, 
-        Singleton 
-    }
+    public enum CreationPolicy { Transient, Scoped, Singleton }
 
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, 
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface,
         Inherited = false, AllowMultiple = false)]
     public sealed class CreationPolicyAttribute : Attribute
     {
@@ -27,21 +22,14 @@
     {
         private const CreationPolicy DefaultPolicy = CreationPolicy.Transient;
 
-        public Lifestyle SelectLifestyle(Type implementationType)
-        {
-            var attribute = implementationType.GetCustomAttribute<CreationPolicyAttribute>();
+        public Lifestyle SelectLifestyle(Type type) => ToLifestyle(GetPolicy(type));
 
-            var policy = attribute == null ? DefaultPolicy : attribute.Policy;
+        private static Lifestyle ToLifestyle(CreationPolicy policy) =>
+            policy == CreationPolicy.Singleton ? Lifestyle.Singleton :
+            policy == CreationPolicy.Scoped ? Lifestyle.Scoped :
+            Lifestyle.Transient;
 
-            switch (policy)
-            {
-                case CreationPolicy.Singleton:
-                    return Lifestyle.Singleton;
-                case CreationPolicy.Scoped:
-                    return Lifestyle.Scoped;
-                default:
-                    return Lifestyle.Transient;
-            }
-        }
+        private static CreationPolicy GetPolicy(Type type) =>
+            type.GetCustomAttribute<CreationPolicyAttribute>()?.Policy ?? DefaultPolicy;
     }
 }

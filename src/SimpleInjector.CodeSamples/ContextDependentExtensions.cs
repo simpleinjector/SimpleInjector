@@ -64,16 +64,11 @@ namespace SimpleInjector.CodeSamples
             internal ParameterInfo Parameter {
                 get {
                     var expression = this.Expression as NewExpression;
-
-                    if (expression == null)
-                        return null;
-
-                    return expression.Constructor.GetParameters()[parameterIndex];
+                    return expression?.Constructor.GetParameters()[parameterIndex];
                 }
             }
 
-            protected override Expression VisitNew(NewExpression node)
-            {
+            protected override Expression VisitNew(NewExpression node) {
                 return node.Update(this.VisitArguments(node.Arguments));
             }
 
@@ -98,11 +93,7 @@ namespace SimpleInjector.CodeSamples
 
             private bool IsRootedContextBasedFactory(InvocationExpression node) {
                 var expression = node.Expression as ConstantExpression;
-
-                if (expression == null)
-                    return false;
-
-                return object.ReferenceEquals(expression.Value, this.RootFactory);
+                return object.ReferenceEquals(expression?.Value, this.RootFactory);
             }
         }
     }

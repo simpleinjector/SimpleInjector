@@ -122,18 +122,14 @@
             }
 
             internal ParameterConvention Convention { get; }
-
             internal Type Type { get; }
-
             internal string Name { get; set; }
-
             internal Expression Expression { get; set; }
         }
 
         private class ParameterDeclaringTypePair
         {
             internal Parameter Parameter { get; set; }
-
             internal Type DeclaringType { get; set; }
         }
     }

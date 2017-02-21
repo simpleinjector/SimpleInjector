@@ -170,28 +170,29 @@
                 {
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                         "Method {0}.{1} is static, but only instance methods can be used for method injection.",
-                        method.DeclaringType.Name, method.Name));
+                        method.DeclaringType.ToFriendlyName(), method.Name));
                 }
 
                 if (method.ReturnType != typeof(void))
                 {
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                         "Method {0}.{1} returns {2}, but injection is only supported the return type is " +
-                        "void.", method.DeclaringType.Name, method.Name, method.ReturnType.Name));
+                        "void.", 
+                        method.DeclaringType.ToFriendlyName(), method.Name, method.ReturnType.ToFriendlyName()));
                 }
 
                 if (!method.GetParameters().Any())
                 {
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                         "Method {0}.{1} has no parameters. What do you expect me to inject here?", 
-                        method.DeclaringType.Name, method.Name));
+                        method.DeclaringType.ToFriendlyName(), method.Name));
                 }
 
                 if (method.GetParameters().Length > 15)
                 {
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                         "Method {0}.{1} has more than 15 parameters. This is not supported.",
-                        method.DeclaringType.Name, method.Name));
+                        method.DeclaringType.ToFriendlyName(), method.Name));
                 }
             }
         }

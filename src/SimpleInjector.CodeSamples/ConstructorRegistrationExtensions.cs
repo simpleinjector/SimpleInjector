@@ -103,9 +103,7 @@
 
         private void RegisterExplicitConstructor<TImplementation>(IConstructorSelector selector)
         {
-            ConstructorInfo constructor = selector.GetConstructor(typeof(TImplementation));
-
-            this.constructors[typeof(TImplementation)] = constructor;
+            this.constructors[typeof(TImplementation)] = selector.GetConstructor(typeof(TImplementation));
         }
     }
 }

@@ -58,7 +58,7 @@
         {
             if (!typeof(TFactory).IsInterface)
             {
-                throw new ArgumentException(typeof(TFactory).Name + " is no interface");
+                throw new ArgumentException(typeof(TFactory).ToFriendlyName() + " is no interface");
             }
 
             var parameters = (
@@ -128,7 +128,7 @@
 
             public override IMessage Invoke(IMessage msg)
             {
-                IMethodCallMessage callMessage = msg as IMethodCallMessage;
+                var callMessage = msg as IMethodCallMessage;
 
                 if (callMessage != null)
                 {
