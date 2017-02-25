@@ -53,6 +53,8 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] Enabled property injection for conditional registrations. (fixes #383)
 		-[Core] Clear exception is thrown when invalid Expression is passed on to 
 		 ExpressionBuildingEventArgs.Expression. (fixes #354)
+		-[Core] Improved exception message when registering generic types with type constraints while in
+		 overriding mode. (fixes #384)
 
 	Project Changes:
 		-Projects for SimpleInjector.dll merged into one single project.

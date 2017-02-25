@@ -182,10 +182,16 @@ namespace SimpleInjector.Internals
                 // We allow the registration in case it doesn't have a predicate (meaning that the type is
                 // solely conditional by its generic type constraints) while it is the first registration.
                 // In that case there is no ambiguity, since there's nothing to replace (fixes #116).
-                if (this.providers.Any() || provider.Predicate != null)
+                if (provider.Predicate != null)
                 {
                     throw new NotSupportedException(
                         StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
+                }
+
+                if (this.providers.Any())
+                {
+                    throw new NotSupportedException(
+                        StringResources.MakingRegistrationsWithTypeConstraintsInOverridingModeIsNotSupported());
                 }
             }
         }

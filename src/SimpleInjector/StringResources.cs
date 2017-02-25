@@ -205,6 +205,11 @@ namespace SimpleInjector
                 "different registration or not.",
                 nameof(ContainerOptions.AllowOverridingRegistrations));
 
+        internal static string MakingRegistrationsWithTypeConstraintsInOverridingModeIsNotSupported() =>
+            MakingConditionalRegistrationsInOverridingModeIsNotSupported() +
+            " Your registration is considered conditional, because of its generic type constraints. " +
+            "This makes Simple Injector apply it conditionally, based on its type constraints.";
+
         internal static string NonGenericTypeAlreadyRegisteredAsConditionalRegistration(Type serviceType) =>
             NonGenericTypeAlreadyRegistered(serviceType, existingRegistrationIsConditional: true);
 

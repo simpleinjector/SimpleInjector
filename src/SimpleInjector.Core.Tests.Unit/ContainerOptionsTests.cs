@@ -160,7 +160,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
-                "making of conditional registrations is not supported when AllowOverridingRegistrations is set",
+                "Your registration is considered conditional, because of its generic type constraints. " +
+                "This makes Simple Injector apply it conditionally, based on its type constraints.",
                 action);
         }
 
