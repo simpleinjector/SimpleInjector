@@ -33,7 +33,7 @@ namespace SimpleInjector
     // Internal helper methods on System.Type.
     internal static class Types
     {
-        private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string), typeof(Scope) };
+        private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string), typeof(Scope), typeof(Container) };
 
         private static readonly Func<Type[], string> FullyQualifiedNameArgumentsFormatter =
             args => string.Join(", ", args.Select(a => a.ToFriendlyName(fullyQualifiedName: true)).ToArray());
