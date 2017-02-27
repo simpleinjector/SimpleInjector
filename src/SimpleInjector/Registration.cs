@@ -490,7 +490,7 @@ namespace SimpleInjector
             this.AddRelationships(constructor.DeclaringType, knownRelationships);
         }
 
-        private static Expression WrapWithNullChecker<TService>(Expression expression)
+        private static Expression WrapWithNullChecker<TService>(Expression expression) where TService : class
         {
             Func<TService, TService> nullChecker = ThrowWhenNull<TService>;
 
@@ -526,7 +526,7 @@ namespace SimpleInjector
             }
         }
 
-        private static TService ThrowWhenNull<TService>(TService instance)
+        private static TService ThrowWhenNull<TService>(TService instance) where TService : class
         {
             if (instance == null)
             {
