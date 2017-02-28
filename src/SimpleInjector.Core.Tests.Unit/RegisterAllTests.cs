@@ -1778,6 +1778,12 @@ namespace SimpleInjector.Tests.Unit
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
                 "Collection of items for type IEventHandler<AuditableEvent> has already been registered",
                 action);
+
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "In case it is your goal to append items to an already registered collection, please use " +
+                "the AppendToCollection extension method. This method is located in the " +
+                "SimpleInjector.Advanced namespace.",
+                action);
         }
 
         [TestMethod]

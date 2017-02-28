@@ -55,6 +55,7 @@ Version 4.0.0 (v4.0 RTM)
 		 ExpressionBuildingEventArgs.Expression. (fixes #354)
 		-[Core] Improved exception message when registering generic types with type constraints while in
 		 overriding mode. (fixes #384)
+		-[Core] Improveed exception message thrown when RegisterCollection is called twice. (fixes #378)
 
 	Project Changes:
 		-Projects for SimpleInjector.dll merged into one single project.
