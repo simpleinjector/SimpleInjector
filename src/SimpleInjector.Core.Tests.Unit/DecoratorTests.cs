@@ -6,6 +6,7 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Linq.Expressions;
+    using Castle.DynamicProxy;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
@@ -2399,6 +2400,33 @@
             }
         }
 
+        [TestMethod]
+        public void GetInstance_OnDecoratedTypeWhereDecoratorTypeHasNamelessParameters_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ILogger, NullLogger>();
+
+            // Castle Dynamic Proxy generates a type with a constructor with parameters where Name is null!
+            // The decorator's constructor becomes: ctor(IInterceptor[], ILogger)
+            var decoratorType = new DefaultProxyBuilder().CreateInterfaceProxyTypeWithTargetInterface(
+                typeof(ILogger), Type.EmptyTypes, ProxyGenerationOptions.Default);
+
+            container.RegisterDecorator(typeof(ILogger), decoratorType);
+
+            // Inject IInterceptor[] in the decorator (needed because Castle spits out such type).
+            container.RegisterConditional(typeof(IInterceptor[]),
+                Lifestyle.Singleton.CreateRegistration(() => new IInterceptor[0], container),
+                c => c.Consumer.ImplementationType == decoratorType);
+
+            // Act
+            var logger = container.GetInstance<ILogger>();
+
+            // Assert
+            AssertThat.IsInstanceOfType(decoratorType, logger);
+        }
+
         private static KnownRelationship GetValidRelationship()
         {
             // Arrange
@@ -2406,6 +2434,13 @@
 
             return new KnownRelationship(typeof(object), Lifestyle.Transient,
                 container.GetRegistration(typeof(Container)));
+        }
+
+        public class DummyInterceptor : IInterceptor
+        {
+            public void Intercept(IInvocation invocation)
+            {
+            }
         }
     }
 

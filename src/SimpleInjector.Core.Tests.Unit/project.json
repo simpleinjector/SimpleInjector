@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-*",
   "buildOptions": {
     "keyFile": "../fake.snk",
@@ -10,7 +10,8 @@
   "dependencies": {
     "MSTest.TestFramework": "1.0.7-preview",
     "dotnet-test-mstest": "1.1.2-preview",
-    "SimpleInjector": { "target": "project" }
+    "SimpleInjector": { "target": "project" },
+    "Castle.Core": "4.0.0"
   },
   "runtimes": {
     "win10-x86": {}
