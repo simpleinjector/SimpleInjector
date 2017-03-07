@@ -84,6 +84,21 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(assemblies));
             }
 
+            foreach (var package in container.GetPackagesToRegister(assemblies))
+            {
+                package.RegisterServices(container);
+            }
+        }
+
+        /// <summary>
+        /// Loads all <see cref="IPackage"/> implementations from the given set of 
+        /// <paramref name="assemblies"/> and returns a list of created package instances.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="assemblies">The assemblies that will be searched for packages.</param>
+        /// <returns>Returns a list of created packages.</returns>
+        public static IPackage[] GetPackagesToRegister(this Container container, IEnumerable<Assembly> assemblies)
+        {
             var packageTypes = (
                 from assembly in assemblies
                 from type in GetExportedTypesFrom(assembly)
@@ -95,15 +110,7 @@ namespace SimpleInjector
 
             RequiresPackageTypesHaveDefaultConstructor(packageTypes);
 
-            var packages = (
-                from type in packageTypes
-                select CreatePackage(type))
-                .ToArray();
-
-            foreach (var package in packages)
-            {
-                package.RegisterServices(container);
-            }
+            return packageTypes.Select(CreatePackage).ToArray();
         }
 
         private static IEnumerable<Type> GetExportedTypesFrom(Assembly assembly)

@@ -56,6 +56,7 @@ Version 4.0.0 (v4.0 RTM)
 		-[Core] Improved exception message when registering generic types with type constraints while in
 		 overriding mode. (fixes #384)
 		-[Core] Improveed exception message thrown when RegisterCollection is called twice. (fixes #378)
+		-[Packaging] Add GetPackagesToRegister extension method to simplify retrieving packages.
 
 	Project Changes:
 		-Projects for SimpleInjector.dll merged into one single project.
