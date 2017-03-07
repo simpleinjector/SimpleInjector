@@ -57,6 +57,8 @@ Version 4.0.0 (v4.0 RTM)
 		 overriding mode. (fixes #384)
 		-[Core] Improveed exception message thrown when RegisterCollection is called twice. (fixes #378)
 		-[Packaging] Add GetPackagesToRegister extension method to simplify retrieving packages.
+		-[Core] Open-generic abstractions with a "new()" type constraint would be incorrectly flagged as
+		 conditional, making it impossible to replace those registrations. (fixes #387)
 
 	Project Changes:
 		-Projects for SimpleInjector.dll merged into one single project.

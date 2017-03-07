@@ -52,10 +52,17 @@ namespace SimpleInjector.Internals
                 return true;
             }
 
-            bool typeHasDefaultCtor = this.Mapping.ConcreteType.GetConstructor(Helpers.Array<Type>.Empty) != null;
+            if (this.Mapping.ConcreteType.IsGenericParameter)
+            {
+                // Since ConcreteType is a type argument, we cannot check whether this constraint holds. 
+                // We just return true and have to check later on whether this constraint holds.
+                return true;
+            }
 
-            return typeHasDefaultCtor;
+            return HasDefaultConstructor(this.Mapping.ConcreteType);
         }
+
+        private static bool HasDefaultConstructor(Type t) => t.GetConstructor(Helpers.Array<Type>.Empty) != null;
 
         private bool ParameterSatisfiesReferenceTypeConstraint()
         {

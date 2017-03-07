@@ -7,10 +7,14 @@
     {
     }
 
-    public interface IConstraintedGeneric<T> where T : class
+    public interface IClassConstraintedGeneric<T> where T : class
     {
     }
-    
+
+    public interface INewConstraintedGeneric<T> where T : struct
+    {
+    }
+
     public interface IOpenGenericWithPredicate<T>
     {
     }
@@ -25,11 +29,19 @@
         }
     }
 
-    public class ConstraintedGeneric<T> : IConstraintedGeneric<T> where T : class
+    public class ClassConstraintedGeneric<T> : IClassConstraintedGeneric<T> where T : class
     {
     }
 
-    public class ConstraintedGeneric2<T> : IConstraintedGeneric<T> where T : class
+    public class ClassConstraintedGeneric2<T> : IClassConstraintedGeneric<T> where T : class
+    {
+    }
+
+    public class NewConstraintedGeneric1<X> : INewConstraintedGeneric<X> where X : struct
+    {
+    }
+
+    public class NewConstraintedGeneric2<T> : INewConstraintedGeneric<T> where T : struct
     {
     }
 

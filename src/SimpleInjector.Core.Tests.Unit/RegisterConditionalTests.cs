@@ -484,21 +484,21 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register(typeof(IConstraintedGeneric<>), typeof(ConstraintedGeneric<>));
+            container.Register(typeof(IClassConstraintedGeneric<>), typeof(ClassConstraintedGeneric<>));
 
             // Act
             // ConstraintedGeneric<T> can be applied to every possible IConstraintedGeneric<T> and that means
             // that the following conditional registration will always overlap with the previous and is 
             // therefore invalid.
-            Action action = () => container.RegisterConditional(typeof(IConstraintedGeneric<>),
-                typeof(ConstraintedGeneric2<>),
+            Action action = () => container.RegisterConditional(typeof(IClassConstraintedGeneric<>),
+                typeof(ClassConstraintedGeneric2<>),
                 c => true);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                There is already a registration for IConstraintedGeneric<T> (with implementation 
-                ConstraintedGeneric<T>) that overlaps with the conditional registration for 
-                ConstraintedGeneric2<T> that you are trying to make. This new registration would cause 
+                There is already a registration for IClassConstraintedGeneric<T> (with implementation 
+                ClassConstraintedGeneric<T>) that overlaps with the conditional registration for 
+                ClassConstraintedGeneric2<T> that you are trying to make. This new registration would cause 
                 ambiguity, because both registrations would be used for the same closed service types. Either 
                 remove one of the registrations or make them both conditional."
                 .TrimInside(),

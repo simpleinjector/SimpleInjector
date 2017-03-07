@@ -1284,6 +1284,44 @@
             container.GetInstance<IQueryDispatcher<MultipleResultsQuery, int>>();
             container.GetInstance<IQueryDispatcher<MultipleResultsQuery, bool>>();
         }
+
+        [TestMethod]
+        public void Register_OverridingNonConditionalOpenGenericTypeWithClassTypeConstraintOnAbstraction_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(IClassConstraintedGeneric<>), typeof(ClassConstraintedGeneric<>));
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            container.Register(typeof(IClassConstraintedGeneric<>), typeof(ClassConstraintedGeneric2<>));
+
+            // Assert
+            AssertThat.IsInstanceOfType(
+                expectedType: typeof(ClassConstraintedGeneric2<object>),
+                actualInstance: container.GetInstance<IClassConstraintedGeneric<object>>());
+        }
+
+        [TestMethod]
+        public void Register_OverridingNonConditionalOpenGenericTypeWithNewTypeConstraintOnAbstraction_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register(typeof(INewConstraintedGeneric<>), typeof(NewConstraintedGeneric1<>));
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            container.Register(typeof(INewConstraintedGeneric<>), typeof(NewConstraintedGeneric2<>));
+
+            // Assert
+            AssertThat.IsInstanceOfType(
+                expectedType: typeof(NewConstraintedGeneric2<int>),
+                actualInstance: container.GetInstance<INewConstraintedGeneric<int>>());
+        }
     }
 
     public interface IQueryDispatcher<TQuery, TResult> { }
