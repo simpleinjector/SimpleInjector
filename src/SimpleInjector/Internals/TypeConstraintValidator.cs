@@ -41,21 +41,21 @@ namespace SimpleInjector.Internals
 
         private bool ParameterSatisfiesDefaultConstructorConstraint()
         {
-            if (!this.MappingHasConstraint(GenericParameterAttributes.DefaultConstructorConstraint))
+            if (!this.MappingArgumentHasConstraint(GenericParameterAttributes.DefaultConstructorConstraint))
             {
-                return true;
-            }
-
-            if (this.Mapping.ConcreteType.IsValueType())
-            {
-                // Value types always have a default constructor.
                 return true;
             }
 
             if (this.Mapping.ConcreteType.IsGenericParameter)
             {
-                // Since ConcreteType is a type argument, we cannot check whether this constraint holds. 
-                // We just return true and have to check later on whether this constraint holds.
+                // In case the concrete type itself is a generic parameter, it as well should have the "new()"
+                // constraint. If not, it means that the "new()" constraint is added on the implementation.
+                return this.MappingConcreteTypeHasConstraint(GenericParameterAttributes.DefaultConstructorConstraint);
+            }
+
+            if (this.Mapping.ConcreteType.IsValueType())
+            {
+                // Value types always have a default constructor.
                 return true;
             }
 
@@ -66,7 +66,7 @@ namespace SimpleInjector.Internals
 
         private bool ParameterSatisfiesReferenceTypeConstraint()
         {
-            if (!this.MappingHasConstraint(GenericParameterAttributes.ReferenceTypeConstraint))
+            if (!this.MappingArgumentHasConstraint(GenericParameterAttributes.ReferenceTypeConstraint))
             {
                 return true;
             }
@@ -76,7 +76,7 @@ namespace SimpleInjector.Internals
 
         private bool ParameterSatisfiesNotNullableValueTypeConstraint()
         {
-            if (!this.MappingHasConstraint(GenericParameterAttributes.NotNullableValueTypeConstraint))
+            if (!this.MappingArgumentHasConstraint(GenericParameterAttributes.NotNullableValueTypeConstraint))
             {
                 return true;
             }
@@ -136,14 +136,21 @@ namespace SimpleInjector.Internals
             return baseTypes.Any(type => type.GetGuid() == constraint.GetGuid());
         }
 
-        private bool MappingHasConstraint(GenericParameterAttributes constraint)
+        private bool MappingArgumentHasConstraint(GenericParameterAttributes constraint) =>
+            GenericParameterHasConstraint(this.Mapping.Argument, constraint);
+
+        private bool MappingConcreteTypeHasConstraint(GenericParameterAttributes constraint) =>
+            GenericParameterHasConstraint(this.Mapping.ConcreteType, constraint);
+
+        private static bool GenericParameterHasConstraint(Type genericParameter, 
+            GenericParameterAttributes constraint)
         {
-            if (!this.Mapping.Argument.IsGenericParameter)
+            if (!genericParameter.IsGenericParameter)
             {
                 return false;
             }
 
-            var constraints = this.Mapping.Argument.GetGenericParameterAttributes();
+            var constraints = genericParameter.GetGenericParameterAttributes();
             return (constraints & constraint) != GenericParameterAttributes.None;
         }
     }
