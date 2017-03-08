@@ -34,13 +34,17 @@ namespace SimpleInjector.Internals
     /// </summary>
     internal sealed class GenericTypeBuilder
     {
-        [DebuggerDisplay("{Helpers.ToFriendlyName(closedGenericBaseType),nq}")]
+        private const string FriendlyName =
+            "SimpleInjector." + nameof(TypesExtensions) + "." + nameof(TypesExtensions.ToFriendlyName);
+
+        [DebuggerDisplay("{" + FriendlyName + "(closedGenericBaseType),nq}")]
         private readonly Type closedGenericBaseType;
 
-        [DebuggerDisplay("{Helpers.ToFriendlyName(openGenericImplementation),nq}")]
+        [DebuggerDisplay("{" + FriendlyName + "(openGenericImplementation),nq}")]
         private readonly Type openGenericImplementation;
 
-        [DebuggerDisplay("{(partialOpenGenericImplementation == null ? \"null\" : Helpers.ToFriendlyName(partialOpenGenericImplementation)),nq}")]
+        [DebuggerDisplay("{(partialOpenGenericImplementation == null ? \"null\" : " + 
+            FriendlyName + "(partialOpenGenericImplementation)),nq}")]
         private readonly Type partialOpenGenericImplementation;
 
         private readonly bool isPartialOpenGenericImplementation;
