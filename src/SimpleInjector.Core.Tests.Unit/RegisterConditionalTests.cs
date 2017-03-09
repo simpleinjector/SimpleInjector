@@ -1587,6 +1587,28 @@
                 "once per registration.");
         }
 
+        [TestMethod]
+        public void GetInstance_ConditionalRegistrationAndOpenGenericRegistrationForSameType_UseSameRegistration()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register(typeof(Logger<>), typeof(Logger<>), Lifestyle.Singleton);
+
+            container.RegisterConditional(typeof(ILogger),
+                c => typeof(Logger<>).MakeGenericType(c.Consumer.ImplementationType),
+                Lifestyle.Singleton,
+                c => true);
+
+            // Act
+            var logger1 = container.GetInstance<ServiceDependingOn<ILogger>>().Dependency;
+            var logger2 = container.GetInstance<Logger<ServiceDependingOn<ILogger>>>();
+
+            // Assert
+            Assert.IsTrue(ReferenceEquals(logger1, logger2),
+                "Simple Injector is expected to reuse the same Registration instance for both registrations.");
+        }
+
         private static void RegisterConditionalConstant<T>(Container container, T constant,
             Predicate<PredicateContext> predicate)
         {
