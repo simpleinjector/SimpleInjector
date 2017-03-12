@@ -1,4 +1,4 @@
-﻿namespace SimpleInjector.Core.Tests.Unit.Lifestyles
+﻿namespace SimpleInjector.Tests.Unit.Lifestyles
 {
     using System;
     using System.Collections.Generic;

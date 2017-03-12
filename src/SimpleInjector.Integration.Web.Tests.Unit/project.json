@@ -11,7 +11,7 @@
     "dotnet-test-mstest": "1.1.2-preview",
     "SimpleInjector": { "target": "project" },
     "SimpleInjector.Integration.Web": { "target": "project" },
-    "SimpleInjector.Core.Tests.Unit": { "target": "project" }
+    "SimpleInjector.Tests.Unit": { "target": "project" }
   },
   "runtimes": {
     "win10-x86": {}

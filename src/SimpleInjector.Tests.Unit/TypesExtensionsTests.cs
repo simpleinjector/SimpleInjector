@@ -1,4 +1,4 @@
-﻿namespace SimpleInjector.Core.Tests.Unit
+﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Linq;
