@@ -247,7 +247,7 @@ namespace SimpleInjector
 
             // This Func<T> is a bit ugly, but does save us a lot of duplicate code.
             Func<InstanceProducer> buildProducer =
-                () => this.BuildInstanceProducerForType(serviceType, autoCreateConcreteTypes);
+                () => this.BuildInstanceProducerForType(serviceType, consumer, autoCreateConcreteTypes);
 
             return this.GetInstanceProducerForType(serviceType, consumer, buildProducer);
         }
@@ -277,13 +277,13 @@ namespace SimpleInjector
         {
             // This generic overload allows retrieving types that are internal inside a sandbox.
             return this.GetInstanceProducerForType(typeof(TService), context,
-                this.BuildInstanceProducerForType<TService>);
+                () => this.BuildInstanceProducerForType<TService>(context));
         }
 
         private InstanceProducer GetInstanceProducerForType(Type serviceType, InjectionConsumerInfo context)
         {
             return this.GetInstanceProducerForType(serviceType, context,
-                () => this.BuildInstanceProducerForType(serviceType));
+                () => this.BuildInstanceProducerForType(serviceType, context));
         }
 
         private object GetInstanceForRootType<TService>() where TService : class
@@ -319,17 +319,18 @@ namespace SimpleInjector
             return instanceProducer.GetInstance();
         }
 
-        private InstanceProducer BuildInstanceProducerForType<TService>() where TService : class
+        private InstanceProducer BuildInstanceProducerForType<TService>(InjectionConsumerInfo context) 
+            where TService : class
         {
             return this.BuildInstanceProducerForType(typeof(TService),
-                this.TryBuildInstanceProducerForConcreteUnregisteredType<TService>);
+                () => this.TryBuildInstanceProducerForConcreteUnregisteredType<TService>(context));
         }
 
-        private InstanceProducer BuildInstanceProducerForType(Type serviceType, 
+        private InstanceProducer BuildInstanceProducerForType(Type serviceType, InjectionConsumerInfo context,
             bool autoCreateConcreteTypes = true)
         {
             var tryBuildInstanceProducerForConcrete = autoCreateConcreteTypes && !serviceType.IsAbstract()
-                ? () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType)
+                ? () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType, context)
                 : (Func<InstanceProducer>)(() => null);
 
             return this.BuildInstanceProducerForType(serviceType, tryBuildInstanceProducerForConcrete);
@@ -551,10 +552,11 @@ namespace SimpleInjector
             return new InstanceProducer(enumerableType, registration, registerExternalProducer: true);
         }
 
-        private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType<TConcrete>()
+        private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType<TConcrete>(
+            InjectionConsumerInfo context)
             where TConcrete : class
         {
-            if (this.IsConcreteConstructableType(typeof(TConcrete)))
+            if (this.IsConcreteConstructableType(typeof(TConcrete), context))
             {
                 return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), () =>
                 {
@@ -568,10 +570,11 @@ namespace SimpleInjector
             return null;
         }
 
-        private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType(Type type)
+        private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType(Type type,
+            InjectionConsumerInfo context)
         {
             if (type.IsAbstract() || type.IsValueType() || type.ContainsGenericParameters() || 
-                !this.IsConcreteConstructableType(type))
+                !this.IsConcreteConstructableType(type, context))
             {
                 return null;
             }
@@ -621,7 +624,7 @@ namespace SimpleInjector
             return producer;
         }
 
-        private bool IsConcreteConstructableType(Type concreteType)
+        private bool IsConcreteConstructableType(Type concreteType, InjectionConsumerInfo context)
         {
             string errorMesssage;
 
