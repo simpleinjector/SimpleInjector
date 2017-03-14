@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "Microsoft.AspNetCore.Http.Abstractions": "1.0.0",
+    "Microsoft.AspNetCore.Hosting.Abstractions": "1.0.0",
     "SimpleInjector": { "target": "project" },
     "NuSpec.ReferenceGenerator": {
       "version": "2.0.0-beta-bld14",

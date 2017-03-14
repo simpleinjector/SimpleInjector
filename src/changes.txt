@@ -59,6 +59,12 @@ Version 4.0.0 (v4.0 RTM)
 		-[Packaging] Add GetPackagesToRegister extension method to simplify retrieving packages.
 		-[Core] Open-generic abstractions with a "new()" type constraint would be incorrectly flagged as
 		 conditional, making it impossible to replace those registrations. (fixes #387)
+		-[AspNetCore] UseSimpleInjectorAspNetRequestScoping extension method for IApplicationBuilder replaced
+		 with UseSimpleInjectorAspNetRequestScoping extension for IServiceCollection to ensure scopes are
+		 added as early as possible in the request pipeline.
+		-[AspNetCore] IApplicationBuilder.GetRequestService and IApplicationBuilder.GetRequiredRequestService
+		 extension methods added to simplify resolving instances from the ASP.NET configuration system, while
+		 their lifestyle is preserved.
 
 	Project Changes:
 		-Projects for SimpleInjector.dll merged into one single project.

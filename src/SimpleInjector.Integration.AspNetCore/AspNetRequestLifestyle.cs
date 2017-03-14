@@ -24,12 +24,13 @@ namespace SimpleInjector.Integration.AspNetCore
 {
     using System;
     using Lifestyles;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single ASP.NET Request.
     /// Unless explicitly stated otherwise, instances created by this lifestyle will be disposed at the end
     /// of the request. Do note that this lifestyle requires the 
-    /// <see cref="SimpleInjectorAspNetCoreIntegrationExtensions.UseSimpleInjectorAspNetRequestScoping">UseSimpleInjectorAspNetRequestScoping.</see>
+    /// <see cref="SimpleInjectorAspNetCoreIntegrationExtensions.UseSimpleInjectorAspNetRequestScoping(IServiceCollection, Container)">UseSimpleInjectorAspNetRequestScoping.</see>
     /// to be registered in the Web API configuration.
     /// </summary>
     /// <example>
