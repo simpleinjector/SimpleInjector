@@ -75,17 +75,22 @@ mkdir %targetPathPcl%
 rmdir %targetPathCoreClr% /s /q
 mkdir %targetPathCoreClr%
 
-%replace% /source:SimpleInjector\project.json /line """version"": " "  ""version"": ""%named_version_Core%""," 
-%replace% /source:SimpleInjector.Extensions.ExecutionContextScoping\project.json /line """version"": " "  ""version"": ""%named_version_Extensions_ExecutionContextScoping%""," 
-%replace% /source:SimpleInjector.Extensions.LifetimeScoping\project.json /line """version"": " "  ""version"": ""%named_version_Extensions_LifetimeScoping%""," 
-%replace% /source:SimpleInjector.Integration.AspNetCore\project.json /line """version"": " "  ""version"": ""%named_version_Integration_AspNetCore%""," 
-%replace% /source:SimpleInjector.Integration.AspNetCore.Mvc\project.json /line """version"": " "  ""version"": ""%named_version_Integration_AspNetCore_Mvc%""," 
-%replace% /source:SimpleInjector.Integration.Wcf\project.json /line """version"": " "  ""version"": ""%named_version_Integration_Wcf%""," 
-%replace% /source:SimpleInjector.Integration.Web\project.json /line """version"": " "  ""version"": ""%named_version_Integration_Web%""," 
-%replace% /source:SimpleInjector.Integration.Web.Mvc\project.json /line """version"": " "  ""version"": ""%named_version_Integration_Mvc%""," 
-%replace% /source:SimpleInjector.Integration.WebApi\project.json /line """version"": " "  ""version"": ""%named_version_Integration_WebApi%""," 
-%replace% /source:SimpleInjector.Packaging\project.json /line """version"": " "  ""version"": ""%named_version_Packaging%""," 
+set version_search_line=""version"": ""4.0.0""
+set version_replace_line=""version"": ""%named_version_Core%""
 
+echo SET VERSION NUMBERS
+%replace% /source:SimpleInjector\project.json "%version_search_line%" """version"": ""%named_version_Core%""" 
+%replace% /source:SimpleInjector.Extensions.ExecutionContextScoping\project.json "%version_search_line%" """version"": ""%named_version_Extensions_ExecutionContextScoping%"""
+%replace% /source:SimpleInjector.Extensions.LifetimeScoping\project.json "%version_search_line%" """version"": ""%named_version_Extensions_LifetimeScoping%"""
+%replace% /source:SimpleInjector.Integration.AspNetCore\project.json "%version_search_line%" """version"": ""%named_version_Integration_AspNetCore%"""
+%replace% /source:SimpleInjector.Integration.AspNetCore.Mvc\project.json "%version_search_line%" """version"": ""%named_version_Integration_AspNetCore_Mvc%"""
+%replace% /source:SimpleInjector.Integration.Wcf\project.json "%version_search_line%" """version"": ""%named_version_Integration_Wcf%"""
+%replace% /source:SimpleInjector.Integration.Web\project.json "%version_search_line%" """version"": ""%named_version_Integration_Web%"""
+%replace% /source:SimpleInjector.Integration.Web.Mvc\project.json "%version_search_line%" """version"": ""%named_version_Integration_Mvc%"""
+%replace% /source:SimpleInjector.Integration.WebApi\project.json "%version_search_line%" """version"": ""%named_version_Integration_WebApi%"""
+%replace% /source:SimpleInjector.Packaging\project.json "%version_search_line%" """version"": ""%named_version_Packaging%"""
+
+echo BUILD PROJECTS
 %msbuild% "SimpleInjector\SimpleInjector.xproj" /nologo
 %msbuild% "SimpleInjector.Extensions.ExecutionContextScoping\SimpleInjector.Extensions.ExecutionContextScoping.xproj" /nologo
 %msbuild% "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.xproj" /nologo
@@ -96,6 +101,19 @@ mkdir %targetPathCoreClr%
 %msbuild% "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.xproj" /nologo
 %msbuild% "SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.xproj" /nologo
 %msbuild% "SimpleInjector.Packaging\SimpleInjector.Packaging.xproj" /nologo
+
+echo RESTORE VERSION NUMBERS
+%replace% /source:SimpleInjector\project.json """version"": ""%named_version_Core%""" "%version_search_line%" 
+%replace% /source:SimpleInjector.Extensions.ExecutionContextScoping\project.json """version"": ""%named_version_Extensions_ExecutionContextScoping%""" "%version_search_line%" 
+%replace% /source:SimpleInjector.Extensions.LifetimeScoping\project.json """version"": ""%named_version_Extensions_LifetimeScoping%""" "%version_search_line%" 
+%replace% /source:SimpleInjector.Integration.AspNetCore\project.json """version"": ""%named_version_Integration_AspNetCore%""" "%version_search_line%" 
+%replace% /source:SimpleInjector.Integration.AspNetCore.Mvc\project.json """version"": ""%named_version_Integration_AspNetCore_Mvc%""" "%version_search_line%" 
+%replace% /source:SimpleInjector.Integration.Wcf\project.json """version"": ""%named_version_Integration_Wcf%""" "%version_search_line%" 
+%replace% /source:SimpleInjector.Integration.Web\project.json """version"": ""%named_version_Integration_Web%""" "%version_search_line%" 
+%replace% /source:SimpleInjector.Integration.Web.Mvc\project.json """version"": ""%named_version_Integration_Mvc%""" "%version_search_line%" 
+%replace% /source:SimpleInjector.Integration.WebApi\project.json """version"": ""%named_version_Integration_WebApi%""" "%version_search_line%" 
+%replace% /source:SimpleInjector.Packaging\project.json """version"": ""%named_version_Packaging%""" "%version_search_line%" 
+
 
 echo BUILD DOCUMENTATION
 
