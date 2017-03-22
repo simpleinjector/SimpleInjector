@@ -57,7 +57,21 @@ namespace SimpleInjector
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(applicationBuilder, nameof(applicationBuilder));
 
-            var manager = applicationBuilder.ApplicationServices.GetRequiredService<ApplicationPartManager>();
+            var manager = applicationBuilder.ApplicationServices.GetService<ApplicationPartManager>();
+
+            if (manager == null)
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "A registration for the {0} is missing from the ASP.NET Core configuration " +
+                        "system. This is most likely caused by a missing call to services.AddMvcCore() or " +
+                        "services.AddMvc() as part of the ConfigureServices(IServiceCollection) method of " +
+                        "the Startup class. A call to one of those methods will ensure the registration " +
+                        "of the {1}.",
+                        typeof(ApplicationPartManager).FullName,
+                        typeof(ApplicationPartManager).Name));
+            }
 
             var feature = new ControllerFeature();
             manager.PopulateFeature(feature);
