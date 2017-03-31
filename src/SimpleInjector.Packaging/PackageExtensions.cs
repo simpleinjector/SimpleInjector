@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -36,6 +36,8 @@ namespace SimpleInjector
     /// </summary>
     public static class PackageExtensions
     {
+        // For more information about why this method was obsoleted, see: #372.
+#if NET40
         /// <summary>
         /// Loads all <see cref="IPackage"/> implementations from assemblies that are currently loaded in the 
         /// current AppDomain, and calls their <see cref="IPackage.RegisterServices">Register</see> method. 
@@ -47,14 +49,19 @@ namespace SimpleInjector
         /// <param name="container">The container to which the packages will be applied to.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null
         /// reference.</exception>
+        [Obsolete("RegisterPackages has been deprecated. " +
+            "Please use RegisterPackages(Container, IEnumerable<Assembly>) instead.",
+            error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void RegisterPackages(this Container container)
         {
-            var assemblies = 
+            var assemblies =
                 AppDomain.CurrentDomain.GetAssemblies()
                 .Where(assembly => !assembly.IsDynamic);
 
             RegisterPackages(container, assemblies);
         }
+#endif
 
         /// <summary>
         /// Loads all <see cref="IPackage"/> implementations from the given set of 
@@ -77,33 +84,44 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(assemblies));
             }
 
+            foreach (var package in container.GetPackagesToRegister(assemblies))
+            {
+                package.RegisterServices(container);
+            }
+        }
+
+        /// <summary>
+        /// Loads all <see cref="IPackage"/> implementations from the given set of 
+        /// <paramref name="assemblies"/> and returns a list of created package instances.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="assemblies">The assemblies that will be searched for packages.</param>
+        /// <returns>Returns a list of created packages.</returns>
+        public static IPackage[] GetPackagesToRegister(this Container container, IEnumerable<Assembly> assemblies)
+        {
             var packageTypes = (
                 from assembly in assemblies
                 from type in GetExportedTypesFrom(assembly)
-                where typeof(IPackage).IsAssignableFrom(type)
-                where !type.IsAbstract
-                where !type.IsGenericTypeDefinition
+                where typeof(IPackage).Info().IsAssignableFrom(type.Info())
+                where !type.Info().IsAbstract
+                where !type.Info().IsGenericTypeDefinition
                 select type)
                 .ToArray();
 
             RequiresPackageTypesHaveDefaultConstructor(packageTypes);
-            
-            var packages = (
-                from type in packageTypes
-                select CreatePackage(type))
-                .ToArray();
 
-            foreach (var package in packages)
-            {
-                package.RegisterServices(container);
-            }
+            return packageTypes.Select(CreatePackage).ToArray();
         }
 
         private static IEnumerable<Type> GetExportedTypesFrom(Assembly assembly)
         {
             try
             {
+#if NET40
                 return assembly.GetExportedTypes();
+#else
+                return assembly.DefinedTypes.Select(info => info.AsType());
+#endif
             }
             catch (NotSupportedException)
             {
@@ -116,7 +134,7 @@ namespace SimpleInjector
         private static void RequiresPackageTypesHaveDefaultConstructor(Type[] packageTypes)
         {
             var invalidPackageType =
-                packageTypes.FirstOrDefault(type => type.GetConstructor(Type.EmptyTypes) == null);
+                packageTypes.FirstOrDefault(type => !type.HasDefaultConstructor());
 
             if (invalidPackageType != null)
             {
@@ -140,5 +158,21 @@ namespace SimpleInjector
                 throw new InvalidOperationException(message, ex);
             }
         }
+
+        private static bool HasDefaultConstructor(this Type type) =>
+            type.GetConstructors().Any(ctor => !ctor.GetParameters().Any());
+
+        private static ConstructorInfo[] GetConstructors(this Type type) =>
+#if NET40
+            type.GetConstructors();
+#else
+            type.GetTypeInfo().DeclaredConstructors.ToArray();
+#endif
+
+#if NET40
+        private static Type Info(this Type type) => type;
+#else
+        private static TypeInfo Info(this Type type) => type.GetTypeInfo();
+#endif
     }
 }

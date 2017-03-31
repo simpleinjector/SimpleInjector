@@ -76,7 +76,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             var componentLifestylePairs =
                 from registrationWithProducers in registrations
                 let r = registrationWithProducers.registration
-                let componentLifestylePair = new { r.ImplementationType, Lifestyle = r.Lifestyle.GetType() }
+                let componentLifestylePair = new { r.ImplementationType, Lifestyle = r.Lifestyle.IdentificationKey }
                 group registrationWithProducers by componentLifestylePair into g
                 select new
                 {
@@ -113,7 +113,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             var lifestyles =
                 from producer in conflictingProducers.Concat(new[] { diagnosedProducer })
                 let lifestyle = producer.Registration.Lifestyle
-                group lifestyle by lifestyle.GetType() into g
+                group lifestyle by lifestyle.IdentificationKey into g
                 select g.First();
 
             string description = BuildDescription(diagnosedProducer, conflictingProducers);

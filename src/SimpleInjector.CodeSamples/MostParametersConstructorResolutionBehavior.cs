@@ -13,7 +13,7 @@
     public class MostParametersConstructorResolutionBehavior : IConstructorResolutionBehavior
     {
         [DebuggerStepThrough]
-        public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
+        public ConstructorInfo GetConstructor(Type implementationType)
         {
             ConstructorInfo[] constructors = GetConstructorsWithMostParameters(implementationType);
 
@@ -53,7 +53,7 @@
             {
                 return string.Format(CultureInfo.InvariantCulture,
                     "For the container to be able to create {0}, it should contain at least one " +
-                    "public constructor.", type);
+                    "public constructor.", type.ToFriendlyName());
             }
 
             return string.Format(CultureInfo.InvariantCulture,

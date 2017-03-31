@@ -57,7 +57,7 @@ namespace SimpleInjector
         /// <value>A boolean.</value>
         public bool IncludeDecorators { get; set; }
 
-#if NETSTANDARD
+#if NETSTANDARD1_0 || NETSTANDARD1_3
         /// <summary>
         /// Gets or sets a value indicating whether generic type definitions (types that have
         /// <see cref="TypeInfo.IsGenericTypeDefinition">TypeInfo.IsGenericTypeDefinition</see>

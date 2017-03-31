@@ -26,7 +26,6 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
@@ -44,32 +43,6 @@ namespace SimpleInjector
         Justification = "Mvc is the word")]
     public static class SimpleInjectorMvcExtensions
     {
-        /// <summary>Registers a <see cref="IFilterProvider"/> that allows implicit property injection into
-        /// the filter attributes that are returned from the provider.</summary>
-        /// <param name="container">The container that should be used for injecting properties into attributes
-        /// that the MVC framework uses.</param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when a MVC filter provider has already been registered for a different container.</exception>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
-            Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
-                            "grouped together.")]
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "container",
-            Justification = "We can't remove the 'container' parameter. That would break the API.")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(
-            "RegisterMvcAttributeFilterProvider has been deprecated and is removed. " +
-            "Use RegisterMvcIntegratedFilterProvider instead. See https://simpleinjector.org/depr2",
-            error: true)]
-        [ExcludeFromCodeCoverage]
-        public static void RegisterMvcAttributeFilterProvider(this Container container)
-        {
-            throw new InvalidOperationException(
-                "RegisterMvcAttributeFilterProvider has been deprecated and is removed. " +
-                "Use RegisterMvcIntegratedFilterProvider instead. See https://simpleinjector.org/depr2");
-        }
-
         /// <summary>Registers a <see cref="IFilterProvider"/> that allows filter attributes to go through the
         /// Simple Injector pipeline (https://simpleinjector.org/pipel). This allows any registered property to be 
         /// injected if a custom <see cref="IPropertySelectionBehavior"/> in configured in the container, and 

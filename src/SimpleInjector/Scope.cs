@@ -38,6 +38,7 @@ namespace SimpleInjector
         private const int MaxRecursion = 100;
 
         private readonly object syncRoot = new object();
+        private readonly ScopeManager manager;
 
         private Dictionary<object, object> items;
         private Dictionary<Registration, object> cachedInstances;
@@ -60,6 +61,14 @@ namespace SimpleInjector
             this.Container = container;
         }
 
+        internal Scope(Container container, ScopeManager manager, Scope parentScope) : this(container)
+        {
+            Requires.IsNotNull(manager, nameof(manager));
+
+            this.ParentScope = parentScope;
+            this.manager = manager;
+        }
+
         private enum DisposeState
         {
             Alive,
@@ -71,57 +80,9 @@ namespace SimpleInjector
         /// <value>The <see cref="Container"/> instance.</value>
         public Container Container { get; }
 
-        /// <summary>Gets an instance of the given <typeparamref name="TService"/> for the current scope.</summary>
-        /// <typeparam name="TService">The type of the service to resolve.</typeparam>
-        /// <returns>An instance of the given service type.</returns>
-        public TService GetInstance<TService>() where TService : class
-        {
-            if (this.Container == null)
-            {
-                throw new InvalidOperationException(
-                    "This method can only be called on Scope instances that are related to a Container. " +
-                    "Please use the overloaded constructor of Scope create an instance with a Container.");
-            }
+        internal bool Disposed => this.state == DisposeState.Disposed;
 
-            Scope originalScope = this.Container.CurrentThreadResolveScope;
-
-            try
-            {
-                this.Container.CurrentThreadResolveScope = this;
-                return this.Container.GetInstance<TService>();
-            }
-            finally
-            {
-                this.Container.CurrentThreadResolveScope = originalScope;
-            }
-        }
-
-        /// <summary>Gets an instance of the given <paramref name="serviceType" /> for the current scope.</summary>
-        /// <param name="serviceType">The type of the service to resolve.</param>
-        /// <returns>An instance of the given service type.</returns>
-        public object GetInstance(Type serviceType)
-        {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-
-            if (this.Container == null)
-            {
-                throw new InvalidOperationException(
-                    "This method can only be called on Scope instances that are related to a Container. " +
-                    "Please use the overloaded constructor of Scope create an instance with a Container.");
-            }
-
-            Scope originalScope = this.Container.CurrentThreadResolveScope;
-
-            try
-            {
-                this.Container.CurrentThreadResolveScope = this;
-                return this.Container.GetInstance(serviceType);
-            }
-            finally
-            {
-                this.Container.CurrentThreadResolveScope = originalScope;
-            }
-        }
+        internal Scope ParentScope { get; }
 
         /// <summary>
         /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
@@ -248,10 +209,9 @@ namespace SimpleInjector
             GC.SuppressFinalize(this);
         }
 
-        internal static TService GetInstance<TService, TImplementation>(
-            ScopedRegistration<TService, TImplementation> registration, Scope scope)
-            where TImplementation : class, TService
-            where TService : class
+        internal static TImplementation GetInstance<TImplementation>(
+            ScopedRegistration<TImplementation> registration, Scope scope)
+            where TImplementation : class
         {
             if (scope == null)
             {
@@ -308,6 +268,8 @@ namespace SimpleInjector
                         this.cachedInstances = null;
                         this.scopeEndActions = null;
                         this.disposables = null;
+
+                        this.manager?.RemoveScope(this);
                     }
                 }
             }
@@ -378,10 +340,9 @@ namespace SimpleInjector
             }
         }
 
-        private static TService GetScopelessInstance<TService, TImplementation>(
-            ScopedRegistration<TService, TImplementation> registration)
-            where TImplementation : class, TService
-            where TService : class
+        private static TImplementation GetScopelessInstance<TImplementation>(
+            ScopedRegistration<TImplementation> registration)
+            where TImplementation : class
         {
             if (registration.Container.IsVerifying())
             {
@@ -390,14 +351,13 @@ namespace SimpleInjector
 
             throw new ActivationException(
                 StringResources.TheServiceIsRequestedOutsideTheContextOfAScopedLifestyle(
-                    typeof(TService),
+                    typeof(TImplementation),
                     registration.Lifestyle));
         }
 
-        private TService GetInstanceInternal<TService, TImplementation>(
-            ScopedRegistration<TService, TImplementation> registration)
-            where TService : class
-            where TImplementation : class, TService
+        private TImplementation GetInstanceInternal<TImplementation>(
+            ScopedRegistration<TImplementation> registration)
+            where TImplementation : class
         {
             lock (this.syncRoot)
             {
@@ -414,34 +374,30 @@ namespace SimpleInjector
                 object instance;
 
                 return !cacheIsEmpty && this.cachedInstances.TryGetValue(registration, out instance)
-                    ? (TService)instance
+                    ? (TImplementation)instance
                     : this.CreateAndCacheInstance(registration);
             }
         }
 
-        private TService CreateAndCacheInstance<TService, TImplementation>(
-            ScopedRegistration<TService, TImplementation> registration)
-            where TService : class
-            where TImplementation : class, TService
+        private TImplementation CreateAndCacheInstance<TImplementation>(
+            ScopedRegistration<TImplementation> registration)
+            where TImplementation : class
         {
-            TService service = registration.InstanceCreator.Invoke();
+            TImplementation instance = registration.InstanceCreator.Invoke();
 
-            this.cachedInstances[registration] = service;
+            this.cachedInstances[registration] = instance;
 
-            if (registration.RegisterForDisposal)
+            var disposable = instance as IDisposable;
+
+            if (disposable != null)
             {
-                var disposable = service as IDisposable;
-
-                if (disposable != null)
-                {
-                    this.RegisterForDisposalInternal(disposable);
-                }
+                this.RegisterForDisposalInternal(disposable);
             }
 
-            return service;
+            return instance;
         }
 
-#if NET45 || NETSTANDARD
+#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private void RegisterForDisposalInternal(IDisposable disposable)
@@ -466,7 +422,7 @@ namespace SimpleInjector
             }
         }
 
-#if NET45 || NETSTANDARD
+#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private void RequiresInstanceNotDisposed()
@@ -482,7 +438,7 @@ namespace SimpleInjector
             throw new ObjectDisposedException(this.GetType().FullName);
         }
 
-#if NET45 || NETSTANDARD
+#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private void PreventCyclicDependenciesDuringDisposal()

@@ -34,7 +34,7 @@ namespace SimpleInjector.Lifestyles
         {
         }
 
-        protected override int Length => 1000;
+        public override int Length => 1000;
 
         // This method seems somewhat redundant, since the exact same can be achieved by calling
         // Lifetime.Singleton.CreateRegistration(serviceType, () => instance, container). Calling that method
@@ -43,13 +43,13 @@ namespace SimpleInjector.Lifestyles
         // (and the extra SingletonInstanceLifestyleRegistration class), we can ensure that the
         // ExpressionBuilding event is called with a ConstantExpression, which is much more intuitive to
         // anyone handling that event.
-        internal static Registration CreateSingleInstanceRegistration(Type serviceType, object instance, 
+        internal static Registration CreateSingleInstanceRegistration(Type serviceType, object instance,
             Container container, Type implementationType = null)
         {
             Requires.IsNotNull(instance, nameof(instance));
 
             return new SingletonInstanceLifestyleRegistration(serviceType, implementationType ?? serviceType,
-                instance, Lifestyle.Singleton, container);
+                instance, container);
         }
 
         internal static InstanceProducer CreateUncontrolledCollectionProducer(Type itemType, 
@@ -75,38 +75,58 @@ namespace SimpleInjector.Lifestyles
         internal static bool IsSingletonInstanceRegistration(Registration registration) => 
             registration is SingletonInstanceLifestyleRegistration;
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container) => 
-            new SingletonLifestyleRegistration<TService, TImplementation>(this, container);
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) => 
+            new SingletonLifestyleRegistration<TConcrete>(container);
 
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {
-            return new SingletonFuncLifestyleRegistration<TService>(instanceCreator, this, container);
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+
+            return new SingletonLifestyleRegistration<TService>(container, instanceCreator);
         }
 
         private sealed class SingletonInstanceLifestyleRegistration : Registration
         {
-            private readonly object originalInstance;
-            private readonly Type serviceType;
-            private readonly Type implementationType;
-            private readonly Lazy<object> initializedInstance;
+            private readonly object locker = new object();
+
+            private object instance;
+            private bool initialized;
 
             internal SingletonInstanceLifestyleRegistration(Type serviceType, Type implementationType, 
-                object instance, Lifestyle lifestyle, Container container)
-                : base(lifestyle, container)
+                object instance, Container container)
+                : base(Lifestyle.Singleton, container)
             {
-                this.originalInstance = instance;
-                this.serviceType = serviceType;
-                this.implementationType = implementationType;
-
-                // Default lazy behavior ensures that the initializer is guaranteed to be called just once.
-                this.initializedInstance = new Lazy<object>(this.GetInjectedInterceptedAndInitializedInstance);
+                this.instance = instance;
+                this.ServiceType = serviceType;
+                this.ImplementationType = implementationType;
             }
 
-            public override Type ImplementationType => this.implementationType;
+            public Type ServiceType { get; }
+            public override Type ImplementationType { get; }
 
-            public override Expression BuildExpression() => 
-                Expression.Constant(this.initializedInstance.Value, this.serviceType);
+            public override Expression BuildExpression()
+            {
+                return Expression.Constant(this.GetInitializedInstance(), this.ImplementationType);
+            }
+
+            private object GetInitializedInstance()
+            {
+                if (!this.initialized)
+                {
+                    lock (this.locker)
+                    {
+                        if (!this.initialized)
+                        {
+                            this.instance = this.GetInjectedInterceptedAndInitializedInstance();
+                        }
+                    }
+
+                    this.initialized = true;
+                }
+
+                return this.instance;
+            }
 
             private object GetInjectedInterceptedAndInitializedInstance()
             {
@@ -117,113 +137,115 @@ namespace SimpleInjector.Lifestyles
                 catch (MemberAccessException ex)
                 {
                     throw new ActivationException(
-                        StringResources.UnableToResolveTypeDueToSecurityConfiguration(this.serviceType, ex));
+                        StringResources.UnableToResolveTypeDueToSecurityConfiguration(this.ImplementationType, ex));
                 }
             }
 
             private object GetInjectedInterceptedAndInitializedInstanceInternal()
             {
-                Expression expression = Expression.Constant(this.originalInstance, this.serviceType);
+                Expression expression = Expression.Constant(this.instance, this.ImplementationType);
 
-                expression = this.WrapWithPropertyInjector(this.serviceType, this.serviceType, expression);
-                expression = this.InterceptInstanceCreation(this.serviceType, this.serviceType, expression);
-                expression = this.WrapWithInitializer(this.serviceType, this.serviceType, expression);
+                // NOTE: We pass on producer.ServiceType as the implementation type for the following three
+                // methods. This will the initialization to be only done based on information of the service
+                // type; not on that of the implementation. Although now the initialization could be 
+                // incomplete, this behavior is consistent with the initialization of 
+                // Register<TService>(Func<TService>, Lifestyle), which doesn't have the proper static type
+                // information available to use the implementation type.
+                // TODO: This behavior should be reconsidered, because now it is incompatible with
+                // Register<TService, TImplementation>(Lifestyle). So the question is, do we consider
+                // RegisterSingleton<TService>(TService) to be similar to Register<TService>(Func<TService>)
+                // or to Register<TService, TImplementation>()? See: #353.
+                expression = this.WrapWithPropertyInjector(this.ServiceType, expression);
+                expression = this.InterceptInstanceCreation(this.ServiceType, expression);
+                expression = this.WrapWithInitializer(this.ServiceType, expression);
 
-                var initializer = Expression.Lambda(expression).Compile();
+                // Optimization: We don't need to compile a delegate in case all we have is a constant.
+                if (expression is ConstantExpression)
+                {
+                    return ((ConstantExpression)expression).Value;
+                }
+
+                Delegate initializer = Expression.Lambda(expression).Compile();
 
                 // This delegate might return a different instance than the originalInstance (caused by a
                 // possible interceptor).
                 return initializer.DynamicInvoke();
             }
         }
-        
-        private sealed class SingletonFuncLifestyleRegistration<TService> 
-            : SingletonLifestyleRegistrationBase<TService>
-            where TService : class
-        {
-            private Func<TService> instanceCreator;
 
-            internal SingletonFuncLifestyleRegistration(Func<TService> instanceCreator, Lifestyle lifestyle,
-                Container container)
-                : base(lifestyle, container)
+        private sealed class SingletonLifestyleRegistration<TImplementation> : Registration 
+            where TImplementation : class
+        {
+            private readonly object locker = new object();
+            private readonly Func<TImplementation> instanceCreator;
+
+            private object interceptedInstance;
+
+            public SingletonLifestyleRegistration(Container container, Func<TImplementation> instanceCreator = null)
+                : base(Lifestyle.Singleton, container)
             {
                 this.instanceCreator = instanceCreator;
             }
 
-            public override Type ImplementationType => typeof(TService);
-
-            protected override Expression BuildTransientExpression() => 
-                this.BuildTransientExpression(this.instanceCreator);
-        }
-
-        private class SingletonLifestyleRegistration<TService, TImplementation>
-            : SingletonLifestyleRegistrationBase<TService>
-            where TImplementation : class, TService
-            where TService : class
-        {
-            public SingletonLifestyleRegistration(Lifestyle lifestyle, Container container)
-                : base(lifestyle, container)
-            {
-            }
-
             public override Type ImplementationType => typeof(TImplementation);
 
-            protected override Expression BuildTransientExpression() => 
-                this.BuildTransientExpression<TService, TImplementation>();
-        }
+            public override Expression BuildExpression() => 
+                Expression.Constant(this.GetInterceptedInstance(), this.ImplementationType);
 
-        private abstract class SingletonLifestyleRegistrationBase<TService> : Registration 
-            where TService : class
-        {
-            private readonly Lazy<TService> lazyInstance;
-
-            protected SingletonLifestyleRegistrationBase(Lifestyle lifestyle, Container container)
-                : base(lifestyle, container)
+            private object GetInterceptedInstance()
             {
                 // Even though the InstanceProducer takes a lock before calling Registration.BuildExpression
-                // we want to be very sure that there will never be more than one instance of a singleton
-                // created. Since the same Registration instance can be used by multiple InstanceProducers,
-                // we absolutely need this protection.
-                this.lazyInstance = new Lazy<TService>(this.CreateInstanceWithNullCheck);
+                // we need to take a lock here, because multiple InstanceProducer instances could reference
+                // the same Registration and call this code in parallel.
+                if (this.interceptedInstance == null)
+                {
+                    lock (this.locker)
+                    {
+                        if (this.interceptedInstance == null)
+                        {
+                            this.interceptedInstance = this.CreateInstanceWithNullCheck();
+
+                            var disposable = this.interceptedInstance as IDisposable;
+
+                            if (disposable != null)
+                            {
+                                this.Container.RegisterForDisposal(disposable);
+                            }
+                        }
+                    }
+                }
+
+                return this.interceptedInstance;
             }
 
-            public override Expression BuildExpression() => 
-                Expression.Constant(this.lazyInstance.Value, typeof(TService));
-
-            protected abstract Expression BuildTransientExpression();
-
-            private TService CreateInstanceWithNullCheck()
+            private TImplementation CreateInstanceWithNullCheck()
             {
-                var expression = this.BuildTransientExpression();
+                Expression expression =
+                    this.instanceCreator == null
+                        ? this.BuildTransientExpression()
+                        : this.BuildTransientExpression(this.instanceCreator);
 
-                Func<TService> func = CompileExpression(expression);
+                Func<TImplementation> func = CompileExpression(expression);
 
-                var instance = func();
+                TImplementation instance = func();
 
                 EnsureInstanceIsNotNull(instance);
-
-                IDisposable disposable = instance as IDisposable;
-
-                if (disposable != null)
-                {
-                    this.Container.RegisterForDisposal(disposable);
-                }
 
                 return instance;
             }
 
-            private static Func<TService> CompileExpression(Expression expression)
+            private static Func<TImplementation> CompileExpression(Expression expression)
             {
                 try
                 {
                     // Don't call BuildTransientDelegate, because that might do optimizations that are simply
                     // not needed, since the delegate will be called just once.
-                    return CompilationHelpers.CompileLambda<TService>(expression);
+                    return CompilationHelpers.CompileLambda<TImplementation>(expression);
                 }
                 catch (Exception ex)
                 {
                     string message = StringResources.ErrorWhileBuildingDelegateFromExpression(
-                        typeof(TService), expression, ex);
+                        typeof(TImplementation), expression, ex);
 
                     throw new ActivationException(message, ex);
                 }
@@ -234,7 +256,7 @@ namespace SimpleInjector.Lifestyles
                 if (instance == null)
                 {
                     throw new ActivationException(
-                        StringResources.DelegateForTypeReturnedNull(typeof(TService)));
+                        StringResources.DelegateForTypeReturnedNull(typeof(TImplementation)));
                 }
             }
         }

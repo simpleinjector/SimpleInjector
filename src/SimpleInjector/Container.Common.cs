@@ -30,7 +30,6 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using System.Threading;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
@@ -62,6 +61,9 @@ namespace SimpleInjector
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public partial class Container : IDisposable
     {
+        internal readonly Dictionary<object, Dictionary<Type, WeakReference>> LifestyleRegistrationCache =
+            new Dictionary<object, Dictionary<Type, WeakReference>>();
+
         private static long counter;
 
         private readonly object locker = new object();
@@ -90,6 +92,7 @@ namespace SimpleInjector
         private bool locked;
         private string stackTraceThatLockedTheContainer;
         private bool disposed;
+        private string stackTraceThatDisposedTheContainer;
 
         private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
         private EventHandler<ExpressionBuildingEventArgs> expressionBuilding;
@@ -113,9 +116,9 @@ namespace SimpleInjector
         // Wrapper for instance initializer delegates
         private interface IInstanceInitializer
         {
-            bool AppliesTo(Type implementationType, InitializationContext context);
+            bool AppliesTo(Type implementationType, InitializerContext registration);
 
-            Action<T> CreateAction<T>(InitializationContext context);
+            Action<T> CreateAction<T>(InitializerContext context);
         }
 
         /// <summary>Gets the container options.</summary>
@@ -158,6 +161,8 @@ namespace SimpleInjector
         }
 
         internal bool HasRegistrations => this.explicitRegistrations.Any() || this.collectionResolvers.Any();
+
+        internal bool HasResolveInterceptors => this.resolveInterceptors.Count > 0;
 
         /// <summary>
         /// Returns an array with the current registrations. This list contains all explicitly registered
@@ -265,7 +270,13 @@ namespace SimpleInjector
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
-            this.disposed = true;
+
+            if (!this.disposed)
+            {
+                this.disposed = true;
+
+                GetStackTrace(ref this.stackTraceThatDisposedTheContainer);
+            }
         }
 
         internal InstanceProducer[] GetRootRegistrations(bool includeInvalidContainerRegisteredTypes)
@@ -344,12 +355,12 @@ namespace SimpleInjector
             }
         }
 
-        internal Expression OnExpressionBuilding(Registration registration, Type serviceType,
-            Type implementationType, Expression instanceCreatorExpression)
+        internal Expression OnExpressionBuilding(Registration registration, Type implementationType, 
+            Expression instanceCreatorExpression)
         {
             if (this.expressionBuilding != null)
             {
-                var e = new ExpressionBuildingEventArgs(serviceType, implementationType,
+                var e = new ExpressionBuildingEventArgs(implementationType,
                     instanceCreatorExpression, registration.Lifestyle);
 
                 var relationships = new KnownRelationshipCollection(registration.GetRelationships().ToList());
@@ -389,7 +400,7 @@ namespace SimpleInjector
         }
 
         /// <summary>Prevents any new registrations to be made to the container.</summary>
-#if NET45 || NETSTANDARD
+#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         internal void LockContainer()
@@ -402,24 +413,30 @@ namespace SimpleInjector
             }
         }
 
-#if NET45 || NETSTANDARD
+#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         internal void ThrowWhenDisposed()
         {
             if (this.disposed)
             {
+                // Performance optimization: Throwing moved to another method to allow this method to be in-lined.
                 this.ThrowContainerDisposedException();
             }
         }
 
-        internal Func<object> WrapWithResolveInterceptor(InitializationContext context, Func<object> producer)
+        internal Func<object> WrapWithResolveInterceptor(InstanceProducer instanceProducer, Func<object> producer)
         {
-            ResolveInterceptor[] interceptors = this.GetResolveInterceptorsFor(context);
-
-            foreach (var interceptor in interceptors)
+            if (this.HasResolveInterceptors)
             {
-                producer = ApplyResolveInterceptor(interceptor, context, producer);
+                var context = new InitializationContext(instanceProducer, instanceProducer.Registration);
+
+                ResolveInterceptor[] interceptors = this.GetResolveInterceptorsFor(context);
+
+                foreach (ResolveInterceptor interceptor in interceptors)
+                {
+                    producer = ApplyResolveInterceptor(interceptor, context, producer);
+                }
             }
 
             return producer;
@@ -501,7 +518,10 @@ namespace SimpleInjector
 
         private void ThrowContainerDisposedException()
         {
-            throw new ObjectDisposedException(this.GetType().FullName);
+            throw new ObjectDisposedException(
+                objectName: null,
+                message: StringResources.ContainerCanNotBeUsedAfterDisposal(this.GetType(),
+                    this.stackTraceThatDisposedTheContainer));
         }
 
         private static object ThrowWhenResolveInterceptorReturnsNull(object instance)
@@ -516,11 +536,6 @@ namespace SimpleInjector
 
         private ResolveInterceptor[] GetResolveInterceptorsFor(InitializationContext context)
         {
-            if (!this.resolveInterceptors.Any())
-            {
-                return Helpers.Array<ResolveInterceptor>.Empty;
-            }
-
             return (
                 from resolveInterceptor in this.resolveInterceptors
                 where resolveInterceptor.Predicate(context)
@@ -528,8 +543,15 @@ namespace SimpleInjector
                 .ToArray();
         }
 
-        private Action<T>[] GetInstanceInitializersFor<T>(Type type, InitializationContext context)
+        private Action<T>[] GetInstanceInitializersFor<T>(Type type, Registration registration)
         {
+            if (this.instanceInitializers.Count == 0)
+            {
+                return Helpers.Array<Action<T>>.Empty;
+            }
+
+            var context = new InitializerContext(registration);
+
             return (
                 from instanceInitializer in this.instanceInitializers
                 where instanceInitializer.AppliesTo(type, context)
@@ -703,14 +725,14 @@ namespace SimpleInjector
             private Type serviceType;
             private object instanceInitializer;
 
-            public bool AppliesTo(Type implementationType, InitializationContext context)
+            public bool AppliesTo(Type implementationType, InitializerContext context)
             {
-                var typeHierarchy = Helpers.GetTypeHierarchyFor(implementationType);
+                var typeHierarchy = Types.GetTypeHierarchyFor(implementationType);
 
                 return typeHierarchy.Contains(this.serviceType);
             }
 
-            public Action<T> CreateAction<T>(InitializationContext context)
+            public Action<T> CreateAction<T>(InitializerContext context)
             {
                 return Helpers.CreateAction<T>(this.instanceInitializer);
             }
@@ -728,22 +750,19 @@ namespace SimpleInjector
 
         private sealed class ContextualInstanceInitializer : IInstanceInitializer
         {
-            private Predicate<InitializationContext> predicate;
+            private Predicate<InitializerContext> predicate;
             private Action<InstanceInitializationData> instanceInitializer;
 
-            public bool AppliesTo(Type implementationType, InitializationContext context) => this.predicate(context);
+            public bool AppliesTo(Type implementationType, InitializerContext context) => this.predicate(context);
 
-            public Action<T> CreateAction<T>(InitializationContext context)
+            public Action<T> CreateAction<T>(InitializerContext context)
             {
-                return instance =>
-                {
-                    this.instanceInitializer(new InstanceInitializationData(context, instance));
-                };
+                return instance => this.instanceInitializer(new InstanceInitializationData(context, instance));
             }
 
             internal static IInstanceInitializer Create(
                 Action<InstanceInitializationData> instanceInitializer,
-                Predicate<InitializationContext> predicate)
+                Predicate<InitializerContext> predicate)
             {
                 return new ContextualInstanceInitializer
                 {

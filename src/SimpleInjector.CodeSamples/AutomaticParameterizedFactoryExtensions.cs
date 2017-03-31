@@ -38,7 +38,7 @@
             where TImplementation : class, TService
             where TService : class
         {
-            var behavior = GetBehavior(container);
+            AutomaticParameterizedFactoriesHelper behavior = GetBehavior(container);
 
             if (behavior == null)
             {
@@ -49,7 +49,7 @@
             behavior.RegisterFactoryProduct(typeof(TService), typeof(TImplementation));
 
             lifestyle = lifestyle ?? container.Options.LifestyleSelectionBehavior
-                .SelectLifestyle(typeof(TService), typeof(TImplementation));
+                .SelectLifestyle(typeof(TImplementation));
 
             container.Register<TService, TImplementation>(lifestyle);
         }
@@ -58,7 +58,7 @@
         {
             if (!typeof(TFactory).IsInterface)
             {
-                throw new ArgumentException(typeof(TFactory).Name + " is no interface");
+                throw new ArgumentException(typeof(TFactory).ToFriendlyName() + " is no interface");
             }
 
             var parameters = (
@@ -128,7 +128,7 @@
 
             public override IMessage Invoke(IMessage msg)
             {
-                IMethodCallMessage callMessage = msg as IMethodCallMessage;
+                var callMessage = msg as IMethodCallMessage;
 
                 if (callMessage != null)
                 {
@@ -233,24 +233,28 @@
                 }
             }
 
-            Expression IDependencyInjectionBehavior.BuildExpression(InjectionConsumerInfo consumer)
+            InstanceProducer IDependencyInjectionBehavior.GetInstanceProducer(
+                InjectionConsumerInfo consumer, bool throwOnFailure)
             {
-                var local = this.FindThreadLocal(consumer.Target);
+                ThreadLocal<object> local = this.FindThreadLocal(consumer.Target);
 
                 if (local != null)
                 {
                     if (consumer.Target.TargetType.IsValueType && this.container.IsVerifying())
                     {
                         throw new InvalidOperationException(
-                            "You can't use Verify() is the factory product contains value types.");
+                            "You can't use Verify() if the factory product contains value types.");
                     }
 
-                    return Expression.Convert(
-                        Expression.Property(Expression.Constant(local), "Value"),
-                        consumer.Target.TargetType);
+                    return InstanceProducer.FromExpression(
+                        consumer.Target.TargetType,
+                        Expression.Convert(
+                            Expression.Property(Expression.Constant(local), "Value"),
+                            consumer.Target.TargetType),
+                        this.container);
                 }
 
-                return this.originalBehavior.BuildExpression(consumer);
+                return this.originalBehavior.GetInstanceProducer(consumer, throwOnFailure);
             }
 
             // Called by RegisterFactory<TFactory>

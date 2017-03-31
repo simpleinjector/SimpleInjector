@@ -8,7 +8,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>dc974673-a490-4376-beca-eede8a33579b</ProjectGuid>
-    <SHFBSchemaVersion>1.9.9.0</SHFBSchemaVersion>
+    <SHFBSchemaVersion>2015.6.5.0</SHFBSchemaVersion>
     <!-- AssemblyName, Name, and RootNamespace are not used by SHFB but Visual
          Studio adds them anyway -->
     <AssemblyName>SimpleInjector.Documentation</AssemblyName>
@@ -18,43 +18,54 @@
     <OutputPath>..\Help\</OutputPath>
     <HtmlHelpName>SimpleInjector</HtmlHelpName>
     <Language>en-US</Language>
-    <ApiFilter />
+    <ApiFilter>
+      <Filter entryType="Namespace" fullName="SimpleInjector" isExposed="True">
+        <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorLifetimeScopeExtensions" filterName="SimpleInjectorLifetimeScopeExtensions" isExposed="False">
+          <Filter entryType="Method" fullName="SimpleInjector.SimpleInjectorLifetimeScopeExtensions.BeginLifetimeScope" filterName="BeginLifetimeScope" isExposed="True" />
+        </Filter>
+        <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorWcfExtensions" filterName="SimpleInjectorWcfExtensions" isExposed="False">
+          <Filter entryType="Method" fullName="SimpleInjector.SimpleInjectorWcfExtensions.RegisterWcfServices" filterName="RegisterWcfServices" isExposed="True" />
+        </Filter>
+        <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorWebApiExtensions" filterName="SimpleInjectorWebApiExtensions" isExposed="True">
+          <Filter entryType="Method" fullName="SimpleInjector.SimpleInjectorWebApiExtensions.RegisterWebApiRequest" filterName="RegisterWebApiRequest" isExposed="False" />
+        </Filter>
+        <Filter entryType="Class" fullName="SimpleInjector.SimpleInjectorWebExtensions" filterName="SimpleInjectorWebExtensions" isExposed="False" />
+      </Filter>
+      <Filter entryType="Namespace" fullName="SimpleInjector.Advanced.Internal" isExposed="False" />
+    </ApiFilter>
     <ComponentConfigurations />
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Packaging.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Packaging.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Web.Mvc.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Web.Mvc.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Web.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Web.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Wcf.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.Wcf.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Extensions.LifetimeScoping.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Extensions.LifetimeScoping.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Extensions.ExecutionContextScoping.xml" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.WebApi.dll" />
-      <DocumentationSource sourceFile="..\bin\NET\SimpleInjector.Integration.WebApi.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector\bin\Release\net45\SimpleInjector.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector\bin\Release\net45\SimpleInjector.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.Wcf\bin\Release\net40\SimpleInjector.Integration.Wcf.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.Wcf\bin\Release\net40\SimpleInjector.Integration.Wcf.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.Web\bin\Release\net40\SimpleInjector.Integration.Web.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.Web\bin\Release\net40\SimpleInjector.Integration.Web.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.Web.Mvc\bin\Release\net40\SimpleInjector.Integration.Web.Mvc.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.Web.Mvc\bin\Release\net40\SimpleInjector.Integration.Web.Mvc.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.WebApi\bin\Release\net45\SimpleInjector.Integration.WebApi.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.WebApi\bin\Release\net45\SimpleInjector.Integration.WebApi.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Packaging\bin\Release\net40\SimpleInjector.Packaging.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Packaging\bin\Release\net40\SimpleInjector.Packaging.xml" />
     </DocumentationSources>
     <HelpAttributes />
     <NamespaceSummaries>
       <NamespaceSummaryItem name="(global)" isDocumented="False" />
-<NamespaceSummaryItem name="SimpleInjector" isDocumented="True">The SimpleInjector namespace contains the core types to use when working with the library.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Advanced" isDocumented="True">The SimpleInjector.Advanced namespace contains types and extension methods. This namespace will typically be used by users writing their own registrations or when writing code that changes the default behavior of the framework.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Extensions" isDocumented="False" />
-<NamespaceSummaryItem name="SimpleInjector.Lifestyles" isDocumented="True">The SimpleInjector.Lifestyles namespace contains types for implementing custom lifestyles.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Extensions.LifetimeScoping" isDocumented="True">The SimpleInjector.Extensions.LifetimeScoping namespace is part of the &lt;b&gt;SimpleInjector.Extensions.LifetimeScoping.dll&lt;/b&gt; and contains functionality for registering services using the &lt;b&gt;LifetimeScopeLifestyle&lt;/b&gt;. This lifestyle alows users to explicitly begin and end a scope on a single thread. Within that scope, a single instance of the registered service will be returned.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.Wcf" isDocumented="True">The SimpleInjector.Integration.Wcf namespace is part of the &lt;b&gt;SimpleInjector.Integration.Wcf.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with WCF services. Core type is the &lt;b&gt;WcfOperationLifestyle&lt;/b&gt; class that allows caching registered services during the execution of a single WCF operation.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.Web" isDocumented="True">The SimpleInjector.Integration.Web namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET web appliactions. Core type is the &lt;b&gt;WebRequestLifestyle&lt;/b&gt; class that allows caching registered services during the execution of a single HTTP request.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.Web.Mvc" isDocumented="True">The SimpleInjector.Integration.Web.Mvc namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Mvc.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET MVC web applications.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Packaging" isDocumented="True">The SimpleInjector.Packaging namespace is part of the &lt;b&gt;SimpleInjector.Packaging.dll&lt;/b&gt; and contains functionality to modularize the container's configuration and dynamically load it from different assemblies.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.Web.Forms" isDocumented="True">The SimpleInjector.Integration.Web.Forms namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Forms.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web Forms applications.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Advanced.Internal" isDocumented="False" />
-<NamespaceSummaryItem name="SimpleInjector.Diagnostics" isDocumented="True">The SimpleInjector.Diagnostics namespace contains diagnostic features for Simple Injector.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Extensions.ExecutionContextScoping" isDocumented="True">The SimpleInjector.Extensions.ExecutionContextScoping namespace is part of the &lt;b&gt;SimpleInjector.Extensions.ExecutionContextScoping.dll&lt;/b&gt; and contains functionality for registering services using the &lt;b&gt;ExecutionContextScopeLifestyle&lt;/b&gt;. This lifestyle alows users to explicitly begin and end a scope for within a logical call context, which allows the scope to be moved with the flow of asynchronous methods. Within that scope, a single instance of the registered service will be returned.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="SimpleInjector.Integration.WebApi" isDocumented="True">The SimpleInjector.Integration.WebApi namespace is part of the &lt;b&gt;SimpleInjector.Integration.WebApi.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web API web applications.</NamespaceSummaryItem></NamespaceSummaries>
+      <NamespaceSummaryItem name="SimpleInjector" isDocumented="True">The SimpleInjector namespace contains the core types to use when working with the library.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Advanced" isDocumented="True">The SimpleInjector.Advanced namespace contains types and extension methods. This namespace will typically be used by users writing their own registrations or when writing code that changes the default behavior of the framework.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Extensions" isDocumented="False" />
+      <NamespaceSummaryItem name="SimpleInjector.Lifestyles" isDocumented="True">The SimpleInjector.Lifestyles namespace contains types for implementing custom lifestyles.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Extensions.LifetimeScoping" isDocumented="True">The SimpleInjector.Extensions.LifetimeScoping namespace is part of the &lt;b&gt;SimpleInjector.Extensions.LifetimeScoping.dll&lt;/b&gt; and contains functionality for registering services using the &lt;b&gt;LifetimeScopeLifestyle&lt;/b&gt;. This lifestyle alows users to explicitly begin and end a scope on a single thread. Within that scope, a single instance of the registered service will be returned.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Integration.Wcf" isDocumented="True">The SimpleInjector.Integration.Wcf namespace is part of the &lt;b&gt;SimpleInjector.Integration.Wcf.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with WCF services. Core type is the &lt;b&gt;WcfOperationLifestyle&lt;/b&gt; class that allows caching registered services during the execution of a single WCF operation.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Integration.Web" isDocumented="True">The SimpleInjector.Integration.Web namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET web appliactions. Core type is the &lt;b&gt;WebRequestLifestyle&lt;/b&gt; class that allows caching registered services during the execution of a single HTTP request.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Integration.Web.Mvc" isDocumented="True">The SimpleInjector.Integration.Web.Mvc namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Mvc.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET MVC web applications.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Packaging" isDocumented="True">The SimpleInjector.Packaging namespace is part of the &lt;b&gt;SimpleInjector.Packaging.dll&lt;/b&gt; and contains functionality to modularize the container's configuration and dynamically load it from different assemblies.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Integration.Web.Forms" isDocumented="True">The SimpleInjector.Integration.Web.Forms namespace is part of the &lt;b&gt;SimpleInjector.Integration.Web.Forms.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web Forms applications.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Advanced.Internal" isDocumented="False" />
+      <NamespaceSummaryItem name="SimpleInjector.Diagnostics" isDocumented="True">The SimpleInjector.Diagnostics namespace contains diagnostic features for Simple Injector.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Extensions.ExecutionContextScoping" isDocumented="True">The SimpleInjector.Extensions.ExecutionContextScoping namespace is part of the &lt;b&gt;SimpleInjector.Extensions.ExecutionContextScoping.dll&lt;/b&gt; and contains functionality for registering services using the &lt;b&gt;ExecutionContextScopeLifestyle&lt;/b&gt;. This lifestyle alows users to explicitly begin and end a scope for within a logical call context, which allows the scope to be moved with the flow of asynchronous methods. Within that scope, a single instance of the registered service will be returned.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="SimpleInjector.Integration.WebApi" isDocumented="True">The SimpleInjector.Integration.WebApi namespace is part of the &lt;b&gt;SimpleInjector.Integration.WebApi.dll&lt;/b&gt; and contains functionality for integrating Simple Injector with ASP.NET Web API web applications.</NamespaceSummaryItem>
+    </NamespaceSummaries>
     <PlugInConfigurations />
     <BuildLogFile />
     <HtmlHelp1xCompilerPath />
@@ -86,7 +97,7 @@
     <HtmlSdkLinkType>None</HtmlSdkLinkType>
     <IncludeFavorites>False</IncludeFavorites>
     <BinaryTOC>True</BinaryTOC>
-    <VisibleItems>Attributes, ExplicitInterfaceImplementations, InheritedMembers, Protected, ProtectedInternalAsProtected, SealedProtected</VisibleItems>
+    <VisibleItems>Attributes, ExplicitInterfaceImplementations, InheritedMembers, Protected, SealedProtected, ProtectedInternalAsProtected</VisibleItems>
     <MissingTags>Summary, Parameter, Returns, AutoDocumentCtors, Namespace, TypeParameter, AutoDocumentDispose</MissingTags>
     <ComponentPath />
     <MaximumGroupParts>2</MaximumGroupParts>

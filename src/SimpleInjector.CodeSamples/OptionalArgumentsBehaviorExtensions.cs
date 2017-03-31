@@ -1,11 +1,10 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
-    using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
 
-    public class OptionalArgumentsBehaviorExtensions
+    public static class OptionalArgumentsBehaviorExtensions
     {
         public static void EnableSkippingOptionalConstructorArguments(ContainerOptions options)
         {
@@ -25,38 +24,32 @@
             this.original = original;
         }
 
-        [DebuggerStepThrough]
         public void Verify(InjectionConsumerInfo consumer)
         {
-            var parameter = consumer.Target.Parameter;
-
-            if (parameter != null && !IsOptional(parameter))
+            if (consumer.Target.Parameter != null && !IsOptional(consumer.Target.Parameter))
             {
                 this.original.Verify(consumer);
             }
         }
 
-        [DebuggerStepThrough]
-        public Expression BuildExpression(InjectionConsumerInfo consumer)
-        {
-            var parameter = consumer.Target.Parameter;
+        public InstanceProducer GetInstanceProducer(InjectionConsumerInfo c, bool t) =>
+            this.TryCreateInstanceProducer(c.Target.Parameter) ?? this.original.GetInstanceProducer(c, t);
 
-            if (parameter != null && IsOptional(parameter) && !this.CanBeResolved(parameter))
-            {
-                return Expression.Constant(parameter.DefaultValue, parameter.ParameterType);
-            }
+        private InstanceProducer TryCreateInstanceProducer(ParameterInfo parameter) =>
+            parameter != null && IsOptional(parameter) && !this.CanBeResolved(parameter)
+                ? this.CreateConstantValueProducer(parameter)
+                : null;
 
-            return this.original.BuildExpression(consumer);
-        }
+        private InstanceProducer CreateConstantValueProducer(ParameterInfo parameter) =>
+            InstanceProducer.FromExpression(
+                parameter.ParameterType, 
+                Expression.Constant(parameter.DefaultValue, parameter.ParameterType), 
+                this.container);
 
-        private static bool IsOptional(ParameterInfo parameter)
-        {
-            return (parameter.Attributes & ParameterAttributes.Optional) != 0;
-        }
+        private static bool IsOptional(ParameterInfo parameter) =>
+            (parameter.Attributes & ParameterAttributes.Optional) != 0;
 
-        private bool CanBeResolved(ParameterInfo parameter)
-        {
-            return this.container.GetRegistration(parameter.ParameterType, false) != null;
-        }
+        private bool CanBeResolved(ParameterInfo parameter) =>
+            this.container.GetRegistration(parameter.ParameterType, false) != null;
     }
 }

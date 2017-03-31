@@ -22,6 +22,9 @@
 
 namespace SimpleInjector.Packaging
 {
+    using System.Collections.Generic;
+    using System.Reflection;
+
     /// <summary>
     /// Contract for types allow registering a set of services.
     /// </summary>
@@ -38,7 +41,7 @@ namespace SimpleInjector.Packaging
     /// }
     /// ]]></code>
     /// The following example shows how to load all defined packages, using the 
-    /// <see cref="PackageExtensions.RegisterPackages(Container)">RegisterPackages</see> method. 
+    /// <see cref="PackageExtensions.RegisterPackages(Container, IEnumerable{Assembly})">RegisterPackages</see> method. 
     /// <code lang="cs"><![CDATA[
     /// container.RegisterPackages();
     /// ]]></code>

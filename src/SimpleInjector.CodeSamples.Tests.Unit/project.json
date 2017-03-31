@@ -1,0 +1,22 @@
+﻿{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "warningsAsErrors": true
+  },
+
+  "testRunner": "mstest",
+
+  "dependencies": {
+    "MSTest.TestFramework": "1.0.7-preview",
+    "dotnet-test-mstest": "1.1.2-preview",
+    "SimpleInjector": { "target": "project" },
+    "SimpleInjector.CodeSamples": { "target": "project" },
+    "SimpleInjector.Tests.Unit": { "target": "project" }
+  },
+  "runtimes": {
+    "win10-x86": {}
+  },
+  "frameworks": {
+    "net451": {}
+  }
+}

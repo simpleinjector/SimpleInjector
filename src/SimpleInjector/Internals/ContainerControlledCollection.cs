@@ -31,11 +31,11 @@ namespace SimpleInjector.Internals
 
     // A decoratable enumerable is a collection that holds a set of Expression objects. When a decorator is
     // applied to a collection, a new DecoratableEnumerable will be created
-    internal class ContainerControlledCollection<TService>
-#if NET45 || NETSTANDARD
-        : IList<TService>, IContainerControlledCollection, IReadOnlyList<TService>
+    internal class ContainerControlledCollection<TService> : IList<TService>,
+#if NET40
+        IContainerControlledCollection
 #else
-        : IList<TService>, IContainerControlledCollection
+        IContainerControlledCollection, IReadOnlyList<TService>
 #endif
     {
         private readonly Container container;
@@ -237,7 +237,7 @@ namespace SimpleInjector.Internals
 
         private InstanceProducer CreateNewExternalProducer(Type implementationType)
         {
-            if (!Helpers.IsConcreteConstructableType(implementationType))
+            if (!Types.IsConcreteConstructableType(implementationType))
             {
                 // This method will throw an (expressive) exception since implementationType is not concrete.
                 this.container.GetRegistration(implementationType, throwOnFailure: true);

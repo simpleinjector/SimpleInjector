@@ -23,13 +23,14 @@
 namespace SimpleInjector.Integration.AspNetCore
 {
     using System;
-    using SimpleInjector.Extensions.ExecutionContextScoping;
+    using Lifestyles;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// Defines a lifestyle that caches instances during the execution of a single ASP.NET Request.
     /// Unless explicitly stated otherwise, instances created by this lifestyle will be disposed at the end
     /// of the request. Do note that this lifestyle requires the 
-    /// <see cref="SimpleInjectorAspNetCoreIntegrationExtensions.UseSimpleInjectorAspNetRequestScoping">UseSimpleInjectorAspNetRequestScoping.</see>
+    /// <see cref="SimpleInjectorAspNetCoreIntegrationExtensions.UseSimpleInjectorAspNetRequestScoping(IServiceCollection, Container)">UseSimpleInjectorAspNetRequestScoping.</see>
     /// to be registered in the Web API configuration.
     /// </summary>
     /// <example>
@@ -41,13 +42,14 @@ namespace SimpleInjector.Integration.AspNetCore
     /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(Lifestyle.Scoped);
     /// ]]></code>
     /// </example>
-    public sealed class AspNetRequestLifestyle : ExecutionContextScopeLifestyle
+    [Obsolete("This lifestyle is obsolete. Please use SimpleInjector.Lifestyles.AsyncScopedLifestyle instead.", error: false)]
+    public sealed class AspNetRequestLifestyle : AsyncScopedLifestyle
     {
         /// <summary>Initializes a new instance of the <see cref="AspNetRequestLifestyle"/> class.
         /// The created and cached instance will be disposed when the Web API request ends, and when the 
         /// created object implements <see cref="IDisposable"/>.
         /// </summary>
-        public AspNetRequestLifestyle() : this(disposeInstanceWhenScopeEnds: true)
+        public AspNetRequestLifestyle()
         {
         }
 
@@ -56,9 +58,15 @@ namespace SimpleInjector.Integration.AspNetCore
         /// Specifies whether the created and cached instance will be disposed when the Web API request ends,
         /// and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
+        [Obsolete("This constructor overload has been deprecated. " +
+            "Please use ExecutionContextScopeLifestyle() instead.",
+            error: true)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public AspNetRequestLifestyle(bool disposeInstanceWhenScopeEnds)
-            : base("ASP.NET Request", disposeInstanceWhenScopeEnds)
         {
+            throw new NotSupportedException(
+                "This constructor overload has been deprecated. " +
+                "Please use AspNetRequestLifestyle() instead.");
         }
     }
 }

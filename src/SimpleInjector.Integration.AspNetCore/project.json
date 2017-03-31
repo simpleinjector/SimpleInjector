@@ -1,5 +1,5 @@
-﻿{
-  "version": "3.3.0",
+{
+  "version": "4.0.0",
   "buildOptions": {
     "keyFile": "../SimpleInjector.snk",
     "xmlDoc": true
@@ -17,16 +17,17 @@
     "requireLicenseAcceptance": false
   },
   "frameworks": {
-    "net451": {
-    },
-    "netstandard1.6": {
-    }
+    "net451": {},
+    "netstandard1.6": {}
   },
   "dependencies": {
     "Microsoft.AspNetCore.Http.Abstractions": "1.0.0",
-    "NuSpec.ReferenceGenerator": "2.0.0-beta-bld14",
-    "SimpleInjector": "3.3.0",
-    "SimpleInjector.Extensions.ExecutionContextScoping": "3.3.0"
+    "Microsoft.AspNetCore.Hosting.Abstractions": "1.0.0",
+    "SimpleInjector": { "target": "project" },
+    "NuSpec.ReferenceGenerator": {
+      "version": "2.0.0-beta-bld14",
+      "type": "build"
+    }
   },
   "scripts": {
     "postcompile": [

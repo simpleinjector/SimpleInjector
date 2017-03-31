@@ -31,12 +31,15 @@ namespace SimpleInjector
     /// <summary>
     /// Thrown by the container in case of a diagnostic error.
     /// </summary>
-    public partial class DiagnosticVerificationException : Exception
+#if NET40 || NET45
+    [Serializable]
+#endif
+    public class DiagnosticVerificationException : Exception
     {
         private static readonly ReadOnlyCollection<DiagnosticResult> Empty =
             new ReadOnlyCollection<DiagnosticResult>(Helpers.Array<DiagnosticResult>.Empty);
 
-#if !PCL
+#if NET40 || NET45
         [NonSerialized]
 #endif
         private readonly ReadOnlyCollection<DiagnosticResult> errors = Empty;
@@ -84,6 +87,31 @@ namespace SimpleInjector
             : base(message, innerException)
         {
         }
+
+#if NET40 || NET45
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiagnosticVerificationException" /> class with serialized data.
+        /// </summary>
+        /// <param name="info">
+        /// The <see cref="System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception 
+        /// being thrown. 
+        /// </param>
+        /// <param name="context">
+        /// The <see cref="System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or 
+        /// destination. 
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// The <paramref name="info" /> parameter is null. 
+        /// </exception>
+        /// <exception cref="System.Runtime.Serialization.SerializationException">
+        /// The class name is null or hresult is zero (0). 
+        /// </exception>
+        protected DiagnosticVerificationException(System.Runtime.Serialization.SerializationInfo info, 
+            System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+        }
+#endif
 
         internal DiagnosticVerificationException(string message, DiagnosticResult error)
             : base(message)

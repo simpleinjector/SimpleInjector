@@ -93,7 +93,6 @@ namespace SimpleInjector
 
         private readonly object locker = new object();
         private readonly Lazy<Expression> lazyExpression;
-        private readonly InitializationContext initializationContext;
 
         private CyclicDependencyValidator validator;
         private Func<object> instanceCreator;
@@ -130,7 +129,6 @@ namespace SimpleInjector
             this.validator = new CyclicDependencyValidator(registration.ImplementationType);
 
             this.lazyExpression = new Lazy<Expression>(this.BuildExpressionInternal);
-            this.initializationContext = new InitializationContext(this, registration);
 
             if (registerExternalProducer)
             {
@@ -138,6 +136,15 @@ namespace SimpleInjector
             }
 
             this.instanceCreator = this.BuildAndReplaceInstanceCreatorAndCreateFirstInstance;
+        }
+
+        // Flagging the registration with WrapsInstanceCreationDelegate prevents false diagnostic warnings.
+        private InstanceProducer(Type serviceType, Expression expression, Container container)
+            : this(serviceType,
+                  new ExpressionRegistration(expression, container) { WrapsInstanceCreationDelegate = true })
+        {
+            // Overrides earlier set value. This prevents ExpressionBuilt from being applied.
+            this.lazyExpression = Helpers.ToLazy(expression);
         }
 
         /// <summary>
@@ -214,6 +221,25 @@ namespace SimpleInjector
             this.wrappedProducers == null
                 ? new[] { this }
                 : this.wrappedProducers.Concat(new[] { this });
+
+        /// <summary>
+        /// Creates a new <see cref="InstanceProducer"/> based on the given <paramref name="serviceType"/> 
+        /// and <paramref name="expression"/> where the <paramref name="expression"/> will be used as-is;
+        /// no interception (using <see cref="Container.ExpressionBuilt">ExpressionBuilt</see>) such as
+        /// decorators will be applied.
+        /// </summary>
+        /// <param name="serviceType">The service type for which this instance is created.</param>
+        /// <param name="expression">The expression that describes the instance to be produced.</param>
+        /// <param name="container">The <see cref="Container"/> instance for this registration.</param>
+        /// <returns>A new <see cref="InstanceProducer"/> that describes the expression.</returns>
+        public static InstanceProducer FromExpression(Type serviceType, Expression expression, Container container)
+        {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(expression, nameof(expression));
+            Requires.IsNotNull(container, nameof(container));
+
+            return new InstanceProducer(serviceType, expression, container);
+        }
 
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance. Will never return null.</returns>
@@ -453,7 +479,7 @@ namespace SimpleInjector
             try
             {
                 creator = CompilationHelpers.CompileExpression<object>(this.Container, expression);
-                creator = this.Container.WrapWithResolveInterceptor(this.initializationContext, creator);
+                creator = this.Container.WrapWithResolveInterceptor(this, creator);
             }
             catch (Exception ex)
             {
@@ -489,7 +515,7 @@ namespace SimpleInjector
             // We must lock the container, because not locking could lead to race conditions.
             this.Container.LockContainer();
 
-            var expression = this.Registration.BuildExpression(this);
+            var expression = this.Registration.BuildExpression();
 
             if (expression == null)
             {
@@ -555,7 +581,7 @@ namespace SimpleInjector
 
         // Prevents any recursive calls from taking place.
         // This method will be inlined by the JIT.
-#if NET45 || NETSTANDARD
+#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private void CheckForCyclicDependencies()
@@ -567,7 +593,7 @@ namespace SimpleInjector
         }
 
         // This method will be inlined by the JIT.
-#if NET45 || NETSTANDARD
+#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private void RemoveCyclicDependencyValidator()
@@ -587,7 +613,7 @@ namespace SimpleInjector
         // exception, because a new call to that provider would otherwise make the validator think it is a
         // recursive call and throw an exception, and this would hide the exception that would otherwise be
         // thrown by the provider itself.
-#if NET45 || NETSTANDARD
+#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private void ResetCyclicDependencyValidator()

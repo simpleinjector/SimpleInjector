@@ -30,10 +30,10 @@ namespace SimpleInjector.Advanced
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="System.Predicate{T}" />
     /// delegate that is that is supplied to the 
-    /// <see cref="Container.RegisterInitializer(Action{InstanceInitializationData}, Predicate{InitializationContext})">RegisterInitializer</see>
-    /// overload that takes this delegate. This type contains contextual information about the creation and it 
-    /// allows the user to examine the given instance to decide whether the instance should be initialized or 
-    /// not.
+    /// <see cref="ContainerOptions.RegisterResolveInterceptor(ResolveInterceptor, Predicate{InitializationContext})">RegisterResolveInterceptor</see>
+    /// method that takes this delegate. This type contains contextual information about a resolved type and it 
+    /// allows the user to examine the given instance to decide whether the <see cref="ResolveInterceptor"/>
+    /// should be applied or not.
     /// </summary>
     [DebuggerDisplay(nameof(InitializationContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
     public class InitializationContext

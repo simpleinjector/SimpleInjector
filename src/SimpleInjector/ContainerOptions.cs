@@ -77,18 +77,6 @@ namespace SimpleInjector
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ScopedLifestyle defaultScopedLifestyle;
 
-        /// <summary>Initializes a new instance of the <see cref="ContainerOptions"/> class.</summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete(
-            "This method is not supported anymore. Please use Container.Options to configure the container.",
-            error: true)]
-        [ExcludeFromCodeCoverage]
-        public ContainerOptions()
-        {
-            throw new InvalidOperationException(
-                "This method is not supported anymore. Please use Container.Options to configure the container.");
-        }
-
         internal ContainerOptions(Container container)
         {
             Requires.IsNotNull(container, nameof(container));
@@ -123,16 +111,13 @@ namespace SimpleInjector
         /// mismatches.</value>
         public bool SuppressLifestyleMismatchVerification { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether the container will return an empty collection when
-        /// a collection is requested that hasn't been explicitly registered. The default value is <b>false</b>,
-        /// which means that the container will throw an exception. Set the value to <b>true</b> to get the
-        /// old behavior of Simple Injector v1.x and v2.x.
-        /// </summary>
+        /// <summary>Gets or sets a value indicating whether. 
+        /// This method is deprecated. Changing its value will have no effect.</summary>
         /// <value>The value indicating whether the container will return an empty collection.</value>
-        [Obsolete("ResolveUnregisteredCollections has been deprecated and will be removed in a future " +
-            "release. Please register collections explicitly instead.",
-            error: false)]
+        [Obsolete("ResolveUnregisteredCollections has been deprecated. " + 
+            "Please register collections explicitly instead.",
+            error: true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool ResolveUnregisteredCollections { get; set; }
 
         /// <summary>
@@ -173,35 +158,6 @@ namespace SimpleInjector
             }
         }
 
-        /// <summary>
-        /// Gets or sets the constructor verification behavior. The container's default behavior is to
-        /// disallow constructors with value types and strings.
-        /// <b>NOTE:</b> This property has been removed. Please use the <see cref="ConstructorInjectionBehavior"/> 
-        /// property to override Simple Injector's verification behavior.
-        /// </summary>
-        /// <value>The constructor resolution behavior.</value>
-        [Obsolete("In v3, the IConstructorVerificationBehavior and IConstructorInjectionBehavior interfaces " +
-            "have been replaced with the single IDependencyInjectionBehavior interface. Please use the " +
-            "DependencyInjectionBehavior property to override Simple Injector's verification behavior.",
-            error: true)]
-        [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public IConstructorVerificationBehavior ConstructorVerificationBehavior { get; set; }
-
-        /// <summary>Gets or sets the constructor injection behavior.</summary>
-        /// <value>The constructor injection behavior.</value>
-        /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when the container already contains registrations.
-        /// </exception>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("In v3, the IConstructorVerificationBehavior and IConstructorInjectionBehavior interfaces " +
-            "have been replaced with the single IDependencyInjectionBehavior interface. Please use the " +
-            "DependencyInjectionBehavior property to override Simple Injector's constructor injection behavior.",
-            error: true)]
-        [ExcludeFromCodeCoverage]
-        public IConstructorInjectionBehavior ConstructorInjectionBehavior { get; set; }
-
         /// <summary>Gets or sets the dependency injection behavior.</summary>
         /// <value>The constructor injection behavior.</value>
         /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
@@ -224,7 +180,7 @@ namespace SimpleInjector
                 this.injectionBehavior = value;
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the property selection behavior. The container's default behavior is to do no
         /// property injection.
@@ -455,15 +411,15 @@ namespace SimpleInjector
             return string.Join(", ", descriptions);
         }
 
-        internal bool IsConstructableType(Type serviceType, Type implementationType, out string errorMessage)
+        internal bool IsConstructableType(Type implementationType, out string errorMessage)
         {
             errorMessage = null;
 
             try
             {
-                var constructor = this.SelectConstructor(serviceType, implementationType);
+                ConstructorInfo constructor = this.SelectConstructor(implementationType);
 
-                this.DependencyInjectionBehavior.Verify(serviceType, constructor);
+                this.DependencyInjectionBehavior.Verify(constructor);
             }
             catch (ActivationException ex)
             {
@@ -473,42 +429,42 @@ namespace SimpleInjector
             return errorMessage == null;
         }
 
-        internal ConstructorInfo SelectConstructor(Type serviceType, Type implementationType)
+        internal ConstructorInfo SelectConstructor(Type implementationType)
         {
-            var constructor = this.ConstructorResolutionBehavior.GetConstructor(serviceType, implementationType);
+            var constructor = this.ConstructorResolutionBehavior.GetConstructor(implementationType);
 
             if (constructor == null)
             {
                 throw new ActivationException(StringResources.ConstructorResolutionBehaviorReturnedNull(
-                    this.ConstructorResolutionBehavior, serviceType, implementationType));
+                    this.ConstructorResolutionBehavior, implementationType));
             }
 
             return constructor;
         }
 
-        internal Expression BuildParameterExpression(InjectionConsumerInfo consumer)
+        internal InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer)
         {
-            Expression expression = this.DependencyInjectionBehavior.BuildExpression(consumer);
+            var producer = this.DependencyInjectionBehavior.GetInstanceProducer(consumer, throwOnFailure: true);
 
-            // Expression will only be null if a user created a custom IConstructorInjectionBehavior that
+            // Producer will only be null if a user created a custom IConstructorInjectionBehavior that
             // returned null.
-            if (expression == null)
+            if (producer == null)
             {
                 throw new ActivationException(StringResources.DependencyInjectionBehaviorReturnedNull(
                     this.DependencyInjectionBehavior));
             }
 
-            return expression;
+            return producer;
         }
 
-        internal Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
+        internal Lifestyle SelectLifestyle(Type implementationType)
         {
-            var lifestyle = this.LifestyleSelectionBehavior.SelectLifestyle(serviceType, implementationType);
+            var lifestyle = this.LifestyleSelectionBehavior.SelectLifestyle(implementationType);
 
             if (lifestyle == null)
             {
                 throw new ActivationException(StringResources.LifestyleSelectionBehaviorReturnedNull(
-                    this.LifestyleSelectionBehavior, serviceType, implementationType));
+                    this.LifestyleSelectionBehavior, implementationType));
             }
 
             return lifestyle;

@@ -1,4 +1,4 @@
-﻿﻿namespace SimpleInjector.CodeSamples
+﻿namespace SimpleInjector.CodeSamples
 {
     using System;
     using System.Threading;
@@ -8,10 +8,9 @@
     {
         private static readonly object Key = new object();
 
-        // This lifestyle should not dispose instances, because they outlive their scope.
-        public PerGraphLifestyle() : base("Per Graph", disposeInstances: false) { }
+        public PerGraphLifestyle() : base("Per Graph") { }
 
-        protected override int Length => 2;
+        public override int Length => Lifestyle.Transient.Length + 1;
 
         public static void EnableFor(Container container)
         {
@@ -22,37 +21,35 @@
             }
         }
 
-        protected override Func<Scope> CreateCurrentScopeProvider(Container c) => () => GetScopeInternal(c);
+        protected override Func<Scope> CreateCurrentScopeProvider(Container c) => () => GetScope(c);
+        protected override Scope GetCurrentScopeCore(Container c) => GetScope(c);
+        private static Scope GetScope(Container c) => ((ThreadLocal<Scope>)c.GetItem(Key))?.Value ?? Throw();
 
-        protected override Scope GetCurrentScopeCore(Container container) => GetScopeInternal(container);
-
-        private static Scope GetScopeInternal(Container container)
+        private static object ApplyGraphScope(InitializationContext context, Func<object> instanceProducer)
         {
-            var currentScope = (ThreadLocal<Scope>)container.GetItem(Key);
+            var container = context.Registration.Container;
+            var threadLocal = (ThreadLocal<Scope>)container.GetItem(Key);
 
-            if (currentScope == null)
-            {
-                throw new InvalidOperationException("Call PerGraphLifestyle.EnableFor(Container) first.");
-            }
-
-            return currentScope.Value;
-        }
-
-        private static object ApplyGraphScope(InitializationContext context, Func<object> getInstance)
-        {
-            var threadLocal = (ThreadLocal<Scope>)context.Registration.Container.GetItem(Key);
-
-            var original = threadLocal.Value;
+            Scope original = threadLocal.Value;
 
             try
             {
-                threadLocal.Value = new Scope(context.Registration.Container);
-                return getInstance();
+                threadLocal.Value = new Scope(container);
+                return instanceProducer();
             }
             finally
             {
+                // We deliberately don't dispose the Scope here, since this lifestyle should not 
+                // dispose instances, because they outlive their scope.
+                // WARNING: Although per-graph instances are not disposed, the diagnostic sub system
+                // will not warn in case a disposable instance is registered as per-graph.
                 threadLocal.Value = original;
             }
+        }
+
+        private static Scope Throw()
+        {
+            throw new InvalidOperationException("Call PerGraphLifestyle.EnableFor(Container) first.");
         }
     }
 }

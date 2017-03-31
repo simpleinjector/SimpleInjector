@@ -1,10 +1,9 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using System;
-    using System.ComponentModel;
-    using System.Configuration;
     using System.Diagnostics;
     using System.Globalization;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Runtime.InteropServices;
@@ -23,32 +22,24 @@
             IParameterConvention convention)
         {
             options.DependencyInjectionBehavior = new ConventionDependencyInjectionBehavior(
-                options.DependencyInjectionBehavior, convention);
+                options.DependencyInjectionBehavior, convention, options.Container);
         }
 
         private class ConventionDependencyInjectionBehavior : IDependencyInjectionBehavior
         {
             private IDependencyInjectionBehavior decorated;
             private IParameterConvention convention;
+            private Container container;
 
             public ConventionDependencyInjectionBehavior(
-                IDependencyInjectionBehavior decorated, IParameterConvention convention)
+                IDependencyInjectionBehavior decorated, IParameterConvention convention,
+                Container container)
             {
                 this.decorated = decorated;
                 this.convention = convention;
+                this.container = container;
             }
 
-            [DebuggerStepThrough]
-            public Expression BuildExpression(InjectionConsumerInfo consumer)
-            {
-                if (!this.convention.CanResolve(consumer.Target))
-                {
-                    return this.decorated.BuildExpression(consumer);
-                }
-
-                return this.convention.BuildExpression(consumer);
-            }
-            
             [DebuggerStepThrough]
             public void Verify(InjectionConsumerInfo consumer)
             {
@@ -57,12 +48,35 @@
                     this.decorated.Verify(consumer);
                 }
             }
+
+            [DebuggerStepThrough]
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure)
+            {
+                if (!this.convention.CanResolve(consumer.Target))
+                {
+                    return this.decorated.GetInstanceProducer(consumer, throwOnFailure);
+                }
+
+                return InstanceProducer.FromExpression(
+                    serviceType: consumer.Target.TargetType,
+                    expression: this.convention.BuildExpression(consumer),
+                    container: this.container);
+            }
         }
     }
 
+    // Example usage:
+    // new ConnectionStringsConvention(name => ConfigurationManager.ConnectionStrings[name]?.ConnectionString)
     public class ConnectionStringsConvention : IParameterConvention
     {
         private const string ConnectionStringPostFix = "ConnectionString";
+
+        private readonly Func<string, string> connectionStringRetriever;
+
+        public ConnectionStringsConvention(Func<string, string> connectionStringRetriever)
+        {
+            this.connectionStringRetriever = connectionStringRetriever;
+        }
 
         [DebuggerStepThrough]
         public bool CanResolve(InjectionTargetInfo target)
@@ -83,7 +97,7 @@
         [DebuggerStepThrough]
         public Expression BuildExpression(InjectionConsumerInfo consumer)
         {
-            string connectionString = GetConnectionString(consumer.Target);
+            string connectionString = this.GetConnectionString(consumer.Target);
 
             return Expression.Constant(connectionString, typeof(string));
         }
@@ -91,31 +105,40 @@
         [DebuggerStepThrough]
         private void VerifyConfigurationFile(InjectionTargetInfo target)
         {
-            GetConnectionString(target);
+            this.GetConnectionString(target);
         }
 
         [DebuggerStepThrough]
-        private static string GetConnectionString(InjectionTargetInfo target)
+        private string GetConnectionString(InjectionTargetInfo target)
         {
             string name = target.Name.Substring(0,
                 target.Name.LastIndexOf(ConnectionStringPostFix));
 
-            var settings = ConfigurationManager.ConnectionStrings[name];
+            var connectionString = this.connectionStringRetriever(name);
 
-            if (settings == null)
+            if (connectionString == null)
             {
                 throw new ActivationException(
                     "No connection string with name '" + name + "' could be found in the " + 
                     "application's configuration file.");
             }
 
-            return settings.ConnectionString;
+            return connectionString;
         }
     }
 
+    // Example usage:
+    // new AppSettingsConvention(key => ConfigurationManager.AppSettings[key]);
     public class AppSettingsConvention : IParameterConvention
     {
         private const string AppSettingsPostFix = "AppSetting";
+
+        private readonly Func<string, string> appSettingRetriever;
+
+        public AppSettingsConvention(Func<string, string> appSettingRetriever)
+        {
+            this.appSettingRetriever = appSettingRetriever;
+        }
 
         [DebuggerStepThrough]
         public bool CanResolve(InjectionTargetInfo target)
@@ -138,7 +161,7 @@
         [DebuggerStepThrough]
         public Expression BuildExpression(InjectionConsumerInfo consumer)
         {
-            object valueToInject = GetAppSettingValue(consumer.Target);
+            object valueToInject = this.GetAppSettingValue(consumer.Target);
 
             return Expression.Constant(valueToInject, consumer.Target.TargetType);
         }
@@ -146,20 +169,21 @@
         [DebuggerStepThrough]
         private void VerifyConfigurationFile(InjectionTargetInfo target)
         {
-            GetAppSettingValue(target);
+            this.GetAppSettingValue(target);
         }
 
         [DebuggerStepThrough]
-        private static object GetAppSettingValue(InjectionTargetInfo target)
+        private object GetAppSettingValue(InjectionTargetInfo target)
         {
             string key = target.Name.Substring(0,
                 target.Name.LastIndexOf(AppSettingsPostFix));
 
-            string configurationValue = ConfigurationManager.AppSettings[key];
+            string configurationValue = this.appSettingRetriever(key); // ConfigurationManager.AppSettings[key];
 
             if (configurationValue != null)
             {
-                TypeConverter converter = TypeDescriptor.GetConverter(target.TargetType);
+                System.ComponentModel.TypeConverter converter = 
+                    System.ComponentModel.TypeDescriptor.GetConverter(target.TargetType);
 
                 return converter.ConvertFromString(null,
                     CultureInfo.InvariantCulture, configurationValue);
@@ -170,7 +194,7 @@
                 "application's configuration file.");
         }
     }
-
+    
     // Using optional parameters in constructor arguments is highly discouraged. 
     // This code is merely an example.
     public class OptionalParameterConvention : IParameterConvention
@@ -183,24 +207,17 @@
         }
 
         [DebuggerStepThrough]
-        public bool CanResolve(InjectionTargetInfo target)
-        {
-            return target.Parameter != null &&
-                target.GetCustomAttributes(typeof(OptionalAttribute), true).Length > 0;
-        }
+        public bool CanResolve(InjectionTargetInfo target) =>
+            target.Parameter != null && target.GetCustomAttributes(typeof(OptionalAttribute), true).Any();
 
         [DebuggerStepThrough]
-        public Expression BuildExpression(InjectionConsumerInfo consumer)
-        {
-            try
-            {
-                return this.injectionBehavior.BuildExpression(consumer);
-            }
-            catch (ActivationException)
-            {
-                var parameter = consumer.Target.Parameter;
-                return Expression.Constant(parameter.RawDefaultValue, parameter.ParameterType);
-            }
-        }
+        public Expression BuildExpression(InjectionConsumerInfo consumer) =>
+            this.GetProducer(consumer)?.BuildExpression() ?? GetDefault(consumer.Target.Parameter);
+
+        private InstanceProducer GetProducer(InjectionConsumerInfo consumer) =>
+            this.injectionBehavior.GetInstanceProducer(consumer, throwOnFailure: false);
+
+        private static ConstantExpression GetDefault(ParameterInfo parameter) =>
+            Expression.Constant(parameter.RawDefaultValue, parameter.ParameterType);
     }
 }

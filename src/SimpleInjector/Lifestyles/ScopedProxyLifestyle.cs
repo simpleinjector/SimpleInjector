@@ -39,16 +39,16 @@ namespace SimpleInjector.Lifestyles
         protected internal override Func<Scope> CreateCurrentScopeProvider(Container container) => 
             GetDefaultScopedLifestyle(container).CreateCurrentScopeProvider(container);
 
-        protected override Scope GetCurrentScopeCore(Container container) => 
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
+            GetDefaultScopedLifestyle(container).CreateRegistrationCore<TConcrete>(container);
+
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) => 
+            GetDefaultScopedLifestyle(c).CreateRegistrationCore<TService>(creator, c);
+
+        protected override Scope GetCurrentScopeCore(Container container) =>
             GetDefaultScopedLifestyle(container).GetCurrentScope(container);
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container) =>
-            GetDefaultScopedLifestyle(container).CreateRegistration<TService, TImplementation>(container);
-
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) => 
-            GetDefaultScopedLifestyle(c).CreateRegistration<TService>(creator, c);
-
-#if NET45 || NETSTANDARD
+#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         private static ScopedLifestyle GetDefaultScopedLifestyle(Container container) => 
@@ -60,7 +60,7 @@ namespace SimpleInjector.Lifestyles
                 "To be able to use the Lifestyle.Scoped property, please ensure that the container is " +
                 "configured with a default scoped lifestyle by setting the Container.Options." +
                 "DefaultScopedLifestyle property with the required scoped lifestyle for your type of " +
-                "application. See: https://simpleinjector.org/lifetimes#scoped");
+                "application. See: https://simpleinjector.org/lifestyles#scoped");
         }
     }
 }

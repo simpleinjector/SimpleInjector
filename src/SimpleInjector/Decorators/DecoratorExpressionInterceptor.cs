@@ -138,7 +138,7 @@ namespace SimpleInjector.Decorators
             var overriddenParameters = this.CreateOverriddenParameters(serviceType, decoratorConstructor,
                 decorateeExpression, realProducer, info);
 
-            return this.Lifestyle.CreateRegistration(serviceType,
+            return this.Lifestyle.CreateDecoratorRegistration(
                 decoratorConstructor.DeclaringType, this.Container,
                 overriddenParameters);
         }

@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015 Simple Injector Contributors
+ * Copyright (c) 2015-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,7 +23,6 @@
 namespace SimpleInjector.Advanced
 {
     using System;
-    using System.Linq.Expressions;
 
     /// <summary>
     /// Defines the container's behavior for building an expression tree for an dependency to inject, based on
@@ -44,14 +43,16 @@ namespace SimpleInjector.Advanced
         void Verify(InjectionConsumerInfo consumer);
 
         /// <summary>
-        /// Builds an <see cref="Expression"/> for the 
+        /// Gets the <see cref="InstanceProducer"/> for the 
         /// <see cref="InjectionConsumerInfo.Target">Target</see> of the supplied <paramref name="consumer"/>.
         /// </summary>
         /// <param name="consumer">Contextual information about the consumer where the built dependency is
         /// injected into.</param>
-        /// <returns>An <see cref="Expression"/> that describes the intend of creating that 
+        /// <param name="throwOnFailure">The indication whether the method should return null or throw
+        /// an exception when the type is not registered.</param>
+        /// <returns>An <see cref="InstanceProducer"/> that describes the intend of creating that 
         /// <see cref="InjectionConsumerInfo.Target">Target</see>. This method never returns null.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the argument is a null reference.</exception>
-        Expression BuildExpression(InjectionConsumerInfo consumer);
+        InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure);
     }
 }

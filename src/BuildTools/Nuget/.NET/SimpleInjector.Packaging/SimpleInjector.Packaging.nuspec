@@ -11,28 +11,10 @@
       <group targetFramework=".NETFramework4.0">
         <dependency id="SimpleInjector" version="{versionCore}" />
       </group>
-      <group targetFramework="WindowsPhone8.0">
-        <dependency id="SimpleInjector" version="{versionCore}" />
-      </group>
-      <group targetFramework="Windows8.0">
-        <dependency id="SimpleInjector" version="{versionCore}" />
-      </group>
       <group targetFramework=".NETStandard1.0">
+        <dependency id="NETStandard.Library" version="1.6.0" />
+        <dependency id="System.Reflection" version="4.1.0" />
         <dependency id="SimpleInjector" version="{versionCore}" />
-        <dependency id="System.Collections" version="4.0.10" />
-        <dependency id="System.Collections.Concurrent" version="4.0.10" />
-        <dependency id="System.Diagnostics.Debug" version="4.0.10" />
-        <dependency id="System.Globalization" version="4.0.10" />
-        <dependency id="System.IO" version="4.0.10" />
-        <dependency id="System.Linq" version="4.0.0" />
-        <dependency id="System.Linq.Expressions" version="4.0.10" />
-        <dependency id="System.Reflection" version="4.0.10" />
-        <dependency id="System.Reflection.Extensions" version="4.0.0" />
-        <dependency id="System.Reflection.TypeExtensions" version="4.0.0" />
-        <dependency id="System.Runtime" version="4.0.20" />
-        <dependency id="System.Runtime.Extensions" version="4.0.10" />
-        <dependency id="System.Threading" version="4.0.10" />
-        <dependency id="System.Threading.Tasks" version="4.0.10" />
       </group>
     </dependencies>
     <id>SimpleInjector.Packaging</id>
@@ -42,6 +24,6 @@
     <summary>Adds support for packaging sets of related services to allow registering them together.</summary>
     <copyright>Simple Injector Contributors 2012 - {year}</copyright>
     <language>en-US</language>
-    <tags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC Servicelocator packaging packages modules installers registries</tags>
+    <tags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC packaging packages modules installers registries</tags>
   </metadata>
 </package>

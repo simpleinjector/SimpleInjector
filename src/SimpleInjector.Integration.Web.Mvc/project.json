@@ -1,0 +1,25 @@
+{
+  "version": "4.0.0",
+  "buildOptions": {
+    "keyFile": "../SimpleInjector.snk",
+    "warningsAsErrors": true,
+    "xmlDoc": true
+  },
+
+  "dependencies": {
+    "SimpleInjector": { "target": "project" },
+    "SimpleInjector.Integration.Web": { "target": "project" }
+  },
+  "frameworks": {
+    "net40": {
+      "dependencies": {
+        "Microsoft.Web.Infrastructure": "1.0.0.0",
+        "Microsoft.AspNet.Mvc": "3.0.20105.1"
+      },
+
+      "frameworkAssemblies": {
+        "System.Web": "4.0.0.0"
+      }
+    }
+  }
+}

@@ -39,22 +39,22 @@ namespace SimpleInjector.Lifestyles
             this.options = options;
         }
 
-        protected override int Length
+        public override int Length
         {
             get { throw new NotImplementedException(); }
         }
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
-            Lifestyle lifestyle = this.options.SelectLifestyle(typeof(TService), typeof(TImplementation));
+            Lifestyle lifestyle = this.options.SelectLifestyle(typeof(TConcrete));
 
-            return lifestyle.CreateRegistration<TService, TImplementation>(container);
+            return lifestyle.CreateRegistration<TConcrete>(container);
         }
 
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {
-            Lifestyle lifestyle = this.options.SelectLifestyle(typeof(TService), typeof(TService));
+            Lifestyle lifestyle = this.options.SelectLifestyle(typeof(TService));
 
             return lifestyle.CreateRegistration<TService>(instanceCreator, container);
         }

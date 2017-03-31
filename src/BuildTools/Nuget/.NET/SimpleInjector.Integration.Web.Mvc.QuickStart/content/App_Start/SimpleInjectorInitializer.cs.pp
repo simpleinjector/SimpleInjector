@@ -6,7 +6,6 @@ namespace $rootnamespace$.App_Start
     using System.Web.Mvc;
 
     using SimpleInjector;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Integration.Web;
     using SimpleInjector.Integration.Web.Mvc;
     

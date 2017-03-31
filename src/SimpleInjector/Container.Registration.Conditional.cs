@@ -157,7 +157,7 @@ namespace SimpleInjector
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType), nameof(implementationType));
 
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, implementationType, nameof(serviceType));
-            Requires.ImplementationHasSelectableConstructor(this, serviceType, implementationType, nameof(implementationType));
+            Requires.ImplementationHasSelectableConstructor(this, implementationType, nameof(implementationType));
             Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, implementationType, nameof(implementationType));
 
             if (serviceType.ContainsGenericParameters())
@@ -166,7 +166,7 @@ namespace SimpleInjector
             }
             else
             {
-                var registration = lifestyle.CreateRegistration(serviceType, implementationType, this);
+                var registration = lifestyle.CreateRegistration(implementationType, this);
                 this.RegisterConditional(serviceType, registration, predicate);
             }
         }

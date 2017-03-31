@@ -61,13 +61,11 @@ namespace SimpleInjector.Decorators
 
         internal void ApplyDecorator(Type closedDecoratorType)
         {
-            this.decoratorConstructor = 
-                this.Container.Options.SelectConstructor(this.e.RegisteredServiceType, closedDecoratorType);
+            this.decoratorConstructor = this.Container.Options.SelectConstructor(closedDecoratorType);
 
             if (object.ReferenceEquals(this.Lifestyle, this.Container.SelectionBasedLifestyle))
             {
-                this.Lifestyle = 
-                    this.Container.Options.SelectLifestyle(this.e.RegisteredServiceType, closedDecoratorType);
+                this.Lifestyle = this.Container.Options.SelectLifestyle(closedDecoratorType);
             }
 
             // The actual decorator could be different. TODO: must... write... test... for... this.
@@ -85,7 +83,7 @@ namespace SimpleInjector.Decorators
 
         private void ReplaceOriginalExpression(Registration decoratorRegistration)
         {
-            this.e.Expression = decoratorRegistration.BuildExpression(this.e.InstanceProducer);
+            this.e.Expression = decoratorRegistration.BuildExpression();
 
             this.e.ReplacedRegistration = decoratorRegistration;
 

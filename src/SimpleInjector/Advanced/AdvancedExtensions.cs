@@ -23,7 +23,6 @@
 namespace SimpleInjector.Advanced
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
 
     /// <summary>
@@ -60,25 +59,6 @@ namespace SimpleInjector.Advanced
             container.ThrowWhenDisposed();
 
             return container.IsVerifying;
-        }
-
-        /// <summary>This method has been removed.</summary>
-        /// <param name="container">The container.</param>
-        /// <typeparam name="TService">The type for with an initializer must be built.</typeparam>
-        /// <returns>An <see cref="Action{TService}"/> delegate or <b>null</b>.</returns>
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        [Obsolete(
-            "This method has been removed. Use Container.GetRegistration().Registration." +
-            "InitializeInstance instead to initialize an existing instance.",
-            error: true)]
-        [ExcludeFromCodeCoverage]
-        public static Action<TService> GetInitializer<TService>(this Container container)
-        {
-            Requires.IsNotNull(container, nameof(container));
-
-            throw new InvalidOperationException(
-                "This method has been removed. Use Container.GetRegistration().Registration." +
-                "InitializeInstance instead to initialize an existing instance.");
         }
 
         /// <summary>
@@ -210,12 +190,11 @@ namespace SimpleInjector.Advanced
             container.AppendToCollectionInternal(serviceType, implementationType);
         }
 
-        internal static void Verify(this IDependencyInjectionBehavior behavior, Type serviceType, 
-            ConstructorInfo constructor)
+        internal static void Verify(this IDependencyInjectionBehavior behavior, ConstructorInfo constructor)
         {
-            foreach (var parameter in constructor.GetParameters())
+            foreach (ParameterInfo parameter in constructor.GetParameters())
             {
-                behavior.Verify(new InjectionConsumerInfo(serviceType, constructor.DeclaringType, parameter));
+                behavior.Verify(new InjectionConsumerInfo(parameter));
             }
         }
     }

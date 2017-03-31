@@ -1,0 +1,21 @@
+{
+  "version": "4.0.0",
+  "buildOptions": {
+    "keyFile": "../SimpleInjector.snk",
+    "warningsAsErrors": true,
+    "xmlDoc": true
+  },
+
+  "dependencies": {
+    "SimpleInjector": { "target": "project" }
+  },
+  "frameworks": {
+    "net45": {
+      "dependencies": {
+        "Microsoft.AspNet.WebApi.Core": "4.0.20710",
+        "System.Runtime": "4.0.0",
+        "System.ComponentModel": "4.0.0"
+      }
+    }
+  }
+}

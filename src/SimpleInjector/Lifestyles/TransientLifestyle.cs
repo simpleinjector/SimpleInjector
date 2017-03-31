@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -31,48 +31,37 @@ namespace SimpleInjector.Lifestyles
         {
         }
 
-        protected override int Length => 1;
+        public override int Length => 1;
 
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
-            return new TransientLifestyleRegistration<TService, TImplementation>(this, container);
+            return new TransientLifestyleRegistration<TConcrete>(this, container);
         }
 
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
             Container container)
         {
             return new TransientLifestyleRegistration<TService>(this, container, instanceCreator);
         }
 
-        private sealed class TransientLifestyleRegistration<TService> : Registration
-            where TService : class
+        private sealed class TransientLifestyleRegistration<TImplementation> : Registration
+            where TImplementation : class
         {
-            private readonly Func<TService> instanceCreator;
+            private readonly Func<TImplementation> instanceCreator;
 
             public TransientLifestyleRegistration(Lifestyle lifestyle, Container container, 
-                Func<TService> instanceCreator)
+                Func<TImplementation> instanceCreator = null)
                 : base(lifestyle, container)
             {
                 this.instanceCreator = instanceCreator;
             }
 
-            public override Type ImplementationType => typeof(TService);
-
-            public override Expression BuildExpression() => this.BuildTransientExpression(this.instanceCreator);
-        }
-
-        private class TransientLifestyleRegistration<TService, TImplementation> : Registration
-            where TImplementation : class, TService
-            where TService : class
-        {
-            internal TransientLifestyleRegistration(Lifestyle lifestyle, Container container)
-                : base(lifestyle, container)
-            {
-            }
-
             public override Type ImplementationType => typeof(TImplementation);
 
-            public override Expression BuildExpression() => this.BuildTransientExpression<TService, TImplementation>();
+            public override Expression BuildExpression() =>
+                this.instanceCreator == null
+                    ? this.BuildTransientExpression()
+                    : this.BuildTransientExpression(this.instanceCreator);
         }
     }
 }

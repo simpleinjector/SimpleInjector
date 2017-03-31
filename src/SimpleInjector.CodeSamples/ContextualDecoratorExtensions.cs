@@ -4,9 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Extensions;
 
     public static class ContextualDecoratorExtensions
     {
@@ -14,20 +12,18 @@
 
         public static void EnableContextualDecoratorSupport(this ContainerOptions options)
         {
-            var predicates = new ContextualPredicateCollection();
-
-            if (options.Container.GetItem(PredicateCollectionKey) != null)
+            if (GetContextualPredicates(options.Container) == null)
             {
-                throw new InvalidOperationException("EnableContextualDecoratorSupport can't be called twice.");
+                var predicates = new ContextualPredicateCollection();
+
+                options.DependencyInjectionBehavior =
+                    new ContextualDecoratorInjectionBehavior(options.Container, predicates);
+
+                options.Container.SetItem(PredicateCollectionKey, predicates);
             }
-
-            options.DependencyInjectionBehavior =
-                new ContextualDecoratorInjectionBehavior(options.Container, predicates);
-
-            options.Container.SetItem(PredicateCollectionKey, predicates);
         }
 
-        public static void RegisterContextualDecorator(this Container container, Type serviceType, 
+        public static void RegisterContextualDecorator(this Container container, Type serviceType,
             Type decoratorType, Predicate<InjectionTargetInfo> contextualPredicate)
         {
             var predicates = GetContextualPredicates(container);
@@ -40,16 +36,17 @@
 
             Predicate<DecoratorPredicateContext> predicateToReplace = c =>
             {
-                throw new InvalidOperationException("Conditional decorator " + decoratorType.FullName + 
-                    " hasn't been applied to type " + c.ServiceType.FullName + ". Make sure that all " +
-                    "registered decorators that wrap this decorator are transient and don't depend on " +
-                    "Func<" + c.ServiceType.FullName + "> and that " + c.ServiceType + " is not resolved " +
-                    "as root type.");
+                throw new InvalidOperationException(
+                    "Conditional decorator " + decoratorType.ToFriendlyName() + " hasn't been applied to " +
+                    "type " + c.ServiceType.ToFriendlyName() + ". Make sure that all registered " +
+                    "decorators that wrap this decorator are transient and don't depend on " +
+                    "Func<" + c.ServiceType.ToFriendlyName() + "> and that " + 
+                    c.ServiceType.ToFriendlyName() + " is not resolved as root type.");
             };
 
             container.RegisterRuntimeDecorator(serviceType, decoratorType, predicateToReplace);
 
-            predicates.Add(serviceType, 
+            predicates.Add(serviceType,
                 new PredicatePair(decoratorType, predicateToReplace, contextualPredicate));
         }
 
@@ -60,12 +57,14 @@
 
         private sealed class ContextualDecoratorInjectionBehavior : IDependencyInjectionBehavior
         {
+            private readonly Container container;
             private readonly ContextualPredicateCollection contextualPredicates;
             private readonly IDependencyInjectionBehavior defaultBehavior;
 
-            public ContextualDecoratorInjectionBehavior(Container container, 
+            public ContextualDecoratorInjectionBehavior(Container container,
                 ContextualPredicateCollection contextualPredicates)
             {
+                this.container = container;
                 this.contextualPredicates = contextualPredicates;
                 this.defaultBehavior = container.Options.DependencyInjectionBehavior;
             }
@@ -75,28 +74,36 @@
                 this.defaultBehavior.Verify(consumer);
             }
 
-            public Expression BuildExpression(InjectionConsumerInfo consumer)
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure)
             {
-                var expression = this.defaultBehavior.BuildExpression(consumer);
+                InstanceProducer producer = this.defaultBehavior.GetInstanceProducer(consumer, throwOnFailure);
 
-                List<PredicatePair> predicatePairs;
+                List<PredicatePair> pairs;
 
-                if (this.MustApplyContextualDecorator(consumer.Target.TargetType, out predicatePairs))
+                if (this.MustApplyContextualDecorator(consumer.Target.TargetType, out pairs))
                 {
-                    var visitor = new ContextualDecoratorExpressionVisitor(consumer.Target, predicatePairs);
-
-                    expression = visitor.Visit(expression);
-
-                    if (!visitor.AllContextualDecoratorsApplied)
-                    {
-                        throw new InvalidOperationException("Couldn't apply the contextual decorator " + 
-                            visitor.UnappliedDecorators.Last().FullName + ". Make sure that all registered " +
-                            "decorators that wrap this decorator are transient and don't depend on " +
-                            "Func<" + consumer.Target.TargetType.FullName + ">.");
-                    }
+                    return this.ApplyDecorator(consumer.Target, producer.BuildExpression(), pairs);
                 }
 
-                return expression;
+                return producer;
+            }
+
+            private InstanceProducer ApplyDecorator(InjectionTargetInfo target, Expression expression,
+                List<PredicatePair> predicatePairs)
+            {
+                var visitor = new ContextualDecoratorExpressionVisitor(target, predicatePairs);
+
+                expression = visitor.Visit(expression);
+
+                if (!visitor.AllContextualDecoratorsApplied)
+                {
+                    throw new InvalidOperationException("Couldn't apply the contextual decorator " +
+                        visitor.UnappliedDecorators.Last().ToFriendlyName() + ". Make sure that all " +
+                        "registered decorators that wrap this decorator are transient and don't depend on " +
+                        "Func<" + target.TargetType.ToFriendlyName() + ">.");
+                }
+
+                return InstanceProducer.FromExpression(target.TargetType, expression, this.container);
             }
 
             private bool MustApplyContextualDecorator(Type serviceType, out List<PredicatePair> predicatePairs)
@@ -119,32 +126,28 @@
             private readonly List<PredicatePair> predicatePairs;
             private readonly List<PredicatePair> appliedPairs = new List<PredicatePair>();
 
-            public ContextualDecoratorExpressionVisitor(InjectionTargetInfo target, 
+            public ContextualDecoratorExpressionVisitor(InjectionTargetInfo target,
                 List<PredicatePair> predicatePairs)
             {
                 this.target = target;
                 this.predicatePairs = predicatePairs;
             }
 
-            public bool AllContextualDecoratorsApplied 
-            {
-                get { return !this.UnappliedDecorators.Any(); }
-            }
+            public bool AllContextualDecoratorsApplied => !this.UnappliedDecorators.Any();
 
-            public IEnumerable<Type> UnappliedDecorators
-            {
-                get { return this.predicatePairs.Except(this.appliedPairs).Select(p => p.DecoratorType); }
-            }
+            public IEnumerable<Type> UnappliedDecorators =>
+                this.predicatePairs.Except(this.appliedPairs).Select(p => p.DecoratorType);
 
             protected override Expression VisitConditional(ConditionalExpression node)
             {
-                var predicatePair = this.GetPredicateToInsert(node);
+                PredicatePair predicatePair = this.GetPredicateToInsert(node);
 
                 if (predicatePair != null)
                 {
                     this.appliedPairs.Add(predicatePair);
-
-                    return this.Visit(predicatePair.ContextualPredicate(this.target) ? node.IfTrue : node.IfFalse);
+                    bool shouldApplyDecorator = predicatePair.ContextualPredicate(this.target);
+                    var expression = shouldApplyDecorator ? node.IfTrue : node.IfFalse;
+                    return this.Visit(expression);
                 }
 
                 return base.VisitConditional(node);
@@ -164,24 +167,14 @@
             private static Predicate<DecoratorPredicateContext> GetTestPredicate(ConditionalExpression node)
             {
                 var test = node.Test as InvocationExpression;
-
-                if (test != null)
-                {
-                    var constant = test.Expression as ConstantExpression;
-
-                    if (constant != null)
-                    {
-                        return constant.Value as Predicate<DecoratorPredicateContext>;
-                    }
-                }
-
-                return null;
+                var constant = test?.Expression as ConstantExpression;
+                return constant?.Value as Predicate<DecoratorPredicateContext>;
             }
         }
 
         private sealed class ContextualPredicateCollection
         {
-            private readonly Dictionary<Type, List<PredicatePair>> dictionary = 
+            private readonly Dictionary<Type, List<PredicatePair>> dictionary =
                 new Dictionary<Type, List<PredicatePair>>();
 
             public IEnumerable<Type> ServiceTypes
@@ -202,7 +195,7 @@
                 }
 
                 this.dictionary[key].Add(value);
-            }        
+            }
         }
 
         private sealed class PredicatePair

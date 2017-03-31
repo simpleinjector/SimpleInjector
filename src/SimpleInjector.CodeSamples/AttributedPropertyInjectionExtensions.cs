@@ -1,7 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
@@ -14,33 +13,25 @@
         public static void AutoWirePropertiesWithAttribute<TAttribute>(this ContainerOptions options)
             where TAttribute : Attribute
         {
-            options.PropertySelectionBehavior =
-                new AttributePropertyInjectionBehavior(options.PropertySelectionBehavior, typeof(TAttribute));
+            options.PropertySelectionBehavior = new AttributePropertyInjectionBehavior<TAttribute>(
+                options.PropertySelectionBehavior);
         }
 
-        internal sealed class AttributePropertyInjectionBehavior : IPropertySelectionBehavior
+        internal sealed class AttributePropertyInjectionBehavior<TAttribute> : IPropertySelectionBehavior
+            where TAttribute : Attribute
         {
             private readonly IPropertySelectionBehavior baseBehavior;
-            private readonly Type attributeType;
 
-            public AttributePropertyInjectionBehavior(IPropertySelectionBehavior baseBehavior, Type attributeType)
+            public AttributePropertyInjectionBehavior(IPropertySelectionBehavior baseBehavior)
             {
                 this.baseBehavior = baseBehavior;
-                this.attributeType = attributeType;
             }
 
-            [DebuggerStepThrough]
-            public bool SelectProperty(Type serviceType, PropertyInfo property)
-            {
-                return this.IsPropertyDecoratedWithAttribute(property) ||
-                    this.baseBehavior.SelectProperty(serviceType, property);
-            }
+            public bool SelectProperty(Type t, PropertyInfo p) => 
+                this.IsPropertyDecoratedWithAttribute(p) || this.baseBehavior.SelectProperty(t, p);
 
-            [DebuggerStepThrough]
-            private bool IsPropertyDecoratedWithAttribute(PropertyInfo property)
-            {
-                return property.GetCustomAttributes(this.attributeType, true).Any();
-            }
+            private bool IsPropertyDecoratedWithAttribute(PropertyInfo property) =>
+                property.GetCustomAttributes(typeof(TAttribute), true).Any();
         }
     }
 }

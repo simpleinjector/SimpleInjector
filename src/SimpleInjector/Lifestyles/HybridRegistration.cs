@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -26,45 +26,40 @@ namespace SimpleInjector.Lifestyles
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
 
     internal sealed class HybridRegistration : Registration
     {
-        private readonly Type serviceType;
-        private readonly Type implementationType;
         private readonly Func<bool> test;
         private readonly Registration trueRegistration;
         private readonly Registration falseRegistration;
 
-        public HybridRegistration(Type serviceType, Type implementationType, Func<bool> test,
+        public HybridRegistration(Type implementationType, Func<bool> test,
             Registration trueRegistration, Registration falseRegistration,
             Lifestyle lifestyle, Container container)
             : base(lifestyle, container)
         {
-            this.serviceType = serviceType;
-            this.implementationType = implementationType;
+            this.ImplementationType = implementationType;
             this.test = test;
             this.trueRegistration = trueRegistration;
             this.falseRegistration = falseRegistration;
         }
 
-        public override Type ImplementationType => this.implementationType;
+        public override Type ImplementationType { get; }
 
         public override Expression BuildExpression()
         {
-            InstanceProducer producer = this.GetCurrentProducer();
-            Expression trueExpression = this.trueRegistration.BuildExpression(producer);
-            Expression falseExpression = this.falseRegistration.BuildExpression(producer);
+            Expression trueExpression = this.trueRegistration.BuildExpression();
+            Expression falseExpression = this.falseRegistration.BuildExpression();
 
             // Must be called after BuildExpression has been called.
             this.AddRelationships();
 
             return Expression.Condition(
                 test: Expression.Invoke(Expression.Constant(this.test)),
-                ifTrue: Expression.Convert(trueExpression, this.serviceType),
-                ifFalse: Expression.Convert(falseExpression, this.serviceType));
+                ifTrue: Expression.Convert(trueExpression, this.ImplementationType),
+                ifFalse: Expression.Convert(falseExpression, this.ImplementationType));
         }
 
         internal override void SetParameterOverrides(IEnumerable<OverriddenParameter> overriddenParameters)

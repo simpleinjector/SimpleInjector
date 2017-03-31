@@ -57,7 +57,21 @@ namespace SimpleInjector
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(applicationBuilder, nameof(applicationBuilder));
 
-            var manager = applicationBuilder.ApplicationServices.GetRequiredService<ApplicationPartManager>();
+            var manager = applicationBuilder.ApplicationServices.GetService<ApplicationPartManager>();
+
+            if (manager == null)
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "A registration for the {0} is missing from the ASP.NET Core configuration " +
+                        "system. This is most likely caused by a missing call to services.AddMvcCore() or " +
+                        "services.AddMvc() as part of the ConfigureServices(IServiceCollection) method of " +
+                        "the Startup class. A call to one of those methods will ensure the registration " +
+                        "of the {1}.",
+                        typeof(ApplicationPartManager).FullName,
+                        typeof(ApplicationPartManager).Name));
+            }
 
             var feature = new ControllerFeature();
             manager.PopulateFeature(feature);
@@ -135,8 +149,15 @@ namespace SimpleInjector
         public static void AddSimpleInjectorTagHelperActivation(this IServiceCollection services, Container container,
             Predicate<Type> applicationTypeSelector = null)
         {
-            if (services == null) throw new ArgumentNullException(nameof(services));
-            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            if (container == null)
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
 
             // There are tag helpers OOTB in MVC. Letting the application container try to create them will fail
             // because of the dependencies these tag helpers have. This means that OOTB tag helpers need to remain
@@ -180,8 +201,7 @@ namespace SimpleInjector
 
         private static Registration CreateConcreteRegistration(Container container, Type concreteType)
         {
-            var lifestyle =
-                container.Options.LifestyleSelectionBehavior.SelectLifestyle(concreteType, concreteType);
+            var lifestyle = container.Options.LifestyleSelectionBehavior.SelectLifestyle(concreteType);
 
             return lifestyle.CreateRegistration(concreteType, container);
         }

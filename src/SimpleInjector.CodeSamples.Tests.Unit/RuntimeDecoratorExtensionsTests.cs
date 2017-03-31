@@ -4,7 +4,6 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Tests.Unit;
 
     [TestClass]
@@ -125,7 +124,7 @@
                 this.lifestyle = lifestyle;
             }
 
-            public Lifestyle SelectLifestyle(Type serviceType, Type implementationType)
+            public Lifestyle SelectLifestyle(Type implementationType)
             {
                 return this.lifestyle;
             }

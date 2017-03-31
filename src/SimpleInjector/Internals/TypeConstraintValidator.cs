@@ -41,9 +41,16 @@ namespace SimpleInjector.Internals
 
         private bool ParameterSatisfiesDefaultConstructorConstraint()
         {
-            if (!this.MappingHasConstraint(GenericParameterAttributes.DefaultConstructorConstraint))
+            if (!this.MappingArgumentHasConstraint(GenericParameterAttributes.DefaultConstructorConstraint))
             {
                 return true;
+            }
+
+            if (this.Mapping.ConcreteType.IsGenericParameter)
+            {
+                // In case the concrete type itself is a generic parameter, it as well should have the "new()"
+                // constraint. If not, it means that the "new()" constraint is added on the implementation.
+                return this.MappingConcreteTypeHasConstraint(GenericParameterAttributes.DefaultConstructorConstraint);
             }
 
             if (this.Mapping.ConcreteType.IsValueType())
@@ -52,14 +59,14 @@ namespace SimpleInjector.Internals
                 return true;
             }
 
-            bool typeHasDefaultCtor = this.Mapping.ConcreteType.GetConstructor(Helpers.Array<Type>.Empty) != null;
-
-            return typeHasDefaultCtor;
+            return HasDefaultConstructor(this.Mapping.ConcreteType);
         }
+
+        private static bool HasDefaultConstructor(Type t) => t.GetConstructor(Helpers.Array<Type>.Empty) != null;
 
         private bool ParameterSatisfiesReferenceTypeConstraint()
         {
-            if (!this.MappingHasConstraint(GenericParameterAttributes.ReferenceTypeConstraint))
+            if (!this.MappingArgumentHasConstraint(GenericParameterAttributes.ReferenceTypeConstraint))
             {
                 return true;
             }
@@ -69,7 +76,7 @@ namespace SimpleInjector.Internals
 
         private bool ParameterSatisfiesNotNullableValueTypeConstraint()
         {
-            if (!this.MappingHasConstraint(GenericParameterAttributes.NotNullableValueTypeConstraint))
+            if (!this.MappingArgumentHasConstraint(GenericParameterAttributes.NotNullableValueTypeConstraint))
             {
                 return true;
             }
@@ -110,15 +117,12 @@ namespace SimpleInjector.Internals
             // we've seen a call to Verify() take up to 6 times as long (from 8.5 seconds to 55 seconds), when 
             // we don't do these checks here (and simply return true). 
             // That's why we need to have these checks in the full version.
-#if PCL
-            return true;
-#else
             if (constraint.IsAssignableFrom(this.Mapping.ConcreteType))
             {
                 return true;
             }
 
-            if (constraint.ContainsGenericParameters)
+            if (constraint.ContainsGenericParameters())
             {
                 // The constraint is one of the other generic parameters, but this class checks a single
                 // mapping, so we cannot check whether this constraint holds. We just return true and
@@ -129,18 +133,24 @@ namespace SimpleInjector.Internals
             var baseTypes = this.Mapping.ConcreteType.GetBaseTypesAndInterfaces();
 
             // This doesn't feel right, but have no idea how to reliably do this check without the GUID.
-            return baseTypes.Any(type => type.GUID == constraint.GUID);
-#endif
+            return baseTypes.Any(type => type.GetGuid() == constraint.GetGuid());
         }
 
-        private bool MappingHasConstraint(GenericParameterAttributes constraint)
+        private bool MappingArgumentHasConstraint(GenericParameterAttributes constraint) =>
+            GenericParameterHasConstraint(this.Mapping.Argument, constraint);
+
+        private bool MappingConcreteTypeHasConstraint(GenericParameterAttributes constraint) =>
+            GenericParameterHasConstraint(this.Mapping.ConcreteType, constraint);
+
+        private static bool GenericParameterHasConstraint(Type genericParameter, 
+            GenericParameterAttributes constraint)
         {
-            if (!this.Mapping.Argument.IsGenericParameter)
+            if (!genericParameter.IsGenericParameter)
             {
                 return false;
             }
 
-            var constraints = this.Mapping.Argument.GetGenericParameterAttributes();
+            var constraints = genericParameter.GetGenericParameterAttributes();
             return (constraints & constraint) != GenericParameterAttributes.None;
         }
     }

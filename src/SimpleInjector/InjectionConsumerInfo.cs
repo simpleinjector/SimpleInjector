@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015 Simple Injector Contributors
+ * Copyright (c) 2015-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,7 +23,7 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Globalization;
+    using System.ComponentModel;
     using System.Reflection;
 
     /// <summary>
@@ -35,39 +35,43 @@ namespace SimpleInjector
         internal static readonly InjectionConsumerInfo Root = null;
         
         /// <summary>Initializes a new instance of the <see cref="InjectionConsumerInfo"/> class.</summary>
-        /// <param name="serviceType">The service type of the consumer of the component that should be created.</param>
-        /// <param name="implementationType">The implementation type of the consumer of the component that should be created.</param>
         /// <param name="parameter">The constructor parameter for the created component.</param>
-        public InjectionConsumerInfo(Type serviceType, Type implementationType, ParameterInfo parameter)
-            : this(serviceType, implementationType)
+        public InjectionConsumerInfo(ParameterInfo parameter)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(implementationType, nameof(implementationType));
             Requires.IsNotNull(parameter, nameof(parameter));
 
             this.Target = new InjectionTargetInfo(parameter);
+            this.ImplementationType = parameter.Member.DeclaringType;
         }
 
-        internal InjectionConsumerInfo(Type serviceType, Type implementationType, PropertyInfo property)
-            : this(serviceType, implementationType)
+        /// <summary>Initializes a new instance of the <see cref="InjectionConsumerInfo"/> class.</summary>
+        /// <param name="implementationType">The implementation type of the consumer of the component that should be created.</param>
+        /// <param name="property">The property for the created component.</param>
+        public InjectionConsumerInfo(Type implementationType, PropertyInfo property)
         {
+            Requires.IsNotNull(implementationType, nameof(implementationType));
             Requires.IsNotNull(property, nameof(property));
 
             this.Target = new InjectionTargetInfo(property);
-        }
-
-        private InjectionConsumerInfo(Type serviceType, Type implementationType)
-        {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(implementationType, nameof(implementationType));
-
-            this.ServiceType = serviceType;
             this.ImplementationType = implementationType;
         }
 
         /// <summary>Gets the service type of the consumer of the component that should be created.</summary>
         /// <value>The closed generic service type.</value>
-        public Type ServiceType { get; }
+        [Obsolete(
+            "This property has been removed. Please use ImplementationType instead. " +
+            "See https://simpleinjector.org/depr3.",
+            error: true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Type ServiceType
+        {
+            get
+            {
+                throw new NotSupportedException(
+                    "This property has been removed. Please use ImplementationType instead. " +
+                    "See https://simpleinjector.org/depr3.");
+            }
+        }
 
         /// <summary>Gets the implementation type of the consumer of the component that should be created.</summary>
         /// <value>The implementation type.</value>
@@ -82,10 +86,8 @@ namespace SimpleInjector
 
         /// <summary>Returns a string that represents the <see cref="InjectionConsumerInfo"/>.</summary>
         /// <returns>A string.</returns>
-        public override string ToString() => string.Format(CultureInfo.InvariantCulture,
-            "{{ ServiceType: {0}, ImplementationType: {1}, Target.Name: '{2}' }}",
-            this.ServiceType.ToFriendlyName(),
-            this.ImplementationType.ToFriendlyName(),
-            this.Target.Name);
+        public override string ToString() => 
+            "{ ImplementationType: " + this.ImplementationType.ToFriendlyName() + 
+            ", Target.Name: '" + this.Target.Name + "' }";
     }
 }

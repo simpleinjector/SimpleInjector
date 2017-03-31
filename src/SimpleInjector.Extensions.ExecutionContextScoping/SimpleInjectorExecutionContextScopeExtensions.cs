@@ -28,15 +28,13 @@
 namespace SimpleInjector.Extensions.ExecutionContextScoping
 {
     using System;
-    using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Extension methods for enabling execution context scoping for the Simple Injector.
     /// </summary>
     public static class SimpleInjectorExecutionContextScopeExtensions
     {
-        private static readonly object ManagerKey = new object();
-  
         /// <summary>
         /// Begins a new execution context scope for the given <paramref name="container"/>. 
         /// Services, registered using the <see cref="ExecutionContextScopeLifestyle"/> are cached during the 
@@ -56,46 +54,27 @@ namespace SimpleInjector.Extensions.ExecutionContextScoping
         /// }
         /// ]]></code>
         /// </example>
+        [Obsolete("BeginExecutionContextScope is obsolete. Please use SimpleInjector.Lifestyles." +
+            "AsyncScopedLifestyle.BeginScope(Container) instead.", error: false)]
         public static Scope BeginExecutionContextScope(this Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            return container.GetExecutionContextScopeManager().BeginExecutionContextScope();
+            return AsyncScopedLifestyle.BeginScope(container);
         }
 
         /// <summary>
-        /// Gets the Execution Context <see cref="Scope"/> that is currently in scope or <b>null</b> when no
-        /// <see cref="Scope"/> is currently in scope.
+        /// GetCurrentExecutionContextScope has been deprecated. This method throws an exception.
         /// </summary>
-        /// <example>
-        /// The following example registers a <b>ServiceImpl</b> type as transient (a new instance will be
-        /// returned every time) and registers an initializer for that type that will register that instance
-        /// for disposal in the <see cref="Scope"/> in which context it is created:
-        /// <code lang="cs"><![CDATA[
-        /// container.Register<IService, ServiceImpl>();
-        /// container.RegisterInitializer<ServiceImpl>(instance =>
-        /// {
-        ///     container.GetCurrentExecutionContextScope().RegisterForDisposal(instance);
-        /// });
-        /// ]]></code>
-        /// </example>
         /// <param name="container">The container.</param>
-        /// <returns>A new <see cref="Scope"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
-        [Obsolete("GetCurrentExecutionContextScope has been deprecated and will be removed in a future release. " +
+        /// <returns>This method throws an exception.</returns>
+        [Obsolete("GetCurrentExecutionContextScope has been deprecated. " +
             "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.",
-            error: false)]
+            error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static Scope GetCurrentExecutionContextScope(this Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            return container.GetExecutionContextScopeManager().CurrentScope;
+            throw new NotSupportedException(
+                "GetCurrentExecutionContextScope has been deprecated. " +
+                "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.");
         }
-
-        // This method will never return null.
-        internal static ExecutionContextScopeManager GetExecutionContextScopeManager(this Container container) => 
-            container.GetOrSetItem(ManagerKey, (c, key) => new ExecutionContextScopeManager(c));
     }
 }

@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015 Simple Injector Contributors
+ * Copyright (c) 2015-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,8 +23,6 @@
 namespace SimpleInjector.Advanced
 {
     using System.Diagnostics;
-    using System.Linq.Expressions;
-    using System.Reflection;
 
     [DebuggerDisplay(nameof(DefaultDependencyInjectionBehavior))]
     internal sealed class DefaultDependencyInjectionBehavior : IDependencyInjectionBehavior
@@ -36,21 +34,11 @@ namespace SimpleInjector.Advanced
             this.container = container;
         }
 
-        public Expression BuildExpression(InjectionConsumerInfo consumer)
-        {
-            Requires.IsNotNull(consumer, nameof(consumer));
-
-            InstanceProducer producer = this.GetInstanceProducerFor(consumer);
-            
-            // When the instance producer is invalid, this call will fail with an expressive exception.
-            return producer.BuildExpression();
-        }
-
         public void Verify(InjectionConsumerInfo consumer)
         {
             Requires.IsNotNull(consumer, nameof(consumer));
 
-            var target = consumer.Target;
+            InjectionTargetInfo target = consumer.Target;
 
             if (target.TargetType.IsValueType() || target.TargetType == typeof(string))
             {
@@ -58,13 +46,15 @@ namespace SimpleInjector.Advanced
             }
         }
 
-        private InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer)
+        public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure)
         {
+            Requires.IsNotNull(consumer, nameof(consumer));
+
             InjectionTargetInfo target = consumer.Target;
 
             InstanceProducer producer = this.container.GetRegistrationEvenIfInvalid(target.TargetType, consumer);
             
-            if (producer == null)
+            if (producer == null && throwOnFailure)
             {
                 // By redirecting to Verify() we let the verify throw an expressive exception. If it doesn't
                 // we throw the exception ourselves.

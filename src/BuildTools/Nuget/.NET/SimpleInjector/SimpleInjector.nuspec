@@ -11,15 +11,18 @@
     <title>Simple Injector</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Simple Injector is an easy, flexible and fast dependency injection library that uses best practice to guide your solutions toward the pit of success.</description>
-    <summary>Simple Injector is an easy-to-use Dependency Injection (DI) library for .NET 4+ that supports Silverlight 4+, Windows Phone 8, Windows 8 including Universal apps and Mono.</summary>
+    <summary>Simple Injector is an easy-to-use Dependency Injection (DI) library for .NET 4+ that supports .NET Core, UWP and Mono.</summary>
     <copyright>Simple Injector Contributors 2010 - {year}</copyright>
     <language>en-US</language>
-    <tags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC silverlight mono wp8 pcl</tags>
+    <tags>simpleinjector architecture dependency-injection DI Inversion-of-Control IOC</tags>
     <dependencies>
-      <group targetFramework=".NETFramework4.5" />
       <group targetFramework=".NETFramework4.0" />
-      <group targetFramework=".NETPortable4.5-Profile136" />
+      <group targetFramework=".NETFramework4.5" />
       <group targetFramework=".NETStandard1.0">
+        <dependency id="NETStandard.Library" version="1.6.0" />
+        <dependency id="System.ComponentModel" version="4.0.1" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
         <dependency id="NETStandard.Library" version="1.6.0" />
         <dependency id="System.ComponentModel" version="4.0.1" />
       </group>

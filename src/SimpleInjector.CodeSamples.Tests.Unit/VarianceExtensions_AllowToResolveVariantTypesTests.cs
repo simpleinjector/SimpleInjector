@@ -1,10 +1,7 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Tests.Unit;
 
     /// <summary>
@@ -119,7 +116,7 @@
             // Arrange
             string expectedMessage =
                 "There is an error in the container's configuration. " +
-                "It is impossible to resolve type System.Action`1[System.ArgumentException], " +
+                "It is impossible to resolve type Action<ArgumentException>, " +
                 "because there are 2 registrations that are applicable. " +
                 "Ambiguous registrations: ";
 
@@ -139,8 +136,8 @@
             {
                 Assert.IsTrue(ex.Message.Contains(expectedMessage), 
                     "Expected: " + expectedMessage + " Actual: " + ex.Message);
-                Assert.IsTrue(ex.Message.Contains(typeof(Action<object>).Name));
-                Assert.IsTrue(ex.Message.Contains(typeof(Action<Exception>).Name));
+                Assert.IsTrue(ex.Message.Contains("Action<Object>"), " Actual: " + ex.Message);
+                Assert.IsTrue(ex.Message.Contains("Action<Exception>"), " Actual: " + ex.Message);
             }
         }
 

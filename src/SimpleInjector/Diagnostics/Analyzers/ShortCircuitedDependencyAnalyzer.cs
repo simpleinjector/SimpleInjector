@@ -107,11 +107,6 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 let registrationIsPossiblyShortCircuited =
                     registeredImplementationTypes.ContainsKey(registration.ServiceType)
                 where registrationIsPossiblyShortCircuited
-                let registrationsWithThisImplementationType =
-                    registeredImplementationTypes[registration.ServiceType]
-                let hasLifestyleMismatch =
-                    registrationsWithThisImplementationType.Any(r => r.Lifestyle != registration.Lifestyle)
-                where hasLifestyleMismatch
                 select registration;
 
             return autoRegisteredRegistrationsWithLifestyleMismatch.ToDictionary(producer => producer.ServiceType);

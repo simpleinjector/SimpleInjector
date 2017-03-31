@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <coreProperties xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
 <dc:creator>Simple Injector Contributors</dc:creator>
-<dc:description>The Simple Injector is an easy-to-use Inversion of Control library for .NET. It solely supports code-based configuration and is an ideal starting point for developers unfamiliar with larger IoC / DI libraries.</dc:description>
+<dc:description>The Simple Injector is an easy-to-use Inversion of Control library for .NET.</dc:description>
 <dc:identifier>SimpleInjector</dc:identifier>
 <version>{version}</version>
 <dc:language>en-US</dc:language>
-<keywords>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC Servicelocator</keywords>
+<keywords>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC</keywords>
 </coreProperties>

@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,6 +23,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Diagnostics;
     using SimpleInjector.Lifestyles;
 
     /// <summary>
@@ -34,14 +35,11 @@ namespace SimpleInjector
     /// </summary>
     public abstract class ScopedLifestyle : Lifestyle
     {
-        private readonly bool disposeInstances;
-
         /// <summary>Initializes a new instance of the <see cref="ScopedLifestyle"/> class.</summary>
         /// <param name="name">The user friendly name of this lifestyle.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB) 
         /// or an empty string.</exception>
-        protected ScopedLifestyle(string name)
-            : this(name, disposeInstances: true)
+        protected ScopedLifestyle(string name) : base(name)
         {
         }
 
@@ -51,15 +49,16 @@ namespace SimpleInjector
         /// disposed or not.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB) 
         /// or an empty string.</exception>
-        protected ScopedLifestyle(string name, bool disposeInstances)
-            : base(name)
+        [Obsolete(
+            "This constructor overload is deprecated. The disposal of instances can't be suppressed anymore", 
+            error: true)]
+        protected ScopedLifestyle(string name, bool disposeInstances) : base(name)
         {
-            this.disposeInstances = disposeInstances;
         }
 
         /// <summary>Gets the length of the lifestyle.</summary>
         /// <value>The <see cref="int"/> representing the length of this lifestyle.</value>
-        protected override int Length => 500;
+        public override int Length => 500;
 
         /// <summary>
         /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
@@ -85,15 +84,7 @@ namespace SimpleInjector
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(action, nameof(action));
 
-            var scope = this.GetCurrentScope(container);
-
-            if (scope == null)
-            {
-                throw new InvalidOperationException(
-                    StringResources.ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(this.Name));
-            }
-
-            scope.WhenScopeEnds(action);
+            this.GetCurrentScopeOrThrow(container).WhenScopeEnds(action);
         }
 
         /// <summary>
@@ -111,15 +102,7 @@ namespace SimpleInjector
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(disposable, nameof(disposable));
 
-            var scope = this.GetCurrentScope(container);
-
-            if (scope == null)
-            {
-                throw new InvalidOperationException(
-                    StringResources.ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(this.Name));
-            }
-
-            scope.RegisterForDisposal(disposable);
+            this.GetCurrentScopeOrThrow(container).RegisterForDisposal(disposable);
         }
 
         /// <summary>
@@ -132,10 +115,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, nameof(container));
 
-            // If we are running verification in the current thread, we prefer returning a verification scope
-            // over a real active scope (issue #95).
-            return container.GetVerificationOrResolveScopeForCurrentThread()
-                ?? this.GetCurrentScopeCore(container);
+            return this.GetCurrentScopeInternal(container);
         }
 
         /// <summary>
@@ -146,6 +126,41 @@ namespace SimpleInjector
         /// <param name="container">The container for which the delegate gets created.</param>
         /// <returns>A <see cref="Func{T}"/> delegate. This method should never return null.</returns>
         protected internal abstract Func<Scope> CreateCurrentScopeProvider(Container container);
+
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
+        /// with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
+        /// <param name="instanceCreator">A delegate that will create a new instance of 
+        /// <typeparamref name="TService"/> every time it is called.</param>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
+            Container container)
+        {
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+            Requires.IsNotNull(container, nameof(container));
+
+            return new ScopedRegistration<TService>(this, container, instanceCreator);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <typeparamref name="TConcrete"/> with the caching as specified by this lifestyle.
+        /// </summary>
+        /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
+        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
+        {
+            Requires.IsNotNull(container, nameof(container));
+
+            return new ScopedRegistration<TConcrete>(this, container);
+        }
 
         /// <summary>
         /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
@@ -167,40 +182,36 @@ namespace SimpleInjector
             return currentScopeProvider.Invoke();
         }
 
-        /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
-        /// with the caching as specified by this lifestyle.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <param name="instanceCreator">A delegate that will create a new instance of 
-        /// <typeparamref name="TService"/> every time it is called.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
-            Container container)
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+        private Scope GetCurrentScopeOrThrow(Container container)
         {
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-            Requires.IsNotNull(container, nameof(container));
+            Scope scope = this.GetCurrentScopeInternal(container);
 
-            return new ScopedRegistration<TService, TService>(this, container, this.disposeInstances, instanceCreator);
+            if (scope == null)
+            {
+                this.ThrowThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope();
+            }
+
+            return scope;
         }
 
-        /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TImplementation"/> with the caching as specified by this lifestyle.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        protected override Registration CreateRegistrationCore<TService, TImplementation>(Container container)
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+        private Scope GetCurrentScopeInternal(Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
+            // If we are running verification in the current thread, we prefer returning a verification scope
+            // over a real active scope (issue #95).
+            return container.GetVerificationScopeForCurrentThread()
+                ?? this.GetCurrentScopeCore(container);
+        }
 
-            return new ScopedRegistration<TService, TImplementation>(this, container, this.disposeInstances);
+        private void ThrowThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope()
+        {
+            throw new InvalidOperationException(
+                StringResources.ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(this));
         }
     }
 }

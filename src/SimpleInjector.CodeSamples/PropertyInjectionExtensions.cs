@@ -73,21 +73,14 @@
                 this.baseBehavior = baseBehavior;
             }
 
-            bool IPropertySelectionBehavior.SelectProperty(Type serviceType, PropertyInfo property)
-            {
-                return this.IsPropertyRegisteredForAutowiring(property) || 
-                    this.baseBehavior.SelectProperty(serviceType, property);
-            }
-            
-            public void AddPropertySelector(Predicate<PropertyInfo> selector)
-            {
-                this.propertySelectors.Add(selector);
-            }
+            bool IPropertySelectionBehavior.SelectProperty(Type t, PropertyInfo p) => 
+                this.IsPropertyRegisteredForAutowiring(p) || this.baseBehavior.SelectProperty(t, p);
 
-            private bool IsPropertyRegisteredForAutowiring(PropertyInfo property)
-            {
-                return this.propertySelectors.Exists(selector => selector(property));
-            }
+            public void AddPropertySelector(Predicate<PropertyInfo> selector) => 
+                this.propertySelectors.Add(selector);
+
+            private bool IsPropertyRegisteredForAutowiring(PropertyInfo property) => 
+                this.propertySelectors.Exists(selector => selector(property));
         }
     }
 }

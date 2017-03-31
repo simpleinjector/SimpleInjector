@@ -2,7 +2,6 @@
 {
     using System;
     using System.Linq;
-    using Extensions.LifetimeScoping;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Tests.Unit;
 
@@ -76,7 +75,7 @@
             container.RegisterSingleton<ILogger>(logger);
             container.RegisterCollection<ICommand>(new[]
             {
-                Lifestyle.Transient.CreateRegistration(typeof(ICommand), typeof(ConcreteCommand), container),
+                Lifestyle.Transient.CreateRegistration(typeof(ConcreteCommand), container),
                 Lifestyle.Transient.CreateRegistration(typeof(ConcreteCommand), container),
             });
 

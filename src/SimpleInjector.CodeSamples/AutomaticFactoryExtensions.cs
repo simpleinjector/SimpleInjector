@@ -28,12 +28,8 @@
         }
 
         [DebuggerStepThrough]
-        public static object CreateFactory(Type factoryType, Container container)
-        {
-            var proxy = new AutomaticFactoryProxy(factoryType, container);
-
-            return proxy.GetTransparentProxy();
-        }
+        public static object CreateFactory(Type factoryType, Container container) =>
+            new AutomaticFactoryProxy(factoryType, container).GetTransparentProxy();
 
         private sealed class AutomaticFactoryProxy : RealProxy
         {
@@ -50,7 +46,7 @@
 
             public override IMessage Invoke(IMessage msg)
             {
-                IMethodCallMessage callMessage = msg as IMethodCallMessage;
+                var callMessage = msg as IMethodCallMessage;
 
                 if (callMessage != null)
                 {

@@ -2,7 +2,6 @@
 {
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Extensions;
     using SimpleInjector.Tests.Unit;
 
     [TestClass]
@@ -205,7 +204,7 @@
             catch (Exception ex)
             {
                 AssertThat.StringContains(
-                    "Couldn't apply the contextual decorator " + typeof(CommandHandlerDecorator<>).FullName,
+                    "Couldn't apply the contextual decorator CommandHandlerDecorator<TCommand>",
                     ex.Message);
 
                 AssertThat.StringContains(
@@ -234,31 +233,6 @@
             {
                 Assert.IsTrue(ex.Message.Contains("EnableContextualDecoratorSupport"));
             }
-        }
-
-        [TestMethod]
-        public void EnableContextualDecoratorSupport_RegisteredOnce_Succeeds()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            container.Options.EnableContextualDecoratorSupport();
-        }
-
-        [TestMethod]
-        public void EnableContextualDecoratorSupport_RegisteredTwice_Fails()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Options.EnableContextualDecoratorSupport();
-
-            // Act
-            Action action = () => container.Options.EnableContextualDecoratorSupport();
-
-            // Assert
-            AssertThat.Throws<InvalidOperationException>(action);
         }
 
         public sealed class Consumer<TDependency>

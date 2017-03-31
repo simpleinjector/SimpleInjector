@@ -91,7 +91,7 @@
                 var factoryArguments = genericArguments.Take(genericArguments.Length - 1).ToArray();
 
                 var constructor = container.Options.ConstructorResolutionBehavior
-                    .GetConstructor(componentType, componentType);
+                    .GetConstructor(componentType);
 
                 var parameters = (
                     from factoryArgumentType in factoryArguments
@@ -132,8 +132,8 @@
                 throw new ActivationException(string.Format(CultureInfo.CurrentCulture,
                     "The constructor of type {0} did not contain the sequence of the following " +
                     "constructor parameters: {1}.",
-                    constructor.DeclaringType.FullName,
-                    string.Join(", ", funcParameterTypes.Select(t => t.Name))));
+                    constructor.DeclaringType.ToFriendlyName(),
+                    string.Join(", ", funcParameterTypes.Select(t => t.ToFriendlyName()))));
             }
 
             var firstCtorParameterExpressions = ctorParameterTypes

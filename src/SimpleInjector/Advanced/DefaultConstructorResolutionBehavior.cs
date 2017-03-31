@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2016 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -33,9 +33,8 @@ namespace SimpleInjector.Advanced
         // NOTE: The serviceType parameter is not used in the default implementation, but can be used by
         // alternative implementations to generate a proxy type based on the service type and return a
         // constructor of that proxy instead of returning a constructor of the implementationType.
-        public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
+        public ConstructorInfo GetConstructor(Type implementationType)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(implementationType, nameof(implementationType));
 
             VerifyTypeIsConcrete(implementationType);
@@ -45,7 +44,7 @@ namespace SimpleInjector.Advanced
 
         private static void VerifyTypeIsConcrete(Type implementationType)
         {
-            if (!Helpers.IsConcreteType(implementationType))
+            if (!Types.IsConcreteType(implementationType))
             {
                 // About arrays: While array types are in fact concrete, we cannot create them and creating 
                 // them would be pretty useless.

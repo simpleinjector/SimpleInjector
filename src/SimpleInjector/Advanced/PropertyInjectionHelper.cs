@@ -57,22 +57,19 @@ namespace SimpleInjector.Advanced
             });
 
         private readonly Container container;
-        private readonly Type serviceType;
         private readonly Type implementationType;
 
-        internal PropertyInjectionHelper(Container container, Type serviceType,
-            Type implementationType)
+        internal PropertyInjectionHelper(Container container, Type implementationType)
         {
             this.container = container;
-            this.serviceType = serviceType;
             this.implementationType = implementationType;
         }
 
-        internal static Expression BuildPropertyInjectionExpression(Container container,
-            Type serviceType, Type implementationType, PropertyInfo[] properties,
+        internal static PropertyInjectionData BuildPropertyInjectionExpression(
+            Container container, Type implementationType, PropertyInfo[] properties,
             Expression expressionToWrap)
         {
-            var helper = new PropertyInjectionHelper(container, serviceType, implementationType);
+            var helper = new PropertyInjectionHelper(container, implementationType);
 
             return helper.BuildPropertyInjectionExpression(expressionToWrap, properties);
         }
@@ -163,40 +160,51 @@ namespace SimpleInjector.Advanced
             }
         }
 
-        private Expression BuildPropertyInjectionExpression(Expression expression, PropertyInfo[] properties)
+        private PropertyInjectionData BuildPropertyInjectionExpression(
+            Expression expression, PropertyInfo[] properties)
         {
-            // Build up an expression like this:
-            // () => func1(Dep1, Dep2, Dep3, func2(Dep4, Dep5, Dep6), func3(Dep7, new TargetType(...))))
-            // () => func1(func2(func3(new TargetType(...), Dep7), Dep4, Dep5, Dep6), Dep1, Dep2, Dep3)
+            PropertyInjectionData data;
+
+            // With MaximumNumberOfPropertiesPerDelegate = 4
+            // new Impl { P1 = Dep1, P2 = Dep2, P3 = Dep3, P4 = Dep4, P5 = Dep5, P6 = Dep6, P6 = Dep7)
+            // We build up an expression like this:
+            // () => func1(Dep1, Dep2, Dep3, func2(Dep4, Dep5, Dep6, func3(Dep7, new Impl())))
             if (properties.Length > MaximumNumberOfPropertiesPerDelegate)
             {
                 // Expression becomes: Func<Prop8, Prop9, ... , PropN, TargetType>
                 var restProperties = properties.Skip(MaximumNumberOfPropertiesPerDelegate).ToArray();
-                expression = this.BuildPropertyInjectionExpression(expression, restProperties);
 
                 // Properties becomes { Prop1, Prop2, ..., Prop7 }.
                 properties = properties.Take(MaximumNumberOfPropertiesPerDelegate).ToArray();
+
+                data = this.BuildPropertyInjectionExpression(expression, restProperties);
+            }
+            else
+            {
+                data = new PropertyInjectionData(expression);
             }
 
-            var dependencyExpressions = this.GetPropertyExpressions(properties);
+            InstanceProducer[] producers = this.GetPropertyInstanceProducers(properties);
 
-            var arguments = dependencyExpressions.Concat(new[] { expression });
+            var arguments = producers.Select(p => p.BuildExpression()).Concat(new[] { data.Expression });
 
             Delegate propertyInjectionDelegate = this.BuildPropertyInjectionDelegate(properties);
 
-            return Expression.Invoke(Expression.Constant(propertyInjectionDelegate), arguments);
+            return new PropertyInjectionData(
+                expression: Expression.Invoke(Expression.Constant(propertyInjectionDelegate), arguments),
+                producers: producers.Concat(data.Producers));
         }
 
-        private IEnumerable<Expression> GetPropertyExpressions(PropertyInfo[] properties)
+        private InstanceProducer[] GetPropertyInstanceProducers(PropertyInfo[] properties)
         {
-            return properties.Select(this.GetPropertyExpression);
+            return properties.Select(this.GetPropertyExpression).ToArray();
         }
 
-        private Expression GetPropertyExpression(PropertyInfo property)
+        private InstanceProducer GetPropertyExpression(PropertyInfo property)
         {
-            var consumer = new InjectionConsumerInfo(this.serviceType, this.implementationType, property);
+            var consumer = new InjectionConsumerInfo(this.implementationType, property);
 
-            return this.container.Options.DependencyInjectionBehavior.BuildExpression(consumer);
+            return this.container.Options.GetInstanceProducerFor(consumer);
         }
 
         private static Type GetFuncType(PropertyInfo[] properties, Type injecteeType)
@@ -227,5 +235,17 @@ namespace SimpleInjector.Advanced
         }
 
         partial void TryCompileLambdaInDynamicAssembly(LambdaExpression expression, ref Delegate compiledDelegate);
+
+        internal struct PropertyInjectionData
+        {
+            public readonly Expression Expression;
+            public readonly IEnumerable<InstanceProducer> Producers;
+
+            public PropertyInjectionData(Expression expression, IEnumerable<InstanceProducer> producers = null)
+            {
+                this.Expression = expression;
+                this.Producers = producers ?? Enumerable.Empty<InstanceProducer>();
+            }
+        }
     }
 }

@@ -1,0 +1,29 @@
+﻿{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "warningsAsErrors": true
+  },
+
+  "testRunner": "mstest",
+  
+  "dependencies": {
+    "MSTest.TestFramework": "1.0.7-preview",
+    "dotnet-test-mstest": "1.1.2-preview",
+    "SimpleInjector": { "target": "project" },
+    "SimpleInjector.Integration.Web": { "target": "project" },
+    "SimpleInjector.Tests.Unit": { "target": "project" }
+  },
+  "runtimes": {
+    "win10-x86": {}
+  },
+  "frameworks": {
+    "net451": {
+      "dependencies": {
+        "System.Linq.Expressions": "4.0.0"
+      },
+      "frameworkAssemblies": {
+        "System.Web": "4.0.0.0"
+      }
+    }
+  }
+}

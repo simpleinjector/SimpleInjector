@@ -71,11 +71,11 @@ namespace SimpleInjector.Diagnostics.Analyzers
         private static string BuildRelationshipDescription(KnownRelationship relationship) => 
             string.Format(CultureInfo.InvariantCulture,
                 "{0} ({1}) depends on {2}{3} ({4}).",
-                Helpers.ToFriendlyName(relationship.ImplementationType),
+                relationship.ImplementationType.ToFriendlyName(),
                 relationship.Lifestyle.Name,
-                Helpers.ToFriendlyName(relationship.Dependency.ServiceType),
+                relationship.Dependency.ServiceType.ToFriendlyName(),
                 relationship.Dependency.ServiceType != relationship.Dependency.ImplementationType
-                    ? " implemented by " + Helpers.ToFriendlyName(relationship.Dependency.ImplementationType)
+                    ? " implemented by " + relationship.Dependency.ImplementationType.ToFriendlyName()
                     : string.Empty,
                 relationship.Dependency.Lifestyle.Name);
 

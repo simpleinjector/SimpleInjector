@@ -78,7 +78,7 @@
         }
 
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior()
+        public void GetInstance_InjectionAttributeOnStaticMethod_ThrowsExceptionWithExpectedMessage()
         {
             // Arrange
             var container = new Container();
@@ -96,7 +96,8 @@
             }
             catch (ActivationException ex)
             {
-                AssertThat.StringContains("Method ClassWithStaticInjectionMethod.Initialize is static", 
+                AssertThat.StringContains(
+                    $"Method {typeof(ClassWithStaticInjectionMethod).ToFriendlyName()}.Initialize is static", 
                     ex.Message);
             }
         }
@@ -121,6 +122,7 @@
             }
         }
 
+#pragma warning disable RCS1102 // Mark class as static.
         public class ClassWithStaticInjectionMethod
         {
             [Inject]
@@ -128,6 +130,7 @@
             {
             }
         }
+#pragma warning restore RCS1102 // Mark class as static.
 
         public sealed class ContextualLogger : ILogger
         {
