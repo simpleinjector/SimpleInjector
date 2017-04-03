@@ -119,10 +119,10 @@ namespace SimpleInjector.Lifestyles
                         if (!this.initialized)
                         {
                             this.instance = this.GetInjectedInterceptedAndInitializedInstance();
+
+                            this.initialized = true;
                         }
                     }
-
-                    this.initialized = true;
                 }
 
                 return this.instance;
