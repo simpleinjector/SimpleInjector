@@ -364,8 +364,7 @@ namespace SimpleInjector
         {
             ConstructorInfo constructor = this.Container.Options.SelectConstructor(this.ImplementationType);
 
-            ParameterDictionary<DependencyData> parameters = this.BuildConstructorParameters(
-                this.ImplementationType, constructor);
+            ParameterDictionary<DependencyData> parameters = this.BuildConstructorParameters(constructor);
 
             var arguments = parameters.Values.Select(v => v.Expression);
 
@@ -376,8 +375,7 @@ namespace SimpleInjector
             return expression;
         }
 
-        private ParameterDictionary<DependencyData> BuildConstructorParameters(Type implementationType, 
-            ConstructorInfo constructor)
+        private ParameterDictionary<DependencyData> BuildConstructorParameters(ConstructorInfo constructor)
         {
             // NOTE: We used to use a LINQ query here (which is cleaner code), but we reverted back to using
             // a foreach statement to clean up the stack trace, since this is a very common code path to
