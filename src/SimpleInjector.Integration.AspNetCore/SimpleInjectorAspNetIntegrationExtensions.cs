@@ -102,7 +102,7 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            return GetRequestServiceProvider(builder).GetService<T>();
+            return GetRequestServiceProvider(builder, typeof(T)).GetService<T>();
         }
 
         /// <summary>
@@ -121,10 +121,10 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            return GetRequestServiceProvider(builder).GetRequiredService<T>();
+            return GetRequestServiceProvider(builder, typeof(T)).GetRequiredService<T>();
         }
 
-        private static IServiceProvider GetRequestServiceProvider(IApplicationBuilder builder)
+        private static IServiceProvider GetRequestServiceProvider(IApplicationBuilder builder, Type serviceType)
         {
             var accessor = builder.ApplicationServices.GetService<IHttpContextAccessor>();
 
@@ -142,7 +142,7 @@ namespace SimpleInjector
             if (context == null)
             {
                 throw new InvalidOperationException(
-                    "No HttpContext. " +
+                    $"Unable to request service '{serviceType.ToFriendlyName()} from ASP.NET Core request services." +
                     "Please make sure this method is called within the context of an active HTTP request.");
             }
 
