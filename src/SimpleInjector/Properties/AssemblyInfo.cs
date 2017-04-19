@@ -14,7 +14,14 @@ using System.Security;
     "05cc27d4")]
 #endif
 
+[assembly: AssemblyTitle("Simple Injector")]
+[assembly: AssemblyDescription("Simple Injector is an easy-to-use Inversion of Control library for .NET.")]
 [assembly: AssemblyCopyright("Copyright © Simple Injector Contributors")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Simple Injector")]
+[assembly: AssemblyProduct("Simple Injector")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
 [assembly: CLSCompliant(true)]
