@@ -4,7 +4,7 @@
     "keyFile": "../SimpleInjector.snk",
     "xmlDoc": true
   },
-  "title": "Simple Injector ASP.NET Core MVC Integration",
+  "title": "Simple Injector ASP.NET Core MVC Core Integration",
   "description": "Integration library for ASP.NET Core MVC for Simple Injector.",
   "authors": [ "Simple Injector Contributors" ],
   "language": "en-US",
@@ -21,8 +21,9 @@
     "netstandard1.6": {}
   },
   "dependencies": {
-    "Microsoft.AspNetCore.Mvc.Razor": "1.0.0",
-    "SimpleInjector.Integration.AspNetCore.Mvc.Core": { "target": "project" },
+    "Microsoft.AspNetCore.Mvc.Core": "1.0.0",
+    "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.0.0",
+    "SimpleInjector.Integration.AspNetCore": { "target": "project" },
     "NuSpec.ReferenceGenerator": {
       "version": "2.0.0-beta-bld14",
       "type": "build"
