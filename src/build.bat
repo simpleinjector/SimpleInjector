@@ -23,7 +23,7 @@ set msbuild="%programfiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe"
 if not exist %vsvars32_bat% goto :vsvars32_bat_missing
 if not exist %msbuild% goto :msbuild_exe_missing
 
-call vsvars32_bat
+call %vsvars32_bat%
 
 set buildToolsPath=BuildTools
 set nugetTemplatePath=%buildToolsPath%\NuGet
@@ -61,6 +61,12 @@ set numeric_version_Packaging=%version_Packaging%.%buildNumber%
 
 if exist Releases\v%named_version% goto :release_directory_already_exists
 if not exist SimpleInjector.snk goto :strong_name_key_missing
+
+
+echo RUNNING TESTS IN PARTIAL TRUST
+%msbuild% "SimpleInjector.Tests.Unit\SimpleInjector,Tests.Unit.xproj" /nologo
+
+"SimpleInjector.Tests.Unit\bin\Release\net451\win7-x64\PartialTrustTestRunner.exe" SimpleInjector.Tests.Unit\bin\Release\net451\win7-x64\SimpleInjector.Tests.Unit.dll
 
 
 echo BUILDING
@@ -106,7 +112,6 @@ echo RESTORE VERSION NUMBERS
 %replace% /source:SimpleInjector.Integration.Web.Mvc\project.json """version"": ""%named_version_Integration_Mvc%""" "%version_search_line%" 
 %replace% /source:SimpleInjector.Integration.WebApi\project.json """version"": ""%named_version_Integration_WebApi%""" "%version_search_line%" 
 %replace% /source:SimpleInjector.Packaging\project.json """version"": ""%named_version_Packaging%""" "%version_search_line%" 
-
 
 echo BUILD DOCUMENTATION
 
