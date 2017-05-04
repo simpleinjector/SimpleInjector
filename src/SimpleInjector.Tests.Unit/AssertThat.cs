@@ -273,19 +273,6 @@
             }
         }
 
-        public static void WriteToConsole(this Exception exception)
-        {
-            while (exception != null)
-            {
-                Console.WriteLine(exception.GetType().FullName);
-                Console.WriteLine(exception.Message);
-                Console.WriteLine(exception.StackTrace);
-                Console.WriteLine();
-
-                exception = exception.InnerException;
-            }
-        }
-
         private static string ToFriendlyName(Type type) => type.ToFriendlyName();
     }
 }
