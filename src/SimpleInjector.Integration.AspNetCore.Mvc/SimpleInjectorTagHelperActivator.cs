@@ -44,7 +44,10 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
             error: false)]
         public SimpleInjectorTagHelperActivator(Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
+            if (container == null)
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
 
             this.container = container;
         }
@@ -60,9 +63,20 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         public SimpleInjectorTagHelperActivator(Container container, Predicate<Type> tagHelperSelector,
             ITagHelperActivator frameworkTagHelperActivator)
         {
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(tagHelperSelector, nameof(tagHelperSelector));
-            Requires.IsNotNull(frameworkTagHelperActivator, nameof(frameworkTagHelperActivator));
+            if (container == null)
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
+
+            if (tagHelperSelector == null)
+            {
+                throw new ArgumentNullException(nameof(tagHelperSelector));
+            }
+
+            if (frameworkTagHelperActivator == null)
+            {
+                throw new ArgumentNullException(nameof(frameworkTagHelperActivator));
+            }
 
             this.container = container;
             this.tagHelperSelector = tagHelperSelector;

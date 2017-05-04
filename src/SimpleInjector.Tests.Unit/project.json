@@ -29,6 +29,7 @@
     },
     "net451": {
       "dependencies": {
+        "PartialTrustTestRunner": { "target": "project" }
       },
       "frameworkAssemblies": {
         "System.Linq.Expressions": "4.0.0.0"

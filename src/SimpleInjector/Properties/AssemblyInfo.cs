@@ -1,4 +1,9 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Reflection;
+using System.Resources;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Security;
 
 #if !PUBLISH
 [assembly: InternalsVisibleTo("SimpleInjector.Tests.Unit, PublicKey=" +
@@ -8,3 +13,17 @@
     "2b32e03a986a32da4b64ed2832b8254c7dbe723c6e412d02fb8f94603e6140237fddd4d9c2cb29" +
     "05cc27d4")]
 #endif
+
+[assembly: AssemblyTitle("Simple Injector")]
+[assembly: AssemblyDescription("Simple Injector is an easy-to-use Inversion of Control library for .NET.")]
+[assembly: AssemblyCopyright("Copyright © Simple Injector Contributors")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Simple Injector")]
+[assembly: AssemblyProduct("Simple Injector")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+
+[assembly: ComVisible(false)]
+[assembly: CLSCompliant(true)]
+[assembly: NeutralResourcesLanguage("en-US")]
+[assembly: AllowPartiallyTrustedCallers]

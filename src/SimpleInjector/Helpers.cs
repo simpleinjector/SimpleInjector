@@ -116,21 +116,18 @@ namespace SimpleInjector
 
         internal static Action<T> CreateAction<T>(object action)
         {
-            Type actionArgumentType = action.GetType().GetGenericArguments()[0];
-
-            if (actionArgumentType.IsAssignableFrom(typeof(T)))
+            if (typeof(Action<T>).IsAssignableFrom(action.GetType()))
             {
-                // In most cases, the given T is a concrete type such as ServiceImpl, and supplied action
-                // object can be everything from Action<ServiceImpl>, to Action<IService>, to Action<object>.
-                // Since Action<T> is contravariant (we're running under .NET 4.0) we can simply cast it.
                 return (Action<T>)action;
             }
 
             // If we come here, the given T is most likely System.Object and this means that the caller needs
-            // a Action<object>, the instance that needs to be casted, so we we need to build the following
+            // an Action<object>, the instance that needs to be casted, so we we need to build the following
             // delegate:
-            // instance => action((ActionType)instance);
+            // instance => action((actionArgumentType)instance);
             var parameter = Expression.Parameter(typeof(T), "instance");
+
+            Type actionArgumentType = action.GetType().GetGenericArguments()[0];
 
             Expression argument = Expression.Convert(parameter, actionArgumentType);
 

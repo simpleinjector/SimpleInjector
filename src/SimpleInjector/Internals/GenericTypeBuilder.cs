@@ -220,7 +220,7 @@ namespace SimpleInjector.Internals
             // When the length of the result does not match the actual length, this means that the generic 
             // type constraints don't match and the given service type does not satisfy the generic type 
             // constraints.
-            return openCandidateServiceType.Arguments.Count() ==
+            return openCandidateServiceType.Arguments.Length ==
                 this.openGenericImplementation.GetGenericArguments().Length;
         }
 

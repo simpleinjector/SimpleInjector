@@ -116,7 +116,7 @@ namespace SimpleInjector
         // Wrapper for instance initializer delegates
         private interface IInstanceInitializer
         {
-            bool AppliesTo(Type implementationType, InitializerContext registration);
+            bool AppliesTo(Type implementationType, InitializerContext context);
 
             Action<T> CreateAction<T>(InitializerContext context);
         }

@@ -33,12 +33,14 @@ namespace System.Threading
 
         public T Value
         {
+           [SecuritySafeCritical]
             get
             {
                 var wrapper = (AsyncScopeWrapper)CallContext.LogicalGetData(this.key);
 
                 return wrapper != null ? wrapper.Value : default(T);
             }
+            [SecuritySafeCritical]
             set
             {
                 var wrapper = value == null ? null : new AsyncScopeWrapper(value);

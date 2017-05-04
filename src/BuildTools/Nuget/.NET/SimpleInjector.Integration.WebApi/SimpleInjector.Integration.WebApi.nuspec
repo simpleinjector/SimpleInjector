@@ -9,7 +9,6 @@
     <iconUrl>https://simpleinjector.org/simpleinjector.ico</iconUrl>
     <dependencies>
       <dependency id="SimpleInjector" version="{versionCore}" />
-      <dependency id="SimpleInjector.Extensions.ExecutionContextScoping" version="{version_Extensions_ExecutionContextScoping}" />
       <dependency id="Microsoft.AspNet.WebApi.Core" version="4.0.20710" />
     </dependencies>
     <id>SimpleInjector.Integration.WebApi</id>

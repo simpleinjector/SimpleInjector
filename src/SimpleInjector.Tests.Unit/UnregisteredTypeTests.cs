@@ -340,10 +340,6 @@
             }
             catch (ActivationException ex)
             {
-                ex.WriteToConsole();
-
-                Console.WriteLine(ex.StackTrace);
-
                 AssertThat.StringContains(typeof(RealUserService).Name, ex.Message);
 
                 // Note: the next line is removed. We optimized Func<T> registrations, and because of this

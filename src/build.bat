@@ -13,9 +13,8 @@ set version_Integration_WebForms=%version_Core%
 set version_Integration_Mvc=%version_Core%
 set version_Integration_Wcf=%version_Core%
 set version_Integration_WebApi=%version_Core%
-set version_Extensions_LifetimeScoping=%version_Core%
-set version_Extensions_ExecutionContextScoping=%version_Core%
 set version_Integration_AspNetCore=%version_Core%
+set version_Integration_AspNetCore_Mvc_Core=%version_Core%
 set version_Integration_AspNetCore_Mvc=%version_Core%
 
 set vsvars32_bat="%programfiles(x86)%\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat"
@@ -24,7 +23,7 @@ set msbuild="%programfiles(x86)%\MSBuild\14.0\Bin\MSBuild.exe"
 if not exist %vsvars32_bat% goto :vsvars32_bat_missing
 if not exist %msbuild% goto :msbuild_exe_missing
 
-call vsvars32_bat
+call %vsvars32_bat%
 
 set buildToolsPath=BuildTools
 set nugetTemplatePath=%buildToolsPath%\NuGet
@@ -42,9 +41,8 @@ set targetPathCoreClr=%targetPath%\DOTNET
 set named_version=%version%%prereleasePostfix%
 
 set named_version_Core=%version_Core%%prereleasePostfix%
-set named_version_Extensions_ExecutionContextScoping=%version_Extensions_ExecutionContextScoping%%prereleasePostfix%
-set named_version_Extensions_LifetimeScoping=%version_Extensions_LifetimeScoping%%prereleasePostfix%
 set named_version_Integration_AspNetCore=%version_Integration_AspNetCore%%prereleasePostfix%
+set named_version_Integration_AspNetCore_Mvc_Core=%version_Integration_AspNetCore_Mvc_Core%%prereleasePostfix%
 set named_version_Integration_AspNetCore_Mvc=%version_Integration_AspNetCore_Mvc%%prereleasePostfix%
 set named_version_Integration_Wcf=%version_Integration_Wcf%%prereleasePostfix%
 set named_version_Integration_Web=%version_Integration_Web%%prereleasePostfix%
@@ -53,8 +51,6 @@ set named_version_Integration_WebApi=%version_Integration_WebApi%%prereleasePost
 set named_version_Packaging=%version_Packaging%%prereleasePostfix%
 
 set numeric_version_Core=%version_Core%.%buildNumber%
-set numeric_version_Extensions_ExecutionContextScoping=%version_Extensions_ExecutionContextScoping%.%buildNumber%
-set numeric_version_Extensions_LifetimeScoping=%version_Extensions_LifetimeScoping%.%buildNumber%
 set numeric_version_Integration_AspNetCore=%version_Integration_AspNetCore%.%buildNumber%
 set numeric_version_Integration_AspNetCore_Mvc=%version_Integration_AspNetCore_Mvc%.%buildNumber%
 set numeric_version_Integration_Wcf=%version_Integration_Wcf%.%buildNumber%
@@ -65,6 +61,12 @@ set numeric_version_Packaging=%version_Packaging%.%buildNumber%
 
 if exist Releases\v%named_version% goto :release_directory_already_exists
 if not exist SimpleInjector.snk goto :strong_name_key_missing
+
+
+echo RUNNING TESTS IN PARTIAL TRUST
+%msbuild% "SimpleInjector.Tests.Unit\SimpleInjector,Tests.Unit.xproj" /nologo
+
+"SimpleInjector.Tests.Unit\bin\Release\net451\win7-x64\PartialTrustTestRunner.exe" SimpleInjector.Tests.Unit\bin\Release\net451\win7-x64\SimpleInjector.Tests.Unit.dll
 
 
 echo BUILDING
@@ -80,9 +82,8 @@ set version_replace_line=""version"": ""%named_version_Core%""
 
 echo SET VERSION NUMBERS
 %replace% /source:SimpleInjector\project.json "%version_search_line%" """version"": ""%named_version_Core%""" 
-%replace% /source:SimpleInjector.Extensions.ExecutionContextScoping\project.json "%version_search_line%" """version"": ""%named_version_Extensions_ExecutionContextScoping%"""
-%replace% /source:SimpleInjector.Extensions.LifetimeScoping\project.json "%version_search_line%" """version"": ""%named_version_Extensions_LifetimeScoping%"""
 %replace% /source:SimpleInjector.Integration.AspNetCore\project.json "%version_search_line%" """version"": ""%named_version_Integration_AspNetCore%"""
+%replace% /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\project.json "%version_search_line%" """version"": ""%named_version_Integration_AspNetCore_Mvc_Core%"""
 %replace% /source:SimpleInjector.Integration.AspNetCore.Mvc\project.json "%version_search_line%" """version"": ""%named_version_Integration_AspNetCore_Mvc%"""
 %replace% /source:SimpleInjector.Integration.Wcf\project.json "%version_search_line%" """version"": ""%named_version_Integration_Wcf%"""
 %replace% /source:SimpleInjector.Integration.Web\project.json "%version_search_line%" """version"": ""%named_version_Integration_Web%"""
@@ -92,9 +93,8 @@ echo SET VERSION NUMBERS
 
 echo BUILD PROJECTS
 %msbuild% "SimpleInjector\SimpleInjector.xproj" /nologo
-%msbuild% "SimpleInjector.Extensions.ExecutionContextScoping\SimpleInjector.Extensions.ExecutionContextScoping.xproj" /nologo
-%msbuild% "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.xproj" /nologo
 %msbuild% "SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.xproj" /nologo
+%msbuild% "SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.xproj" /nologo
 %msbuild% "SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.xproj" /nologo
 %msbuild% "SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.xproj" /nologo
 %msbuild% "SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.xproj" /nologo
@@ -104,16 +104,14 @@ echo BUILD PROJECTS
 
 echo RESTORE VERSION NUMBERS
 %replace% /source:SimpleInjector\project.json """version"": ""%named_version_Core%""" "%version_search_line%" 
-%replace% /source:SimpleInjector.Extensions.ExecutionContextScoping\project.json """version"": ""%named_version_Extensions_ExecutionContextScoping%""" "%version_search_line%" 
-%replace% /source:SimpleInjector.Extensions.LifetimeScoping\project.json """version"": ""%named_version_Extensions_LifetimeScoping%""" "%version_search_line%" 
 %replace% /source:SimpleInjector.Integration.AspNetCore\project.json """version"": ""%named_version_Integration_AspNetCore%""" "%version_search_line%" 
+%replace% /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\project.json """version"": ""%named_version_Integration_AspNetCore_Mvc_Core%""" "%version_search_line%" 
 %replace% /source:SimpleInjector.Integration.AspNetCore.Mvc\project.json """version"": ""%named_version_Integration_AspNetCore_Mvc%""" "%version_search_line%" 
 %replace% /source:SimpleInjector.Integration.Wcf\project.json """version"": ""%named_version_Integration_Wcf%""" "%version_search_line%" 
 %replace% /source:SimpleInjector.Integration.Web\project.json """version"": ""%named_version_Integration_Web%""" "%version_search_line%" 
 %replace% /source:SimpleInjector.Integration.Web.Mvc\project.json """version"": ""%named_version_Integration_Mvc%""" "%version_search_line%" 
 %replace% /source:SimpleInjector.Integration.WebApi\project.json """version"": ""%named_version_Integration_WebApi%""" "%version_search_line%" 
 %replace% /source:SimpleInjector.Packaging\project.json """version"": ""%named_version_Packaging%""" "%version_search_line%" 
-
 
 echo BUILD DOCUMENTATION
 
@@ -169,36 +167,6 @@ copy SimpleInjector.Packaging\bin\Release\netstandard1.0\SimpleInjector.Packagin
 %replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {year} %copyrightYear%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\4d447eef3ba54c2da48c4d25f475fcbe.psmdcp {version} %named_version_Packaging%
 %compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\SimpleInjector.Packaging.%named_version_Packaging%.zip"
-rmdir Releases\temp /s /q
-
-mkdir Releases\temp
-xcopy %nugetTemplatePath%\.NET\SimpleInjector.Extensions.LifetimeScoping Releases\temp /E /H
-attrib -r "%CD%\Releases\temp\*.*" /s /d
-del Releases\temp\.gitignore /s /q
-copy SimpleInjector.Extensions.LifetimeScoping\bin\Release\net40\SimpleInjector.Extensions.LifetimeScoping.dll Releases\temp\lib\net40\SimpleInjector.Extensions.LifetimeScoping.dll
-copy SimpleInjector.Extensions.LifetimeScoping\bin\Release\net40\SimpleInjector.Extensions.LifetimeScoping.xml Releases\temp\lib\net40\SimpleInjector.Extensions.LifetimeScoping.xml
-copy SimpleInjector.Extensions.LifetimeScoping\bin\Release\netstandard1.0\SimpleInjector.Extensions.LifetimeScoping.dll "Releases\temp\lib\netstandard1.0\SimpleInjector.Extensions.LifetimeScoping.dll"
-copy SimpleInjector.Extensions.LifetimeScoping\bin\Release\netstandard1.0\SimpleInjector.Extensions.LifetimeScoping.xml "Releases\temp\lib\netstandard1.0\SimpleInjector.Extensions.LifetimeScoping.xml"
-%replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {version} %named_version_Extensions_LifetimeScoping%
-%replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {versionCore} %named_version_Core%
-%replace% /source:Releases\temp\SimpleInjector.Extensions.LifetimeScoping.nuspec {year} %copyrightYear%
-%replace% /source:Releases\temp\package\services\metadata\core-properties\3c829585afae419fa2b861a3b473739c.psmdcp {version} %named_version_Extensions_LifetimeScoping%
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\SimpleInjector.Extensions.LifetimeScoping.%named_version_Extensions_LifetimeScoping%.zip"
-rmdir Releases\temp /s /q
-
-mkdir Releases\temp
-xcopy %nugetTemplatePath%\.NET\SimpleInjector.Extensions.ExecutionContextScoping Releases\temp /E /H
-attrib -r "%CD%\Releases\temp\*.*" /s /d
-del Releases\temp\.gitignore /s /q
-copy SimpleInjector.Extensions.ExecutionContextScoping\bin\Release\net45\SimpleInjector.Extensions.ExecutionContextScoping.dll Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.dll
-copy SimpleInjector.Extensions.ExecutionContextScoping\bin\Release\net45\SimpleInjector.Extensions.ExecutionContextScoping.xml Releases\temp\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.xml
-copy SimpleInjector.Extensions.ExecutionContextScoping\bin\Release\netstandard1.3\SimpleInjector.Extensions.ExecutionContextScoping.dll "Releases\temp\lib\netstandard1.3\SimpleInjector.Extensions.ExecutionContextScoping.dll"
-copy SimpleInjector.Extensions.ExecutionContextScoping\bin\Release\netstandard1.3\SimpleInjector.Extensions.ExecutionContextScoping.xml "Releases\temp\lib\netstandard1.3\SimpleInjector.Extensions.ExecutionContextScoping.xml"
-%replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {version} %named_version_Extensions_ExecutionContextScoping%
-%replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {versionCore} %named_version_Core%
-%replace% /source:Releases\temp\SimpleInjector.Extensions.ExecutionContextScoping.nuspec {year} %copyrightYear%
-%replace% /source:Releases\temp\package\services\metadata\core-properties\418513f6bda44f0aaa7ad35e612de928.psmdcp {version} %named_version_Extensions_ExecutionContextScoping%
-%compress% "%CD%\Releases\temp" "%CD%\Releases\v%named_version%\SimpleInjector.Extensions.ExecutionContextScoping.%named_version_Extensions_ExecutionContextScoping%.zip"
 rmdir Releases\temp /s /q
 
 mkdir Releases\temp
@@ -272,7 +240,6 @@ del Releases\temp\.gitignore /s /q
 copy SimpleInjector.Integration.WebApi\bin\Release\net45\SimpleInjector.Integration.WebApi.dll Releases\temp\lib\net45\SimpleInjector.Integration.WebApi.dll
 copy SimpleInjector.Integration.WebApi\bin\Release\net45\SimpleInjector.Integration.WebApi.xml Releases\temp\lib\net45\SimpleInjector.Integration.WebApi.xml
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {version} %named_version_Integration_WebApi%
-%replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {version_Extensions_ExecutionContextScoping} %named_version_Extensions_ExecutionContextScoping%
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {versionCore} %named_version_Core%
 %replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {year} %copyrightYear%
 %replace% /source:Releases\temp\package\services\metadata\core-properties\a3b1f940a1584e868b3266ff38ba4e08.psmdcp {version} %named_version_Integration_WebApi%
@@ -294,6 +261,7 @@ rmdir Releases\temp /s /q
 ren "%CD%\Releases\v%named_version%\*.zip" "*.nupkg"
 
 copy "SimpleInjector.Integration.AspNetCore\bin\Release\SimpleInjector.Integration.AspNetCore.%named_version_Integration_AspNetCore%.nupkg" Releases\v%named_version%\
+copy "SimpleInjector.Integration.AspNetCore.Mvc.Core\bin\Release\SimpleInjector.Integration.AspNetCore.Mvc.Core.%named_version_Integration_AspNetCore_Mvc_Core%.nupkg" Releases\v%named_version%\
 copy "SimpleInjector.Integration.AspNetCore.Mvc\bin\Release\SimpleInjector.Integration.AspNetCore.Mvc.%named_version_Integration_AspNetCore_Mvc%.nupkg" Releases\v%named_version%\
 
 echo Done!
