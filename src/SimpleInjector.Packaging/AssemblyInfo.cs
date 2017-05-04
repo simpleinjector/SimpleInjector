@@ -13,8 +13,5 @@ using System.Security;
 [assembly: ComVisible(false)]
 [assembly: CLSCompliant(true)]
 [assembly: NeutralResourcesLanguage("en-US")]
-
-// These attributes needed to be removed because they were removed from the core library. They can be added again,
-// after they are added again to the core library.
-// [assembly: AllowPartiallyTrustedCallers]
-// [assembly: SecurityTransparent]
+[assembly: AllowPartiallyTrustedCallers]
+[assembly: SecurityTransparent]
