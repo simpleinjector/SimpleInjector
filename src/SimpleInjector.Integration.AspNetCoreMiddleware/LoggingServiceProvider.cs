@@ -20,7 +20,7 @@
 */
 #endregion
 
-namespace SimpleInjector.Integration.AspNetCore
+namespace SimpleInjector.Integration.AspNetCoreMiddleware
 {
 
 #if(DEBUG)
@@ -30,7 +30,7 @@ namespace SimpleInjector.Integration.AspNetCore
     using System.Linq;
     using System.Text;
 
-    private class LoggingServiceProvider : IServiceProvider
+    class LoggingServiceProvider : IServiceProvider
     {
         private readonly IServiceProvider _target;
         private Stack<string> _path = new Stack<string>();

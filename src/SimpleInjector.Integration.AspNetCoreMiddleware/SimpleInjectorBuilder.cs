@@ -20,7 +20,7 @@
 */
 #endregion
 
-namespace Big.Paw.AgentService.SimpleInjectorMiddleware
+namespace SimpleInjector.Integration.AspNetCoreMiddleware
 {
     using Microsoft.AspNetCore.Builder;
     using System;
@@ -62,7 +62,7 @@ namespace Big.Paw.AgentService.SimpleInjectorMiddleware
 
                 IServiceProvider provider = container;
 #if(DEBUG)
-                provider = new LoggingServiceProvider(provider)
+                provider = new LoggingServiceProvider(provider);
 #endif
             app.ApplicationServices = provider;
 
@@ -90,7 +90,7 @@ namespace Big.Paw.AgentService.SimpleInjectorMiddleware
                 
                 IServiceProvider provider = _container;
 #if(DEBUG)
-                provider = new LoggingServiceProvider(provider)
+                provider = new LoggingServiceProvider(provider);
 #endif
                 _container.Register(svc.ServiceType, () => factory(provider), lifetime);
             }

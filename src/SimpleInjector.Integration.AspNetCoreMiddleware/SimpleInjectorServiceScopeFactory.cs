@@ -21,7 +21,7 @@
 #endregion
 
 
-namespace SimpleInjector.Integration.AspNetCore
+namespace SimpleInjector.Integration.AspNetCoreMiddleware
 {
     using SimpleInjector;
     using Microsoft.Extensions.DependencyInjection;

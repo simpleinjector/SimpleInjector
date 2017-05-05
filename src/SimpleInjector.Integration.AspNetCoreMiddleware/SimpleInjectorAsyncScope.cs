@@ -21,9 +21,8 @@
 #endregion
 
 
-namespace Big.Paw.AgentService.SimpleInjectorMiddleware
+namespace SimpleInjector.Integration.AspNetCoreMiddleware
 {
-    using Microsoft.Extensions.Options;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
     using SimpleInjector;

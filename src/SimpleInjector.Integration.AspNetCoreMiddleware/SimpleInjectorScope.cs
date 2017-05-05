@@ -20,7 +20,7 @@
 */
 #endregion
 
-namespace SimpleInjector.Integration.AspNetCore
+namespace SimpleInjector.Integration.AspNetCoreMiddleware
 {
     using System;
     using SimpleInjector;

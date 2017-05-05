@@ -20,7 +20,7 @@
 */
 #endregion
 
-namespace Big.Paw.AgentService.SimpleInjectorMiddleware
+namespace SimpleInjector.Integration.AspNetCoreMiddleware
 {
     using Microsoft.AspNetCore.Http;
     using SimpleInjector;

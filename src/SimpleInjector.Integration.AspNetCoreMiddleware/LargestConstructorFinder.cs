@@ -20,7 +20,7 @@
 */
 #endregion
 
-namespace SimpleInjector.Integration.AspNetCore
+namespace SimpleInjector.Integration.AspNetCoreMiddleware
 {
     using System;
     using SimpleInjector;
@@ -28,7 +28,7 @@ namespace SimpleInjector.Integration.AspNetCore
     using System.Linq;
     using SimpleInjector.Advanced;
 
-    private class LargestConstructorFinder : IConstructorResolutionBehavior
+    class LargestConstructorFinder : IConstructorResolutionBehavior
     {
         public static readonly IConstructorResolutionBehavior Instance = new LargestConstructorFinder();
         public ConstructorInfo GetConstructor(Type implementationType)

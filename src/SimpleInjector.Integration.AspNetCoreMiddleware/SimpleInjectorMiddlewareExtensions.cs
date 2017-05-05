@@ -27,6 +27,7 @@ namespace SimpleInjector
     using Microsoft.AspNetCore.Hosting;
     using System;
     using SimpleInjector;
+    using SimpleInjector.Integration.AspNetCoreMiddleware;
     using Microsoft.Extensions.DependencyInjection;
 
     public static class SimpleInjectorMiddlewareExtensions

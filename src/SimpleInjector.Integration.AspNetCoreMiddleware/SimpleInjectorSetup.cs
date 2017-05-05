@@ -21,7 +21,7 @@
 #endregion
 
 
-namespace SimpleInjector.Integration.AspNetCore
+namespace SimpleInjector.Integration.AspNetCoreMiddleware
 {
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
