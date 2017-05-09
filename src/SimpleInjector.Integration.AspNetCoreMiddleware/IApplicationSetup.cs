@@ -21,33 +21,29 @@
 #endregion
 
 
+
 namespace SimpleInjector.Integration.AspNetCoreMiddleware
 {
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
     using System;
-    using SimpleInjector;
-    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.AspNetCore.Builder;
 
-    class SimpleInjectorSetup : IStartupFilter
+    public interface IApplicationSetup
     {
-        private readonly Action<IApplicationBuilder, Container> _setup;
+        void Configure(IApplicationBuilder app);
+    }
 
-        public SimpleInjectorSetup(Action<IApplicationBuilder, Container> setup)
+    public class DelegateApplicationSetup : IApplicationSetup
+    {
+        private readonly Action<IApplicationBuilder> _appSetupCall;
+
+        public DelegateApplicationSetup(Action<IApplicationBuilder> appSetupCall)
         {
-            _setup = setup;
+            _appSetupCall = appSetupCall;
         }
 
-        public void Setup(IServiceCollection services)
+        public void Configure(IApplicationBuilder app)
         {
-            services.AddSingleton<IStartupFilter>(this);
-            services.AddSingleton(new ServicesAccessor(services));
-        }
-
-        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
-        {
-            return new SimpleInjectorBuilder(next, _setup).Build;
+            _appSetupCall(app);
         }
     }
 }
-

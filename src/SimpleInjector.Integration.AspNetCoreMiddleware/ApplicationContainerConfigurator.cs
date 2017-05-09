@@ -20,23 +20,11 @@
 */
 #endregion
 
+
 namespace SimpleInjector.Integration.AspNetCoreMiddleware
 {
-    using Microsoft.Extensions.DependencyInjection;
-
-    class ServicesAccessor
+    public class ApplicationContainerConfigurator
     {
-        private readonly IServiceCollection _services;
 
-        public ServicesAccessor(IServiceCollection services)
-        {
-            _services = services;
-        }
-
-        public IServiceCollection GetServices()
-        {
-            return _services;
-        }
     }
 }
-

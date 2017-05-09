@@ -29,34 +29,40 @@ namespace SimpleInjector
     using SimpleInjector;
     using SimpleInjector.Integration.AspNetCoreMiddleware;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.AspNetCore.Http;
 
     public static class SimpleInjectorMiddlewareExtensions
     {
-        public static IWebHostBuilder UseSimpleInjector(this IWebHostBuilder web, Action<IApplicationBuilder, Container> setup)
+
+        public static IWebHostBuilder ConfigureApplicationContainer(this IWebHostBuilder web, SetupCallDelegate setup)
         {
-            return web.ConfigureServices(new SimpleInjectorSetup(setup).Setup);
+            return web.ConfigureServices(services => services.AddSingleton<IApplicationContainerSetup>(p => new DelegateAppContainerSetup(setup)));
         }
 
-        /// <remarks>
-        /// setup should include new WebHostBuilder().UseSimpleInjector(...)
-        /// </remarks>
-        public static void RegisterWebHost(this Container container, Func<IWebHostBuilder> webhostFactory)
+        public static IWebHostBuilder ConfigureApplicationSetup(this IWebHostBuilder web, Action<IApplicationBuilder> appSetup)
         {
-            container.Register<IWebHostBuilder>(() => webhostFactory().Configure(app => { }));
-            container.Register<IWebHost>(() => container.GetInstance<IWebHostBuilder>().Build());
+            return web.ConfigureServices(services => services.AddSingleton<IApplicationSetup>(p => new DelegateApplicationSetup(appSetup)));
         }
-        public static void RegisterWebHost(this Container container, Action<IApplicationBuilder, Container> setup)
+
+        public static void RegisterWebHost(
+            this Container hostingContainer,
+            Func<IWebHostBuilder, IWebHostBuilder> webhostSetup,
+            SetupCallDelegate setup,
+            Action<IApplicationBuilder> appSetup)
         {
-            container.RegisterWebHost(() => new WebHostBuilder().UseSimpleInjector(setup));
-        }
-        public static void RegisterWebHost(this Container container, Action<IWebHostBuilder> webhostSetup, Action<IApplicationBuilder, Container> setup)
-        {
-            container.RegisterWebHost(() =>
-            {
-                var host = new WebHostBuilder().UseSimpleInjector(setup);
-                webhostSetup(host);
-                return host;
-            });
+            hostingContainer.Register<IWebHost>(() =>
+                webhostSetup(
+                    ((IServiceProvider)hostingContainer)
+                    .GetService<IWebHostBuilder>() ?? new WebHostBuilder()
+                    .ConfigureServices(services => services.AddSingleton<IApplicationContainerSetup, DefaultOptionsAppContainerSetup>())
+                    .ConfigureServices(services => services.AddSingleton<IApplicationContainerSetup, AddServiceRegistrationsAppContainerSetup>())
+                    .ConfigureServices(services => services.AddSingleton<IApplicationContainerSetup, AddScopeFactoryAppContainerSetup>())
+                    .ConfigureServices(services => services.AddSingleton<IApplicationContainerSetup, ContainerAsServiceProviderAppContainerSetup>())
+                    .ConfigureApplicationContainer(setup)
+                    .ConfigureApplicationSetup(appSetup)
+                    //.ConfigureServices(services => services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>())
+                    .UseStartup<SimpleInjectorStartup>()
+                ).Build(), Lifestyle.Scoped);
         }
     }
 }

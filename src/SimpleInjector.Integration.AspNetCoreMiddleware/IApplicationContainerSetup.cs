@@ -20,58 +20,81 @@
 */
 #endregion
 
+
 namespace SimpleInjector.Integration.AspNetCoreMiddleware
 {
-    using Microsoft.AspNetCore.Builder;
     using System;
-    using SimpleInjector;
-    using Microsoft.Extensions.DependencyInjection;
     using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
     using System.Reflection;
+    using Microsoft.AspNetCore.Mvc.ApplicationParts;
+    using Microsoft.AspNetCore.Mvc.Controllers;
+    using Microsoft.Extensions.DependencyInjection;
     using SimpleInjector.Advanced;
 
-    class SimpleInjectorBuilder
+
+    public interface IApplicationContainerSetup
     {
-        private Action<IApplicationBuilder> _next;
-        private Action<IApplicationBuilder, Container> _setup;
+        Container Setup(Container applicationContainer, IServiceCollection services);
+    }
 
-        public SimpleInjectorBuilder(Action<IApplicationBuilder> next, Action<IApplicationBuilder, Container> setup)
+    public  delegate Container SetupCallDelegate(Container applicationContainer, IServiceCollection services);
+
+    public class DelegateAppContainerSetup : IApplicationContainerSetup
+    {
+        private readonly SetupCallDelegate _call;
+
+        public DelegateAppContainerSetup(SetupCallDelegate call)
         {
-            _next = next;
-            _setup = setup;
+            _call = call;
         }
-
-        public void Build(IApplicationBuilder app)
+        public Container Setup(Container applicationContainer, IServiceCollection services)
         {
-            var services = app
-            .ApplicationServices
-            .GetRequiredService<ServicesAccessor>()
-            .GetServices();
+            return _call(applicationContainer, services);            
+        }
+    }
 
-            var container = new Container();
-
+    public class DefaultOptionsAppContainerSetup : IApplicationContainerSetup
+    {
+        public Container Setup(Container container, IServiceCollection services)
+        {
+            container.Options.SuppressLifestyleMismatchVerification = true;
             container.Options.AllowOverridingRegistrations = true;
-            container.Options.ConstructorResolutionBehavior = new LargestConstructorFinder();
+            container.Options.ConstructorResolutionBehavior = LargestConstructorFinder.Instance;
             container.Options.DefaultScopedLifestyle = new SimpleInjector.Lifestyles.AsyncScopedLifestyle();
-            container.Register<IServiceScopeFactory, SimpleInjectorServiceScopeFactory>();
+            return container;
+        }
+    }
 
+    public class AddScopeFactoryAppContainerSetup : IApplicationContainerSetup
+    {
+        public Container Setup(Container container, IServiceCollection services)
+        {
+            container.Register<IServiceScopeFactory, SimpleInjectorServiceScopeFactory>();
+            return container;
+        }
+    }
+    public class ContainerAsServiceProviderAppContainerSetup : IApplicationContainerSetup
+    {
+        public Container Setup(Container container, IServiceCollection services)
+        {
+            container.RegisterSingleton<IServiceProvider>(container);
+            return container;
+        }
+    }
+
+    public class AddServiceRegistrationsAppContainerSetup : IApplicationContainerSetup
+    {
+        public Container Setup(Container container, IServiceCollection services)
+        {
             foreach (var svc in services)
                 Add(container, svc);
 
-            _setup(app, container);
-
-                IServiceProvider provider = container;
-#if(DEBUG)
-                provider = new LoggingServiceProvider(provider);
-#endif
-            app.ApplicationServices = provider;
-
-            app.Use(new SimpleInjectorAsyncScopeSetup(container).Setup);
-
-            _next(app);
+            return container;
         }
-
-        public void Add(Container _container, ServiceDescriptor svc)
+        
+        public static void Add(Container container, ServiceDescriptor svc)
         {
             var lifetime
                 = svc.Lifetime == ServiceLifetime.Scoped
@@ -87,20 +110,20 @@ namespace SimpleInjector.Integration.AspNetCoreMiddleware
 
             if (factory != null)
             {
-                
-                IServiceProvider provider = _container;
+
+                IServiceProvider provider = container;
 #if(DEBUG)
                 provider = new LoggingServiceProvider(provider);
 #endif
-                _container.Register(svc.ServiceType, () => factory(provider), lifetime);
+                container.Register(svc.ServiceType, () => factory(provider), lifetime);
             }
             else if (type != null)
             {
-                _container.Register(svc.ServiceType, type, lifetime);
+                container.Register(svc.ServiceType, type, lifetime);
             }
             else
             {
-                _container.RegisterSingleton(svc.ServiceType, instance);
+                container.RegisterSingleton(svc.ServiceType, instance);
             }
 
             var generic = svc.ServiceType.GetTypeInfo().IsGenericTypeDefinition;
@@ -109,9 +132,8 @@ namespace SimpleInjector.Integration.AspNetCoreMiddleware
 
             if (doMulti)
             {
-                _container.AppendToCollection(svc.ServiceType, type);
+                container.AppendToCollection(svc.ServiceType, type);
             }
         }
     }
 }
-
