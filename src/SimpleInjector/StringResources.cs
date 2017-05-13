@@ -897,8 +897,14 @@ namespace SimpleInjector
         private static string DidYouMeanToDependOnCollectionInstead(bool hasCollection, Type serviceType) =>
             hasCollection
                 ? string.Format(CultureInfo.InvariantCulture,
-                    " There is, however, a registration for {0}; Did you mean to depend on {0}?",
-                    typeof(IEnumerable<>).MakeGenericType(serviceType).TypeName())
+                    " There is, however, a registration for {0}; Did you mean to depend on {0}? " +
+                    "If you meant to depend on {1}, use should use one of the {3} overloads instead of using {2}." +
+                    "Please see https://simpleinjector.org/collections for more information " +
+                    "about registering and resolving collections.",
+                    typeof(IEnumerable<>).MakeGenericType(serviceType).TypeName(),
+                    serviceType.TypeName(),
+                    nameof(Container.RegisterCollection),
+                    nameof(Container.Register))
                 : string.Empty;
 
         private static string NoteThatSkippedDecoratorsWereFound(Type serviceType, Type[] decorators) =>
