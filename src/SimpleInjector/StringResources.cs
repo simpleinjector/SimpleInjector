@@ -561,9 +561,12 @@ namespace SimpleInjector
             string.Format(CultureInfo.InvariantCulture,
                 "The supplied list of types contains one or multiple open generic types, but this method is " +
                 "unable to handle open generic types because it can only map closed generic service types " +
-                "to a single implementation. Try using {1} instead. Invalid types: {0}.",
-                openGenericTypes.Select(type => type.TypeName()).ToCommaSeparatedText(),
-                nameof(Container.RegisterCollection));
+                "to a single implementation. " +
+                "You must register the open-generic types separately using the Register(Type, Type) " +
+                $"overload. Alternatively, try using {nameof(Container.RegisterCollection)} instead, " +
+                "if you expect to have multiple implementations per closed-generic abstraction. " + 
+                "Invalid types: {0}.",
+                openGenericTypes.Select(type => type.TypeName()).ToCommaSeparatedText());
 
         internal static string AppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
             Type serviceType) =>
