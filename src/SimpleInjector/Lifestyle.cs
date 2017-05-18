@@ -289,10 +289,9 @@ namespace SimpleInjector
             Requires.IsNotNull(defaultLifestyle, nameof(defaultLifestyle));
             Requires.IsNotNull(fallbackLifestyle, nameof(fallbackLifestyle));
 
-            return new ScopedHybridLifestyle(
-                lifestyleSelector: container => defaultLifestyle.GetCurrentScope(container) != null,
-                trueLifestyle: defaultLifestyle,
-                falseLifestyle: fallbackLifestyle);
+            return new DefaultFallbackScopedHybridLifestyle(
+                defaultLifestyle: defaultLifestyle,
+                fallbackLifestyle: fallbackLifestyle);
         }
 
         /// <summary>
@@ -401,7 +400,7 @@ namespace SimpleInjector
             Requires.IsNotNull(trueLifestyle, nameof(trueLifestyle));
             Requires.IsNotNull(falseLifestyle, nameof(falseLifestyle));
 
-            return new ScopedHybridLifestyle(c => lifestyleSelector(), trueLifestyle, falseLifestyle);
+            return new LifestyleSelectorScopedHybridLifestyle(c => lifestyleSelector(), trueLifestyle, falseLifestyle);
         }
 
         /// <summary>
