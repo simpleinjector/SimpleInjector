@@ -24,14 +24,14 @@ namespace SimpleInjector.Lifestyles
 {
     using System;
 
-    internal sealed class ScopedHybridLifestyle : ScopedLifestyle
+    internal sealed class LifestyleSelectorScopedHybridLifestyle : ScopedLifestyle, IHybridLifestyle
     {
         private readonly Predicate<Container> selector;
         private readonly ScopedLifestyle trueLifestyle;
         private readonly ScopedLifestyle falseLifestyle;
 
-        internal ScopedHybridLifestyle(Predicate<Container> lifestyleSelector, ScopedLifestyle trueLifestyle,
-            ScopedLifestyle falseLifestyle)
+        internal LifestyleSelectorScopedHybridLifestyle(
+            Predicate<Container> lifestyleSelector, ScopedLifestyle trueLifestyle, ScopedLifestyle falseLifestyle)
             : base("Hybrid " + GetHybridName(trueLifestyle) + " / " + GetHybridName(falseLifestyle))
         {
             this.selector = lifestyleSelector;
@@ -39,17 +39,17 @@ namespace SimpleInjector.Lifestyles
             this.falseLifestyle = falseLifestyle;
         }
 
-        internal override int ComponentLength(Container container) => 
+        internal override int ComponentLength(Container container) =>
             Math.Max(
                 this.trueLifestyle.ComponentLength(container),
                 this.falseLifestyle.ComponentLength(container));
 
-        internal override int DependencyLength(Container container) => 
+        internal override int DependencyLength(Container container) =>
             Math.Min(
                 this.trueLifestyle.DependencyLength(container),
                 this.falseLifestyle.DependencyLength(container));
 
-        internal string GetHybridName() => 
+        string IHybridLifestyle.GetHybridName() =>
             GetHybridName(this.trueLifestyle) + " / " + GetHybridName(this.falseLifestyle);
 
         protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
@@ -69,7 +69,7 @@ namespace SimpleInjector.Lifestyles
         protected override Scope GetCurrentScopeCore(Container container) =>
             this.CurrentLifestyle(container).GetCurrentScope(container);
 
-        private ScopedLifestyle CurrentLifestyle(Container container) => 
+        private ScopedLifestyle CurrentLifestyle(Container container) =>
             this.selector(container) ? this.trueLifestyle : this.falseLifestyle;
 
         private static string GetHybridName(Lifestyle lifestyle) => HybridLifestyle.GetHybridName(lifestyle);

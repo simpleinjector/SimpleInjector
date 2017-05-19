@@ -426,7 +426,8 @@
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
                 The supplied list of types contains one or multiple open generic types, but this method 
                 is unable to handle open generic types because it can only map closed generic service 
-                types to a single implementation. Try using RegisterCollection instead."
+                types to a single implementation. You must register the open-generic types separately
+                using the Register(Type, Type) overload."
                 .TrimInside(),
                 action);
         }

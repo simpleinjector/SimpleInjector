@@ -367,7 +367,9 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 There is, however, a registration for IEnumerable<ILogger>; 
-                Did you mean to depend on IEnumerable<ILogger>?"
+                Did you mean to depend on IEnumerable<ILogger>?
+                If you meant to depend on ILogger, 
+                use should use one of the Register overloads instead of using RegisterCollection"
                 .TrimInside(),
                 action);
         }

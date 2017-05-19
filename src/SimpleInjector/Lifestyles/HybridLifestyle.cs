@@ -24,7 +24,7 @@ namespace SimpleInjector.Lifestyles
 {
     using System;
 
-    internal sealed class HybridLifestyle : Lifestyle
+    internal sealed class HybridLifestyle : Lifestyle, IHybridLifestyle
     {
         private readonly Predicate<Container> lifestyleSelector;
         private readonly Lifestyle trueLifestyle;
@@ -53,24 +53,8 @@ namespace SimpleInjector.Lifestyles
                 this.trueLifestyle.DependencyLength(container),
                 this.falseLifestyle.DependencyLength(container));
 
-        internal static string GetHybridName(Lifestyle lifestyle)
-        {
-            var hybrid = lifestyle as HybridLifestyle;
-
-            if (hybrid != null)
-            {
-                return hybrid.GetHybridName();
-            }
-
-            var scopedHybrid = lifestyle as ScopedHybridLifestyle;
-
-            if (scopedHybrid != null)
-            {
-                return scopedHybrid.GetHybridName();
-            }
-
-            return lifestyle.Name;
-        }
+        internal static string GetHybridName(Lifestyle lifestyle) => 
+            (lifestyle as IHybridLifestyle)?.GetHybridName() ?? lifestyle.Name;
 
         protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
         {
@@ -93,7 +77,7 @@ namespace SimpleInjector.Lifestyles
                 this, container);
         }
 
-        private string GetHybridName() => 
+        string IHybridLifestyle.GetHybridName() => 
             GetHybridName(this.trueLifestyle) + " / " + GetHybridName(this.falseLifestyle);
     }
 }
