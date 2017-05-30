@@ -29,12 +29,13 @@ namespace SimpleInjector.Diagnostics
     /// Base class for types that hold information about a single diagnostic message or warning for a
     /// particular type or part of the configuration.
     /// </summary>
-    [DebuggerDisplay(
-        "{" + nameof(Name) + ", nq} " + 
-        "{SimpleInjector.Helpers.ToFriendlyName(" + nameof(ServiceType) + "), nq}: " + 
-        "{" + nameof(Description) + ", nq}")]
     public abstract class DiagnosticResult
     {
+        internal const string DebuggerDisplayValue =
+            "{" + nameof(Name) + ", nq} " +
+            "{" + TypesExtensions.FriendlyName + "(" + nameof(ServiceType) + "), nq}: " +
+            "{" + nameof(Description) + ", nq}";
+
         internal DiagnosticResult(Type serviceType, string description, DiagnosticType diagnosticType,
             DiagnosticSeverity severity, object value)
         {
@@ -55,7 +56,7 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>Gets the service type to which this warning is related.</summary>
         /// <value>A <see cref="Type"/>.</value>
-        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(ServiceType) + "),nq}")]
+        [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(" + nameof(ServiceType) + "),nq}")]
         public Type ServiceType { get; }
 
         /// <summary>Gets the description of the diagnostic result.</summary>

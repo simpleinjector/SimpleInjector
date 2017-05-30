@@ -37,7 +37,7 @@ namespace SimpleInjector
     /// currently being built.
     /// </summary>
     [DebuggerDisplay(nameof(ExpressionBuildingEventArgs) + " (" + 
-        nameof(KnownImplementationType) + ": {SimpleInjector.Helpers.ToFriendlyName(" + nameof(KnownImplementationType) + "), nq}, " +
+        nameof(KnownImplementationType) + ": {" + TypesExtensions.FriendlyName + "(" + nameof(KnownImplementationType) + "), nq}, " +
         nameof(Expression) + ": {" + nameof(Expression) + "})")]
     public class ExpressionBuildingEventArgs : EventArgs
     {

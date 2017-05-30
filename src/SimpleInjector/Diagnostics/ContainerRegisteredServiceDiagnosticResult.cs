@@ -25,6 +25,7 @@ namespace SimpleInjector.Diagnostics
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics;
     using System.Linq;
     using SimpleInjector.Advanced;
 
@@ -34,6 +35,7 @@ namespace SimpleInjector.Diagnostics
     /// lifestyle.
     /// For more information, see: https://simpleinjector.org/diaut.
     /// </summary>
+    [DebuggerDisplay(DebuggerDisplayValue)]
     public class ContainerRegisteredServiceDiagnosticResult : DiagnosticResult
     {
         internal ContainerRegisteredServiceDiagnosticResult(Type serviceType, string description,

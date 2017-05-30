@@ -37,7 +37,7 @@ namespace SimpleInjector
     /// being built. 
     /// </summary>
     [DebuggerDisplay(nameof(ExpressionBuiltEventArgs) + " (" + 
-        nameof(RegisteredServiceType) + ": {SimpleInjector.Helpers.ToFriendlyName(" + nameof(RegisteredServiceType) + "), nq}, " + 
+        nameof(RegisteredServiceType) + ": {" + TypesExtensions.FriendlyName + "(" + nameof(RegisteredServiceType) + "), nq}, " + 
         nameof(Expression) + ": {" + nameof(Expression) + "})")]
     public class ExpressionBuiltEventArgs : EventArgs
     {
@@ -56,7 +56,7 @@ namespace SimpleInjector
 
         /// <summary>Gets the registered service type that is currently requested.</summary>
         /// <value>The registered service type that is currently requested.</value>
-        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(RegisteredServiceType) + "), nq}")]
+        [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(" + nameof(RegisteredServiceType) + "), nq}")]
         public Type RegisteredServiceType { get; }
 
         /// <summary>Gets or sets the currently registered 

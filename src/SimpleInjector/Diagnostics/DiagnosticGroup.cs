@@ -55,7 +55,7 @@ namespace SimpleInjector.Diagnostics
         /// generic types.
         /// </summary>
         /// <value>The <see cref="Type"/>.</value>
-        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(GroupType) + "), nq}")]
+        [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(" + nameof(GroupType) + "), nq}")]
         public Type GroupType { get; }
 
         /// <summary>Gets the friendly name of the group.</summary>

@@ -662,10 +662,10 @@ namespace SimpleInjector
 
             public Lifestyle Lifestyle => this.producer.Lifestyle;
 
-            [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(ServiceType) + "), nq}")]
+            [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(" + nameof(ServiceType) + "), nq}")]
             public Type ServiceType => this.producer.ServiceType;
 
-            [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(ImplementationType) + "), nq}")]
+            [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(" + nameof(ImplementationType) + "), nq}")]
             public Type ImplementationType => this.producer.ImplementationType;
 
             public KnownRelationship[] Relationships => this.producer.GetRelationships();
