@@ -24,13 +24,13 @@ namespace SimpleInjector.Advanced
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Contains data that can be used to initialize a created instance. This data includes the actual
     /// created <see cref="Instance"/> and the <see cref="Context"/> information about the created instance.
     /// </summary>
-    [DebuggerDisplay(nameof(InstanceInitializationData) + 
-        " ({" + nameof(Context) + "." + nameof(InitializerContext.DebuggerDisplay) + ", nq})")]
+    [DebuggerDisplay(nameof(InstanceInitializationData) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
     public struct InstanceInitializationData : IEquatable<InstanceInitializationData>
     {
         /// <summary>Initializes a new instance of the <see cref="InstanceInitializationData"/> struct.</summary>
@@ -54,6 +54,11 @@ namespace SimpleInjector.Advanced
         /// <summary>Gets the created instance.</summary>
         /// <value>The created instance.</value>
         public object Instance { get; }
+
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
+            Justification = "This method is called by the debugger.")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal string DebuggerDisplay => this.Context.DebuggerDisplay;
 
         /// <summary>Returns the hash code for this instance.</summary>
         /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>

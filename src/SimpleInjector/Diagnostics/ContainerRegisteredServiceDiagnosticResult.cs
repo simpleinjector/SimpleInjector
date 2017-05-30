@@ -35,7 +35,7 @@ namespace SimpleInjector.Diagnostics
     /// lifestyle.
     /// For more information, see: https://simpleinjector.org/diaut.
     /// </summary>
-    [DebuggerDisplay(DebuggerDisplayValue)]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public class ContainerRegisteredServiceDiagnosticResult : DiagnosticResult
     {
         internal ContainerRegisteredServiceDiagnosticResult(Type serviceType, string description,

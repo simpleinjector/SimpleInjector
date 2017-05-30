@@ -26,6 +26,8 @@ namespace SimpleInjector
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
 
@@ -36,14 +38,12 @@ namespace SimpleInjector
     /// <see cref="Expression"/> property to change the component that is 
     /// currently being built.
     /// </summary>
-    [DebuggerDisplay(nameof(ExpressionBuildingEventArgs) + " (" + 
-        nameof(KnownImplementationType) + ": {" + TypesExtensions.FriendlyName + "(" + nameof(KnownImplementationType) + "), nq}, " +
-        nameof(Expression) + ": {" + nameof(Expression) + "})")]
+    [DebuggerDisplay(nameof(ExpressionBuildingEventArgs) + " ({" + nameof(DebuggerDisplay) + "), nq})")]
     public class ExpressionBuildingEventArgs : EventArgs
     {
         private Expression expression;
 
-        internal ExpressionBuildingEventArgs(Type knownImplementationType, 
+        internal ExpressionBuildingEventArgs(Type knownImplementationType,
             Expression expression, Lifestyle lifestyle)
         {
             this.KnownImplementationType = knownImplementationType;
@@ -111,7 +111,7 @@ namespace SimpleInjector
                 this.expression = value;
             }
         }
-        
+
         /// <summary>
         /// Gets the collection of currently known relationships. This information is used by the Diagnostics 
         /// Debug View. Change the contents of this collection to represent the changes made to the
@@ -120,5 +120,16 @@ namespace SimpleInjector
         /// </summary>
         /// <value>The collection of <see cref="KnownRelationship"/> instances.</value>
         public Collection<KnownRelationship> KnownRelationships { get; internal set; }
+
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
+            Justification = "This method is called by the debugger.")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal string DebuggerDisplay => string.Format(
+            CultureInfo.InvariantCulture,
+            "{0}: {1}, {2}: {3}",
+            nameof(this.KnownImplementationType),
+            this.KnownImplementationType.ToFriendlyName(),
+            nameof(this.KnownImplementationType),
+            this.KnownImplementationType.ToFriendlyName());
     }
 }

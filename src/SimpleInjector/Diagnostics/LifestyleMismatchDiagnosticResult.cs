@@ -32,7 +32,7 @@ namespace SimpleInjector.Diagnostics
     /// component that depends on a service with a lifestyle that is shorter than that of the component.
     /// For more information, see: https://simpleinjector.org/dialm.
     /// </summary>
-    [DebuggerDisplay(DebuggerDisplayValue)]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public class LifestyleMismatchDiagnosticResult : DiagnosticResult
     {
         internal LifestyleMismatchDiagnosticResult(Type serviceType, string description,

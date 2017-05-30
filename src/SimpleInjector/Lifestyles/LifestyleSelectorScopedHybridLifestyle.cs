@@ -39,6 +39,9 @@ namespace SimpleInjector.Lifestyles
             this.falseLifestyle = falseLifestyle;
         }
 
+        string IHybridLifestyle.GetHybridName() =>
+            GetHybridName(this.trueLifestyle) + " / " + GetHybridName(this.falseLifestyle);
+
         internal override int ComponentLength(Container container) =>
             Math.Max(
                 this.trueLifestyle.ComponentLength(container),
@@ -48,9 +51,6 @@ namespace SimpleInjector.Lifestyles
             Math.Min(
                 this.trueLifestyle.DependencyLength(container),
                 this.falseLifestyle.DependencyLength(container));
-
-        string IHybridLifestyle.GetHybridName() =>
-            GetHybridName(this.trueLifestyle) + " / " + GetHybridName(this.falseLifestyle);
 
         protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
         {

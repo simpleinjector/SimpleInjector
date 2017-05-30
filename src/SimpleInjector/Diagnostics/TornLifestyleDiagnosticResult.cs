@@ -34,7 +34,7 @@ namespace SimpleInjector.Diagnostics
     /// and lifestyle, which might cause multiple instances to be created during the lifespan of that lifestyle.
     /// For more information, see: https://simpleinjector.org/diatl.
     /// </summary>
-    [DebuggerDisplay(DebuggerDisplayValue)]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public class TornLifestyleDiagnosticResult : DiagnosticResult
     {
         internal TornLifestyleDiagnosticResult(Type serviceType, string description, Lifestyle lifestyle,

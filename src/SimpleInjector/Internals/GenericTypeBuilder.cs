@@ -27,24 +27,20 @@ namespace SimpleInjector.Internals
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
-    using System.Reflection;
 
     /// <summary>
     /// Helper class for building closed generic type for a given open generic type and a closed generic base.
     /// </summary>
     internal sealed class GenericTypeBuilder
     {
-        private const string FriendlyName =
-            "SimpleInjector." + nameof(TypesExtensions) + "." + nameof(TypesExtensions.ToFriendlyName);
-
-        [DebuggerDisplay("{" + FriendlyName + "(closedGenericBaseType),nq}")]
+        [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(closedGenericBaseType),nq}")]
         private readonly Type closedGenericBaseType;
 
-        [DebuggerDisplay("{" + FriendlyName + "(openGenericImplementation),nq}")]
+        [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(openGenericImplementation),nq}")]
         private readonly Type openGenericImplementation;
 
-        [DebuggerDisplay("{(partialOpenGenericImplementation == null ? \"null\" : " + 
-            FriendlyName + "(partialOpenGenericImplementation)),nq}")]
+        [DebuggerDisplay("{(partialOpenGenericImplementation == null ? \"null\" : " +
+            TypesExtensions.FriendlyName + "(partialOpenGenericImplementation)),nq}")]
         private readonly Type partialOpenGenericImplementation;
 
         private readonly bool isPartialOpenGenericImplementation;

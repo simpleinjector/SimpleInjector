@@ -24,6 +24,8 @@ namespace SimpleInjector.Diagnostics
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
 
     /// <summary>
     /// Base class for types that hold information about a single diagnostic message or warning for a
@@ -31,11 +33,6 @@ namespace SimpleInjector.Diagnostics
     /// </summary>
     public abstract class DiagnosticResult
     {
-        internal const string DebuggerDisplayValue =
-            "{" + nameof(Name) + ", nq} " +
-            "{" + TypesExtensions.FriendlyName + "(" + nameof(ServiceType) + "), nq}: " +
-            "{" + nameof(Description) + ", nq}";
-
         internal DiagnosticResult(Type serviceType, string description, DiagnosticType diagnosticType,
             DiagnosticSeverity severity, object value)
         {
@@ -56,17 +53,17 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>Gets the service type to which this warning is related.</summary>
         /// <value>A <see cref="Type"/>.</value>
-        [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(" + nameof(ServiceType) + "),nq}")]
+        [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(ServiceType),nq}")]
         public Type ServiceType { get; }
 
         /// <summary>Gets the description of the diagnostic result.</summary>
         /// <value>A <see cref="string"/> with the description.</value>
-        [DebuggerDisplay("{" + nameof(Description) + ", nq}")]
+        [DebuggerDisplay("{Description, nq}")]
         public string Description { get; }
 
         /// <summary>Gets the documentation URL of the diagnostic result.</summary>
         /// <value>A <see cref="string"/> with the URL.</value>
-        [DebuggerDisplay("{" + nameof(DocumentationUrl) + ", nq}")]
+        [DebuggerDisplay("{DocumentationUrl, nq}")]
         public Uri DocumentationUrl => 
             DocumentationAttribute.GetDocumentationAttribute(this.DiagnosticType).DocumentationUrl;
 
@@ -79,5 +76,15 @@ namespace SimpleInjector.Diagnostics
 
         [DebuggerHidden]
         internal string Name => DocumentationAttribute.GetDocumentationAttribute(this.DiagnosticType).Name;
+
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
+            Justification = "This method is called by the debugger.")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal string DebuggerDisplay => string.Format(
+            CultureInfo.InvariantCulture,
+            "{0} {1}: {2}", 
+            this.Name, 
+            this.ServiceType.ToFriendlyName(), 
+            this.Description);
     }
 }
