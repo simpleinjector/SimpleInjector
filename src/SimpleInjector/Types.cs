@@ -285,26 +285,14 @@ namespace SimpleInjector
                 return name;
             }
 
-            name = name.Substring(0, name.IndexOf('`'));
+            name = name.Contains("`") ? name.Substring(0, name.LastIndexOf('`')) : name;
 
-            return name + "<" + argumentsFormatter(genericArguments.ToArray()) + ">";
+            return name + "<" + argumentsFormatter(genericArguments) + ">";
         }
 
-        private static IEnumerable<Type> GetGenericArguments(Type type)
-        {
-            if (!type.Name.Contains("`"))
-            {
-                return Enumerable.Empty<Type>();
-            }
-
-            int numberOfGenericArguments = Convert.ToInt32(type.Name.Substring(type.Name.IndexOf('`') + 1),
-                 CultureInfo.InvariantCulture);
-
-            var argumentOfTypeAndOuterType = type.GetGenericArguments();
-
-            return argumentOfTypeAndOuterType
-                .Skip(argumentOfTypeAndOuterType.Length - numberOfGenericArguments)
-                .ToArray();
-        }
+        private static Type[] GetGenericArguments(Type type) =>
+            type.IsNested
+                ? type.GetGenericArguments().Skip(type.DeclaringType.GetGenericArguments().Length).ToArray()
+                : type.GetGenericArguments();
     }
 }
