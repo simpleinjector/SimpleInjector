@@ -1,13 +1,15 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Runtime.Remoting;
-
-namespace SimpleInjector.PartialTrustConsole
+﻿namespace SimpleInjector.PartialTrustConsole
 {
-    // Allows running tests for a given test assembly in a partial trust sandbox. 
-    // Allows verifying whether Simple Injector runs correctly in partial trust.
-    public class Program
+    using System;
+    using System.IO;
+    using System.Reflection;
+    using System.Runtime.Remoting;
+
+    /// <summary>
+    /// Allows running tests for a given test assembly in a partial trust sandbox. 
+    /// Allows verifying whether Simple Injector runs correctly in partial trust.
+    /// </summary>
+    public static class Program
     {
         public static void Main(string[] args)
         {

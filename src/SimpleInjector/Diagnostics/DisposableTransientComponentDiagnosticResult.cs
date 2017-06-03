@@ -23,6 +23,7 @@
 namespace SimpleInjector.Diagnostics
 {
     using System;
+    using System.Diagnostics;
     using SimpleInjector.Advanced;
 
     /// <summary>
@@ -30,6 +31,7 @@ namespace SimpleInjector.Diagnostics
     /// <see cref="IDisposable"/>.
     /// For more information, see: https://simpleinjector.org/diadt.
     /// </summary>
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public class DisposableTransientComponentDiagnosticResult : DiagnosticResult
     {
         internal DisposableTransientComponentDiagnosticResult(Type serviceType, InstanceProducer registration, 

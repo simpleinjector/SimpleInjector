@@ -25,6 +25,7 @@ namespace SimpleInjector.Diagnostics
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics;
     using System.Linq;
     using SimpleInjector.Diagnostics.Debugger;
 
@@ -32,6 +33,7 @@ namespace SimpleInjector.Diagnostics
     /// Diagnostic result that warns about a component that depends on (too) many services.
     /// For more information, see: https://simpleinjector.org/diasr.
     /// </summary>
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public class SingleResponsibilityViolationDiagnosticResult : DiagnosticResult
     {
         internal SingleResponsibilityViolationDiagnosticResult(Type serviceType, string description,

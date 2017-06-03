@@ -31,6 +31,9 @@ namespace SimpleInjector
     /// <summary>Useful extensions on <see cref="Type"/>.</summary>
     public static class TypesExtensions
     {
+        internal const string FriendlyName =
+            "SimpleInjector." + nameof(TypesExtensions) + "." + nameof(TypesExtensions.ToFriendlyName);
+
         /// <summary>
         /// Builds an easy to read type name. Namespaces will be omitted, and generic types will be displayed 
         /// in a C#-like syntax. Ideal for reporting type names in exception messages.

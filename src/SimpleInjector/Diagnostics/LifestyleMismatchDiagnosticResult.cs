@@ -24,6 +24,7 @@ namespace SimpleInjector.Diagnostics
 {
     using System;
     using System.ComponentModel;
+    using System.Diagnostics;
     using SimpleInjector.Advanced;
 
     /// <summary>
@@ -31,6 +32,7 @@ namespace SimpleInjector.Diagnostics
     /// component that depends on a service with a lifestyle that is shorter than that of the component.
     /// For more information, see: https://simpleinjector.org/dialm.
     /// </summary>
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public class LifestyleMismatchDiagnosticResult : DiagnosticResult
     {
         internal LifestyleMismatchDiagnosticResult(Type serviceType, string description,

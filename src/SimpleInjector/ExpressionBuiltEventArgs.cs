@@ -25,6 +25,8 @@ namespace SimpleInjector
     using System;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.Linq.Expressions;
 
     using SimpleInjector.Advanced;
@@ -33,12 +35,10 @@ namespace SimpleInjector
     /// Provides data for and interaction with the 
     /// <see cref="Container.ExpressionBuilt">ExpressionBuilt</see> event of 
     /// the <see cref="Container"/>. An observer can change the 
-    /// <see cref="ExpressionBuiltEventArgs.Expression"/> property to change the component that is currently 
+    /// <see cref="Expression"/> property to change the component that is currently 
     /// being built. 
     /// </summary>
-    [DebuggerDisplay(nameof(ExpressionBuiltEventArgs) + " (" + 
-        nameof(RegisteredServiceType) + ": {SimpleInjector.Helpers.ToFriendlyName(" + nameof(RegisteredServiceType) + "), nq}, " + 
-        nameof(Expression) + ": {" + nameof(Expression) + "})")]
+    [DebuggerDisplay(nameof(ExpressionBuiltEventArgs) + " ({" + nameof(DebuggerDisplay) + "), nq})")]
     public class ExpressionBuiltEventArgs : EventArgs
     {
         private Expression expression;
@@ -56,7 +56,7 @@ namespace SimpleInjector
 
         /// <summary>Gets the registered service type that is currently requested.</summary>
         /// <value>The registered service type that is currently requested.</value>
-        [DebuggerDisplay("{SimpleInjector.Helpers.ToFriendlyName(" + nameof(RegisteredServiceType) + "), nq}")]
+        [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(" + nameof(RegisteredServiceType) + "), nq}")]
         public Type RegisteredServiceType { get; }
 
         /// <summary>Gets or sets the currently registered 
@@ -109,5 +109,16 @@ namespace SimpleInjector
         internal Registration ReplacedRegistration { get; set; }
 
         internal InstanceProducer InstanceProducer { get; set; }
+
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
+            Justification = "This method is called by the debugger.")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal string DebuggerDisplay => string.Format(
+            CultureInfo.InvariantCulture,
+            "{0}: {1}, {2}: {3}",
+            nameof(this.RegisteredServiceType),
+            this.RegisteredServiceType.ToFriendlyName(),
+            nameof(this.RegisteredServiceType),
+            this.RegisteredServiceType.ToFriendlyName());
     }
 }

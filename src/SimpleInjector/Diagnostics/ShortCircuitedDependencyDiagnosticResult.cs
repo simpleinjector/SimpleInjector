@@ -25,6 +25,7 @@ namespace SimpleInjector.Diagnostics
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics;
     using System.Linq;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics.Debugger;
@@ -36,6 +37,7 @@ namespace SimpleInjector.Diagnostics
     /// implementation.
     /// For more information, see: https://simpleinjector.org/diasc.
     /// </summary>
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public class ShortCircuitedDependencyDiagnosticResult : DiagnosticResult
     {
         internal ShortCircuitedDependencyDiagnosticResult(Type serviceType, string description,

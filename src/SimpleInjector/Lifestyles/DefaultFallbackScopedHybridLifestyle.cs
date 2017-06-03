@@ -36,6 +36,9 @@ namespace SimpleInjector.Lifestyles
             this.fallbackLifestyle = fallbackLifestyle;
         }
 
+        string IHybridLifestyle.GetHybridName() =>
+            GetHybridName(this.defaultLifestyle) + " / " + GetHybridName(this.fallbackLifestyle);
+
         internal override int ComponentLength(Container container) =>
             Math.Max(
                 this.defaultLifestyle.ComponentLength(container),
@@ -61,9 +64,6 @@ namespace SimpleInjector.Lifestyles
 
         protected override Scope GetCurrentScopeCore(Container container) =>
             this.defaultLifestyle.GetCurrentScope(container) ?? this.fallbackLifestyle.GetCurrentScope(container);
-
-        string IHybridLifestyle.GetHybridName() =>
-            GetHybridName(this.defaultLifestyle) + " / " + GetHybridName(this.fallbackLifestyle);
 
         private static string GetHybridName(Lifestyle lifestyle) => HybridLifestyle.GetHybridName(lifestyle);
     }
