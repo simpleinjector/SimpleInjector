@@ -23,6 +23,7 @@
 namespace SimpleInjector
 {
     using System;
+    using Integration.AspNetCore;
     using Lifestyles;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -34,6 +35,8 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorAspNetCoreIntegrationExtensions
     {
+        private static readonly object crossWireContextKey = new object();
+
         /// <summary>Wraps ASP.NET requests in an <see cref="AsyncScopedLifestyle"/>.</summary>
         /// <param name="applicationBuilder">The ASP.NET application builder instance that references all
         /// framework components.</param>
@@ -90,7 +93,7 @@ namespace SimpleInjector
         /// Get service of type <typeparamref name="T"/> from the list of request-specific services of the
         /// application builder. This preserves the lifestyle of the registered component.
         /// </summary>
-        /// <typeparam name="T"> The type of service object to get.</typeparam>
+        /// <typeparam name="T">The type of service object to get.</typeparam>
         /// <param name="builder">The IApplicationBuilder to retrieve the service object from.</param>
         /// <returns>A service object of type T or null if there is no such service.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the method is called outside the 
@@ -126,16 +129,7 @@ namespace SimpleInjector
 
         private static IServiceProvider GetRequestServiceProvider(IApplicationBuilder builder, Type serviceType)
         {
-            var accessor = builder.ApplicationServices.GetService<IHttpContextAccessor>();
-
-            if (accessor == null)
-            {
-                throw new InvalidOperationException(
-                    "Type 'Microsoft.AspNetCore.Http.IHttpContextAccessor' is not available in the " +
-                    "IApplicationBuilder.ApplicationServices collection. Please make sure it is " +
-                    "registered by adding it to the ConfigureServices method as follows: " + Environment.NewLine +
-                    "services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();");
-            }
+            IHttpContextAccessor accessor = GetHttpContextAccessor(builder);
 
             var context = accessor.HttpContext;
 
@@ -149,7 +143,23 @@ namespace SimpleInjector
             return context.RequestServices;
         }
 
-        private sealed class RequestScopingStartupFilter : IStartupFilter
+        private static IHttpContextAccessor GetHttpContextAccessor(IApplicationBuilder builder)
+        {
+            var accessor = builder.ApplicationServices.GetService<IHttpContextAccessor>();
+
+            if (accessor == null)
+            {
+                throw new InvalidOperationException(
+                    "Type 'Microsoft.AspNetCore.Http.IHttpContextAccessor' is not available in the " +
+                    "IApplicationBuilder.ApplicationServices collection. Please make sure it is " +
+                    "registered by adding it to the ConfigureServices method as follows: " + Environment.NewLine +
+                    "services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();");
+            }
+
+            return accessor;
+        }
+        
+        private class RequestScopingStartupFilter : IStartupFilter
         {
             private readonly Container container;
 
