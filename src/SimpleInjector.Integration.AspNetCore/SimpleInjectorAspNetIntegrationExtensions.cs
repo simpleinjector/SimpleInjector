@@ -239,7 +239,8 @@ namespace SimpleInjector
                     "Cross-wiring has to be enabled first. Please make sure the " +
                     $"{nameof(EnableSimpleInjectorCrossWiring)} extension method is called first by " +
                     "adding it to the ConfigureServices method as follows: " + Environment.NewLine +
-                    $"services.{nameof(EnableSimpleInjectorCrossWiring)}(container);");
+                    $"services.{nameof(EnableSimpleInjectorCrossWiring)}(container);" + Environment.NewLine +
+                    "See: https://simpleinjector.org/aspnetcore");
             }
 
             return context;
