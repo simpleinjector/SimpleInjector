@@ -479,7 +479,7 @@
                 this.selector = lifestyleSelector;
             }
 
-            public Lifestyle SelectLifestyle(Type impl) => this.selector(impl);
+            public Lifestyle SelectLifestyle(Type implementationType) => this.selector(implementationType);
         }
 
         public class FakeLifestyleSelectionBehavior : ILifestyleSelectionBehavior

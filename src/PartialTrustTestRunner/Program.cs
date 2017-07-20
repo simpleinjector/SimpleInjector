@@ -11,6 +11,8 @@
     /// </summary>
     public static class Program
     {
+        /// <summary>Main method.</summary>
+        /// <param name="args">The args.</param>
         public static void Main(string[] args)
         {
             string assemblyFile = args[0];
