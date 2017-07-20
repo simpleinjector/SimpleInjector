@@ -33,7 +33,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            // Use the RegisterAll(Type, Type[]) overload.
+            // Use the RegisterCollection(Type, Type[]) overload.
             container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] { typeof(RealCommandHandler) });
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
@@ -57,7 +57,7 @@
 
             var expectedSingletonHandler = new RealCommandHandler();
 
-            // Use the RegisterAll<T>(T[]) overload.
+            // Use the RegisterCollection<T>(T[]) overload.
             container.RegisterCollection<ICommandHandler<RealCommand>>(expectedSingletonHandler);
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
@@ -82,7 +82,7 @@
 
             var expectedSingletonHandler = new RealCommandHandler();
 
-            // Use the RegisterAll(Type, IEnumerable) overload.
+            // Use the RegisterCollection(Type, IEnumerable) overload.
             container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] { expectedSingletonHandler });
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
@@ -245,7 +245,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            // Use the RegisterAll(Type, Type[]) overload.
+            // Use the RegisterCollection(Type, Type[]) overload.
             container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] 
             { 
                 typeof(RealCommandHandler),
@@ -272,7 +272,7 @@
 
             var expectedSingletonHandler = new RealCommandHandler();
 
-            // Use the RegisterAll<T>(T[]) overload.
+            // Use the RegisterCollection<T>(T[]) overload.
             container.RegisterCollection<ICommandHandler<RealCommand>>(expectedSingletonHandler);
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>));
@@ -296,7 +296,7 @@
 
             var expectedSingletonHandler = new RealCommandHandler();
 
-            // Use the RegisterAll(Type, IEnumerable) overload.
+            // Use the RegisterCollection(Type, IEnumerable) overload.
             container.RegisterCollection(typeof(ICommandHandler<RealCommand>), new[] { expectedSingletonHandler });
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(AsyncCommandHandlerProxy<>));
@@ -639,7 +639,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            // Use the RegisterAll<T>(Type[]) overload.
+            // Use the RegisterCollection<T>(Type[]) overload.
             container.RegisterCollection<ICommandHandler<RealCommand>>(new[] { typeof(RealCommandHandler) });
 
             container.RegisterDecorator(
@@ -662,7 +662,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            // Use the RegisterAll<T>(T[]) overload.
+            // Use the RegisterCollection<T>(T[]) overload.
             container.RegisterCollection<ICommandHandler<RealCommand>>(new[] { new RealCommandHandler() });
 
             container.RegisterDecorator(
@@ -685,7 +685,7 @@
 
             IEnumerable<ICommandHandler<RealCommand>> handlers = new[] { new RealCommandHandler() };
 
-            // Use the RegisterAll<T>(IEnumerable<T>) overload.
+            // Use the RegisterCollection<T>(IEnumerable<T>) overload.
             container.RegisterCollection<ICommandHandler<RealCommand>>(handlers);
 
             container.RegisterDecorator(
@@ -1024,12 +1024,12 @@
         }
 
         [TestMethod]
-        public void GetAllInstances_InstancesRegisteredWithRegisterAllParamsTAndDecorated_InjectsSingletons()
+        public void GetAllInstances_InstancesRegisteredWithRegisterCollectionParamsTAndDecorated_InjectsSingletons()
         {
             // Arrange
             var container = ContainerFactory.New();
 
-            // Uses the RegisterAll<T>(params T[]) that explicitly registers a collection of singletons.
+            // Uses the RegisterCollection<T>(params T[]) that explicitly registers a collection of singletons.
             container.RegisterCollection<ICommandHandler<RealCommand>>(
                 new RealCommandHandler(),
                 new NullCommandHandler<RealCommand>());
@@ -1046,14 +1046,14 @@
         }
 
         [TestMethod]
-        public void GetAllInstances_InstancesRegisteredWithRegisterAllParamsTAndDecorated_SuppliesTheCorrectPredicateContextForEachElement()
+        public void GetAllInstances_InstancesRegisteredWithRegisterCollectionParamsTAndDecorated_SuppliesTheCorrectPredicateContextForEachElement()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             var predicateContexts = new List<DecoratorPredicateContext>();
 
-            // Uses the RegisterAll<T>(params T[]) that explicitly registers a collection of singletons.
+            // Uses the RegisterCollection<T>(params T[]) that explicitly registers a collection of singletons.
             container.RegisterCollection<ICommandHandler<RealCommand>>(
                 new RealCommandHandler(),
                 new NullCommandHandler<RealCommand>());
@@ -1095,7 +1095,7 @@
         }
 
         [TestMethod]
-        public void GetAllInstances_InstancesRegisteredWithRegisterAllEnumerableAndDecorated_CallsThePredicateJustOnceForTheWholeCollection()
+        public void GetAllInstances_InstancesRegisteredWithRegisterCollectionEnumerableAndDecorated_CallsThePredicateJustOnceForTheWholeCollection()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -1108,7 +1108,7 @@
                 new NullCommandHandler<RealCommand>()
             };
 
-            // Uses the RegisterAll<T>(IEnumerable<T>) that registers a dynamic list.
+            // Uses the RegisterCollection<T>(IEnumerable<T>) that registers a dynamic list.
             container.RegisterCollection<ICommandHandler<RealCommand>>(dynamicList);
 
             container.RegisterDecorator(
@@ -1129,7 +1129,7 @@
 
             // Assert
             Assert.AreEqual(1, predicateContexts.Count, "The predicate should therefore be called " +
-                "just once when collections are registered using RegisterAll(IEnumerable).");
+                "just once when collections are registered using RegisterCollection(IEnumerable).");
 
             DecoratorPredicateContext collectionContext = predicateContexts.Single();
 
@@ -1142,7 +1142,7 @@
         }
 
         [TestMethod]
-        public void GetAllInstances_InstancesRegisteredWithRegisterAllEnumerableAndDecoratedWithMultipleDecorators_SuppliesThePreviouslyAppliedDecoratorsToThePredicate()
+        public void GetAllInstances_InstancesRegisteredWithRegisterCollectionEnumerableAndDecoratedWithMultipleDecorators_SuppliesThePreviouslyAppliedDecoratorsToThePredicate()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -1155,7 +1155,7 @@
                 new NullCommandHandler<RealCommand>()
             };
 
-            // Uses the RegisterAll<T>(IEnumerable<T>) that registers a dynamic list.
+            // Uses the RegisterCollection<T>(IEnumerable<T>) that registers a dynamic list.
             container.RegisterCollection<ICommandHandler<RealCommand>>(dynamicList);
 
             container.RegisterDecorator(
@@ -1188,7 +1188,7 @@
         }
 
         [TestMethod]
-        public void GetAllInstances_InstancesRegisteredWithRegisterAllEnumerableAndDecoratedWithMultipleDecorators_DoesNotSupplyThePreviousDecoratorWhenItWasNotApplied()
+        public void GetAllInstances_InstancesRegisteredWithRegisterCollectionEnumerableAndDecoratedWithMultipleDecorators_DoesNotSupplyThePreviousDecoratorWhenItWasNotApplied()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -1201,7 +1201,7 @@
                 new NullCommandHandler<RealCommand>()
             };
 
-            // Uses the RegisterAll<T>(IEnumerable<T>) that registers a dynamic list.
+            // Uses the RegisterCollection<T>(IEnumerable<T>) that registers a dynamic list.
             container.RegisterCollection<ICommandHandler<RealCommand>>(dynamicList);
 
             container.RegisterDecorator(
@@ -1244,7 +1244,7 @@
 
             container.Register<ICommandHandler<RealCommand>, RealCommandHandler>();
 
-            // Uses the RegisterAll<T>(IEnumerable<T>) that registers a dynamic list.
+            // Uses the RegisterCollection<T>(IEnumerable<T>) that registers a dynamic list.
             container.RegisterCollection<ICommandHandler<RealCommand>>(dynamicList);
 
             container.RegisterDecorator(
@@ -1293,7 +1293,7 @@
                 new NullCommandHandler<RealCommand>()
             };
 
-            // Uses the RegisterAll<T>(IEnumerable<T>) that registers a dynamic list.
+            // Uses the RegisterCollection<T>(IEnumerable<T>) that registers a dynamic list.
             container.RegisterCollection<ICommandHandler<RealCommand>>(dynamicList);
 
             // Register the same decorator twice. 
@@ -1322,7 +1322,7 @@
         }
 
         [TestMethod]
-        public void RegisterAll_ContainerUncontrolledSingletons_InitializesThoseSingletonsOnce()
+        public void RegisterCollection_ContainerUncontrolledSingletons_InitializesThoseSingletonsOnce()
         {
             // Arrange
             var containerUncontrolledSingletonHandlers = new ICommandHandler<RealCommand>[]

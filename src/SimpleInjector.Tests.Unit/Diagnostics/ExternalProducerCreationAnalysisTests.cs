@@ -69,7 +69,7 @@
 
             // Assert
             Assert.AreEqual(0, results.Length,
-                "Since the SomePluginImpl is registered explicitly using the RegisterAll method, this " +
+                "Since the SomePluginImpl is registered explicitly using the RegisterCollection method, this " +
                 "registration should contain no warnings, but the following warnings are present: \"" +
                 string.Join(" ", results.Select(result => result.Description)) + "\"");
         }

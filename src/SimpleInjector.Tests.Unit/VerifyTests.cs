@@ -277,7 +277,7 @@ namespace SimpleInjector.Tests.Unit
         }
         
         [TestMethod]
-        public void Verify_RegisterAllCalledWithUnregisteredType_ThrowsExpectedException()
+        public void Verify_RegisterCollectionCalledWithUnregisteredType_ThrowsExpectedException()
         {
             // Arrange
             string expectedException = "No registration for type IUserRepository could be found.";
@@ -421,7 +421,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void Verify_RegisterAllRegistrationWithTypeReferencingAPrimitiveType_ThrowsExpectedException()
+        public void Verify_RegisterCollectionRegistrationWithTypeReferencingAPrimitiveType_ThrowsExpectedException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -455,7 +455,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void Verify_LockedContainerWithRegisterAllRegisterationForOpenGenericType_Succeeds()
+        public void Verify_LockedContainerWithRegisterCollectionRegisterationForOpenGenericType_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();

@@ -8,7 +8,7 @@ namespace SimpleInjector.Tests.Unit
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    /// <summary>Tests for RegisterAll.</summary>
+    /// <summary>Tests for RegisterCollection.</summary>
     [TestClass]
     public partial class RegisterAllTests
     {
@@ -17,7 +17,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllTService_WithNullArgument_ThrowsException()
+        public void RegisterCollectionTService_WithNullArgument_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -55,7 +55,7 @@ namespace SimpleInjector.Tests.Unit
 
             IPlugin[] plugins = new IPlugin[] { new PluginImpl(), new PluginImpl(), new PluginImpl() };
 
-            // RegisterSingleton<IEnumerable<T>> should have the same effect as RegisterAll<T>
+            // RegisterSingleton<IEnumerable<T>> should have the same effect as RegisterCollection<T>
             container.RegisterSingleton<IEnumerable<IPlugin>>(plugins);
 
             // Act
@@ -101,7 +101,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingle_WithEnumerableCalledAfterRegisterAllWithSameType_Fails()
+        public void RegisterSingle_WithEnumerableCalledAfterRegisterCollectionWithSameType_Fails()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -116,7 +116,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void Register_WithEnumerableCalledAfterRegisterAllWithSameType_Fails()
+        public void Register_WithEnumerableCalledAfterRegisterCollectionWithSameType_Fails()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -253,7 +253,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllParamsT_WithNullArgument_ThrowsException()
+        public void RegisterCollectionParamsT_WithNullArgument_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -268,7 +268,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllParamsType_WithNullArgument_ThrowsException()
+        public void RegisterCollectionParamsType_WithNullArgument_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -283,7 +283,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllIEnumerableT_WithNullArgument_ThrowsException()
+        public void RegisterCollectionIEnumerableT_WithNullArgument_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -298,7 +298,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllIEnumerableType_WithNullArgument_ThrowsException()
+        public void RegisterCollectionIEnumerableType_WithNullArgument_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -334,7 +334,7 @@ namespace SimpleInjector.Tests.Unit
                     .TrimInside(),
                     ex,
                     "This call is expected to fail, since C# overload resolution will select the " +
-                    "RegisterAll<TService> overload where TService is Type, which is unlikely what the " +
+                    "RegisterCollection<TService> overload where TService is Type, which is unlikely what the " +
                     "use intended. We should throw an exception instead.");
             }
         }
@@ -446,7 +446,7 @@ namespace SimpleInjector.Tests.Unit
             var collection = container.GetAllInstances<IUserRepository>().ToArray();
 
             // Assert
-            Assert.IsNotNull(collection[0], "RegisterAll<T>(T[]) did not make a copy of the supplied array.");
+            Assert.IsNotNull(collection[0], "RegisterCollection<T>(T[]) did not make a copy of the supplied array.");
         }
 
         [TestMethod]
@@ -529,7 +529,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllTService_RegisteredCollectionWithNullElements_ThrowsException()
+        public void RegisterCollectionTService_RegisteredCollectionWithNullElements_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -717,7 +717,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void GetAllInstances_RegisterAllWithRegistration_ResolvesTheExpectedInstance()
+        public void GetAllInstances_RegisterCollectionWithRegistration_ResolvesTheExpectedInstance()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -757,7 +757,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void GetAllInstances_RegisterAllWithRegistrationsAndDecorator_WrapsTheDecorator()
+        public void GetAllInstances_RegisterCollectionWithRegistrationsAndDecorator_WrapsTheDecorator()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -779,7 +779,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllGeneric_RegisteringCovarientTypes_Succeeds()
+        public void RegisterCollectionGeneric_RegisteringCovarientTypes_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -794,7 +794,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllNonGeneric_RegisteringCovarientTypes_Succeeds()
+        public void RegisterCollectionNonGeneric_RegisteringCovarientTypes_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -1006,7 +1006,7 @@ namespace SimpleInjector.Tests.Unit
 
             var container = new Container();
 
-            // RegisterAll will not throw an exception, because registration is forwarded back into the
+            // RegisterCollection will not throw an exception, because registration is forwarded back into the
             // container, and it could be possible that someone does a registration like:
             // container.Register(typeof(EventHandlerWithConstructorContainingPrimitive<>), typeof(X))
             // where X is a type with one constructor.
@@ -1554,7 +1554,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllEnumerableRegistration_NullArgument_ThrowsExpectedException()
+        public void RegisterCollectionEnumerableRegistration_NullArgument_ThrowsExpectedException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -1600,8 +1600,8 @@ namespace SimpleInjector.Tests.Unit
                 @"The registrations for IEventHandler<CustomerMovedEvent> that are assignable to 
                 IEventHandler<CustomerMovedAbroadEvent> are expected to 'flow' to the 
                 IEventHandler<CustomerMovedAbroadEvent> collection, because the expected way for users to
-                register generic types by supplying the RegisterAll(Type, Type[]) overload as follows:
-                container.RegisterManyForOpenGeneric(type, container.RegisterAll, assemblies)."
+                register generic types by supplying the RegisterCollection(Type, Type[]) overload as follows:
+                container.RegisterManyForOpenGeneric(type, container.RegisterCollection, assemblies)."
                 .TrimInside() +
                 "Actual: " + actualHandlerTypes.ToFriendlyNamesText());
         }
@@ -1623,7 +1623,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllClosedGeneric_CalledAfterRegisterForSameCollection_ThrowsAlreadyRegisteredException()
+        public void RegisterCollection_CalledAfterRegisterForSameCollection_ThrowsAlreadyRegisteredException()
         {
             // Arrange
             var container = new Container();
@@ -1643,7 +1643,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllClosedGenericControlled_CalledAfterRegisterAllUncontrolledForSameType_ThrowsAlreadyRegisteredException()
+        public void RegisterCollectionClosedGenericControlled_CalledAfterRegisterCollectionUncontrolledForSameType_ThrowsAlreadyRegisteredException()
         {
             // Arrange
             var container = new Container();
@@ -1668,7 +1668,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllClosedGenericUncontrolled_CalledAfterRegisterAllControlledForSameType_ThrowsAlreadyRegisteredException()
+        public void RegisterCollectionClosedGenericUncontrolled_CalledAfterRegisterCollectionControlledForSameType_ThrowsAlreadyRegisteredException()
         {
             // Arrange
             var container = new Container();
@@ -1690,7 +1690,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllClosedGeneric_CalledAfterRegisterSingleOnSameCollectionType_ThrowsAlreadyRegisteredException()
+        public void RegisterCollectionClosedGeneric_CalledAfterRegisterSingleOnSameCollectionType_ThrowsAlreadyRegisteredException()
         {
             // Arrange
             var container = new Container();
@@ -1710,7 +1710,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterWithGenericCollection_CalledAfterRegisterAllForSameClosedCollection_ThrowsAlreadyRegisteredException()
+        public void RegisterWithGenericCollection_CalledAfterRegisterCollectionForSameClosedCollection_ThrowsAlreadyRegisteredException()
         {
             // Arrange
             var container = new Container();
@@ -1727,7 +1727,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterWithGenericCollection_CalledAfterRegisterAllSingletonForSameCollection_ThrowsAlreadyRegisteredException()
+        public void RegisterWithGenericCollection_CalledAfterRegisterCollectionSingletonForSameCollection_ThrowsAlreadyRegisteredException()
         {
             // Arrange
             var container = new Container();
@@ -1744,7 +1744,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllSingleton_CalledAfterRegisterForSameCollection_ThrowsAlreadyRegisteredException()
+        public void RegisterCollectionSingleton_CalledAfterRegisterForSameCollection_ThrowsAlreadyRegisteredException()
         {
             // Arrange
             var container = new Container();
@@ -1761,7 +1761,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllClosed_CalledAfterRegisterAllSingletonForSameCollection_ThrowsAlreadyRegisteredException()
+        public void RegisterCollectionClosed_CalledAfterRegisterCollectionSingletonForSameCollection_ThrowsAlreadyRegisteredException()
         {
             // Arrange
             var container = new Container();
@@ -1819,7 +1819,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterAllClosed_CalledAfterRegisterAllSingletonWithAllowOverridingRegistrations_CompletelyReplacesPrevious()
+        public void RegisterCollectionClosed_CalledAfterRegisterCollectionSingletonWithAllowOverridingRegistrations_CompletelyReplacesPrevious()
         {
             // Arrange
             Type[] expectedHandlerTypes = new[] { typeof(AuditableEventEventHandler) };
