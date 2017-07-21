@@ -195,6 +195,14 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(builder));
             }
 
+            Registration registration = CreateRegistration(container, serviceType, builder);
+
+            container.AddRegistration(serviceType, registration);
+        }
+
+        private static Registration CreateRegistration(
+            Container container, Type serviceType, IApplicationBuilder builder)
+        {
             CrossWireContext context = GetCrossWireContext(container);
 
             Lifestyle lifestyle = DetermineLifestyle(serviceType, context.Services);
@@ -226,7 +234,7 @@ namespace SimpleInjector
                     justification: "This is a cross-wired service. ASP.NET Core will ensure it gets disposed.");
             }
 
-            container.AddRegistration(serviceType, registration);
+            return registration;
         }
 
         private static CrossWireContext GetCrossWireContext(Container container)
@@ -279,27 +287,30 @@ namespace SimpleInjector
 
         private static Lifestyle DetermineLifestyle(Type serviceType, IServiceCollection services)
         {
-            var descriptor = GetAppropriateServiceDescriptor(serviceType, services);
+            var descriptor = FindDescriptor(serviceType, services);
 
+            // In case the service type is an IEnumerable, a registration can't be found, but collections are
+            // in Core always registered as Transient, so it's safe to fall back to the transient lifestyle.
             return ToLifestyle(descriptor?.Lifetime ?? ServiceLifetime.Transient);
         }
 
-        private static ServiceDescriptor GetAppropriateServiceDescriptor(Type serviceType, IServiceCollection services)
+        private static ServiceDescriptor FindDescriptor(Type serviceType, IServiceCollection services)
         {
             var descriptor = services.LastOrDefault(d => d.ServiceType == serviceType);
 
             if (descriptor == null && serviceType.GetTypeInfo().IsGenericType)
             {
-                var serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
+                var serviceTypeDefinition = serviceType.GetTypeInfo().GetGenericTypeDefinition();
 
-                // NOTE: When it comes to IEnumerable<T> registrations, .NET Core will generate them as new arrays, which means
-                // transient. So it's okay to return null here, we'll default to transient.
-                descriptor = services.LastOrDefault(d => d.ServiceType == serviceTypeDefinition);
+                // In case the type is an IEnumerable<T>, no registration can be found and null is returned.
+                return services.LastOrDefault(d => d.ServiceType == serviceTypeDefinition);
             }
-
-            return descriptor;
+            else
+            {
+                return descriptor;
+            }
         }
-
+        
         private static Lifestyle ToLifestyle(ServiceLifetime lifetime)
         {
             switch (lifetime)
