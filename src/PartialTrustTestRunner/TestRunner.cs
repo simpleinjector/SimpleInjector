@@ -29,6 +29,44 @@
             }
 
             Console.WriteLine();
+
+            var old = Console.ForegroundColor;
+
+            if (failedTests.Any())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+
+                Console.WriteLine(@"
+                    ******    ****    ****  **
+                    **      **    **   **   **
+                    ***     ********   **   **
+                    **      **    **   **   **
+                    **      **    **  ****  ******
+                ");
+            }
+            else if (tests > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+
+                Console.WriteLine(@"
+                      ****    **  **
+                    **    **  ** **
+                    **    **  ****
+                    **    **  ** **
+                      ****    **  **
+                ");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+
+                Console.WriteLine("No tests executed!!!");
+            }
+
+            Console.ForegroundColor = old;
+
+            Console.WriteLine();
+
             Console.WriteLine("Tests {0}. Failed {1}. Succeeded {2}.", tests, failedTests.Count, tests - failedTests.Count);
 
             if (failedTests.Any())
