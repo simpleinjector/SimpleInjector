@@ -132,7 +132,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
         }
 
         [TestMethod]
-        public void AppendToCollection_CalledAfterRegisterAllWithTypes_CombinedAllRegistrationsWhenRequested()
+        public void AppendToCollection_CalledAfterRegisterCollectionWithTypes_CombinedAllRegistrationsWhenRequested()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -152,7 +152,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
         }
 
         [TestMethod]
-        public void AppendToCollection_CalledAfterRegisterAllWithRegistration_CombinedAllRegistrationsWhenRequested()
+        public void AppendToCollection_CalledAfterRegisterCollectionWithRegistration_CombinedAllRegistrationsWhenRequested()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -299,7 +299,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
         }
         
         [TestMethod]
-        public void GetAllInstances_MultipleAppendedOpenGenericTypesMixedWithClosedGenericRegisterAll_ResolvesTheExpectedCollection()
+        public void GetAllInstances_MultipleAppendedOpenGenericTypesMixedWithClosedGenericRegisterCollection_ResolvesTheExpectedCollection()
         {
             // Arrange
             Type[] expectedHandlerTypes = new[]

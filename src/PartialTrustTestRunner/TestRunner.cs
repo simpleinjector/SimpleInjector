@@ -6,8 +6,11 @@
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    /// <summary>The TestRunner.</summary>
     public class TestRunner : MarshalByRefObject
     {
+        /// <summary>Runs all tests in the supplied assembly.</summary>
+        /// <param name="testAssemblyName">The name of the assembly that contains the tests to run.</param>
         public void Run(string testAssemblyName)
         {
             var testClasses =
@@ -20,12 +23,50 @@
 
             foreach (var testClass in testClasses)
             {
-                var results = RunTestMethods(testClass);
+                var results = this.RunTestMethods(testClass);
                 tests += results.Item1;
                 failedTests.AddRange(results.Item2);
             }
 
             Console.WriteLine();
+
+            var old = Console.ForegroundColor;
+
+            if (failedTests.Any())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+
+                Console.WriteLine(@"
+                    ******    ****    ****  **
+                    **      **    **   **   **
+                    ***     ********   **   **
+                    **      **    **   **   **
+                    **      **    **  ****  ******
+                ");
+            }
+            else if (tests > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+
+                Console.WriteLine(@"
+                      ****    **  **
+                    **    **  ** **
+                    **    **  ****
+                    **    **  ** **
+                      ****    **  **
+                ");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+
+                Console.WriteLine("No tests executed!!!");
+            }
+
+            Console.ForegroundColor = old;
+
+            Console.WriteLine();
+
             Console.WriteLine("Tests {0}. Failed {1}. Succeeded {2}.", tests, failedTests.Count, tests - failedTests.Count);
 
             if (failedTests.Any())
@@ -68,7 +109,7 @@
 
             foreach (var testMethod in testMethods)
             {
-                if (!RunTestMethod(testMethod))
+                if (!this.RunTestMethod(testMethod))
                 {
                     failedTests.Add(testMethod);
                 }

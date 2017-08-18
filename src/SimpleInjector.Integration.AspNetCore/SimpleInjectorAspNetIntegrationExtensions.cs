@@ -40,6 +40,7 @@ namespace SimpleInjector
     public static class SimpleInjectorAspNetCoreIntegrationExtensions
     {
         private static readonly object CrossWireContextKey = new object();
+        private static readonly object ServiceScopeKey = new object();
 
         /// <summary>Wraps ASP.NET requests in an <see cref="AsyncScopedLifestyle"/>.</summary>
         /// <param name="applicationBuilder">The ASP.NET application builder instance that references all
@@ -154,8 +155,8 @@ namespace SimpleInjector
 
             if (container.GetItem(CrossWireContextKey) == null)
             {
-                container.SetItem(CrossWireContextKey, new CrossWireContext(services));
-            }
+                container.SetItem(CrossWireContextKey, services);
+            }            
         }
 
         /// <summary>
@@ -195,9 +196,50 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            CrossWireContext context = GetCrossWireContext(container);
+            CrossWireServiceScope(container, builder);
 
-            Lifestyle lifestyle = DetermineLifestyle(serviceType, context.Services);
+            Registration registration = CreateCrossWireRegistration(container, serviceType, builder);
+
+            container.AddRegistration(serviceType, registration);
+        }
+
+        private static void CrossWireServiceScope(Container container, IApplicationBuilder builder)
+        {
+            if (container.Options.DefaultScopedLifestyle == null)
+            {
+                throw new InvalidOperationException(
+                    "To be able to cross-wire a service with a transient or scoped lifestyle, " +
+                    "please ensure that the container is configured with a default scoped lifestyle by " +
+                    "setting the Container.Options.DefaultScopedLifestyle property with the required " +
+                    "scoped lifestyle for your type of application. In ASP.NET Core, the typical " +
+                    $"lifestyle to use is the {nameof(AsyncScopedLifestyle)}. " +
+                    "See: https://simpleinjector.org/lifestyles#scoped");
+            }
+
+            if (container.GetItem(ServiceScopeKey) == null)
+            {
+                var scopeFactory = builder.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+
+                // We use unregistered type resolution, to allow the user to register IServiceScope manually
+                // if he needs.
+                container.ResolveUnregisteredType += (s, e) =>
+                {
+                    if (e.UnregisteredServiceType == typeof(IServiceScope) && !e.Handled)
+                    {
+                        e.Register(Lifestyle.Scoped.CreateRegistration(scopeFactory.CreateScope, container));
+                    }
+                };
+
+                container.SetItem(ServiceScopeKey, new object());
+            }
+        }
+
+        private static Registration CreateCrossWireRegistration(
+            Container container, Type serviceType, IApplicationBuilder builder)
+        {
+            IServiceCollection services = GetServiceCollection(container);
+
+            Lifestyle lifestyle = DetermineLifestyle(serviceType, services);
 
             Registration registration;
 
@@ -212,8 +254,6 @@ namespace SimpleInjector
             {
                 IHttpContextAccessor accessor = GetHttpContextAccessor(builder);
 
-                EnsureServiceScopeIsRegistered(context, container, builder);
-
                 registration = lifestyle.CreateRegistration(
                     serviceType,
                     () => GetServiceProvider(accessor, container).GetRequiredService(serviceType),
@@ -226,12 +266,12 @@ namespace SimpleInjector
                     justification: "This is a cross-wired service. ASP.NET Core will ensure it gets disposed.");
             }
 
-            container.AddRegistration(serviceType, registration);
+            return registration;
         }
 
-        private static CrossWireContext GetCrossWireContext(Container container)
+        private static IServiceCollection GetServiceCollection(Container container)
         {
-            var context = (CrossWireContext)container.GetItem(CrossWireContextKey);
+            var context = (IServiceCollection)container.GetItem(CrossWireContextKey);
 
             if (context == null)
             {
@@ -246,29 +286,6 @@ namespace SimpleInjector
             return context;
         }
 
-        private static void EnsureServiceScopeIsRegistered(CrossWireContext context, Container container,
-            IApplicationBuilder builder)
-        {
-            if (container.Options.DefaultScopedLifestyle == null)
-            {
-                throw new InvalidOperationException(
-                    "To be able to cross-wire a service with a transient or scoped lifestyle, " +
-                    "please ensure that the container is configured with a default scoped lifestyle by " +
-                    "setting the Container.Options.DefaultScopedLifestyle property with the required " +
-                    "scoped lifestyle for your type of application. " +
-                    "See: https://simpleinjector.org/lifestyles#scoped");
-            }
-
-            if (!context.ServiceScopeRegistered)
-            {
-                var scopeFactory = builder.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
-
-                container.Register<IServiceScope>(scopeFactory.CreateScope, Lifestyle.Scoped);
-
-                context.ServiceScopeRegistered = true;
-            }
-        }
-
         private static IServiceProvider GetServiceProvider(IHttpContextAccessor accessor, Container container)
         {
             // Pull the IServiceProvider from the current request. If there is no request, pull it from an 
@@ -279,27 +296,30 @@ namespace SimpleInjector
 
         private static Lifestyle DetermineLifestyle(Type serviceType, IServiceCollection services)
         {
-            var descriptor = GetAppropriateServiceDescriptor(serviceType, services);
+            var descriptor = FindDescriptor(serviceType, services);
 
+            // In case the service type is an IEnumerable, a registration can't be found, but collections are
+            // in Core always registered as Transient, so it's safe to fall back to the transient lifestyle.
             return ToLifestyle(descriptor?.Lifetime ?? ServiceLifetime.Transient);
         }
 
-        private static ServiceDescriptor GetAppropriateServiceDescriptor(Type serviceType, IServiceCollection services)
+        private static ServiceDescriptor FindDescriptor(Type serviceType, IServiceCollection services)
         {
             var descriptor = services.LastOrDefault(d => d.ServiceType == serviceType);
 
             if (descriptor == null && serviceType.GetTypeInfo().IsGenericType)
             {
-                var serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
+                var serviceTypeDefinition = serviceType.GetTypeInfo().GetGenericTypeDefinition();
 
-                // NOTE: When it comes to IEnumerable<T> registrations, .NET Core will generate them as new arrays, which means
-                // transient. So it's okay to return null here, we'll default to transient.
-                descriptor = services.LastOrDefault(d => d.ServiceType == serviceTypeDefinition);
+                // In case the type is an IEnumerable<T>, no registration can be found and null is returned.
+                return services.LastOrDefault(d => d.ServiceType == serviceTypeDefinition);
             }
-
-            return descriptor;
+            else
+            {
+                return descriptor;
+            }
         }
-
+        
         private static Lifestyle ToLifestyle(ServiceLifetime lifetime)
         {
             switch (lifetime)
@@ -340,18 +360,6 @@ namespace SimpleInjector
             }
 
             return accessor;
-        }
-
-        private sealed class CrossWireContext
-        {
-            internal CrossWireContext(IServiceCollection services)
-            {
-                this.Services = services;
-            }
-
-            internal IServiceCollection Services { get; }
-
-            internal bool ServiceScopeRegistered { get; set; }
         }
     }
 }

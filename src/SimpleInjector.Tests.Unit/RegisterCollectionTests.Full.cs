@@ -1,12 +1,11 @@
-﻿#pragma warning disable 0618
-namespace SimpleInjector.Tests.Unit
+﻿namespace SimpleInjector.Tests.Unit
 {
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    /// <summary>Tests for RegisterAll for the full .NET version.</summary>
-    public partial class RegisterAllTests
+    /// <summary>Tests for RegisterCollection for the full .NET version.</summary>
+    public partial class RegisterCollectionTests
     {
         [TestMethod]
         public void GetInstance_TypeDependingOnIReadOnlyCollection_InjectsTheRegisteredCollection()
@@ -71,7 +70,7 @@ namespace SimpleInjector.Tests.Unit
             container.RegisterCollection<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
 
             // Act
-            IReadOnlyList<IPlugin> list = 
+            IReadOnlyList<IPlugin> list =
                 container.GetInstance<ClassDependingOn<IReadOnlyList<IPlugin>>>().Dependency;
 
             // Assert
@@ -91,7 +90,7 @@ namespace SimpleInjector.Tests.Unit
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
 
             // Act
-            IReadOnlyList<IPlugin> list = 
+            IReadOnlyList<IPlugin> list =
                 container.GetInstance<ClassDependingOn<IReadOnlyList<IPlugin>>>().Dependency;
 
             // Assert
@@ -109,7 +108,7 @@ namespace SimpleInjector.Tests.Unit
             container.RegisterCollection<IPlugin>();
 
             // Act
-            IReadOnlyList<IPlugin> list = 
+            IReadOnlyList<IPlugin> list =
                 container.GetInstance<ClassDependingOn<IReadOnlyList<IPlugin>>>().Dependency;
 
             // Assert

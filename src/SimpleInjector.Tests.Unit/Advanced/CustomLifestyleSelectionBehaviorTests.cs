@@ -148,7 +148,7 @@
         }
 
         [TestMethod]
-        public void RegisterAllGeneric_WithOverriddenLifestyleSelectionBehavior_ReturnsInstancesBasedOnTheirExpectedLifestyle()
+        public void RegisterCollectionGeneric_WithOverriddenLifestyleSelectionBehavior_ReturnsInstancesBasedOnTheirExpectedLifestyle()
         {
             // Arrange
             var container = new Container();
@@ -167,7 +167,7 @@
         }
 
         [TestMethod]
-        public void RegisterAllNonGeneric_WithOverriddenLifestyleSelectionBehavior_ReturnsInstancesBasedOnTheirExpectedLifestyle()
+        public void RegisterCollectionNonGeneric_WithOverriddenLifestyleSelectionBehavior_ReturnsInstancesBasedOnTheirExpectedLifestyle()
         {
             // Arrange
             var container = new Container();
@@ -479,7 +479,7 @@
                 this.selector = lifestyleSelector;
             }
 
-            public Lifestyle SelectLifestyle(Type impl) => this.selector(impl);
+            public Lifestyle SelectLifestyle(Type implementationType) => this.selector(implementationType);
         }
 
         public class FakeLifestyleSelectionBehavior : ILifestyleSelectionBehavior

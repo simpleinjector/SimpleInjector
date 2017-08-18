@@ -7,6 +7,7 @@
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>Tests for testing conditional registrations.</summary>
     [TestClass]
@@ -1608,6 +1609,52 @@
             Assert.IsTrue(ReferenceEquals(logger1, logger2),
                 "Simple Injector is expected to reuse the same Registration instance for both registrations.");
         }
+        
+        [TestMethod]
+        public void EnumeratingAStream_WithEachMoveNextCallWrappedInItsOwnScope_ResolvesInstancesFromThatScope()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IUserRepository, SqlUserRepository>(new ThreadScopedLifestyle());
+
+            container.RegisterCollection<ILogger>(new[]
+            {
+                Lifestyle.Transient.CreateRegistration<LoggerWithDependency<IUserRepository, IUserRepository>>(container),
+                Lifestyle.Transient.CreateRegistration<LoggerWithDependency<IUserRepository, IUserRepository>>(container)
+            });
+
+            var loggerStream = container.GetAllInstances<ILogger>();
+
+            var resolvedLoggers = new List<LoggerWithDependency<IUserRepository, IUserRepository>>();
+
+            // Act
+            using (var enumerator = loggerStream.GetEnumerator())
+            {
+                while (true)
+                {
+                    using (ThreadScopedLifestyle.BeginScope(container))
+                    {
+                        if (!enumerator.MoveNext())
+                        {
+                            break;
+                        }
+
+                        var logger = enumerator.Current as LoggerWithDependency<IUserRepository, IUserRepository>;
+
+                        resolvedLoggers.Add(logger);
+                    }
+                }
+            }
+
+            // Assert
+            Assert.AreSame(resolvedLoggers.First().Dependency1, resolvedLoggers.First().Dependency2,
+                "IUserRepository is Scoped, so both dependencie should be the same instance");
+            Assert.AreSame(resolvedLoggers.Second().Dependency1, resolvedLoggers.Second().Dependency2);
+
+            Assert.AreNotSame(resolvedLoggers.First().Dependency1, resolvedLoggers.Second().Dependency1,
+                "Since both loggers are resolved from their own scope, they should both have their own scoped dependencies.");
+        }
 
         private static void RegisterConditionalConstant<T>(Container container, T constant,
             Predicate<PredicateContext> predicate)
@@ -1617,9 +1664,21 @@
                 predicate);
         }
 
+        private class LoggerWithDependency<TDependency1, TDependency2> : ILogger
+        {
+            public LoggerWithDependency(TDependency1 dependency1, TDependency2 dependency2)
+            {
+                this.Dependency1 = dependency1;
+                this.Dependency2 = dependency2;
+            }
+
+            public TDependency1 Dependency1 { get; }
+            public TDependency2 Dependency2 { get; }
+        }
+
         private sealed class InjectAllProperties : IPropertySelectionBehavior
         {
-            public bool SelectProperty(Type implementationType, PropertyInfo property) => true;
+            public bool SelectProperty(Type implementationType, PropertyInfo propertyInfo) => true;
         }
 
         private sealed class VerficationlessInjectionBehavior : IDependencyInjectionBehavior
@@ -1631,8 +1690,8 @@
                 this.real = real;
             }
 
-            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo c, bool t) => 
-                this.real.GetInstanceProducer(c, t);
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure) => 
+                this.real.GetInstanceProducer(consumer, throwOnFailure);
 
             public void Verify(InjectionConsumerInfo consumer)
             {
