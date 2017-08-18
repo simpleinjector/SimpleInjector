@@ -45,7 +45,7 @@
             var container = new Container();
             container.RegisterCollection(typeof(IRepo<>), new[] { typeof(RepoA<>), typeof(RepoB<>) });
             var repo = container.GetAllInstances<IRepo<Entity>>();
-            AssertThat.Equals(repo.Count(), 2);
+            Assert.AreEqual(repo.Count(), 2);
         }
 
         private class Entity : IEntity<Entity>
