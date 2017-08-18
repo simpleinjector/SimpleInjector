@@ -198,7 +198,7 @@ namespace SimpleInjector
 
             CrossWireServiceScope(container, builder);
 
-            Registration registration = CreateRegistration(container, serviceType, builder);
+            Registration registration = CreateCrossWireRegistration(container, serviceType, builder);
 
             container.AddRegistration(serviceType, registration);
         }
@@ -234,7 +234,7 @@ namespace SimpleInjector
             }
         }
 
-        private static Registration CreateRegistration(
+        private static Registration CreateCrossWireRegistration(
             Container container, Type serviceType, IApplicationBuilder builder)
         {
             IServiceCollection services = GetServiceCollection(container);
