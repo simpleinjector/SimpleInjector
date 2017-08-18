@@ -188,6 +188,52 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// Registers all concrete, non-generic, public and internal types in the given set of
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
+        /// with <see cref="Lifestyle.Singleton" /> lifestyle.
+        /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
+        /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
+        /// will be excluded from registration, while 
+        /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
+        /// </summary>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the given set of 
+        /// <paramref name="assemblies"/> contain multiple types that implement the same 
+        /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
+        public void RegisterSingleton(Type openGenericServiceType, params Assembly[] assemblies)
+        {
+            this.RegisterSingleton(openGenericServiceType, (IEnumerable<Assembly>)assemblies);
+        }
+
+        /// <summary>
+        /// Registers all concrete, non-generic, public and internal types in the given set of
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
+        /// with <see cref="Lifestyle.Singleton" /> lifestyle.
+        /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
+        /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
+        /// will be excluded from registration, while 
+        /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
+        /// </summary>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the given set of 
+        /// <paramref name="assemblies"/> contain multiple types that implement the same 
+        /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
+        public void RegisterSingleton(Type openGenericServiceType, IEnumerable<Assembly> assemblies)
+        {
+            this.Register(openGenericServiceType, assemblies, Lifestyle.Singleton);
+        }
+
+        /// <summary>
         /// Registers all concrete, non-generic types (both public and internal) that are defined in the given
         /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
         /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
