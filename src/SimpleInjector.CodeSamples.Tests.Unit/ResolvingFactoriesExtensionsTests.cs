@@ -1,9 +1,7 @@
 ﻿namespace SimpleInjector.CodeSamples.Tests.Unit
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
+    using Lifestyles;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Tests.Unit;
 
@@ -83,6 +81,46 @@
 
             // Assert
             Assert.IsTrue(object.ReferenceEquals(instance1, instance2), "Singleton object was expected.");
+        }
+
+        [TestMethod]
+        public void AllowResolvingLazyFactories_ScopedConsumerOfLazyForScopedDependency_DoesNotCauseLifestyleMismatch()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
+
+            container.AllowResolvingLazyFactories();
+
+            container.Register<ILogger, NullLogger>(Lifestyle.Scoped);
+
+            container.Register<ServiceDependingOn<Lazy<ILogger>>>(Lifestyle.Scoped);
+
+            // Act
+            // Verify checks for lifestyle mismatches
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void AllowResolvingLazyFactories_SingletonConsumerOfLazyForScopedDependency_CausesLifestyleMismatchError()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
+
+            container.AllowResolvingLazyFactories();
+
+            container.Register<ILogger, NullLogger>(Lifestyle.Scoped);
+
+            container.Register<ServiceDependingOn<Lazy<ILogger>>>(Lifestyle.Singleton);
+
+            // Act
+            Action action = container.Verify;
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(
+                "ServiceDependingOn<Lazy<ILogger>> (Singleton) depends on Lazy<ILogger> (Thread Scoped)",
+                action);
         }
 
         [TestMethod]
