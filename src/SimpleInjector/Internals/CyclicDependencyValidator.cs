@@ -28,38 +28,38 @@ namespace SimpleInjector.Internals
 
     /// <summary>
     /// Allows verifying whether a given type has a direct or indirect dependency on itself. Verifying is done
-    /// by preventing recursive calls to a IInstanceProvider. An instance of this type is related to a single 
-    /// instance of a IInstanceProvider. A RecursiveDependencyValidator instance checks a single 
-    /// IInstanceProvider and therefore a single service type.
+    /// by preventing recursive calls to an InstanceProducer. A CyclicDependencyValidator instance checks a 
+    /// single InstanceProducer and therefore a single service type.
     /// </summary>
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
         Justification = "Same as for other parts of the library that use ThreadLocal<T>. It's difficult " +
             "to implement, while the downsides are minimal.")]
     internal sealed class CyclicDependencyValidator
     {
-        private readonly ThreadLocal<bool> cycleDetected = new ThreadLocal<bool>();
-        private readonly Type typeToValidate;
+        private readonly ThreadLocal<bool> producerVisited = new ThreadLocal<bool>();
+        private readonly InstanceProducer producer;
 
-        internal CyclicDependencyValidator(Type typeToValidate)
+        internal CyclicDependencyValidator(InstanceProducer producer)
         {
-            this.typeToValidate = typeToValidate;
+            this.producer = producer;
         }
 
         // Checks whether this is a recursive call (and thus a cyclic dependency) and throw in that case.
         internal void Check()
         {
-            if (this.cycleDetected.Value)
+            if (this.producerVisited.Value)
             {
-                throw new CyclicDependencyException(this.typeToValidate);
+                throw new CyclicDependencyException(
+                    this.producer, this.producer.Registration.ImplementationType);
             }
 
-            this.cycleDetected.Value = true;
+            this.producerVisited.Value = true;
         }
 
         // Resets the validator to its initial state.
         internal void Reset()
         {
-            this.cycleDetected.Value = false;   
+            this.producerVisited.Value = false;   
         }
     }
 }

@@ -126,7 +126,7 @@ namespace SimpleInjector
 
             this.ServiceType = serviceType;
             this.Registration = registration;
-            this.validator = new CyclicDependencyValidator(registration.ImplementationType);
+            this.validator = new CyclicDependencyValidator(this);
 
             this.lazyExpression = new Lazy<Expression>(this.BuildExpressionInternal);
 
@@ -266,12 +266,6 @@ namespace SimpleInjector
                 // throw a false positive on the next resolve.
                 this.ResetCyclicDependencyValidator();
 
-                if (ex is CyclicDependencyException)
-                {
-                    var cex = ex as CyclicDependencyException;
-                    throw new ActivationException(cex.Message, ex);
-                }
-
                 if (this.MustWrapThrownException(ex))
                 {
                     throw new ActivationException(this.BuildActivationExceptionMessage(ex), ex);
@@ -303,7 +297,16 @@ namespace SimpleInjector
             }
             catch (CyclicDependencyException ex)
             {
-                ex.AddTypeToCycle(this.Registration.ImplementationType);
+                // When a cyclic dependency is detected, a CyclicDependencyException will buble up, and will
+                // get enriched by Registration instances with type information about the types in the chain.
+                // In case the current producer is the OriginatingProducer, we should transform the exception
+                // into an ActivationException to prevent types from being added that are not part of the
+                // cycle.
+                if (ex.OriginatingProducer == this)
+                {
+                    throw new ActivationException(ex.Message, ex);
+                }
+
                 throw;
             }
             catch (Exception ex)
