@@ -182,7 +182,7 @@ namespace SimpleInjector
             }
         }
 
-        internal Expression InterceptInstanceCreation(Type implementationType, 
+        internal Expression InterceptInstanceCreation(Type implementationType,
             Expression instanceCreatorExpression)
         {
             return this.Container.OnExpressionBuilding(this, implementationType, instanceCreatorExpression);
@@ -201,7 +201,7 @@ namespace SimpleInjector
         // This method should only be called by the Lifestyle base class and the HybridRegistration.
         internal virtual void SetParameterOverrides(IEnumerable<OverriddenParameter> overrides)
         {
-            this.overriddenParameters = 
+            this.overriddenParameters =
                 new ParameterDictionary<OverriddenParameter>(overrides, keySelector: p => p.Parameter);
         }
 
@@ -257,11 +257,19 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
-            Expression expression = this.BuildTransientExpression(instanceCreator);
+            try
+            {
+                Expression expression = this.BuildTransientExpression(instanceCreator);
 
-            // NOTE: The returned delegate could still return null (caused by the ExpressionBuilding event),
-            // but I don't feel like protecting us against such an obscure user bug.
-            return (Func<TService>)this.BuildDelegate(expression);
+                // NOTE: The returned delegate could still return null (caused by the ExpressionBuilding event),
+                // but I don't feel like protecting us against such an obscure user bug.
+                return (Func<TService>)this.BuildDelegate(expression);
+            }
+            catch (CyclicDependencyException ex)
+            {
+                ex.AddTypeToCycle(this.ImplementationType);
+                throw;
+            }
         }
 
         /// <summary>
@@ -277,9 +285,17 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         protected Func<object> BuildTransientDelegate()
         {
-            Expression expression = this.BuildTransientExpression();
+            try
+            {
+                Expression expression = this.BuildTransientExpression();
 
-            return (Func<object>)this.BuildDelegate(expression);
+                return (Func<object>)this.BuildDelegate(expression);
+            }
+            catch (CyclicDependencyException ex)
+            {
+                ex.AddTypeToCycle(this.ImplementationType);
+                throw;
+            }
         }
 
         /// <summary>
@@ -301,14 +317,22 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
-            Expression expression = Expression.Invoke(Expression.Constant(instanceCreator));
+            try
+            {
+                Expression expression = Expression.Invoke(Expression.Constant(instanceCreator));
 
-            expression = WrapWithNullChecker<TService>(expression);
-            expression = this.WrapWithPropertyInjector(typeof(TService), expression);
-            expression = this.InterceptInstanceCreation(typeof(TService), expression);
-            expression = this.WrapWithInitializer(typeof(TService), expression);
+                expression = WrapWithNullChecker<TService>(expression);
+                expression = this.WrapWithPropertyInjector(typeof(TService), expression);
+                expression = this.InterceptInstanceCreation(typeof(TService), expression);
+                expression = this.WrapWithInitializer(typeof(TService), expression);
 
-            return expression;
+                return expression;
+            }
+            catch (CyclicDependencyException ex)
+            {
+                ex.AddTypeToCycle(this.ImplementationType);
+                throw;
+            }
         }
 
         /// <summary>
@@ -324,13 +348,21 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         protected Expression BuildTransientExpression()
         {
-            Expression expression = this.BuildNewExpression();
+            try
+            {
+                Expression expression = this.BuildNewExpression();
 
-            expression = this.WrapWithPropertyInjector(this.ImplementationType, expression);
-            expression = this.InterceptInstanceCreation(this.ImplementationType, expression);
-            expression = this.WrapWithInitializer(this.ImplementationType, expression);
+                expression = this.WrapWithPropertyInjector(this.ImplementationType, expression);
+                expression = this.InterceptInstanceCreation(this.ImplementationType, expression);
+                expression = this.WrapWithInitializer(this.ImplementationType, expression);
 
-            return this.ReplacePlaceHoldersWithOverriddenParameters(expression);
+                return this.ReplacePlaceHoldersWithOverriddenParameters(expression);
+            }
+            catch (CyclicDependencyException ex)
+            {
+                ex.AddTypeToCycle(this.ImplementationType);
+                throw;
+            }
         }
 
         private Action<object> BuildInstanceInitializer()
