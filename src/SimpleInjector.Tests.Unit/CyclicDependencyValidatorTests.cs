@@ -7,7 +7,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class CyclicDependencyValidatorTests
+    public class CyclicDependencyTests
     {
         public interface INode
         {
@@ -30,25 +30,20 @@
         {
             // Arrange
             string expectedExcpetionMessage = @"
-                The configuration is invalid. The type CyclicDependencyValidatorTests.A is directly or
+                The configuration is invalid. The type CyclicDependencyTests.CyclicA is directly or
                 indirectly depending on itself."
                 .TrimInside();
 
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                // Note: A depends on B which depends on A.
-                container.GetInstance<A>();
+            // Act
+            // Note: A depends on B which depends on A.
+            Action action = () => container.GetInstance<CyclicA>();
 
-                // Assert
-                Assert.Fail("An exception was expected, because A depends indirectly on itself.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.StringContains(expectedExcpetionMessage, ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                expectedExcpetionMessage,
+                action);
         }
 
         [TestMethod]
@@ -57,18 +52,13 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Act
-                // Note: A depends on B which depends on A.
-                container.GetInstance<A>();
+            // Act
+            // Note: A depends on B which depends on A.
+            Action action = () => container.GetInstance<CyclicA>();
 
-                // Assert
-                Assert.Fail("An exception was expected, because A depends indirectly on itself.");
-            }
-            catch (ActivationException)
-            {
-            }
+            // Assert
+            AssertThat.Throws<ActivationException>(action,
+                assertMessage: "An exception was expected, because A depends indirectly on itself.");
         }
 
         [TestMethod]
@@ -77,27 +67,16 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                // Note: A depends on B which depends on A.
-                container.GetInstance<A>();
-            }
-            catch (ActivationException)
-            {
-            }
+            Action action = () => container.GetInstance<CyclicA>();
 
-            try
-            {
-                // Act
-                container.GetInstance<A>();
+            AssertThat.Throws<ActivationException>(action, assertMessage: "Test setup failed.");
 
-                // Assert
-                Assert.Fail("An exception was expected, because A depends indirectly on itself.");
-            }
-            catch (ActivationException)
-            {
-                // This exception is expected.
-            }
+            // Act
+            action = () => container.GetInstance<CyclicA>();
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action,
+                assertMessage: "An exception was expected, because A depends indirectly on itself.");
         }
 
         [TestMethod]
@@ -107,20 +86,14 @@
             var container = ContainerFactory.New();
 
             // Note: A depends on B which depends on A.
-            container.Register<B>(Lifestyle.Singleton);
+            container.Register<CyclicB>(Lifestyle.Singleton);
 
-            try
-            {
-                // Act
-                container.GetInstance<A>();
+            // Act
+            Action action = () => container.GetInstance<CyclicA>();
 
-                // Assert
-                Assert.Fail("An exception was expected, because A depends indirectly on itself.");
-            }
-            catch (ActivationException)
-            {
-                // This exception is expected.
-            }
+            // Assert
+            AssertThat.Throws<ActivationException>(action,
+                assertMessage: "An exception was expected, because A depends indirectly on itself.");
         }
 
         [TestMethod]
@@ -129,21 +102,14 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register<A>(Lifestyle.Singleton);
+            container.Register<CyclicA>(Lifestyle.Singleton);
 
-            try
-            {
-                // Act
-                // Note: A depends on B which depends on A.
-                container.GetInstance<A>();
+            // Act
+            Action action = () => container.GetInstance<CyclicA>();
 
-                // Assert
-                Assert.Fail("An exception was expected, because A depends indirectly on itself.");
-            }
-            catch (ActivationException)
-            {
-                // This exception is expected.
-            }
+            // Assert
+            AssertThat.Throws<ActivationException>(action,
+                assertMessage: "An exception was expected, because A depends indirectly on itself.");
         }
 
         [TestMethod]
@@ -153,21 +119,15 @@
             var container = ContainerFactory.New();
 
             // Note: A depends on B which depends on A.
-            container.Register<A>(Lifestyle.Singleton);
-            container.Register<B>(Lifestyle.Singleton);
+            container.Register<CyclicA>(Lifestyle.Singleton);
+            container.Register<CyclicB>(Lifestyle.Singleton);
 
-            try
-            {
-                // Act
-                container.GetInstance<A>();
+            // Act
+            Action action = () => container.GetInstance<CyclicA>();
 
-                // Assert
-                Assert.Fail("An exception was expected, because A depends indirectly on itself.");
-            }
-            catch (ActivationException)
-            {
-                // This exception is expected.
-            }
+            // Assert
+            AssertThat.Throws<ActivationException>(action,
+                assertMessage: "An exception was expected, because A depends indirectly on itself.");
         }
 
         [TestMethod]
@@ -180,18 +140,12 @@
             container.Register<IOne, One>();
             container.Register<ITwo, Two>();
 
-            try
-            {
-                // Act
-                container.GetInstance<IOne>();
+            // Act
+            Action action = () => container.GetInstance<CyclicA>();
 
-                // Assert
-                Assert.Fail("An exception was expected, because A depends indirectly on itself.");
-            }
-            catch (ActivationException)
-            {
-                // This exception is expected.
-            }
+            // Assert
+            AssertThat.Throws<ActivationException>(action,
+                assertMessage: "An exception was expected, because A depends indirectly on itself.");
         }
 
         [TestMethod]
@@ -204,18 +158,12 @@
             container.Register<IOne, One>(Lifestyle.Singleton);
             container.Register<ITwo, Two>(Lifestyle.Singleton);
 
-            try
-            {
-                // Act
-                container.GetInstance<IOne>();
+            // Act
+            Action action = () => container.GetInstance<IOne>();
 
-                // Assert
-                Assert.Fail("An exception was expected, because A depends indirectly on itself.");
-            }
-            catch (ActivationException)
-            {
-                // This exception is expected.
-            }
+            // Assert
+            AssertThat.Throws<ActivationException>(action,
+                assertMessage: "An exception was expected, because A depends indirectly on itself.");
         }
 
         [TestMethod]
@@ -240,10 +188,11 @@
             });
 
             // Act
-            Action action = () => container.Verify();
+            Action action = container.Verify;
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>("depending on itself", action);
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "depending on itself", action);
         }
         
         [TestMethod]
@@ -313,18 +262,12 @@
             container.Register<IOne>(() => new One(container.GetInstance<ITwo>()));
             container.Register<ITwo, Two>();
 
-            try
-            {
-                // Act
-                container.GetInstance<IOne>();
+            // Act
+            Action action = () => container.GetInstance<IOne>();
 
-                // Assert
-                Assert.Fail("An exception was expected, because A depends indirectly on itself.");
-            }
-            catch (ActivationException)
-            {
-                // This exception is expected.
-            }
+            // Assert
+            AssertThat.Throws<ActivationException>(action,
+                assertMessage: "An exception was expected, because A depends indirectly on itself.");
         }
 
         [TestMethod]
@@ -337,18 +280,12 @@
             container.Register<IOne>(() => new One(container.GetInstance<ITwo>()));
             container.Register<ITwo>(() => new Two(container.GetInstance<IOne>()));
 
-            try
-            {
-                // Act
-                container.GetInstance<ComponentDependingOn<IOne>>();
+            // Act
+            Action action = () => container.GetInstance<ComponentDependingOn<IOne>>();
 
-                // Assert
-                Assert.Fail("An exception was expected, because A depends indirectly on itself.");
-            }
-            catch (ActivationException)
-            {
-                // This exception is expected.
-            }
+            // Assert
+            AssertThat.Throws<ActivationException>(action,
+                assertMessage: "An exception was expected, because A depends indirectly on itself.");
         }
 
         [TestMethod]
@@ -359,18 +296,12 @@
 
             container.Register<IOne>(() => container.GetInstance<IOne>());
 
-            try
-            {
-                // Act
-                container.GetInstance<IOne>();
+            // Act
+            Action action = () => container.GetInstance<IOne>();
 
-                // Assert
-                Assert.Fail("An exception was expected, because A depends indirectly on itself.");
-            }
-            catch (ActivationException)
-            {
-                // This exception is expected.
-            }
+            // Assert
+            AssertThat.Throws<ActivationException>(action,
+                assertMessage: "An exception was expected, because A depends indirectly on itself.");
         }
 
         [TestMethod]
@@ -453,18 +384,11 @@
                 container.GetInstance<RealUserService>();
             });
 
-            try
-            {
-                // Act
-                container.GetInstance<RealUserService>();
+            // Act
+            Action action = () => container.GetInstance<RealUserService>();
 
-                // Assert
-                Assert.Fail("Verify is expected to throw an exception.");
-            }
-            catch (ActivationException ex)
-            {
-                AssertThat.StringContains(expectedMessage, ex.Message);
-            }
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(expectedMessage, action);
         }
 
         [TestMethod]
@@ -511,7 +435,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "The configuration is invalid. The type CyclicDependencyValidatorTests.CompositeService " + 
+                "The configuration is invalid. The type CyclicDependencyTests.CompositeService " + 
                 "is directly or indirectly depending on itself.",
                 action);
         }
@@ -597,6 +521,45 @@
                 action);
         }
 
+        // Reported with issue #445.
+        [TestMethod]
+        public void GetInstance_OnCyclicGraphWithDecorator_DoesNotShowTheCyclicDependencyTwiceInTheGraph()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IX, CyclicX>();
+            container.RegisterDecorator(typeof(IX), typeof(XDecorator1));
+            container.Register<B>();
+
+            // Act
+            Action action = () => container.GetInstance<A>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "The cyclic graph contains the following types: CyclicX -> CyclicX.",
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_OnCyclicGraphWithCycleInDecorator_ShowsTheDecoratorInTheGraph()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IX, NonCyclicX>();
+            container.RegisterDecorator(typeof(IX), typeof(CyclicXDecorator3));
+            container.Register<B>();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceDependingOn<A>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "The cyclic graph contains the following types: A -> B -> CyclicXDecorator3 -> A.",
+                action);
+        }
+
         private static void Assert_FinishedWithoutExceptions(ThreadWrapper thread)
         {
             thread.Join();
@@ -664,16 +627,16 @@
 
         #region Direct dependency
 
-        public sealed class A
+        public sealed class CyclicA
         {
-            public A(B b)
+            public CyclicA(CyclicB b)
             {
             }
         }
 
-        public sealed class B
+        public sealed class CyclicB
         {
-            public B(A a)
+            public CyclicB(CyclicA a)
             {
             }
         }
@@ -758,6 +721,14 @@
     {
     }
 
+    public class A { public A(B b) { } }
+    public class B { public B(IX c) { } }
+    public class NonCyclicX : IX { }
+    public class CyclicX : IX { public CyclicX(IX c) { } } // Depending on itself
+    public class XDecorator1 : IX { public XDecorator1(IX d) { } }
+    public class XDecorator2 : IX { public XDecorator2(IX d) { } }
+    public class CyclicXDecorator3 : IX { public CyclicXDecorator3(IX d, A a) { } }
+    
     public class ServiceDependingOn<TDependency>
     {
         public readonly TDependency Dependency;
