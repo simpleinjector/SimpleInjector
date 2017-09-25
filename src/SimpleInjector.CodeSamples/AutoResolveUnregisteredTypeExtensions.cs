@@ -1,4 +1,4 @@
-﻿namespace SimpleInjector.CodeSamples2
+﻿namespace SimpleInjector.CodeSamples
 {
     using System.Linq;
     using System.Reflection;
