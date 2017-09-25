@@ -12,7 +12,7 @@
         /// </summary>
         /// <param name="container">The container.</param>
         /// <param name="assemblies">The list of assemblies to search for implementations.</param>
-        public static void AutoResolveUnregisteresTypes(this Container container, params Assembly[] assemblies)
+        public static void AutoResolveUnregisteredTypes(this Container container, params Assembly[] assemblies)
         {
             container.ResolveUnregisteredType += (s, e) =>
             {
