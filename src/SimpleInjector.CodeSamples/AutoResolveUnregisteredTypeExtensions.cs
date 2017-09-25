@@ -18,7 +18,15 @@
             {
                 if (e.UnregisteredServiceType.IsAbstract)
                 {
-                    var types = container.GetTypesToRegister(e.UnregisteredServiceType, assemblies).ToArray();
+                    var options = new TypesToRegisterOptions
+                    {
+                        IncludeDecorators = false,
+                        IncludeGenericTypeDefinitions = false,
+                        IncludeComposites = false,
+                    };
+
+                    var types = container.GetTypesToRegister(e.UnregisteredServiceType, assemblies, options)
+                        .ToArray();
 
                     // Only map when there is no ambiguity, meaning: exactly one implementation.
                     if (types.Length == 1)
