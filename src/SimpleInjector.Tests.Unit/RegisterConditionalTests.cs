@@ -1656,6 +1656,29 @@
                 "Since both loggers are resolved from their own scope, they should both have their own scoped dependencies.");
         }
 
+        // See #471. This used to throw a NullReferenceException (.NET 4.0) or ArgumentNullException (.NET Standard).
+        [TestMethod]
+        public void GetInstance_TypeFactoryRegistrationThatDoesNotMatch_ThrowsAnExpressiveException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(
+                typeof(IGeneric<>), 
+                c => null,
+                Lifestyle.Singleton, c => false);
+
+            // Act
+            Action action = () => container.GetInstance<ServiceDependingOn<IGeneric<int>>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                @"1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<Int32>, 
+                but its supplied predicate didn't return true"
+                .TrimInside(),
+                action);
+        }
+
         private static void RegisterConditionalConstant<T>(Container container, T constant,
             Predicate<PredicateContext> predicate)
         {
