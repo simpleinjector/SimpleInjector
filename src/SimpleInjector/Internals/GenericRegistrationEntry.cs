@@ -385,8 +385,11 @@ namespace SimpleInjector.Internals
                 return shouldBuildProducer ? this.GetProducer(context) : null;
             }
 
+            // In case this is a type factory registration (meaning ImplementationType is null) we consider
+            // the service to be matching, since we can't (and should not) invoke the factory.
             public bool MatchesServiceType(Type serviceType) =>
-                GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType) != null;
+                this.ImplementationType == null 
+                || GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType) != null;
 
             private Type GetImplementationTypeThroughFactory(Type serviceType, InjectionConsumerInfo consumer)
             {

@@ -1656,6 +1656,57 @@
                 "Since both loggers are resolved from their own scope, they should both have their own scoped dependencies.");
         }
 
+        // See #471. This used to throw a NullReferenceException (.NET 4.0) or ArgumentNullException (.NET Standard).
+        [TestMethod]
+        public void GetInstance_TypeFactoryRegistrationThatDoesNotMatch_ThrowsAnExpressiveException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(
+                typeof(IGeneric<>), 
+                c => null,
+                Lifestyle.Singleton, c => false);
+
+            // Act
+            Action action = () => container.GetInstance<ServiceDependingOn<IGeneric<int>>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                @"1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<Int32>, 
+                but its supplied predicate didn't return true"
+                .TrimInside(),
+                action);
+        }
+
+        // See #468
+        [TestMethod]
+        public void ContainerUncontrolledCollections_RegisteredAsConditional_ResolvesExpectedRegistrations()
+        {
+            // Arrange
+            var container = new Container();
+
+            var collection1 = Lifestyle.Singleton.CreateRegistration(() => new[] { "sqrt2", "e", "pi" }, container);
+            var collection2 = Lifestyle.Singleton.CreateRegistration(() => new[] { "foo", "bar", "foobar" }, container);
+
+            container.RegisterConditional(typeof(IEnumerable<string>), collection1, context => false);
+            container.RegisterConditional(typeof(IEnumerable<string>), collection2, context => true);
+
+            var collection3 = Lifestyle.Singleton.CreateRegistration(() => new[] { 1, 2, 3 }, container);
+            var collection4 = Lifestyle.Singleton.CreateRegistration(() => new[] { 4, 5, 6 }, container);
+
+            container.RegisterConditional(typeof(IEnumerable<int>), collection3, context => false);
+            container.RegisterConditional(typeof(IEnumerable<int>), collection4, context => true);
+
+            // Act
+            var stringService = container.GetInstance<ServiceDependingOn<IEnumerable<string>>>();
+            var intService = container.GetInstance<ServiceDependingOn<IEnumerable<int>>>();
+
+            // Assert
+            Assert.AreEqual(expected: "foo, bar, foobar", actual: string.Join(", ", stringService.Dependency));
+            Assert.AreEqual(expected: "4, 5, 6", actual: string.Join(", ", intService.Dependency));
+        }
+
         private static void RegisterConditionalConstant<T>(Container container, T constant,
             Predicate<PredicateContext> predicate)
         {

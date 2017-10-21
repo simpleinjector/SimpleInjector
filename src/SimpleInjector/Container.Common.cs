@@ -575,9 +575,12 @@ namespace SimpleInjector
        
         private void AddInstanceProducer(InstanceProducer producer)
         {
-            if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(producer.ServiceType))
+            // HACK: Conditional registrations for IEnumerable<T> are not added as uncontrolled collection,
+            // because that would lose the conditional ability and would cause collections to be appended
+            // together, instead of selected conditionally. (see #468).
+            if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(producer.ServiceType) && producer.IsUnconditional)
             {
-                this.AddCollectionInstanceProducer(producer);
+                this.AddUncontrolledCollectionInstanceProducer(producer);
             }
             else
             {
@@ -589,7 +592,7 @@ namespace SimpleInjector
             }
         }
 
-        private void AddCollectionInstanceProducer(InstanceProducer producer)
+        private void AddUncontrolledCollectionInstanceProducer(InstanceProducer producer)
         {
             Type itemType = producer.ServiceType.GetGenericArguments()[0];
 
@@ -627,7 +630,8 @@ namespace SimpleInjector
                 : null;
         }
 
-        private InstanceProducer TryGetInstanceProducerForRegisteredCollection(Type enumerableServiceType) =>
+        private InstanceProducer TryGetInstanceProducerForRegisteredCollection(
+            Type enumerableServiceType) =>
             typeof(IEnumerable<>).IsGenericTypeDefinitionOf(enumerableServiceType)
                 ? this.GetInstanceProducerForRegisteredCollection(
                     enumerableServiceType.GetGenericArguments()[0])
