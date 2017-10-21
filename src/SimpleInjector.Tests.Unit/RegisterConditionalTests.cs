@@ -1679,6 +1679,34 @@
                 action);
         }
 
+        // See #468
+        [TestMethod]
+        public void ContainerUncontrolledCollections_RegisteredAsConditional_ResolvesExpectedRegistrations()
+        {
+            // Arrange
+            var container = new Container();
+
+            var collection1 = Lifestyle.Singleton.CreateRegistration(() => new[] { "sqrt2", "e", "pi" }, container);
+            var collection2 = Lifestyle.Singleton.CreateRegistration(() => new[] { "foo", "bar", "foobar" }, container);
+
+            container.RegisterConditional(typeof(IEnumerable<string>), collection1, context => false);
+            container.RegisterConditional(typeof(IEnumerable<string>), collection2, context => true);
+
+            var collection3 = Lifestyle.Singleton.CreateRegistration(() => new[] { 1, 2, 3 }, container);
+            var collection4 = Lifestyle.Singleton.CreateRegistration(() => new[] { 4, 5, 6 }, container);
+
+            container.RegisterConditional(typeof(IEnumerable<int>), collection3, context => false);
+            container.RegisterConditional(typeof(IEnumerable<int>), collection4, context => true);
+
+            // Act
+            var stringService = container.GetInstance<ServiceDependingOn<IEnumerable<string>>>();
+            var intService = container.GetInstance<ServiceDependingOn<IEnumerable<int>>>();
+
+            // Assert
+            Assert.AreEqual(expected: "foo, bar, foobar", actual: string.Join(", ", stringService.Dependency));
+            Assert.AreEqual(expected: "4, 5, 6", actual: string.Join(", ", intService.Dependency));
+        }
+
         private static void RegisterConditionalConstant<T>(Container container, T constant,
             Predicate<PredicateContext> predicate)
         {
