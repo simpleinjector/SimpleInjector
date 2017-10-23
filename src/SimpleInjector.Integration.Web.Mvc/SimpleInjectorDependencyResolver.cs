@@ -114,6 +114,8 @@ namespace SimpleInjector.Integration.Web.Mvc
 
             var services = (IEnumerable<object>)this.ServiceProvider.GetService(collectionType);
 
+            // NOTE: The contract of IDependencyResolver isn't very clear, but MVC will break when null
+            // is returned.
             return services ?? Enumerable.Empty<object>();
         }
     }
