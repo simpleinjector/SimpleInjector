@@ -185,6 +185,8 @@ namespace SimpleInjector.Integration.WebApi
 
             var services = (IEnumerable<object>)this.ServiceProvider.GetService(collectionType);
 
+            // NOTE: The contract of IDependencyScope isn't very clear, but Web API will break when null
+            // is returned.
             return services ?? Enumerable.Empty<object>();
         }
 
