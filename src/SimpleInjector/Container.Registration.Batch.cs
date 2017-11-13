@@ -477,6 +477,9 @@ namespace SimpleInjector
 
             private static void RequiresNoDuplicateRegistrations(BatchMapping[] mappings)
             {
+                // Use of 'Count() > 1' instead of 'Skip(1).Any()' is not a performance problem here, and is actually
+                // faster in this case, because Enumerable.GroupBy returns an instance that implements ICollection<T>.
+#pragma warning disable RCS1083
                 var duplicateServiceTypes =
                     from mapping in mappings
                     from closedServiceType in mapping.ClosedServiceTypes
