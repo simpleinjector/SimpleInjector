@@ -53,13 +53,14 @@ namespace SimpleInjector.Internals
         [DebuggerDisplay("{ConcreteType, nq}")]
         internal Type ConcreteType { get; }
 
-        internal bool TypeConstraintsAreSatisfied => 
-            new TypeConstraintValidator { Mapping = this }.AreTypeConstraintsSatisfied();
+        internal bool TypeConstraintsAreSatisfied => this.Validator.AreTypeConstraintsSatisfied();
+
+        private TypeConstraintValidator Validator => new TypeConstraintValidator { Mapping = this };
 
         /// <summary>Implements equality. Needed for doing LINQ distinct operations.</summary>
         /// <param name="other">The other to compare to.</param>
         /// <returns>True or false.</returns>
-        bool IEquatable<ArgumentMapping>.Equals(ArgumentMapping other) => 
+        bool IEquatable<ArgumentMapping>.Equals(ArgumentMapping other) =>
             this.Argument == other.Argument && this.ConcreteType == other.ConcreteType;
 
         /// <summary>Overrides the default hash code. Needed for doing LINQ distinct operations.</summary>

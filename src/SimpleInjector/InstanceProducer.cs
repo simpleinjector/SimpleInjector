@@ -218,9 +218,9 @@ namespace SimpleInjector
             nameof(this.Lifestyle), this.Lifestyle.Name);
 
         internal IEnumerable<InstanceProducer> SelfAndWrappedProducers =>
-            this.wrappedProducers == null
-                ? new[] { this }
-                : this.wrappedProducers.Concat(new[] { this });
+            this.wrappedProducers == null ? this.Self : this.wrappedProducers.Concat(this.Self);
+
+        private IEnumerable<InstanceProducer> Self => new[] { this };
 
         /// <summary>
         /// Creates a new <see cref="InstanceProducer"/> based on the given <paramref name="serviceType"/> 
