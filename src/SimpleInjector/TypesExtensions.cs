@@ -67,7 +67,8 @@ namespace SimpleInjector
         /// <returns>The matching closed type.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="genericTypeDefinition"/> is not
-        /// a generic type or when none of the base classes or implemented interfaces of </exception>
+        /// a generic type or when none of the base classes or implemented interfaces of <paramref name="type"/>
+        /// are closed-versions of <paramref name="genericTypeDefinition"/>.</exception>
         /// <exception cref="InvalidOperationException">Thrown when multiple matching closed generic types
         /// are found.</exception>
         public static Type GetClosedTypeOf(this Type type, Type genericTypeDefinition)

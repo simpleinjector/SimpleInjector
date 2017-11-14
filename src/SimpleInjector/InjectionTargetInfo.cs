@@ -102,7 +102,7 @@ namespace SimpleInjector
         /// <param name="inherit">When true, look up the hierarchy chain for the inherited custom attribute.</param>
         /// <returns>An array of Objects representing custom attributes, or an empty array.</returns>
         /// <exception cref="TypeLoadException">The custom attribute type cannot be loaded.</exception>
-        /// <exception cref="ArgumentNullException">attributeType is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when attributeType is null.</exception>
         public object[] GetCustomAttributes(Type attributeType, bool inherit) => 
             this.Parameter != null
                 ? this.Parameter.GetCustomAttributes(attributeType, inherit).ToArray()
