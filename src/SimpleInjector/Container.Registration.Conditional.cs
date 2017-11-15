@@ -54,7 +54,9 @@ namespace SimpleInjector
         /// <param name="predicate">The predicate that determines whether the <typeparamref name="TImplementation"/> 
         /// can be applied for the requested service type. This predicate
         /// can be used to build a fallback mechanism where multiple registrations for the same service type
-        /// are made.</param>
+        /// are made. Note that the predicate will be called a finite number of times and its result will be cached
+        /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
+        /// </param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when one of the arguments is a null reference (Nothing in VB).
         /// </exception>
@@ -81,7 +83,9 @@ namespace SimpleInjector
         /// <param name="predicate">The predicate that determines whether the 
         /// <typeparamref name="TImplementation"/> can be applied for the requested service type. This predicate
         /// can be used to build a fallback mechanism where multiple registrations for the same service type
-        /// are made.</param>
+        /// are made. Note that the predicate will be called a finite number of times and its result will be cached
+        /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
+        /// </param>
         /// <exception cref="ArgumentNullException">
         /// Thrown when one of the arguments is a null reference (Nothing in VB).
         /// </exception>
@@ -113,7 +117,9 @@ namespace SimpleInjector
         /// <param name="predicate">The predicate that determines whether the 
         /// <paramref name="implementationType"/> can be applied for the requested service type. This predicate
         /// can be used to build a fallback mechanism where multiple registrations for the same service type
-        /// are made.</param>
+        /// are made. Note that the predicate will be called a finite number of times and its result will be cached
+        /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
+        /// </param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
         /// <exception cref="InvalidOperationException">
@@ -137,7 +143,9 @@ namespace SimpleInjector
         /// <param name="predicate">The predicate that determines whether the 
         /// <paramref name="implementationType"/> can be applied for the requested service type. This predicate
         /// can be used to build a fallback mechanism where multiple registrations for the same service type
-        /// are made.</param>
+        /// are made. Note that the predicate will be called a finite number of times and its result will be cached
+        /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
+        /// </param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> and 
@@ -187,7 +195,10 @@ namespace SimpleInjector
         /// <param name="lifestyle">The lifestyle that defines how returned instances are cached.</param>
         /// <param name="predicate">The predicate that determines whether the registration can be applied for
         /// the requested service type. This predicate can be used to build a fallback mechanism where 
-        /// multiple registrations for the same service type are made.</param>
+        /// multiple registrations for the same service type are made.
+        /// Note that the predicate will be called a finite number of times and its result will be cached
+        /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
+        /// </param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is a 
@@ -223,7 +234,9 @@ namespace SimpleInjector
         /// <param name="predicate">The predicate that determines whether the 
         /// <paramref name="registration"/> can be applied for the requested service type. This predicate
         /// can be used to build a fallback mechanism where multiple registrations for the same service type
-        /// are made.</param>
+        /// are made. Note that the predicate will be called a finite number of times and its result will be cached
+        /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
+        /// </param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is open generic or
