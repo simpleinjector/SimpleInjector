@@ -16,28 +16,18 @@
         // component, while allowing instances to depend on singletons.
         public override int Length => Singleton.Length;
 
-        protected override Registration CreateRegistrationCore<TConcrete>(Container container) => 
-            new InstancePerDependencyRegistration<TConcrete>(this, container);
+        protected override Registration CreateRegistrationCore<T>(Container c) => new Reg<T>(this, c, null);
+        protected override Registration CreateRegistrationCore<T>(Func<T> ic, Container c) => new Reg<T>(this, c, ic);
 
-        protected override Registration CreateRegistrationCore<TService>(
-            Func<TService> instanceCreator, Container container) => 
-            new InstancePerDependencyRegistration<TService>(this, container, instanceCreator);
-
-        private class InstancePerDependencyRegistration<TImpl> : Registration where TImpl : class
+        private class Reg<T> : Registration where T : class
         {
-            private readonly Func<TImpl> creator;
+            private readonly Func<T> creator;
+            public Reg(Lifestyle l, Container c,Func<T> creator) : base(l, c) => this.creator = creator;
 
-            public InstancePerDependencyRegistration(Lifestyle lifestyle, Container container, 
-                Func<TImpl> creator = null) : base(lifestyle, container)
-            {
-                this.creator = creator;
-            }
-
-            public override Type ImplementationType => typeof(TImpl);
-            public override Expression BuildExpression() =>
-                this.creator == null
-                    ? this.BuildTransientExpression()
-                    : this.BuildTransientExpression(this.creator);
+            public override Type ImplementationType => typeof(T);
+            public override Expression BuildExpression() => this.creator == null
+                ? this.BuildTransientExpression()
+                : this.BuildTransientExpression(this.creator);
         }
     }
 }
