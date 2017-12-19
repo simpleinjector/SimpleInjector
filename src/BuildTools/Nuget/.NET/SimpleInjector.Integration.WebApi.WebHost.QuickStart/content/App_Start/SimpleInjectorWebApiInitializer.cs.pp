@@ -5,6 +5,7 @@ namespace $rootnamespace$.App_Start
     using System.Web.Http;
     using SimpleInjector;
     using SimpleInjector.Integration.WebApi;
+    using SimpleInjector.Lifestyles;
     
     public static class SimpleInjectorWebApiInitializer
     {
@@ -12,7 +13,7 @@ namespace $rootnamespace$.App_Start
         public static void Initialize()
         {
             var container = new Container();
-            container.Options.DefaultScopedLifestyle = new WebApiRequestLifestyle();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
             
             InitializeContainer(container);
 
