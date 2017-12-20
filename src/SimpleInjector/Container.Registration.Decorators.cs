@@ -143,6 +143,8 @@ namespace SimpleInjector
         /// <typeparamref name="TService"/> or <see cref="Func{T}"/> where <b>T</b> is
         /// <typeparamref name="TService"/>.</exception>
         public void RegisterDecorator<TService, TDecorator>(Lifestyle lifestyle)
+            where TService : class
+            where TDecorator : class, TService
         {
             this.RegisterDecoratorCore(typeof(TService), typeof(TDecorator), lifestyle: lifestyle);
         }
