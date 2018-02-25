@@ -47,6 +47,12 @@
       <DocumentationSource sourceFile="..\SimpleInjector.Integration.WebApi\bin\Release\net45\SimpleInjector.Integration.WebApi.xml" />
       <DocumentationSource sourceFile="..\SimpleInjector.Packaging\bin\Release\net40\SimpleInjector.Packaging.dll" />
       <DocumentationSource sourceFile="..\SimpleInjector.Packaging\bin\Release\net40\SimpleInjector.Packaging.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore\bin\Release\net451\SimpleInjector.Integration.AspNetCore.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore\bin\Release\net451\SimpleInjector.Integration.AspNetCore.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore.Mvc.Core\bin\Release\net451\SimpleInjector.Integration.AspNetCore.Mvc.Core.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore.Mvc.Core\bin\Release\net451\SimpleInjector.Integration.AspNetCore.Mvc.Core.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore.Mvc\bin\Release\net451\SimpleInjector.Integration.AspNetCore.Mvc.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore.Mvc\bin\Release\net451\SimpleInjector.Integration.AspNetCore.Mvc.xml" />
     </DocumentationSources>
     <HelpAttributes />
     <NamespaceSummaries>
