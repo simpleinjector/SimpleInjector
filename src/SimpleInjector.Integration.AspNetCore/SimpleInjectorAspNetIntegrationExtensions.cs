@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015-2017 Simple Injector Contributors
+ * Copyright (c) 2015-2018 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -201,6 +201,42 @@ namespace SimpleInjector
             Registration registration = CreateCrossWireRegistration(container, serviceType, builder);
 
             container.AddRegistration(serviceType, registration);
+        }
+        
+        /// <summary>
+        /// Adds a middleware type to the application's request pipeline. The middleware will be resolved from the supplied
+        /// the Simple Injector <paramref name="container"/>. The middleware will be added to the container for verification.
+        /// </summary>
+        /// <typeparam name="TMiddleware">The middleware type.</typeparam>
+        /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
+        /// <param name="container">The container to resolve <typeparamref name="TMiddleware"/> from.</param>
+        /// <returns>The <see cref="IApplicationBuilder"/> instance.</returns>
+        public static IApplicationBuilder UseMiddleware<TMiddleware>(this IApplicationBuilder app, Container container)
+            where TMiddleware : class, IMiddleware
+        {
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+
+            if (container == null)
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
+
+            var lifestyle = container.Options.LifestyleSelectionBehavior.SelectLifestyle(typeof(TMiddleware));
+
+            // By creating an InstanceProducer up front, it will be known to the container, and will be part of the
+            // verification process of the container.
+            InstanceProducer<IMiddleware> producer = lifestyle.CreateProducer<IMiddleware, TMiddleware>(container);
+
+            app.Use((c, next) =>
+            {
+                IMiddleware middleware = producer.GetInstance();
+                return middleware.InvokeAsync(c, _ => next());
+            });
+
+            return app;
         }
 
         private static void CrossWireServiceScope(Container container, IApplicationBuilder builder)
