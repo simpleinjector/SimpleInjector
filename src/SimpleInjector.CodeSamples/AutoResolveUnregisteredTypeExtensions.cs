@@ -28,7 +28,6 @@
 
                 if (serviceType.IsAbstract)
                 {
-
                     var types = container.GetTypesToRegister(serviceType, assemblies, options).ToArray();
 
                     // Only map when there is no ambiguity, meaning: exactly one implementation.

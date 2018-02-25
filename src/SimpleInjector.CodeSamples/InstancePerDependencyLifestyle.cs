@@ -22,7 +22,8 @@
         private class Reg<T> : Registration where T : class
         {
             private readonly Func<T> creator;
-            public Reg(Lifestyle l, Container c, Func<T> creator) : base(l, c) => this.creator = creator;
+            public Reg(Lifestyle l, Container c, Func<T> creator) : base(l, c)
+                => this.creator = creator;
 
             public override Type ImplementationType => typeof(T);
             public override Expression BuildExpression() => this.creator == null
