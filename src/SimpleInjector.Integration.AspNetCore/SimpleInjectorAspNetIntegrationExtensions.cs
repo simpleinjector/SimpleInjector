@@ -210,7 +210,7 @@ namespace SimpleInjector
         /// <typeparam name="TMiddleware">The middleware type.</typeparam>
         /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
         /// <param name="container">The container to resolve <typeparamref name="TMiddleware"/> from.</param>
-        /// <returns>The <see cref="IApplicationBuilder"/> instance.</returns>
+        /// <returns>The supplied <see cref="IApplicationBuilder"/> instance.</returns>
         public static IApplicationBuilder UseMiddleware<TMiddleware>(this IApplicationBuilder app, Container container)
             where TMiddleware : class, IMiddleware
         {
@@ -238,12 +238,13 @@ namespace SimpleInjector
 
             return app;
         }
-        
+
         /// <summary>
         /// Allows registrations made using the <see cref="IServiceCollection"/> API to be resolved by Simple Injector.
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
         /// <param name="container">The container.</param>
+        /// <returns>The supplied <see cref="IApplicationBuilder"/> instance.</returns>
         public static IApplicationBuilder UseAutoCrossWiring(this IApplicationBuilder app, Container container)
         {
             if (app == null)
@@ -318,7 +319,6 @@ namespace SimpleInjector
 
         private static ServiceDescriptor FindServiceDescriptor(IServiceCollection services, Type serviceType)
         {
-
             // In case there are multiple descriptors for a given type, .NET Core will use the last descriptor
             // when one instance is resolved. We will have to get this last one as well.
             ServiceDescriptor descriptor = services.LastOrDefault(d => d.ServiceType == serviceType);
