@@ -227,8 +227,8 @@ IF %step%=="4" (
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector.Integration.Wcf Releases\temp /E /H
 	%attrib% -r "%CD%\Releases\temp\*.*" /s /d
 	del Releases\temp\.gitignore /s /q
-	copy SimpleInjector.Integration.Wcf\bin\Release\net40\SimpleInjector.Integration.Wcf.dll Releases\temp\lib\net40\SimpleInjector.Integration.Wcf.dll
-	copy SimpleInjector.Integration.Wcf\bin\Release\net40\SimpleInjector.Integration.Wcf.xml Releases\temp\lib\net40\SimpleInjector.Integration.Wcf.xml
+	copy SimpleInjector.Integration.Wcf\bin\Release\net45\SimpleInjector.Integration.Wcf.dll Releases\temp\lib\net45\SimpleInjector.Integration.Wcf.dll
+	copy SimpleInjector.Integration.Wcf\bin\Release\net45\SimpleInjector.Integration.Wcf.xml Releases\temp\lib\net45\SimpleInjector.Integration.Wcf.xml
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {version} %named_version_Integration_Wcf%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {versionCore} %named_version_Core%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {year} %copyrightYear%

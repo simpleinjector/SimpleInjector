@@ -5,6 +5,7 @@ namespace $rootnamespace$.App_Start
     using System.Reflection;
 
     using SimpleInjector;
+    using SimpleInjector.Lifestyles;
     using SimpleInjector.Integration.Wcf;
 
     public static class SimpleInjectorInitializer
@@ -13,7 +14,7 @@ namespace $rootnamespace$.App_Start
         public static void Initialize()
         {
             var container = new Container();
-            container.Options.DefaultScopedLifestyle = new WcfOperationLifestyle();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
             InitializeContainer(container);
 

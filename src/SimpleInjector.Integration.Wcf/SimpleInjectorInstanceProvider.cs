@@ -1,7 +1,7 @@
 #region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2018 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -26,6 +26,7 @@ namespace SimpleInjector.Integration.Wcf
     using System.ServiceModel;
     using System.ServiceModel.Channels;
     using System.ServiceModel.Dispatcher;
+    using SimpleInjector.Lifestyles;
 
     internal class SimpleInjectorInstanceProvider : IInstanceProvider
     {
@@ -42,7 +43,11 @@ namespace SimpleInjector.Integration.Wcf
 
         public object GetInstance(InstanceContext instanceContext)
         {
-            var scope = instanceContext.BeginScope();
+            Scope scope = AsyncScopedLifestyle.BeginScope(this.container);
+
+            // Although an Async Scope is ambient, we still attach it to the InstanceContext, so we're 100% sure
+            // it is still available when ReleaseInstance is called.
+            Attach(instanceContext, scope);
 
             try
             {
@@ -52,7 +57,7 @@ namespace SimpleInjector.Integration.Wcf
             {
                 // We need to dispose the scope here, because WCF will never call ReleaseInstance if
                 // this method throws an exception (since it has no instance to pass to ReleaseInstance).
-                scope.Dispose();
+                ReleaseInstance(instanceContext, null);
 
                 throw;
             }
@@ -62,11 +67,36 @@ namespace SimpleInjector.Integration.Wcf
         {
             Requires.IsNotNull(instanceContext, nameof(instanceContext));
 
-            var scope = instanceContext.GetCurrentScope();
+            var extension = instanceContext.Extensions.Find<SimpleInjectorInstanceContextExtension>();
 
-            if (scope != null)
+            extension?.Scope?.Dispose();
+        }
+
+        private static void Attach(InstanceContext instanceContext, Scope scope)
+        {
+            var extension = instanceContext.Extensions.Find<SimpleInjectorInstanceContextExtension>();
+
+            if (extension == null)
             {
-                scope.Dispose();
+                instanceContext.Extensions.Add(extension = new SimpleInjectorInstanceContextExtension());
+            }
+
+            if (extension.Scope == null)
+            {
+                extension.Scope = scope;
+            }
+        }
+
+        private sealed class SimpleInjectorInstanceContextExtension : IExtension<InstanceContext>
+        {
+            internal Scope Scope { get; set; }
+
+            public void Attach(InstanceContext owner)
+            {
+            }
+
+            public void Detach(InstanceContext owner)
+            {
             }
         }
     }
