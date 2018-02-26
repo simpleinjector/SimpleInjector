@@ -35,6 +35,30 @@ namespace SimpleInjector
     {
         private readonly Dictionary<Type, List<Type>> skippedNonGenericDecorators = new Dictionary<Type, List<Type>>();
 
+
+        /// <summary>
+        /// Registers all concrete, non-generic, public and internal types in the given set of
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
+        /// with container's default lifestyle (which is transient by default).
+        /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
+        /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
+        /// will be excluded from registration, while 
+        /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
+        /// </summary>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the given set of 
+        /// <paramref name="assemblies"/> contain multiple types that implement the same 
+        /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
+        public void Register(Type openGenericServiceType, params Assembly[] assemblies)
+        {
+            this.Register(openGenericServiceType, assemblies, this.SelectionBasedLifestyle);
+        }
+
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given set of
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
@@ -56,6 +80,32 @@ namespace SimpleInjector
         public void Register(Type openGenericServiceType, IEnumerable<Assembly> assemblies)
         {
             this.Register(openGenericServiceType, assemblies, this.SelectionBasedLifestyle);
+        }
+
+        /// <summary>
+        /// Registers all concrete, non-generic, public and internal types in the given
+        /// <paramref name="assembly"/> that implement the given <paramref name="openGenericServiceType"/> 
+        /// with the supplied <paramref name="lifestyle"/>.
+        /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
+        /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
+        /// will be excluded from registration, while 
+        /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
+        /// </summary>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="assembly">An assembly that will be searched.</param>
+        /// <param name="lifestyle">The lifestyle to register instances with.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the given 
+        /// <paramref name="assembly"/> contain multiple types that implement the same 
+        /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
+        public void Register(Type openGenericServiceType, Assembly assembly, Lifestyle lifestyle)
+        {
+            Requires.IsNotNull(assembly, nameof(assembly));
+
+            Register(openGenericServiceType, new[] { assembly }, lifestyle);
         }
 
         /// <summary>

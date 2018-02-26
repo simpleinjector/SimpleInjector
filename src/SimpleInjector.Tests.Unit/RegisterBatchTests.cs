@@ -171,7 +171,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register(typeof(IService<,>), Assemblies, Lifestyle.Transient);
+            container.Register(typeof(IService<,>), Assemblies.Single(), Lifestyle.Transient);
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
@@ -187,7 +187,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Register(typeof(IService<,>), Assemblies, Lifestyle.Singleton);
+            container.Register(typeof(IService<,>), Assemblies.Single(), Lifestyle.Singleton);
 
             // Act
             var impl1 = container.GetInstance<IService<int, string>>();
