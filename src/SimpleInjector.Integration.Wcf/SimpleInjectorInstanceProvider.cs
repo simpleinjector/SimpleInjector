@@ -43,10 +43,13 @@ namespace SimpleInjector.Integration.Wcf
 
         public object GetInstance(InstanceContext instanceContext)
         {
+            Requires.IsNotNull(instanceContext, nameof(instanceContext));
+
             Scope scope = AsyncScopedLifestyle.BeginScope(this.container);
 
-            // Although an Async Scope is ambient, we still attach it to the InstanceContext, so we're 100% sure
-            // it is still available when ReleaseInstance is called.
+            // During the time that WCF calls ReleaseInstance, the ambient context provided by AsyncLocal<T> will be reset and 
+            // AsyncScopedLifestyle.GetCurrentScope will return null. That's why we have to attach the scope to the current
+            // InstanceContext. This way we can still dispose the Scope during ReleaseInstance.
             Attach(instanceContext, scope);
 
             try
@@ -57,7 +60,7 @@ namespace SimpleInjector.Integration.Wcf
             {
                 // We need to dispose the scope here, because WCF will never call ReleaseInstance if
                 // this method throws an exception (since it has no instance to pass to ReleaseInstance).
-                ReleaseInstance(instanceContext, null);
+                scope.Dispose();
 
                 throw;
             }
@@ -67,18 +70,18 @@ namespace SimpleInjector.Integration.Wcf
         {
             Requires.IsNotNull(instanceContext, nameof(instanceContext));
 
-            var extension = instanceContext.Extensions.Find<SimpleInjectorInstanceContextExtension>();
+            var extension = instanceContext.Extensions.Find<InstanceContextScopeWrapper>();
 
             extension?.Scope?.Dispose();
         }
 
         private static void Attach(InstanceContext instanceContext, Scope scope)
         {
-            var extension = instanceContext.Extensions.Find<SimpleInjectorInstanceContextExtension>();
+            var extension = instanceContext.Extensions.Find<InstanceContextScopeWrapper>();
 
             if (extension == null)
             {
-                instanceContext.Extensions.Add(extension = new SimpleInjectorInstanceContextExtension());
+                instanceContext.Extensions.Add(extension = new InstanceContextScopeWrapper());
             }
 
             if (extension.Scope == null)
@@ -87,7 +90,7 @@ namespace SimpleInjector.Integration.Wcf
             }
         }
 
-        private sealed class SimpleInjectorInstanceContextExtension : IExtension<InstanceContext>
+        private sealed class InstanceContextScopeWrapper : IExtension<InstanceContext>
         {
             internal Scope Scope { get; set; }
 
