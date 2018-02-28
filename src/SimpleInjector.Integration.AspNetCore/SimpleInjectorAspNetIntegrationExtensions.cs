@@ -242,19 +242,18 @@ namespace SimpleInjector
         /// <summary>
         /// Allows registrations made using the <see cref="IServiceCollection"/> API to be resolved by Simple Injector.
         /// </summary>
-        /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
         /// <param name="container">The container.</param>
-        /// <returns>The supplied <see cref="IApplicationBuilder"/> instance.</returns>
-        public static IApplicationBuilder UseAutoCrossWiring(this IApplicationBuilder app, Container container)
+        /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
+        public static void AutoCrossWireAspNetComponents(this Container container, IApplicationBuilder app)
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
             if (container == null)
             {
                 throw new ArgumentNullException(nameof(container));
+            }
+
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
             }
 
             var services = (IServiceCollection)container.GetItem(CrossWireContextKey);
@@ -313,8 +312,6 @@ namespace SimpleInjector
                     e.Register(registration);
                 }
             };
-
-            return app;
         }
 
         private static ServiceDescriptor FindServiceDescriptor(IServiceCollection services, Type serviceType)
