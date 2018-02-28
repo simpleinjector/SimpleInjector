@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Integration library for ASP.NET Core MVC for Simple Injector.</Description>
+    <Description>Integration library for ASP.NET Core MVC core features for Simple Injector. This includes control and view component integration.</Description>
     <AssemblyTitle>Simple Injector ASP.NET Core MVC Core Integration</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
     <VersionPrefix>4.0.0</VersionPrefix>
