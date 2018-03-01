@@ -179,8 +179,7 @@ namespace SimpleInjector.Decorators
         {
             return
                 BuildExpressionForDecorateeDependencyParameter(parameter, serviceType, expression) ??
-                this.BuildExpressionForDecorateeFactoryDependencyParameter(parameter, serviceType, expression) ??
-                null;
+                this.BuildExpressionForDecorateeFactoryDependencyParameter(parameter, serviceType, expression);
         }
 
         protected static ParameterInfo GetDecorateeParameter(Type serviceType,
@@ -238,8 +237,11 @@ namespace SimpleInjector.Decorators
 
             if (IsDecorateeFactoryDependencyParameter(decorateeParameter, serviceType))
             {
+                // Adding a verifier makes sure the graph for the decoratee gets created,
+                // which allows testing whether constructing the graph fails.
                 AddVerifierForDecorateeFactoryDependency(decorateeExpression, realProducer);
 
+                // By adding the decoratee producer, we allow that object graph to be diagnosed.
                 realProducer.AddProducerToVerify(currentProducer);
 
                 currentProducer = this.CreateDecorateeFactoryProducer(decorateeParameter);

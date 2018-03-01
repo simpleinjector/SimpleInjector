@@ -74,7 +74,7 @@ namespace SimpleInjector.Decorators
             // By creating the decorator using a Lifestyle Registration the decorator can be completely
             // incorporated into the pipeline. This means that the ExpressionBuilding can be applied,
             // properties can be injected, and it can be wrapped with an initializer.
-            var decoratorRegistration = this.CreateRegistrationForDecorator();
+            Registration decoratorRegistration = this.CreateRegistrationForDecorator();
 
             this.ReplaceOriginalExpression(decoratorRegistration);
 
@@ -106,7 +106,7 @@ namespace SimpleInjector.Decorators
             }
         }
 
-        private IEnumerable<Registration> GetDecorateeFactoryDependencies(KnownRelationship[] relationships) => 
+        private IEnumerable<Registration> GetDecorateeFactoryDependencies(KnownRelationship[] relationships) =>
             from relationship in relationships
             where DecoratorHelpers.IsDecorateeFactoryDependencyParameter(
                 relationship.Dependency.ServiceType, this.e.RegisteredServiceType)
@@ -123,8 +123,11 @@ namespace SimpleInjector.Decorators
             {
                 if (!this.registrations.TryGetValue(this.e.InstanceProducer, out registration))
                 {
-                    registration = this.CreateRegistration(this.registeredServiceType,
-                        this.decoratorConstructor, this.e.Expression, this.e.InstanceProducer,
+                    registration = this.CreateRegistration(
+                        this.registeredServiceType,
+                        this.decoratorConstructor,
+                        this.e.Expression,
+                        this.e.InstanceProducer,
                         this.GetServiceTypeInfo(this.e));
 
                     this.registrations[this.e.InstanceProducer] = registration;
@@ -141,7 +144,7 @@ namespace SimpleInjector.Decorators
 
             // Add the decorator to the list of applied decorators. This way users can use this information in 
             // the predicate of the next decorator they add.
-            info.AddAppliedDecorator(this.e.RegisteredServiceType, this.decoratorType, this.Container, 
+            info.AddAppliedDecorator(this.e.RegisteredServiceType, this.decoratorType, this.Container,
                 this.Lifestyle, this.e.Expression, decoratorRelationships);
         }
     }
