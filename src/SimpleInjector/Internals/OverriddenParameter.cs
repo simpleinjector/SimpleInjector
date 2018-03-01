@@ -56,7 +56,7 @@ namespace SimpleInjector.Internals
             // being processed twice by the ExpressionBuilding event (since we expect the supplied expressions
             // to already be processed). After the event has ran we replace the placeholders with the real
             // expressions again (using an ExpressionVisitor).
-            this.PlaceHolder = Expression.Constant(null, parameter.ParameterType);
+            this.PlaceHolder = System.Linq.Expressions.Expression.Constant(null, parameter.ParameterType);
         }
     }
 }

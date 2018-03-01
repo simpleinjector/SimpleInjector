@@ -35,7 +35,6 @@ namespace SimpleInjector
     {
         private readonly Dictionary<Type, List<Type>> skippedNonGenericDecorators = new Dictionary<Type, List<Type>>();
 
-
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given set of
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
@@ -105,7 +104,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(assembly, nameof(assembly));
 
-            Register(openGenericServiceType, new[] { assembly }, lifestyle);
+            this.Register(openGenericServiceType, new[] { assembly }, lifestyle);
         }
 
         /// <summary>
