@@ -44,7 +44,7 @@ namespace SimpleInjector
         private Dictionary<Registration, object> cachedInstances;
         private List<Action> scopeEndActions;
         private List<IDisposable> disposables;
-        private DisposeState state = DisposeState.Alive;
+        private DisposeState state;
         private int recursionDuringDisposalCounter;
 
         /// <summary>Initializes a new instance of the <see cref="Scope"/> class.</summary>
@@ -202,6 +202,31 @@ namespace SimpleInjector
             }
         }
 
+        /// <summary>
+        /// Returns the list of <see cref="IDisposable"/> instances that will be disposed of when this <see cref="Scope"/>
+        /// instance is being disposed. The list contains scoped instances that are cached in this <see cref="Scope"/> instance, 
+        /// and instances explicitly registered for disposal using <see cref="RegisterForDisposal"/>. The instances are returned
+        /// in order of creation/registration. When <see cref="Dispose()">Scope.Dispose</see> is called, the scope will ensure 
+        /// <see cref="IDisposable.Dispose"/> is called on each instance in this list. The instance will be disposed in opposite
+        /// order as they appear in the list.
+        /// </summary>
+        /// <returns>The list of <see cref="IDisposable"/> instances that will be disposed of when this <see cref="Scope"/>
+        /// instance is being disposed.</returns>
+        public IDisposable[] GetDisposables()
+        {
+            lock (this.syncRoot)
+            {
+                this.RequiresInstanceNotDisposed();
+
+                if (this.disposables == null)
+                {
+                    return Helpers.Array<IDisposable>.Empty;
+                }
+
+                return this.disposables.ToArray();
+            }
+        }
+
         /// <summary>Releases all instances that are cached by the <see cref="Scope"/> object.</summary>
         public void Dispose()
         {
@@ -219,17 +244,6 @@ namespace SimpleInjector
             }
 
             return scope.GetInstanceInternal(registration);
-        }
-
-        // This method is called from within the test suite.
-        internal IDisposable[] GetDisposables()
-        {
-            if (this.disposables == null)
-            {
-                return Helpers.Array<IDisposable>.Empty;
-            }
-
-            return this.disposables.ToArray();
         }
 
         /// <summary>
@@ -456,7 +470,7 @@ namespace SimpleInjector
 
         // This method simulates the behavior of a set of nested 'using' statements: It ensures that dispose
         // is called on each element, even if a previous instance threw an exception. 
-        internal static void DisposeInstancesInReverseOrder(List<IDisposable> disposables,
+        private static void DisposeInstancesInReverseOrder(List<IDisposable> disposables,
             int startingAsIndex = int.MinValue)
         {
             if (startingAsIndex == int.MinValue)
