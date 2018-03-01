@@ -2426,6 +2426,52 @@
             // Assert
             AssertThat.IsInstanceOfType(decoratorType, logger);
         }
+        
+        [TestMethod]
+        public void RegisterDecorator_WithPartialOpenGenericServiceType_ThrowsExpectedMessage()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.RegisterDecorator(
+                typeof(ICommandHandler<>).MakeGenericType(typeof(List<>)),
+                typeof(CommandHandlerDecorator<>));
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentException>("serviceType", action);
+
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
+                The supplied type 'ICommandHandler<List<T>>' is a partially-closed generic type, which is not 
+                supported by this method. Please supply the open generic type 'ICommandHandler<>' instead."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterDecorator_WithConstructedGenericServiceType_ThrowsExpectedMessage()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Getting the interface of an open-generic type is not the same as specifying the open-generic interface.
+            // The former is a constructed generic type (e.g. IX<T>), while the latter is a generic type definition (e.g.
+            // IX<>). Being able to register the constructed generic type would cause the decorator to be never matched and
+            // applied.
+            Type serviceType = typeof(CommandHandlerDecorator<>).GetInterfaces().Single();
+
+            // Act
+            Action action = () => container.RegisterDecorator(serviceType, typeof(CommandHandlerDecorator<>));
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentException>("serviceType", action);
+
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
+                The supplied type 'ICommandHandler<TCommand>' is a partially-closed generic type, which is not 
+                supported by this method. Please supply the open generic type 'ICommandHandler<>' instead."
+                .TrimInside(),
+                action);
+        }
 
         private static KnownRelationship GetValidRelationship()
         {
