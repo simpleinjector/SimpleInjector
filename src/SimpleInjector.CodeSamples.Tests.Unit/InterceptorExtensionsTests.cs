@@ -24,7 +24,7 @@
 
             var container = new Container();
 
-            container.RegisterSingleton<ILogger>(logger);
+            container.RegisterInstance<ILogger>(logger);
             container.Register<ICommand, CommandThatLogsOnExecute>();
 
             container.InterceptWith<InterceptorThatLogsBeforeAndAfter>(IsACommandPredicate);
@@ -49,7 +49,7 @@
 
             var container = new Container();
 
-            container.RegisterSingleton<ILogger>(logger);
+            container.RegisterInstance<ILogger>(logger);
             container.RegisterCollection<ICommand>(new[] { typeof(ConcreteCommand), typeof(ConcreteCommand) });
 
             container.InterceptWith<InterceptorThatLogsBeforeAndAfter>(IsACommandPredicate);
@@ -72,7 +72,7 @@
 
             var container = new Container();
 
-            container.RegisterSingleton<ILogger>(logger);
+            container.RegisterInstance<ILogger>(logger);
             container.RegisterCollection<ICommand>(new[]
             {
                 Lifestyle.Transient.CreateRegistration(typeof(ConcreteCommand), container),
@@ -100,7 +100,7 @@
 
             var container = new Container();
 
-            container.RegisterSingleton<ILogger>(logger);
+            container.RegisterInstance<ILogger>(logger);
             container.Register<ICommand, CommandThatLogsOnExecute>();
 
             container.Register(typeof(IValidator<>), typeof(LoggingValidator<>));
@@ -128,7 +128,7 @@
 
             var container = new Container();
 
-            container.RegisterSingleton<ILogger>(logger);
+            container.RegisterInstance<ILogger>(logger);
             container.Register<ICommand, CommandThatLogsOnExecute>();
 
             container.InterceptWith<InterceptorThatLogsBeforeAndAfter>(IsACommandPredicate);
@@ -220,7 +220,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<ILogger>(logger);
+            container.RegisterInstance<ILogger>(logger);
 
             container.InterceptWith<InterceptorThatLogsBeforeAndAfter>(type => type == typeof(ICommand));
 
@@ -252,7 +252,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<ILogger>(logger);
+            container.RegisterInstance<ILogger>(logger);
             container.Register<ICommand, CommandThatLogsOnExecute>();
 
             container.InterceptWith(singletonInterceptor, IsACommandPredicate);
@@ -288,7 +288,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<ILogger>(logger);
+            container.RegisterInstance<ILogger>(logger);
             container.Register<ICommand, CommandThatLogsOnExecute>();
 
             container.InterceptWith(interceptor1, IsACommandPredicate);
@@ -362,7 +362,7 @@
 
             var container = new Container();
 
-            container.RegisterSingleton<ILogger>(logger);
+            container.RegisterInstance<ILogger>(logger);
             container.Register<ICommand, CommandThatLogsOnExecute>();
 
             container.InterceptWith(interceptorCreator, IsACommandPredicate);
@@ -398,7 +398,7 @@
 
             var container = new Container();
 
-            container.RegisterSingleton<ILogger>(logger);
+            container.RegisterInstance<ILogger>(logger);
             container.Register<ICommand, CommandThatLogsOnExecute>();
 
             container.InterceptWith(interceptorCreator1, IsACommandPredicate);
@@ -533,7 +533,7 @@
 
             var interceptee = new WithOutAndRef { ReturnValue = expectedReturnValue };
 
-            container.RegisterSingleton<IWithOutAndRef>(interceptee);
+            container.RegisterInstance<IWithOutAndRef>(interceptee);
 
             container.InterceptWith<FakeInterceptor>(IsInterface);
 
@@ -558,7 +558,7 @@
 
             var interceptee = new WithOutAndRef();
 
-            container.RegisterSingleton<IWithOutAndRef>(interceptee);
+            container.RegisterInstance<IWithOutAndRef>(interceptee);
 
             container.InterceptWith<FakeInterceptor>(IsInterface);
 
@@ -583,7 +583,7 @@
 
             var interceptee = new WithOutAndRef { OutputRefValue = expectedRefValue };
 
-            container.RegisterSingleton<IWithOutAndRef>(interceptee);
+            container.RegisterInstance<IWithOutAndRef>(interceptee);
 
             container.InterceptWith<FakeInterceptor>(IsInterface);
 
@@ -608,7 +608,7 @@
 
             var interceptee = new WithOutAndRef { OutValue = expectedOutValue };
 
-            container.RegisterSingleton<IWithOutAndRef>(interceptee);
+            container.RegisterInstance<IWithOutAndRef>(interceptee);
 
             container.InterceptWith<FakeInterceptor>(IsInterface);
 
@@ -640,7 +640,7 @@
                 invocation.Arguments[0] = expectedValue;
             };
 
-            container.RegisterSingleton<IWithOutAndRef>(interceptee);
+            container.RegisterInstance<IWithOutAndRef>(interceptee);
             container.InterceptWith(interceptor, IsInterface);
 
             var intercepted = container.GetInstance<IWithOutAndRef>();
@@ -671,7 +671,7 @@
                 invocation.Arguments[1] = expectedOutValue;
             };
 
-            container.RegisterSingleton<IWithOutAndRef>(interceptee);
+            container.RegisterInstance<IWithOutAndRef>(interceptee);
             container.InterceptWith(interceptor, IsInterface);
 
             var intercepted = container.GetInstance<IWithOutAndRef>();

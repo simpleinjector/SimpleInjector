@@ -180,7 +180,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<ICommandHandler<RealCommand>>(new RealCommandHandler());
+            container.RegisterInstance<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<RealCommand>));
 
@@ -203,7 +203,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<ICommandHandler<RealCommand>>(new RealCommandHandler());
+            container.RegisterInstance<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
             // Act
             Action action = () => container.RegisterDecorator(
@@ -220,7 +220,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<ICommandHandler<RealCommand>>(new RealCommandHandler());
+            container.RegisterInstance<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<RealCommand>),
@@ -239,7 +239,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<ICommandHandler<RealCommand>>(new RealCommandHandler());
+            container.RegisterInstance<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<int>));
 
@@ -258,7 +258,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<ICommandHandler<RealCommand>>(new RealCommandHandler());
+            container.RegisterInstance<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
             container.RegisterDecorator(typeof(ICommandHandler<int>), typeof(TransactionHandlerDecorator<int>));
 
@@ -275,7 +275,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<ICommandHandler<RealCommand>>(new RealCommandHandler());
+            container.RegisterInstance<ICommandHandler<RealCommand>>(new RealCommandHandler());
 
             Type closedGenericServiceType = typeof(ICommandHandler<RealCommand>);
             Type nonGenericDecorator = typeof(RealCommandHandlerDecorator);
@@ -571,7 +571,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<ICommandHandler<RealCommand>>(new StubCommandHandler());
+            container.RegisterInstance<ICommandHandler<RealCommand>>(new StubCommandHandler());
 
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(TransactionHandlerDecorator<>), c =>
             {
@@ -1012,7 +1012,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<ILogger>(new FakeLogger());
+            container.RegisterInstance<ILogger>(new FakeLogger());
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>();
 

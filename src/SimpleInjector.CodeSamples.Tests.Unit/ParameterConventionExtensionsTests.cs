@@ -346,7 +346,7 @@
             AddConventions(container,
                 new OptionalParameterConvention(container.Options.DependencyInjectionBehavior));
 
-            container.RegisterSingleton<ILogger>(dependency);
+            container.RegisterInstance<ILogger>(dependency);
 
             // Act
             var instance = container.GetInstance<TypeWithOptionalDependency<ILogger>>();

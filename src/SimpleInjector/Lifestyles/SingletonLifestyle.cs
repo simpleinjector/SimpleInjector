@@ -153,7 +153,7 @@ namespace SimpleInjector.Lifestyles
                 // information available to use the implementation type.
                 // TODO: This behavior should be reconsidered, because now it is incompatible with
                 // Register<TService, TImplementation>(Lifestyle). So the question is, do we consider
-                // RegisterSingleton<TService>(TService) to be similar to Register<TService>(Func<TService>)
+                // RegisterInstance<TService>(TService) to be similar to Register<TService>(Func<TService>)
                 // or to Register<TService, TImplementation>()? See: #353.
                 expression = this.WrapWithPropertyInjector(this.ServiceType, expression);
                 expression = this.InterceptInstanceCreation(this.ServiceType, expression);

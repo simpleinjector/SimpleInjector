@@ -96,7 +96,7 @@
             container.Register(typeof(IEventHandler<>), typeof(MultipleDispatchEventHandler<>), Lifestyle.Singleton);
 
             // The ILogger is used by the unit tests to test the configuration.
-            container.RegisterSingleton<ILogger>(logger ?? new ListLogger());
+            container.RegisterInstance<ILogger>(logger ?? new ListLogger());
 
             return container;
         }

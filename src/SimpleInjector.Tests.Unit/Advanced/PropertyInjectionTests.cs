@@ -207,7 +207,7 @@
 
             container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
-            container.RegisterSingleton<ServiceWithProperty<ITimeProvider>>(singleton);
+            container.RegisterInstance<ServiceWithProperty<ITimeProvider>>(singleton);
 
             // Act
             container.GetInstance<ServiceWithProperty<ITimeProvider>>();
@@ -249,7 +249,7 @@
 
             container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
-            container.RegisterSingleton<IService>(singleton);
+            container.RegisterInstance<IService>(singleton);
 
             // Act
             container.GetInstance<IService>();
@@ -291,7 +291,7 @@
 
             var container = CreateContainerThatInjectsAllProperties();
 
-            container.RegisterSingleton<Action<object>>(instance => actualOrderOfCreation.Add(instance.GetType()));
+            container.RegisterInstance<Action<object>>(instance => actualOrderOfCreation.Add(instance.GetType()));
 
             // Act
             container.GetInstance<ComponentWithPropertyDependency>();

@@ -458,8 +458,8 @@
 
             IPlugin[] plugins = new IPlugin[] { new PluginImpl(), new PluginImpl(), new PluginImpl() };
 
-            // RegisterSingleton<IEnumerable<T>> should have the same effect as RegisterCollection<T>
-            container.RegisterSingleton<IEnumerable<IPlugin>>(plugins);
+            // RegisterInstance<IEnumerable<T>> should have the same effect as RegisterCollection<T>
+            container.RegisterInstance<IEnumerable<IPlugin>>(plugins);
 
             // Act
             // PluginManager has a constructor with an IEnumerable<IPlugin> argument.
@@ -512,7 +512,7 @@
             container.RegisterCollection<IPlugin>(new PluginImpl());
 
             // Act
-            Action action = () => container.RegisterSingleton<IEnumerable<IPlugin>>(new IPlugin[0]);
+            Action action = () => container.RegisterInstance<IEnumerable<IPlugin>>(new IPlugin[0]);
 
             // Assert
             AssertThat.Throws<NotSupportedException>(action);
@@ -541,7 +541,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<IEnumerable<IPlugin>>(new IPlugin[0]);
+            container.RegisterInstance<IEnumerable<IPlugin>>(new IPlugin[0]);
 
             // Act
             Action action = () => container.RegisterCollection<IPlugin>(new PluginImpl());
@@ -627,7 +627,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterSingleton<IUserRepository>(new InMemoryUserRepository());
+            container.RegisterInstance<IUserRepository>(new InMemoryUserRepository());
             container.GetInstance<IUserRepository>();
 
             // Act
@@ -2100,7 +2100,7 @@
 
             var collection = new IEventHandler<AuditableEvent>[0];
 
-            container.RegisterSingleton<IEnumerable<IEventHandler<AuditableEvent>>>(collection);
+            container.RegisterInstance<IEnumerable<IEventHandler<AuditableEvent>>>(collection);
 
             // Act
             Action action =
