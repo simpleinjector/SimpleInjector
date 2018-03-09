@@ -192,11 +192,11 @@ namespace SimpleInjector
 
         private static void VerifyInstanceProducersOfContainerControlledCollection(Expression expression)
         {
-            ConstantExpression constant = expression as ConstantExpression;
+            var constant = expression as ConstantExpression;
 
-            if (constant != null && constant.Value is IContainerControlledCollection)
+            if (constant != null && constant.Value is IContainerControlledCollection collection)
             {
-                ((IContainerControlledCollection)constant.Value).VerifyCreatingProducers();
+                collection.VerifyCreatingProducers();
             }
         }
 
