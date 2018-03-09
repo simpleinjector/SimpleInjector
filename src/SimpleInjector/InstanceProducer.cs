@@ -401,7 +401,7 @@ namespace SimpleInjector
             catch (Exception ex)
             {
                 throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
-                    this.ServiceType, ex), ex);
+                    this.Registration.ImplementationType, ex), ex);
             }
 
             return instance;

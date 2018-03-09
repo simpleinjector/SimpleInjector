@@ -52,6 +52,24 @@ namespace SimpleInjector.Tests.Unit
             container.Verify();
         }
 
+
+        [TestMethod]
+        public void Verify_WithFailingConstructor_ReportsConcreteTypeOfFailingType()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IPlugin, FailingConstructorPlugin<Exception>>();
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                $"Creating the instance for type {typeof(FailingConstructorPlugin<Exception>).ToFriendlyName()} failed",
+                action);
+        }
+
         [TestMethod]
         public void Verify_CalledAfterGetInstance_Succeeds()
         {
