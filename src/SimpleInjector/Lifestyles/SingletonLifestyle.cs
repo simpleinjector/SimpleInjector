@@ -52,6 +52,16 @@ namespace SimpleInjector.Lifestyles
                 instance, container);
         }
 
+        internal static InstanceProducer CreateControlledCollectionProducer<TService>(
+            ContainerControlledCollection<TService> collection, Container container)
+        {
+            var registration = CreateSingleInstanceRegistration(typeof(IEnumerable<TService>), collection, container);
+
+            registration.IsCollection = true;
+
+            return new InstanceProducer(typeof(IEnumerable<TService>), registration);
+        }
+
         internal static InstanceProducer CreateUncontrolledCollectionProducer(Type itemType, 
             IEnumerable collection, Container container)
         {

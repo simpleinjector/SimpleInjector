@@ -52,7 +52,6 @@ namespace SimpleInjector.Tests.Unit
             container.Verify();
         }
 
-
         [TestMethod]
         public void Verify_WithFailingConstructor_ReportsConcreteTypeOfFailingType()
         {

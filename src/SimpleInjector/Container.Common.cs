@@ -106,6 +106,7 @@ namespace SimpleInjector
 
             this.disposableSingletonsScope = new Scope(this);
 
+            this.Collections = new CollectionRegistrator(this);
             this.Options = new ContainerOptions(this);
 
             this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);

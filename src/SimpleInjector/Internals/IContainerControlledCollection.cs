@@ -62,5 +62,11 @@ namespace SimpleInjector.Internals
         {
             collection.AppendAll(registrations.Select(ContainerControlledItem.CreateFromRegistration));
         }
+
+        internal static void AppendAll(this IContainerControlledCollection collection, 
+            IEnumerable<Type> types)
+        {
+            collection.AppendAll(types.Select(ContainerControlledItem.CreateFromType));
+        }
     }
 }

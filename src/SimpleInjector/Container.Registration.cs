@@ -388,6 +388,10 @@ namespace SimpleInjector
         // can be verified.
         internal event Action Verifying = () => { };
 
+        /// <summary>Gets the object that allows access to methods related to registration and creation of collections.</summary>
+        /// <value>The <see cref="CollectionRegistrator"/> instance for this container.</value>
+        public CollectionRegistrator Collections { get; }
+
         /// <summary>
         /// Registers that a new instance of <typeparamref name="TConcrete"/> will be returned every time it 
         /// is requested (transient).
