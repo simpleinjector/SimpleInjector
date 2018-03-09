@@ -156,13 +156,16 @@ namespace SimpleInjector
         internal static void DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(Type serviceType,
             IEnumerable<Type> serviceTypes, string paramName)
         {
-            Type openGenericType = serviceTypes.FirstOrDefault(t => t.ContainsGenericParameters());
-
-            if (!serviceType.IsGenericType() && openGenericType != null)
+            if (!serviceType.IsGenericType())
             {
-                throw new ArgumentException(
-                    StringResources.SuppliedTypeIsAnOpenGenericTypeWhileTheServiceTypeIsNot(openGenericType),
-                    paramName);
+                Type openGenericType = serviceTypes.FirstOrDefault(t => t.ContainsGenericParameters());
+
+                if (openGenericType != null)
+                {
+                    throw new ArgumentException(
+                        StringResources.SuppliedTypeIsAnOpenGenericTypeWhileTheServiceTypeIsNot(openGenericType),
+                        paramName);
+                }
             }
         }
 
