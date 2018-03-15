@@ -1,4 +1,4 @@
-﻿namespace SimpleInjector.Advanced
+﻿namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
@@ -10,11 +10,11 @@
     /// <summary>
     /// Contains methods for registering and creating collections in the <see cref="Container"/>.
     /// </summary>
-    public class CollectionRegistrator
+    public class ContainerCollectionRegistrator
     {
         private readonly Container container;
 
-        internal CollectionRegistrator(Container container)
+        internal ContainerCollectionRegistrator(Container container)
         {
             Requires.IsNotNull(container, nameof(container));
 
