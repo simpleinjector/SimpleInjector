@@ -253,8 +253,7 @@ namespace SimpleInjector
         }
 
         // This method is internal to prevent the main API of the framework from being 'polluted'. The
-        // SimpleInjector.Advanced.AdvancedExtensions.AppendToCollection extension method enabled public
-        // exposure.
+        // Collections.AppendTo method enabled public exposure.
         internal void AppendToCollectionInternal(Type itemType, Registration registration)
         {
             this.RegisterCollectionInternal(itemType,

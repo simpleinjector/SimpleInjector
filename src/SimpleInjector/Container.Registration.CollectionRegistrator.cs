@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
@@ -155,6 +154,69 @@
             this.RegisterForVerification(collection);
 
             return collection;
+        }
+        
+        /// <summary>
+        /// Allows appending new registrations to existing registrations made using one of the
+        /// <b>RegisterCollection</b> overloads.
+        /// </summary>
+        /// <param name="serviceType">The service type of the collection.</param>
+        /// <param name="registration">The registration to append.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is not a
+        /// reference type, is open generic, or ambiguous.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
+        /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
+        /// that is made with one of the <b>RegisterCollection</b> overloads that accepts a dynamic collection
+        /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
+        public void AppendTo(Type serviceType, Registration registration)
+        {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(registration, nameof(registration));
+
+            Requires.IsReferenceType(serviceType, nameof(serviceType));
+            Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
+
+            Requires.IsRegistrationForThisContainer(this.container, registration, nameof(registration));
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
+                registration.ImplementationType, nameof(registration));
+
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, new[] { registration },
+                nameof(registration));
+
+            this.container.AppendToCollectionInternal(serviceType, registration);
+        }
+
+        /// <summary>
+        /// Allows appending new registrations to existing registrations made using one of the
+        /// <b>RegisterCollection</b> overloads.
+        /// </summary>
+        /// <param name="serviceType">The service type of the collection.</param>
+        /// <param name="implementationType">The implementation type to append.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is not a
+        /// reference type, or ambiguous.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
+        /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
+        /// that is made with one of the <b>RegisterCollection</b> overloads that accepts a dynamic collection
+        /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
+        public void AppendTo(Type serviceType, Type implementationType)
+        {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
+
+            Requires.IsReferenceType(serviceType, nameof(serviceType));
+            Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
+
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
+                implementationType, nameof(implementationType));
+
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType,
+                new[] { implementationType }, nameof(implementationType));
+
+            this.container.AppendToCollectionInternal(serviceType, implementationType);
         }
 
         private void RegisterForVerification<TService>(ContainerControlledCollection<TService> collection)
