@@ -10,8 +10,8 @@ IF "%1"=="" (
 
 set step="%1"
 
-set version=4.1.0
-set prereleasePostfix=-alpha1
+set version=4.0.0
+set prereleasePostfix=
 set buildNumber=0 
 set copyrightYear=2017
 
@@ -83,6 +83,9 @@ IF %step%=="1" (
 	mkdir %targetPathPcl%
 	rmdir %targetPathCoreClr% /s /q
 	mkdir %targetPathCoreClr%
+	
+	echo CLEAN SOLUTION
+	%msbuild% /t:Clean /p:Configuration=Release
 
 	echo SET VERSION NUMBERS
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Core%</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
@@ -117,6 +120,7 @@ IF %step%=="2" (
 	set testDll=SimpleInjector.Tests.Unit\bin\Release\net451\SimpleInjector.Tests.Unit.dll
 	set testRunner=SimpleInjector.Tests.Unit\bin\Release\net451\PartialTrustTestRunner.exe
 	
+	echo %testRunner% %testDll%
 	%testRunner% %testDll%
 	
     echo If tests were green, please run step 3
