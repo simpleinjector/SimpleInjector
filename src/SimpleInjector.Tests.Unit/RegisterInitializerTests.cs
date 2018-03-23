@@ -235,7 +235,7 @@
 
             container.RegisterInitializer<ICommand>(c => { actualNumberOfCalls++; });
 
-            container.RegisterSingleton<ICommand>(new ConcreteCommand());
+            container.RegisterInstance<ICommand>(new ConcreteCommand());
 
             // Act
             // Request the instance 4 times
@@ -307,7 +307,7 @@
 
             container.RegisterInitializer<ConcreteCommand>(c => { initializerWasCalled = true; });
 
-            container.RegisterSingleton<ICommand>(new ConcreteCommand());
+            container.RegisterInstance<ICommand>(new ConcreteCommand());
 
             // Act
             container.GetInstance<ICommand>();

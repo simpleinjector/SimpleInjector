@@ -1004,6 +1004,30 @@
         }
 
         [TestMethod]
+        public void RegisterOpenGeneric_WithConstructedGenericServiceType_ThrowsExpectedMessage()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Getting the interface of an open-generic type is not the same as specifying the open-generic interface.
+            // The former is a constructed generic type (e.g. IX<T>), while the latter is a generic type definition (e.g.
+            // IX<>).
+            Type serviceType = typeof(ServiceImpl<,>).GetInterfaces().Single();
+
+            // Act
+            Action action = () => container.Register(serviceType, typeof(ServiceImpl<,>));
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentException>("serviceType", action);
+
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
+                The supplied type 'IService<TA, TB>' is a partially-closed generic type, which is not 
+                supported by this method. Please supply the open generic type 'IService<,>' instead."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
         public void RegisterOpenGeneric_ImplementationThatOverlapsWithPreviousNonGenericRegistration_ThrowsExpressiveException()
         {
             // Arrange
@@ -1321,6 +1345,17 @@
             AssertThat.IsInstanceOfType(
                 expectedType: typeof(NewConstraintedGeneric2<int>),
                 actualInstance: container.GetInstance<INewConstraintedGeneric<int>>());
+        }
+
+        public interface IService<T> { }
+
+        public class ServiceImplementation<T> : IService<T> { }
+
+        public class FailingServiceDecorator<T> : IService<T>
+        {
+            public FailingServiceDecorator(IService<T> d)
+            {
+            }
         }
     }
 

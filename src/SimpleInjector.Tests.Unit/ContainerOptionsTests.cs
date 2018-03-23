@@ -207,7 +207,7 @@
 
             container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
 
-            container.AppendToCollection(typeof(IEventHandler<AuditableEvent>), typeof(NewConstraintEventHandler<AuditableEvent>));
+            container.Collections.AppendTo(typeof(IEventHandler<AuditableEvent>), typeof(NewConstraintEventHandler<AuditableEvent>));
 
             // Act
             container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
@@ -424,7 +424,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingleton<object>("The first registration.");
+            container.RegisterInstance<object>("The first registration.");
 
             // Act
             Action action = () => container.Options.ConstructorResolutionBehavior = 
@@ -491,7 +491,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingleton<object>("The first registration.");
+            container.RegisterInstance<object>("The first registration.");
 
             // Act
             Action action = () => container.Options.DependencyInjectionBehavior = 
@@ -557,7 +557,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingleton<object>("The first registration.");
+            container.RegisterInstance<object>("The first registration.");
 
             // Act
             Action action = 
@@ -632,7 +632,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingleton<object>("The first registration.");
+            container.RegisterInstance<object>("The first registration.");
 
             // Act
             Action action = () => container.Options.DefaultLifestyle = Lifestyle.Singleton;
@@ -712,7 +712,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingleton<object>("The first registration.");
+            container.RegisterInstance<object>("The first registration.");
 
             // Act
             Action action = () => container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();

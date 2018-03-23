@@ -1,7 +1,7 @@
 #region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2018 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -26,6 +26,7 @@ namespace SimpleInjector.Integration.Wcf
     using System.ServiceModel;
     using System.ServiceModel.Channels;
     using System.ServiceModel.Dispatcher;
+    using SimpleInjector.Lifestyles;
 
     internal class SimpleInjectorInstanceProvider : IInstanceProvider
     {
@@ -42,7 +43,14 @@ namespace SimpleInjector.Integration.Wcf
 
         public object GetInstance(InstanceContext instanceContext)
         {
-            var scope = instanceContext.BeginScope();
+            Requires.IsNotNull(instanceContext, nameof(instanceContext));
+
+            Scope scope = AsyncScopedLifestyle.BeginScope(this.container);
+
+            // During the time that WCF calls ReleaseInstance, the ambient context provided by AsyncLocal<T> will be reset and 
+            // AsyncScopedLifestyle.GetCurrentScope will return null. That's why we have to attach the scope to the current
+            // InstanceContext. This way we can still dispose the Scope during ReleaseInstance.
+            Attach(instanceContext, scope);
 
             try
             {
@@ -62,11 +70,36 @@ namespace SimpleInjector.Integration.Wcf
         {
             Requires.IsNotNull(instanceContext, nameof(instanceContext));
 
-            var scope = instanceContext.GetCurrentScope();
+            var extension = instanceContext.Extensions.Find<InstanceContextScopeWrapper>();
 
-            if (scope != null)
+            extension?.Scope?.Dispose();
+        }
+
+        private static void Attach(InstanceContext instanceContext, Scope scope)
+        {
+            var extension = instanceContext.Extensions.Find<InstanceContextScopeWrapper>();
+
+            if (extension == null)
             {
-                scope.Dispose();
+                instanceContext.Extensions.Add(extension = new InstanceContextScopeWrapper());
+            }
+
+            if (extension.Scope == null)
+            {
+                extension.Scope = scope;
+            }
+        }
+
+        private sealed class InstanceContextScopeWrapper : IExtension<InstanceContext>
+        {
+            internal Scope Scope { get; set; }
+
+            public void Attach(InstanceContext owner)
+            {
+            }
+
+            public void Detach(InstanceContext owner)
+            {
             }
         }
     }

@@ -90,8 +90,8 @@
 
             var fooBar = new FooBar();
 
-            container.RegisterSingleton<IFoo>(fooBar);
-            container.RegisterSingleton<IBar>(fooBar);
+            container.RegisterInstance<IFoo>(fooBar);
+            container.RegisterInstance<IBar>(fooBar);
 
             container.Verify(VerificationOption.VerifyOnly);
 

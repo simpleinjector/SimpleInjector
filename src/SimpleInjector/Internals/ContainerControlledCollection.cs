@@ -54,6 +54,8 @@ namespace SimpleInjector.Internals
 
         bool ICollection<TService>.IsReadOnly => true;
 
+        internal InstanceProducer ParentProducer { get; set; }
+
         public TService this[int index]
         {
             get

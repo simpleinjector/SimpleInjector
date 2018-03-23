@@ -42,7 +42,7 @@
             // Arrange
             var container = CreateContainer();
 
-            container.RegisterSingleton<IInvariantInterface<CustomerMovedEvent>>(
+            container.RegisterInstance<IInvariantInterface<CustomerMovedEvent>>(
                 new InvariantClass<CustomerMovedEvent>());
 
             // Act
@@ -63,7 +63,7 @@
 
             Func<string> expectedFunc = () => expectedValue;
 
-            container.RegisterSingleton<Func<string>>(expectedFunc);
+            container.RegisterInstance<Func<string>>(expectedFunc);
 
             // Act
             var actualFunc = container.GetInstance<Func<object>>();
@@ -84,7 +84,7 @@
 
             var container = CreateContainer();
 
-            container.RegisterSingleton<Action<object>>(s => { actualValue = s; });
+            container.RegisterInstance<Action<object>>(s => { actualValue = s; });
 
             // Act
             var action = container.GetInstance<Action<string>>();
@@ -101,7 +101,7 @@
             // Arrange
             var container = CreateContainer();
 
-            container.RegisterSingleton<Action<string>>(s => { });
+            container.RegisterInstance<Action<string>>(s => { });
 
             // Act
             var registration = container.GetRegistration(typeof(Action<object>));
@@ -122,8 +122,8 @@
 
             var container = CreateContainer();
 
-            container.RegisterSingleton<Action<object>>(s => { });
-            container.RegisterSingleton<Action<Exception>>(s => { });
+            container.RegisterInstance<Action<object>>(s => { });
+            container.RegisterInstance<Action<Exception>>(s => { });
 
             try
             {

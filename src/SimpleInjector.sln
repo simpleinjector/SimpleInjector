@@ -1,11 +1,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3BEF8719-6153-4397-9075-F1AC5AAF1AA6}"
 	ProjectSection(SolutionItems) = preProject
 		empty.ruleset = empty.ruleset
-		global.json = global.json
 		Settings.StyleCop = Settings.StyleCop
 		SimpleInjector.FxCop = SimpleInjector.FxCop
 		SimpleInjector.ncover = SimpleInjector.ncover
@@ -39,37 +38,33 @@ Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "SimpleInjector.Documentatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.CI", "SimpleInjector.CI\SimpleInjector.CI.csproj", "{6C96DF05-104B-4AD0-B686-0FB59AEF1DC2}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.Extensions.ExecutionContextScoping", "SimpleInjector.Extensions.ExecutionContextScoping\SimpleInjector.Extensions.ExecutionContextScoping.xproj", "{D9682551-4E0F-49C7-F304-D0C2B172E67D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector", "SimpleInjector\SimpleInjector.csproj", "{B70B03F6-7320-4A40-A8A0-1FFE2B7DB815}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.Extensions.LifetimeScoping", "SimpleInjector.Extensions.LifetimeScoping\SimpleInjector.Extensions.LifetimeScoping.xproj", "{DA576DA1-55A9-4600-EB88-DE71449D3F1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector,Tests.Unit", "SimpleInjector.Tests.Unit\SimpleInjector,Tests.Unit.csproj", "{4520DB0D-3990-4CE1-8CF0-F3807B393C77}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector", "SimpleInjector\SimpleInjector.xproj", "{B70B03F6-7320-4A40-A8A0-1FFE2B7DB815}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.CodeSamples", "SimpleInjector.CodeSamples\SimpleInjector.CodeSamples.csproj", "{A785BE2F-E759-40A4-988C-C9AC052AD8CC}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector,Tests.Unit", "SimpleInjector.Tests.Unit\SimpleInjector,Tests.Unit.xproj", "{4520DB0D-3990-4CE1-8CF0-F3807B393C77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.CodeSamples.Tests.Unit", "SimpleInjector.CodeSamples.Tests.Unit\SimpleInjector.CodeSamples.Tests.Unit.csproj", "{FCE00ECF-2995-41C3-8555-660B6DFD282A}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.CodeSamples", "SimpleInjector.CodeSamples\SimpleInjector.CodeSamples.xproj", "{A785BE2F-E759-40A4-988C-C9AC052AD8CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.Integration.Wcf", "SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj", "{2976CA2C-DCC4-4935-8181-239DDCC69AB8}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.CodeSamples.Tests.Unit", "SimpleInjector.CodeSamples.Tests.Unit\SimpleInjector.CodeSamples.Tests.Unit.xproj", "{FCE00ECF-2995-41C3-8555-660B6DFD282A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.Integration.Web", "SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj", "{4F0BCB4C-D66A-43DE-BDE0-FDD19B2E7A96}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.Integration.Wcf", "SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.xproj", "{2976CA2C-DCC4-4935-8181-239DDCC69AB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.Integration.Web.Mvc", "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj", "{3D11D6C1-3BB3-44DF-B007-72155E555477}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.Integration.Web", "SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.xproj", "{4F0BCB4C-D66A-43DE-BDE0-FDD19B2E7A96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.Integration.Web.Tests.Unit", "SimpleInjector.Integration.Web.Tests.Unit\SimpleInjector.Integration.Web.Tests.Unit.csproj", "{EB52EF0B-E694-4B7F-896E-FA101A67BEB4}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.Integration.Web.Mvc", "SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.xproj", "{3D11D6C1-3BB3-44DF-B007-72155E555477}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.Integration.WebApi", "SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj", "{F3CEA48D-A4F8-448B-9DEB-538E059A6712}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.Integration.Web.Tests.Unit", "SimpleInjector.Integration.Web.Tests.Unit\SimpleInjector.Integration.Web.Tests.Unit.xproj", "{EB52EF0B-E694-4B7F-896E-FA101A67BEB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.Packaging", "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj", "{7D639474-9B1F-4CE2-B807-7E63B2E5E576}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.Integration.WebApi", "SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.xproj", "{F3CEA48D-A4F8-448B-9DEB-538E059A6712}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.Integration.AspNetCore", "SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj", "{A9B34F26-6D22-40FA-A0CC-47E49229C229}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.Packaging", "SimpleInjector.Packaging\SimpleInjector.Packaging.xproj", "{7D639474-9B1F-4CE2-B807-7E63B2E5E576}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.Integration.AspNetCore.Mvc", "SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj", "{2EADB665-EE8F-435F-AB76-6CEAC01132D8}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.Integration.AspNetCore", "SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.xproj", "{A9B34F26-6D22-40FA-A0CC-47E49229C229}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.Integration.AspNetCore.Mvc.Core", "SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj", "{635BDB92-7697-467F-AC72-1DD309660A5C}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.Integration.AspNetCore.Mvc", "SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.xproj", "{2EADB665-EE8F-435F-AB76-6CEAC01132D8}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleInjector.Integration.AspNetCore.Mvc.Core", "SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.xproj", "{635BDB92-7697-467F-AC72-1DD309660A5C}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "PartialTrustTestRunner", "PartialTrustTestRunner\PartialTrustTestRunner.xproj", "{E710BB05-06B6-40FC-9BA0-D02FFF69A532}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PartialTrustTestRunner", "PartialTrustTestRunner\PartialTrustTestRunner.csproj", "{E710BB05-06B6-40FC-9BA0-D02FFF69A532}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,30 +94,6 @@ Global
 		{6C96DF05-104B-4AD0-B686-0FB59AEF1DC2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{6C96DF05-104B-4AD0-B686-0FB59AEF1DC2}.Release|x86.ActiveCfg = Release|Any CPU
 		{6C96DF05-104B-4AD0-B686-0FB59AEF1DC2}.Release|x86.Build.0 = Release|Any CPU
-		{D9682551-4E0F-49C7-F304-D0C2B172E67D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D9682551-4E0F-49C7-F304-D0C2B172E67D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D9682551-4E0F-49C7-F304-D0C2B172E67D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{D9682551-4E0F-49C7-F304-D0C2B172E67D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{D9682551-4E0F-49C7-F304-D0C2B172E67D}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{D9682551-4E0F-49C7-F304-D0C2B172E67D}.Debug|x86.Build.0 = Debug|Any CPU
-		{D9682551-4E0F-49C7-F304-D0C2B172E67D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D9682551-4E0F-49C7-F304-D0C2B172E67D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D9682551-4E0F-49C7-F304-D0C2B172E67D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{D9682551-4E0F-49C7-F304-D0C2B172E67D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{D9682551-4E0F-49C7-F304-D0C2B172E67D}.Release|x86.ActiveCfg = Release|Any CPU
-		{D9682551-4E0F-49C7-F304-D0C2B172E67D}.Release|x86.Build.0 = Release|Any CPU
-		{DA576DA1-55A9-4600-EB88-DE71449D3F1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA576DA1-55A9-4600-EB88-DE71449D3F1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA576DA1-55A9-4600-EB88-DE71449D3F1A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{DA576DA1-55A9-4600-EB88-DE71449D3F1A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{DA576DA1-55A9-4600-EB88-DE71449D3F1A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DA576DA1-55A9-4600-EB88-DE71449D3F1A}.Debug|x86.Build.0 = Debug|Any CPU
-		{DA576DA1-55A9-4600-EB88-DE71449D3F1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA576DA1-55A9-4600-EB88-DE71449D3F1A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA576DA1-55A9-4600-EB88-DE71449D3F1A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{DA576DA1-55A9-4600-EB88-DE71449D3F1A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{DA576DA1-55A9-4600-EB88-DE71449D3F1A}.Release|x86.ActiveCfg = Release|Any CPU
-		{DA576DA1-55A9-4600-EB88-DE71449D3F1A}.Release|x86.Build.0 = Release|Any CPU
 		{B70B03F6-7320-4A40-A8A0-1FFE2B7DB815}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B70B03F6-7320-4A40-A8A0-1FFE2B7DB815}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B70B03F6-7320-4A40-A8A0-1FFE2B7DB815}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -297,5 +268,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E710BB05-06B6-40FC-9BA0-D02FFF69A532} = {D1A45E86-CD79-4F65-AC0B-25A21166B1E9}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7BEFA7B1-31AD-42F8-9B7B-FB1DEDE04D8C}
 	EndGlobalSection
 EndGlobal

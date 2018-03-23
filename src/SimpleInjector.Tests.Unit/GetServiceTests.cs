@@ -14,7 +14,7 @@
 
             var expectedInstance = new InMemoryUserRepository();
 
-            container.RegisterSingleton<IUserRepository>(expectedInstance);
+            container.RegisterInstance<IUserRepository>(expectedInstance);
 
             // Act
             var actualInstance = ((IServiceProvider)container).GetService(typeof(IUserRepository));

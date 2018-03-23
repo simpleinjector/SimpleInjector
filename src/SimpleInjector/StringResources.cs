@@ -223,12 +223,11 @@ namespace SimpleInjector
                 "To allow overriding the current registration, please create the container using the " +
                 "constructor overload that takes a {1} instance and set the {2} property to true. " +
                 "In case it is your goal to append items to an already registered collection, please use " +
-                "the {3} extension method. This method is located in the {4} namespace.",
+                "the Container.Collections.{3} method overloads.",
                 serviceType.TypeName(),
                 nameof(ContainerOptions),
                 nameof(ContainerOptions.AllowOverridingRegistrations),
-                nameof(AdvancedExtensions.AppendToCollection),
-                typeof(AdvancedExtensions).Namespace);
+                nameof(ContainerCollectionRegistrator.AppendTo));
 
         internal static string ParameterTypeMustBeRegistered(InjectionTargetInfo target, int numberOfConditionals,
             bool hasRelatedOneToOneMapping, bool hasRelatedCollectionMapping, Type[] skippedDecorators,

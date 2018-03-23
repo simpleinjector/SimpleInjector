@@ -54,7 +54,7 @@
             // Act
             Assert_RegistrationFailsWithExpectedAmbiguousMessage("String", () =>
             {
-                container.RegisterSingleton<string>("some value");
+                container.RegisterInstance<string>("some value");
             });
         }
 
@@ -96,7 +96,7 @@
             Assert_RegistrationFailsWithExpectedParamName("TService", () =>
             {
                 // Act
-                container.RegisterSingleton<string>("some value");
+                container.RegisterInstance<string>("some value");
             });
         }
 

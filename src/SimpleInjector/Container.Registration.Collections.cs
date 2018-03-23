@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2018 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -103,7 +103,7 @@ namespace SimpleInjector
         /// The underlying collection is a stream that will return individual instances based on their 
         /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
         /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// registered, i.e the resolved collection is deterministic.   
+        /// supplied to this method, i.e the resolved collection is deterministic.   
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
@@ -126,7 +126,7 @@ namespace SimpleInjector
         /// The underlying collection is a stream that will return individual instances based on their 
         /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
         /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// registered, i.e the resolved collection is deterministic.   
+        /// supplied to this method, i.e the resolved collection is deterministic.   
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
@@ -150,7 +150,7 @@ namespace SimpleInjector
         /// The underlying collection is a stream that will return individual instances based on their 
         /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
         /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// registered, i.e the resolved collection is deterministic.   
+        /// supplied to this method, i.e the resolved collection is deterministic.   
         /// </summary>
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
@@ -187,7 +187,7 @@ namespace SimpleInjector
         /// The underlying collection is a stream that will return individual instances based on their 
         /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
         /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// registered, i.e the resolved collection is deterministic.   
+        /// supplied to this method, i.e the resolved collection is deterministic.   
         /// </summary>
         /// <param name="serviceType">The base type or interface for elements in the collection. This can be
         /// an a non-generic type, closed generic type or generic type definition.</param>
@@ -253,8 +253,7 @@ namespace SimpleInjector
         }
 
         // This method is internal to prevent the main API of the framework from being 'polluted'. The
-        // SimpleInjector.Advanced.AdvancedExtensions.AppendToCollection extension method enabled public
-        // exposure.
+        // Collections.AppendTo method enabled public exposure.
         internal void AppendToCollectionInternal(Type itemType, Registration registration)
         {
             this.RegisterCollectionInternal(itemType,

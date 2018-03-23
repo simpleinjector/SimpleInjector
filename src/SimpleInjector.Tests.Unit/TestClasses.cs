@@ -247,6 +247,14 @@
     {
     }
 
+    public sealed class FailingConstructorLogger : ILogger
+    {
+        public FailingConstructorLogger()
+        {
+            throw new ArgumentNullException("some programming error.");
+        }
+    }
+
     public sealed class LoggerDecorator : ILogger
     {
         public readonly ILogger Logger;

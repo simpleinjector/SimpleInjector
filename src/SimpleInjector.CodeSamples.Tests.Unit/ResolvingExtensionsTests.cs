@@ -128,7 +128,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingleton<ICommand>(new ConcreteCommand());
+            container.RegisterInstance<ICommand>(new ConcreteCommand());
 
             // Act
             ICommand command;
@@ -145,7 +145,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingleton<ICommand>(new ConcreteCommand());
+            container.RegisterInstance<ICommand>(new ConcreteCommand());
 
             // Act
             ICommand command;
@@ -192,7 +192,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingleton<ICommand>(new ConcreteCommand());
+            container.RegisterInstance<ICommand>(new ConcreteCommand());
 
             // Act
             object command;
@@ -209,7 +209,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingleton<ICommand>(new ConcreteCommand());
+            container.RegisterInstance<ICommand>(new ConcreteCommand());
 
             // Act
             object command;
@@ -256,7 +256,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterSingleton<ICommand>(new ConcreteCommand());
+            container.RegisterInstance<ICommand>(new ConcreteCommand());
 
             // Act
             object command;

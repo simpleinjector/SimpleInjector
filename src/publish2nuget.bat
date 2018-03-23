@@ -3,17 +3,18 @@ REM This bat file allows publishing packages to Nuget.
 REM Usage:
 REM publish2nuget.bat [version] [NuGet API key]
 
-IF "%1"=="" (
+set version=%1
+set superSecretApiKey=%2
+
+IF %version%=="" (
     ECHO Please supply the version number and API key that should be published to nuget. Example: "%0 1.6.2-beta4 00000000-0000-0000-0000-000000000000"
     GOTO :EOF
 )
-IF "%2"=="" (
+IF %superSecretApiKey%=="" (
     ECHO Please supply the version number and API key that should be published to nuget. Example: "%0 1.6.2-beta4 00000000-0000-0000-0000-000000000000"
     GOTO :EOF
 )
 
-set version=%1
-set superSecretApiKey=%2
 set packageDirectory=Releases\v%version%
 set options=%superSecretApiKey% -Verbosity detailed -source https://www.nuget.org/api/v2/package
 set nugetexe=..\..\nuget.exe

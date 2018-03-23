@@ -665,7 +665,7 @@ namespace SimpleInjector
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null 
         /// reference (Nothing in VB).</exception>
-        [Obsolete("This overload has been deprecated. Please call CreateRegistration(Type, Container) instead.", 
+        [Obsolete("This overload has been deprecated. Please call CreateRegistration(Type, Container) instead.",
             error: false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public Registration CreateRegistration(Type serviceType, Type implementationType, Container container)
@@ -724,10 +724,10 @@ namespace SimpleInjector
                 ? this.CreateRegistrationFromCache<TConcrete>(container)
                 : this.CreateRegistrationCore<TConcrete>(container);
 
-        internal Registration CreateDecoratorRegistration(Type concreteType, Container container, 
+        internal Registration CreateDecoratorRegistration(Type concreteType, Container container,
             params OverriddenParameter[] overriddenParameters)
         {
-            Registration registration = 
+            Registration registration =
                 this.CreateRegistrationInternal(concreteType, container, preventTornLifestyles: false);
 
             registration.SetParameterOverrides(overriddenParameters);
@@ -773,7 +773,7 @@ namespace SimpleInjector
             Container container)
             where TService : class;
 
-        private Registration CreateRegistrationInternal(Type concreteType, Container container, 
+        private Registration CreateRegistrationInternal(Type concreteType, Container container,
             bool preventTornLifestyles)
         {
             var closedCreateRegistrationMethod = preventTornLifestyles

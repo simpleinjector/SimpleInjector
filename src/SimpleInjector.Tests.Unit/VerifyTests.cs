@@ -53,6 +53,23 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
+        public void Verify_WithFailingConstructor_ReportsConcreteTypeOfFailingType()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IPlugin, FailingConstructorPlugin<Exception>>();
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                $"Creating the instance for type {typeof(FailingConstructorPlugin<Exception>).ToFriendlyName()} failed",
+                action);
+        }
+
+        [TestMethod]
         public void Verify_CalledAfterGetInstance_Succeeds()
         {
             // Arrange
@@ -484,7 +501,7 @@ namespace SimpleInjector.Tests.Unit
                 typeof(StructEventHandler),
             });
 
-            container.AppendToCollection(typeof(IEventHandler<>),
+            container.Collections.AppendTo(typeof(IEventHandler<>),
                 Lifestyle.Singleton.CreateRegistration<AuditableEventEventHandler>(container));
 
             var handler = container.GetAllInstances<IEventHandler<AuditableEvent>>().Single();

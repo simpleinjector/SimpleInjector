@@ -240,7 +240,7 @@
 
         // See issue #128.
         [TestMethod]
-        public void GetInstance_WithDecorateeGraphWithLifestyleMismatch_ThrowsExpectedException()
+        public void GetInstance_WithFuncDecorateeGraphWithLifestyleMismatch_ThrowsExpectedException()
         {
             // Arrange
             var container = new Container();

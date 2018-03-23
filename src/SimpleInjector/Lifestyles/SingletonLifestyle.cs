@@ -52,6 +52,24 @@ namespace SimpleInjector.Lifestyles
                 instance, container);
         }
 
+        internal static InstanceProducer CreateControlledCollectionProducer<TService>(
+            ContainerControlledCollection<TService> collection, Container container)
+        {
+            Registration registration = CreateControlledCollectionRegistration(collection, container);
+
+            return new InstanceProducer(typeof(IEnumerable<TService>), registration);
+        }
+
+        internal static Registration CreateControlledCollectionRegistration<TService>(
+            ContainerControlledCollection<TService> collection, Container container)
+        {
+            var registration = CreateSingleInstanceRegistration(typeof(IEnumerable<TService>), collection, container);
+
+            registration.IsCollection = true;
+
+            return registration;
+        }
+
         internal static InstanceProducer CreateUncontrolledCollectionProducer(Type itemType, 
             IEnumerable collection, Container container)
         {
@@ -153,7 +171,7 @@ namespace SimpleInjector.Lifestyles
                 // information available to use the implementation type.
                 // TODO: This behavior should be reconsidered, because now it is incompatible with
                 // Register<TService, TImplementation>(Lifestyle). So the question is, do we consider
-                // RegisterSingleton<TService>(TService) to be similar to Register<TService>(Func<TService>)
+                // RegisterInstance<TService>(TService) to be similar to Register<TService>(Func<TService>)
                 // or to Register<TService, TImplementation>()? See: #353.
                 expression = this.WrapWithPropertyInjector(this.ServiceType, expression);
                 expression = this.InterceptInstanceCreation(this.ServiceType, expression);

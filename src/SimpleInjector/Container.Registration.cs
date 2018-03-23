@@ -300,7 +300,7 @@ namespace SimpleInjector
         /// will result in an <see cref="NewExpression"/>, while registrations that take a delegate (such as
         /// <see cref="Register{TService}(Func{TService})">Register&lt;TService&gt;(Func&lt;TService&gt;)</see>)
         /// will result in an <see cref="InvocationExpression"/>. Singletons that are passed in using their
-        /// value (<see cref="RegisterSingleton{TService}(TService)">RegisterSingleton&lt;TService&gt;(TService)</see>)
+        /// value (<see cref="RegisterInstance{TService}(TService)">RegisterInstance&lt;TService&gt;(TService)</see>)
         /// will result in an <see cref="ConstantExpression"/>. Note that other <b>ExpressionBuilding</b> 
         /// registrations might have changed the <see cref="ExpressionBuildingEventArgs.Expression" /> 
         /// property and might have supplied an <see cref="Expression"/> of a different type. The order in
@@ -387,6 +387,10 @@ namespace SimpleInjector
         // This event is currently only used by RegisterCollection to make sure that as many registered types
         // can be verified.
         internal event Action Verifying = () => { };
+
+        /// <summary>Gets the object that allows access to methods related to registration and creation of collections.</summary>
+        /// <value>The <see cref="ContainerCollectionRegistrator"/> instance for this container.</value>
+        public ContainerCollectionRegistrator Collections { get; }
 
         /// <summary>
         /// Registers that a new instance of <typeparamref name="TConcrete"/> will be returned every time it 
@@ -675,7 +679,30 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="instance"/> is a null reference.
         /// </exception>
+        [Obsolete("Please use " + nameof(RegisterInstance) + "<TService>(TService) instead.", error: false)]
         public void RegisterSingleton<TService>(TService instance) where TService : class
+        {
+            this.RegisterInstance<TService>(instance);
+        }
+
+        /// <summary>
+        /// Registers a single instance that will be returned when an instance of type 
+        /// <typeparamref name="TService"/> is requested. This <paramref name="instance"/> must be thread-safe
+        /// when working in a multi-threaded environment.
+        /// <b>NOTE:</b> Do note that instances supplied by this method <b>NEVER</b> get disposed by the
+        /// container, since the instance is assumed to outlive this container instance. If disposing is
+        /// required, use 
+        /// <see cref="RegisterSingleton{TService}(Func{TService})">RegisterSingleton&lt;TService&gt;(Func&lt;TService&gt;)</see>.
+        /// </summary>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instance.</typeparam>
+        /// <param name="instance">The instance to register.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// <typeparamref name="TService"/> has already been registered.</exception>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="instance"/> is a null reference.
+        /// </exception>
+        public void RegisterInstance<TService>(TService instance) where TService : class
         {
             Requires.IsNotNull(instance, nameof(instance));
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
@@ -701,7 +728,32 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when an 
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
+        [Obsolete("Please use " + nameof(RegisterInstance) + "(Type, object) instead.", error: false)]
         public void RegisterSingleton(Type serviceType, object instance)
+        {
+            this.RegisterInstance(serviceType, instance);
+        }
+
+        /// <summary>
+        /// Registers a single instance that will be returned when an instance of type 
+        /// <paramref name="serviceType"/> is requested. This <paramref name="instance"/> must be thread-safe
+        /// when working in a multi-threaded environment.
+        /// <b>NOTE:</b> Do note that instances supplied by this method <b>NEVER</b> get disposed by the
+        /// container, since the instance is assumed to outlive this container instance. If disposing is
+        /// required, use 
+        /// <see cref="RegisterSingleton(Type, Func{object})">RegisterSingleton(Type, Func&lt;object&gt;)</see>.
+        /// </summary>
+        /// <param name="serviceType">The base type or interface to register.</param>
+        /// <param name="instance">The instance to register.</param>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <paramref name="instance"/> are null references (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="instance"/> is
+        /// no sub type from <paramref name="serviceType"/>.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// the <paramref name="serviceType"/> has already been registered.
+        /// </exception>
+        public void RegisterInstance(Type serviceType, object instance)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(instance, nameof(instance));
@@ -713,7 +765,7 @@ namespace SimpleInjector
 
             this.AddRegistration(serviceType, registration);
         }
-        
+
         /// <summary>
         /// Registers a single concrete instance that will be constructed using constructor injection and will
         /// be returned when this instance is requested by type <typeparamref name="TConcrete"/>. 
@@ -914,7 +966,7 @@ namespace SimpleInjector
         /// (using constructor injection). Types that are newed up manually by supplying a 
         /// <see cref="Func{T}"/> delegate to the container (using the 
         /// <see cref="Register{TService}(Func{TService})"/> method) or registered as single instance
-        /// (using <see cref="RegisterSingleton{TService}(TService)"/>) will not trigger initialization.
+        /// (using <see cref="RegisterInstance{TService}(TService)"/>) will not trigger initialization.
         /// When initialization of these instances is needed, this must be done manually, as can be seen in 
         /// the following example:
         /// <code lang="cs"><![CDATA[

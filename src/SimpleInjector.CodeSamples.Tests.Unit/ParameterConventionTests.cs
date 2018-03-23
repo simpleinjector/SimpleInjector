@@ -144,7 +144,7 @@
 
             container.Options.RegisterParameterConvention(convention);
 
-            container.RegisterSingleton<IDependency>(new Dependency());
+            container.RegisterInstance<IDependency>(new Dependency());
 
             // Act
             // ctor: ClassWithAPrimitiveConstructorParam(IDependency dependency, Decimal someDecimal)
@@ -164,7 +164,7 @@
             var container = new Container();
             var convention = new ParameterConvention();
             container.Options.RegisterParameterConvention(convention);
-            container.RegisterSingleton<IDependency>(expectedDependency);
+            container.RegisterInstance<IDependency>(expectedDependency);
 
             // ctor: ClassWithAPrimitiveConstructorParam(IDependency dependency, Decimal someDecimal)
             container.RegisterSingleton<ClassWithAPrimitiveConstructorParam>(
