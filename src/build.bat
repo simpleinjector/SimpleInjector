@@ -10,10 +10,10 @@ IF "%1"=="" (
 
 set step="%1"
 
-set version=4.0.0
+set version=4.1.0
 set prereleasePostfix=
 set buildNumber=0 
-set copyrightYear=2017
+set copyrightYear=2018
 
 set version_Core=%version%
 set version_Packaging=%version_Core%
