@@ -205,16 +205,32 @@ namespace SimpleInjector
         //// 7.1 DO NOT have public members that can either throw or not based on some option.
         public InstanceProducer GetRegistration(Type serviceType, bool throwOnFailure)
         {
+            // GetRegistration might lock the container, but only when not-explicitly made registrations are
+            // requested.
             this.ThrowWhenDisposed();
-            this.LockContainer();
 
             InstanceProducer producer;
 
             if (!this.rootProducerCache.TryGetValue(serviceType, out producer))
             {
-                producer = this.GetRegistrationEvenIfInvalid(serviceType, InjectionConsumerInfo.Root, 
-                    autoCreateConcreteTypes: true);
+                producer = this.GetExplicitlyRegisteredInstanceProducer(serviceType, InjectionConsumerInfo.Root);
 
+                if (producer == null)
+                {
+                    // The producer is created implicitly. This forces us to lock the container.
+                    // Such implicit registration could be done through in numberous ways (such as
+                    // through unregistered type resotion, or because the type is concrete). Being able to
+                    // make registrations after such call, could lead to unexpected behavior, which is why
+                    // locking the container makes most sense.
+                    // We even lock when the producer is null, because unregistered type resolution events may
+                    // have been invoked.
+                    this.LockContainer();
+
+                    producer = this.GetRegistrationEvenIfInvalid(serviceType, InjectionConsumerInfo.Root,
+                        autoCreateConcreteTypes: true);
+                }
+
+                // Add the producer, even when it's null.
                 this.AppendRootInstanceProducer(serviceType, producer);
             }
 
@@ -237,8 +253,6 @@ namespace SimpleInjector
         internal InstanceProducer GetRegistrationEvenIfInvalid(Type serviceType, InjectionConsumerInfo consumer,
             bool autoCreateConcreteTypes = true)
         {
-            this.LockContainer();
-
             if (serviceType.ContainsGenericParameters())
             {
                 throw new ArgumentException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType), 
@@ -415,6 +429,7 @@ namespace SimpleInjector
                     return null;
                 }
 
+                // GetAllInstances locks the container
                 bool isContainerControlledCollection =
                     this.GetAllInstances(elementType) is IContainerControlledCollection;
 
@@ -502,6 +517,7 @@ namespace SimpleInjector
                 // will cause (incorrect) diagnostic warnings.
                 if (!this.emptyAndRedirectedCollectionRegistrationCache.TryGetValue(serviceType, out producer))
                 {
+                    // This call might lock the container
                     producer = this.TryBuildCollectionInstanceProducer(serviceType);
 
                     this.emptyAndRedirectedCollectionRegistrationCache[serviceType] = producer;

@@ -45,11 +45,12 @@ namespace SimpleInjector
         internal static string ContainerCanNotBeChangedAfterUse(string stackTrace)
         {
             string message = string.Format(CultureInfo.InvariantCulture,
-                "The container can't be changed after the first call to {0}, {1} and {2}. " +
+                "The container can't be changed after the first call to {0}, {1}, {2}, and some calls of {3}. " +
                 "Please see https://simpleinjector.org/locked to understand why the container is locked.",
                 nameof(Container.GetInstance),
                 nameof(Container.GetAllInstances),
-                nameof(Container.Verify));
+                nameof(Container.Verify),
+                nameof(Container.GetRegistration));
 
             if (stackTrace == null)
             {
