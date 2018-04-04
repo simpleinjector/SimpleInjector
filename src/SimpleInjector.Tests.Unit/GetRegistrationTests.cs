@@ -8,85 +8,83 @@
     public class GetRegistrationTests
     {
         [TestMethod]
-        public void GetRegistration_Always_LocksTheContainer1()
+        public void GetRegistration_RequestingAnExplicitlyRegisteredType_DoesNotLockTheContainer()
         {
             // Arrange
             var container = ContainerFactory.New();
 
-            container.GetRegistration(typeof(ITimeProvider));
+            container.Register<ITimeProvider, RealTimeProvider>();
 
-            try
-            {
-                // Act
-                container.Register<ITimeProvider, RealTimeProvider>();
+            // Act
+            // An explicitly made registration is returned from the internal root cache
+            var prod = container.GetRegistration(typeof(ITimeProvider));
 
-                // Assert
-                Assert.Fail("The container should get locked during the call to GetRegistration, because a " +
-                    "user can call the GetInstance() and BuildExpression() methods on the returned instance. " +
-                    "BuildExpression can internally call GetInstance and the first call to GetInstance should " +
-                    "always lock the container for reasons of correctness.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                AssertThat.ExceptionMessageContains("container can't be changed", ex);
-            }
+            Assert.IsNotNull(prod, "Test setup failed");
+
+            // Act
+            Assert.IsFalse(container.IsLocked,
+                "No internal container state has been changed, and the container doesn't have to be locked.");
         }
 
         [TestMethod]
-        public void GetRegistration_Always_LocksTheContainer2()
+        public void GetRegistration_WhenTheRegistrationIsUnknownAndCanNotBeCreated_LocksTheContainer()
         {
             // Arrange
             var container = ContainerFactory.New();
 
-            container.GetRegistration(typeof(ITimeProvider), throwOnFailure: false);
+            // Act
+            var prod = container.GetRegistration(typeof(ITimeProvider));
 
-            try
-            {
-                // Act
-                container.Register<ITimeProvider, RealTimeProvider>();
+            Assert.IsNull(prod, "Test setup failed");
 
-                // Assert
-                Assert.Fail("The container should get locked during the call to GetRegistration, because a " +
-                    "user can call the GetInstance() and BuildExpression() methods on the returned instance. " +
-                    "BuildExpression can internally call GetInstance and the first call to GetInstance should " +
-                    "always lock the container for reasons of correctness.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                AssertThat.ExceptionMessageContains("container can't be changed", ex);
-            }
+            Assert.IsTrue(container.IsLocked, @"
+                Even if GetRegistration returns null, and no InstanceProducer is built, the container
+                should be locked, because all kinds of things could have happened on the background, such as
+                the invocation of unregistered type resolution event handlers.");
         }
 
         [TestMethod]
-        public void GetRegistration_Always_LocksTheContainer3()
+        public void GetRegistration_WhenTheRegistrationIsUnknownButCanBeCreated_LocksTheContainer()
         {
             // Arrange
             var container = ContainerFactory.New();
 
-            try
-            {
-                container.GetRegistration(typeof(ITimeProvider), throwOnFailure: true);
-            }
-            catch
-            {
-                // Exception expected.
-            }
+            // Act
+            var prod = container.GetRegistration(typeof(RealTimeProvider));
 
-            try
-            {
-                // Act
-                container.Register<ITimeProvider, RealTimeProvider>();
+            Assert.IsNotNull(prod, "Test setup failed.");
 
-                // Assert
-                Assert.Fail("The container should get locked during the call to GetRegistration, because a " +
-                    "user can call the GetInstance() and BuildExpression() methods on the returned instance. " +
-                    "BuildExpression can internally call GetInstance and the first call to GetInstance should " +
-                    "always lock the container for reasons of correctness.");
-            }
-            catch (InvalidOperationException ex)
+            // Arrange
+            Assert.IsTrue(container.IsLocked, @"
+                Whenever a not explicitly made registration can be returned, the container needs to be locked,
+                since in most cases, changing the container might invalidate the registration. For instance, 
+                building concrete type registrations will create a transient registration, while making the
+                registration later might be done with a different lifestyle.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_WhenTheRegistrationIsUnknownButCanBeCreatedUsingUnregTypeRes_DoesNotLockTheContainer()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Not sure whether it would be wise to always lock the container when an unregistered event handler is fired.
+            container.ResolveUnregisteredType += (s, e) =>
             {
-                AssertThat.ExceptionMessageContains("container can't be changed", ex);
-            }
+                e.Register(Lifestyle.Singleton.CreateRegistration<RealTimeProvider>(container));
+            };
+
+            // Act
+            var prod = container.GetRegistration(typeof(ITimeProvider));
+
+            Assert.IsNotNull(prod, "Test setup failed.");
+
+            // Arrange
+            Assert.IsTrue(container.IsLocked, @"
+            Whenever a not explicitly made registration can be returned using unregistered type resolution, 
+            the container needs to be locked, changing the container might invalidate the registration. 
+            For instance, adding unregistered type resolution events later, might cause a different registration to
+            be returned when GetRegistration is called again.");
         }
 
         [TestMethod]
@@ -359,9 +357,9 @@
             Assert.IsNull(registration);
         }
 
-        public class SomeGenericNastyness<TBla>
+        public static class SomeGenericNastyness<TBla>
         {
-            public class ReadOnlyDictionary<TKey, TValue>
+            public static class ReadOnlyDictionary<TKey, TValue>
             {
                 public sealed class KeyCollection
                 {
