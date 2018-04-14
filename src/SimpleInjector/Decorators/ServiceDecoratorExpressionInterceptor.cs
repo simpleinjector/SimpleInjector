@@ -108,7 +108,7 @@ namespace SimpleInjector.Decorators
 
         private IEnumerable<Registration> GetDecorateeFactoryDependencies(KnownRelationship[] relationships) =>
             from relationship in relationships
-            where DecoratorHelpers.IsDecorateeFactoryDependencyParameter(
+            where DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(
                 relationship.Dependency.ServiceType, this.e.RegisteredServiceType)
             select relationship.Dependency.Registration;
 

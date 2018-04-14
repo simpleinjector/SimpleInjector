@@ -98,6 +98,7 @@ namespace SimpleInjector.Internals
             return compiledLambda ?? CompileLambda(resultType, expression);
         }
 
+        // TODO: If we make this method a no-op, which unit tests do break? Does the new ambient-less scoping test break?
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal static Expression OptimizeScopedRegistrationsInObjectGraph(Container container,
             Expression expression)

@@ -195,7 +195,7 @@ namespace SimpleInjector
                 where !producer.InstanceSuccessfullyCreated || !producer.VerifiersAreSuccessfullyCalled
                 select producer;
 
-            VerifyInstanceCreation(producersToVerify.ToArray());
+            this.VerifyInstanceCreation(producersToVerify.ToArray());
         }
 
         private IEnumerable<InstanceProducer> GetProducersThatNeedExplicitVerification()
@@ -228,7 +228,7 @@ namespace SimpleInjector
             }
         }
 
-        private static void VerifyInstanceCreation(InstanceProducer[] producersToVerify)
+        private void VerifyInstanceCreation(InstanceProducer[] producersToVerify)
         {
             foreach (var producer in producersToVerify)
             {
@@ -241,7 +241,7 @@ namespace SimpleInjector
 
                 if (!producer.VerifiersAreSuccessfullyCalled)
                 {
-                    producer.DoExtraVerfication();
+                    producer.DoExtraVerfication(this.VerificationScope);
                 }
             }
         }

@@ -264,6 +264,16 @@
             this.Logger = logger;
         }
     }
+    
+    public sealed class ScopedLoggerDecoratorProxy : ILogger
+    {
+        public readonly Func<Scope, ILogger> DecorateeFactory;
+
+        public ScopedLoggerDecoratorProxy(Func<Scope, ILogger> decorateeFactory)
+        {
+            this.DecorateeFactory = decorateeFactory;
+        }
+    }
 
     public sealed class NullValidator<T> : IValidate<T>
     {

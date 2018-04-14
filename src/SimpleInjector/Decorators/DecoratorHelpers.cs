@@ -164,7 +164,7 @@ namespace SimpleInjector.Decorators
             var decoratorInterfaces =
                 from abstraction in Types.GetBaseTypeCandidates(serviceType, decoratorConstructor.DeclaringType)
                 where decoratorConstructor.GetParameters()
-                    .Any(parameter => IsDecorateeParameter(parameter.ParameterType, abstraction))
+                    .Any(parameter => IsDecorateeParameter(parameter, abstraction))
                 select abstraction;
 
             return decoratorInterfaces.FirstOrDefault();
@@ -182,7 +182,7 @@ namespace SimpleInjector.Decorators
 
             var validServiceTypeArguments =
                 from parameter in decoratorConstructor.GetParameters()
-                where IsDecorateeParameter(parameter.ParameterType, decoratorType)
+                where IsDecorateeParameter(parameter, decoratorType)
                 select parameter;
 
             return validServiceTypeArguments.Count();
@@ -214,31 +214,37 @@ namespace SimpleInjector.Decorators
 
             return (
                 from baseType in decoratorConstructor.DeclaringType.GetBaseTypesAndInterfaces()
-                where IsDecorateeDependencyParameter(baseType, decoratingBaseType)
+                where IsDecorateeDependencyType(baseType, decoratingBaseType)
                 select baseType)
                 .ToArray();
         }
 
-        internal static bool IsDecorateeParameter(Type parameterType, Type decoratingType) => 
-            IsDecorateeDependencyParameter(parameterType, decoratingType) ||
-            IsDecorateeFactoryDependencyParameter(parameterType, decoratingType);
+        internal static bool IsDecorateeParameter(ParameterInfo parameter, Type decoratingType) =>
+            IsDecorateeDependencyType(parameter.ParameterType, decoratingType)
+            || IsDecorateeFactoryDependencyType(parameter.ParameterType, decoratingType);
 
-        // Checks if the given parameterType can function as the decorated instance of the given service type.
-        internal static bool IsDecorateeFactoryDependencyParameter(Type parameterType, Type serviceType)
+        internal static bool IsDecorateeDependencyType(Type dependencyType, Type serviceType)
         {
-            if (!parameterType.IsGenericType() || parameterType.GetGenericTypeDefinition() != typeof(Func<>))
-            {
-                return false;
-            }
-
-            Type funcArgumentType = parameterType.GetGenericArguments()[0];
-
-            return IsDecorateeDependencyParameter(funcArgumentType, serviceType);
+            return dependencyType == serviceType;
         }
 
-        // Checks if the given parameterType can function as the decorated instance of the given service type.
-        private static bool IsDecorateeDependencyParameter(Type parameterType, Type serviceType) => 
-            parameterType == serviceType;
+        internal static bool IsDecorateeFactoryDependencyType(Type dependencyType, Type decoratingType) =>
+            IsScopelessDecorateeFactoryDependencyType(dependencyType, decoratingType)
+            || IsScopeDecorateeFactoryDependencyParameter(dependencyType, decoratingType);
+
+        internal static bool IsScopelessDecorateeFactoryDependencyType(Type dependencyType, Type decoratingType)
+        {
+            return dependencyType.IsGenericType() 
+                && dependencyType.GetGenericTypeDefinition() == typeof(Func<>)
+                && dependencyType == typeof(Func<>).MakeGenericType(decoratingType);
+        }
+
+        internal static bool IsScopeDecorateeFactoryDependencyParameter(Type parameterType, Type decoratingType)
+        {
+            return parameterType.IsGenericType()
+                && parameterType.GetGenericTypeDefinition() == typeof(Func<,>)
+                && parameterType == typeof(Func<,>).MakeGenericType(typeof(Scope), decoratingType);
+        }
 
         private sealed class ContainerControlledCollectionRegistration : Registration
         {

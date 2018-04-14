@@ -37,6 +37,9 @@ namespace SimpleInjector.Decorators
     /// </summary>
     internal abstract class DecoratorExpressionInterceptor
     {
+        private static readonly MethodInfo ResolveWithinThreadResolveScopeMethod =
+            typeof(DecoratorExpressionInterceptor).GetMethod(nameof(ResolveWithinThreadResolveScope));
+
         private static readonly Func<Container, object, ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>> ThreadLocalDictionaryFactory =
             (container, key) => new ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>(
                 () => new Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>());
@@ -65,6 +68,25 @@ namespace SimpleInjector.Decorators
         protected abstract Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
         {
             get;
+        }
+
+        // NOTE: This method must be public for it to be callable through reflection when running in a sandbox.
+        public static TService ResolveWithinThreadResolveScope<TService>(
+            Scope scope, Func<TService> instanceCreator)
+        {
+            var container = scope.Container;
+
+            Scope originalScope = container.CurrentThreadResolveScope;
+
+            try
+            {
+                container.CurrentThreadResolveScope = scope;
+                return instanceCreator();
+            }
+            finally
+            {
+                container.CurrentThreadResolveScope = originalScope;
+            }
         }
 
         // Store a ServiceTypeDecoratorInfo object per closed service type. We have a dictionary per
@@ -142,20 +164,7 @@ namespace SimpleInjector.Decorators
                 decoratorConstructor.DeclaringType, this.Container,
                 overriddenParameters);
         }
-
-        protected static bool IsDecorateeParameter(ParameterInfo parameter, Type registeredServiceType)
-        {
-            return IsDecorateeDependencyParameter(parameter, registeredServiceType) ||
-                IsDecorateeFactoryDependencyParameter(parameter, registeredServiceType);
-        }
-
-        protected static bool IsDecorateeFactoryDependencyParameter(ParameterInfo parameter, Type serviceType)
-        {
-            return parameter.ParameterType.IsGenericType() &&
-                parameter.ParameterType.GetGenericTypeDefinition() == typeof(Func<>) &&
-                parameter.ParameterType == typeof(Func<>).MakeGenericType(serviceType);
-        }
-
+        
         protected DecoratorPredicateContext CreatePredicateContext(ExpressionBuiltEventArgs e)
         {
             return this.CreatePredicateContext(e.InstanceProducer, e.ReplacedRegistration,
@@ -179,18 +188,19 @@ namespace SimpleInjector.Decorators
         {
             return
                 BuildExpressionForDecorateeDependencyParameter(parameter, serviceType, expression) ??
-                this.BuildExpressionForDecorateeFactoryDependencyParameter(parameter, serviceType, expression);
+                this.BuildExpressionForDecorateeFactoryDependencyParameter(parameter, serviceType, expression) ??
+                this.BuildExpressionForScopedDecorateeFactoryDependencyParameter(parameter, serviceType, expression);
         }
 
-        protected static ParameterInfo GetDecorateeParameter(Type serviceType,
-            ConstructorInfo decoratorConstructor)
+        protected static ParameterInfo GetDecorateeParameter(
+            Type serviceType, ConstructorInfo decoratorConstructor)
         {
             // Although we partly check for duplicate arguments during registration phase, we must do it here
             // as well, because some registrations are allowed while not all closed-generic implementations
             // can be resolved.
             var parameters = (
                 from parameter in decoratorConstructor.GetParameters()
-                where DecoratorHelpers.IsDecorateeParameter(parameter.ParameterType, serviceType)
+                where DecoratorHelpers.IsDecorateeParameter(parameter, serviceType)
                 select parameter)
                 .ToArray();
 
@@ -219,7 +229,7 @@ namespace SimpleInjector.Decorators
         {
             // Func<T> dependencies for the decoratee must be explicitly added to the InstanceProducer as 
             // verifier. This allows those dependencies to be verified when calling Container.Verify().
-            Action verifier = GetVerifierFromDecorateeExpression(decorateeExpression);
+            Action<Scope> verifier = GetVerifierFromDecorateeExpression(decorateeExpression);
 
             producer.AddVerifier(verifier);
         }
@@ -235,7 +245,7 @@ namespace SimpleInjector.Decorators
 
             var currentProducer = info.GetCurrentInstanceProducer();
 
-            if (IsDecorateeFactoryDependencyParameter(decorateeParameter, serviceType))
+            if (DecoratorHelpers.IsDecorateeFactoryDependencyType(decorateeParameter.ParameterType, serviceType))
             {
                 // Adding a verifier makes sure the graph for the decoratee gets created,
                 // which allows testing whether constructing the graph fails.
@@ -269,11 +279,20 @@ namespace SimpleInjector.Decorators
                 select new OverriddenParameter(parameter, contextExpression, currentProducer);
         }
 
-        private static Action GetVerifierFromDecorateeExpression(Expression decorateeExpression)
+        private static Action<Scope> GetVerifierFromDecorateeExpression(Expression decorateeExpression)
         {
-            Func<object> instanceCreator = (Func<object>)((ConstantExpression)decorateeExpression).Value;
+            var value = ((ConstantExpression)decorateeExpression).Value;
 
-            return () => instanceCreator();
+            if (value is Func<object> instanceCreator)
+            {
+                return _ => instanceCreator();
+            }
+            else
+            {
+                var scopedInstanceCreator = (Func<Scope, object>)value;
+
+                return scope => scopedInstanceCreator(scope);
+            }
         }
 
         // The constructor parameter in which the decorated instance should be injected.
@@ -297,7 +316,7 @@ namespace SimpleInjector.Decorators
         private Expression BuildExpressionForDecorateeFactoryDependencyParameter(
             ParameterInfo parameter, Type serviceType, Expression expression)
         {
-            if (IsDecorateeFactoryDependencyParameter(parameter, serviceType))
+            if (DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(parameter.ParameterType, serviceType))
             {
                 // We can't call CompilationHelpers.CompileExpression here, because it has a generic type and
                 // we don't know the type at runtime here. We need to do some refactoring to CompilationHelpers
@@ -308,6 +327,34 @@ namespace SimpleInjector.Decorators
                     Expression.Lambda(Expression.Convert(expression, serviceType)).Compile();
 
                 return Expression.Constant(instanceCreator);
+            }
+
+            return null;
+        }
+
+        // The constructor parameter in which the factory for creating decorated instances should be injected.
+        private Expression BuildExpressionForScopedDecorateeFactoryDependencyParameter(
+            ParameterInfo parameter, Type serviceType, Expression expression)
+        {
+            if (DecoratorHelpers.IsScopeDecorateeFactoryDependencyParameter(parameter.ParameterType, serviceType))
+            {
+                expression = CompilationHelpers.OptimizeScopedRegistrationsInObjectGraph(this.Container, expression);
+
+                var instanceCreator =
+                    Expression.Lambda(Expression.Convert(expression, serviceType)).Compile();
+
+                var scopeParameter = Expression.Parameter(typeof(Scope), "scope");
+
+                // Create an Func<Scope, [ServiceType>
+                var scopedInstanceCreator = Expression.Lambda(
+                    Expression.Call(
+                        ResolveWithinThreadResolveScopeMethod.MakeGenericMethod(serviceType),
+                        scopeParameter,
+                        Expression.Constant(instanceCreator)),
+                    scopeParameter)
+                    .Compile();
+
+                return Expression.Constant(scopedInstanceCreator);
             }
 
             return null;
