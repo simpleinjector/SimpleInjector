@@ -2474,7 +2474,7 @@
         }
 
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behaviorx()
+        public void InjectedScopeDecorateeFactory_WhenSuppliedWithAScopeInstance_CreatesScopedInstancesBasedOnThatScope()
         {
             // Arrange
             var container = ContainerFactory.New();

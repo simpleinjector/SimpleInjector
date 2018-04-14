@@ -1086,7 +1086,7 @@
         }
 
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior()
+        public void Verify_RegistrationDependingOnScopeWithDefaultScopedLifestyleSet_Succeeds()
         {
             var container = ContainerFactory.New();
             container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();

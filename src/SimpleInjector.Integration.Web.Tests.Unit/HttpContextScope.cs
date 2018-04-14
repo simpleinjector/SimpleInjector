@@ -61,7 +61,7 @@
     public class HttpContextScopeTests
     {
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior()
+        public void ctor_Always_SetsHttpContextCurrentForCurrentThread()
         {
             // Arrange
             Assert.IsNull(HttpContext.Current, "Test setup failed");
@@ -72,12 +72,25 @@
                 // Assert
                 Assert.IsNotNull(HttpContext.Current, "HttpContext.Current should be set.");
             }
+        }
 
+        [TestMethod]
+        public void Dispose_Always_ClearsHttpContextCurrentForCurrentThread()
+        {
+            // Arrange
+            Assert.IsNull(HttpContext.Current, "Test setup failed");
+
+            // Act
+            using (new HttpContextScope())
+            {
+            }
+
+            // Assert
             Assert.IsNull(HttpContext.Current, "HttpContext.Current should be null after disposing.");
         }
 
         [TestMethod]
-        public void MethodUnderTest_Scenario_Behavior2()
+        public void ctor_Never_SetsHttpContextCurrentOnDifferentThread()
         {
             // Arrange
             Assert.IsNull(HttpContext.Current, "Test setup failed");
