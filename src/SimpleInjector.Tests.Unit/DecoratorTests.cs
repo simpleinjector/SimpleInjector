@@ -2478,7 +2478,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.Options.DefaultScopedLifestyle = new AmbientlessScopedLifestyle();
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
 
             container.Register<ICommandHandler<int>, NullCommandHandler<int>>(Lifestyle.Scoped);
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ScopedCommandHandlerProxy<>),
@@ -2523,12 +2523,6 @@
             {
                 this.DecorateeFactory = decorateeFactory;
             }
-        }
-
-        private sealed class AmbientlessScopedLifestyle : ScopedLifestyle
-        {
-            public AmbientlessScopedLifestyle() : base("Scoped") { }
-            protected internal override Func<Scope> CreateCurrentScopeProvider(Container c) => () => null;
         }
     }
 

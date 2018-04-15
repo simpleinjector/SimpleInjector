@@ -50,12 +50,11 @@ namespace SimpleInjector
         internal Scope VerificationScope { get; private set; }
 
         // Allows to resolve directly from a scope instead of relying on an ambient context.
-        // TODO: Optimize performance for the common scenario where the resolveScope is never used.
         internal Scope CurrentThreadResolveScope
         {
             get
             {
-                return this.resolveScope.Value;
+                return this.usingCurrentThreadResolveScope ? this.resolveScope.Value : null;
             }
 
             set
@@ -119,6 +118,11 @@ namespace SimpleInjector
                 : this.usingCurrentThreadResolveScope
                     ? this.resolveScope.Value
                     : null;
+
+        internal void UseCurrentThreadResolveScope()
+        {
+            this.usingCurrentThreadResolveScope = true;
+        }
 
         private void VerifyInternal(bool suppressLifestyleMismatchVerification)
         {

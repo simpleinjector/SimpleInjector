@@ -47,17 +47,11 @@ namespace SimpleInjector.Lifestyles
                 return lifestyle.GetCurrentScope(container) ?? ThrowThereIsNoActiveScopeException();
             }
 
-            if (container.GetVerificationOrResolveScopeForCurrentThread() == null)
-            {
-                ThrowResolveFromScopeOrRegisterDefaultScopedLifestyleException();
-            }
-
-            // We return null instead of one of the scope returned from the previous method call,
-            // since the CreateCurrentScopeProvider contract states that we should return null.
-            return null;
+            return container.GetVerificationOrResolveScopeForCurrentThread()
+                ?? ThrowResolveFromScopeOrRegisterDefaultScopedLifestyleException();
         }
 
-        private static void ThrowResolveFromScopeOrRegisterDefaultScopedLifestyleException()
+        private static Scope ThrowResolveFromScopeOrRegisterDefaultScopedLifestyleException()
         {
             throw new InvalidOperationException(
                 "To be able to resolve and inject Scope instances, you need to either resolve " +

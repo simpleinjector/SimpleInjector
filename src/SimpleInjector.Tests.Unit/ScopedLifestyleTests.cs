@@ -749,7 +749,7 @@
             plugin = null;
 
             // Act
-            // When calling verify, we expect DisposablePlugin to be created again.
+            // When calling verify, we expect DisposablePlugin to be created again, because verify gets its own scope
             container.Verify();
 
             // Assert
@@ -976,7 +976,7 @@
             var container = ContainerFactory.New();
 
             // We need a 'dummy' scoped lifestyle to be able to use Lifestyle.Scoped
-            container.Options.DefaultScopedLifestyle = new AmbientlessScopedLifestyle();
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
 
             container.Register<ILogger, NullLogger>(Lifestyle.Scoped);
 
@@ -999,12 +999,13 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Options.DefaultScopedLifestyle = new AmbientlessScopedLifestyle();
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
 
             // Calling back into the container to get a scoped instance, from within an instanceCreator lambda,
             // should work, in case the the root object is resolved from a scope.
             container.Register<ILogger>(() => container.GetInstance<NullLogger>());
             container.Register<NullLogger>(Lifestyle.Scoped);
+            container.Register<ServiceDependingOn<ILogger>>();
 
             var scope = new Scope(container);
 
@@ -1186,12 +1187,6 @@
             }
 
             protected internal override Func<Scope> CreateCurrentScopeProvider(Container c) => () => this.scope;
-        }
-
-        private sealed class AmbientlessScopedLifestyle : ScopedLifestyle
-        {
-            public AmbientlessScopedLifestyle() : base("Scoped") { }
-            protected internal override Func<Scope> CreateCurrentScopeProvider(Container c) => () => null;
         }
     }
 }

@@ -35,6 +35,14 @@ namespace SimpleInjector
     /// </summary>
     public abstract class ScopedLifestyle : Lifestyle
     {
+        /// <summary>
+        /// Gets the scoped lifestyle that allows Scoped registrations to be resolved direclty from the
+        /// <see cref="Scope"/> by calling <see cref="Scope.GetInstance{TService}()"/>. This allows multiple
+        /// scopes to be active and overlap within the same logical context, such as a single thread, or an
+        /// asynchronous context.
+        /// </summary>
+        public static readonly ScopedLifestyle Flowing = new FlowingScopedLifestyle();
+
         /// <summary>Initializes a new instance of the <see cref="ScopedLifestyle"/> class.</summary>
         /// <param name="name">The user friendly name of this lifestyle.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB) 

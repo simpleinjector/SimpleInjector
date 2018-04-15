@@ -163,7 +163,6 @@ namespace SimpleInjector.Decorators
 
         private OverriddenParameter[] CreateOverriddenParameters(Expression decorateeExpression)
         {
-            // TODO: Check this
             ParameterInfo decorateeParameter =
                 GetDecorateeParameter(this.registeredServiceType, this.decoratorConstructor);
 
