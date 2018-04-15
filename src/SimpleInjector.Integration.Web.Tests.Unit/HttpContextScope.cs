@@ -61,7 +61,7 @@
     public class HttpContextScopeTests
     {
         [TestMethod]
-        public void ctor_Always_SetsHttpContextCurrentForCurrentThread()
+        public void Ctor_Always_SetsHttpContextCurrentForCurrentThread()
         {
             // Arrange
             Assert.IsNull(HttpContext.Current, "Test setup failed");
@@ -90,7 +90,7 @@
         }
 
         [TestMethod]
-        public void ctor_Never_SetsHttpContextCurrentOnDifferentThread()
+        public void Ctor_Never_SetsHttpContextCurrentOnDifferentThread()
         {
             // Arrange
             Assert.IsNull(HttpContext.Current, "Test setup failed");
