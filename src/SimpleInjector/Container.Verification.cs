@@ -40,10 +40,35 @@ namespace SimpleInjector
         // Flag to signal that the container's configuration is currently being verified.
         private readonly ThreadLocal<bool> isVerifying = new ThreadLocal<bool>();
 
+        private readonly ThreadLocal<Scope> resolveScope = new ThreadLocal<Scope>();
+
+        private bool usingCurrentThreadResolveScope;
+
         // Flag to signal that the container's configuration has been verified (at least once).
         internal bool SuccesfullyVerified { get; private set; }
 
         internal Scope VerificationScope { get; private set; }
+
+        // Allows to resolve directly from a scope instead of relying on an ambient context.
+        internal Scope CurrentThreadResolveScope
+        {
+            get
+            {
+                return this.usingCurrentThreadResolveScope ? this.resolveScope.Value : null;
+            }
+
+            set
+            {
+                // PERF: We flag the use of the current-thread-resolve-scope to optimize getting the right
+                // scope. Most application's won't resolve directly from the scope, but from the container.
+                if (!this.usingCurrentThreadResolveScope)
+                {
+                    this.usingCurrentThreadResolveScope = true;
+                }
+
+                this.resolveScope.Value = value;
+            }
+        }
 
         /// <summary>
         /// Verifies and diagnoses this <b>Container</b> instance. This method will call all registered 
@@ -87,10 +112,17 @@ namespace SimpleInjector
         // different thread.
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        internal Scope GetVerificationScopeForCurrentThread() => 
+        internal Scope GetVerificationOrResolveScopeForCurrentThread() =>
             this.VerificationScope != null && this.IsVerifying
                 ? this.VerificationScope
-                : null;
+                : this.usingCurrentThreadResolveScope
+                    ? this.resolveScope.Value
+                    : null;
+
+        internal void UseCurrentThreadResolveScope()
+        {
+            this.usingCurrentThreadResolveScope = true;
+        }
 
         private void VerifyInternal(bool suppressLifestyleMismatchVerification)
         {
@@ -167,7 +199,7 @@ namespace SimpleInjector
                 where !producer.InstanceSuccessfullyCreated || !producer.VerifiersAreSuccessfullyCalled
                 select producer;
 
-            VerifyInstanceCreation(producersToVerify.ToArray());
+            this.VerifyInstanceCreation(producersToVerify.ToArray());
         }
 
         private IEnumerable<InstanceProducer> GetProducersThatNeedExplicitVerification()
@@ -200,7 +232,7 @@ namespace SimpleInjector
             }
         }
 
-        private static void VerifyInstanceCreation(InstanceProducer[] producersToVerify)
+        private void VerifyInstanceCreation(InstanceProducer[] producersToVerify)
         {
             foreach (var producer in producersToVerify)
             {
@@ -213,7 +245,7 @@ namespace SimpleInjector
 
                 if (!producer.VerifiersAreSuccessfullyCalled)
                 {
-                    producer.DoExtraVerfication();
+                    producer.DoExtraVerfication(this.VerificationScope);
                 }
             }
         }

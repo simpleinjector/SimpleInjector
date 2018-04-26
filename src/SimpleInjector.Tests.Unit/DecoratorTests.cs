@@ -2473,6 +2473,32 @@
                 action);
         }
 
+        [TestMethod]
+        public void InjectedScopeDecorateeFactory_WhenSuppliedWithAScopeInstance_CreatesScopedInstancesBasedOnThatScope()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+
+            container.Register<ICommandHandler<int>, NullCommandHandler<int>>(Lifestyle.Scoped);
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ScopedCommandHandlerProxy<>),
+                Lifestyle.Singleton);
+
+            var proxy = (ScopedCommandHandlerProxy<int>)container.GetInstance<ICommandHandler<int>>();
+            var factory = proxy.DecorateeFactory;
+
+            // Act
+            var scope1 = new Scope(container);
+            var handler1 = proxy.DecorateeFactory(scope1);
+            var handler2 = proxy.DecorateeFactory(scope1);
+            var handler3 = proxy.DecorateeFactory(new Scope(container));
+
+            // Assert
+            Assert.IsInstanceOfType(handler1, typeof(NullCommandHandler<int>));
+            Assert.AreSame(handler1, handler2, "Handler is expected to be Scoped but was transient.");
+            Assert.AreNotSame(handler2, handler3, "Handler is expected to be Scoped but was singleton.");
+        }
+
         private static KnownRelationship GetValidRelationship()
         {
             // Arrange
@@ -2486,6 +2512,16 @@
         {
             public void Intercept(IInvocation invocation)
             {
+            }
+        }
+
+        public sealed class ScopedCommandHandlerProxy<T> : ICommandHandler<T>
+        {
+            public readonly Func<Scope, ICommandHandler<T>> DecorateeFactory;
+
+            public ScopedCommandHandlerProxy(Func<Scope, ICommandHandler<T>> decorateeFactory)
+            {
+                this.DecorateeFactory = decorateeFactory;
             }
         }
     }

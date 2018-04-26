@@ -88,7 +88,6 @@ namespace SimpleInjector
         internal static readonly IEqualityComparer<InstanceProducer> EqualityComparer =
             ReferenceEqualityComparer<InstanceProducer>.Instance;
 
-        private static readonly Action[] NoVerifiers = Helpers.Array<Action>.Empty;
         private static readonly Predicate<PredicateContext> Always = context => true;
 
         private readonly object locker = new object();
@@ -99,7 +98,7 @@ namespace SimpleInjector
         private bool? isValid = true;
         private Lifestyle overriddenLifestyle;
         private ReadOnlyCollection<KnownRelationship> knownRelationships;
-        private List<Action> verifiers;
+        private List<Action<Scope>> verifiers;
         private List<InstanceProducer> wrappedProducers;
 
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
@@ -410,13 +409,13 @@ namespace SimpleInjector
         // A verifier is an Action delegate that will be called during the object creation step in the
         // verification process (when the user calls Verify()) to enable verification of the whole object 
         // graph.
-        internal void AddVerifier(Action action)
+        internal void AddVerifier(Action<Scope> action)
         {
             lock (this.locker)
             {
                 if (this.verifiers == null)
                 {
-                    this.verifiers = new List<Action>();
+                    this.verifiers = new List<Action<Scope>>();
                 }
 
                 this.verifiers.Add(action);
@@ -446,13 +445,13 @@ namespace SimpleInjector
             this.isValid = null;
         }
 
-        internal void DoExtraVerfication()
+        internal void DoExtraVerfication(Scope scope)
         {
             try
             {
                 foreach (var verify in this.GetVerifiers())
                 {
-                    verify();
+                    verify(scope);
                 }
 
                 this.VerifiersAreSuccessfullyCalled = true;
@@ -464,11 +463,11 @@ namespace SimpleInjector
             }
         }
 
-        private Action[] GetVerifiers()
+        private Action<Scope>[] GetVerifiers()
         {
             lock (this.locker)
             {
-                return this.verifiers != null ? this.verifiers.ToArray() : NoVerifiers;
+                return this.verifiers?.ToArray() ?? Helpers.Array<Action<Scope>>.Empty;
             }
         }
 

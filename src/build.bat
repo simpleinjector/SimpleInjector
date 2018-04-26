@@ -10,7 +10,7 @@ IF "%1"=="" (
 
 set step="%1"
 
-set version=4.1.0
+set version=4.0.0
 set prereleasePostfix=
 set buildNumber=0 
 set copyrightYear=2018
@@ -288,18 +288,16 @@ IF %step%=="4" (
 )
 
 IF %step%=="5" (
-	set version_restore_line="    <VersionPrefix>4.0.0</VersionPrefix>"
-
 	echo RESTORE VERSION NUMBERS
-	%replace% /line "<VersionPrefix>" %version_restore_line% /source:SimpleInjector\SimpleInjector.csproj
-	%replace% /line "<VersionPrefix>" %version_restore_line% /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
-	%replace% /line "<VersionPrefix>" %version_restore_line% /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj
-	%replace% /line "<VersionPrefix>" %version_restore_line% /source:SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj
-	%replace% /line "<VersionPrefix>" %version_restore_line% /source:SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj
-	%replace% /line "<VersionPrefix>" %version_restore_line% /source:SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj
-	%replace% /line "<VersionPrefix>" %version_restore_line% /source:SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj
-	%replace% /line "<VersionPrefix>" %version_restore_line% /source:SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj
-	%replace% /line "<VersionPrefix>" %version_restore_line% /source:SimpleInjector.Packaging\SimpleInjector.Packaging.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Packaging\SimpleInjector.Packaging.csproj
 	
 	echo Done!
 	GOTO :EOF	

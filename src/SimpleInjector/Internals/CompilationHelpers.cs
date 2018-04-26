@@ -141,8 +141,8 @@ namespace SimpleInjector.Internals
         // Func<HomeController> factory = () =>
         // {
         //     var scope1 = new LazyScope(scopeFactory1, container);
-        //     var value1 = new LazyScopedRegistration<IRepository, RepositoryImpl>(reg1);
-        //     var value2 = new LazyScopedRegistration<IService, ServiceImpl>(reg2);
+        //     var value1 = new LazyScopedRegistration<RepositoryImpl>(reg1);
+        //     var value2 = new LazyScopedRegistration<ServiceImpl>(reg2);
         //
         //     return new HomeController(
         //         value1.GetInstance(scope1.Value), // Hits ThreadLocal, hits dictionary

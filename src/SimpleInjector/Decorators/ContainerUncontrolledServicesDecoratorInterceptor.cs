@@ -275,7 +275,7 @@ namespace SimpleInjector.Decorators
 
         private bool DecoratorNeedsADecorateeFactory() => (
             from parameter in this.decoratorConstructor.GetParameters()
-            where IsDecorateeFactoryDependencyParameter(parameter, this.registeredServiceType)
+            where DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(parameter.ParameterType, this.registeredServiceType)
             select parameter)
             .Any();
 
