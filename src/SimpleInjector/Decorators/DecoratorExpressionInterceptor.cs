@@ -41,8 +41,15 @@ namespace SimpleInjector.Decorators
             typeof(DecoratorExpressionInterceptor).GetMethod(nameof(ResolveWithinThreadResolveScope));
 
         private static readonly Func<Container, object, ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>> ThreadLocalDictionaryFactory =
-            (container, key) => new ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>(
-                () => new Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>());
+            (container, key) =>
+            {
+                var threadLocal = new ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>(
+                    () => new Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>());
+
+                container.RegisterForDisposal(threadLocal);
+
+                return threadLocal;
+            };
 
         private readonly DecoratorExpressionInterceptorData data;
 
@@ -101,12 +108,7 @@ namespace SimpleInjector.Decorators
         // DecoratorExpressionInterceptor and the ContainerUncontrolledServiceDecoratorInterceptor can have
         // their own dictionary. This is needed because they both use the same key, but store different
         // information.
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
-            Justification = "The ThreadLocal<T> instances are cached for the lifetime of the container. " +
-                "We have no mechanism to dispose them, but this isn't a big problem, because the container " +
-                "will typically live for the duration of the AppDomain and we will only created a limited " +
-                "amount of ThreadLocal<T> instances.")]
-        protected Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> GetThreadStaticServiceTypePredicateCacheByKey(object key) => 
+        protected Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> GetThreadStaticServiceTypePredicateCacheByKey(object key) =>
             this.Container.GetOrSetItem(key, ThreadLocalDictionaryFactory).Value;
 
         protected bool SatisfiesPredicate(DecoratorPredicateContext context) =>
