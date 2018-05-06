@@ -471,10 +471,12 @@ namespace SimpleInjector
             Type[] implementations) =>
             string.Format(CultureInfo.InvariantCulture,
                 "There are {0} types in the supplied list of types or assemblies that represent the " +
-                "same closed generic type {1}. Conflicting types: {2}.",
+                "same closed generic type {1}. Did you meant to register register the types as a " +
+                "collection using the {2} method instead? Conflicting types: {3}.",
                 implementations.Length,
                 closedServiceType.TypeName(),
-                implementations.Select(type => type.TypeName()).ToCommaSeparatedText());
+                nameof(Container.RegisterCollection),
+                implementations.Select(TypeName).ToCommaSeparatedText());
 
         internal static string CantGenerateFuncForDecorator(Type serviceType, Type decoratorType) =>
             string.Format(CultureInfo.InvariantCulture,
