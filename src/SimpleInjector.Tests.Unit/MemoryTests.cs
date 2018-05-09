@@ -112,11 +112,10 @@
 
         private static string ToMemorySize(long bytes) =>
             bytes >= 1024 * 1024 * 10
-            ? bytes / (1024 * 1024) + " MB"
+            ? (bytes / (1024 * 1024)) + " MB"
             : bytes >= 1024 * 10
-                ? bytes / 1024 + " KB"
+                ? (bytes / 1024) + " KB"
                 : bytes + " bytes";
-
 
         private class MemoryResults
         {
