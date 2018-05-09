@@ -25,6 +25,7 @@ namespace SimpleInjector
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
@@ -40,6 +41,54 @@ namespace SimpleInjector
             Requires.IsNotNull(container, nameof(container));
 
             this.container = container;
+        }
+
+        /// <summary>
+        /// Creates a collection of 
+        /// all concrete, non-generic types (both public and internal) that are defined in the given
+        /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
+        /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
+        /// Unless overridden using a custom 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
+        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
+        /// </summary>
+        /// <typeparam name="TService">The element type of the collections to register. This can be either
+        /// a non-generic, closed-generic or open-generic type.</typeparam>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
+        /// reference (Nothing in VB).</exception>
+        /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
+        /// every time the collection is enumerated.</returns>
+        public IEnumerable<TService> Create<TService>(params Assembly[] assemblies) where TService : class
+        {
+            return this.Create<TService>((IEnumerable<Assembly>)assemblies);
+        }
+
+        /// <summary>
+        /// Creates a collection of 
+        /// all concrete, non-generic types (both public and internal) that are defined in the given
+        /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
+        /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
+        /// Unless overridden using a custom 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
+        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
+        /// </summary>
+        /// <typeparam name="TService">The element type of the collections to register. This can be either
+        /// a non-generic, closed-generic or open-generic type.</typeparam>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
+        /// reference (Nothing in VB).</exception>
+        /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
+        /// every time the collection is enumerated.</returns>
+        public IEnumerable<TService> Create<TService>(IEnumerable<Assembly> assemblies) where TService : class
+        {
+            Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
+            Requires.IsNotNull(assemblies, nameof(assemblies));
+
+            var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };
+            var types = this.container.GetTypesToRegister(typeof(TService), assemblies, compositesExcluded);
+
+            return this.Create<TService>(types);
         }
 
         /// <summary>

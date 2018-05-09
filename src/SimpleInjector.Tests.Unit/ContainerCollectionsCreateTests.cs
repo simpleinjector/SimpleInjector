@@ -1,13 +1,21 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class ContainerCollectionsCreateTests
     {
+        public interface ILogStuf
+        {
+        }
+
+        private static readonly Assembly CurrentAssembly = typeof(RegisterCollectionTests).GetTypeInfo().Assembly;
+
         [TestMethod]
         public void Create_WhenReturnedCollectionIterated_ProducesTheExpectedInstances()
         {
@@ -282,7 +290,59 @@
                 "The supplied type Logger<T> is an open generic type.",
                 action);
         }
+        
+        [TestMethod]
+        public void RegisterCollectionTServiceAssemblyArray_RegisteringNonGenericServiceAndAssemblyWithMultipleImplementations_RegistersThoseImplementations()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            var loggers = container.Collections.Create<ILogStuf>(new[] { CurrentAssembly });
+
+            // Assert
+            Assert_ContainsAllLoggers(loggers);
+        }
+
+        [TestMethod]
+        public void RegisterCollectionTServiceAssemblyEnumerable_AccidentallyUsingTheSameAssemblyTwice_RegistersThoseImplementationsOnce()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var assemblies = Enumerable.Repeat(CurrentAssembly, 2);
+
+            // Act
+            var loggers = container.Collections.Create<ILogStuf>(assemblies);
+
+            // Assert
+            Assert_ContainsAllLoggers(loggers);
+        }
 
         private static Type GetType<T>(T instance) => instance.GetType();
+        
+        private static void Assert_ContainsAllLoggers(IEnumerable loggers)
+        {
+            var instances = loggers.Cast<ILogStuf>().ToArray();
+
+            string types = string.Join(", ", instances.Select(instance => instance.GetType().Name));
+
+            Assert.AreEqual(3, instances.Length, "Actual: " + types);
+            Assert.IsTrue(instances.OfType<LogStuff1>().Any(), "Actual: " + types);
+            Assert.IsTrue(instances.OfType<LogStuff2>().Any(), "Actual: " + types);
+            Assert.IsTrue(instances.OfType<LogStuff3>().Any(), "Actual: " + types);
+        }
+        
+        public class LogStuff1 : ILogStuf
+        {
+        }
+
+        public class LogStuff2 : ILogStuf
+        {
+        }
+
+        public class LogStuff3 : ILogStuf
+        {
+        }
     }
 }
