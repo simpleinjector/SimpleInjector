@@ -82,7 +82,6 @@ namespace SimpleInjector
         /// every time the collection is enumerated.</returns>
         public IEnumerable<TService> Create<TService>(IEnumerable<Assembly> assemblies) where TService : class
         {
-            Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
             Requires.IsNotNull(assemblies, nameof(assemblies));
 
             var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };
@@ -190,6 +189,62 @@ namespace SimpleInjector
             where TService : class
         {
             return this.CreateInternal<TService>(registrations);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of 
+        /// all concrete, non-generic types (both public and internal) that are defined in the given
+        /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
+        /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
+        /// Unless overridden using a custom 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
+        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
+        /// The collection's instances will be resolved lazily
+        /// each time the returned collection of <typeparamref name="TService"/> is enumerated. 
+        /// The underlying collection is a stream that will return individual instances based on their 
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
+        /// The order in which the types appear in the collection is the exact same order that the items were 
+        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// </summary>
+        /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
+        /// reference (Nothing in VB).</exception>
+        public Registration CreateRegistration<TService>(params Assembly[] assemblies) where TService : class
+        {
+            return this.CreateRegistration<TService>((IEnumerable<Assembly>)assemblies);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of 
+        /// all concrete, non-generic types (both public and internal) that are defined in the given
+        /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
+        /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
+        /// Unless overridden using a custom 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
+        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
+        /// The collection's instances will be resolved lazily
+        /// each time the returned collection of <typeparamref name="TService"/> is enumerated. 
+        /// The underlying collection is a stream that will return individual instances based on their 
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
+        /// The order in which the types appear in the collection is the exact same order that the items were 
+        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// </summary>
+        /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
+        /// reference (Nothing in VB).</exception>
+        public Registration CreateRegistration<TService>(IEnumerable<Assembly> assemblies)
+            where TService : class
+        {
+            Requires.IsNotNull(assemblies, nameof(assemblies));
+
+            var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };
+            var types = this.container.GetTypesToRegister(typeof(TService), assemblies, compositesExcluded);
+
+            return this.CreateRegistration<TService>(types);
         }
 
         /// <summary>
