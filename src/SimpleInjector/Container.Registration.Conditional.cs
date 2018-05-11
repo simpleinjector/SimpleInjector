@@ -244,7 +244,7 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterConditional<TService>(Registration registration, Predicate<PredicateContext> predicate)
         {
-            RegisterConditional(typeof(TService), registration, predicate);
+            this.RegisterConditional(typeof(TService), registration, predicate);
         }
 
         /// <summary>
