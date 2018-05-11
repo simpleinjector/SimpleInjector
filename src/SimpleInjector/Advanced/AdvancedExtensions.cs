@@ -23,7 +23,6 @@
 namespace SimpleInjector.Advanced
 {
     using System;
-    using System.ComponentModel;
     using System.Reflection;
 
     /// <summary>
@@ -141,7 +140,7 @@ namespace SimpleInjector.Advanced
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void AppendToCollection(this Container container, Type serviceType, 
             Registration registration)
         {

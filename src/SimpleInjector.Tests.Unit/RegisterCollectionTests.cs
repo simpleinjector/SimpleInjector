@@ -2184,7 +2184,7 @@
 
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
                 "In case it is your goal to append items to an already registered collection, please use " +
-                "the Container.Collections.AppendTo method overloads.",
+                "the Container.Collections.Append method overloads.",
                 action);
         }
 

@@ -207,7 +207,7 @@
 
             container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
 
-            container.Collections.Append(typeof(IEventHandler<AuditableEvent>), typeof(NewConstraintEventHandler<AuditableEvent>));
+            container.Collections.Append<IEventHandler<AuditableEvent>, NewConstraintEventHandler<AuditableEvent>>();
 
             // Act
             container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
@@ -981,7 +981,7 @@
 
         private sealed class AlternativePropertySelectionBehavior : IPropertySelectionBehavior
         {
-            public bool SelectProperty(Type implementationType, PropertyInfo property)
+            public bool SelectProperty(Type implementationType, PropertyInfo propertyInfo)
             {
                 throw new NotImplementedException();
             }

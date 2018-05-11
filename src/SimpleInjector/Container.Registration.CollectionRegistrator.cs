@@ -24,7 +24,6 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
     using System.Reflection;
     using SimpleInjector.Internals;
@@ -53,8 +52,7 @@ namespace SimpleInjector
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
         /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// </summary>
-        /// <typeparam name="TService">The element type of the collections to register. This can be either
-        /// a non-generic, closed-generic or open-generic type.</typeparam>
+        /// <typeparam name="TService">The element type of the collections to register.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
@@ -74,8 +72,7 @@ namespace SimpleInjector
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
         /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// </summary>
-        /// <typeparam name="TService">The element type of the collections to register. This can be either
-        /// a non-generic, closed-generic or open-generic type.</typeparam>
+        /// <typeparam name="TService">The element type of the collections to register.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
@@ -369,7 +366,7 @@ namespace SimpleInjector
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void AppendTo(Type serviceType, Registration registration)
         {
             this.Append(serviceType, registration);
@@ -391,15 +388,16 @@ namespace SimpleInjector
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void AppendTo(Type serviceType, Type implementationType)
         {
             this.Append(serviceType, implementationType);
         }
 
         /// <summary>
-        /// Allows appending new registrations to existing registrations made using one of the
-        /// <b>RegisterCollection</b> overloads.
+        /// Appends a new <paramref name="registration"/> to existing registrations made using one of the
+        /// <see cref="Container.RegisterCollection(Type, IEnumerable{Type})">RegisterCollection</see>
+        /// overloads.
         /// </summary>
         /// <param name="serviceType">The service type of the collection.</param>
         /// <param name="registration">The registration to append.</param>
@@ -430,8 +428,30 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Allows appending new registrations to existing registrations made using one of the
-        /// <b>RegisterCollection</b> overloads.
+        /// Appends a new registration of <typeparamref name="TImplementation"/> to existing registrations 
+        /// made for a collection of <typeparamref name="TService"/> elements using one of the 
+        /// <see cref="Container.RegisterCollection(Type, IEnumerable{Type})">RegisterCollection</see>
+        /// overloads.
+        /// </summary>
+        /// <typeparam name="TService">The element type of the collections to register.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be appended as registration to the
+        /// collection.</typeparam>
+        /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TService"/>is ambiguous.
+        /// </exception>
+        public void Append<TService, TImplementation>()
+            where TImplementation : class, TService
+            where TService : class
+        {
+            Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
+            
+            this.container.AppendToCollectionInternal(typeof(TService), typeof(TImplementation));
+        }
+
+        /// <summary>
+        /// Appends a new registration to existing registrations made for a collection of 
+        /// <paramref name="serviceType"/> elements using one of the 
+        /// <see cref="Container.RegisterCollection(Type, IEnumerable{Type})">RegisterCollection</see>
+        /// overloads.
         /// </summary>
         /// <param name="serviceType">The service type of the collection.</param>
         /// <param name="implementationType">The implementation type to append.</param>
