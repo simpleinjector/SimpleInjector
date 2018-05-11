@@ -59,7 +59,7 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
         /// every time the collection is enumerated.</returns>
-        public IEnumerable<TService> Create<TService>(params Assembly[] assemblies) where TService : class
+        public IList<TService> Create<TService>(params Assembly[] assemblies) where TService : class
         {
             return this.Create<TService>((IEnumerable<Assembly>)assemblies);
         }
@@ -79,7 +79,7 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
         /// every time the collection is enumerated.</returns>
-        public IEnumerable<TService> Create<TService>(IEnumerable<Assembly> assemblies) where TService : class
+        public IList<TService> Create<TService>(IEnumerable<Assembly> assemblies) where TService : class
         {
             Requires.IsNotNull(assemblies, nameof(assemblies));
 
@@ -109,7 +109,7 @@ namespace SimpleInjector
         /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        public IEnumerable<TService> Create<TService>(params Type[] serviceTypes) where TService : class
+        public IList<TService> Create<TService>(params Type[] serviceTypes) where TService : class
         {
             return this.Create<TService>((IEnumerable<Type>)serviceTypes);
         }
@@ -134,7 +134,7 @@ namespace SimpleInjector
         /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        public IEnumerable<TService> Create<TService>(IEnumerable<Type> serviceTypes) where TService : class
+        public IList<TService> Create<TService>(IEnumerable<Type> serviceTypes) where TService : class
         {
             return this.CreateInternal<TService>(serviceTypes);
         }
@@ -159,7 +159,7 @@ namespace SimpleInjector
         /// (Nothing in VB) element or when <typeparamref name="TService"/> is not assignable from any of the
         /// types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
-        public IEnumerable<TService> Create<TService>(params Registration[] registrations) where TService : class
+        public IList<TService> Create<TService>(params Registration[] registrations) where TService : class
         {
             return this.Create<TService>((IEnumerable<Registration>)registrations);
         }
@@ -184,7 +184,7 @@ namespace SimpleInjector
         /// (Nothing in VB) element or when <typeparamref name="TService"/> is not assignable from any of the
         /// types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
-        public IEnumerable<TService> Create<TService>(IEnumerable<Registration> registrations)
+        public IList<TService> Create<TService>(IEnumerable<Registration> registrations)
             where TService : class
         {
             return this.CreateInternal<TService>(registrations);
