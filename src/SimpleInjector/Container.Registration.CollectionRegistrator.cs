@@ -24,6 +24,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Reflection;
     using SimpleInjector.Internals;
@@ -366,7 +367,51 @@ namespace SimpleInjector
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>RegisterCollection</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
+        [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
+            nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public void AppendTo(Type serviceType, Registration registration)
+        {
+            this.Append(serviceType, registration);
+        }
+
+        /// <summary>
+        /// Allows appending new registrations to existing registrations made using one of the
+        /// <b>RegisterCollection</b> overloads.
+        /// </summary>
+        /// <param name="serviceType">The service type of the collection.</param>
+        /// <param name="implementationType">The implementation type to append.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is not a
+        /// reference type, or ambiguous.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
+        /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
+        /// that is made with one of the <b>RegisterCollection</b> overloads that accepts a dynamic collection
+        /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
+        [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
+            nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void AppendTo(Type serviceType, Type implementationType)
+        {
+            this.Append(serviceType, implementationType);
+        }
+
+        /// <summary>
+        /// Allows appending new registrations to existing registrations made using one of the
+        /// <b>RegisterCollection</b> overloads.
+        /// </summary>
+        /// <param name="serviceType">The service type of the collection.</param>
+        /// <param name="registration">The registration to append.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is not a
+        /// reference type, is open generic, or ambiguous.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
+        /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
+        /// that is made with one of the <b>RegisterCollection</b> overloads that accepts a dynamic collection
+        /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
+        public void Append(Type serviceType, Registration registration)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(registration, nameof(registration));
@@ -398,7 +443,7 @@ namespace SimpleInjector
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>RegisterCollection</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        public void AppendTo(Type serviceType, Type implementationType)
+        public void Append(Type serviceType, Type implementationType)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(implementationType, nameof(implementationType));

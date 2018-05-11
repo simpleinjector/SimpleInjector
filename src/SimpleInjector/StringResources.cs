@@ -228,7 +228,7 @@ namespace SimpleInjector
                 serviceType.TypeName(),
                 nameof(ContainerOptions),
                 nameof(ContainerOptions.AllowOverridingRegistrations),
-                nameof(ContainerCollectionRegistrator.AppendTo));
+                nameof(ContainerCollectionRegistrator.Append));
 
         internal static string ParameterTypeMustBeRegistered(InjectionTargetInfo target, int numberOfConditionals,
             bool hasRelatedOneToOneMapping, bool hasRelatedCollectionMapping, Type[] skippedDecorators,

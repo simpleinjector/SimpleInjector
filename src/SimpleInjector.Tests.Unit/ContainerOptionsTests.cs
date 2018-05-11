@@ -207,7 +207,7 @@
 
             container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
 
-            container.Collections.AppendTo(typeof(IEventHandler<AuditableEvent>), typeof(NewConstraintEventHandler<AuditableEvent>));
+            container.Collections.Append(typeof(IEventHandler<AuditableEvent>), typeof(NewConstraintEventHandler<AuditableEvent>));
 
             // Act
             container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
@@ -963,7 +963,7 @@
 
         private sealed class AlternativeConstructorResolutionBehavior : IConstructorResolutionBehavior
         {
-            public ConstructorInfo GetConstructor(Type impl) => impl.GetConstructors()[0];
+            public ConstructorInfo GetConstructor(Type implementationType) => implementationType.GetConstructors()[0];
         }
 
         private sealed class AlternativeDependencyInjectionBehavior : IDependencyInjectionBehavior

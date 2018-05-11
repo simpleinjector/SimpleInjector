@@ -15,7 +15,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            container.Collections.AppendTo(typeof(object), CreateRegistration(container));
+            container.Collections.Append(typeof(object), CreateRegistration(container));
         }
 
         [TestMethod]
@@ -28,7 +28,7 @@
 
             // Act
             Action action =
-                () => container.Collections.AppendTo(invalidServiceType, CreateRegistration(container));
+                () => container.Collections.Append(invalidServiceType, CreateRegistration(container));
 
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentNullException>("serviceType", action);
@@ -43,7 +43,7 @@
             Registration invalidRegistration = null;
 
             // Act
-            Action action = () => container.Collections.AppendTo(typeof(object), invalidRegistration);
+            Action action = () => container.Collections.Append(typeof(object), invalidRegistration);
 
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentNullException>("registration", action);
@@ -60,7 +60,7 @@
             Registration invalidRegistration = CreateRegistration(differentContainer);
 
             // Act
-            Action action = () => container.Collections.AppendTo(typeof(object), invalidRegistration);
+            Action action = () => container.Collections.Append(typeof(object), invalidRegistration);
 
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentException>("registration", action);
@@ -76,7 +76,7 @@
 
             var registration = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
 
-            container.Collections.AppendTo(typeof(IPlugin), registration);
+            container.Collections.Append(typeof(IPlugin), registration);
 
             // Act
             var instance = container.GetAllInstances<IPlugin>().Single();
@@ -94,8 +94,8 @@
             var registration1 = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
             var registration2 = Lifestyle.Transient.CreateRegistration<PluginImpl2>(container);
 
-            container.Collections.AppendTo(typeof(IPlugin), registration1);
-            container.Collections.AppendTo(typeof(IPlugin), registration2);
+            container.Collections.Append(typeof(IPlugin), registration1);
+            container.Collections.Append(typeof(IPlugin), registration2);
 
             // Act
             var instances = container.GetAllInstances<IPlugin>().ToArray();
@@ -115,7 +115,7 @@
 
             var registration = Lifestyle.Transient.CreateRegistration<PluginImpl2>(container);
 
-            container.Collections.AppendTo(typeof(IPlugin), registration);
+            container.Collections.Append(typeof(IPlugin), registration);
 
             // Act
             var instances = container.GetAllInstances<IPlugin>().ToArray();
@@ -136,7 +136,7 @@
 
             container.RegisterCollection(typeof(IPlugin), new[] { registration1 });
 
-            container.Collections.AppendTo(typeof(IPlugin), registration2);
+            container.Collections.Append(typeof(IPlugin), registration2);
 
             // Act
             var instances = container.GetAllInstances<IPlugin>().ToArray();
@@ -155,12 +155,12 @@
             var registration1 = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
             var registration2 = Lifestyle.Transient.CreateRegistration<PluginImpl2>(container);
 
-            container.Collections.AppendTo(typeof(IPlugin), registration1);
+            container.Collections.Append(typeof(IPlugin), registration1);
 
             var instances = container.GetAllInstances<IPlugin>().ToArray();
 
             // Act
-            Action action = () => container.Collections.AppendTo(typeof(IPlugin), registration2);
+            Action action = () => container.Collections.Append(typeof(IPlugin), registration2);
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action);
@@ -179,7 +179,7 @@
             var registration = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
 
             // Act
-            Action action = () => container.Collections.AppendTo(typeof(IPlugin), registration);
+            Action action = () => container.Collections.Append(typeof(IPlugin), registration);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
@@ -205,7 +205,7 @@
 
             var registration = Lifestyle.Transient.CreateRegistration<StructEventHandler>(container);
 
-            container.Collections.AppendTo(typeof(IEventHandler<>), registration);
+            container.Collections.Append(typeof(IEventHandler<>), registration);
 
             // Act
             Type[] actualHandlerTypes = container.GetAllInstances(typeof(IEventHandler<StructEvent>))
@@ -231,7 +231,7 @@
 
             var registration = Lifestyle.Transient.CreateRegistration<StructEventHandler>(container);
 
-            container.Collections.AppendTo(typeof(IEventHandler<>), registration);
+            container.Collections.Append(typeof(IEventHandler<>), registration);
 
             container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
@@ -258,9 +258,9 @@
 
             var container = ContainerFactory.New();
 
-            container.Collections.AppendTo(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
-            container.Collections.AppendTo(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
-            container.Collections.AppendTo(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
+            container.Collections.Append(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
+            container.Collections.Append(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+            container.Collections.Append(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
 
             // Act
             Type[] actualHandlerTypes = container.GetAllInstances(typeof(IEventHandler<StructEvent>))
@@ -285,14 +285,14 @@
 
             var container = ContainerFactory.New();
 
-            container.Collections.AppendTo(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
+            container.Collections.Append(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
 
             container.RegisterCollection(typeof(IEventHandler<StructEvent>), new[]
             {
                 typeof(AuditableEventEventHandler<StructEvent>)
             });
 
-            container.Collections.AppendTo(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+            container.Collections.Append(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
 
             // Act
             Type[] actualHandlerTypes = container.GetAllInstances(typeof(IEventHandler<StructEvent>))
@@ -319,8 +319,8 @@
 
             container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
-            container.Collections.AppendTo(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
-            container.Collections.AppendTo(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
+            container.Collections.Append(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+            container.Collections.Append(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
 
             // Act
             Type[] actualHandlerTypes = container.GetAllInstances(typeof(IEventHandler<StructEvent>))
@@ -348,7 +348,7 @@
             var registration = Lifestyle.Singleton
                 .CreateRegistration(typeof(StructConstraintEventHandler<StructEvent>), container);
 
-            container.Collections.AppendTo(typeof(IEventHandler<>), registration);
+            container.Collections.Append(typeof(IEventHandler<>), registration);
 
             // Act
             var handler1 = container.GetAllInstances<IEventHandler<StructEvent>>().Last();
@@ -375,7 +375,7 @@
                 () => new StructConstraintEventHandler<StructEvent>(),
                 container);
 
-            container.Collections.AppendTo(typeof(IEventHandler<>), registration);
+            container.Collections.Append(typeof(IEventHandler<>), registration);
 
             // Act
             var handler1 = container.GetAllInstances<IEventHandler<StructEvent>>().Last();

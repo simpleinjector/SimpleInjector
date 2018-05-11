@@ -23,6 +23,7 @@
 namespace SimpleInjector.Advanced
 {
     using System;
+    using System.ComponentModel;
     using System.Reflection;
 
     /// <summary>
@@ -139,13 +140,14 @@ namespace SimpleInjector.Advanced
         /// that is made with one of the <b>RegisterCollection</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
-            nameof(ContainerCollectionRegistrator.AppendTo) + " instead.", error: false)]
+            nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void AppendToCollection(this Container container, Type serviceType, 
             Registration registration)
         {
             Requires.IsNotNull(container, nameof(container));
 
-            container.Collections.AppendTo(serviceType, registration);
+            container.Collections.Append(serviceType, registration);
         }
 
         /// <summary>
@@ -164,13 +166,13 @@ namespace SimpleInjector.Advanced
         /// that is made with one of the <b>RegisterCollection</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
-            nameof(ContainerCollectionRegistrator.AppendTo) + " instead.", error: false)]
+            nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
         public static void AppendToCollection(this Container container, Type serviceType,
             Type implementationType)
         {
             Requires.IsNotNull(container, nameof(container));
 
-            container.Collections.AppendTo(serviceType, implementationType);
+            container.Collections.Append(serviceType, implementationType);
         }
 
         internal static void Verify(this IDependencyInjectionBehavior behavior, ConstructorInfo constructor)

@@ -501,7 +501,7 @@ namespace SimpleInjector.Tests.Unit
                 typeof(StructEventHandler),
             });
 
-            container.Collections.AppendTo(typeof(IEventHandler<>),
+            container.Collections.Append(typeof(IEventHandler<>),
                 Lifestyle.Singleton.CreateRegistration<AuditableEventEventHandler>(container));
 
             var handler = container.GetAllInstances<IEventHandler<AuditableEvent>>().Single();
