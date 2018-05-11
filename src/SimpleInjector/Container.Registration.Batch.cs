@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015 Simple Injector Contributors
+ * Copyright (c) 2015-2018 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -272,9 +272,11 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
+        [Obsolete("Please use Container." + nameof(Collections) + "." +
+            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection<TService>(IEnumerable<Assembly> assemblies) where TService : class
         {
-            this.RegisterCollection(typeof(TService), assemblies);
+            this.Collections.Register<TService>(assemblies);
         }
 
         /// <summary>
@@ -294,9 +296,11 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
+        [Obsolete("Please use Container." + nameof(Collections) + "." +
+            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection(Type serviceType, params Assembly[] assemblies)
         {
-            this.RegisterCollection(serviceType, (IEnumerable<Assembly>)assemblies);
+            this.Collections.Register(serviceType, assemblies);
         }
 
         /// <summary>
@@ -316,11 +320,11 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
+        [Obsolete("Please use Container." + nameof(Collections) + "." +
+            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection(Type serviceType, IEnumerable<Assembly> assemblies)
         {
-            var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };
-            var types = this.GetTypesToRegister(serviceType, assemblies, compositesExcluded);
-            this.RegisterCollection(serviceType, types);
+            this.Collections.Register(serviceType, assemblies);
         }
 
         /// <summary>
@@ -329,8 +333,8 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using 
-        /// <see cref="RegisterCollection(Type, Assembly[])">RegisterCollection</see>. 
-        /// The <b>RegisterCollection</b> overloads that take a collection of <see cref="Assembly"/> 
+        /// <see cref="ContainerCollectionRegistrator.Register(Type, Assembly[])">Container.Collections.Register</see>. 
+        /// The <b>Collections.Register</b> overloads that take a collection of <see cref="Assembly"/> 
         /// objects use this method internally to get the list of types that need to be registered. Instead of
         /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
         /// and pass in a filtered result from this <b>GetTypesToRegister</b> method.
@@ -341,12 +345,12 @@ namespace SimpleInjector
         /// var types = container.GetTypesToRegister<ILogger>(assemblies)
         ///     .Where(type => type.IsPublic);
         /// 
-        /// container.RegisterCollection<ILogger>(types);
+        /// container.Collections.Register<ILogger>(types);
         /// ]]></code>
         /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
         /// of the <b>ILogger</b> interface from the assembly of that interface. After that
         /// all internal types are filtered out. This list is supplied to the
-        /// <see cref="Container.RegisterCollection{TService}(IEnumerable{TService})">RegisterCollection&lt;TService&gt;(IEnumerable&lt;Type&gt;)</see>
+        /// <see cref="ContainerCollectionRegistrator.Register{TService}(IEnumerable{Type})">Collections.Register&lt;TService&gt;(IEnumerable&lt;Type&gt;)</see>
         /// overload to finish the registration.
         /// </remarks>
         /// <typeparam name="TService">The base type or interface to find derived types for.</typeparam>
@@ -365,9 +369,9 @@ namespace SimpleInjector
         /// and implement or inherit from the supplied <typeparamref name="TService"/>. 
         /// </summary>
         /// <remarks>
-        /// Use this method when you need influence the types that are registered using 
-        /// <see cref="RegisterCollection(Type, Assembly[])">RegisterCollection</see>. 
-        /// The <b>RegisterCollection</b> overloads that take a collection of <see cref="Assembly"/> 
+        /// Use this method when you need influence the types that are registered using
+        /// <see cref="ContainerCollectionRegistrator.Register(Type, Assembly[])">Container.Collections.Register</see>. 
+        /// The <b>Collections.Register</b> overloads that take a collection of <see cref="Assembly"/> 
         /// objects use this method internally to get the list of types that need to be registered. Instead of
         /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
         /// and pass in a filtered result from this <b>GetTypesToRegister</b> method.
@@ -379,12 +383,12 @@ namespace SimpleInjector
         ///     typeof(FileLogger).Assembly)
         ///     .Where(type => type.IsPublic);
         /// 
-        /// container.RegisterCollection<ILogger>(types);
+        /// container.Collections.Register<ILogger>(types);
         /// ]]></code>
         /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
         /// of the <b>ILogger</b> interface from the assembly of that interface. After that
         /// all internal types are filtered out. This list is supplied to the
-        /// <see cref="Container.RegisterCollection{TService}(IEnumerable{TService})">RegisterCollection&lt;TService&gt;(IEnumerable&lt;Type&gt;)</see>
+        /// <see cref="ContainerCollectionRegistrator.Register{TService}(IEnumerable{TService})">Container.Collections.Register&lt;TService&gt;(IEnumerable&lt;Type&gt;)</see>
         /// overload to finish the registration.
         /// </remarks>
         /// <typeparam name="TService">The base type or interface to find derived types for.</typeparam>
@@ -405,8 +409,8 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using 
-        /// <see cref="Register(System.Type, IEnumerable{System.Reflection.Assembly})">Register</see>  or
-        /// <see cref="RegisterCollection(Type, Assembly[])">RegisterCollection</see>. 
+        /// <see cref="Register(System.Type, IEnumerable{System.Reflection.Assembly})">Register</see> or
+        /// <see cref="ContainerCollectionRegistrator.Register(Type, Assembly[])">Collections.Register</see>. 
         /// The <b>Register</b> overloads that take a collection of <see cref="Assembly"/> 
         /// objects use this method internally to get the list of types that need to be registered. Instead of
         /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
@@ -444,8 +448,8 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using 
-        /// <see cref="Register(System.Type, IEnumerable{System.Reflection.Assembly})">Register</see>  or
-        /// <see cref="RegisterCollection(Type, Assembly[])">RegisterCollection</see>. 
+        /// <see cref="Register(System.Type, IEnumerable{System.Reflection.Assembly})">Register</see> or
+        /// <see cref="ContainerCollectionRegistrator.Register(Type, Assembly[])">Collections.Register</see>. 
         /// The <b>Register</b> overloads that take a collection of <see cref="Assembly"/> 
         /// objects use this method internally to get the list of types that need to be registered. Instead of
         /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
@@ -494,7 +498,7 @@ namespace SimpleInjector
         /// var assemblies = new[] { typeof(ICommandHandler<>).Assembly };
         /// var options = new TypesToRegisterOptions { IncludeGenericTypeDefinitions: true };
         /// var types = container.GetTypesToRegister(typeof(ICommandHandler<>), assemblies, options)
-        ///     .Where(type => !type.IsPublic);
+        ///     .Where(type => type.IsPublic);
         /// 
         /// container.Register(typeof(ICommandHandler<>), types);
         /// ]]></code>

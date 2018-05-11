@@ -314,8 +314,8 @@
         public void GetInstance_OnDecoratedType_GetsHandledAsExpected()
         {
             // Arrange
-            var expectedTypeChain = new[] 
-            { 
+            var expectedTypeChain = new[]
+            {
                 typeof(LogExceptionCommandHandlerDecorator<RealCommand>),
                 typeof(RealCommandHandler),
             };
@@ -1186,7 +1186,7 @@
             var decorator2 = decorator1.Decorated;
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(TransactionHandlerDecorator<RealCommand>), decorator2, 
+            AssertThat.IsInstanceOfType(typeof(TransactionHandlerDecorator<RealCommand>), decorator2,
                 "Since the decorator is registered twice, it should wrap the decoratee twice.");
 
             var decoratee = ((TransactionHandlerDecorator<RealCommand>)decorator2).Decorated;
@@ -1331,7 +1331,7 @@
             var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
 
             var expectedRelationships = new[]
-            {   
+            {
                 new RelationshipInfo
                 {
                     Lifestyle = hybrid,
@@ -1645,7 +1645,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterCollection<ICommandHandler<RealCommand>>(new[] 
+            container.Collections.Register<ICommandHandler<RealCommand>>(new[]
             {
                 typeof(NullCommandHandler<RealCommand>),
                 typeof(StubCommandHandler)
@@ -2426,7 +2426,7 @@
             // Assert
             AssertThat.IsInstanceOfType(decoratorType, logger);
         }
-        
+
         [TestMethod]
         public void RegisterDecorator_WithPartialOpenGenericServiceType_ThrowsExpectedMessage()
         {
@@ -2758,15 +2758,15 @@
 
         public DependencyInfo Dependency { get; set; }
 
-        internal static bool EqualsTo(RelationshipInfo info, KnownRelationship other) => 
-            info.ImplementationType == other.ImplementationType 
-            && info.Lifestyle == other.Lifestyle 
-            && info.Dependency.ServiceType == other.Dependency.ServiceType 
+        internal static bool EqualsTo(RelationshipInfo info, KnownRelationship other) =>
+            info.ImplementationType == other.ImplementationType
+            && info.Lifestyle == other.Lifestyle
+            && info.Dependency.ServiceType == other.Dependency.ServiceType
             && info.Dependency.Lifestyle == other.Dependency.Lifestyle;
 
         internal bool Equals(KnownRelationship other) => EqualsTo(this, other);
 
-        internal static string ToString(KnownRelationship relationship) => 
+        internal static string ToString(KnownRelationship relationship) =>
             string.Format("ImplementationType: {0}, Lifestyle: {1}, Dependency: {2}",
                 relationship.ImplementationType.ToFriendlyName(),
                 relationship.Lifestyle.Name,

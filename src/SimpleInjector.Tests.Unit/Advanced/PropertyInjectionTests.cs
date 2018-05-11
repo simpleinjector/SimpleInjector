@@ -228,7 +228,7 @@
 
             ServiceWithProperty<ITimeProvider>[] services = new[] { singleton };
 
-            container.RegisterCollection<ServiceWithProperty<ITimeProvider>>(services);
+            container.Collections.Register<ServiceWithProperty<ITimeProvider>>(services);
 
             // Act
             container.GetAllInstances<ServiceWithProperty<ITimeProvider>>().ToArray();
@@ -268,7 +268,7 @@
 
             container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
-            container.RegisterCollection<IService>(new[] { singleton });
+            container.Collections.Register<IService>(new[] { singleton });
 
             // Act
             container.GetAllInstances<IService>().ToArray();
@@ -483,7 +483,7 @@
                 this.selector = selector;
             }
 
-            public bool SelectProperty(Type type, PropertyInfo property) => this.selector(property);
+            public bool SelectProperty(Type implementationType, PropertyInfo propertyInfo) => this.selector(propertyInfo);
         }
     }
 }

@@ -46,7 +46,7 @@
             // Assert
             Assert.AreEqual(expectedCallCount, actualCallCount);
         }
-        
+
         [TestMethod]
         public void GetInstance_CalledOnInitializerWithPredicateReturningFalse_CallsPredicateOnceAndDelegateNever()
         {
@@ -244,15 +244,15 @@
             Assert.AreSame(decorator1.Decorated, actualContexts.First().Instance);
 
             Assert.AreEqual(
-                expected: typeof(RealCommandHandlerDecorator), 
+                expected: typeof(RealCommandHandlerDecorator),
                 actual: actualContexts.Second().Context.Registration.ImplementationType);
 
             Assert.AreSame(decorator1, actualContexts.Second().Instance);
 
             Assert.AreEqual(
-                expected: typeof(RealCommandHandlerDecorator), 
+                expected: typeof(RealCommandHandlerDecorator),
                 actual: actualContexts.Last().Context.Registration.ImplementationType);
-            
+
             Assert.AreSame(decorator2, actualContexts.Last().Instance);
         }
 
@@ -264,7 +264,7 @@
 
             var container = new Container();
 
-            container.RegisterCollection<ICommandHandler<RealCommand>>(new[] { typeof(StubCommandHandler) });
+            container.Collections.Register<ICommandHandler<RealCommand>>(new[] { typeof(StubCommandHandler) });
 
             container.RegisterInitializer(actualContexts.Add, TruePredicate);
 
@@ -296,7 +296,7 @@
                 new StubCommandHandler(),
             };
 
-            container.RegisterCollection<ICommandHandler<RealCommand>>(handlers);
+            container.Collections.Register<ICommandHandler<RealCommand>>(handlers);
 
             container.RegisterInitializer(actualContexts.Add, TruePredicate);
 
@@ -314,7 +314,7 @@
             Assert.AreSame(producer.Registration, actualContexts.First().Context.Registration);
 
             Assert.AreEqual(
-                typeof(IEnumerable<ICommandHandler<RealCommand>>), 
+                typeof(IEnumerable<ICommandHandler<RealCommand>>),
                 actualContexts.First().Context.Registration.ImplementationType);
 
             Assert.AreEqual(
@@ -340,7 +340,7 @@
             container.GetInstance<RealTimeProvider>();
 
             // Assert
-            Assert.AreEqual(2, actualContexts.Count, 
+            Assert.AreEqual(2, actualContexts.Count,
                 "Both the singleton and transient instance should have been triggered.");
 
             // Act
@@ -360,7 +360,7 @@
 
             var container = new Container();
 
-            var custom = 
+            var custom =
                 Lifestyle.CreateCustom("Custom", transientInstanceCreator => transientInstanceCreator);
 
             container.Register<RealTimeProvider, RealTimeProvider>(custom);

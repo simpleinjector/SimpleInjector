@@ -339,7 +339,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterCollection(typeof(ILogger), new[] { typeof(NullLogger) });
+            container.Collections.Register(typeof(ILogger), new[] { typeof(NullLogger) });
 
             // Act
             Action action = () => container.GetInstance<ILogger>();
@@ -359,7 +359,7 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterCollection(typeof(ILogger), new[] { typeof(NullLogger) });
+            container.Collections.Register(typeof(ILogger), new[] { typeof(NullLogger) });
 
             // Act
             Action action = () => container.GetInstance<ComponentDependingOn<ILogger>>();
@@ -369,7 +369,7 @@
                 There is, however, a registration for IEnumerable<ILogger>; 
                 Did you mean to depend on IEnumerable<ILogger>?
                 If you meant to depend on ILogger, 
-                use should use one of the Register overloads instead of using RegisterCollection"
+                you should use one of the Register overloads instead of using Collections.Register"
                 .TrimInside(),
                 action);
         }
@@ -566,7 +566,7 @@
             container.Register(typeof(IDuplicate<>), typeof(Duplicate<>));
 
             // Act
-            Action action = () => 
+            Action action = () =>
                 container.GetInstance<ServiceDependingOn<SimpleInjector.Tests.Unit.Duplicates.IDuplicate<object>>>();
 
             // Assert
@@ -579,9 +579,9 @@
 
         //// Seems like there are tests missing, but all other cases are already covered by other test classes.
 
-        public class SomeGenericNastyness<TBla>
+        public static class SomeGenericNastyness<TBla>
         {
-            public class ReadOnlyDictionary<TKey, TValue>
+            public static class ReadOnlyDictionary<TKey, TValue>
             {
                 public sealed class KeyCollection
                 {

@@ -664,8 +664,8 @@
 
             // Act
             Action action = () => container.Register(
-                typeof(IService<,>), 
-                typeof(ServiceImplWithMultipleCtors<,>), 
+                typeof(IService<,>),
+                typeof(ServiceImplWithMultipleCtors<,>),
                 Lifestyle.Singleton);
 
             // Assert
@@ -1093,7 +1093,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 Type IGeneric<Int32> has already been registered. If your intention is to resolve a collection 
-                of IGeneric<Int32> implementations, use the RegisterCollection overloads."
+                of IGeneric<Int32> implementations, use the Collections.Register overloads."
                 .TrimInside(),
                 action);
         }
@@ -1260,7 +1260,7 @@
                 "Multiple applicable registrations found for IGeneric<IDisposable>.",
                 action);
         }
-        
+
         // This is a regression test: This is a bug in v2.8's RegisterOpenGeneric extension method.
         [TestMethod]
         public void GetInstance_RegisterConditionalWithTypeWithCyclicDependency_DoesNotCauseAStackOverflow()
@@ -1295,9 +1295,9 @@
         {
             // Arrange
             var container = new Container();
-                        
+
             container.Register(typeof(IQueryDispatcher<,>), typeof(QueryDispatcher<,>));
-            container.RegisterCollection(typeof(IQueryHandler<,>), new[] 
+            container.Collections.Register(typeof(IQueryHandler<,>), new[]
             {
                 typeof(MultipleResultsIntQueryHandler),
                 typeof(MultipleResultsBoolQueryHandler)

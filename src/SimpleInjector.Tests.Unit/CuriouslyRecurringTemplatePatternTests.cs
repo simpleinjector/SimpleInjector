@@ -28,7 +28,7 @@
         public void RegisterCollection_CuriouslyRecurringTemplatePattern_Succeeds()
         {
             var container = new Container();
-            container.RegisterCollection(typeof(IRepo<>), new[] { typeof(RepoA<>), typeof(RepoB<>) });
+            container.Collections.Register(typeof(IRepo<>), new[] { typeof(RepoA<>), typeof(RepoB<>) });
         }
 
         [TestMethod]
@@ -43,7 +43,7 @@
         public void GetAllInstances_CuriouslyRecurringTemplatePattern_Succeeds()
         {
             var container = new Container();
-            container.RegisterCollection(typeof(IRepo<>), new[] { typeof(RepoA<>), typeof(RepoB<>) });
+            container.Collections.Register(typeof(IRepo<>), new[] { typeof(RepoA<>), typeof(RepoB<>) });
             var repo = container.GetAllInstances<IRepo<Entity>>();
             Assert.AreEqual(repo.Count(), 2);
         }

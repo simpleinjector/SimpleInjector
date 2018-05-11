@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2018 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -141,7 +141,7 @@ namespace SimpleInjector
         internal static IEnumerable CastCollection(IEnumerable collection, Type resultType)
         {
             // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a 
-            // CastEnumerator<[ServiceType]> to be able to supply it to the RegisterCollection<T> method.
+            // CastEnumerator<[ServiceType]> to be able to supply it to the Collections.Register<T> method.
             var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(resultType);
 
             return (IEnumerable)castMethod.Invoke(null, new[] { collection });
@@ -172,12 +172,12 @@ namespace SimpleInjector
             ((NewExpression)constructorCall.Body).Constructor;
 
         private static IEnumerable<T> CreateReadOnlyCollection<T>(IEnumerable<T> collection) =>
-            RegisterCollectionEnumerable(collection);
+            Collections_Register_Enumerable(collection);
 
         // This method name does not describe what it does, but since the C# compiler will create a iterator
         // type named after this method, it allows us to return a type that has a nice name that will show up
         // during debugging.
-        private static IEnumerable<T> RegisterCollectionEnumerable<T>(IEnumerable<T> collection)
+        private static IEnumerable<T> Collections_Register_Enumerable<T>(IEnumerable<T> collection)
         {
             foreach (var item in collection)
             {

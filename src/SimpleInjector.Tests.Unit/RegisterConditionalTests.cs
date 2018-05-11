@@ -322,7 +322,7 @@
             container.Register<IGeneric<int>, GenericType<int>>();
 
             // Act
-            Action action = () => container.RegisterConditional(typeof(IGeneric<int>), typeof(IntGenericType), 
+            Action action = () => container.RegisterConditional(typeof(IGeneric<int>), typeof(IntGenericType),
                 c => true);
 
             // Assert
@@ -380,7 +380,7 @@
             container.Register(typeof(IGeneric<>), typeof(GenericType<>));
 
             // Act
-            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType<>), 
+            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType<>),
                 c => true);
 
             // Assert
@@ -405,7 +405,7 @@
             // Act
             // Although we skip checks for types with type constraints, these two registrations use the same
             // implementation type and this will always cause overlap.
-            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType<>), 
+            Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericClassType<>),
                 c => true);
 
             // Assert
@@ -425,7 +425,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), Lifestyle.Singleton, 
+            container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), Lifestyle.Singleton,
                 c => false);
 
             // Act
@@ -677,9 +677,9 @@
             var anotherDecorator2 = container.GetInstance<AnotherServiceWithDependency<IPlugin>>().Dependency;
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(PluginDecorator), decorator1, 
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), decorator1,
                 "Service was expected to be decorated");
-            AssertThat.IsInstanceOfType(typeof(PluginDecorator), anotherDecorator1, 
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), anotherDecorator1,
                 "Service was expected to be decorated");
 
             Assert.AreNotSame(decorator1, anotherDecorator1, @"
@@ -1385,7 +1385,7 @@
             // Act
             container.GetInstance<ILogger>();
         }
-        
+
         [TestMethod]
         public void ConditionalRegistration_ClosedGenericTypes_RegistrationsAreAppended1()
         {
@@ -1401,7 +1401,7 @@
             // Assert
             AssertThat.IsInstanceOfType(typeof(IntGenericType), instance);
         }
-        
+
         [TestMethod]
         public void ConditionalRegistration_ClosedGenericTypes_RegistrationsAreAppended2()
         {
@@ -1461,7 +1461,7 @@
             // Assert
             Assert.AreEqual(expectedValue, service.Dependency);
         }
-        
+
         [TestMethod]
         public void GetInstance_PredicateContextForOpenGenericConsumer_ContainsTheExpectedConsumerInfo()
         {
@@ -1472,7 +1472,7 @@
 
             container.Register(typeof(IGeneric<>), typeof(GenericTypeWithLoggerDependency<>), Lifestyle.Transient);
 
-            RegisterConditionalConstant<ILogger>(container, new NullLogger(), 
+            RegisterConditionalConstant<ILogger>(container, new NullLogger(),
                 c => { actualConsumer = c.Consumer; return true; });
 
             // Act
@@ -1492,7 +1492,7 @@
 
             container.Register<IGeneric<int>, GenericTypeWithLoggerDependency<int>>(Lifestyle.Singleton);
 
-            RegisterConditionalConstant<ILogger>(container, new NullLogger(), 
+            RegisterConditionalConstant<ILogger>(container, new NullLogger(),
                 c => { actualConsumer = c.Consumer; return true; });
 
             // Act
@@ -1573,7 +1573,7 @@
 
             int actualPredicateCallCount = 0;
 
-            RegisterConditionalConstant<ILogger>(container, new NullLogger(), c => 
+            RegisterConditionalConstant<ILogger>(container, new NullLogger(), c =>
             {
                 actualPredicateCallCount++;
                 return true;
@@ -1609,7 +1609,7 @@
             Assert.IsTrue(ReferenceEquals(logger1, logger2),
                 "Simple Injector is expected to reuse the same Registration instance for both registrations.");
         }
-        
+
         [TestMethod]
         public void EnumeratingAStream_WithEachMoveNextCallWrappedInItsOwnScope_ResolvesInstancesFromThatScope()
         {
@@ -1618,7 +1618,7 @@
 
             container.Register<IUserRepository, SqlUserRepository>(new ThreadScopedLifestyle());
 
-            container.RegisterCollection<ILogger>(new[]
+            container.Collections.Register<ILogger>(new[]
             {
                 Lifestyle.Transient.CreateRegistration<LoggerWithDependency<IUserRepository, IUserRepository>>(container),
                 Lifestyle.Transient.CreateRegistration<LoggerWithDependency<IUserRepository, IUserRepository>>(container)
@@ -1664,7 +1664,7 @@
             var container = new Container();
 
             container.RegisterConditional(
-                typeof(IGeneric<>), 
+                typeof(IGeneric<>),
                 c => null,
                 Lifestyle.Singleton, c => false);
 
@@ -1741,7 +1741,7 @@
                 this.real = real;
             }
 
-            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure) => 
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure) =>
                 this.real.GetInstanceProducer(consumer, throwOnFailure);
 
             public void Verify(InjectionConsumerInfo consumer)

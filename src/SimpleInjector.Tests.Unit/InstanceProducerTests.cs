@@ -168,7 +168,7 @@
             var container = new Container();
 
             // class NodeOne(INodeFactory factory)
-            container.RegisterCollection<INode>(new[] { typeof(NodeOne) });
+            container.Collections.Register<INode>(new[] { typeof(NodeOne) });
 
             // class NodeFactory(IEnumerable<INode>)
             container.Register<INodeFactory, NodeFactory>();

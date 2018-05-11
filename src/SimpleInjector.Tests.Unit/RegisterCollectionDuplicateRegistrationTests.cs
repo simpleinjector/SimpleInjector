@@ -18,7 +18,7 @@
         {
             Assert_CalledTwiceForSameType_ThrowsExpectedMessage(
                 "Collection of items for type IEventHandler<Int32> has already been registered",
-                c => c.RegisterCollection<IEventHandler<int>>(Enumerable.Empty<IEventHandler<int>>()));
+                c => c.Collections.Register<IEventHandler<int>>(Enumerable.Empty<IEventHandler<int>>()));
         }
 
         [TestMethod]
@@ -29,9 +29,9 @@
 
             Assert_CalledTwiceForSameType_ResolvesExpectedSequence<IEventHandler<int>>(c =>
                 {
-                    c.RegisterCollection<IEventHandler<int>>(handlers1);
+                    c.Collections.Register<IEventHandler<int>>(handlers1);
                     c.Options.AllowOverridingRegistrations = true;
-                    c.RegisterCollection<IEventHandler<int>>(handlers2);
+                    c.Collections.Register<IEventHandler<int>>(handlers2);
                 },
                 expectedTypes: typeof(GenericEventHandler<int>));
         }
@@ -41,7 +41,7 @@
         {
             Assert_CalledTwiceForSameType_ThrowsExpectedMessage(
                 "Collection of items for type ILogger has already been registered",
-                c => c.RegisterCollection<ILogger>(Enumerable.Empty<ILogger>()));
+                c => c.Collections.Register<ILogger>(Enumerable.Empty<ILogger>()));
         }
 
         [TestMethod]
@@ -49,9 +49,9 @@
         {
             Assert_CalledTwiceForSameType_ResolvesExpectedSequence<ILogger>(c =>
                 {
-                    c.RegisterCollection<ILogger>((IEnumerable<ILogger>)new[] { new NullLogger() });
+                    c.Collections.Register<ILogger>((IEnumerable<ILogger>)new[] { new NullLogger() });
                     c.Options.AllowOverridingRegistrations = true;
-                    c.RegisterCollection<ILogger>((IEnumerable<ILogger>)new[] { new ConsoleLogger() });
+                    c.Collections.Register<ILogger>((IEnumerable<ILogger>)new[] { new ConsoleLogger() });
                 },
                 expectedTypes: typeof(ConsoleLogger));
         }
@@ -61,7 +61,7 @@
         {
             Assert_CalledTwiceForSameType_ThrowsExpectedMessage(
                 "Collection of items for type IEventHandler<Int32> has already been registered",
-                c => c.RegisterCollection<IEventHandler<int>>(new[] { new StructConstraintEventHandler<int>() }));
+                c => c.Collections.Register<IEventHandler<int>>(new[] { new StructConstraintEventHandler<int>() }));
         }
 
         [TestMethod]
@@ -69,9 +69,9 @@
         {
             Assert_CalledTwiceForSameType_ResolvesExpectedSequence<IEventHandler<int>>(c =>
                 {
-                    c.RegisterCollection<IEventHandler<int>>(new[] { new StructConstraintEventHandler<int>() });
+                    c.Collections.Register<IEventHandler<int>>(new[] { new StructConstraintEventHandler<int>() });
                     c.Options.AllowOverridingRegistrations = true;
-                    c.RegisterCollection<IEventHandler<int>>(new[] { new GenericEventHandler<int>() });
+                    c.Collections.Register<IEventHandler<int>>(new[] { new GenericEventHandler<int>() });
                 },
                 expectedTypes: typeof(GenericEventHandler<int>));
         }
@@ -81,7 +81,7 @@
         {
             Assert_CalledTwiceForSameType_ThrowsExpectedMessage(
                 "Collection of items for type ILogger has already been registered",
-                c => c.RegisterCollection<ILogger>(new[] { new NullLogger() }));
+                c => c.Collections.Register<ILogger>(new[] { new NullLogger() }));
         }
 
         [TestMethod]
@@ -89,9 +89,9 @@
         {
             Assert_CalledTwiceForSameType_ResolvesExpectedSequence<ILogger>(c =>
                 {
-                    c.RegisterCollection<ILogger>(new[] { new NullLogger() });
+                    c.Collections.Register<ILogger>(new[] { new NullLogger() });
                     c.Options.AllowOverridingRegistrations = true;
-                    c.RegisterCollection<ILogger>(new[] { new ConsoleLogger() });
+                    c.Collections.Register<ILogger>(new[] { new ConsoleLogger() });
                 },
                 expectedTypes: typeof(ConsoleLogger));
         }
@@ -101,7 +101,7 @@
         {
             Assert_CalledTwiceForSameType_ThrowsExpectedMessage(
                 "Collection of items for type IEventHandler<Int32> has already been registered",
-                c => c.RegisterCollection<IEventHandler<int>>(new[] { typeof(StructConstraintEventHandler<int>) }));
+                c => c.Collections.Register<IEventHandler<int>>(new[] { typeof(StructConstraintEventHandler<int>) }));
         }
 
         [TestMethod]
@@ -109,9 +109,9 @@
         {
             Assert_CalledTwiceForSameType_ResolvesExpectedSequence<IEventHandler<int>>(c =>
                 {
-                    c.RegisterCollection<IEventHandler<int>>(new[] { typeof(StructConstraintEventHandler<int>) });
+                    c.Collections.Register<IEventHandler<int>>(new[] { typeof(StructConstraintEventHandler<int>) });
                     c.Options.AllowOverridingRegistrations = true;
-                    c.RegisterCollection<IEventHandler<int>>(new[] { typeof(GenericEventHandler<int>) });
+                    c.Collections.Register<IEventHandler<int>>(new[] { typeof(GenericEventHandler<int>) });
                 },
                 expectedTypes: typeof(GenericEventHandler<int>));
         }
@@ -121,7 +121,7 @@
         {
             Assert_CalledTwiceForSameType_ThrowsExpectedMessage(
                 "Collection of items for type ILogger has already been registered",
-                c => c.RegisterCollection<ILogger>(new[] { typeof(NullLogger) }));
+                c => c.Collections.Register<ILogger>(new[] { typeof(NullLogger) }));
         }
 
         [TestMethod]
@@ -129,9 +129,9 @@
         {
             Assert_CalledTwiceForSameType_ResolvesExpectedSequence<ILogger>(c =>
                 {
-                    c.RegisterCollection<ILogger>(new[] { typeof(NullLogger) });
+                    c.Collections.Register<ILogger>(new[] { typeof(NullLogger) });
                     c.Options.AllowOverridingRegistrations = true;
-                    c.RegisterCollection<ILogger>(new[] { typeof(ConsoleLogger) });
+                    c.Collections.Register<ILogger>(new[] { typeof(ConsoleLogger) });
                 },
                 expectedTypes: typeof(ConsoleLogger));
         }
@@ -141,17 +141,17 @@
         {
             Assert_CalledTwiceForSameType_ThrowsExpectedMessage(
                 "Collection of items for type IEventHandler<Int32> has already been registered",
-                c => c.RegisterCollection(typeof(IEventHandler<int>), new[] { new StructConstraintEventHandler<int>() }));
+                c => c.Collections.Register(typeof(IEventHandler<int>), new[] { new StructConstraintEventHandler<int>() }));
         }
-        
+
         [TestMethod]
         public void RegisterCollectionTypes_CalledTwiceWithSameClosedGenericTypeAllowOverridingRegistrations_ResolvedExpectedType()
         {
             Assert_CalledTwiceForSameType_ResolvesExpectedSequence<IEventHandler<int>>(c =>
                 {
-                    c.RegisterCollection(typeof(IEventHandler<int>), new[] { typeof(StructConstraintEventHandler<int>) });
+                    c.Collections.Register(typeof(IEventHandler<int>), new[] { typeof(StructConstraintEventHandler<int>) });
                     c.Options.AllowOverridingRegistrations = true;
-                    c.RegisterCollection(typeof(IEventHandler<int>), new[] { typeof(GenericEventHandler<int>) });
+                    c.Collections.Register(typeof(IEventHandler<int>), new[] { typeof(GenericEventHandler<int>) });
                 },
                 expectedTypes: typeof(GenericEventHandler<int>));
         }
@@ -161,7 +161,7 @@
         {
             Assert_CalledTwiceForSameType_ThrowsExpectedMessage(
                 "Collection of items for type ILogger has already been registered",
-                c => c.RegisterCollection(typeof(ILogger), new[] { typeof(NullLogger) }));
+                c => c.Collections.Register(typeof(ILogger), new[] { typeof(NullLogger) }));
         }
 
         [TestMethod]
@@ -169,20 +169,20 @@
         {
             Assert_CalledTwiceForSameType_ResolvesExpectedSequence<ILogger>(c =>
                 {
-                    c.RegisterCollection(typeof(ILogger), new[] { typeof(NullLogger) });
+                    c.Collections.Register(typeof(ILogger), new[] { typeof(NullLogger) });
                     c.Options.AllowOverridingRegistrations = true;
-                    c.RegisterCollection(typeof(ILogger), new[] { typeof(ConsoleLogger) });
+                    c.Collections.Register(typeof(ILogger), new[] { typeof(ConsoleLogger) });
                 },
                 expectedTypes: typeof(ConsoleLogger));
         }
-        
+
         [TestMethod]
         public void RegisterCollectionRegistrations_CalledTwiceWithSameClosedGenericType_Throws()
         {
             Assert_CalledTwiceForSameType_ThrowsExpectedMessage(
                 "Collection of items for type IEventHandler<Int32> has already been registered",
-                c => c.RegisterCollection(typeof(IEventHandler<int>), new[] 
-                { 
+                c => c.Collections.Register(typeof(IEventHandler<int>), new[]
+                {
                     Lifestyle.Transient.CreateRegistration<StructConstraintEventHandler<int>>(c)
                 }));
         }
@@ -192,15 +192,15 @@
         {
             Assert_CalledTwiceForSameType_ResolvesExpectedSequence<IEventHandler<int>>(c =>
                 {
-                    c.RegisterCollection(typeof(IEventHandler<int>), new[] 
-                    { 
+                    c.Collections.Register(typeof(IEventHandler<int>), new[]
+                    {
                         Lifestyle.Transient.CreateRegistration<StructConstraintEventHandler<int>>(c)
                     });
 
                     c.Options.AllowOverridingRegistrations = true;
 
-                    c.RegisterCollection(typeof(IEventHandler<int>), new[] 
-                    { 
+                    c.Collections.Register(typeof(IEventHandler<int>), new[]
+                    {
                         Lifestyle.Transient.CreateRegistration<GenericEventHandler<int>>(c)
                     });
                 },
@@ -212,9 +212,9 @@
         {
             Assert_CalledTwiceForSameType_ThrowsExpectedMessage(
                 "Collection of items for type ILogger has already been registered",
-                c => c.RegisterCollection(typeof(ILogger), new[] 
-                { 
-                    Lifestyle.Transient.CreateRegistration<NullLogger>(c) 
+                c => c.Collections.Register(typeof(ILogger), new[]
+                {
+                    Lifestyle.Transient.CreateRegistration<NullLogger>(c)
                 }));
         }
 
@@ -223,27 +223,27 @@
         {
             Assert_CalledTwiceForSameType_ResolvesExpectedSequence<ILogger>(c =>
                 {
-                    c.RegisterCollection(typeof(ILogger), new[] 
-                    { 
-                        Lifestyle.Transient.CreateRegistration<NullLogger>(c) 
+                    c.Collections.Register(typeof(ILogger), new[]
+                    {
+                        Lifestyle.Transient.CreateRegistration<NullLogger>(c)
                     });
 
                     c.Options.AllowOverridingRegistrations = true;
 
-                    c.RegisterCollection(typeof(ILogger), new[] 
-                    { 
-                        Lifestyle.Transient.CreateRegistration<ConsoleLogger>(c) 
+                    c.Collections.Register(typeof(ILogger), new[]
+                    {
+                        Lifestyle.Transient.CreateRegistration<ConsoleLogger>(c)
                     });
                 },
                 expectedTypes: typeof(ConsoleLogger));
         }
-        
+
         [TestMethod]
         public void RegisterCollectionUncontrolled_CalledTwiceWithSameClosedGenericType_Throws()
         {
             Assert_CalledTwiceForSameType_ThrowsExpectedMessage(
                 "Collection of items for type IEventHandler<Int32> has already been registered",
-                c => c.RegisterCollection(typeof(IEventHandler<int>), Enumerable.Empty<IEventHandler<int>>()));
+                c => c.Collections.Register(typeof(IEventHandler<int>), Enumerable.Empty<IEventHandler<int>>()));
         }
 
         [TestMethod]
@@ -251,9 +251,9 @@
         {
             Assert_CalledTwiceForSameType_ResolvesExpectedSequence<IEventHandler<int>>(c =>
                 {
-                    c.RegisterCollection(typeof(IEventHandler<int>), new[] { new StructConstraintEventHandler<int>() });
+                    c.Collections.Register(typeof(IEventHandler<int>), new[] { new StructConstraintEventHandler<int>() });
                     c.Options.AllowOverridingRegistrations = true;
-                    c.RegisterCollection(typeof(IEventHandler<int>), new[] { new GenericEventHandler<int>() });
+                    c.Collections.Register(typeof(IEventHandler<int>), new[] { new GenericEventHandler<int>() });
                 },
                 expectedTypes: typeof(GenericEventHandler<int>));
         }
@@ -263,7 +263,7 @@
         {
             Assert_CalledTwiceForSameType_ThrowsExpectedMessage(
                 "Collection of items for type ILogger has already been registered",
-                c => c.RegisterCollection(typeof(ILogger), Enumerable.Empty<ILogger>()));
+                c => c.Collections.Register(typeof(ILogger), Enumerable.Empty<ILogger>()));
         }
 
         [TestMethod]
@@ -271,9 +271,9 @@
         {
             Assert_CalledTwiceForSameType_ResolvesExpectedSequence<ILogger>(c =>
                 {
-                    c.RegisterCollection(typeof(ILogger), (IEnumerable)new[] { new NullLogger() });
+                    c.Collections.Register(typeof(ILogger), (IEnumerable)new[] { new NullLogger() });
                     c.Options.AllowOverridingRegistrations = true;
-                    c.RegisterCollection(typeof(ILogger), (IEnumerable)new[] { new ConsoleLogger() });
+                    c.Collections.Register(typeof(ILogger), (IEnumerable)new[] { new ConsoleLogger() });
                 },
                 expectedTypes: typeof(ConsoleLogger));
         }
@@ -284,18 +284,18 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterCollection(typeof(IEventHandler<AuditableEvent>), new[]
+            container.Collections.Register(typeof(IEventHandler<AuditableEvent>), new[]
             {
                 typeof(AuditableEventEventHandler)
             });
 
             // Act 
-            Action action = () => container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(StructEventHandler) });
+            Action action = () => container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(StructEventHandler) });
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                Mixing calls to RegisterCollection for the same open generic service type is not supported. Consider
-                making one single call to RegisterCollection(typeof(IEventHandler<>), types)."
+                Mixing calls to Collections.Register for the same open generic service type is not supported. Consider
+                making one single call to Collections.Register(typeof(IEventHandler<>), types)."
                 .TrimInside(),
                 action);
         }
@@ -306,18 +306,18 @@
             // Arrange
             var container = new Container();
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(StructEventHandler) });
+            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(StructEventHandler) });
 
             // Act
-            Action action = () => container.RegisterCollection(typeof(IEventHandler<AuditableEvent>), new[]
+            Action action = () => container.Collections.Register(typeof(IEventHandler<AuditableEvent>), new[]
             {
                 typeof(AuditableEventEventHandler)
             });
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                Mixing calls to RegisterCollection for the same open generic service type is not supported. Consider
-                making one single call to RegisterCollection(typeof(IEventHandler<>), types)."
+                Mixing calls to Collections.Register for the same open generic service type is not supported. Consider
+                making one single call to Collections.Register(typeof(IEventHandler<>), types)."
                 .TrimInside(),
                 action);
         }
@@ -356,7 +356,7 @@
             AssertThat.SequenceEquals(expectedTypes, actualTypes);
         }
 
-        private static string ToActualTypeNames<T>(IEnumerable<T> instances) => 
+        private static string ToActualTypeNames<T>(IEnumerable<T> instances) =>
             "Actual: " + instances.Select(GetType).ToFriendlyNamesText();
 
         private static Type GetType<T>(T instance) => instance.GetType();

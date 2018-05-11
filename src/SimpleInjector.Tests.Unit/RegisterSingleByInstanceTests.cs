@@ -88,7 +88,7 @@ namespace SimpleInjector.Tests.Unit
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterCollection<IUserRepository>();
+            container.Collections.Register<IUserRepository>();
             var repositories = container.GetAllInstances<IUserRepository>();
 
             // Calling count will iterate the collections. 
@@ -115,7 +115,7 @@ namespace SimpleInjector.Tests.Unit
             // Act
             container.GetInstance<RealUserService>();
         }
-        
+
         [TestMethod]
         public void RegisterSingleByInstanceNonGeneric_ValidRegistration_GetInstanceReturnsExpectedInstance()
         {

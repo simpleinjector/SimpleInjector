@@ -58,7 +58,7 @@ namespace SimpleInjector.Tests.Unit
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterCollection<IUserRepository>();
+            container.Collections.Register<IUserRepository>();
             var repositories = container.GetAllInstances<IUserRepository>();
 
             // Only during iterating the collection, will the underlying container be called. This is a
@@ -100,7 +100,7 @@ namespace SimpleInjector.Tests.Unit
             // Assert
             AssertThat.Throws<ActivationException>(action);
         }
-        
+
         [TestMethod]
         public void GetInstance_SubTypeRegisteredWithFuncReturningNull_ThrowsExpectedException()
         {
@@ -123,7 +123,7 @@ namespace SimpleInjector.Tests.Unit
                     "Actual: " + ex.Message);
             }
         }
-        
+
         [TestMethod]
         public void GetInstance_TypeRegisteredWithFuncReturningNullWhilePropertiesBeingInjected_ThrowsExpectedException()
         {
@@ -149,8 +149,8 @@ namespace SimpleInjector.Tests.Unit
             catch (ActivationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains(
-                    "The registered delegate for type " + 
-                    typeof(PluginWithPropertyDependencyOfType<ITimeProvider>).ToFriendlyName() + 
+                    "The registered delegate for type " +
+                    typeof(PluginWithPropertyDependencyOfType<ITimeProvider>).ToFriendlyName() +
                     " returned null."),
                     "Actual: " + ex.Message);
             }
@@ -158,7 +158,8 @@ namespace SimpleInjector.Tests.Unit
 
         private sealed class InjectPropertyOfType<T> : IPropertySelectionBehavior
         {
-            public bool SelectProperty(Type t, PropertyInfo prop) => prop.PropertyType == typeof(T);
+            public bool SelectProperty(Type implementationType, PropertyInfo propertyInfo) =>
+                propertyInfo.PropertyType == typeof(T);
         }
 
         [TestMethod]
@@ -199,7 +200,7 @@ namespace SimpleInjector.Tests.Unit
                     "thrown ActivationException.");
             }
         }
-        
+
         [TestMethod]
         public void RegisterByFunc_ValidArguments_Succeeds()
         {

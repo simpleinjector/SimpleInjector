@@ -155,7 +155,7 @@ namespace SimpleInjector.Internals
                 }
 
                 throw new InvalidOperationException(
-                    StringResources.MixingCallsToRegisterCollectionIsNotSupported(serviceType));
+                    StringResources.MixingCallsToCollectionsRegisterIsNotSupported(serviceType));
             }
         }
 

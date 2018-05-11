@@ -26,10 +26,7 @@ namespace SimpleInjector
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using SimpleInjector.Decorators;
     using SimpleInjector.Internals;
-    using SimpleInjector.Lifestyles;
 
 #if !PUBLISH
     /// <summary>Methods for registration of collections.</summary>
@@ -51,13 +48,12 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="containerUncontrolledCollection"/> is a null
         /// reference.</exception>
+        [Obsolete("Please use Container." + nameof(Collections) + "." +
+            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection<TService>(IEnumerable<TService> containerUncontrolledCollection)
             where TService : class
         {
-            Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
-            Requires.IsNotNull(containerUncontrolledCollection, nameof(containerUncontrolledCollection));
-
-            this.RegisterContainerUncontrolledCollection(typeof(TService), containerUncontrolledCollection);
+            this.Collections.Register<TService>(containerUncontrolledCollection);
         }
 
         /// <summary>
@@ -75,26 +71,11 @@ namespace SimpleInjector
         /// is a null reference.</exception>
         [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly",
             Justification = "TService is the name of the generic type argument. So this warning is a false positive.")]
+        [Obsolete("Please use Container." + nameof(Collections) + "." +
+            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection<TService>(params TService[] singletons) where TService : class
         {
-            Requires.IsNotNull(singletons, nameof(singletons));
-            Requires.DoesNotContainNullValues(singletons, nameof(singletons));
-
-            if (typeof(TService) == typeof(Type) && singletons.Any())
-            {
-                throw new ArgumentException(
-                    StringResources.RegisterCollectionCalledWithTypeAsTService(singletons.Cast<Type>()),
-                    nameof(TService));
-            }
-
-            Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
-
-            var singletonRegistrations =
-                from singleton in singletons
-                select SingletonLifestyle.CreateSingleInstanceRegistration(typeof(TService), singleton, this,
-                    singleton.GetType());
-
-            this.RegisterCollection(typeof(TService), singletonRegistrations);
+            this.Collections.Register<TService>(singletons);
         }
 
         /// <summary>
@@ -115,6 +96,8 @@ namespace SimpleInjector
         /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
+        [Obsolete("Please use Container." + nameof(Collections) + "." +
+            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection<TService>(IEnumerable<Type> serviceTypes) where TService : class
         {
             this.RegisterCollection(typeof(TService), serviceTypes);
@@ -138,6 +121,8 @@ namespace SimpleInjector
         /// (Nothing in VB) element or when <typeparamref name="TService"/> is not assignable from any of the
         /// service types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
+        [Obsolete("Please use Container." + nameof(Collections) + "." +
+            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection<TService>(IEnumerable<Registration> registrations)
             where TService : class
         {
@@ -162,23 +147,11 @@ namespace SimpleInjector
         /// (Nothing in VB) element, a generic type definition, or the <paramref name="serviceType"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
+        [Obsolete("Please use Container." + nameof(Collections) + "." +
+            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection(Type serviceType, IEnumerable<Type> serviceTypes)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(serviceTypes, nameof(serviceTypes));
-
-            // Make a copy for correctness and performance.
-            serviceTypes = serviceTypes.ToArray();
-
-            Requires.DoesNotContainNullValues(serviceTypes, nameof(serviceTypes));
-            Requires.ServiceIsAssignableFromImplementations(serviceType, serviceTypes, nameof(serviceTypes),
-                typeCanBeServiceType: true);
-            Requires.DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(serviceType, serviceTypes,
-                nameof(serviceTypes));
-            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, serviceTypes, 
-                nameof(serviceTypes));
-
-            this.RegisterCollectionInternal(serviceType, serviceTypes);
+            this.Collections.Register(serviceType, serviceTypes);
         }
 
         /// <summary>
@@ -200,22 +173,11 @@ namespace SimpleInjector
         /// (Nothing in VB) element or when <paramref name="serviceType"/> is not assignable from any of the
         /// service types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
+        [Obsolete("Please use Container." + nameof(Collections) + "." +
+            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection(Type serviceType, IEnumerable<Registration> registrations)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(registrations, nameof(registrations));
-
-            // Make a copy for performance and correctness.
-            registrations = registrations.ToArray();
-
-            Requires.DoesNotContainNullValues(registrations, nameof(registrations));
-            Requires.AreRegistrationsForThisContainer(this, registrations, nameof(registrations));
-            Requires.ServiceIsAssignableFromImplementations(serviceType, registrations, nameof(registrations), 
-                typeCanBeServiceType: true);
-            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, registrations, 
-                nameof(registrations));
-
-            this.RegisterCollectionInternal(serviceType, registrations);
+            this.Collections.Register(serviceType, registrations);
         }
 
         /// <summary>
@@ -231,124 +193,11 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
+        [Obsolete("Please use Container." + nameof(Collections) + "." +
+            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection(Type serviceType, IEnumerable containerUncontrolledCollection)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(containerUncontrolledCollection, nameof(containerUncontrolledCollection));
-            Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
-            Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
-
-            try
-            {
-                this.RegisterContainerUncontrolledCollection(serviceType,
-                    containerUncontrolledCollection.Cast<object>());
-            }
-            catch (MemberAccessException ex)
-            {
-                // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
-                throw new ArgumentException(
-                    StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, ex) +
-                    Environment.NewLine + "paramName: " + nameof(serviceType), ex);
-            }
-        }
-
-        // This method is internal to prevent the main API of the framework from being 'polluted'. The
-        // Collections.AppendTo method enabled public exposure.
-        internal void AppendToCollectionInternal(Type itemType, Registration registration)
-        {
-            this.RegisterCollectionInternal(itemType,
-                new[] { ContainerControlledItem.CreateFromRegistration(registration) },
-                appending: true);
-        }
-
-        internal void AppendToCollectionInternal(Type itemType, Type implementationType)
-        {
-            // NOTE: The supplied serviceTypes can be opened, partially-closed, closed, non-generic or even
-            // abstract.
-            this.RegisterCollectionInternal(itemType,
-                new[] { ContainerControlledItem.CreateFromType(implementationType) },
-                appending: true);
-        }
-
-        private void RegisterCollectionInternal(Type itemType, IEnumerable<Registration> registrations)
-        {
-            var controlledItems = registrations.Select(ContainerControlledItem.CreateFromRegistration).ToArray();
-
-            this.RegisterCollectionInternal(itemType, controlledItems);
-        }
-
-        private void RegisterCollectionInternal(Type itemType, IEnumerable<Type> serviceTypes)
-        {
-            // NOTE: The supplied serviceTypes can be opened, partially-closed, closed, non-generic or even
-            // abstract.
-            var controlledItems = serviceTypes.Select(ContainerControlledItem.CreateFromType).ToArray();
-            this.RegisterCollectionInternal(itemType, controlledItems);
-        }
-
-        private void RegisterCollectionInternal(Type itemType, ContainerControlledItem[] controlledItems, 
-            bool appending = false)
-        {
-            this.ThrowWhenContainerIsLockedOrDisposed();
-
-            this.RegisterGenericContainerControlledCollection(itemType, controlledItems, appending);
-        }
-
-        private void RegisterGenericContainerControlledCollection(Type itemType,
-            ContainerControlledItem[] controlledItems, bool appending)
-        {
-            CollectionResolver resolver = this.GetContainerControlledResolver(itemType);
-
-            resolver.AddControlledRegistrations(itemType, controlledItems, append: appending);
-        }
-
-        private void RegisterGenericContainerUncontrolledCollection(Type itemType, IEnumerable collection)
-        {
-            var resolver = this.GetContainerUncontrolledResolver(itemType);
-
-            var producer = SingletonLifestyle.CreateUncontrolledCollectionProducer(itemType, collection, this);
-
-            resolver.RegisterUncontrolledCollection(itemType, producer);
-        }
-
-        private void RegisterContainerUncontrolledCollection<T>(Type itemType,
-            IEnumerable<T> containerUncontrolledCollection)
-        {
-            IEnumerable readOnlyCollection = containerUncontrolledCollection.MakeReadOnly();
-            IEnumerable castedCollection = Helpers.CastCollection(readOnlyCollection, itemType);
-
-            this.RegisterGenericContainerUncontrolledCollection(itemType, castedCollection);
-        }
-
-        private CollectionResolver GetContainerControlledResolver(Type itemType)
-        {
-            return this.GetCollectionResolver(itemType, containerControlled: true);
-        }
-
-        private CollectionResolver GetContainerUncontrolledResolver(Type itemType)
-        {
-            return this.GetCollectionResolver(itemType, containerControlled: false);
-        }
-
-        private CollectionResolver GetCollectionResolver(Type itemType, bool containerControlled)
-        {
-            Type key = GetRegistrationKey(itemType);
-
-            return this.collectionResolvers.GetValueOrDefault(key)
-                ?? this.CreateAndAddCollectionResolver(key, containerControlled);
-        }
-
-        private CollectionResolver CreateAndAddCollectionResolver(Type openGenericServiceType, bool controlled)
-        {
-            var resolver = controlled
-                ? (CollectionResolver)new ContainerControlledCollectionResolver(this, openGenericServiceType)
-                : (CollectionResolver)new ContainerUncontrolledCollectionResolver(this, openGenericServiceType);
-
-            this.collectionResolvers.Add(openGenericServiceType, resolver);
-
-            this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
-            this.Verifying += resolver.TriggerUnregisteredTypeResolutionOnAllClosedCollections;
-
-            return resolver;
+            this.Collections.Register(serviceType, containerUncontrolledCollection);
         }
     }
 }

@@ -125,7 +125,7 @@ namespace SimpleInjector.Advanced
 
         /// <summary>
         /// Allows appending new registrations to existing registrations made using one of the
-        /// <b>RegisterCollection</b> overloads.
+        /// <b>Collections.Register</b> overloads.
         /// </summary>
         /// <param name="container">The container.</param>
         /// <param name="serviceType">The service type of the collection.</param>
@@ -136,7 +136,7 @@ namespace SimpleInjector.Advanced
         /// reference type, is open generic, or ambiguous.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
-        /// that is made with one of the <b>RegisterCollection</b> overloads that accepts a dynamic collection
+        /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
@@ -151,7 +151,7 @@ namespace SimpleInjector.Advanced
 
         /// <summary>
         /// Allows appending new registrations to existing registrations made using one of the
-        /// <b>RegisterCollection</b> overloads.
+        /// <b>Collections.Register</b> overloads.
         /// </summary>
         /// <param name="container">The container.</param>
         /// <param name="serviceType">The service type of the collection.</param>
@@ -162,7 +162,7 @@ namespace SimpleInjector.Advanced
         /// reference type, or ambiguous.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
-        /// that is made with one of the <b>RegisterCollection</b> overloads that accepts a dynamic collection
+        /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]

@@ -2,7 +2,7 @@
 {
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    
+
     [TestClass]
     public class RegisterByGenericArgumentTests
     {
@@ -44,7 +44,7 @@
             var instance2 = container.GetInstance<IUserRepository>();
 
             // Assert
-            Assert.AreNotEqual(instance1, instance2, "Register<TService, TImplementation>() should " + 
+            Assert.AreNotEqual(instance1, instance2, "Register<TService, TImplementation>() should " +
                 "return transient objects.");
         }
 
@@ -89,7 +89,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<IPlugin>();
+            container.Collections.Register<IPlugin>();
 
             container.GetInstance<PluginManager>();
 
@@ -107,14 +107,14 @@
             var container = ContainerFactory.New();
 
             // Act
-            Action action = () => 
+            Action action = () =>
                 container.Register<ConcreteTypeWithMultiplePublicConstructors, ConcreteTypeWithMultiplePublicConstructors>(
                     Lifestyle.Transient);
 
             // Assert
             AssertThat.Throws<ArgumentException>(action);
         }
-        
+
         [TestMethod]
         public void RegisterByGenericArgument_RegisteringCovarientType_Succeeds()
         {

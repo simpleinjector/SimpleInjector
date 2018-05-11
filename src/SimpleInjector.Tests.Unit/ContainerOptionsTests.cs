@@ -29,7 +29,7 @@
             // Arrange
             var container = new Container();
             container.Options.AllowOverridingRegistrations = false;
-            
+
             container.Register<IUserRepository, SqlUserRepository>();
 
             // Act
@@ -46,10 +46,10 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = false;
 
-            container.RegisterCollection(typeof(ILogger), new[] { typeof(NullLogger) });
+            container.Collections.Register(typeof(ILogger), new[] { typeof(NullLogger) });
 
             // Act
-            Action action = () => container.RegisterCollection(typeof(ILogger), new[] { typeof(NullLogger) });
+            Action action = () => container.Collections.Register(typeof(ILogger), new[] { typeof(NullLogger) });
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action);
@@ -62,10 +62,10 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = false;
 
-            container.RegisterCollection(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
+            container.Collections.Register(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
 
             // Act
-            container.RegisterCollection(typeof(IEventHandler<AuditableEvent>), new[] { typeof(AuditableEventEventHandler) });
+            container.Collections.Register(typeof(IEventHandler<AuditableEvent>), new[] { typeof(AuditableEventEventHandler) });
 
             // Assert
             AssertThat.IsInstanceOfType(typeof(NonGenericEventHandler), container.GetAllInstances<IEventHandler<ClassEvent>>().Single());
@@ -80,12 +80,12 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = true;
 
-            container.RegisterCollection(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
+            container.Collections.Register(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
 
             // Act
-            container.RegisterCollection(typeof(IEventHandler<ClassEvent>), new[] 
+            container.Collections.Register(typeof(IEventHandler<ClassEvent>), new[]
             {
-                typeof(ClassConstraintEventHandler<ClassEvent>) 
+                typeof(ClassConstraintEventHandler<ClassEvent>)
             });
 
             var handlers = container.GetAllInstances<IEventHandler<ClassEvent>>().Select(h => h.GetType()).ToArray();
@@ -94,7 +94,7 @@
             Assert.IsTrue(handlers.Length == 1 && handlers[0] == typeof(ClassConstraintEventHandler<ClassEvent>),
                 "Actual: " + handlers.ToFriendlyNamesText());
         }
-        
+
         [TestMethod]
         public void AllowOverridingRegistrations_SetToTrue_ContainerAllowsOverridingClosedGenericRegistrations()
         {
@@ -172,10 +172,10 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = true;
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
+            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
 
             // Act
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
+            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
 
             // Assert
             var handlers = container.GetAllInstances<IEventHandler<AuditableEvent>>().Select(h => h.GetType()).ToArray();
@@ -192,12 +192,12 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = false;
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(NonGenericEventHandler) });
+            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(NonGenericEventHandler) });
 
             // Act
-            container.RegisterCollection(typeof(IValidate<>), new[] { typeof(NullValidator<int>) });
+            container.Collections.Register(typeof(IValidate<>), new[] { typeof(NullValidator<int>) });
         }
-        
+
         [TestMethod]
         public void AllowOverridingRegistrations_SetToTrue_ContainerReplacesAppendedRegistrationsAsWell()
         {
@@ -205,12 +205,12 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = true;
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
+            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
 
             container.Collections.Append<IEventHandler<AuditableEvent>, NewConstraintEventHandler<AuditableEvent>>();
 
             // Act
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
+            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
 
             // Assert
             var handlers = container.GetAllInstances<IEventHandler<AuditableEvent>>().Select(h => h.GetType()).ToArray();
@@ -219,7 +219,7 @@
             Assert.IsTrue(handlers.Length == 1 && handlers[0] == typeof(AuditableEventEventHandler),
                 "Actual: " + handlers.ToFriendlyNamesText());
         }
-        
+
         [TestMethod]
         public void AllowOverridingRegistrations_SetToFalse_ContainerThrowsExpectedExceptionMessage()
         {
@@ -264,10 +264,10 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = false;
 
-            container.RegisterCollection<IUserRepository>(new SqlUserRepository());
+            container.Collections.Register<IUserRepository>(new SqlUserRepository());
 
             // Act
-            Action action = () => container.RegisterCollection<IUserRepository>(new InMemoryUserRepository());
+            Action action = () => container.Collections.Register<IUserRepository>(new InMemoryUserRepository());
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action);
@@ -280,16 +280,16 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = true;
 
-            container.RegisterCollection<IUserRepository>(new SqlUserRepository());
+            container.Collections.Register<IUserRepository>(new SqlUserRepository());
 
             // Act
-            container.RegisterCollection<IUserRepository>(new InMemoryUserRepository());
+            container.Collections.Register<IUserRepository>(new InMemoryUserRepository());
 
             // Assert
             var instance = container.GetAllInstances<IUserRepository>().Single();
             AssertThat.IsInstanceOfType(typeof(InMemoryUserRepository), instance);
         }
-        
+
         [TestMethod]
         public void AllowOverridingRegistrations_SetToTrueWhileOverridingRegistrationWithSameImplementation_Succeeds()
         {
@@ -401,7 +401,7 @@
             // Act
             container.Verify(VerificationOption.VerifyAndDiagnose);
         }
-        
+
         [TestMethod]
         public void ConstructorResolutionBehavior_ChangedBeforeAnyRegistrations_ChangesThePropertyToTheSetInstance()
         {
@@ -427,7 +427,7 @@
             container.RegisterInstance<object>("The first registration.");
 
             // Act
-            Action action = () => container.Options.ConstructorResolutionBehavior = 
+            Action action = () => container.Options.ConstructorResolutionBehavior =
                 new AlternativeConstructorResolutionBehavior();
 
             // Assert
@@ -494,7 +494,7 @@
             container.RegisterInstance<object>("The first registration.");
 
             // Act
-            Action action = () => container.Options.DependencyInjectionBehavior = 
+            Action action = () => container.Options.DependencyInjectionBehavior =
                 new AlternativeDependencyInjectionBehavior();
 
             // Assert
@@ -511,7 +511,7 @@
 
             var container = new Container();
 
-            container.RegisterCollection<ILogger>(new[] { typeof(NullLogger) });
+            container.Collections.Register<ILogger>(new[] { typeof(NullLogger) });
 
             // Act
             Action action = () => container.Options.DependencyInjectionBehavior = expectedBehavior;
@@ -560,7 +560,7 @@
             container.RegisterInstance<object>("The first registration.");
 
             // Act
-            Action action = 
+            Action action =
                 () => container.Options.PropertySelectionBehavior = new AlternativePropertySelectionBehavior();
 
             // Assert
@@ -642,7 +642,7 @@
                 "DefaultLifestyle property cannot be changed after the first registration",
                 action);
         }
-        
+
         [TestMethod]
         public void DefaultLifestyle_WithCustomLifestyle_MakesARegistrationUsingThatLifestyle()
         {
@@ -728,11 +728,11 @@
         {
             // Arrange
             Type containerOptionsType = typeof(ContainerOptions);
-            
+
             // Act
-            var debuggerDisplayAttributes = 
+            var debuggerDisplayAttributes =
                 containerOptionsType.GetCustomAttributes(typeof(DebuggerDisplayAttribute), false);
-            
+
             // Assert
             Assert.AreEqual(1, debuggerDisplayAttributes.Length);
         }
@@ -745,7 +745,7 @@
                 typeof(ContainerOptions).GetCustomAttributes(typeof(DebuggerDisplayAttribute), false)
                 .Single() as DebuggerDisplayAttribute;
 
-            var debuggerDisplayDescriptionProperty = 
+            var debuggerDisplayDescriptionProperty =
                 GetProperty<ContainerOptions>(options => options.DebuggerDisplayDescription);
 
             // Act
@@ -865,7 +865,7 @@
                 Custom Dependency Injection,
                 Custom Property Selection,
                 Custom Lifestyle Selection
-                ".TrimInside(), 
+                ".TrimInside(),
                 description);
         }
 
@@ -881,7 +881,7 @@
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
         }
-        
+
         [TestMethod]
         public void PropertySelectionBehaviorSelectProperty_WithDefaultConfiguration_ReturnsFalse()
         {

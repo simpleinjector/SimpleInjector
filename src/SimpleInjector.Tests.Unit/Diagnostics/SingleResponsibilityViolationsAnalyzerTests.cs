@@ -261,7 +261,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             // Arrange
             Container container = CreateContainerWithRegistrations(Type.EmptyTypes);
 
-            container.RegisterCollection<IPlugin>(new[] { typeof(PluginWith8Dependencies) });
+            container.Collections.Register<IPlugin>(new[] { typeof(PluginWith8Dependencies) });
 
             container.Verify();
 
@@ -287,7 +287,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith5Dependencies));
 
             // Non of these types have too many dependencies.
-            container.RegisterCollection<IPlugin>(new[] { typeof(PluginImpl), typeof(SomePluginImpl) });
+            container.Collections.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(SomePluginImpl) });
 
             container.Verify();
 
@@ -314,7 +314,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecoratorWith8Dependencies));
 
             // Non of these types have too many dependencies.
-            container.RegisterCollection<IPlugin>(new[] { typeof(PluginImpl), typeof(SomePluginImpl) });
+            container.Collections.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(SomePluginImpl) });
 
             container.Verify();
 

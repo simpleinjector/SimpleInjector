@@ -137,7 +137,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<IPlugin>(new[] { typeof(PluginImpl) });
+            container.Collections.Register<IPlugin>(new[] { typeof(PluginImpl) });
 
             var registration = Lifestyle.Transient.CreateRegistration<PluginImpl2>(container);
 
@@ -160,7 +160,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var registration1 = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
             var registration2 = Lifestyle.Transient.CreateRegistration<PluginImpl2>(container);
 
-            container.RegisterCollection(typeof(IPlugin), new[] { registration1 });
+            container.Collections.Register(typeof(IPlugin), new[] { registration1 });
 
             container.AppendToCollection(typeof(IPlugin), registration2);
 
@@ -200,7 +200,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             IEnumerable<IPlugin> containerUncontrolledCollection = new[] { new PluginImpl() };
 
-            container.RegisterCollection<IPlugin>(containerUncontrolledCollection);
+            container.Collections.Register<IPlugin>(containerUncontrolledCollection);
 
             var registration = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
 
@@ -210,7 +210,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
                 appending registrations to these collections is not supported. Please register the collection
-                with one of the other RegisterCollection overloads if appending is required."
+                with one of the other Collections.Register overloads if appending is required."
                 .TrimInside(),
                 action);
         }
@@ -227,7 +227,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
             var registration = Lifestyle.Transient.CreateRegistration<StructEventHandler>(container);
 
@@ -242,7 +242,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
                 expected: expectedHandlerTypes.ToFriendlyNamesText(),
                 actual: actualHandlerTypes.ToFriendlyNamesText());
         }
-        
+
         [TestMethod]
         public void GetAllInstances_RegistrationPrependedToExistingOpenGenericRegistration_ResolvesTheExtectedCollection()
         {
@@ -259,7 +259,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             container.AppendToCollection(typeof(IEventHandler<>), registration);
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
             // Act
             Type[] actualHandlerTypes = container.GetAllInstances(typeof(IEventHandler<StructEvent>))
@@ -297,7 +297,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
                 expected: expectedHandlerTypes.ToFriendlyNamesText(),
                 actual: actualHandlerTypes.ToFriendlyNamesText());
         }
-        
+
         [TestMethod]
         public void GetAllInstances_MultipleAppendedOpenGenericTypesMixedWithClosedGenericRegisterCollection_ResolvesTheExpectedCollection()
         {
@@ -313,9 +313,9 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             container.AppendToCollection(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
 
-            container.RegisterCollection(typeof(IEventHandler<StructEvent>), new[] 
-            { 
-                typeof(AuditableEventEventHandler<StructEvent>) 
+            container.Collections.Register(typeof(IEventHandler<StructEvent>), new[]
+            {
+                typeof(AuditableEventEventHandler<StructEvent>)
             });
 
             container.AppendToCollection(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
@@ -343,7 +343,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
             container.AppendToCollection(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
             container.AppendToCollection(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
@@ -364,8 +364,8 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[] 
-            { 
+            container.Collections.Register(typeof(IEventHandler<>), new[]
+            {
                 // Here we make a closed registration; this causes an explicit registration for the
                 // IEventHandlerStructEvent> collection.
                 typeof(NewConstraintEventHandler<StructEvent>),
@@ -384,15 +384,15 @@ namespace SimpleInjector.Tests.Unit.Advanced
             AssertThat.IsInstanceOfType(typeof(StructConstraintEventHandler<StructEvent>), handler1);
             Assert.AreSame(handler1, handler2, "The instance was expected to be registered as singleton");
         }
-        
+
         [TestMethod]
         public void GetAllInstances_DelegatedRegistrationAppendedToExistingRegistrationForSameClosedType_ResolvesTheInstanceWithExpectedLifestyle()
         {
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[] 
-            { 
+            container.Collections.Register(typeof(IEventHandler<>), new[]
+            {
                 typeof(NewConstraintEventHandler<StructEvent>),
             });
 

@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2018 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -384,7 +384,7 @@ namespace SimpleInjector
         }
 
         // Allows getting notified when Verify() is called.
-        // This event is currently only used by RegisterCollection to make sure that as many registered types
+        // This event is currently only used by Collections.Register to make sure that as many registered types
         // can be verified.
         internal event Action Verifying = () => { };
 
@@ -860,7 +860,7 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterSingleton(Type serviceType, Type implementationType)
         {
-            this.Register(serviceType, implementationType, Lifestyle.Singleton, nameof(serviceType), 
+            this.Register(serviceType, implementationType, Lifestyle.Singleton, nameof(serviceType),
                 nameof(implementationType));
         }
 
@@ -1057,7 +1057,7 @@ namespace SimpleInjector
 
             this.instanceInitializers.Add(ContextualInstanceInitializer.Create(instanceInitializer, predicate));
         }
-        
+
         /// <summary>
         /// Adds the <paramref name="registration"/> for the supplied <paramtyperef name="TService"/>. This
         /// method can be used to apply the same <see cref="Registration"/> to multiple different service
@@ -1243,7 +1243,7 @@ namespace SimpleInjector
 
             Requires.IsReferenceType(serviceType, serviceTypeParamName);
             Requires.IsReferenceType(implementationType, implementationTypeParamName);
-            
+
             Requires.IsNotAnAmbiguousType(serviceType, serviceTypeParamName);
 
             this.ThrowArgumentExceptionWhenTypeIsNotConstructable(implementationType,
@@ -1290,7 +1290,7 @@ namespace SimpleInjector
                 throw new ArgumentException(message, parameterName);
             }
         }
-        
+
         private sealed class ContainerVerificationScope : Scope
         {
             public ContainerVerificationScope(Container container) : base(container)

@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2018 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -82,7 +82,7 @@ namespace SimpleInjector
             new Dictionary<Type, CollectionResolver>();
 
         // This list contains all instance producers that not yet have been explicitly registered in the container.
-        private readonly ConditionalHashSet<InstanceProducer> externalProducers = 
+        private readonly ConditionalHashSet<InstanceProducer> externalProducers =
             new ConditionalHashSet<InstanceProducer>();
 
         private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
@@ -356,7 +356,7 @@ namespace SimpleInjector
             }
         }
 
-        internal Expression OnExpressionBuilding(Registration registration, Type implementationType, 
+        internal Expression OnExpressionBuilding(Registration registration, Type implementationType,
             Expression instanceCreatorExpression)
         {
             if (this.expressionBuilding != null)
@@ -476,6 +476,19 @@ namespace SimpleInjector
                     this.GetLookalikesForMissingType(target.TargetType)));
         }
 
+        internal CollectionResolver GetContainerUncontrolledResolver(Type itemType)
+        {
+            return this.GetCollectionResolver(itemType, containerControlled: false);
+        }
+
+        internal CollectionResolver GetCollectionResolver(Type itemType, bool containerControlled)
+        {
+            Type key = GetRegistrationKey(itemType);
+
+            return this.collectionResolvers.GetValueOrDefault(key)
+                ?? this.CreateAndAddCollectionResolver(key, containerControlled);
+        }
+
         /// <summary>Releases all instances that are cached by the <see cref="Container"/> object.</summary>
         /// <param name="disposing">True for a normal dispose operation; false to finalize the handle.</param>
         protected virtual void Dispose(bool disposing)
@@ -503,6 +516,20 @@ namespace SimpleInjector
             InitializationContext context, Func<object> wrappedProducer)
         {
             return () => ThrowWhenResolveInterceptorReturnsNull(interceptor(context, wrappedProducer));
+        }
+
+        private CollectionResolver CreateAndAddCollectionResolver(Type openGenericServiceType, bool controlled)
+        {
+            var resolver = controlled
+                ? (CollectionResolver)new ContainerControlledCollectionResolver(this, openGenericServiceType)
+                : (CollectionResolver)new ContainerUncontrolledCollectionResolver(this, openGenericServiceType);
+
+            this.collectionResolvers.Add(openGenericServiceType, resolver);
+
+            this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
+            this.Verifying += resolver.TriggerUnregisteredTypeResolutionOnAllClosedCollections;
+
+            return resolver;
         }
 
         private void FlagContainerAsLocked()
@@ -559,8 +586,8 @@ namespace SimpleInjector
                 select instanceInitializer.CreateAction<T>(context))
                 .ToArray();
         }
-        
-        private void RegisterOpenGeneric(Type serviceType, Type implementationType, 
+
+        private void RegisterOpenGeneric(Type serviceType, Type implementationType,
             Lifestyle lifestyle, Predicate<PredicateContext> predicate = null)
         {
             Requires.IsGenericType(serviceType, nameof(serviceType));
@@ -573,7 +600,7 @@ namespace SimpleInjector
             this.GetOrCreateRegistrationalEntry(serviceType)
                 .AddGeneric(serviceType, implementationType, lifestyle, predicate);
         }
-       
+
         private void AddInstanceProducer(InstanceProducer producer)
         {
             // HACK: Conditional registrations for IEnumerable<T> are not added as uncontrolled collection,
@@ -606,8 +633,8 @@ namespace SimpleInjector
         {
             var entry = this.GetRegistrationalEntryOrNull(serviceType);
 
-            return entry == null 
-                ? 0 
+            return entry == null
+                ? 0
                 : entry.GetNumberOfConditionalRegistrationsFor(serviceType);
         }
 
@@ -616,7 +643,7 @@ namespace SimpleInjector
         private InstanceProducer GetInstanceProducerForType(Type serviceType, InjectionConsumerInfo consumer,
             Func<InstanceProducer> buildInstanceProducer)
         {
-            return 
+            return
                 this.GetExplicitlyRegisteredInstanceProducer(serviceType, consumer)
                 ?? this.TryGetInstanceProducerForRegisteredCollection(serviceType)
                 ?? buildInstanceProducer();
@@ -699,7 +726,7 @@ namespace SimpleInjector
         // and the parent type name of a nested type is included) as the missing type. Nested types are
         // mostly excluded from this list, because it would be quite common for developers to have lots
         // of nested types with the same name.
-        private IEnumerable<Type> GetLookalikesForMissingNonGenericType(string missingServiceTypeName) => 
+        private IEnumerable<Type> GetLookalikesForMissingNonGenericType(string missingServiceTypeName) =>
             from registration in this.GetCurrentRegistrations(false, includeExternalProducers: false)
             let typeName = registration.ServiceType.ToFriendlyName()
             where StringComparer.OrdinalIgnoreCase.Equals(typeName, missingServiceTypeName)

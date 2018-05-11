@@ -111,7 +111,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection<IPlugin>(new[] { typeof(PluginImpl) });
+            container.Collections.Register<IPlugin>(new[] { typeof(PluginImpl) });
 
             var registration = Lifestyle.Transient.CreateRegistration<PluginImpl2>(container);
 
@@ -134,7 +134,7 @@
             var registration1 = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
             var registration2 = Lifestyle.Transient.CreateRegistration<PluginImpl2>(container);
 
-            container.RegisterCollection(typeof(IPlugin), new[] { registration1 });
+            container.Collections.Register(typeof(IPlugin), new[] { registration1 });
 
             container.Collections.Append(typeof(IPlugin), registration2);
 
@@ -174,7 +174,7 @@
 
             IEnumerable<IPlugin> containerUncontrolledCollection = new[] { new PluginImpl() };
 
-            container.RegisterCollection<IPlugin>(containerUncontrolledCollection);
+            container.Collections.Register<IPlugin>(containerUncontrolledCollection);
 
             var registration = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
 
@@ -184,7 +184,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
                 appending registrations to these collections is not supported. Please register the collection
-                with one of the other RegisterCollection overloads if appending is required."
+                with one of the other Collections.Register overloads if appending is required."
                 .TrimInside(),
                 action);
         }
@@ -201,7 +201,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
             var registration = Lifestyle.Transient.CreateRegistration<StructEventHandler>(container);
 
@@ -233,7 +233,7 @@
 
             container.Collections.Append(typeof(IEventHandler<>), registration);
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
             // Act
             Type[] actualHandlerTypes = container.GetAllInstances(typeof(IEventHandler<StructEvent>))
@@ -287,7 +287,7 @@
 
             container.Collections.Append(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
 
-            container.RegisterCollection(typeof(IEventHandler<StructEvent>), new[]
+            container.Collections.Register(typeof(IEventHandler<StructEvent>), new[]
             {
                 typeof(AuditableEventEventHandler<StructEvent>)
             });
@@ -317,7 +317,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
             container.Collections.Append(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
             container.Collections.Append(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
@@ -338,7 +338,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[]
+            container.Collections.Register(typeof(IEventHandler<>), new[]
             { 
                 // Here we make a closed registration; this causes an explicit registration for the
                 // IEventHandlerStructEvent> collection.
@@ -365,7 +365,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(IEventHandler<>), new[]
+            container.Collections.Register(typeof(IEventHandler<>), new[]
             {
                 typeof(NewConstraintEventHandler<StructEvent>),
             });

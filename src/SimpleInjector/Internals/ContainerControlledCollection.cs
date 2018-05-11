@@ -180,7 +180,7 @@ namespace SimpleInjector.Internals
 
         // Note that the 'implementationType' could in fact be a service type as well and it is allowed
         // for the implementationType to equal TService. This will happen when someone does the following:
-        // container.RegisterCollection<ILogger>(typeof(ILogger));
+        // container.Collections.Register<ILogger>(typeof(ILogger));
         private InstanceProducer GetOrCreateInstanceProducer(Type implementationType)
         {
             // If the implementationType is explicitly registered (using a Register call) we select this 

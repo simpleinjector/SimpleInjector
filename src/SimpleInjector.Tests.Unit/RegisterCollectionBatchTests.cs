@@ -30,13 +30,13 @@
             var container = ContainerFactory.New();
 
             // class Concrete3 : IService<float, double>, IService<Type, Type>
-            container.RegisterCollection(typeof(IService<,>), new[] { typeof(Concrete3) });
+            container.Collections.Register(typeof(IService<,>), new[] { typeof(Concrete3) });
 
             // Act
             container.GetAllInstances<IService<float, double>>().Single();
             container.GetAllInstances<IService<Type, Type>>().Single();
         }
-        
+
         [TestMethod]
         public void RegisterCollectionTypes_SuppliedWithOpenGenericType_Succeeds()
         {
@@ -45,7 +45,7 @@
 
             var types = new[] { typeof(GenericHandler<>) };
 
-            container.RegisterCollection(typeof(ICommandHandler<>), types);
+            container.Collections.Register(typeof(ICommandHandler<>), types);
 
             // Act
             var handler = container.GetAllInstances<ICommandHandler<int>>().Single();
@@ -64,7 +64,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(ICommandHandler<>), registeredTypes);
+            container.Collections.Register(typeof(ICommandHandler<>), registeredTypes);
 
             // Act
             var handlers = container.GetAllInstances<ICommandHandler<decimal>>();
@@ -84,7 +84,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(ICommandHandler<>), registeredTypes);
+            container.Collections.Register(typeof(ICommandHandler<>), registeredTypes);
 
             // Assert
             var handlers = container.GetAllInstances<ICommandHandler<float>>();
@@ -104,7 +104,7 @@
 
             var container = ContainerFactory.New();
 
-            container.RegisterCollection(typeof(ICommandHandler<>), registeredTypes);
+            container.Collections.Register(typeof(ICommandHandler<>), registeredTypes);
 
             // Assert
             var handlers = container.GetAllInstances<ICommandHandler<object>>();
@@ -141,7 +141,7 @@
         public class GenericStructHandler<T> : ICommandHandler<T> where T : struct
         {
         }
-        
+
         #endregion
     }
 }

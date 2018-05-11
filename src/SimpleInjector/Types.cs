@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2016 Simple Injector Contributors
+ * Copyright (c) 2016-2018 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -156,11 +156,11 @@ namespace SimpleInjector
                 baseType.IsGenericType() && serviceType.IsGenericType() &&
                 baseType.GetGenericTypeDefinition() == serviceType.GetGenericTypeDefinition())
             select baseType;
-        
+
         // PERF: This method is a hot path in the registration phase and can get called thousands of times
         // during application startup. For that reason it is heavily optimized to prevent unneeded memory 
         // allocations as much as possible. This method is called in a loop by Container.GetTypesToRegister 
-        // and GetTypesToRegister is called by overloads of Register and RegisterCollection.
+        // and GetTypesToRegister is called by overloads of Register and Collections.Register.
         internal static bool ServiceIsAssignableFromImplementation(Type service, Type implementation)
         {
             if (!service.IsGenericType())

@@ -164,7 +164,7 @@
             // Assert
             Assert.AreEqual(0, results.Length, Actual(results));
         }
-        
+
         [TestMethod]
         public void Analyze_Uncached_OneViolationWithSuppressDiagnosticWarningOnOneRegistration_OneWarning()
         {
@@ -512,7 +512,7 @@
             var reg1 = Lifestyle.Singleton.CreateRegistration<IFoo>(() => new FooBar(), container);
             var reg2 = Lifestyle.Singleton.CreateRegistration<IFoo>(() => new ChocolateBar(), container);
 
-            container.RegisterCollection(typeof(IFoo), new[] { reg1, reg2 });
+            container.Collections.Register(typeof(IFoo), new[] { reg1, reg2 });
 
             container.Verify();
 
@@ -535,7 +535,7 @@
             var reg1 = Lifestyle.Singleton.CreateRegistration<FooBar>(() => new FooBar(), container);
             var reg2 = Lifestyle.Singleton.CreateRegistration<FooBar>(() => new FooBarSub(), container);
 
-            container.RegisterCollection(typeof(IFoo), new[] { reg1, reg2 });
+            container.Collections.Register(typeof(IFoo), new[] { reg1, reg2 });
 
             container.Verify();
 
@@ -558,7 +558,7 @@
             var reg1 = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
             var reg2 = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
 
-            container.RegisterCollection(typeof(IFoo), new[] { reg1, reg2 });
+            container.Collections.Register(typeof(IFoo), new[] { reg1, reg2 });
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -578,7 +578,7 @@
             var reg1 = Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false);
             var reg2 = Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false);
 
-            container.RegisterCollection(typeof(IFoo), new[] { reg1, reg2 });
+            container.Collections.Register(typeof(IFoo), new[] { reg1, reg2 });
 
             container.Verify(VerificationOption.VerifyOnly);
 

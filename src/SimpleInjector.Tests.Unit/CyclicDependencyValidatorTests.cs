@@ -194,7 +194,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
                 "depending on itself", action);
         }
-        
+
         [TestMethod]
         public void GetInstance_DelegateRegistrationDependingOnItself_Throws()
         {
@@ -222,7 +222,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>("depending on itself", action);
         }
-        
+
         [TestMethod]
         public void GetInstance_DelegateRegistrationDependingIndirectlyOnItselfThroughRootType_Throws()
         {
@@ -405,7 +405,7 @@
 
             Action arrangeAction = () => container.GetInstance<ITimeProvider>();
 
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(expectedMessage, arrangeAction, 
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(expectedMessage, arrangeAction,
                 "Test setup failed.");
 
             // Act
@@ -428,14 +428,14 @@
             container.Register<IService, CompositeService>(Lifestyle.Singleton);
 
             // CompositeService is also part of the collection making it indirectly depending on itself.
-            container.RegisterCollection<IService>(new[] { typeof(Service), typeof(CompositeService) });
+            container.Collections.Register<IService>(new[] { typeof(Service), typeof(CompositeService) });
 
             // Act
             Action action = () => container.GetAllInstances<IService>().ToArray();
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "The configuration is invalid. The type CyclicDependencyTests.CompositeService " + 
+                "The configuration is invalid. The type CyclicDependencyTests.CompositeService " +
                 "is directly or indirectly depending on itself.",
                 action);
         }
@@ -447,7 +447,7 @@
             var container = new Container();
 
             // NodeOne depends on INodeFactory
-            container.RegisterCollection<INode>(new[] { typeof(NodeOne) });
+            container.Collections.Register<INode>(new[] { typeof(NodeOne) });
 
             // NodeFactory depends on IEnumerable<INode>
             container.Register<INodeFactory, NodeFactory>();
@@ -477,7 +477,7 @@
             container.Register<NodeOne>();
 
             // NodeOne depends on INodeFactory
-            container.RegisterCollection<INode>(new[] { typeof(NodeOne) });
+            container.Collections.Register<INode>(new[] { typeof(NodeOne) });
 
             // With the previous releases of Simple Injector the use of a decorator would cause collections to
             // be built less lazily, i.e. all collection elements would be compiled upon injection. This would
@@ -728,7 +728,7 @@
     public class XDecorator1 : IX { public XDecorator1(IX d) { } }
     public class XDecorator2 : IX { public XDecorator2(IX d) { } }
     public class CyclicXDecorator3 : IX { public CyclicXDecorator3(IX d, A a) { } }
-    
+
     public class ServiceDependingOn<TDependency>
     {
         public readonly TDependency Dependency;
