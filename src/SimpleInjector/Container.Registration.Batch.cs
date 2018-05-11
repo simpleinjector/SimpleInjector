@@ -138,7 +138,7 @@ namespace SimpleInjector
                 guidance: StringResources.SuppliedTypeIsNotOpenGenericExplainingAlternativesWithAssemblies);
 
             Type[] skippedDecorators;
-            
+
             Type[] implementationTypes = this.GetNonGenericTypesToRegisterForOneToOneMapping(
                 openGenericServiceType, assemblies, out skippedDecorators);
 
@@ -325,22 +325,137 @@ namespace SimpleInjector
 
         /// <summary>
         /// Returns all concrete non-generic types that are located in the supplied <paramref name="assemblies"/> 
+        /// and implement or inherit from the supplied <typeparamref name="TService"/>. 
+        /// </summary>
+        /// <remarks>
+        /// Use this method when you need influence the types that are registered using 
+        /// <see cref="RegisterCollection(Type, Assembly[])">RegisterCollection</see>. 
+        /// The <b>RegisterCollection</b> overloads that take a collection of <see cref="Assembly"/> 
+        /// objects use this method internally to get the list of types that need to be registered. Instead of
+        /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
+        /// and pass in a filtered result from this <b>GetTypesToRegister</b> method.
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        /// 
+        /// IEnumerable<Assembly> assemblies = new[] { typeof(ILogger).Assembly };
+        /// var types = container.GetTypesToRegister<ILogger>(assemblies)
+        ///     .Where(type => type.IsPublic);
+        /// 
+        /// container.RegisterCollection<ILogger>(types);
+        /// ]]></code>
+        /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
+        /// of the <b>ILogger</b> interface from the assembly of that interface. After that
+        /// all internal types are filtered out. This list is supplied to the
+        /// <see cref="Container.RegisterCollection{TService}(IEnumerable{TService})">RegisterCollection&lt;TService&gt;(IEnumerable&lt;Type&gt;)</see>
+        /// overload to finish the registration.
+        /// </remarks>
+        /// <typeparam name="TService">The base type or interface to find derived types for.</typeparam>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <returns>A collection of types.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference 
+        /// (Nothing in VB).</exception>
+        /// <returns>A collection of types.</returns>
+        public IEnumerable<Type> GetTypesToRegister<TService>(IEnumerable<Assembly> assemblies)
+        {
+            return this.GetTypesToRegister(typeof(TService), assemblies, new TypesToRegisterOptions());
+        }
+
+        /// <summary>
+        /// Returns all concrete non-generic types that are located in the supplied <paramref name="assemblies"/> 
+        /// and implement or inherit from the supplied <typeparamref name="TService"/>. 
+        /// </summary>
+        /// <remarks>
+        /// Use this method when you need influence the types that are registered using 
+        /// <see cref="RegisterCollection(Type, Assembly[])">RegisterCollection</see>. 
+        /// The <b>RegisterCollection</b> overloads that take a collection of <see cref="Assembly"/> 
+        /// objects use this method internally to get the list of types that need to be registered. Instead of
+        /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
+        /// and pass in a filtered result from this <b>GetTypesToRegister</b> method.
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        /// 
+        /// var types = container.GetTypesToRegister<ILogger>(
+        ///     typeof(ILogger).Assembly,
+        ///     typeof(FileLogger).Assembly)
+        ///     .Where(type => type.IsPublic);
+        /// 
+        /// container.RegisterCollection<ILogger>(types);
+        /// ]]></code>
+        /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
+        /// of the <b>ILogger</b> interface from the assembly of that interface. After that
+        /// all internal types are filtered out. This list is supplied to the
+        /// <see cref="Container.RegisterCollection{TService}(IEnumerable{TService})">RegisterCollection&lt;TService&gt;(IEnumerable&lt;Type&gt;)</see>
+        /// overload to finish the registration.
+        /// </remarks>
+        /// <typeparam name="TService">The base type or interface to find derived types for.</typeparam>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <returns>A collection of types.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference 
+        /// (Nothing in VB).</exception>
+        /// <returns>A collection of types.</returns>
+        public IEnumerable<Type> GetTypesToRegister<TService>(params Assembly[] assemblies)
+        {
+            return this.GetTypesToRegister(typeof(TService), assemblies, new TypesToRegisterOptions());
+        }
+
+        /// <summary>
+        /// Returns all concrete non-generic types that are located in the supplied <paramref name="assemblies"/> 
         /// and implement or inherit from the supplied <paramref name="serviceType"/>. 
         /// <paramref name="serviceType"/> can be an open-generic type.
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using 
-        /// <see cref="Register(System.Type, IEnumerable{System.Reflection.Assembly})">Register</see>. 
+        /// <see cref="Register(System.Type, IEnumerable{System.Reflection.Assembly})">Register</see>  or
+        /// <see cref="RegisterCollection(Type, Assembly[])">RegisterCollection</see>. 
         /// The <b>Register</b> overloads that take a collection of <see cref="Assembly"/> 
         /// objects use this method internally to get the list of types that need to be registered. Instead of
-        /// calling  such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
-        /// and pass  in a filtered result from this <b>GetTypesToRegister</b> method.
+        /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
+        /// and pass in a filtered result from this <b>GetTypesToRegister</b> method.
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
         /// 
         /// var assemblies = new[] { typeof(ICommandHandler<>).Assembly };
         /// var types = container.GetTypesToRegister(typeof(ICommandHandler<>), assemblies)
-        ///     .Where(type => !type.IsPublic);
+        ///     .Where(type => type.IsPublic);
+        /// 
+        /// container.Register(typeof(ICommandHandler<>), types);
+        /// ]]></code>
+        /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
+        /// of the <b>ICommandHandler&lt;T&gt;</b> interface from the assembly of that interface. After that
+        /// all internal types are filtered out. This list is supplied to the
+        /// <see cref="Container.Register(System.Type,IEnumerable{System.Type})">Register(Type, IEnumerable&lt;Type&gt;)</see>
+        /// overload to finish the registration.
+        /// </remarks>
+        /// <param name="serviceType">The base type or interface to find derived types for. This can be both
+        /// a non-generic and open-generic type.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <returns>A collection of types.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference 
+        /// (Nothing in VB).</exception>
+        public IEnumerable<Type> GetTypesToRegister(Type serviceType, params Assembly[] assemblies)
+        {
+            return this.GetTypesToRegister(serviceType, assemblies, new TypesToRegisterOptions());
+        }
+
+        /// <summary>
+        /// Returns all concrete non-generic types that are located in the supplied <paramref name="assemblies"/> 
+        /// and implement or inherit from the supplied <paramref name="serviceType"/>. 
+        /// <paramref name="serviceType"/> can be an open-generic type.
+        /// </summary>
+        /// <remarks>
+        /// Use this method when you need influence the types that are registered using 
+        /// <see cref="Register(System.Type, IEnumerable{System.Reflection.Assembly})">Register</see>  or
+        /// <see cref="RegisterCollection(Type, Assembly[])">RegisterCollection</see>. 
+        /// The <b>Register</b> overloads that take a collection of <see cref="Assembly"/> 
+        /// objects use this method internally to get the list of types that need to be registered. Instead of
+        /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
+        /// and pass in a filtered result from this <b>GetTypesToRegister</b> method.
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        /// 
+        /// var assemblies = new[] { typeof(ICommandHandler<>).Assembly };
+        /// var types = container.GetTypesToRegister(typeof(ICommandHandler<>), assemblies)
+        ///     .Where(type => type.IsPublic);
         /// 
         /// container.Register(typeof(ICommandHandler<>), types);
         /// ]]></code>
@@ -426,7 +541,7 @@ namespace SimpleInjector
 
             var typesIncludingDecorators = this.GetTypesToRegister(openGenericServiceType, assemblies, options);
 
-            var partitions = 
+            var partitions =
                 typesIncludingDecorators.Partition(type => this.IsDecorator(openGenericServiceType, type));
 
             skippedDecorators = partitions.Item1;

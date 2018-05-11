@@ -9,7 +9,7 @@
     /// <summary>Tests for full .NET framework version.</summary>
     public partial class RegisterBatchTestsFull
     {
-        private static readonly Assembly[] Assemblies =
+        private static readonly IEnumerable<Assembly> Assemblies =
             new[] { typeof(RegisterBatchTestsFull).GetTypeInfo().Assembly };
 
         // This is the open generic interface that will be used as service type.
@@ -111,7 +111,7 @@
             var container = new Container();
 
             // Act
-            var result = container.GetTypesToRegister(typeof(IServiceFull<,>), Assemblies);
+            var result = container.GetTypesToRegister(typeof(IServiceFull<,>), Assemblies.ToArray());
 
             // Assert
             Assert.IsTrue(result.Contains(typeof(InternalConcrete4Full)));
