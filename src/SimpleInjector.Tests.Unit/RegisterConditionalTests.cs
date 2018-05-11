@@ -1325,7 +1325,7 @@
 
             var registration = Lifestyle.Transient.CreateRegistration<NullLogger>(container);
 
-            container.RegisterConditional(typeof(ILogger), registration, c => true);
+            container.RegisterConditional<ILogger>(registration, c => true);
 
             // Act
             container.GetInstance<ILogger>();
@@ -1339,7 +1339,7 @@
 
             var registration = Lifestyle.Transient.CreateRegistration<NullLogger>(container);
 
-            container.RegisterConditional(typeof(ILogger), registration, c => true);
+            container.RegisterConditional<ILogger>(registration, c => true);
 
             // Act
             Action action = () => container.RegisterConditional(typeof(ILogger), registration, c => false);

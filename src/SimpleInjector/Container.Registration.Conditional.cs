@@ -225,6 +225,30 @@ namespace SimpleInjector
 
         /// <summary>
         /// Conditionally registers that <paramref name="registration"/> will be used every time a 
+        /// <typeparamref name="TService"/> requested and where the supplied <paramref name="predicate"/> 
+        /// returns true. The predicate will only be evaluated a finite number of times; the predicate is 
+        /// unsuited for making decisions based on runtime conditions.
+        /// </summary>
+        /// <typeparam name="TService">The base type or interface to register. This can be an open-generic type.</typeparam>
+        /// <param name="registration">The <see cref="Registration"/> instance to register.</param>
+        /// <param name="predicate">The predicate that determines whether the 
+        /// <paramref name="registration"/> can be applied for the requested service type. This predicate
+        /// can be used to build a fallback mechanism where multiple registrations for the same service type
+        /// are made. Note that the predicate will be called a finite number of times and its result will be cached
+        /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
+        /// </param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered.
+        /// </exception>
+        public void RegisterConditional<TService>(Registration registration, Predicate<PredicateContext> predicate)
+        {
+            RegisterConditional(typeof(TService), registration, predicate);
+        }
+
+        /// <summary>
+        /// Conditionally registers that <paramref name="registration"/> will be used every time a 
         /// <paramref name="serviceType"/> is requested and where the supplied <paramref name="predicate"/> 
         /// returns true. The predicate will only be evaluated a finite number of times; the predicate is 
         /// unsuited for making decisions based on runtime conditions.
