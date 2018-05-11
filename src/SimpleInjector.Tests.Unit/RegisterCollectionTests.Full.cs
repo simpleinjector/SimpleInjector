@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -51,7 +52,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>();
+            container.Collections.Register<IPlugin>(Type.EmptyTypes);
 
             // Act
             IReadOnlyCollection<IPlugin> collection =
@@ -105,7 +106,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>();
+            container.Collections.Register<IPlugin>(Type.EmptyTypes);
 
             // Act
             IReadOnlyList<IPlugin> list =

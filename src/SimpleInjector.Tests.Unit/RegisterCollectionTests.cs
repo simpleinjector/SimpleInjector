@@ -492,7 +492,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>();
+            container.Collections.Register<IPlugin>(Type.EmptyTypes);
 
             // Act
             // PluginManager has a constructor with an IEnumerable<IPlugin> argument.
@@ -643,7 +643,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.Collections.Register<IUserRepository>();
+            container.Collections.Register<IUserRepository>(Type.EmptyTypes);
             var repositories = container.GetAllInstances<IUserRepository>();
             var count = repositories.Count();
 
@@ -763,7 +763,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IUserRepository>();
+            container.Collections.Register<IUserRepository>(new Assembly[0]);
 
             // Act
             var repositories = container.GetAllInstances(typeof(IUserRepository));
@@ -1687,7 +1687,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>();
+            container.Collections.Register<IPlugin>(Type.EmptyTypes);
 
             // Act
             ICollection<IPlugin> collection =
@@ -1740,7 +1740,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>();
+            container.Collections.Register<IPlugin>(Type.EmptyTypes);
 
             // Act
             IList<IPlugin> list =

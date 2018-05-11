@@ -561,6 +561,29 @@ namespace SimpleInjector
         /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
+        public void Register<TService>(params Type[] serviceTypes) where TService : class
+        {
+            this.Register(typeof(TService), serviceTypes);
+        }
+
+        /// <summary>
+        /// Registers a collection of <paramref name="serviceTypes"/>, whose instances will be resolved lazily
+        /// each time the resolved collection of <typeparamref name="TService"/> is enumerated. 
+        /// The underlying collection is a stream that will return individual instances based on their 
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
+        /// The order in which the types appear in the collection is the exact same order that the items were 
+        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// </summary>
+        /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
+        /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
+        /// will be requested from the container.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null 
+        /// reference (Nothing in VB).
+        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
+        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
+        /// </exception>
         public void Register<TService>(IEnumerable<Type> serviceTypes) where TService : class
         {
             this.Register(typeof(TService), serviceTypes);
@@ -696,6 +719,24 @@ namespace SimpleInjector
                     StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, ex) +
                     Environment.NewLine + "paramName: " + nameof(serviceType), ex);
             }
+        }
+
+        /// <summary>
+        /// Registers all concrete, non-generic types (both public and internal) that are defined in the given
+        /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
+        /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
+        /// Unless overridden using a custom 
+        /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
+        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
+        /// </summary>
+        /// <typeparam name="TService">The element type of the collections to register. This can be either
+        /// a non-generic, closed-generic or open-generic type.</typeparam>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
+        /// reference (Nothing in VB).</exception>
+        public void Register<TService>(params Assembly[] assemblies) where TService : class
+        {
+            this.Register(typeof(TService), assemblies);
         }
 
         /// <summary>
