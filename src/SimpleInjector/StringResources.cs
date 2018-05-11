@@ -221,13 +221,15 @@ namespace SimpleInjector
             string.Format(CultureInfo.InvariantCulture,
                 "Collection of items for type {0} has already been registered " +
                 "and the container is currently not configured to allow overriding registrations. " +
-                "To allow overriding the current registration, please create the container using the " +
-                "constructor overload that takes a {1} instance and set the {2} property to true. " +
+                "If your intention is to replace the existing collection with this new one, " +
+                "you can allow overriding the current registration by setting Container.{1}.{2} to true. " +
                 "In case it is your goal to append items to an already registered collection, please use " +
-                "the Container.Collections.{3} method overloads.",
+                "the Container.{3}.{4} method overloads. " +
+                "More info on overriding registration: https://simpleinjector.org/ovrrd.",
                 serviceType.TypeName(),
                 nameof(ContainerOptions),
                 nameof(ContainerOptions.AllowOverridingRegistrations),
+                nameof(Container.Collections),
                 nameof(ContainerCollectionRegistrator.Append));
 
         internal static string ParameterTypeMustBeRegistered(InjectionTargetInfo target, int numberOfConditionals,
