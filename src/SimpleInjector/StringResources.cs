@@ -40,6 +40,9 @@ namespace SimpleInjector
         private static readonly PropertyInfo AssemblyLocationProperty =
             typeof(Assembly).GetProperties().SingleOrDefault(p => p.Name == "Location");
 
+        private const string CollectionsRegisterMethodName =
+            nameof(Container) + "." + nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register);
+
         internal static bool UseFullyQualifiedTypeNames { get; set; } = false;
 
         internal static string ContainerCanNotBeChangedAfterUse(string stackTrace)
@@ -195,7 +198,7 @@ namespace SimpleInjector
                 "you can allow overriding the current registration by setting {2}.{3} to true. " +
                 "More info: https://simpleinjector.org/ovrrd.",
                 serviceType.TypeName(),
-                nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register),
+                CollectionsRegisterMethodName,
                 nameof(Container) + "." + nameof(Container.Options),
                 nameof(ContainerOptions.AllowOverridingRegistrations));
 
@@ -377,7 +380,7 @@ namespace SimpleInjector
                 ToTypeOCfSharpFriendlyList(types),
                 CSharpFriendlyName(types.First()),
                 ToTypeOCfSharpFriendlyList(types.Skip(1)),
-                nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register));
+                CollectionsRegisterMethodName);
 
         internal static string TypeIsAmbiguous(Type serviceType) =>
             string.Format(CultureInfo.InvariantCulture,
@@ -473,10 +476,12 @@ namespace SimpleInjector
             Type[] implementations) =>
             string.Format(CultureInfo.InvariantCulture,
                 "There are {0} types in the supplied list of types or assemblies that represent the " +
-                "same closed generic type {1}. Conflicting types: {2}.",
+                "same closed generic type {1}. Did you mean to register the types as a collection " +
+                "using the {2} method instead? Conflicting types: {3}.",
                 implementations.Length,
                 closedServiceType.TypeName(),
-                implementations.Select(type => type.TypeName()).ToCommaSeparatedText());
+                CollectionsRegisterMethodName,
+                implementations.Select(TypeName).ToCommaSeparatedText());
 
         internal static string CantGenerateFuncForDecorator(Type serviceType, Type decoratorType) =>
             string.Format(CultureInfo.InvariantCulture,
@@ -489,7 +494,7 @@ namespace SimpleInjector
                 "depends on a Func<T> for injecting the decoratee.",
                 serviceType.TypeName(),
                 decoratorType.TypeName(),
-                nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register));
+                CollectionsRegisterMethodName);
 
         internal static string SuppliedTypeIsNotAGenericType(Type type) =>
             string.Format(CultureInfo.InvariantCulture,
@@ -546,7 +551,7 @@ namespace SimpleInjector
                 decoratorType.TypeName(),
                 lifestyle.Name,
                 serviceType.TypeName(),
-                nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register));
+                CollectionsRegisterMethodName);
 
         internal static string PropertyHasNoSetter(PropertyInfo property) =>
             string.Format(CultureInfo.InvariantCulture,
@@ -567,7 +572,7 @@ namespace SimpleInjector
                 "You must register the open-generic types separately using the Register(Type, Type) " +
                 "overload. Alternatively, try using {0} instead, if you expect to have multiple " +
                 "implementations per closed-generic abstraction. Invalid types: {1}.",
-                nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register),
+                CollectionsRegisterMethodName,
                 openGenericTypes.Select(TypeName).ToCommaSeparatedText());
 
         internal static string AppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
@@ -579,7 +584,7 @@ namespace SimpleInjector
                 "appending registrations to these collections is not supported. Please register the " +
                 "collection with one of the other {1} overloads if appending is required.",
                 serviceType.TypeName(),
-                nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register));
+                CollectionsRegisterMethodName);
 
         internal static string UnregisteredTypeEventArgsRegisterDelegateReturnedUncastableInstance(
             Type serviceType, InvalidCastException exception) =>
@@ -671,7 +676,7 @@ namespace SimpleInjector
                 "Mixing calls to {1} for the same open generic service type is not supported. Consider " +
                 "making one single call to {1}(typeof({0}), types).",
                 CSharpFriendlyName(serviceType.GetGenericTypeDefinition()),
-                nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register));
+                CollectionsRegisterMethodName);
 
         internal static string MixingRegistrationsWithControlledAndUncontrolledIsNotSupported(Type serviceType,
             bool controlled) =>
@@ -683,7 +688,7 @@ namespace SimpleInjector
                 (serviceType.IsGenericType() ? serviceType.GetGenericTypeDefinition() : serviceType).TypeName(),
                 controlled ? "uncontrolled" : "controlled",
                 controlled ? "controlled" : "uncontrolled",
-                nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register));
+                CollectionsRegisterMethodName);
 
         internal static string ValueInvalidForEnumType(string paramName, object invalidValue, Type enumClass) =>
             string.Format(CultureInfo.InvariantCulture,
@@ -847,7 +852,7 @@ namespace SimpleInjector
                 "or closed version of that type to register a collection of instances based on that type.",
                 CSharpFriendlyName(type.GetGenericTypeDefinition()),
                 registeringElement,
-                nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register));
+                CollectionsRegisterMethodName);
 
         private static string ToTypeOCfSharpFriendlyList(IEnumerable<Type> types) =>
             string.Join(", ",
@@ -861,7 +866,7 @@ namespace SimpleInjector
                 "{2}(typeof({0}), IEnumerable<{1}>) instead.",
                 type.TypeName(),
                 registeringElement,
-                nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register));
+                CollectionsRegisterMethodName);
 
         private static object ContainerHasNoRegistrationsAddition(bool containerHasRegistrations) =>
             containerHasRegistrations
@@ -877,7 +882,7 @@ namespace SimpleInjector
                     "or depend on {0}? Or did you mean to register a collection of types using " +
                     "{1}?",
                     collectionServiceType.GetGenericArguments()[0].TypeName(),
-                    nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register))
+                    CollectionsRegisterMethodName)
                 : string.Empty;
 
         private static string DidYouMeanToDependOnNonCollectionInstead(bool hasRelatedOneToOneMapping,
@@ -906,7 +911,7 @@ namespace SimpleInjector
                     "about registering and resolving collections.",
                     typeof(IEnumerable<>).MakeGenericType(serviceType).TypeName(),
                     serviceType.TypeName(),
-                    nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register),
+                    CollectionsRegisterMethodName,
                     nameof(Container.Register))
                 : string.Empty;
 
