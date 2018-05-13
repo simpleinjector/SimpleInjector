@@ -294,8 +294,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                Mixing calls to Collections.Register for the same open generic service type is not supported. Consider
-                making one single call to Collections.Register(typeof(IEventHandler<>), types)."
+                Mixing calls to Container.Collections.Register for the same open generic service type is not supported. Consider
+                making one single call to Container.Collections.Register(typeof(IEventHandler<>), types)."
                 .TrimInside(),
                 action);
         }
@@ -316,8 +316,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                Mixing calls to Collections.Register for the same open generic service type is not supported. Consider
-                making one single call to Collections.Register(typeof(IEventHandler<>), types)."
+                Mixing calls to Container.Collections.Register for the same open generic service type is not supported. Consider
+                making one single call to Container.Collections.Register(typeof(IEventHandler<>), types)."
                 .TrimInside(),
                 action);
         }

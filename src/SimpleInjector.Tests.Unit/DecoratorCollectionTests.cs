@@ -1552,7 +1552,7 @@
                 AssertThat.ExceptionMessageContains(@"
                     Since the number of returned items might change on each call, the decorator with this 
                     lifestyle cannot be applied to the collection. Instead, register the decorator with the 
-                    Transient lifestyle, or use one of the Collections.Register overloads that takes a collection of 
+                    Transient lifestyle, or use one of the Container.Collections.Register overloads that takes a collection of 
                     System.Type types."
                     .TrimInside(), ex);
             }
@@ -2016,12 +2016,12 @@
                 ex.Message);
 
             AssertThat.StringContains(
-                "the registration hasn't been made using one of the Collections.Register overloads that take " +
+                "the registration hasn't been made using one of the Container.Collections.Register overloads that take " +
                 "a list of System.Type",
                 ex.Message);
 
             AssertThat.StringContains(
-                "switch to one of the other Collections.Register overloads, or don't use a decorator that " +
+                "switch to one of the other Container.Collections.Register overloads, or don't use a decorator that " +
                 "depends on a Func<T>",
                 ex.Message);
         }

@@ -184,7 +184,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
                 appending registrations to these collections is not supported. Please register the collection
-                with one of the other Collections.Register overloads if appending is required."
+                with one of the other Container.Collections.Register overloads if appending is required."
                 .TrimInside(),
                 action);
         }

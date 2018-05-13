@@ -1093,7 +1093,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 Type IGeneric<Int32> has already been registered. If your intention is to resolve a collection 
-                of IGeneric<Int32> implementations, use the Collections.Register overloads."
+                of IGeneric<Int32> implementations, use the Container.Collections.Register overloads."
                 .TrimInside(),
                 action);
         }

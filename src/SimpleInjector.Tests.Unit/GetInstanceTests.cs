@@ -369,7 +369,7 @@
                 There is, however, a registration for IEnumerable<ILogger>; 
                 Did you mean to depend on IEnumerable<ILogger>?
                 If you meant to depend on ILogger, 
-                you should use one of the Register overloads instead of using Collections.Register"
+                you should use one of the Register overloads instead of using Container.Collections.Register"
                 .TrimInside(),
                 action);
         }

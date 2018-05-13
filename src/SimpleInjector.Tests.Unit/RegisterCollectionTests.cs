@@ -106,7 +106,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
                 "The most likely cause of this happening is because the C# overload resolution picked " +
                 "a different method for you than you expected to call. The method C# selected for you is: " +
-                "Collections.Register<Type>",
+                "Container.Collections.Register<Type>",
                 action);
         }
 
@@ -2064,7 +2064,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
                 You already made a registration for IEventHandler<TEvent> using one of the 
-                Collections.Register overloads that registers container-uncontrolled collections, while this 
+                Container.Collections.Register overloads that registers container-uncontrolled collections, while this 
                 method registers container-controlled collections. Mixing calls is not supported."
                 .TrimInside(),
                 action);
@@ -2086,7 +2086,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
                 You already made a registration for IEventHandler<TEvent> using one of the 
-                Collections.Register overloads that registers container-controlled collections, while this 
+                Container.Collections.Register overloads that registers container-controlled collections, while this 
                 method registers container-uncontrolled collections. Mixing calls is not supported."
                 .TrimInside(),
                 action);
