@@ -34,14 +34,14 @@ namespace SimpleInjector
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
     {
+        private const string CollectionsRegisterMethodName =
+            nameof(Container) + "." + nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register);
+
         // Assembly.Location only exists in .NETStandard1.5 and up, .NET4.0 and PCL, but we only compile
         // against .NETStandard1.0 and .NETStandard1.3. We don't want to add an extra build directly, solely
         // for the Location property.
         private static readonly PropertyInfo AssemblyLocationProperty =
             typeof(Assembly).GetProperties().SingleOrDefault(p => p.Name == "Location");
-
-        private const string CollectionsRegisterMethodName =
-            nameof(Container) + "." + nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register);
 
         internal static bool UseFullyQualifiedTypeNames { get; set; } = false;
 

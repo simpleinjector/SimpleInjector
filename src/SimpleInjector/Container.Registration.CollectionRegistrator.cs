@@ -449,6 +449,31 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// Appends a new registration of <typeparamref name="TImplementation"/> to existing registrations 
+        /// made for a collection of <typeparamref name="TService"/> elements using one of the 
+        /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see>
+        /// overloads with the given <paramref name="lifestyle"/>.
+        /// </summary>
+        /// <typeparam name="TService">The element type of the collections to register.</typeparam>
+        /// <typeparam name="TImplementation">The concrete type that will be appended as registration to the
+        /// collection.</typeparam>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
+        /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TService"/>is ambiguous.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="lifestyle"/> is a null reference.
+        /// </exception>
+        public void Append<TService, TImplementation>(Lifestyle lifestyle)
+            where TImplementation : class, TService
+            where TService : class
+        {
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
+
+            this.AppendToCollectionInternal(typeof(TService),
+                lifestyle.CreateRegistration<TImplementation>(this.container));
+        }
+
+        /// <summary>
         /// Appends a new registration to existing registrations made for a collection of 
         /// <paramref name="serviceType"/> elements using one of the 
         /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see>

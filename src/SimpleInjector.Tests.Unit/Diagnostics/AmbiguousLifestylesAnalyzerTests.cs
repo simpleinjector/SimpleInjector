@@ -321,6 +321,33 @@
             Assert_AllOfType<AmbiguousLifestylesDiagnosticResult>(results);
         }
 
+        [TestMethod]
+        public void Verify_AmbiquousLifestylesAcrossCollectionAppendAndNormalRegistration_CausesAmbiguousLifestyleWarning()
+        {
+            // Arrange
+            string expectedMessage = @"
+                The registration for IFoo (Singleton) maps to the same implementation (FooBar)
+                as the registration for IFoo (Transient) does";
+
+            var container = ContainerFactory.New();
+
+            container.Register<IFoo, FooBar>(Lifestyle.Transient);
+
+            container.Collections.Append<IFoo, FooBar>(Lifestyle.Singleton);
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            Assert.AreEqual(1, container.GetAllInstances<IFoo>().Count(), "Test setuo failed");
+            Assert.IsInstanceOfType(container.GetInstance<IFoo>(), typeof(FooBar), "Test setuo failed");
+
+            // Act
+            var results = Analyzer.Analyze(container);
+            
+            // Assert
+            Assert_ContainsDescription(results, expectedMessage.TrimInside());
+            Assert_AllOfType<AmbiguousLifestylesDiagnosticResult>(results);
+        }
+
         private static void Assert_ContainsDescription(IEnumerable<DiagnosticResult> results,
             string expectedDescription)
         {
