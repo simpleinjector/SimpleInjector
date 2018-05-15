@@ -89,7 +89,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(Type.EmptyTypes);
+            container.Collection.Register<IPlugin>(Type.EmptyTypes);
 
             container.GetInstance<PluginManager>();
 

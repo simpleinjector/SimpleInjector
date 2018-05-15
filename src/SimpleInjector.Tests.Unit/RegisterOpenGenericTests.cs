@@ -1093,7 +1093,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 Type IGeneric<Int32> has already been registered. If your intention is to resolve a collection 
-                of IGeneric<Int32> implementations, use the Container.Collections.Register overloads."
+                of IGeneric<Int32> implementations, use the Container.Collection.Register overloads."
                 .TrimInside(),
                 action);
         }
@@ -1297,7 +1297,7 @@
             var container = new Container();
 
             container.Register(typeof(IQueryDispatcher<,>), typeof(QueryDispatcher<,>));
-            container.Collections.Register(typeof(IQueryHandler<,>), new[]
+            container.Collection.Register(typeof(IQueryHandler<,>), new[]
             {
                 typeof(MultipleResultsIntQueryHandler),
                 typeof(MultipleResultsBoolQueryHandler)

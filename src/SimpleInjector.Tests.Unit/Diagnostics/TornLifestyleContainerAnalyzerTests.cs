@@ -512,7 +512,7 @@
             var reg1 = Lifestyle.Singleton.CreateRegistration<IFoo>(() => new FooBar(), container);
             var reg2 = Lifestyle.Singleton.CreateRegistration<IFoo>(() => new ChocolateBar(), container);
 
-            container.Collections.Register(typeof(IFoo), new[] { reg1, reg2 });
+            container.Collection.Register(typeof(IFoo), new[] { reg1, reg2 });
 
             container.Verify();
 
@@ -535,7 +535,7 @@
             var reg1 = Lifestyle.Singleton.CreateRegistration<FooBar>(() => new FooBar(), container);
             var reg2 = Lifestyle.Singleton.CreateRegistration<FooBar>(() => new FooBarSub(), container);
 
-            container.Collections.Register(typeof(IFoo), new[] { reg1, reg2 });
+            container.Collection.Register(typeof(IFoo), new[] { reg1, reg2 });
 
             container.Verify();
 
@@ -558,7 +558,7 @@
             var reg1 = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
             var reg2 = Lifestyle.Singleton.CreateRegistration<FooBar>(container);
 
-            container.Collections.Register(typeof(IFoo), new[] { reg1, reg2 });
+            container.Collection.Register(typeof(IFoo), new[] { reg1, reg2 });
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -578,7 +578,7 @@
             var reg1 = Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false);
             var reg2 = Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false);
 
-            container.Collections.Register(typeof(IFoo), new[] { reg1, reg2 });
+            container.Collection.Register(typeof(IFoo), new[] { reg1, reg2 });
 
             container.Verify(VerificationOption.VerifyOnly);
 

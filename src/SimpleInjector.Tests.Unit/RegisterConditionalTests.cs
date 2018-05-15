@@ -1618,7 +1618,7 @@
 
             container.Register<IUserRepository, SqlUserRepository>(new ThreadScopedLifestyle());
 
-            container.Collections.Register<ILogger>(new[]
+            container.Collection.Register<ILogger>(new[]
             {
                 Lifestyle.Transient.CreateRegistration<LoggerWithDependency<IUserRepository, IUserRepository>>(container),
                 Lifestyle.Transient.CreateRegistration<LoggerWithDependency<IUserRepository, IUserRepository>>(container)

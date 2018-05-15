@@ -30,7 +30,7 @@
             var container = ContainerFactory.New();
 
             // class Concrete3 : IService<float, double>, IService<Type, Type>
-            container.Collections.Register(typeof(IService<,>), new[] { typeof(Concrete3) });
+            container.Collection.Register(typeof(IService<,>), new[] { typeof(Concrete3) });
 
             // Act
             container.GetAllInstances<IService<float, double>>().Single();
@@ -45,7 +45,7 @@
 
             var types = new[] { typeof(GenericHandler<>) };
 
-            container.Collections.Register(typeof(ICommandHandler<>), types);
+            container.Collection.Register(typeof(ICommandHandler<>), types);
 
             // Act
             var handler = container.GetAllInstances<ICommandHandler<int>>().Single();
@@ -64,7 +64,7 @@
 
             var container = ContainerFactory.New();
 
-            container.Collections.Register(typeof(ICommandHandler<>), registeredTypes);
+            container.Collection.Register(typeof(ICommandHandler<>), registeredTypes);
 
             // Act
             var handlers = container.GetAllInstances<ICommandHandler<decimal>>();
@@ -84,7 +84,7 @@
 
             var container = ContainerFactory.New();
 
-            container.Collections.Register(typeof(ICommandHandler<>), registeredTypes);
+            container.Collection.Register(typeof(ICommandHandler<>), registeredTypes);
 
             // Assert
             var handlers = container.GetAllInstances<ICommandHandler<float>>();
@@ -104,7 +104,7 @@
 
             var container = ContainerFactory.New();
 
-            container.Collections.Register(typeof(ICommandHandler<>), registeredTypes);
+            container.Collection.Register(typeof(ICommandHandler<>), registeredTypes);
 
             // Assert
             var handlers = container.GetAllInstances<ICommandHandler<object>>();

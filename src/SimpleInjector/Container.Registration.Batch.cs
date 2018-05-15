@@ -272,11 +272,11 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        [Obsolete("Please use Container." + nameof(Collections) + "." +
+        [Obsolete("Please use Container." + nameof(Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection<TService>(IEnumerable<Assembly> assemblies) where TService : class
         {
-            this.Collections.Register<TService>(assemblies);
+            this.Collection.Register<TService>(assemblies);
         }
 
         /// <summary>
@@ -296,11 +296,11 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        [Obsolete("Please use Container." + nameof(Collections) + "." +
+        [Obsolete("Please use Container." + nameof(Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection(Type serviceType, params Assembly[] assemblies)
         {
-            this.Collections.Register(serviceType, assemblies);
+            this.Collection.Register(serviceType, assemblies);
         }
 
         /// <summary>
@@ -320,11 +320,11 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        [Obsolete("Please use Container." + nameof(Collections) + "." +
+        [Obsolete("Please use Container." + nameof(Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection(Type serviceType, IEnumerable<Assembly> assemblies)
         {
-            this.Collections.Register(serviceType, assemblies);
+            this.Collection.Register(serviceType, assemblies);
         }
 
         /// <summary>

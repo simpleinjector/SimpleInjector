@@ -228,7 +228,7 @@
 
             ServiceWithProperty<ITimeProvider>[] services = new[] { singleton };
 
-            container.Collections.Register<ServiceWithProperty<ITimeProvider>>(services);
+            container.Collection.Register<ServiceWithProperty<ITimeProvider>>(services);
 
             // Act
             container.GetAllInstances<ServiceWithProperty<ITimeProvider>>().ToArray();
@@ -268,7 +268,7 @@
 
             container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
 
-            container.Collections.Register<IService>(new[] { singleton });
+            container.Collection.Register<IService>(new[] { singleton });
 
             // Act
             container.GetAllInstances<IService>().ToArray();

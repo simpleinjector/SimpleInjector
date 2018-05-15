@@ -390,7 +390,14 @@ namespace SimpleInjector
 
         /// <summary>Gets the object that allows access to methods related to registration and creation of collections.</summary>
         /// <value>The <see cref="ContainerCollectionRegistrator"/> instance for this container.</value>
-        public ContainerCollectionRegistrator Collections { get; }
+        public ContainerCollectionRegistrator Collection { get; }
+
+        /// <summary>This property is obsolete. Please use <see cref="Collection"/> instead.</summary>
+        /// <value>The <see cref="ContainerCollectionRegistrator"/> instance for this container.</value>
+        [Obsolete("Please use the " + nameof(Collection) + " property instead. " + 
+            "This property will be removed in a later release", error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public ContainerCollectionRegistrator Collections => this.Collection;
 
         /// <summary>
         /// Registers that a new instance of <typeparamref name="TConcrete"/> will be returned every time it 

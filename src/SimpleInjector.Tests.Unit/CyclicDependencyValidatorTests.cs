@@ -428,7 +428,7 @@
             container.Register<IService, CompositeService>(Lifestyle.Singleton);
 
             // CompositeService is also part of the collection making it indirectly depending on itself.
-            container.Collections.Register<IService>(new[] { typeof(Service), typeof(CompositeService) });
+            container.Collection.Register<IService>(new[] { typeof(Service), typeof(CompositeService) });
 
             // Act
             Action action = () => container.GetAllInstances<IService>().ToArray();
@@ -447,7 +447,7 @@
             var container = new Container();
 
             // NodeOne depends on INodeFactory
-            container.Collections.Register<INode>(new[] { typeof(NodeOne) });
+            container.Collection.Register<INode>(new[] { typeof(NodeOne) });
 
             // NodeFactory depends on IEnumerable<INode>
             container.Register<INodeFactory, NodeFactory>();
@@ -477,7 +477,7 @@
             container.Register<NodeOne>();
 
             // NodeOne depends on INodeFactory
-            container.Collections.Register<INode>(new[] { typeof(NodeOne) });
+            container.Collection.Register<INode>(new[] { typeof(NodeOne) });
 
             // With the previous releases of Simple Injector the use of a decorator would cause collections to
             // be built less lazily, i.e. all collection elements would be compiled upon injection. This would

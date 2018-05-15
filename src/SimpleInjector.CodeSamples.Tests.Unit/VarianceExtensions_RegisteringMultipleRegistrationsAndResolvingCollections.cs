@@ -91,7 +91,7 @@
             // Container configuration.
             var container = new Container();
 
-            container.Collections.Register(typeof(IEventHandler<>), typeof(IEventHandler<>).Assembly);
+            container.Collection.Register(typeof(IEventHandler<>), typeof(IEventHandler<>).Assembly);
 
             container.Register(typeof(IEventHandler<>), typeof(MultipleDispatchEventHandler<>), Lifestyle.Singleton);
 

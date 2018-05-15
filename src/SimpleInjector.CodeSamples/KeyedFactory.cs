@@ -138,7 +138,7 @@
         private void RegisterImplementations(List<Tuple<TKey, Type, Lifestyle>> implementations)
         {
             // Register as list.
-            this.container.Collections.Register<TService>(
+            this.container.Collection.Register<TService>(
                 from tuple in implementations
                 select tuple.Item2);
 

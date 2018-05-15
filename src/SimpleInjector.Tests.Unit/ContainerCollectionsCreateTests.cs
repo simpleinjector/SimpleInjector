@@ -25,7 +25,7 @@
             var container = new Container();
 
             // Act
-            var stream = container.Collections.Create<ILogger>(expectedTypes);
+            var stream = container.Collection.Create<ILogger>(expectedTypes);
 
             // Assert
             AssertThat.SequenceEquals(expectedTypes, actualTypes: stream.Select(GetType));
@@ -41,8 +41,8 @@
             var container = new Container();
 
             // Act
-            var stream1 = container.Collections.Create<ILogger>(expectedTypes1);
-            var stream2 = container.Collections.Create<ILogger>(expectedTypes2);
+            var stream1 = container.Collection.Create<ILogger>(expectedTypes1);
+            var stream2 = container.Collection.Create<ILogger>(expectedTypes2);
 
             // Assert
             AssertThat.SequenceEquals(expectedTypes1, actualTypes: stream1.Select(GetType));
@@ -58,7 +58,7 @@
             container.Register<ILogger, ConsoleLogger>();
 
             // Act
-            var stream = container.Collections.Create<ILogger>(typeof(ILogger));
+            var stream = container.Collection.Create<ILogger>(typeof(ILogger));
 
             // Assert
             AssertThat.SequenceEquals(
@@ -72,7 +72,7 @@
             // Arrange
             var container = new Container();
 
-            var stream = container.Collections.Create<ILogger>(typeof(ConsoleLogger));
+            var stream = container.Collection.Create<ILogger>(typeof(ConsoleLogger));
 
             stream.First();
 
@@ -95,7 +95,7 @@
             container.Register<NullLogger>(Lifestyle.Singleton);
 
             // Act
-            var stream = container.Collections.Create<ILogger>(typeof(ConsoleLogger), typeof(NullLogger));
+            var stream = container.Collection.Create<ILogger>(typeof(ConsoleLogger), typeof(NullLogger));
 
             // Assert
             Assert.AreNotSame(stream.First(), stream.First(), "ConsoleLogger was expected to be transient.");
@@ -109,7 +109,7 @@
             var container = new Container();
 
             // Act
-            var stream = container.Collections.Create<ILogger>(
+            var stream = container.Collection.Create<ILogger>(
                 Lifestyle.Singleton.CreateRegistration<ConsoleLogger>(container),
                 Lifestyle.Transient.CreateRegistration<NullLogger>(container));
 
@@ -132,8 +132,8 @@
             container.Register<NullLogger>(Lifestyle.Singleton);
 
             // Act
-            var stream1 = container.Collections.Create<ILogger>(expectedTypes1);
-            var stream2 = container.Collections.Create<ILogger>(expectedTypes2);
+            var stream1 = container.Collection.Create<ILogger>(expectedTypes1);
+            var stream2 = container.Collection.Create<ILogger>(expectedTypes2);
 
             var nullLoggerFromStream1 = stream1.OfType<NullLogger>().Single();
             var nullLoggerFromStream2 = stream2.OfType<NullLogger>().Single();
@@ -148,7 +148,7 @@
             // Arrange
             var container = new Container();
 
-            var stream = container.Collections.Create<ILogger>(typeof(FailingConstructorLogger));
+            var stream = container.Collection.Create<ILogger>(typeof(FailingConstructorLogger));
 
             // Notice the explicit call to GC.Collect(). Simple Injector holds on to 'stuff' using WeakReferences
             // to ensure that to memory is leaked, but as long as stream is referenced, should it as well be
@@ -172,7 +172,7 @@
             // Arrange
             var container = new Container();
 
-            var stream = container.Collections.Create<ILogger>(
+            var stream = container.Collection.Create<ILogger>(
                 Lifestyle.Transient.CreateRegistration<FailingConstructorLogger>(container));
             
             // Notice the explicit call to GC.Collect(). Simple Injector holds on to 'stuff' using WeakReferences
@@ -197,7 +197,7 @@
             // Arrange
             var container = new Container();
 
-            var stream = container.Collections.Create<ILogger>(typeof(FailingConstructorLogger));
+            var stream = container.Collection.Create<ILogger>(typeof(FailingConstructorLogger));
 
             // Explicitly clear the reference to stream, so ensure GC.Collect cleans it up (only needed when
             // running in debug).
@@ -221,7 +221,7 @@
             var container = new Container();
 
             // Act
-            Action action = () => container.Collections.Create<ILogger>((Type[])null);
+            Action action = () => container.Collection.Create<ILogger>((Type[])null);
 
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentNullException>("serviceTypes", action);
@@ -234,7 +234,7 @@
             var container = new Container();
 
             // Act
-            Action action = () => container.Collections.Create<ILogger>((IEnumerable<Type>)null);
+            Action action = () => container.Collection.Create<ILogger>((IEnumerable<Type>)null);
 
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentNullException>("serviceTypes", action);
@@ -249,7 +249,7 @@
             var container = new Container();
 
             // Act
-            Action action = () => container.Collections.Create<ILogger>(expectedTypes);
+            Action action = () => container.Collection.Create<ILogger>(expectedTypes);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
@@ -266,7 +266,7 @@
             var container = new Container();
 
             // Act
-            Action action = () => container.Collections.Create<ILogger>(listWithIncompatibleType);
+            Action action = () => container.Collection.Create<ILogger>(listWithIncompatibleType);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
@@ -283,7 +283,7 @@
             var container = new Container();
 
             // Act
-            Action action = () => container.Collections.Create<ILogger>(new[] { invalidType });
+            Action action = () => container.Collection.Create<ILogger>(new[] { invalidType });
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
@@ -298,7 +298,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            var loggers = container.Collections.Create<ILogStuf>(new[] { CurrentAssembly });
+            var loggers = container.Collection.Create<ILogStuf>(new[] { CurrentAssembly });
 
             // Assert
             Assert_ContainsAllLoggers(loggers);
@@ -313,7 +313,7 @@
             var assemblies = Enumerable.Repeat(CurrentAssembly, 2);
 
             // Act
-            var loggers = container.Collections.Create<ILogStuf>(assemblies);
+            var loggers = container.Collection.Create<ILogStuf>(assemblies);
 
             // Assert
             Assert_ContainsAllLoggers(loggers);

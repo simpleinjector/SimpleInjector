@@ -365,7 +365,7 @@ namespace SimpleInjector
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void AppendTo(Type serviceType, Registration registration)
@@ -387,7 +387,7 @@ namespace SimpleInjector
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void AppendTo(Type serviceType, Type implementationType)

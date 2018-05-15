@@ -33,7 +33,7 @@
             plugins.Register(() => new Plugin("4"), "4");
             plugins.Register(() => new Plugin("5"), "5", Lifestyle.Singleton);
 
-            container.Collections.Register<IPlugin>(plugins);
+            container.Collection.Register<IPlugin>(plugins);
 
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator), Lifestyle.Singleton,
                 context => context.ImplementationType == typeof(Plugin3));

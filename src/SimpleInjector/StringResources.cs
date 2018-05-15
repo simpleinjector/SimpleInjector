@@ -35,7 +35,7 @@ namespace SimpleInjector
     internal static class StringResources
     {
         private const string CollectionsRegisterMethodName =
-            nameof(Container) + "." + nameof(Container.Collections) + "." + nameof(ContainerCollectionRegistrator.Register);
+            nameof(Container) + "." + nameof(Container.Collection) + "." + nameof(ContainerCollectionRegistrator.Register);
 
         // Assembly.Location only exists in .NETStandard1.5 and up, .NET4.0 and PCL, but we only compile
         // against .NETStandard1.0 and .NETStandard1.3. We don't want to add an extra build directly, solely
@@ -232,7 +232,7 @@ namespace SimpleInjector
                 serviceType.TypeName(),
                 nameof(ContainerOptions),
                 nameof(ContainerOptions.AllowOverridingRegistrations),
-                nameof(Container.Collections),
+                nameof(Container.Collection),
                 nameof(ContainerCollectionRegistrator.Append));
 
         internal static string ParameterTypeMustBeRegistered(InjectionTargetInfo target, int numberOfConditionals,

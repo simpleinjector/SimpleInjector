@@ -60,7 +60,7 @@
             // Arrange
             var container = new Container();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(SomePluginImpl) });
+            container.Collection.Register<IPlugin>(new[] { typeof(SomePluginImpl) });
 
             container.Verify();
 
@@ -82,7 +82,7 @@
 
             container.Register(typeof(IGeneric<>), typeof(GenericType<>));
 
-            container.Collections.Register<IPlugin>(new[] { typeof(PluginWith8Dependencies) });
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginWith8Dependencies) });
 
             container.Verify();
             

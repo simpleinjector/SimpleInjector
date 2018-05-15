@@ -333,7 +333,7 @@
 
             container.Register<IFoo, FooBar>(Lifestyle.Transient);
 
-            container.Collections.Append<IFoo, FooBar>(Lifestyle.Singleton);
+            container.Collection.Append<IFoo, FooBar>(Lifestyle.Singleton);
 
             container.Verify(VerificationOption.VerifyOnly);
 

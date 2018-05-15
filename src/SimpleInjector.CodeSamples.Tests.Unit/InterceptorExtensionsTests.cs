@@ -50,7 +50,7 @@
             var container = new Container();
 
             container.RegisterInstance<ILogger>(logger);
-            container.Collections.Register<ICommand>(new[] { typeof(ConcreteCommand), typeof(ConcreteCommand) });
+            container.Collection.Register<ICommand>(new[] { typeof(ConcreteCommand), typeof(ConcreteCommand) });
 
             container.InterceptWith<InterceptorThatLogsBeforeAndAfter>(IsACommandPredicate);
 
@@ -73,7 +73,7 @@
             var container = new Container();
 
             container.RegisterInstance<ILogger>(logger);
-            container.Collections.Register<ICommand>(new[]
+            container.Collection.Register<ICommand>(new[]
             {
                 Lifestyle.Transient.CreateRegistration(typeof(ConcreteCommand), container),
                 Lifestyle.Transient.CreateRegistration(typeof(ConcreteCommand), container),

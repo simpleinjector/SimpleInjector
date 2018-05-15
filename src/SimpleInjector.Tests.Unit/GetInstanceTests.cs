@@ -339,7 +339,7 @@
             // Arrange
             var container = new Container();
 
-            container.Collections.Register(typeof(ILogger), new[] { typeof(NullLogger) });
+            container.Collection.Register(typeof(ILogger), new[] { typeof(NullLogger) });
 
             // Act
             Action action = () => container.GetInstance<ILogger>();
@@ -359,7 +359,7 @@
             // Arrange
             var container = new Container();
 
-            container.Collections.Register(typeof(ILogger), new[] { typeof(NullLogger) });
+            container.Collection.Register(typeof(ILogger), new[] { typeof(NullLogger) });
 
             // Act
             Action action = () => container.GetInstance<ComponentDependingOn<ILogger>>();
@@ -369,7 +369,7 @@
                 There is, however, a registration for IEnumerable<ILogger>; 
                 Did you mean to depend on IEnumerable<ILogger>?
                 If you meant to depend on ILogger, 
-                you should use one of the Register overloads instead of using Container.Collections.Register"
+                you should use one of the Register overloads instead of using Container.Collection.Register"
                 .TrimInside(),
                 action);
         }

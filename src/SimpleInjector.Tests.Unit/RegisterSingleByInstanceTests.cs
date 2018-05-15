@@ -88,7 +88,7 @@ namespace SimpleInjector.Tests.Unit
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.Collections.Register<IUserRepository>(Type.EmptyTypes);
+            container.Collection.Register<IUserRepository>(Type.EmptyTypes);
             var repositories = container.GetAllInstances<IUserRepository>();
 
             // Calling count will iterate the collections. 

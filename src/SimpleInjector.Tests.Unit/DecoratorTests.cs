@@ -1645,7 +1645,7 @@
             // Arrange
             var container = new Container();
 
-            container.Collections.Register<ICommandHandler<RealCommand>>(new[]
+            container.Collection.Register<ICommandHandler<RealCommand>>(new[]
             {
                 typeof(NullCommandHandler<RealCommand>),
                 typeof(StubCommandHandler)

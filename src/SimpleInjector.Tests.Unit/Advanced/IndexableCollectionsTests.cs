@@ -20,7 +20,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             // Act
             var plugins = container.GetAllInstances<IPlugin>();
@@ -35,7 +35,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             // Act
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
@@ -52,7 +52,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1) });
 
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
 
@@ -69,7 +69,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
 
@@ -86,7 +86,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             // Act
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
@@ -101,7 +101,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
 
@@ -118,7 +118,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
 
@@ -135,7 +135,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
 
@@ -152,7 +152,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
 
@@ -169,7 +169,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
 
@@ -186,7 +186,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
 
@@ -203,7 +203,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
 
@@ -220,7 +220,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             var plugins = container.GetAllInstances<IPlugin>() as ICollection<IPlugin>;
 
@@ -237,7 +237,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             // Act
             var plugins = container.GetAllInstances<IPlugin>().ToArray();
@@ -256,7 +256,7 @@
 
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             var plugins = container.GetAllInstances<IPlugin>() as ICollection<IPlugin>;
 
@@ -275,7 +275,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register(typeof(IPlugin), new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register(typeof(IPlugin), new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             // Act
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
@@ -292,7 +292,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator),
                 context => context.ImplementationType != typeof(Plugin2));
@@ -312,7 +312,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator),
                 context => context.ImplementationType != typeof(Plugin2));
@@ -334,7 +334,7 @@
 
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
 
             var plugins = (IEnumerable)container.GetAllInstances<IPlugin>();
 

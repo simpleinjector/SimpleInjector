@@ -137,7 +137,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(PluginImpl) });
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl) });
 
             var registration = Lifestyle.Transient.CreateRegistration<PluginImpl2>(container);
 
@@ -160,7 +160,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             var registration1 = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
             var registration2 = Lifestyle.Transient.CreateRegistration<PluginImpl2>(container);
 
-            container.Collections.Register(typeof(IPlugin), new[] { registration1 });
+            container.Collection.Register(typeof(IPlugin), new[] { registration1 });
 
             container.AppendToCollection(typeof(IPlugin), registration2);
 
@@ -200,7 +200,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             IEnumerable<IPlugin> containerUncontrolledCollection = new[] { new PluginImpl() };
 
-            container.Collections.Register<IPlugin>(containerUncontrolledCollection);
+            container.Collection.Register<IPlugin>(containerUncontrolledCollection);
 
             var registration = Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
 
@@ -210,7 +210,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
                 appending registrations to these collections is not supported. Please register the collection
-                with one of the other Container.Collections.Register overloads if appending is required."
+                with one of the other Container.Collection.Register overloads if appending is required."
                 .TrimInside(),
                 action);
         }
@@ -227,7 +227,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             var container = ContainerFactory.New();
 
-            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+            container.Collection.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
             var registration = Lifestyle.Transient.CreateRegistration<StructEventHandler>(container);
 
@@ -259,7 +259,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             container.AppendToCollection(typeof(IEventHandler<>), registration);
 
-            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+            container.Collection.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
             // Act
             Type[] actualHandlerTypes = container.GetAllInstances(typeof(IEventHandler<StructEvent>))
@@ -313,7 +313,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             container.AppendToCollection(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
 
-            container.Collections.Register(typeof(IEventHandler<StructEvent>), new[]
+            container.Collection.Register(typeof(IEventHandler<StructEvent>), new[]
             {
                 typeof(AuditableEventEventHandler<StructEvent>)
             });
@@ -343,7 +343,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
 
             var container = ContainerFactory.New();
 
-            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+            container.Collection.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
 
             container.AppendToCollection(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
             container.AppendToCollection(typeof(IEventHandler<>), typeof(AuditableEventEventHandler<>));
@@ -364,7 +364,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register(typeof(IEventHandler<>), new[]
+            container.Collection.Register(typeof(IEventHandler<>), new[]
             {
                 // Here we make a closed registration; this causes an explicit registration for the
                 // IEventHandlerStructEvent> collection.
@@ -391,7 +391,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register(typeof(IEventHandler<>), new[]
+            container.Collection.Register(typeof(IEventHandler<>), new[]
             {
                 typeof(NewConstraintEventHandler<StructEvent>),
             });

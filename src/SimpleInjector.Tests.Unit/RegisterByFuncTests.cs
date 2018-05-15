@@ -58,7 +58,7 @@ namespace SimpleInjector.Tests.Unit
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.Collections.Register<IUserRepository>(Type.EmptyTypes);
+            container.Collection.Register<IUserRepository>(Type.EmptyTypes);
             var repositories = container.GetAllInstances<IUserRepository>();
 
             // Only during iterating the collection, will the underlying container be called. This is a

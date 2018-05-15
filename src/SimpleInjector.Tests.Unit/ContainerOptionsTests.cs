@@ -46,10 +46,10 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = false;
 
-            container.Collections.Register(typeof(ILogger), new[] { typeof(NullLogger) });
+            container.Collection.Register(typeof(ILogger), new[] { typeof(NullLogger) });
 
             // Act
-            Action action = () => container.Collections.Register(typeof(ILogger), new[] { typeof(NullLogger) });
+            Action action = () => container.Collection.Register(typeof(ILogger), new[] { typeof(NullLogger) });
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action);
@@ -62,10 +62,10 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = false;
 
-            container.Collections.Register(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
+            container.Collection.Register(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
 
             // Act
-            container.Collections.Register(typeof(IEventHandler<AuditableEvent>), new[] { typeof(AuditableEventEventHandler) });
+            container.Collection.Register(typeof(IEventHandler<AuditableEvent>), new[] { typeof(AuditableEventEventHandler) });
 
             // Assert
             AssertThat.IsInstanceOfType(typeof(NonGenericEventHandler), container.GetAllInstances<IEventHandler<ClassEvent>>().Single());
@@ -80,10 +80,10 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = true;
 
-            container.Collections.Register(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
+            container.Collection.Register(typeof(IEventHandler<ClassEvent>), new[] { typeof(NonGenericEventHandler) });
 
             // Act
-            container.Collections.Register(typeof(IEventHandler<ClassEvent>), new[]
+            container.Collection.Register(typeof(IEventHandler<ClassEvent>), new[]
             {
                 typeof(ClassConstraintEventHandler<ClassEvent>)
             });
@@ -172,10 +172,10 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = true;
 
-            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
+            container.Collection.Register(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
 
             // Act
-            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
+            container.Collection.Register(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
 
             // Assert
             var handlers = container.GetAllInstances<IEventHandler<AuditableEvent>>().Select(h => h.GetType()).ToArray();
@@ -192,10 +192,10 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = false;
 
-            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(NonGenericEventHandler) });
+            container.Collection.Register(typeof(IEventHandler<>), new[] { typeof(NonGenericEventHandler) });
 
             // Act
-            container.Collections.Register(typeof(IValidate<>), new[] { typeof(NullValidator<int>) });
+            container.Collection.Register(typeof(IValidate<>), new[] { typeof(NullValidator<int>) });
         }
 
         [TestMethod]
@@ -205,12 +205,12 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = true;
 
-            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
+            container.Collection.Register(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
 
-            container.Collections.Append<IEventHandler<AuditableEvent>, NewConstraintEventHandler<AuditableEvent>>();
+            container.Collection.Append<IEventHandler<AuditableEvent>, NewConstraintEventHandler<AuditableEvent>>();
 
             // Act
-            container.Collections.Register(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
+            container.Collection.Register(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });
 
             // Assert
             var handlers = container.GetAllInstances<IEventHandler<AuditableEvent>>().Select(h => h.GetType()).ToArray();
@@ -264,10 +264,10 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = false;
 
-            container.Collections.Register<IUserRepository>(new SqlUserRepository());
+            container.Collection.Register<IUserRepository>(new SqlUserRepository());
 
             // Act
-            Action action = () => container.Collections.Register<IUserRepository>(new InMemoryUserRepository());
+            Action action = () => container.Collection.Register<IUserRepository>(new InMemoryUserRepository());
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action);
@@ -280,10 +280,10 @@
             var container = new Container();
             container.Options.AllowOverridingRegistrations = true;
 
-            container.Collections.Register<IUserRepository>(new SqlUserRepository());
+            container.Collection.Register<IUserRepository>(new SqlUserRepository());
 
             // Act
-            container.Collections.Register<IUserRepository>(new InMemoryUserRepository());
+            container.Collection.Register<IUserRepository>(new InMemoryUserRepository());
 
             // Assert
             var instance = container.GetAllInstances<IUserRepository>().Single();
@@ -511,7 +511,7 @@
 
             var container = new Container();
 
-            container.Collections.Register<ILogger>(new[] { typeof(NullLogger) });
+            container.Collection.Register<ILogger>(new[] { typeof(NullLogger) });
 
             // Act
             Action action = () => container.Options.DependencyInjectionBehavior = expectedBehavior;

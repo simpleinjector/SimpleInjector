@@ -138,7 +138,7 @@ namespace SimpleInjector.Advanced
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void AppendToCollection(this Container container, Type serviceType, 
@@ -146,7 +146,7 @@ namespace SimpleInjector.Advanced
         {
             Requires.IsNotNull(container, nameof(container));
 
-            container.Collections.Append(serviceType, registration);
+            container.Collection.Append(serviceType, registration);
         }
 
         /// <summary>
@@ -164,14 +164,14 @@ namespace SimpleInjector.Advanced
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
         public static void AppendToCollection(this Container container, Type serviceType,
             Type implementationType)
         {
             Requires.IsNotNull(container, nameof(container));
 
-            container.Collections.Append(serviceType, implementationType);
+            container.Collection.Append(serviceType, implementationType);
         }
 
         internal static void Verify(this IDependencyInjectionBehavior behavior, ConstructorInfo constructor)

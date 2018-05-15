@@ -14,7 +14,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
 
             // Act
             IReadOnlyCollection<IPlugin> collection =
@@ -32,7 +32,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
 
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
 
@@ -52,7 +52,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(Type.EmptyTypes);
+            container.Collection.Register<IPlugin>(Type.EmptyTypes);
 
             // Act
             IReadOnlyCollection<IPlugin> collection =
@@ -68,7 +68,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
 
             // Act
             IReadOnlyList<IPlugin> list =
@@ -86,7 +86,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
 
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
 
@@ -106,7 +106,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collections.Register<IPlugin>(Type.EmptyTypes);
+            container.Collection.Register<IPlugin>(Type.EmptyTypes);
 
             // Act
             IReadOnlyList<IPlugin> list =

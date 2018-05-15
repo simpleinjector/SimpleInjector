@@ -22,7 +22,7 @@
             container.Register<Consumer<IReadOnlyCollection<ILogger>>>();
 
             // Since this collection is registered, the previous registration should not yield a warning.
-            container.Collections.Register<ILogger>(new[] { typeof(NullLogger) });
+            container.Collection.Register<ILogger>(new[] { typeof(NullLogger) });
 
             container.Verify();
 
@@ -43,7 +43,7 @@
             container.Register<Consumer<IReadOnlyList<ILogger>>>();
 
             // Since this collection is registered, the previous registration should not yield a warning.
-            container.Collections.Register<ILogger>(new[] { typeof(NullLogger) });
+            container.Collection.Register<ILogger>(new[] { typeof(NullLogger) });
 
             container.Verify();
 
