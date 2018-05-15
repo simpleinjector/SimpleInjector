@@ -1,19 +1,43 @@
 @ECHO OFF
 
-IF "%1"=="" (
+set buildNumber=0 
+set copyrightYear=2018
+set version="%1"
+set prereleasePostfix=""
+
+IF "%2"=="1" ( 
+	set step="1"
+) ELSE IF "%2"=="2" (
+	set step="2"
+) ELSE IF "%2"=="3" (
+	set step="3"
+) ELSE IF "%2"=="4" (
+	set step="4"
+) ELSE IF "%2"=="5" (
+	set step="5"
+) ELSE (
+	set step="%3"
+	set prereleasePostfix="%2"
+)
+
+set inputOk="true"
+IF "%version%"=="" ( set inputOk="false" ) 
+ELSE IF "%step%"=="" ( set inputOk="false" ) 
+
+echo step: %step%
+echo version: %version%
+echo prereleasePostfix: %prereleasePostfix%
+
+IF "%inputOk%"=="false" (
 	rem I would have loved doing this all in one single step, but for some reason, I can't seem to build using MSBuild
 	rem while running from the command line using MSBuild 2017. See https://stackoverflow.com/questions/47002571/.
 	rem That's why this build file must be called multiple times.
-    echo Please provide a number of the build step. Starting with 1. Example: "%0 1
+    echo Please provide both the version number and the number of the of the build step. Starting with 1.
+	echo Usage: "%0 [version] {-[prerelease postfix]} [step]
+	echo Example1: "%0 4.0.0 -beta1 1
+	echo Example2: "%0 4.0.0 1
     goto :EOF
 )
-
-set step="%1"
-
-set version=4.0.0
-set prereleasePostfix=
-set buildNumber=0 
-set copyrightYear=2018
 
 set version_Core=%version%
 set version_Packaging=%version_Core%
@@ -303,11 +327,11 @@ IF %step%=="5" (
 	GOTO :EOF	
 )
 
-echo Unknown step number.
+echo Unknown step number %step%.
 GOTO :EOF
 
 :release_directory_already_exists
-echo The release directory already exists.
+echo The release directory v%named_version% already exists.
 GOTO :EOF
 
 :strong_name_key_missing
