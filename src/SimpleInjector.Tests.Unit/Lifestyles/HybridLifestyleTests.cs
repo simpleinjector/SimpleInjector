@@ -19,7 +19,7 @@
 
             container.Register<IUserRepository, SqlUserRepository>(hybrid);
 
-            var registration = container.GetRegistration(typeof(IUserRepository)); 
+            var registration = container.GetRegistration(typeof(IUserRepository));
 
             // Act
             var expression = registration.BuildExpression().ToString();
@@ -102,7 +102,7 @@
         {
             // Arrange
             var hybrid = Lifestyle.CreateHybrid(
-                defaultLifestyle: new ThreadScopedLifestyle(), 
+                defaultLifestyle: new ThreadScopedLifestyle(),
                 fallbackLifestyle: Lifestyle.Singleton);
 
             var container = ContainerFactory.New();
@@ -122,7 +122,7 @@
         {
             // Arrange
             var hybrid = Lifestyle.CreateHybrid(
-                defaultLifestyle: new ThreadScopedLifestyle(), 
+                defaultLifestyle: new ThreadScopedLifestyle(),
                 fallbackLifestyle: Lifestyle.Singleton);
 
             var container = ContainerFactory.New();
@@ -225,7 +225,7 @@
                 callCount++;
                 return pickLeft.Value;
             };
-            
+
             var hybrid = Lifestyle.CreateHybrid(predicate, Lifestyle.Singleton, Lifestyle.Singleton);
 
             var container = ContainerFactory.New();
@@ -278,7 +278,7 @@
                 "The event is not expected to be called on the HybridLifestyle itself, since this is not a " +
                 "NewExpression but an IFF wrapper.");
         }
-        
+
         [TestMethod]
         public void ExpressionBuilt_Always_GetsCalledOnceOnlyForTheHybridLifestyle()
         {
@@ -306,7 +306,7 @@
             // Assert
             Assert.AreEqual(expectedNumberOfCalls, actualNumberOfCalls,
                 "The ExpressionBuilt event is expected to be called once when resolving a Hybrid lifestyled " +
-                "instance, since this is the time that decorators would be applied and they should be " + 
+                "instance, since this is the time that decorators would be applied and they should be " +
                 "to the whole expression.");
 
             Assert.AreEqual(@"
@@ -520,7 +520,7 @@
             var trueLifestyle = new CustomScopedLifestyle(trueScope);
             var falseLifestyle = new CustomScopedLifestyle(falseScope);
 
-            ScopedLifestyle hybrid = 
+            ScopedLifestyle hybrid =
                 Lifestyle.CreateHybrid(() => selectTrueLifestyle, trueLifestyle, falseLifestyle);
 
             container.Register<IDisposable, DisposableObject>(hybrid);
@@ -662,7 +662,7 @@
             }
 
             public int GetCurrentScopeCoreCallCount { get; private set; }
-            
+
             public int CurrentScopeProviderCallCount { get; private set; }
 
             public bool ScopeUsed => this.GetCurrentScopeCoreCallCount + this.CurrentScopeProviderCallCount > 0;

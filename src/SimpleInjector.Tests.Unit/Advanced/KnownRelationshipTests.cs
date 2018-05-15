@@ -3,7 +3,7 @@
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
-    
+
     [TestClass]
     public class KnownDependencyTests
     {
@@ -121,7 +121,7 @@
 
             var relationship = CreateKnownRelationship(parameters);
             var anotherRelationshipWithSameContent = CreateKnownRelationship(parameters);
-            
+
             // Act
             bool result = relationship.Equals(anotherRelationshipWithSameContent);
 
@@ -129,16 +129,16 @@
             Assert.IsTrue(result);
         }
 
-        private static KnownRelationship CreateValidKnownRelationship() => 
+        private static KnownRelationship CreateValidKnownRelationship() =>
             CreateKnownRelationship(ValidKnownRelationshipParameters());
 
-        private static KnownRelationship CreateKnownRelationship(KnownDependencyConstructorParameters paramaters) => 
+        private static KnownRelationship CreateKnownRelationship(KnownDependencyConstructorParameters paramaters) =>
             new KnownRelationship(
                 implementationType: paramaters.ImplementationType,
                 lifestyle: paramaters.Lifestyle,
                 dependency: paramaters.Dependency);
 
-        private static KnownDependencyConstructorParameters ValidKnownRelationshipParameters() => 
+        private static KnownDependencyConstructorParameters ValidKnownRelationshipParameters() =>
             new KnownDependencyConstructorParameters
             {
                 Lifestyle = Lifestyle.Transient,

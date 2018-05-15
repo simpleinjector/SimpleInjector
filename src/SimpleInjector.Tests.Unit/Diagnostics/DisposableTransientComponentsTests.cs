@@ -1,12 +1,8 @@
 ﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
-    using System;
     using System.Linq;
     using Lifestyles;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Diagnostics.Analyzers;
-    using SimpleInjector.Diagnostics.Debugger;
-    using SimpleInjector.Tests.Unit;
 
     public static class RegistrationExtensions
     {
@@ -134,7 +130,7 @@
             Assert.AreEqual(0, results.Length, Actual(results));
         }
 
-        private static string Actual(DisposableTransientComponentDiagnosticResult[] results) => 
+        private static string Actual(DisposableTransientComponentDiagnosticResult[] results) =>
             "actual: " + string.Join(" - ", results.Select(r => r.Description));
     }
 }

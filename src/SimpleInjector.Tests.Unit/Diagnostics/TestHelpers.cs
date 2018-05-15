@@ -7,8 +7,8 @@
 
     internal static class TestHelpers
     {
-        internal static string ToFriendlyNamesText(this IEnumerable<Type> types) => 
-            string.Join(", ", types.Select(type => type.ToFriendlyName()));
+        internal static string ToFriendlyNamesText(this IEnumerable<Type> types) =>
+            string.Join(", ", types.Select(ToFriendlyName));
 
         internal static string ToFriendlyName(this Type type)
         {
@@ -37,7 +37,7 @@
 
             return name + "<" + string.Join(", ", argumentNames) + ">";
         }
-        
+
         private static Type[] GetGenericArguments(Type type)
         {
             if (!type.Name.Contains('`'))

@@ -15,7 +15,7 @@
         {
             // Arrange
             var dependency = CreateRelationship(parent: Lifestyle.Transient, child: Lifestyle.Singleton);
-            
+
             // Act
             bool result = HasPossibleLifestyleMismatch(dependency);
 
@@ -100,7 +100,7 @@
             // Assert
             Assert.IsTrue(result);
         }
-        
+
         [TestMethod]
         public void DependencyHasPossibleLifestyleMismatch_LifetimeScopeToSingleton_DoesNotReportAMismatch()
         {
@@ -139,7 +139,7 @@
             // Assert
             Assert.IsFalse(result, "Every service can safely depend on a singleton.");
         }
-        
+
         [TestMethod]
         public void DependencyHasPossibleLifestyleMismatch_LifetimeScopeToTransient_ReportsMismatch()
         {
@@ -230,7 +230,7 @@
             // Assert
             Assert.IsFalse(result, "Every dependency can always safely depend on a singleton.");
         }
-        
+
         [TestMethod]
         public void DependencyHasPossibleLifestyleMismatch_LifetimeScopeToUnknown_ReportsMismatch()
         {
@@ -258,7 +258,7 @@
             Assert.IsTrue(result, "An unknown lifestyle can not safely depend on a lifestyle that is " +
                 "shorter than singleton, since this unknown lifestyle could act like a singleton.");
         }
-        
+
         [TestMethod]
         public void DependencyHasPossibleLifestyleMismatch_HybridToTheSameHybridInstance_DoesNotReportAMismatch()
         {
@@ -290,7 +290,7 @@
             // Assert
             Assert.IsFalse(result, "Both lifestyles of the parent are shorter than those of the child.");
         }
-        
+
         [TestMethod]
         public void DependencyHasPossibleLifestyleMismatch_ShortHybridToLongHybrid_ReportsMismatch()
         {
@@ -333,18 +333,18 @@
             Func<bool> selector = () => true;
 
             var hybridWithDeeplyNestedSingleton = Lifestyle.CreateHybrid(selector,
-                Lifestyle.Transient, 
+                Lifestyle.Transient,
                 Lifestyle.CreateHybrid(selector,
-                    Lifestyle.Transient, 
+                    Lifestyle.Transient,
                     Lifestyle.CreateHybrid(selector,
-                        Lifestyle.Transient, 
+                        Lifestyle.Transient,
                         Lifestyle.CreateHybrid(selector,
-                            Lifestyle.Transient, 
+                            Lifestyle.Transient,
                             Lifestyle.CreateHybrid(selector,
-                                Lifestyle.Transient, 
+                                Lifestyle.Transient,
                                 Lifestyle.Singleton)))));
 
-            var dependency = 
+            var dependency =
                 CreateRelationship(parent: hybridWithDeeplyNestedSingleton, child: Lifestyle.Transient);
 
             // Act
@@ -354,13 +354,13 @@
             Assert.IsTrue(result, "Since the hybrid lifestyle contains a singleton lifestyle, this " +
                 "hybrid lifestyle should be considered to be a singleton when evaluated on the parent.");
         }
-        
+
         [TestMethod]
         public void DependencyHasPossibleLifestyleMismatch_NestedHybridSingletonToTransient2_ReportsMismatch()
         {
             // Arrange
-            Func<bool> selector = () => true; 
-            
+            Func<bool> selector = () => true;
+
             var hybridWithDeeplyNestedTransient = Lifestyle.CreateHybrid(selector,
                 Lifestyle.Singleton,
                 Lifestyle.CreateHybrid(selector,
@@ -412,14 +412,14 @@
                 action);
         }
 
-        private static KnownRelationship CreateRelationship(Lifestyle parent, Lifestyle child) => 
+        private static KnownRelationship CreateRelationship(Lifestyle parent, Lifestyle child) =>
             new KnownRelationship(
                 implementationType: typeof(RealTimeProvider),
                 lifestyle: parent,
-                dependency: 
+                dependency:
                     new InstanceProducer(typeof(IDisposable), new DummyRegistration<IDisposable>(child)));
 
-        private static bool HasPossibleLifestyleMismatch(KnownRelationship dependency) => 
+        private static bool HasPossibleLifestyleMismatch(KnownRelationship dependency) =>
             LifestyleMismatchChecker.HasLifestyleMismatch(new Container(), dependency);
 
         private class DummyRegistration<TImplementation> : Registration
@@ -435,7 +435,7 @@
                 throw new NotImplementedException();
             }
         }
-        
+
         private class KnownDependencyConstructorParameters
         {
             public Type ParentServiceType { get; set; }
@@ -446,7 +446,7 @@
 
             public InstanceProducer ChildRegistration { get; set; }
         }
-        
+
         private static class Lifestyles
         {
             internal static Lifestyle LifetimeScope = new FakeLifestyle("Lifetime Scope", 100);
@@ -475,14 +475,14 @@
                 return this.realLifestyle.CreateRegistration<TConcrete>(container);
             }
 
-            protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
+            protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
                 Container container)
             {
                 return this.realLifestyle.CreateRegistration(instanceCreator, container);
             }
         }
     }
-    
+
     internal class FakeLifestyle : Lifestyle
     {
         public FakeLifestyle(string name, int length) : base("Fake " + name)
@@ -492,10 +492,10 @@
 
         public override int Length { get; }
 
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container c) => 
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container c) =>
             Transient.CreateRegistration<TConcrete>(c);
 
-        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) => 
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) =>
             Transient.CreateRegistration(creator, c);
     }
 }

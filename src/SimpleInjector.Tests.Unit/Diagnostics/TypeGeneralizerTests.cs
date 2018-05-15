@@ -5,8 +5,7 @@
     using System.Collections.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Diagnostics;
-    using SimpleInjector.Tests.Unit;
-        
+
     [TestClass]
     public class TypeGeneralizerTests
     {
@@ -159,7 +158,7 @@
             // Assert
             Assert.AreEqual(expectedType, actualType);
         }
-        
+
         [TestMethod]
         public void MakeTypePartiallyGenericUpToLevel_RequestingLevelOneOnTypeWithGenericConstraint_SkipsLevelOne()
         {

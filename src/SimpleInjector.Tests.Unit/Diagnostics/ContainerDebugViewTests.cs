@@ -92,7 +92,7 @@
             Assert.AreEqual("How To View Diagnostic Info", debugView.Items.Single().Name);
             Assert.AreEqual(
                 "Analysis info is available in this debug view after Verify() is " +
-                "called on this container instance.", 
+                "called on this container instance.",
                 debugView.Items.Single().Description);
         }
 
@@ -109,7 +109,7 @@
             {
                 container.Verify();
             }
-            catch (InvalidOperationException) 
+            catch (InvalidOperationException)
             {
             }
 

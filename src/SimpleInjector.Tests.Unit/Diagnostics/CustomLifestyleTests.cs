@@ -147,7 +147,7 @@
             Assert.IsTrue(items.Any(item => item.Name == "Lifestyle Mismatches"),
                 "No lifestyle mismatch was detected.");
         }
-        
+
         private sealed class FakeLifestyle : Lifestyle
         {
             public FakeLifestyle(int length)
@@ -158,7 +158,7 @@
 
             public override int Length { get; }
 
-            protected internal override Registration CreateRegistrationCore<TConcrete>(Container c) => 
+            protected internal override Registration CreateRegistrationCore<TConcrete>(Container c) =>
                 new FakeRegistration<TConcrete>(this, c);
 
             protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
@@ -167,7 +167,7 @@
                 throw new NotImplementedException();
             }
 
-            private sealed class FakeRegistration<TImplementation> : Registration 
+            private sealed class FakeRegistration<TImplementation> : Registration
                 where TImplementation : class
             {
                 public FakeRegistration(Lifestyle lifestyle, Container container)

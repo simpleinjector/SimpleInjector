@@ -58,7 +58,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 property with name 'Dependency' and type ITimeProvider that is not registered. 
                 Please ensure ITimeProvider is registered"
-                .TrimInside(), 
+                .TrimInside(),
                 action);
         }
 
@@ -236,7 +236,7 @@
             // Assert
             Assert.IsNotNull(singleton.Dependency);
         }
-        
+
         [TestMethod]
         public void InjectAllProperties_OnContainerUncontrolledSingleton_DoesNotInjectPropertiesOfImplementation()
         {
@@ -302,12 +302,12 @@
                 "Types were expected to be created in the following order: {0}, " +
                 "but they actually were created in the order: {1}. " +
                 "Creation of property dependencies -before- the actual type is important, because this " +
-                "allows them to be correctly disposed when disposing is done in the opposite order of " + 
+                "allows them to be correctly disposed when disposing is done in the opposite order of " +
                 "creation.",
                 string.Join(", ", expectedOrderOfCreation.Select(type => type.ToFriendlyName())),
                 string.Join(", ", actualOrderOfCreation.Select(type => type.ToFriendlyName())));
         }
-        
+
         [TestMethod]
         public void GetInstance_InjectingPropertyWithConditionalRegistration_UsesTheExpectedPredicateContext()
         {
@@ -344,12 +344,12 @@
             var container = ContainerFactory.New();
 
             Predicate<PropertyInfo> allExceptPropertiesDeclaredOnRealTimeProvider =
-                prop => 
-                    prop.DeclaringType != typeof(RealTimeProvider) && 
+                prop =>
+                    prop.DeclaringType != typeof(RealTimeProvider) &&
                     prop.DeclaringType != typeof(Container) &&
                     prop.DeclaringType != typeof(Delegate);
 
-            container.Options.PropertySelectionBehavior = 
+            container.Options.PropertySelectionBehavior =
                 new PredicatePropertySelectionBehavior(allExceptPropertiesDeclaredOnRealTimeProvider);
 
             return container;
@@ -376,7 +376,7 @@
         {
             public TDependency BaseClassDependency { get; set; }
         }
-        
+
         public class SubClassServiceWithProperty<TDependency> : BaseClassServiceWithProperty<TDependency>
         {
             public TDependency Dependency { get; set; }
@@ -449,7 +449,7 @@
 
             public TDependency Dependency20 { get; set; }
         }
-        
+
         public class ComponentWithPropertyDependency
         {
             public ComponentWithPropertyDependency(Action<object> creationCallback)
@@ -467,7 +467,7 @@
                 creationCallback(this);
             }
         }
-        
+
         private class PrivateServiceWithPrivateSetPropertyDependency<TDependency>
         {
             // NOTE: 'private set' is required.

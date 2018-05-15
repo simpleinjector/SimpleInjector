@@ -21,7 +21,7 @@
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentNullException>("consumer", action);
         }
-        
+
         [TestMethod]
         public void DependencyInjectionBehavior_CustomBehaviorThatReturnsNull_ThrowsExpressiveException()
         {
@@ -40,7 +40,7 @@
             Action action = () => container.GetInstance<RealUserService>();
 
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "FakeDependencyInjectionBehavior that was registered through " + 
+                "FakeDependencyInjectionBehavior that was registered through " +
                 "the Container.Options.DependencyInjectionBehavior property, returned a null reference",
                 action);
         }

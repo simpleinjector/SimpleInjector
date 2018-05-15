@@ -81,7 +81,7 @@
                 "NullLogger (Transient).",
                 result.Description);
         }
-        
+
         [TestMethod]
         public void Analyze_ContainerWithOneMismatch_ReturnsSeverityWarning()
         {
@@ -342,7 +342,7 @@
                 action);
         }
 
-        private static string Actual(LifestyleMismatchDiagnosticResult[] results) => 
+        private static string Actual(LifestyleMismatchDiagnosticResult[] results) =>
             "actual: " + string.Join(" - ", results.Select(r => r.Description));
     }
 }

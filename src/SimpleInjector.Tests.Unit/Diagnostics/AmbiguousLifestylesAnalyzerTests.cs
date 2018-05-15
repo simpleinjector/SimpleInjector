@@ -285,15 +285,15 @@
             var results = Analyzer.Analyze(container);
 
             // Assert
-            Assert.AreEqual(0, results.Length, 
-                "Registrations for delegates must be suppressed, because Simple Injector has no notion of " + 
+            Assert.AreEqual(0, results.Length,
+                "Registrations for delegates must be suppressed, because Simple Injector has no notion of " +
                 "the actual implementation. " +
                 Actual(results));
 
             GC.KeepAlive(a);
             GC.KeepAlive(b);
         }
-        
+
         [TestMethod]
         public void Verify_TwoRegistrationsForDifferentCustomLifestyleButAndSameImplementation_CausesAmbiguousLifestyleWarning()
         {
@@ -342,7 +342,7 @@
 
             // Act
             var results = Analyzer.Analyze(container);
-            
+
             // Assert
             Assert_ContainsDescription(results, expectedMessage.TrimInside());
             Assert_AllOfType<AmbiguousLifestylesDiagnosticResult>(results);
@@ -369,7 +369,7 @@
             Assert.IsFalse(notOfT.Any(), "Not all items where of type " + typeof(T).Name + ". " + Actual(items));
         }
 
-        private static string Actual(IEnumerable<DiagnosticResult> results) => 
+        private static string Actual(IEnumerable<DiagnosticResult> results) =>
             "Actual: " + string.Join(" - ", results.Select(r => r.Description));
     }
 }

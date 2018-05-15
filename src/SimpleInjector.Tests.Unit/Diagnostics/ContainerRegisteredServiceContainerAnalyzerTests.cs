@@ -19,11 +19,11 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
             container.Register<Consumer<ConcreteShizzle>>();
 
             container.Verify();
-            
+
             // Act
-            var results = 
+            var results =
                 Analyzer.Analyze(container).OfType<ContainerRegisteredServiceDiagnosticResult>().ToArray();
-            
+
             // Assert
             Assert.AreEqual(1, results.Length);
             Assert.AreEqual(

@@ -19,7 +19,7 @@
     public interface IBarExt : IBar
     {
     }
-        
+
     public interface IConcreteThing
     {
     }
@@ -108,7 +108,7 @@
         {
         }
     }
-    
+
     public class ConcreteTypeWithMultiplePublicConstructors
     {
         public ConcreteTypeWithMultiplePublicConstructors()
@@ -126,7 +126,7 @@
         {
         }
     }
-    
+
     public class ComponentDependingOn<TDependency>
     {
         public ComponentDependingOn(TDependency dependency)
@@ -141,7 +141,7 @@
     public class PluginImpl2 : IPlugin
     {
     }
-    
+
     public class PluginDecorator : IPlugin
     {
         public PluginDecorator(IPlugin decoratee)
@@ -166,7 +166,7 @@
     {
         public TDependency Dependency { get; set; }
     }
-    
+
     public class PluginManager
     {
         public PluginManager(IEnumerable<IPlugin> plugins)
@@ -205,7 +205,7 @@
     public class ConcreteThing : IConcreteThing
     {
     }
-    
+
     public class SomePluginImpl : IPlugin
     {
     }

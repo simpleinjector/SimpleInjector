@@ -20,7 +20,7 @@
             var instance2 = Lifestyle.Unknown;
 
             // Assert
-            Assert.IsTrue(object.ReferenceEquals(instance1, instance2), "For performance and correctness, " + 
+            Assert.IsTrue(object.ReferenceEquals(instance1, instance2), "For performance and correctness, " +
                 "the Instance field must always return the same instance.");
         }
 

@@ -677,7 +677,7 @@
                     "The decorated instance should be scoped per execution context. It seems to be transient.");
             }
         }
-                
+
         [TestMethod]
         public void ContainerVerify_WithWhenScopeEndsRegistration_Succeeds()
         {

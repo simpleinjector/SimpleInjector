@@ -9,7 +9,7 @@
     [TestClass]
     public class CustomLifestyleTests
     {
-        private static readonly Lifestyle CustomLifestyle = 
+        private static readonly Lifestyle CustomLifestyle =
             Lifestyle.CreateCustom("Custom", creator => () => creator());
 
         [TestMethod]

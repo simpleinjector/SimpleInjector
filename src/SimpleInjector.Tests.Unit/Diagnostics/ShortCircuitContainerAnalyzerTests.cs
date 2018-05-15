@@ -152,7 +152,7 @@
         {
             // Arrange
             var container = new Container();
-            
+
             container.Register<ILogger, NullLogger>();
             container.Register<ServiceDependingOn<NullLogger>>();
 
@@ -194,10 +194,10 @@
                 .Value as DebuggerViewItem[];
         }
 
-        private static string Actual(ShortCircuitedDependencyDiagnosticResult[] results) => 
+        private static string Actual(ShortCircuitedDependencyDiagnosticResult[] results) =>
             "actual: " + string.Join(" - ", results.Select(r => r.Description));
     }
-        
+
     public class ImplementsBothInterfaces : IService1, IService2
     {
     }
@@ -209,7 +209,7 @@
         }
     }
 
-    public class MyUnitOfWork : IUnitOfWork 
+    public class MyUnitOfWork : IUnitOfWork
     {
     }
 
