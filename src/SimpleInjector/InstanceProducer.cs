@@ -421,7 +421,7 @@ namespace SimpleInjector
                 this.verifiers.Add(action);
             }
         }
-        
+
         internal void AddProducerToVerify(InstanceProducer currentProducer)
         {
             lock (this.locker)
@@ -562,7 +562,7 @@ namespace SimpleInjector
             }
             else if (this.Registration.WrapsInstanceCreationDelegate)
             {
-                return StringResources.DelegateForTypeThrewAnException(this.ServiceType) + " " + 
+                return StringResources.DelegateForTypeThrewAnException(this.ServiceType) + " " +
                     innerException.Message;
             }
             else

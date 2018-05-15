@@ -26,7 +26,6 @@ namespace SimpleInjector
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using SimpleInjector.Internals;
 
 #if !PUBLISH
     /// <summary>Methods for registration of collections.</summary>

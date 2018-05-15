@@ -33,7 +33,7 @@ namespace SimpleInjector
     public class InjectionConsumerInfo
     {
         internal static readonly InjectionConsumerInfo Root = null;
-        
+
         /// <summary>Initializes a new instance of the <see cref="InjectionConsumerInfo"/> class.</summary>
         /// <param name="parameter">The constructor parameter for the created component.</param>
         public InjectionConsumerInfo(ParameterInfo parameter)
@@ -86,8 +86,8 @@ namespace SimpleInjector
 
         /// <summary>Returns a string that represents the <see cref="InjectionConsumerInfo"/>.</summary>
         /// <returns>A string.</returns>
-        public override string ToString() => 
-            "{ ImplementationType: " + this.ImplementationType.ToFriendlyName() + 
+        public override string ToString() =>
+            "{ ImplementationType: " + this.ImplementationType.ToFriendlyName() +
             ", Target.Name: '" + this.Target.Name + "' }";
     }
 }

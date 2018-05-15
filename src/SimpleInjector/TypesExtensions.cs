@@ -81,7 +81,7 @@ namespace SimpleInjector
                     StringResources.TypeIsNotAssignableFromOpenGenericType(type, genericTypeDefinition),
                     nameof(type));
             }
-            
+
             if (types.Length > 1)
             {
                 throw new InvalidOperationException(
@@ -101,7 +101,7 @@ namespace SimpleInjector
         /// <param name="type">The type to check.</param>
         /// <param name="genericTypeDefinition">The generic type definition to match.</param>
         /// <returns>A list of matching closed generic types.</returns>
-        public static Type[] GetClosedTypesOf(this Type type, Type genericTypeDefinition) 
+        public static Type[] GetClosedTypesOf(this Type type, Type genericTypeDefinition)
             => GetClosedTypesOfInternal(type, genericTypeDefinition).ToArray();
 
         private static IEnumerable<Type> GetClosedTypesOfInternal(Type type, Type genericTypeDefinition)

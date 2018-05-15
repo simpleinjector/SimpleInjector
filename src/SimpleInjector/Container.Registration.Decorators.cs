@@ -85,7 +85,7 @@ namespace SimpleInjector
         /// have a single public constructor, or when <typeparamref name="TDecorator"/> does not
         /// contain a constructor that has exactly one argument of type <typeparamref name="TService"/> or 
         /// <see cref="Func{T}"/> where <b>T</b> is <typeparamref name="TService"/>.</exception>
-        public void RegisterDecorator<TService, TDecorator>() 
+        public void RegisterDecorator<TService, TDecorator>()
             where TService : class
             where TDecorator : class, TService
         {
@@ -627,7 +627,7 @@ namespace SimpleInjector
             this.RegisterDecoratorCore(serviceType, decoratorType, predicate);
         }
 
-        private void RegisterDecoratorCore(Type serviceType, Type decoratorType, 
+        private void RegisterDecoratorCore(Type serviceType, Type decoratorType,
             Predicate<DecoratorPredicateContext> predicate = null, Lifestyle lifestyle = null)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));

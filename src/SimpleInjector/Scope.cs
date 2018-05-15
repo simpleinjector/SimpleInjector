@@ -200,8 +200,8 @@ namespace SimpleInjector
             lock (this.syncRoot)
             {
                 object value;
-                return this.items != null && this.items.TryGetValue(key, out value) 
-                    ? value 
+                return this.items != null && this.items.TryGetValue(key, out value)
+                    ? value
                     : null;
             }
         }

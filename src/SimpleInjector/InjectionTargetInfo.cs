@@ -88,7 +88,7 @@ namespace SimpleInjector
         /// <exception cref="TypeLoadException">The custom attribute type cannot be loaded.</exception>
         /// <exception cref="AmbiguousMatchException">There is more than one attribute of type attributeType 
         /// defined on this member.</exception>
-        public object[] GetCustomAttributes(bool inherit) => 
+        public object[] GetCustomAttributes(bool inherit) =>
             this.Parameter != null
                 ? this.Parameter.GetCustomAttributes(inherit).ToArray()
                 : this.Property.GetCustomAttributes(inherit).ToArray();
@@ -103,7 +103,7 @@ namespace SimpleInjector
         /// <returns>An array of Objects representing custom attributes, or an empty array.</returns>
         /// <exception cref="TypeLoadException">The custom attribute type cannot be loaded.</exception>
         /// <exception cref="ArgumentNullException">Thrown when attributeType is null.</exception>
-        public object[] GetCustomAttributes(Type attributeType, bool inherit) => 
+        public object[] GetCustomAttributes(Type attributeType, bool inherit) =>
             this.Parameter != null
                 ? this.Parameter.GetCustomAttributes(attributeType, inherit).ToArray()
                 : this.Property.GetCustomAttributes(attributeType, inherit).ToArray();
@@ -115,7 +115,7 @@ namespace SimpleInjector
         /// <param name="attributeType">The type of the custom attributes.</param>
         /// <param name="inherit">When true, look up the hierarchy chain for the inherited custom attribute.</param>
         /// <returns>true if the attributeType is defined on this member; false otherwise.</returns>
-        public bool IsDefined(Type attributeType, bool inherit) => 
+        public bool IsDefined(Type attributeType, bool inherit) =>
             this.Parameter != null
                 ? this.Parameter.IsDefined(attributeType, inherit)
                 : this.Property.IsDefined(attributeType, inherit);
@@ -186,7 +186,7 @@ namespace SimpleInjector
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
         /// <returns>A collection of the custom attributes that are applied to element and that match T, or an 
         /// empty collection if no such attributes exist.</returns>
-        public IEnumerable<T> GetCustomAttributes<T>(bool inherit) where T : Attribute => 
+        public IEnumerable<T> GetCustomAttributes<T>(bool inherit) where T : Attribute =>
             this.Parameter != null
                 ? this.Parameter.GetCustomAttributes(typeof(T), inherit).Cast<T>()
                 : this.Property.GetCustomAttributes(typeof(T), inherit).Cast<T>();

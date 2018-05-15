@@ -255,7 +255,7 @@ namespace SimpleInjector
         {
             if (serviceType.ContainsGenericParameters())
             {
-                throw new ArgumentException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType), 
+                throw new ArgumentException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType),
                     nameof(serviceType));
             }
 
@@ -333,7 +333,7 @@ namespace SimpleInjector
             return instanceProducer.GetInstance();
         }
 
-        private InstanceProducer BuildInstanceProducerForType<TService>(InjectionConsumerInfo context) 
+        private InstanceProducer BuildInstanceProducerForType<TService>(InjectionConsumerInfo context)
             where TService : class
         {
             return this.BuildInstanceProducerForType(typeof(TService),
@@ -363,7 +363,7 @@ namespace SimpleInjector
         // Instead of wrapping the complete method in a lock, we lock inside the individual methods. We 
         // don't want to hold a lock while calling back into user code, because who knows what the user 
         // is doing there. We don't want a dead lock.
-        private InstanceProducer TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType) => 
+        private InstanceProducer TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType) =>
             this.TryGetInstanceProducerForUnregisteredTypeResolutionFromCache(serviceType)
             ?? this.TryGetInstanceProducerThroughResolveUnregisteredTypeEvent(serviceType);
 
@@ -383,7 +383,7 @@ namespace SimpleInjector
             {
                 return null;
             }
-            
+
             var e = new UnregisteredTypeEventArgs(serviceType);
 
             this.resolveUnregisteredType(this, e);
@@ -589,7 +589,7 @@ namespace SimpleInjector
         private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType(Type type,
             InjectionConsumerInfo context)
         {
-            if (type.IsAbstract() || type.IsValueType() || type.ContainsGenericParameters() || 
+            if (type.IsAbstract() || type.IsValueType() || type.ContainsGenericParameters() ||
                 !this.IsConcreteConstructableType(type, context))
             {
                 return null;
@@ -699,7 +699,7 @@ namespace SimpleInjector
             }
 
             throw new ActivationException(StringResources.NoRegistrationForTypeFound(
-                serviceType, 
+                serviceType,
                 this.HasRegistrations,
                 this.ContainsOneToOneRegistrationForCollectionType(serviceType),
                 this.ContainsCollectionRegistrationFor(serviceType),
@@ -708,7 +708,7 @@ namespace SimpleInjector
         }
 
         private bool ContainsOneToOneRegistrationForCollectionType(Type collectionServiceType) =>
-            Types.IsGenericCollectionType(collectionServiceType) && 
+            Types.IsGenericCollectionType(collectionServiceType) &&
                 this.ContainsExplicitRegistrationFor(collectionServiceType.GetGenericArguments()[0]);
 
         // NOTE: MakeGenericType will fail for IEnumerable<T> when T is a pointer.

@@ -114,7 +114,7 @@ namespace SimpleInjector
         /// <summary>Gets or sets a value indicating whether. 
         /// This method is deprecated. Changing its value will have no effect.</summary>
         /// <value>The value indicating whether the container will return an empty collection.</value>
-        [Obsolete("ResolveUnregisteredCollections has been deprecated. " + 
+        [Obsolete("ResolveUnregisteredCollections has been deprecated. " +
             "Please register collections explicitly instead.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]

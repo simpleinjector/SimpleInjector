@@ -82,7 +82,7 @@ namespace SimpleInjector
         {
             if (!service.IsAssignableFrom(expression.Type))
             {
-                ThrowSuppliedElementDoesNotInheritFromOrImplement(service, expression.Type, "expression", 
+                ThrowSuppliedElementDoesNotInheritFromOrImplement(service, expression.Type, "expression",
                     paramName);
             }
         }
@@ -93,7 +93,7 @@ namespace SimpleInjector
         {
             if (!service.IsAssignableFrom(registration.ImplementationType))
             {
-                ThrowSuppliedElementDoesNotInheritFromOrImplement(service, registration.ImplementationType, 
+                ThrowSuppliedElementDoesNotInheritFromOrImplement(service, registration.ImplementationType,
                     "registration", paramName);
             }
         }
@@ -171,10 +171,10 @@ namespace SimpleInjector
 
         internal static void ServiceTypeIsNotClosedWhenImplementationIsOpen(Type service, Type implementation)
         {
-            bool implementationIsOpen = 
+            bool implementationIsOpen =
                 implementation.IsGenericType() && implementation.ContainsGenericParameters();
 
-            bool serviceTypeIsClosed = 
+            bool serviceTypeIsClosed =
                 service.IsGenericType() && !service.ContainsGenericParameters();
 
             if (implementationIsOpen && serviceTypeIsClosed)
@@ -448,11 +448,11 @@ namespace SimpleInjector
             throw new ArgumentNullException(paramName);
         }
 
-        private static void ThrowSuppliedElementDoesNotInheritFromOrImplement(Type service, 
+        private static void ThrowSuppliedElementDoesNotInheritFromOrImplement(Type service,
             Type implementation, string elementDescription, string paramName)
         {
             throw new ArgumentException(
-                StringResources.SuppliedElementDoesNotInheritFromOrImplement(service, implementation, 
+                StringResources.SuppliedElementDoesNotInheritFromOrImplement(service, implementation,
                     elementDescription),
                 paramName);
         }

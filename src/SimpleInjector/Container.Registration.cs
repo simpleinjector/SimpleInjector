@@ -394,7 +394,7 @@ namespace SimpleInjector
 
         /// <summary>This property is obsolete. Please use <see cref="Collection"/> instead.</summary>
         /// <value>The <see cref="ContainerCollectionRegistrator"/> instance for this container.</value>
-        [Obsolete("Please use the " + nameof(Collection) + " property instead. " + 
+        [Obsolete("Please use the " + nameof(Collection) + " property instead. " +
             "This property will be removed in a later release", error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public ContainerCollectionRegistrator Collections => this.Collection;

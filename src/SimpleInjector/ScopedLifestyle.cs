@@ -58,7 +58,7 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB) 
         /// or an empty string.</exception>
         [Obsolete(
-            "This constructor overload is deprecated. The disposal of instances can't be suppressed anymore", 
+            "This constructor overload is deprecated. The disposal of instances can't be suppressed anymore",
             error: true)]
         protected ScopedLifestyle(string name, bool disposeInstances) : base(name)
         {

@@ -92,7 +92,7 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
-        public void RegisterConditional<TService, TImplementation>(Lifestyle lifestyle, 
+        public void RegisterConditional<TService, TImplementation>(Lifestyle lifestyle,
             Predicate<PredicateContext> predicate)
             where TImplementation : class, TService
             where TService : class
@@ -208,7 +208,7 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
         public void RegisterConditional(
-            Type serviceType, 
+            Type serviceType,
             Func<TypeFactoryContext, Type> implementationTypeFactory,
             Lifestyle lifestyle,
             Predicate<PredicateContext> predicate)
@@ -218,7 +218,7 @@ namespace SimpleInjector
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
             Requires.IsNotNull(predicate, nameof(predicate));
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
-            
+
             this.GetOrCreateRegistrationalEntry(serviceType)
                 .Add(serviceType, implementationTypeFactory, lifestyle, predicate);
         }
@@ -268,7 +268,7 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
-        public void RegisterConditional(Type serviceType, Registration registration, 
+        public void RegisterConditional(Type serviceType, Registration registration,
             Predicate<PredicateContext> predicate)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
@@ -279,7 +279,7 @@ namespace SimpleInjector
                 nameof(serviceType));
 
             this.ThrowWhenContainerIsLockedOrDisposed();
-            
+
             var producer = new InstanceProducer(serviceType, registration, predicate);
 
             this.AddInstanceProducer(producer);

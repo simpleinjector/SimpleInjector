@@ -38,8 +38,8 @@ namespace SimpleInjector
         /// <summary>
         /// Initializes a new instance of the <see cref="ActivationException" /> class.
         /// </summary>
-        public ActivationException() 
-        { 
+        public ActivationException()
+        {
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace SimpleInjector
         /// message.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
-        public ActivationException(string message) : base(message) 
+        public ActivationException(string message) : base(message)
         {
         }
 
@@ -62,7 +62,7 @@ namespace SimpleInjector
         /// The exception that is the cause of the current exception, or a null reference (Nothing in Visual 
         /// Basic) if no inner exception is specified. 
         /// </param>
-        public ActivationException(string message, Exception innerException) : base(message, innerException) 
+        public ActivationException(string message, Exception innerException) : base(message, innerException)
         {
         }
 
