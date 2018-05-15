@@ -207,7 +207,7 @@
 
             container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandlerWithUnknown<int>) });
 
-            container.Collections.AppendTo(typeof(IEventHandler<AuditableEvent>), typeof(NewConstraintEventHandler<AuditableEvent>));
+            container.Collection.AppendTo(typeof(IEventHandler<AuditableEvent>), typeof(NewConstraintEventHandler<AuditableEvent>));
 
             // Act
             container.RegisterCollection(typeof(IEventHandler<>), new[] { typeof(AuditableEventEventHandler) });

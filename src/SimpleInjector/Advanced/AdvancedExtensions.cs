@@ -138,14 +138,14 @@ namespace SimpleInjector.Advanced
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>RegisterCollection</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.AppendTo) + " instead.", error: false)]
         public static void AppendToCollection(this Container container, Type serviceType, 
             Registration registration)
         {
             Requires.IsNotNull(container, nameof(container));
 
-            container.Collections.AppendTo(serviceType, registration);
+            container.Collection.AppendTo(serviceType, registration);
         }
 
         /// <summary>
@@ -163,14 +163,14 @@ namespace SimpleInjector.Advanced
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>RegisterCollection</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collections) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.AppendTo) + " instead.", error: false)]
         public static void AppendToCollection(this Container container, Type serviceType,
             Type implementationType)
         {
             Requires.IsNotNull(container, nameof(container));
 
-            container.Collections.AppendTo(serviceType, implementationType);
+            container.Collection.AppendTo(serviceType, implementationType);
         }
 
         internal static void Verify(this IDependencyInjectionBehavior behavior, ConstructorInfo constructor)
