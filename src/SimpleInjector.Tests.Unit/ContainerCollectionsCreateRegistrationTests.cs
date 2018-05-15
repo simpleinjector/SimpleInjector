@@ -17,8 +17,8 @@
             var container = new Container();
 
             // Act
-            var reg1 = container.Collections.CreateRegistration<ILogger>(typeof(NullLogger));
-            var reg2 = container.Collections.CreateRegistration<ILogger>(typeof(ConsoleLogger));
+            var reg1 = container.Collection.CreateRegistration<ILogger>(typeof(NullLogger));
+            var reg2 = container.Collection.CreateRegistration<ILogger>(typeof(ConsoleLogger));
 
             // Assert
             Assert.AreNotSame(reg1, reg2, 
@@ -34,8 +34,8 @@
             var container = new Container();
 
             // Act
-            var reg1 = container.Collections.CreateRegistration<ILogger>(typeof(NullLogger));
-            var reg2 = container.Collections.CreateRegistration<ILogger>(typeof(ConsoleLogger));
+            var reg1 = container.Collection.CreateRegistration<ILogger>(typeof(NullLogger));
+            var reg2 = container.Collection.CreateRegistration<ILogger>(typeof(ConsoleLogger));
 
             var prod1 = new InstanceProducer<IEnumerable<ILogger>>(reg1);
             var prod2 = new InstanceProducer<IEnumerable<ILogger>>(reg2);
@@ -57,7 +57,7 @@
             // Arrange
             var container = new Container();
             
-            var registration = container.Collections.CreateRegistration<ILogger>(typeof(FailingConstructorLogger));
+            var registration = container.Collection.CreateRegistration<ILogger>(typeof(FailingConstructorLogger));
 
             // Notice the explicit call to GC.Collect(). Simple Injector holds on to 'stuff' using WeakReferences
             // to ensure that to memory is leaked, but as long as stream is referenced, should it as well be
@@ -78,7 +78,7 @@
         private static IEnumerable<T> GetStreamFromRegistration<T>(
             Container container, params Type[] serviceTypes) where T : class
         {
-            var reg = container.Collections.CreateRegistration<T>(serviceTypes);
+            var reg = container.Collection.CreateRegistration<T>(serviceTypes);
             var prod = new InstanceProducer<IEnumerable<T>>(reg);
             return prod.GetInstance();
         }
