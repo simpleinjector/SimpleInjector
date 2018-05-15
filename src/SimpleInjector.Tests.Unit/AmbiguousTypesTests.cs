@@ -63,7 +63,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
-            
+
             // Assert
             Assert_RegistrationFailsWithExpectedParamName("TService", () =>
             {

@@ -181,7 +181,7 @@
             Lifestyle lifestyle = Lifestyle.Transient;
 
             // Act
-            Action action = () => lifestyle.CreateProducer(typeof(ICommandHandler<>), 
+            Action action = () => lifestyle.CreateProducer(typeof(ICommandHandler<>),
                 typeof(StubCommandHandler), container);
 
             // Assert
@@ -208,7 +208,7 @@
                 action);
             AssertThat.ThrowsWithParamName("implementationType", action);
         }
-        
+
         [TestMethod]
         public void CreateProducerTService_SuppliedWithOpenGenericImplementationType_ThrowsExpectedException()
         {

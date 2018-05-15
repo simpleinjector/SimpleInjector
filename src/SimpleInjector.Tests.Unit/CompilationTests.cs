@@ -18,7 +18,7 @@
             // Act
             container.GetInstance<InternalClass.PublicNestedClass>();
         }
-        
+
         [TestMethod]
         public void GetInstance_ResolvingPrivateTypeRegisteredAsDelegate_Succeeds()
         {
@@ -30,7 +30,7 @@
             // Act
             container.GetInstance<InternalClass>();
         }
-        
+
         [TestMethod]
         public void GetInstance_ResolvingPublicClassNestedInPublicClassNestedInPrivateClass_Succeeds()
         {
@@ -93,12 +93,12 @@
             }
         }
 
-        private class PrivateNested
+        private static class PrivateNested
         {
-            public class NestedNested
+            public static class NestedNested
             {
-                public class DeeplyNestedClass 
-                { 
+                public class DeeplyNestedClass
+                {
                 }
             }
         }
@@ -106,8 +106,8 @@
 
     internal class InternalClass
     {
-        public class PublicNestedClass 
-        { 
+        public class PublicNestedClass
+        {
         }
     }
 }

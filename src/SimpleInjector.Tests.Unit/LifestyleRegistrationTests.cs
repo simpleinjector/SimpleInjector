@@ -16,7 +16,7 @@
             var container = ContainerFactory.New();
 
             var invalidLifestyle = new FakeLifestyle();
-            
+
             var invalidRegistration = new FakeRegistration(invalidLifestyle, container, typeof(RealTimeProvider))
             {
                 ExpressionToReturn = null
@@ -37,7 +37,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.ExceptionMessageContains(
-                    "The FakeRegistration for the FakeLifestyle returned a null reference " + 
+                    "The FakeRegistration for the FakeLifestyle returned a null reference " +
                     "from its BuildExpression method.", ex);
             }
         }
@@ -75,7 +75,7 @@
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentException>("instance", action);
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The supplied type Object does not inherit from Container.", 
+                "The supplied type Object does not inherit from Container.",
                 action);
         }
 
@@ -111,7 +111,7 @@
                 "The supplied type FakeTimeProvider does not inherit from RealTimeProvider.",
                 action);
         }
-        
+
         [TestMethod]
         public void InitializeInstance_WithSubTypeOfRegistration_Succeeds()
         {
@@ -170,7 +170,7 @@
                 interceptedExpression = e.Expression;
             };
 
-            var registration = 
+            var registration =
                 container.GetRegistration(typeof(ServiceWithProperty<RealTimeProvider>)).Registration;
 
             // GetRegistration might trigger interception, so we have to reset that.
@@ -209,7 +209,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            var producer = 
+            var producer =
                 Lifestyle.Transient.CreateProducer<ICovariant<object>, CovariantImplementation<string>>(
                     container);
 
@@ -241,10 +241,10 @@
             public TDependency Dependency { get; set; }
         }
 
-        private sealed class RealTimeProviderSubType : RealTimeProvider 
+        private sealed class RealTimeProviderSubType : RealTimeProvider
         {
         }
-        
+
         private sealed class PredicatePropertySelectionBehavior : IPropertySelectionBehavior
         {
             public Predicate<PropertyInfo> Predicate { get; set; }
@@ -268,7 +268,7 @@
             return this.RegistrationToReturn;
         }
 
-        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
+        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {
             return this.RegistrationToReturn;
@@ -277,7 +277,7 @@
 
     internal sealed class FakeRegistration : Registration
     {
-        public FakeRegistration(Lifestyle lifestyle, Container container, Type implementationType) 
+        public FakeRegistration(Lifestyle lifestyle, Container container, Type implementationType)
             : base(lifestyle, container)
         {
             this.ImplementationType = implementationType;

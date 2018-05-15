@@ -231,7 +231,7 @@
 
             // Act
             var registrations = container.GetCurrentRegistrations();
-           
+
             // Assert
             var actualRegistration = registrations.SingleOrDefault(r => r.ServiceType == invalidType);
 

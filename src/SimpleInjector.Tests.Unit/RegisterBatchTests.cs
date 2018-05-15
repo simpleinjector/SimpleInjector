@@ -26,12 +26,12 @@
         public interface IInvalid<TA, TB>
         {
         }
-        
+
         public interface ISkipDecorator<T>
         {
         }
-        
-        private static readonly IEnumerable<Assembly> Assemblies = 
+
+        private static readonly IEnumerable<Assembly> Assemblies =
             new[] { typeof(RegisterBatchTests).GetTypeInfo().Assembly };
 
         [TestMethod]
@@ -50,7 +50,7 @@
                 Container.Collection.Register(typeof(ILogger), IEnumerable<Assembly>) instead.".TrimInside(),
                 action);
         }
-        
+
         [TestMethod]
         public void RegisterAssemblies_WithClosedGenericType_Fails()
         {
@@ -70,7 +70,7 @@
                 Types.ToCSharpFriendlyName(typeof(IService<,>))),
                 action);
         }
-        
+
         [TestMethod]
         public void RegisterTypes_WithNonGenericType_Fails()
         {
@@ -225,7 +225,7 @@
             var impl = container.GetInstance<IService<float, double>>();
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(Concrete3), impl, 
+            AssertThat.IsInstanceOfType(typeof(Concrete3), impl,
                 "Concrete3 implements INonGeneric which implements IService<float, double>.");
         }
 

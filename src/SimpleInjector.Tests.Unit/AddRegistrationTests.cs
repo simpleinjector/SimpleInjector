@@ -7,11 +7,11 @@
     [TestClass]
     public class AddRegistrationTests
     {
-        public interface IService1 
+        public interface IService1
         {
         }
-        
-        public interface IService2 
+
+        public interface IService2
         {
         }
 
@@ -45,7 +45,7 @@
                 Lifestyle.Singleton.CreateRegistration<Implementation>(otherContainer);
 
             // Act
-            Action action = 
+            Action action =
                 () => container.AddRegistration(typeof(IService1), registrationFromAnotherContainer);
 
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
@@ -69,7 +69,7 @@
                 action);
             AssertThat.ThrowsWithParamName("serviceType", action);
         }
-        
+
         [TestMethod]
         public void AddRegistration_SuppliedWithPartialOpenGenericServiceType_ThrowsExpectedException()
         {
@@ -80,7 +80,7 @@
 
             // Act
             Action action = () => container.AddRegistration(
-                typeof(ICommandHandler<>).MakeGenericType(typeof(List<>)), 
+                typeof(ICommandHandler<>).MakeGenericType(typeof(List<>)),
                 registration);
 
             // Assert
@@ -90,8 +90,8 @@
             AssertThat.ThrowsWithParamName("serviceType", action);
         }
 
-        public class Implementation : IService1, IService2 
-        { 
+        public class Implementation : IService1, IService2
+        {
         }
     }
 }

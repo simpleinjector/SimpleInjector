@@ -523,7 +523,7 @@
                     throw ex.GetExceptionChain().Last();
                 }
             };
-            
+
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
         }
@@ -597,7 +597,7 @@
                     // Assert
                     AssertThat.Throws<ArgumentNullException>(
                         () => e.KnownRelationships.Insert(0, invalidRelationship));
-                }               
+                }
             };
 
             // Act

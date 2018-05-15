@@ -123,7 +123,7 @@
             container.Dispose();
 
             // Assert
-            Assert.IsTrue(instance.Disposed, 
+            Assert.IsTrue(instance.Disposed,
                 "When supplying a factory, the instances returned from that factory are considered to be " +
                 "'container controlled' and the container should dispose them when its lifetime ends.");
         }
@@ -187,7 +187,7 @@
             Assert.IsTrue(instance1.Disposed);
             Assert.IsTrue(instance2.Disposed);
         }
-        
+
         [TestMethod]
         public void Dispose_MultipleDisposableSingletons_DisposesThemInOppositeOrderOfCreation()
         {
@@ -212,7 +212,7 @@
             Assert.AreSame(instance2, instances[0], "Instances are expected to be disposed in opposite order.");
             Assert.AreSame(instance1, instances[1], "Instances are expected to be disposed in opposite order.");
         }
-        
+
         [TestMethod]
         public void Dispose_ResolvedDisposableTransient_DoesNotDisposeInstance()
         {
@@ -227,7 +227,7 @@
             container.Dispose();
 
             // Assert
-            Assert.IsFalse(instance1.Disposed, 
+            Assert.IsFalse(instance1.Disposed,
                 "Transients should not get disposed. That would keep them alive for the lifetime of the container.");
         }
 

@@ -35,7 +35,7 @@
             // registrations dictionary. This call would fail in that case, because the snapshot is needed
             // for consistency.
             container.GetInstance<Concrete>();
-            
+
             // Assert
             Assert.IsFalse(shouldCall, "ResolveUnregisteredType was not called.");
         }

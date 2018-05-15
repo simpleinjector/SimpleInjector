@@ -7,7 +7,7 @@
 
     public static class AssertThat
     {
-        public static void Throws<TException>(Action action, string assertMessage = null) 
+        public static void Throws<TException>(Action action, string assertMessage = null)
             where TException : Exception
         {
             try
@@ -42,7 +42,7 @@
             });
         }
 
-        public static void ThrowsWithExceptionMessageContains<TException>(string expectedMessage, 
+        public static void ThrowsWithExceptionMessageContains<TException>(string expectedMessage,
             Action action, string assertMessage = null)
             where TException : Exception
         {
@@ -219,7 +219,7 @@
                 "Expected value to be in the string:\n\n" + expectedMessage + "\n\n" + Environment.NewLine +
                 stackTrace);
         }
-        
+
         public static void ExceptionMessageShouldNotContain(string messageNotToBeExpected, Exception actualException,
             string assertMessage = null)
         {
@@ -248,7 +248,7 @@
                 assertMessage +
                 " The string did contain the expected value, while it was not expected. " +
                 "Actual string: \"" + actualMessage + "\". " +
-                "Value to be NOT expected in the string: \"" + messageNotToBeExpected + "\"." + 
+                "Value to be NOT expected in the string: \"" + messageNotToBeExpected + "\"." +
                 Environment.NewLine +
                 stackTrace);
         }

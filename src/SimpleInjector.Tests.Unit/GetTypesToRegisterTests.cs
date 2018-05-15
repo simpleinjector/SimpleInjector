@@ -95,7 +95,7 @@
             Assert_CollectionsContainExactSameTypes(expectedTypes, actualTypes,
                 "Excluded should have been: Everything that is a decorator, so generic decorators as well.");
         }
-        
+
         [TestMethod]
         public void GetTypesToRegister_ExcludeComposites_ContainsListOfExpectedTypes()
         {
@@ -200,7 +200,7 @@
                 missingTypes.ToFriendlyNamesText(),
                 message));
         }
-        
+
         public abstract class AbstractService : IService<int> { }
 
         public class NonGeneric1 : IService<int> { }

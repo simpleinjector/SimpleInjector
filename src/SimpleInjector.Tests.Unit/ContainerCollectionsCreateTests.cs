@@ -119,7 +119,7 @@
             Assert.AreSame(stream.First(), stream.First(), "ConsoleLogger was expected to be singleton.");
             Assert.AreNotSame(stream.Second(), stream.Second(), "NullLogger was expected to be transient.");
         }
-                
+
         [TestMethod]
         public void Create_MultipleStreamsUsingTheSameSingletonComponent_PreservesLifestyleAcrossStreams()
         {
@@ -165,7 +165,7 @@
 
             GC.KeepAlive(stream);
         }
-        
+
         [TestMethod]
         public void Verify_WhenCollectionIsCreatedForRegistrationThatFailsDuringCreation_VerifyTestsTheCollection()
         {
@@ -174,7 +174,7 @@
 
             var stream = container.Collection.Create<ILogger>(
                 Lifestyle.Transient.CreateRegistration<FailingConstructorLogger>(container));
-            
+
             // Notice the explicit call to GC.Collect(). Simple Injector holds on to 'stuff' using WeakReferences
             // to ensure that to memory is leaked, but as long as stream is referenced, should it as well be
             // verified
@@ -190,7 +190,7 @@
 
             GC.KeepAlive(stream);
         }
-        
+
         [TestMethod]
         public void Verify_WhenCollectionIsCreatedForTypeThatFailsDuringCreation_VerifySucceedsWhenCollectionWasAlreadyCollected()
         {
@@ -213,7 +213,7 @@
             // a memory leak.
             container.Verify();
         }
-        
+
         [TestMethod]
         public void Create_SuppliedWithNullTypeArray_ThrowsArgumentNullException()
         {
@@ -290,7 +290,7 @@
                 "The supplied type Logger<T> is an open generic type.",
                 action);
         }
-        
+
         [TestMethod]
         public void RegisterCollectionTServiceAssemblyArray_RegisteringNonGenericServiceAndAssemblyWithMultipleImplementations_RegistersThoseImplementations()
         {
@@ -320,7 +320,7 @@
         }
 
         private static Type GetType<T>(T instance) => instance.GetType();
-        
+
         private static void Assert_ContainsAllLoggers(IEnumerable loggers)
         {
             var instances = loggers.Cast<ILogStuf>().ToArray();
@@ -332,7 +332,7 @@
             Assert.IsTrue(instances.OfType<LogStuff2>().Any(), "Actual: " + types);
             Assert.IsTrue(instances.OfType<LogStuff3>().Any(), "Actual: " + types);
         }
-        
+
         public class LogStuff1 : ILogStuf
         {
         }

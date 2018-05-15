@@ -21,7 +21,7 @@
             var reg2 = container.Collection.CreateRegistration<ILogger>(typeof(ConsoleLogger));
 
             // Assert
-            Assert.AreNotSame(reg1, reg2, 
+            Assert.AreNotSame(reg1, reg2,
                 "Registration caching should not have been applied here, since that would lead to incorrect results");
         }
 
@@ -56,7 +56,7 @@
         {
             // Arrange
             var container = new Container();
-            
+
             var registration = container.Collection.CreateRegistration<ILogger>(typeof(FailingConstructorLogger));
 
             // Notice the explicit call to GC.Collect(). Simple Injector holds on to 'stuff' using WeakReferences

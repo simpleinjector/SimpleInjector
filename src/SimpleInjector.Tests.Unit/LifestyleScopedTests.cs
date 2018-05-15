@@ -68,7 +68,7 @@
                 container.GetInstance<RealTimeProvider>();
             }
         }
- 
+
         [TestMethod]
         public void InstanceProducerLifestyle_ForAScopedRegistration_HasTheExpectedDefaultScopedLifestyle()
         {
@@ -266,7 +266,7 @@
 
             public override int Length { get; }
 
-            protected internal override Func<Scope> CreateCurrentScopeProvider(Container container) => 
+            protected internal override Func<Scope> CreateCurrentScopeProvider(Container container) =>
                 () => this.scope;
         }
     }

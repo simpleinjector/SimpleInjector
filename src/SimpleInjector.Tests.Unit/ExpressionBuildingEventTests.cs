@@ -335,18 +335,18 @@
             container.GetInstance<IUserRepository>();
 
             // Assert
-            var constantValues = 
+            var constantValues =
                 Visitor.GetAllExpressions(actualExpression)
                 .OfType<ConstantExpression>()
                 .Select(expr => expr.Value);
-            
+
             Assert.IsTrue(constantValues.Contains(registeredFactory),
                 "The expression that is generated for a Func<T> registration should contain a " +
                 "ConstantExpression with a reference of the registered factory delegate. This way " +
                 "ExpressionBuilding registrations can replace the original registered delegate with " +
                 "something different.");
         }
-        
+
         [TestMethod]
         public void GetInstance_UnregisteredConcreteType_CallsEventOnceForGivenServiceType()
         {
@@ -499,7 +499,7 @@
         {
             // Arrange
             var eventArgs = new ExpressionBuildingEventArgs(
-                typeof(PluginImpl), 
+                typeof(PluginImpl),
                 Expression.Constant(new PluginImpl()),
                 Lifestyle.Transient);
 
@@ -509,7 +509,7 @@
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
         }
- 
+
         [TestMethod]
         public void GetInstance_ExpressionBuildingChangedTheRegisterSingleRegistrationToReturnNull_ThrowsExpectedException()
         {
@@ -537,7 +537,7 @@
                     "The registered delegate for type SqlUserRepository returned null.", ex);
             }
         }
-        
+
         [TestMethod]
         public void GetInstance_ExpressionBuildingChangedExpressionInAnIncompatibleWay_ThrowsExpectedException()
         {
