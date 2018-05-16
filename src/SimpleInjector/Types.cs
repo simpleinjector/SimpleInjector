@@ -89,8 +89,14 @@ namespace SimpleInjector
         internal static bool IsConcreteConstructableType(Type serviceType) =>
             !serviceType.ContainsGenericParameters() && IsConcreteType(serviceType);
 
-        // While array types are in fact concrete, we can not create them and creating them would be
-        // pretty useless.
+        // About arrays: While array types are in fact concrete, we cannot create them and creating 
+        // them would be pretty useless.
+        // About object: System.Object is concrete and even contains a single public (default) 
+        // constructor. Allowing it to be created however, would lead to confusion, since this allows
+        // injecting System.Object into constructors, even though it is not registered explicitly.
+        // This is bad, since creating an System.Object on the fly (transient) has no purpose and this
+        // could lead to an accidentally valid container configuration, while there is in fact an
+        // error in the configuration.
         internal static bool IsConcreteType(Type serviceType) =>
             !serviceType.IsAbstract() && !serviceType.IsArray && serviceType != typeof(object) &&
             !typeof(Delegate).IsAssignableFrom(serviceType);

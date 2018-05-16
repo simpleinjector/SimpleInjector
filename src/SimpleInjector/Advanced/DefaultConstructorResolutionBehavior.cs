@@ -30,9 +30,6 @@ namespace SimpleInjector.Advanced
     [DebuggerDisplay(nameof(DefaultConstructorResolutionBehavior))]
     internal sealed class DefaultConstructorResolutionBehavior : IConstructorResolutionBehavior
     {
-        // NOTE: The serviceType parameter is not used in the default implementation, but can be used by
-        // alternative implementations to generate a proxy type based on the service type and return a
-        // constructor of that proxy instead of returning a constructor of the implementationType.
         public ConstructorInfo GetConstructor(Type implementationType)
         {
             Requires.IsNotNull(implementationType, nameof(implementationType));
@@ -46,14 +43,6 @@ namespace SimpleInjector.Advanced
         {
             if (!Types.IsConcreteType(implementationType))
             {
-                // About arrays: While array types are in fact concrete, we cannot create them and creating 
-                // them would be pretty useless.
-                // About object: System.Object is concrete and even contains a single public (default) 
-                // constructor. Allowing it to be created however, would lead to confusion, since this allows
-                // injecting System.Object into constructors, even though it is not registered explicitly.
-                // This is bad, since creating an System.Object on the fly (transient) has no purpose and this
-                // could lead to an accidentally valid container configuration, while there is in fact an
-                // error in the configuration.
                 throw new ActivationException(
                     StringResources.TypeShouldBeConcreteToBeUsedOnThisMethod(implementationType));
             }
