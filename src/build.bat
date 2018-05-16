@@ -2,27 +2,27 @@
 
 set buildNumber=0 
 set copyrightYear=2018
-set version="%1"
-set prereleasePostfix=""
+set version=%1
+set prereleasePostfix=
 
 IF "%2"=="1" ( 
-	set step="1"
+	set step=%2
 ) ELSE IF "%2"=="2" (
-	set step="2"
+	set step=%2
 ) ELSE IF "%2"=="3" (
-	set step="3"
+	set step=%2
 ) ELSE IF "%2"=="4" (
-	set step="4"
+	set step=%2
 ) ELSE IF "%2"=="5" (
-	set step="5"
+	set step=%2
 ) ELSE (
-	set step="%3"
-	set prereleasePostfix="%2"
+	set step=%3
+	set prereleasePostfix=%2
 )
 
-set inputOk="true"
-IF "%version%"=="" ( set inputOk="false" ) 
-ELSE IF "%step%"=="" ( set inputOk="false" ) 
+set inputOk=true
+IF "%version%"=="" ( set inputOk=false ) 
+ELSE IF "%step%"=="" ( set inputOk=false ) 
 
 echo step: %step%
 echo version: %version%
@@ -96,7 +96,7 @@ set numeric_version_Packaging=%version_Packaging%.%buildNumber%
 
 if not exist SimpleInjector.snk goto :strong_name_key_missing
 
-IF %step%=="1" (
+IF %step%==1 (
 	echo Running step 1
 	if exist Releases\v%named_version% goto :release_directory_already_exists
 
@@ -138,7 +138,7 @@ IF %step%=="1" (
     goto :EOF
 )
 
-IF %step%=="2" (
+IF %step%==2 (
 	echo RUNNING TESTS IN PARTIAL TRUST
 
 	set testDll=SimpleInjector.Tests.Unit\bin\Release\net451\SimpleInjector.Tests.Unit.dll
@@ -151,7 +151,7 @@ IF %step%=="2" (
     goto :EOF	
 )
 
-IF %step%=="3" (
+IF %step%==3 (
 	echo BUILD DOCUMENTATION
 
 	%msbuild% "SimpleInjector.Documentation\SimpleInjector.Documentation.shfbproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
@@ -176,9 +176,10 @@ IF %step%=="3" (
     goto :EOF	
 )
 
-IF %step%=="4" (
+IF %step%==4 (
 	echo CREATING NUGET PACKAGES
-
+	rmdir Releases\temp /s /q
+	
 	mkdir Releases\temp
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector Releases\temp /E /H
 	%attrib% -r "%CD%\Releases\temp\*.*" /s /d
@@ -311,7 +312,7 @@ IF %step%=="4" (
     goto :EOF	
 )
 
-IF %step%=="5" (
+IF %step%==5 (
 	echo RESTORE VERSION NUMBERS
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
