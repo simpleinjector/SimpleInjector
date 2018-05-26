@@ -413,8 +413,14 @@ namespace SimpleInjector
 
         internal bool IsConstructableType(Type implementationType, out string errorMessage)
         {
-            errorMessage = null;
+            if (!Types.IsConcreteType(implementationType))
+            {
+                errorMessage = StringResources.TypeShouldBeConcreteToBeUsedOnThisMethod(implementationType);
+                return false;
+            }
 
+            errorMessage = null;
+            
             try
             {
                 ConstructorInfo constructor = this.SelectConstructor(implementationType);

@@ -287,7 +287,7 @@ namespace SimpleInjector
             if (invalidTarget.Parameter != null)
             {
                 return string.Format(CultureInfo.InvariantCulture,
-                    "The constructor of type {0} contains parameter '{1}' of type {2} which can not be used " +
+                    "The constructor of type {0} contains parameter '{1}' of type {2}, which can not be used " +
                     "for constructor injection{3}.",
                     invalidTarget.Member.DeclaringType.TypeName(),
                     invalidTarget.Name,
@@ -297,7 +297,7 @@ namespace SimpleInjector
             else
             {
                 return string.Format(CultureInfo.InvariantCulture,
-                    "The type {0} contains property '{1}' of type {2} which can not be used for property " +
+                    "The type {0} contains property '{1}' of type {2}, which can not be used for property " +
                     "injection{3}.",
                     invalidTarget.Member.DeclaringType.TypeName(),
                     invalidTarget.Name,
