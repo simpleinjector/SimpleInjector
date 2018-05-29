@@ -192,6 +192,8 @@ IF %step%==4 (
 	copy SimpleInjector\bin\Release\netstandard1.0\SimpleInjector.xml "Releases\temp\lib\netstandard1.0\SimpleInjector.xml"
 	copy SimpleInjector\bin\Release\netstandard1.3\SimpleInjector.dll "Releases\temp\lib\netstandard1.3\SimpleInjector.dll"
 	copy SimpleInjector\bin\Release\netstandard1.3\SimpleInjector.xml "Releases\temp\lib\netstandard1.3\SimpleInjector.xml"
+	copy SimpleInjector\bin\Release\netstandard2.0\SimpleInjector.dll "Releases\temp\lib\netstandard2.0\SimpleInjector.dll"
+	copy SimpleInjector\bin\Release\netstandard2.0\SimpleInjector.xml "Releases\temp\lib\netstandard2.0\SimpleInjector.xml"
 	%replace% /source:Releases\temp\SimpleInjector.nuspec {version} %named_version_Core%
 	%replace% /source:Releases\temp\SimpleInjector.nuspec {year} %copyrightYear%
 	%replace% /source:Releases\temp\package\services\metadata\core-properties\c8082e2254fe4defafc3b452026f048d.psmdcp {version} %named_version_Core%

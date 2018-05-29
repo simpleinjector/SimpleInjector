@@ -50,7 +50,7 @@ namespace SimpleInjector
         public static Assembly GetAssembly(this Type type) => type.Assembly;
         public static Guid GetGuid(this Type type) => type.GUID;
 #endif        
-#if NETSTANDARD1_0 || NETSTANDARD1_3
+#if NETSTANDARD1_0 || NETSTANDARD1_3 || NETSTANDARD2_0
         public static MethodInfo GetSetMethod(this PropertyInfo property, bool nonPublic = true) =>
             nonPublic || property.SetMethod?.IsPublic == true ? property.SetMethod : null;
 
