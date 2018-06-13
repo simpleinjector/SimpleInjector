@@ -20,6 +20,8 @@
 */
 #endregion
 
+using System.Collections.ObjectModel;
+
 namespace SimpleInjector
 {
     using System;
@@ -40,7 +42,7 @@ namespace SimpleInjector
     public partial class Container : IServiceProvider
     {
         private static readonly MethodInfo EnumerableToArrayMethod = typeof(Enumerable).GetMethod("ToArray");
-
+   
         private readonly Dictionary<Type, Lazy<InstanceProducer>> resolveUnregisteredTypeRegistrations =
             new Dictionary<Type, Lazy<InstanceProducer>>();
 
@@ -419,36 +421,58 @@ namespace SimpleInjector
 
         private InstanceProducer TryBuildArrayInstanceProducer(Type serviceType)
         {
-            if (serviceType.IsArray)
-            {
-                Type elementType = serviceType.GetElementType();
+            Type elementType = null;
+            MethodInfo createCollectionMethod = null;
 
-                // We don't auto-register collections for ambiguous types.
-                if (elementType.IsValueType() || Types.IsAmbiguousType(elementType))
+            if (serviceType.IsGenericType())
+            {
+                var elementTypes = serviceType.GetGenericArguments();
+                if (elementTypes.Length != 1)
                 {
                     return null;
                 }
-
-                // GetAllInstances locks the container
-                bool isContainerControlledCollection =
-                    this.GetAllInstances(elementType) is IContainerControlledCollection;
-
-                if (isContainerControlledCollection)
-                {
-                    return this.BuildArrayProducerFromControlledCollection(serviceType, elementType);
-                }
-                else
-                {
-                    return this.BuildArrayProducerFromUncontrolledCollection(serviceType, elementType);
-                }
+                elementType = elementTypes[0];
+                createCollectionMethod = CollectionInitializer.GetInitializer(serviceType.GetGenericTypeDefinition());
+            }
+            else if (serviceType.IsArray)
+            {
+                elementType = serviceType.GetElementType();
+                createCollectionMethod = EnumerableToArrayMethod;
+            }
+            if (createCollectionMethod == null)
+            {
+                return null;
             }
 
-            return null;
+            // We don't auto-register collections for ambiguous types.
+            if (elementType.IsValueType() || Types.IsAmbiguousType(elementType))
+            {
+                return null;
+            }
+
+            // GetAllInstances locks the container
+            bool isContainerControlledCollection =
+                this.GetAllInstances(elementType) is IContainerControlledCollection;
+
+            if (isContainerControlledCollection)
+            {
+                return this.BuildCollectionProducerFromControlledCollection(
+                    serviceType,
+                    elementType,
+                    createCollectionMethod);
+            }
+            else
+            {
+                return this.BuildCollectionProducerFromUncontrolledCollection(
+                    serviceType,
+                    elementType,
+                    createCollectionMethod);
+            }
         }
 
-        private InstanceProducer BuildArrayProducerFromControlledCollection(Type serviceType, Type elementType)
+        private InstanceProducer BuildCollectionProducerFromControlledCollection(Type serviceType, Type elementType, MethodInfo createCollectionMethodInfo)
         {
-            var arrayMethod = EnumerableToArrayMethod.MakeGenericMethod(elementType);
+            var arrayMethod = createCollectionMethodInfo.MakeGenericMethod(elementType);
 
             IEnumerable<object> singletonCollection = this.GetAllInstances(elementType);
 
@@ -477,9 +501,9 @@ namespace SimpleInjector
             return producer;
         }
 
-        private InstanceProducer BuildArrayProducerFromUncontrolledCollection(Type serviceType, Type elementType)
+        private InstanceProducer BuildCollectionProducerFromUncontrolledCollection(Type serviceType, Type elementType, MethodInfo createCollectionMethodInfo)
         {
-            var arrayMethod = EnumerableToArrayMethod.MakeGenericMethod(elementType);
+            var arrayMethod = createCollectionMethodInfo.MakeGenericMethod(elementType);
 
             var enumerableProducer = this.GetRegistration(typeof(IEnumerable<>).MakeGenericType(elementType));
             var enumerableExpression = enumerableProducer.BuildExpression();

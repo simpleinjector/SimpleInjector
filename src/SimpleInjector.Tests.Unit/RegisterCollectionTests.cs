@@ -1870,6 +1870,35 @@
         }
 
         [TestMethod]
+        public void GetRegistration_RequestingListRegistrationContainerControlledCollection_HasTheTransientLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register<ICommand>(new[] { typeof(ConcreteCommand) });
+
+            // Act
+            var registration = container.GetRegistration(typeof(List<ICommand>));
+
+            // Assert
+            Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle);
+        }
+        [TestMethod]
+        public void GetRegistration_RequestingCollectionRegistrationContainerControlledCollection_HasTheTransientLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register<ICommand>(new[] { typeof(ConcreteCommand) });
+
+            // Act
+            var registration = container.GetRegistration(typeof(Collection<ICommand>));
+
+            // Assert
+            Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle);
+        }
+
+        [TestMethod]
         public void GetRegistration_RequestingArrayRegistrationUncontainerControlledCollection_HasTheTransientLifestyle()
         {
             // Arrange
@@ -1885,6 +1914,40 @@
             // Assert
             Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle);
         }
+
+        [TestMethod]
+        public void GetRegistration_RequestingListRegistrationUncontainerControlledCollection_HasTheTransientLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            IEnumerable<ICommand> commands = new List<ICommand> { new ConcreteCommand() };
+
+            container.Collection.Register<ICommand>(commands);
+
+            // Act
+            var registration = container.GetRegistration(typeof(List<ICommand>));
+
+            // Assert
+            Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle);
+        }
+        [TestMethod]
+        public void GetRegistration_RequestingCollectionRegistrationUncontainerControlledCollection_HasTheTransientLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            IEnumerable<ICommand> commands = new Collection<ICommand> { new ConcreteCommand() };
+
+            container.Collection.Register<ICommand>(commands);
+
+            // Act
+            var registration = container.GetRegistration(typeof(Collection<ICommand>));
+
+            // Assert
+            Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle);
+        }
+
 
         [TestMethod]
         public void GetRegistration_RequestingArrayRegistrationContainerControlledCollectionThatOnlyContainsSingletons_StillHasTheTransientLifestyle()
