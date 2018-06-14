@@ -40,7 +40,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleInjector.CI", "Simple
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector", "SimpleInjector\SimpleInjector.csproj", "{B70B03F6-7320-4A40-A8A0-1FFE2B7DB815}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.Tests.Unit", "SimpleInjector.Tests.Unit\SimpleInjector.Tests.Unit.csproj", "{4520DB0D-3990-4CE1-8CF0-F3807B393C77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector,Tests.Unit", "SimpleInjector.Tests.Unit\SimpleInjector,Tests.Unit.csproj", "{4520DB0D-3990-4CE1-8CF0-F3807B393C77}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.CodeSamples", "SimpleInjector.CodeSamples\SimpleInjector.CodeSamples.csproj", "{A785BE2F-E759-40A4-988C-C9AC052AD8CC}"
 EndProject
