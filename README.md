@@ -1,6 +1,9 @@
 # Simple Injector
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/simpleinjector/SimpleInjector?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![NuGet](https://img.shields.io/nuget/v/SimpleInjector.svg)](https://www.nuget.org/packages/simpleinjector)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/simpleinjector/SimpleInjector?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![NuGet](https://img.shields.io/nuget/v/SimpleInjector.svg)](https://www.nuget.org/packages/simpleinjector)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/simpleinjector/SimpleInjector?branch=master&svg=true)](https://ci.appveyor.com/project/simpleinjector/SimpleInjector)
+[![codecov](https://codecov.io/gh/simpleinjector/SimpleInjector/branch/master/graph/badge.svg)](https://codecov.io/gh/simpleinjector/SimpleInjector)
 
 <!--- [![Build status](https://ci.appveyor.com/api/projects/status/2k9ududhkqqufk76?svg=true)](https://ci.appveyor.com/project/simpleinjector/simpleinjector) --->
 
