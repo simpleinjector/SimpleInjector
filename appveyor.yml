@@ -6,6 +6,7 @@ skip_tags: true
 configuration: Release
 before_build:
 - cmd: dotnet restore src\SimpleInjector.sln
+- cmd: copy src\fake.snk src\SimpleInjector.snk
 build:
   verbosity: minimal
   parallel: true
