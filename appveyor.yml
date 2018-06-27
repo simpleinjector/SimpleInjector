@@ -15,7 +15,7 @@ after_test:
 - choco install opencover.portable
 - choco install codecov
 - cd src
-- OpenCover.Console.exe -register:user -target:"C:\Program Files\dotnet\dotnet.exe" -targetargs:"test --framework net471 --verbosity q"
+- OpenCover.Console.exe -register:user -target:"C:\Program Files\dotnet\dotnet.exe" -targetargs:"test --framework net451 --verbosity q"
 - codecov -f "results.xml" 
 artifacts:
 - path: '**\*.nupkg'
