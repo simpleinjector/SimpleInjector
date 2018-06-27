@@ -5,11 +5,11 @@ pull_requests:
 skip_tags: true
 configuration: Release
 before_build:
-- cmd: dotnet restore
+- cmd: dotnet restore src\SimpleInjector.sln
 build:
   verbosity: minimal
   parallel: true
-  project: src\SimpleInjector.sln  
+  project: src\SimpleInjector.sln
 after_test:
 - choco install opencover.portable
 - choco install codecov
