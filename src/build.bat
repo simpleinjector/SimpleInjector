@@ -21,8 +21,11 @@ IF "%2"=="1" (
 )
 
 set inputOk=true
-IF "%version%"=="" ( set inputOk=false ) 
-ELSE IF "%step%"=="" ( set inputOk=false ) 
+IF "%version%"=="" ( 
+	set inputOk=false
+) ELSE IF "%step%"=="" (
+	set inputOk=false
+)
 
 echo step: %step%
 echo version: %version%
