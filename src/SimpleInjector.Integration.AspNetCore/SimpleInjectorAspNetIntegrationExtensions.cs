@@ -279,8 +279,6 @@ namespace SimpleInjector
 
             CrossWireServiceScope(container, app);
 
-            IHttpContextAccessor accessor = GetHttpContextAccessor(app);
-
             container.ResolveUnregisteredType += (s, e) =>
             {
                 if (e.Handled)
@@ -296,18 +294,9 @@ namespace SimpleInjector
                 {
                     Lifestyle lifestyle = ToLifestyle(descriptor.Lifetime);
 
-                    // Create a cross-wire registration that calls back into the .NET Core container.
-                    Registration registration = lifestyle.CreateRegistration(serviceType,
-                        () => GetServiceProvider(accessor, container).GetRequiredService(serviceType),
-                        container);
-
-                    // Apply the required suppressions.
-                    if (lifestyle == Lifestyle.Transient && typeof(IDisposable).IsAssignableFrom(serviceType))
-                    {
-                        registration.SuppressDiagnosticWarning(
-                            DiagnosticType.DisposableTransientComponent,
-                            justification: "This is a cross-wired service. ASP.NET will ensure it gets disposed.");
-                    }
+                    Registration registration = lifestyle == Lifestyle.Singleton
+                        ? CreateSingletonRegistration(container, serviceType, app)
+                        : CreateNonSingletonRegistration(container, serviceType, app, lifestyle);
 
                     e.Register(registration);
                 }
@@ -363,34 +352,39 @@ namespace SimpleInjector
         }
 
         private static Registration CreateCrossWireRegistration(
-            Container container, Type serviceType, IApplicationBuilder builder)
+            Container container, Type serviceType, IApplicationBuilder app)
         {
             IServiceCollection services = GetServiceCollection(container);
 
             Lifestyle lifestyle = DetermineLifestyle(serviceType, services);
 
-            Registration registration;
+            return lifestyle == Lifestyle.Singleton
+                ? CreateSingletonRegistration(container, serviceType, app)
+                : CreateNonSingletonRegistration(container, serviceType, app, lifestyle);
+        }
 
-            if (lifestyle == Lifestyle.Singleton)
-            {
-                registration = lifestyle.CreateRegistration(
-                    serviceType,
-                    () => builder.ApplicationServices.GetRequiredService(serviceType),
-                    container);
-            }
-            else
-            {
-                IHttpContextAccessor accessor = GetHttpContextAccessor(builder);
+        private static Registration CreateSingletonRegistration(Container container, Type serviceType, IApplicationBuilder app)
+        {
+            return Lifestyle.Singleton.CreateRegistration(
+                serviceType,
+                () => app.ApplicationServices.GetRequiredService(serviceType),
+                container);
+        }
 
-                registration = lifestyle.CreateRegistration(
-                    serviceType,
-                    () => GetServiceProvider(accessor, container).GetRequiredService(serviceType),
-                    container);
-            }
+        private static Registration CreateNonSingletonRegistration(
+            Container container, Type serviceType, IApplicationBuilder app, Lifestyle lifestyle)
+        {
+            IHttpContextAccessor accessor = GetHttpContextAccessor(app);
+
+            Registration registration = lifestyle.CreateRegistration(
+                serviceType,
+                () => GetServiceProvider(accessor, container, lifestyle).GetRequiredService(serviceType),
+                container);
 
             if (lifestyle == Lifestyle.Transient && typeof(IDisposable).IsAssignableFrom(serviceType))
             {
-                registration.SuppressDiagnosticWarning(DiagnosticType.DisposableTransientComponent,
+                registration.SuppressDiagnosticWarning(
+                    DiagnosticType.DisposableTransientComponent,
                     justification: "This is a cross-wired service. ASP.NET Core will ensure it gets disposed.");
             }
 
@@ -414,13 +408,21 @@ namespace SimpleInjector
             return context;
         }
 
-        private static IServiceProvider GetServiceProvider(IHttpContextAccessor accessor, Container container)
+        private static IServiceProvider GetServiceProvider(IHttpContextAccessor accessor, Container container, Lifestyle lifestyle)
         {
             // Pull the IServiceProvider from the current request. If there is no request, pull it from an 
             // IServiceScope that that will be managed by Simple Injector as scoped registration
-            // (see EnsureServiceScopeIsRegistered).
-            return accessor.HttpContext?.RequestServices ?? container.GetInstance<IServiceScope>().ServiceProvider;
+            // (see CrossWireServiceScope).
+            return accessor.HttpContext?.RequestServices ?? GetServiceProviderForBackgroundThread(container, lifestyle);
         }
+        
+        private static IServiceProvider GetServiceProviderForBackgroundThread(Container container, Lifestyle lifestyle) =>
+            Lifestyle.Scoped.GetCurrentScope(container) != null
+                ? container.GetInstance<IServiceScope>().ServiceProvider
+                : throw new ActivationException(
+                    $"You are trying to resolve a {lifestyle.Name} cross-wired service, but are doing so outside the context " +
+                    $"of a web request. To be able to resolve this service, the operation must run in the context of an " +
+                    $"active ({container.Options.DefaultScopedLifestyle.Name}) scope.");
 
         private static Lifestyle DetermineLifestyle(Type serviceType, IServiceCollection services)
         {
