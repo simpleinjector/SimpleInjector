@@ -110,7 +110,7 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            return GetRequestServiceProvider(builder, typeof(T)).GetService<T>();
+            return GetRequestServiceProvider(builder.GetApplicationServices(), typeof(T)).GetService<T>();
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            return GetRequestServiceProvider(builder, typeof(T)).GetRequiredService<T>();
+            return GetRequestServiceProvider(builder.GetApplicationServices(), typeof(T)).GetRequiredService<T>();
         }
 
         /// <summary>
@@ -196,9 +196,9 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            CrossWireServiceScope(container, builder);
+            CrossWireServiceScope(container, builder.GetApplicationServices());
 
-            Registration registration = CreateCrossWireRegistration(container, serviceType, builder);
+            Registration registration = CreateCrossWireRegistration(container, serviceType, builder.GetApplicationServices());
 
             container.AddRegistration(serviceType, registration);
         }
@@ -246,14 +246,34 @@ namespace SimpleInjector
         /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
         public static void AutoCrossWireAspNetComponents(this Container container, IApplicationBuilder app)
         {
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+
             if (container == null)
             {
                 throw new ArgumentNullException(nameof(container));
             }
 
-            if (app == null)
+            container.AutoCrossWireAspNetComponents(app.GetApplicationServices());
+        }
+
+        /// <summary>
+        /// Allows registrations made using the <see cref="IServiceCollection"/> API to be resolved by Simple Injector.
+        /// </summary>
+        /// <param name="container">The container.</param>
+        /// <param name="appServices">The <see cref="IServiceProvider"/> instance that provides the set of singleton services.</param>
+        public static void AutoCrossWireAspNetComponents(this Container container, IServiceProvider appServices)
+        {
+            if (container == null)
             {
-                throw new ArgumentNullException(nameof(app));
+                throw new ArgumentNullException(nameof(container));
+            }
+
+            if (appServices == null)
+            {
+                throw new ArgumentNullException(nameof(appServices));
             }
 
             var services = (IServiceCollection)container.GetItem(CrossWireContextKey);
@@ -277,7 +297,7 @@ namespace SimpleInjector
                     "See: https://simpleinjector.org/lifestyles#scoped");
             }
 
-            CrossWireServiceScope(container, app);
+            CrossWireServiceScope(container, appServices);
 
             container.ResolveUnregisteredType += (s, e) =>
             {
@@ -295,12 +315,24 @@ namespace SimpleInjector
                     Lifestyle lifestyle = ToLifestyle(descriptor.Lifetime);
 
                     Registration registration = lifestyle == Lifestyle.Singleton
-                        ? CreateSingletonRegistration(container, serviceType, app)
-                        : CreateNonSingletonRegistration(container, serviceType, app, lifestyle);
+                        ? CreateSingletonRegistration(container, serviceType, appServices)
+                        : CreateNonSingletonRegistration(container, serviceType, appServices, lifestyle);
 
                     e.Register(registration);
                 }
             };
+        }
+
+        private static IServiceProvider GetApplicationServices(this IApplicationBuilder builder)
+        {
+            var appServices = builder.ApplicationServices;
+
+            if (appServices == null)
+            {
+                throw new ArgumentNullException(nameof(builder) + ".ApplicationServices");
+            }
+
+            return appServices;
         }
 
         private static ServiceDescriptor FindServiceDescriptor(IServiceCollection services, Type serviceType)
@@ -320,7 +352,7 @@ namespace SimpleInjector
             return descriptor;
         }
 
-        private static void CrossWireServiceScope(Container container, IApplicationBuilder builder)
+        private static void CrossWireServiceScope(Container container, IServiceProvider appServices)
         {
             if (container.Options.DefaultScopedLifestyle == null)
             {
@@ -335,7 +367,7 @@ namespace SimpleInjector
 
             if (container.GetItem(ServiceScopeKey) == null)
             {
-                var scopeFactory = builder.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+                var scopeFactory = appServices.GetRequiredService<IServiceScopeFactory>();
 
                 // We use unregistered type resolution, to allow the user to register IServiceScope manually
                 // if he needs.
@@ -352,29 +384,30 @@ namespace SimpleInjector
         }
 
         private static Registration CreateCrossWireRegistration(
-            Container container, Type serviceType, IApplicationBuilder app)
+            Container container, Type serviceType, IServiceProvider appServices)
         {
             IServiceCollection services = GetServiceCollection(container);
 
             Lifestyle lifestyle = DetermineLifestyle(serviceType, services);
 
             return lifestyle == Lifestyle.Singleton
-                ? CreateSingletonRegistration(container, serviceType, app)
-                : CreateNonSingletonRegistration(container, serviceType, app, lifestyle);
+                ? CreateSingletonRegistration(container, serviceType, appServices)
+                : CreateNonSingletonRegistration(container, serviceType, appServices, lifestyle);
         }
 
-        private static Registration CreateSingletonRegistration(Container container, Type serviceType, IApplicationBuilder app)
+        private static Registration CreateSingletonRegistration(
+            Container container, Type serviceType, IServiceProvider appServices)
         {
             return Lifestyle.Singleton.CreateRegistration(
                 serviceType,
-                () => app.ApplicationServices.GetRequiredService(serviceType),
+                () => appServices.GetRequiredService(serviceType),
                 container);
         }
 
         private static Registration CreateNonSingletonRegistration(
-            Container container, Type serviceType, IApplicationBuilder app, Lifestyle lifestyle)
+            Container container, Type serviceType, IServiceProvider appServices, Lifestyle lifestyle)
         {
-            IHttpContextAccessor accessor = GetHttpContextAccessor(app);
+            IHttpContextAccessor accessor = GetHttpContextAccessor(appServices);
 
             Registration registration = lifestyle.CreateRegistration(
                 serviceType,
@@ -408,7 +441,8 @@ namespace SimpleInjector
             return context;
         }
 
-        private static IServiceProvider GetServiceProvider(IHttpContextAccessor accessor, Container container, Lifestyle lifestyle)
+        private static IServiceProvider GetServiceProvider(
+            IHttpContextAccessor accessor, Container container, Lifestyle lifestyle)
         {
             // Pull the IServiceProvider from the current request. If there is no request, pull it from an 
             // IServiceScope that that will be managed by Simple Injector as scoped registration
@@ -460,9 +494,9 @@ namespace SimpleInjector
             }
         }
 
-        private static IServiceProvider GetRequestServiceProvider(IApplicationBuilder builder, Type serviceType)
+        private static IServiceProvider GetRequestServiceProvider(IServiceProvider appServices, Type serviceType)
         {
-            IHttpContextAccessor accessor = GetHttpContextAccessor(builder);
+            IHttpContextAccessor accessor = GetHttpContextAccessor(appServices);
 
             var context = accessor.HttpContext;
 
@@ -476,9 +510,9 @@ namespace SimpleInjector
             return context.RequestServices;
         }
 
-        private static IHttpContextAccessor GetHttpContextAccessor(IApplicationBuilder builder)
+        private static IHttpContextAccessor GetHttpContextAccessor(IServiceProvider appServices)
         {
-            var accessor = builder.ApplicationServices.GetService<IHttpContextAccessor>();
+            var accessor = appServices.GetService<IHttpContextAccessor>();
 
             if (accessor == null)
             {
