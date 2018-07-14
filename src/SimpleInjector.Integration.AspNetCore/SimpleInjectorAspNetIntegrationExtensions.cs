@@ -25,6 +25,7 @@ namespace SimpleInjector
     using System;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
     using Integration.AspNetCore;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -240,9 +241,11 @@ namespace SimpleInjector
 
             CrossWireServiceScope(container, appServices);
 
+            AutoCrossWireSettings.Configure(container);
+
             container.ResolveUnregisteredType += (s, e) =>
             {
-                if (e.Handled)
+                if (e.Handled || !AutoCrossWireSettings.IsAutoCrossWiringEnabledForThisThread(container))
                 {
                     return;
                 }
