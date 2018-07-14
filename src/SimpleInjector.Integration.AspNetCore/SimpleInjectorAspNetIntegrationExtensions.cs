@@ -55,15 +55,8 @@ namespace SimpleInjector
         public static void UseSimpleInjectorAspNetRequestScoping(this IApplicationBuilder applicationBuilder,
             Container container)
         {
-            if (applicationBuilder == null)
-            {
-                throw new ArgumentNullException(nameof(applicationBuilder));
-            }
-
-            if (container == null)
-            {
-                throw new ArgumentNullException(nameof(container));
-            }
+            Requires.IsNotNull(applicationBuilder, nameof(applicationBuilder));
+            Requires.IsNotNull(container, nameof(container));
 
             applicationBuilder.Use(async (context, next) =>
             {
@@ -81,15 +74,8 @@ namespace SimpleInjector
         public static void UseSimpleInjectorAspNetRequestScoping(this IServiceCollection services,
             Container container)
         {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            if (container == null)
-            {
-                throw new ArgumentNullException(nameof(container));
-            }
+            Requires.IsNotNull(services, nameof(services));
+            Requires.IsNotNull(container, nameof(container));
 
             services.AddSingleton<IStartupFilter>(new RequestScopingStartupFilter(container));
         }
@@ -105,10 +91,7 @@ namespace SimpleInjector
         /// context of a web request.</exception>
         public static T GetRequestService<T>(this IApplicationBuilder builder)
         {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
+            Requires.IsNotNull(builder, nameof(builder));
 
             return GetRequestServiceProvider(builder.GetApplicationServices(), typeof(T)).GetService<T>();
         }
@@ -124,10 +107,7 @@ namespace SimpleInjector
         /// context of a web request, or when there is no service of type <typeparamref name="T"/>.</exception>
         public static T GetRequiredRequestService<T>(this IApplicationBuilder builder)
         {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
+            Requires.IsNotNull(builder, nameof(builder));
 
             return GetRequestServiceProvider(builder.GetApplicationServices(), typeof(T)).GetRequiredService<T>();
         }
@@ -143,15 +123,8 @@ namespace SimpleInjector
         /// <param name="container">The container.</param>
         public static void EnableSimpleInjectorCrossWiring(this IServiceCollection services, Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException(nameof(container));
-            }
-
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
+            Requires.IsNotNull(services, nameof(services));
+            Requires.IsNotNull(container, nameof(container));
 
             if (container.GetItem(CrossWireContextKey) == null)
             {
@@ -181,20 +154,9 @@ namespace SimpleInjector
         /// <param name="builder">The IApplicationBuilder to retrieve the service object from.</param>
         public static void CrossWire(this Container container, Type serviceType, IApplicationBuilder builder)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException(nameof(container));
-            }
-
-            if (serviceType == null)
-            {
-                throw new ArgumentNullException(nameof(serviceType));
-            }
-
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(builder, nameof(builder));
 
             CrossWireServiceScope(container, builder.GetApplicationServices());
 
@@ -214,15 +176,8 @@ namespace SimpleInjector
         public static IApplicationBuilder UseMiddleware<TMiddleware>(this IApplicationBuilder app, Container container)
             where TMiddleware : class, IMiddleware
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            if (container == null)
-            {
-                throw new ArgumentNullException(nameof(container));
-            }
+            Requires.IsNotNull(app, nameof(app));
+            Requires.IsNotNull(container, nameof(container));
 
             var lifestyle = container.Options.LifestyleSelectionBehavior.SelectLifestyle(typeof(TMiddleware));
 
@@ -246,15 +201,8 @@ namespace SimpleInjector
         /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
         public static void AutoCrossWireAspNetComponents(this Container container, IApplicationBuilder app)
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            if (container == null)
-            {
-                throw new ArgumentNullException(nameof(container));
-            }
+            Requires.IsNotNull(app, nameof(app));
+            Requires.IsNotNull(container, nameof(container));
 
             container.AutoCrossWireAspNetComponents(app.GetApplicationServices());
         }
@@ -266,15 +214,8 @@ namespace SimpleInjector
         /// <param name="appServices">The <see cref="IServiceProvider"/> instance that provides the set of singleton services.</param>
         public static void AutoCrossWireAspNetComponents(this Container container, IServiceProvider appServices)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException(nameof(container));
-            }
-
-            if (appServices == null)
-            {
-                throw new ArgumentNullException(nameof(appServices));
-            }
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(appServices, nameof(appServices));
 
             var services = (IServiceCollection)container.GetItem(CrossWireContextKey);
 
