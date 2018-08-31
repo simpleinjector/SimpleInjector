@@ -13,11 +13,11 @@ Many of the existing DI libraries have a big complicated legacy API or are new, 
 The following platforms are supported:
 
 * *.NET 4.0* and up.
-* *Silverlight 4* and up.
-* *Windows Phone 8*.
-* *Windows Store Apps*.
-* *Mono*.
-* *.NET Core*.
+* .NET Standard including:
+  * Universal Windows Programs. 
+  * Mono. 
+  * .NET Core. 
+  * Xamarin.
 
 > Simple Injector is carefully designed to run in **partial / medium trust**, and it is fast; blazingly fast.
 
