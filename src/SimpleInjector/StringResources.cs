@@ -475,7 +475,7 @@ namespace SimpleInjector
         internal static string MultipleTypesThatRepresentClosedGenericType(Type closedServiceType,
             Type[] implementations) =>
             string.Format(CultureInfo.InvariantCulture,
-                "There are {0} types in the supplied list of types or assemblies that represent the " +
+                "In the supplied list of types or assemblies, there are {0} types that represent the " +
                 "same closed generic type {1}. Did you mean to register the types as a collection " +
                 "using the {2} method instead? Conflicting types: {3}.",
                 implementations.Length,

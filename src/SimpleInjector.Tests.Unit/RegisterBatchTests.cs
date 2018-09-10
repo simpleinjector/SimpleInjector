@@ -257,7 +257,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "There are 2 types in the supplied list of types or assemblies that represent the same " +
+                "In the supplied list of types or assemblies, there are 2 types that represent the same " +
                 "closed generic type",
                 action);
         }
