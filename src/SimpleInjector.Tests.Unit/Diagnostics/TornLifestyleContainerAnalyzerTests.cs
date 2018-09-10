@@ -108,19 +108,19 @@
             // Arrange
             string expectedMessage1 =
                 "The registration for IFoo maps to the same implementation and lifestyle as the " +
-                "registrations for IFooExt, IBar and IBarExt do. They all map to FooBar (Singleton).";
+                "registrations for IFooExt, IBar, and IBarExt do. They all map to FooBar (Singleton).";
 
             string expectedMessage2 =
                 "The registration for IFooExt maps to the same implementation and lifestyle as the " +
-                "registrations for IFoo, IBar and IBarExt do.";
+                "registrations for IFoo, IBar, and IBarExt do.";
 
             string expectedMessage3 =
                 "The registration for IBar maps to the same implementation and lifestyle as the " +
-                "registrations for IFoo, IFooExt and IBarExt do.";
+                "registrations for IFoo, IFooExt, and IBarExt do.";
 
             string expectedMessage4 =
                 "The registration for IBarExt maps to the same implementation and lifestyle as the " +
-                "registrations for IFoo, IFooExt and IBar do.";
+                "registrations for IFoo, IFooExt, and IBar do.";
 
             var container = new Container();
 

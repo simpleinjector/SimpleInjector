@@ -54,8 +54,15 @@ namespace SimpleInjector
             {
                 return names.FirstOrDefault() ?? string.Empty;
             }
-
-            return string.Join(", ", names.Take(names.Length - 1)) + " and " + names.Last();
+            else if (names.Length == 2)
+            {
+                return names.First() + " and " + names.Last();
+            }
+            else
+            {
+                // For three names or more, we use the Oxford comma.
+                return string.Join(", ", names.Take(names.Length - 1)) + ", and " + names.Last();
+            }
         }
 
         // This makes the collection immutable for the consumer. The creator might still be able to change
