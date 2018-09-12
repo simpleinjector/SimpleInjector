@@ -193,10 +193,11 @@ namespace SimpleInjector
         internal static string TypeAlreadyRegistered(Type serviceType) =>
             string.Format(CultureInfo.InvariantCulture,
                 "Type {0} has already been registered. If your intention is to resolve a collection of " +
-                "{0} implementations, use the {1} overloads. More info: https://simpleinjector.org/coll1" +
-                ". If your intention is to replace the existing registration with this new registration, " +
+                "{0} implementations, use the {1} overloads. " +
+                "For more information, see https://simpleinjector.org/coll1. " +
+                "If your intention is to replace the existing registration with this new registration, " +
                 "you can allow overriding the current registration by setting {2}.{3} to true. " +
-                "More info: https://simpleinjector.org/ovrrd.",
+                "For more information, see https://simpleinjector.org/ovrrd.",
                 serviceType.TypeName(),
                 CollectionsRegisterMethodName,
                 nameof(Container) + "." + nameof(Container.Options),
