@@ -2246,6 +2246,32 @@
                 actualHandlerTypes.ToFriendlyNamesText());
         }
 
+        // Regression: #627 In case Registration classes where added where the ImplementationType was the abstraction,
+        // the check whether service is assignable from the implementation type would fail, due to a bug in the Types class.
+        [TestMethod]
+        public void CollectionRegister_SupplyingRegistrationsForVariantAbstractionWithOnlyAbstractionKnown_SuccessfullyRegistersAndResolvesThem()
+        {
+            // Arrange
+            var container = new Container();
+
+            IEventHandler<BaseClass> impl = new GenericEventHandler<BaseClass>();
+
+            // Act
+            // This call failed.
+            container.Collection.Register<IEventHandler<DerivedA>>(new[]
+            {
+                Lifestyle.Transient.CreateRegistration<IEventHandler<BaseClass>>(() => impl, container),
+                Lifestyle.Transient.CreateRegistration<IEventHandler<DerivedA>>(() => impl, container)
+            });
+
+            var deriveds = container.GetAllInstances<IEventHandler<DerivedA>>();
+            var bases = container.GetAllInstances<IEventHandler<BaseClass>>();
+
+            // Assert
+            Assert.AreEqual(2, deriveds.Count(), "Two registrations were made for IContra<Derived>.");
+            Assert.AreEqual(0, bases.Count(), "No registrations were made for IContra<Base>.");
+        }
+        
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +

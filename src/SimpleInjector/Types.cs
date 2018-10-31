@@ -169,9 +169,9 @@ namespace SimpleInjector
         // and GetTypesToRegister is called by overloads of Register and Collections.Register.
         internal static bool ServiceIsAssignableFromImplementation(Type service, Type implementation)
         {
-            if (!service.IsGenericType())
+            if (service.IsAssignableFrom(implementation))
             {
-                return service.IsAssignableFrom(implementation);
+                return true;
             }
 
             if (implementation.IsGenericType() && implementation.GetGenericTypeDefinition() == service)
