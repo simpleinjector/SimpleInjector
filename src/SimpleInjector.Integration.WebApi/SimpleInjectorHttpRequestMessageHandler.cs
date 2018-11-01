@@ -28,12 +28,20 @@ namespace SimpleInjector.Integration.WebApi
 
     internal sealed class SimpleInjectorHttpRequestMessageHandler : DelegatingHandler
     {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
             SimpleInjectorHttpRequestMessageProvider.CurrentMessage = request;
 
-            return base.SendAsync(request, cancellationToken);
+            try
+            {
+                return await base.SendAsync(request, cancellationToken);
+            }
+            finally
+            {
+                // Fixes #628. Not clearing the current message caused a memory leak under .NET < v4.7.
+                SimpleInjectorHttpRequestMessageProvider.CurrentMessage = null;
+            }
         }
     }
 }
