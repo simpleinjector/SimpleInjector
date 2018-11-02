@@ -1662,6 +1662,24 @@
         }
 
         [TestMethod]
+        public void GetInstance_TypeDependingOnCollection_InjectsTheRegisteredCollection()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
+
+            // Act
+            Collection<IPlugin> collection =
+                container.GetInstance<ClassDependingOn<Collection<IPlugin>>>().Dependency;
+
+            // Assert
+            Assert.AreEqual(2, collection.Count);
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), collection.First());
+            AssertThat.IsInstanceOfType(typeof(PluginImpl2), collection.Second());
+        }
+
+        [TestMethod]
         public void GetInstance_TypeDependingOnICollection_InjectsTheRegisteredCollectionOfDecorators()
         {
             // Arrange
@@ -1707,6 +1725,23 @@
 
             // Act
             IList<IPlugin> list = container.GetInstance<ClassDependingOn<IList<IPlugin>>>().Dependency;
+
+            // Assert
+            Assert.AreEqual(2, list.Count);
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), list[0]);
+            AssertThat.IsInstanceOfType(typeof(PluginImpl2), list[1]);
+        }
+
+        [TestMethod]
+        public void GetInstance_TypeDependingOnList_InjectsTheRegisteredList()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
+
+            // Act
+            List<IPlugin> list = container.GetInstance<ClassDependingOn<List<IPlugin>>>().Dependency;
 
             // Assert
             Assert.AreEqual(2, list.Count);
@@ -1807,6 +1842,49 @@
         }
 
         [TestMethod]
+        public void GetInstance_CalledMultipleTimesOnContainerControlledCollection_InjectsANewListOnEachRequest()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterSingleton<ConcreteCommand>();
+
+            container.Collection.Register<ICommand>(new[] { typeof(ConcreteCommand) });
+
+            // Act
+            var injectedList = container.GetInstance<ServiceDependingOn<List<ICommand>>>().Dependency;
+
+            injectedList[0] = null;
+
+            injectedList = container.GetInstance<ServiceDependingOn<List<ICommand>>>().Dependency;
+
+            // Assert
+            Assert.IsNotNull(injectedList[0],
+                "The element in the array is expected NOT to be null. When it is null, it means that the " +
+                "array has been cached.");
+        }
+
+        [TestMethod]
+        public void GetInstance_AResolvedCollectionOfT_CanNotBeChanged()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterSingleton<ConcreteCommand>();
+
+            container.Collection.Register<ICommand>(new[] { typeof(ConcreteCommand) });
+
+            var collection = container.GetInstance<Collection<ICommand>>();
+
+            // Act
+            Action action = () => collection[0] = new ConcreteCommand();
+
+            // Assert
+            Assert.ThrowsException<NotSupportedException>(action, 
+                "Changing the collection should be blocked by Simple Injector.");
+        }
+
+        [TestMethod]
         public void GetInstance_CalledMultipleTimesOnContainerControlledSingletons_StillInjectsANewArrayOnEachRequest()
         {
             // Arrange
@@ -1815,16 +1893,117 @@
             container.Collection.Register<ICommand>(new ConcreteCommand());
 
             // Act
-            var composite = container.GetInstance<CompositeCommand>();
+            ICommand[] commands = container.GetInstance<ServiceDependingOn<ICommand[]>>().Dependency;
 
-            composite.Commands[0] = null;
+            commands[0] = null;
 
-            composite = container.GetInstance<CompositeCommand>();
+            commands = container.GetInstance<ServiceDependingOn<ICommand[]>>().Dependency;
 
             // Assert
-            Assert.IsNotNull(composite.Commands[0],
+            Assert.IsNotNull(commands[0],
                 "The element in the array is expected NOT to be null. When it is null, it means that the " +
                 "array has been cached.");
+        }
+        
+        [TestMethod]
+        public void GetInstance_ResolvingACollectionOfT_IsSingleton()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register<ICommand>(new ConcreteCommand());
+
+            // Act
+            Collection<ICommand> commands1 = container.GetInstance<Collection<ICommand>>();
+            Collection<ICommand> commands2 = container.GetInstance<Collection<ICommand>>();
+
+            // Assert
+            Assert.AreSame(commands1, commands2,
+                "Collection<T> is just a wrapper for a container controlled collection IList<T>. And should therefore be a singleton.");
+
+            Assert.AreSame(Lifestyle.Singleton, container.GetRegistration(typeof(Collection<ICommand>)).Lifestyle);
+        }
+
+        public class MyList<T> : IList<T>
+        {
+            public T this[int index]
+            {
+                get => default(T);
+                set { }
+            }
+
+            public int Count => throw new NotImplementedException();
+
+            public bool IsReadOnly => throw new NotImplementedException();
+
+            public void Add(T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Clear()
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Contains(T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void CopyTo(T[] array, int arrayIndex)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+
+            public int IndexOf(T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Insert(int index, T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Remove(T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RemoveAt(int index)
+            {
+                throw new NotImplementedException();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        [TestMethod]
+        public void GetInstance_CollectionOfT_FunctionsAsAStream()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register<ICommand>(typeof(ConcreteCommand));
+
+            // Act
+            Collection<ICommand> commands = container.GetInstance<Collection<ICommand>>();
+
+            // Assert
+            Assert.AreNotSame(commands[0], commands[0],
+                "Requesting an instance from the collection thould cause a callback into the Container " + 
+                "causing the type to be resolved again.");
+
+            Assert.AreSame(Lifestyle.Singleton, container.GetRegistration(typeof(Collection<ICommand>)).Lifestyle);
         }
 
         [TestMethod]
@@ -1866,7 +2045,41 @@
             var registration = container.GetRegistration(typeof(ICommand[]));
 
             // Assert
-            Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle);
+            Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle,
+                "Array must be resolved as transient, because it is a mutable type.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_RequestingListRegistrationContainerControlledCollection_HasTheTransientLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register<ICommand>(new[] { typeof(ConcreteCommand) });
+
+            // Act
+            var registration = container.GetRegistration(typeof(List<ICommand>));
+
+            // Assert
+            Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle,
+                "List must be resolved as transient, because it is a mutable type.");
+        }
+
+        [TestMethod]
+        public void GetRegistration_RequestingCollectionRegistrationContainerControlledCollection_HasTheTransientLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register<ICommand>(new[] { typeof(ConcreteCommand) });
+
+            // Act
+            var registration = container.GetRegistration(typeof(List<ICommand>));
+
+            // Assert
+            Assert.AreEqual(Lifestyle.Transient, registration.Lifestyle,
+                "Although Collection technically doesn't have to a a transient, we chose to keep it that way. " +
+                "See #545 for more details.");
         }
 
         [TestMethod]
@@ -2271,7 +2484,7 @@
             Assert.AreEqual(2, deriveds.Count(), "Two registrations were made for IContra<Derived>.");
             Assert.AreEqual(0, bases.Count(), "No registrations were made for IContra<Base>.");
         }
-        
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +

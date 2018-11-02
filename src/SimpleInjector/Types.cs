@@ -24,6 +24,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
@@ -125,7 +126,8 @@ namespace SimpleInjector
 #endif
                 serviceTypeDefinition == typeof(IEnumerable<>) ||
                 serviceTypeDefinition == typeof(IList<>) ||
-                serviceTypeDefinition == typeof(ICollection<>);
+                serviceTypeDefinition == typeof(ICollection<>) ||
+                serviceTypeDefinition == typeof(Collection<>);
         }
 
         // Return a list of all base types T inherits, all interfaces T implements and T itself.
