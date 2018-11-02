@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2016 Simple Injector Contributors
+ * Copyright (c) 2016-2018 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -22,6 +22,8 @@
 
 namespace SimpleInjector.Integration.AspNetCore.Mvc
 {
+    using System;
+    using System.Collections.Concurrent;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewComponents;
 
@@ -30,6 +32,9 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
     /// </summary>
     public sealed class SimpleInjectorViewComponentActivator : IViewComponentActivator
     {
+        private readonly ConcurrentDictionary<Type, InstanceProducer> viewComponentProducers =
+            new ConcurrentDictionary<Type, InstanceProducer>();
+
         private readonly Container container;
 
         /// <summary>
@@ -46,8 +51,14 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// <summary>Creates a view component.</summary>
         /// <param name="context">The <see cref="ViewComponentContext"/> for the executing <see cref="ViewComponent"/>.</param>
         /// <returns>A view component instance.</returns>
-        public object Create(ViewComponentContext context) =>
-            this.container.GetInstance(context.ViewComponentDescriptor.TypeInfo.AsType());
+        public object Create(ViewComponentContext context)
+        {
+            Type type = context.ViewComponentDescriptor.TypeInfo.AsType();
+
+            var producer = this.viewComponentProducers.GetOrAdd(type, this.GetViewComponentProducer);
+
+            return producer.GetInstance();
+        }
 
         /// <summary>Releases the view component.</summary>
         /// <param name="context">The <see cref="ViewComponentContext"/> associated with the viewComponent.</param>
@@ -55,6 +66,14 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         public void Release(ViewComponentContext context, object viewComponent)
         {
             // No-op.
+        }
+
+        private InstanceProducer GetViewComponentProducer(Type controllerType)
+        {
+            using (AutoCrossWireSettings.SuppressAutoCrossWiringForThisThread(this.container))
+            {
+                return this.container.GetRegistration(controllerType, throwOnFailure: true);
+            }
         }
     }
 }

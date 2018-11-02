@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015-2016 Simple Injector Contributors
+ * Copyright (c) 2015-2018 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -22,12 +22,17 @@
 
 namespace SimpleInjector.Integration.AspNetCore.Mvc
 {
+    using System;
+    using System.Collections.Concurrent;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Controllers;
 
     /// <summary>Controller activator for Simple Injector.</summary>
     public sealed class SimpleInjectorControllerActivator : IControllerActivator
     {
+        private readonly ConcurrentDictionary<Type, InstanceProducer> controllerProducers =
+            new ConcurrentDictionary<Type, InstanceProducer>();
+
         private readonly Container container;
 
         /// <summary>
@@ -44,14 +49,28 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// <summary>Creates a controller.</summary>
         /// <param name="context">The Microsoft.AspNet.Mvc.ActionContext for the executing action.</param>
         /// <returns>A new controller instance.</returns>
-        public object Create(ControllerContext context) =>
-            this.container.GetInstance(context.ActionDescriptor.ControllerTypeInfo.AsType());
+        public object Create(ControllerContext context)
+        {
+            Type controllerType = context.ActionDescriptor.ControllerTypeInfo.AsType();
+
+            var producer = this.controllerProducers.GetOrAdd(controllerType, this.GetControllerProducer);
+
+            return producer.GetInstance();
+        }
 
         /// <summary>Releases the controller.</summary>
         /// <param name="context">The Microsoft.AspNet.Mvc.ActionContext for the executing action.</param>
         /// <param name="controller">The controller instance.</param>
         public void Release(ControllerContext context, object controller)
         {
+        }
+
+        private InstanceProducer GetControllerProducer(Type controllerType)
+        {
+            using (AutoCrossWireSettings.SuppressAutoCrossWiringForThisThread(this.container))
+            {
+                return this.container.GetRegistration(controllerType, throwOnFailure: true);
+            }
         }
     }
 }

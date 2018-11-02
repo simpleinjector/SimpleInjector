@@ -24,6 +24,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
@@ -40,6 +41,7 @@ namespace SimpleInjector
     public partial class Container : IServiceProvider
     {
         private static readonly MethodInfo EnumerableToArrayMethod = typeof(Enumerable).GetMethod("ToArray");
+        private static readonly MethodInfo EnumerableToListMethod = typeof(Enumerable).GetMethod("ToList");
 
         private readonly Dictionary<Type, Lazy<InstanceProducer>> resolveUnregisteredTypeRegistrations =
             new Dictionary<Type, Lazy<InstanceProducer>>();
@@ -355,9 +357,15 @@ namespace SimpleInjector
         {
             return
                 this.TryBuildInstanceProducerThroughUnregisteredTypeResolution(serviceType) ??
-                this.TryBuildArrayInstanceProducer(serviceType) ??
-                this.TryBuildInstanceProducerForCollection(serviceType) ??
+                this.TryBuildInstanceProducerForCollectionType(serviceType) ??
                 tryBuildInstanceProducerForConcreteType();
+        }
+
+        private InstanceProducer TryBuildInstanceProducerForCollectionType(Type serviceType)
+        {
+            return
+                this.TryBuildInstanceProducerForMutableCollection(serviceType) ??
+                this.TryBuildInstanceProducerForStream(serviceType);
         }
 
         // Instead of wrapping the complete method in a lock, we lock inside the individual methods. We 
@@ -417,47 +425,51 @@ namespace SimpleInjector
             }
         }
 
-        private InstanceProducer TryBuildArrayInstanceProducer(Type serviceType)
+        private InstanceProducer TryBuildInstanceProducerForMutableCollection(Type serviceType)
         {
             if (serviceType.IsArray)
             {
-                Type elementType = serviceType.GetElementType();
-
-                // We don't auto-register collections for ambiguous types.
-                if (elementType.IsValueType() || Types.IsAmbiguousType(elementType))
-                {
-                    return null;
-                }
-
-                // GetAllInstances locks the container
-                bool isContainerControlledCollection =
-                    this.GetAllInstances(elementType) is IContainerControlledCollection;
-
-                if (isContainerControlledCollection)
-                {
-                    return this.BuildArrayProducerFromControlledCollection(serviceType, elementType);
-                }
-                else
-                {
-                    return this.BuildArrayProducerFromUncontrolledCollection(serviceType, elementType);
-                }
+                return this.BuildInstanceProducerForMutableCollectionType(
+                    serviceType, serviceType.GetElementType(), MutableCollectionType.Array);
             }
-
-            return null;
+            else if (typeof(List<>).IsGenericTypeDefinitionOf(serviceType))
+            {
+                return this.BuildInstanceProducerForMutableCollectionType(
+                    serviceType, serviceType.GetGenericArguments().FirstOrDefault(), MutableCollectionType.List);
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        private InstanceProducer BuildArrayProducerFromControlledCollection(Type serviceType, Type elementType)
+        private enum MutableCollectionType { Array, List };
+
+        private InstanceProducer BuildInstanceProducerForMutableCollectionType(
+            Type serviceType, Type elementType, MutableCollectionType type)
         {
-            var arrayMethod = EnumerableToArrayMethod.MakeGenericMethod(elementType);
+            // We don't auto-register collections for ambiguous types.
+            if (Types.IsAmbiguousOrValueType(elementType))
+            {
+                return null;
+            }
 
-            IEnumerable<object> singletonCollection = this.GetAllInstances(elementType);
+            // GetAllInstances locks the container
+            if (this.GetAllInstances(elementType) is IContainerControlledCollection)
+            {
+                return this.BuildMutableCollectionProducerFromControlledCollection(serviceType, elementType, type);
+            }
+            else
+            {
+                return this.BuildMutableCollectionProducerFromUncontrolledCollection(serviceType, elementType);
+            }
+        }
 
-            var collectionExpression = Expression.Constant(
-                singletonCollection,
-                typeof(IEnumerable<>).MakeGenericType(elementType));
-
-            // Build the call "Enumerable.ToArray(collection)".
-            var arrayExpression = Expression.Call(arrayMethod, collectionExpression);
+        private InstanceProducer BuildMutableCollectionProducerFromControlledCollection(
+            Type serviceType, Type elementType, MutableCollectionType collectionType)
+        {
+            Expression expression =
+                BuildMutableCollectionExpressionFromControlledCollection(serviceType, elementType);
 
             // Technically, we could determine the longest lifestyle out of the elements of the collection,
             // instead of using Transient here. This would make it less likely for the user to get false
@@ -465,38 +477,60 @@ namespace SimpleInjector
             // longest lifestyle might cause the array to be cached in a way that is incorrect, because
             // who knows what kind of lifestyles the used created.
             Registration registration =
-                new ExpressionRegistration(arrayExpression, serviceType, Lifestyle.Transient, this);
+                new ExpressionRegistration(expression, serviceType, Lifestyle.Transient, this);
 
-            var producer = new InstanceProducer(serviceType, registration);
-
-            if (!singletonCollection.Any())
+            return new InstanceProducer(serviceType, registration)
             {
-                producer.IsContainerAutoRegistered = true;
-            }
-
-            return producer;
+                IsContainerAutoRegistered = !this.GetAllInstances(elementType).Any()
+            };
         }
 
-        private InstanceProducer BuildArrayProducerFromUncontrolledCollection(Type serviceType, Type elementType)
+        private Expression BuildMutableCollectionExpressionFromControlledCollection(
+            Type serviceType, Type elementType)
         {
-            var arrayMethod = EnumerableToArrayMethod.MakeGenericMethod(elementType);
+            var streamExpression = Expression.Constant(
+                value: this.GetAllInstances(elementType),
+                type: typeof(IEnumerable<>).MakeGenericType(elementType));
 
+            if (serviceType.IsArray)
+            {
+                // builds: Enumerable.ToArray(collection)
+                return Expression.Call(
+                    EnumerableToArrayMethod.MakeGenericMethod(elementType),
+                    streamExpression);
+            }
+            else
+            {
+                // builds: new List<T>(collection)
+                var listConstructor = typeof(List<>).MakeGenericType(elementType)
+                    .GetConstructor(new[] { typeof(IEnumerable<>).MakeGenericType(elementType) });
+
+                return Expression.New(listConstructor, streamExpression);
+            }
+        }
+
+        private InstanceProducer BuildMutableCollectionProducerFromUncontrolledCollection(
+            Type serviceType, Type elementType)
+        {
             var enumerableProducer = this.GetRegistration(typeof(IEnumerable<>).MakeGenericType(elementType));
-            var enumerableExpression = enumerableProducer.BuildExpression();
+            Expression enumerableExpression = enumerableProducer.BuildExpression();
 
-            var arrayExpression = Expression.Call(arrayMethod, enumerableExpression);
+            var expression = Expression.Call(
+                method: serviceType.IsArray
+                    ? EnumerableToArrayMethod.MakeGenericMethod(elementType)
+                    : EnumerableToListMethod.MakeGenericMethod(elementType),
+                arg0: enumerableExpression);
 
             Registration registration =
-                new ExpressionRegistration(arrayExpression, serviceType, Lifestyle.Transient, this);
+                new ExpressionRegistration(expression, serviceType, Lifestyle.Transient, this);
 
-            var producer = new InstanceProducer(serviceType, registration);
-
-            producer.IsContainerAutoRegistered = true;
-
-            return producer;
+            return new InstanceProducer(serviceType, registration)
+            {
+                IsContainerAutoRegistered = true
+            };
         }
 
-        private InstanceProducer TryBuildInstanceProducerForCollection(Type serviceType)
+        private InstanceProducer TryBuildInstanceProducerForStream(Type serviceType)
         {
             if (!Types.IsGenericCollectionType(serviceType))
             {
@@ -518,7 +552,7 @@ namespace SimpleInjector
                 if (!this.emptyAndRedirectedCollectionRegistrationCache.TryGetValue(serviceType, out producer))
                 {
                     // This call might lock the container
-                    producer = this.TryBuildCollectionInstanceProducer(serviceType);
+                    producer = this.TryBuildStreamInstanceProducer(serviceType);
 
                     this.emptyAndRedirectedCollectionRegistrationCache[serviceType] = producer;
                 }
@@ -527,32 +561,39 @@ namespace SimpleInjector
             }
         }
 
-        private InstanceProducer TryBuildCollectionInstanceProducer(Type collectionType)
+        private InstanceProducer TryBuildStreamInstanceProducer(Type collectionType)
         {
             Type serviceTypeDefinition = collectionType.GetGenericTypeDefinition();
 
-            if (serviceTypeDefinition != typeof(IEnumerable<>))
+            if (serviceTypeDefinition == typeof(IEnumerable<>))
             {
-                Type elementType = collectionType.GetGenericArguments()[0];
-
-                var collection = this.GetAllInstances(elementType) as IContainerControlledCollection;
-
-                if (collection != null)
-                {
-                    var registration = SingletonLifestyle.CreateSingleInstanceRegistration(collectionType, collection, this);
-
-                    var producer = new InstanceProducer(collectionType, registration);
-
-                    if (!((IEnumerable<object>)collection).Any())
-                    {
-                        producer.IsContainerAutoRegistered = true;
-                    }
-
-                    return producer;
-                }
+                return null;
             }
 
-            return null;
+            Type elementType = collectionType.GetGenericArguments()[0];
+
+            object stream = this.GetAllInstances(elementType);
+
+            if (!(stream is IContainerControlledCollection))
+            {
+                return null;
+            }
+
+            // We need special handling for Collection<T>, because the ContainerControlledCollection does not
+            // (and can't) inherit from Collection<T>. So we have to wrap that stream into a Collection<T>.
+            if (serviceTypeDefinition == typeof(Collection<>))
+            {
+                Type listType = typeof(IList<>).MakeGenericType(elementType);
+                stream = collectionType.GetConstructor(new[] { listType }).Invoke(new[] { stream });
+            }
+
+            var registration =
+                SingletonLifestyle.CreateSingleInstanceRegistration(collectionType, stream, this);
+
+            return new InstanceProducer(collectionType, registration)
+            {
+                IsContainerAutoRegistered = !((IEnumerable<object>)stream).Any()
+            };
         }
 
         private InstanceProducer BuildEmptyCollectionInstanceProducerForEnumerable(Type enumerableType)

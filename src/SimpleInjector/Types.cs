@@ -24,6 +24,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
@@ -125,7 +126,8 @@ namespace SimpleInjector
 #endif
                 serviceTypeDefinition == typeof(IEnumerable<>) ||
                 serviceTypeDefinition == typeof(IList<>) ||
-                serviceTypeDefinition == typeof(ICollection<>);
+                serviceTypeDefinition == typeof(ICollection<>) ||
+                serviceTypeDefinition == typeof(Collection<>);
         }
 
         // Return a list of all base types T inherits, all interfaces T implements and T itself.
@@ -169,9 +171,9 @@ namespace SimpleInjector
         // and GetTypesToRegister is called by overloads of Register and Collections.Register.
         internal static bool ServiceIsAssignableFromImplementation(Type service, Type implementation)
         {
-            if (!service.IsGenericType())
+            if (service.IsAssignableFrom(implementation))
             {
-                return service.IsAssignableFrom(implementation);
+                return true;
             }
 
             if (implementation.IsGenericType() && implementation.GetGenericTypeDefinition() == service)

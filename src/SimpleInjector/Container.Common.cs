@@ -276,7 +276,7 @@ namespace SimpleInjector
             {
                 this.disposed = true;
 
-                GetStackTrace(ref this.stackTraceThatDisposedTheContainer);
+                this.stackTraceThatDisposedTheContainer = GetStackTraceOrNull();
             }
         }
 
@@ -510,7 +510,15 @@ namespace SimpleInjector
             }
         }
 
-        static partial void GetStackTrace(ref string stackTrace);
+        [DebuggerStepThrough]
+        static string GetStackTraceOrNull()
+        {
+#if NET40 || NET45 || NETSTANDARD2_0
+            return new System.Diagnostics.StackTrace(fNeedFileInfo: true, skipFrames: 2).ToString();
+#else
+            return null;
+#endif
+        }
 
         private static Func<object> ApplyResolveInterceptor(ResolveInterceptor interceptor,
             InitializationContext context, Func<object> wrappedProducer)
@@ -538,7 +546,7 @@ namespace SimpleInjector
             // immediately, since ThrowWhenContainerIsLocked also locks on 'locker'.
             lock (this.locker)
             {
-                GetStackTrace(ref this.stackTraceThatLockedTheContainer);
+                this.stackTraceThatLockedTheContainer = GetStackTraceOrNull();
 
                 this.locked = true;
             }

@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2015 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,23 +23,15 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Diagnostics;
-    using System.Reflection;
-    using System.Reflection.Emit;
 
-#if !PUBLISH && (NET40 || NET45)
-    /// <summary>Common Container methods specific for the full .NET version of Simple Injector.</summary>
-#endif
-#if NET40 || NET45
-    public partial class Container
+    internal static class Requires
     {
-        private static readonly Lazy<ModuleBuilder> LazyBuilder = new Lazy<ModuleBuilder>(() => 
-            AppDomain.CurrentDomain.DefineDynamicAssembly(
-                new AssemblyName("SimpleInjector.Compiled"),
-                AssemblyBuilderAccess.Run)
-                .DefineDynamicModule("SimpleInjector.CompiledModule"));
-
-        internal static ModuleBuilder ModuleBuilder => LazyBuilder.Value;
+        internal static void IsNotNull(object instance, string paramName)
+        {
+            if (object.ReferenceEquals(instance, null))
+            {
+                throw new ArgumentNullException(paramName);
+            }
+        }
     }
-#endif
 }
