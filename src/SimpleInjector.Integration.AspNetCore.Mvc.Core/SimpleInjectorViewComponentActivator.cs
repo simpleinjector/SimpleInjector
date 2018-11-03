@@ -24,6 +24,8 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Globalization;
+    using System.Linq;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewComponents;
 
@@ -53,9 +55,26 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// <returns>A view component instance.</returns>
         public object Create(ViewComponentContext context)
         {
-            Type type = context.ViewComponentDescriptor.TypeInfo.AsType();
+            Type viewComponentType = context.ViewComponentDescriptor.TypeInfo.AsType();
 
-            var producer = this.viewComponentProducers.GetOrAdd(type, this.GetViewComponentProducer);
+            var producer = this.viewComponentProducers.GetOrAdd(viewComponentType, this.GetViewComponentProducer);
+
+            if (producer == null)
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "For the {0} to function properly, it requires all view components to be registered explicitly " +
+                        "in Simple Injector, but a registration for {1} is missing. To ensure all view components are " +
+                        "registered properly, call the RegisterMvcViewComponents extension method on the Container " +
+                        "from within your Startup.Configure method while supplying the IApplicationBuilder " +
+                        "instance, e.g. \"this.container.RegisterMvcViewComponents(app);\".{2}" +
+                        "Full view component name: {3}.",
+                        typeof(SimpleInjectorViewComponentActivator).Name,
+                        viewComponentType.ToFriendlyName(),
+                        Environment.NewLine,
+                        viewComponentType.FullName));
+            }
 
             return producer.GetInstance();
         }
@@ -68,12 +87,9 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
             // No-op.
         }
 
-        private InstanceProducer GetViewComponentProducer(Type controllerType)
-        {
-            using (AutoCrossWireSettings.SuppressAutoCrossWiringForThisThread(this.container))
-            {
-                return this.container.GetRegistration(controllerType, throwOnFailure: true);
-            }
-        }
+        // By searching through the current registrations, we ensure that the component is not auto-registered, because
+        // that might cause it to be resolved from ASP.NET Core, in case auto cross-wiring is enabled.
+        private InstanceProducer GetViewComponentProducer(Type viewComponentType) =>
+            this.container.GetCurrentRegistrations().SingleOrDefault(r => r.ServiceType == viewComponentType);
     }
 }
