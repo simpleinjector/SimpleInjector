@@ -24,6 +24,8 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Globalization;
+    using System.Linq;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Controllers;
 
@@ -55,6 +57,23 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
 
             var producer = this.controllerProducers.GetOrAdd(controllerType, this.GetControllerProducer);
 
+            if (producer == null)
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "For the {0} to function properly, it requires all controllers to be registered explicitly " +
+                        "in Simple Injector, but a registration for {1} is missing. To ensure all controllers are " +
+                        "registered properly, call the RegisterMvcControllers extension method on the Container " +
+                        "from within your Startup.Configure method while supplying the IApplicationBuilder " +
+                        "instance, e.g. \"this.container.RegisterMvcControllers(app);\".{2}" +
+                        "Full controller name: {3}.",
+                        typeof(SimpleInjectorControllerActivator).Name,
+                        controllerType.ToFriendlyName(),
+                        Environment.NewLine,
+                        controllerType.FullName));
+            }
+
             return producer.GetInstance();
         }
 
@@ -65,12 +84,9 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         {
         }
 
-        private InstanceProducer GetControllerProducer(Type controllerType)
-        {
-            using (AutoCrossWireSettings.SuppressAutoCrossWiringForThisThread(this.container))
-            {
-                return this.container.GetRegistration(controllerType, throwOnFailure: true);
-            }
-        }
+        // By searching through the current registrations, we ensure that the controller is not auto-registered, because
+        // that might cause it to be resolved from ASP.NET Core, in case auto cross-wiring is enabled.
+        private InstanceProducer GetControllerProducer(Type controllerType) =>
+            this.container.GetCurrentRegistrations().SingleOrDefault(r => r.ServiceType == controllerType);
     }
 }
