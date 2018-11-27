@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
+ * Copyright (c) 2013-2018 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -42,7 +42,7 @@ namespace SimpleInjector.Diagnostics
         /// For more information, see: https://simpleinjector.org/diaut.
         /// </summary>
         [Documentation("Container-Registered Component", "https://simpleinjector.org/diaut")]
-        ContainerRegisteredComponent,
+        ContainerRegisteredComponent = 0,
 
         /// <summary>
         /// Diagnostic type that warns when a 
@@ -50,7 +50,7 @@ namespace SimpleInjector.Diagnostics
         /// For more information, see: https://simpleinjector.org/dialm.
         /// </summary>
         [Documentation("Lifestyle Mismatch", "https://simpleinjector.org/dialm")]
-        LifestyleMismatch,
+        LifestyleMismatch = 1,
 
         /// <summary>
         /// Diagnostic type that warns when a
@@ -60,14 +60,14 @@ namespace SimpleInjector.Diagnostics
         /// For more information, see: https://simpleinjector.org/diasc.
         /// </summary>
         [Documentation("Short Circuited Dependency", "https://simpleinjector.org/diasc")]
-        ShortCircuitedDependency,
+        ShortCircuitedDependency = 2,
 
         /// <summary>
         /// Diagnostic type that warns when a component depends on (too) many services.
         /// For more information, see: https://simpleinjector.org/diasr.
         /// </summary>
         [Documentation("SRP Violation", "https://simpleinjector.org/diasr")]
-        SingleResponsibilityViolation,
+        SingleResponsibilityViolation = 3,
 
         /// <summary>
         /// Diagnostic type that warns when multiple registrations map to the same component and
@@ -75,7 +75,7 @@ namespace SimpleInjector.Diagnostics
         /// For more information, see: https://simpleinjector.org/diatl.
         /// </summary>
         [Documentation("Torn Lifestyle", "https://simpleinjector.org/diatl")]
-        TornLifestyle,
+        TornLifestyle = 4,
 
         /// <summary>
         /// Diagnostic type that warns when a component is registered as transient, while implementing
@@ -83,7 +83,7 @@ namespace SimpleInjector.Diagnostics
         /// For more information, see: https://simpleinjector.org/diadt.
         /// </summary>
         [Documentation("Disposable Transient Component", "https://simpleinjector.org/diadt")]
-        DisposableTransientComponent,
+        DisposableTransientComponent = 5,
 
         /// <summary>
         /// Diagnostic type that warns when multiple registrations exist that map to the same component but
@@ -92,7 +92,7 @@ namespace SimpleInjector.Diagnostics
         /// For more information, see: https://simpleinjector.org/diaal.
         /// </summary>
         [Documentation("Ambiguous Lifestyles", "https://simpleinjector.org/diaal")]
-        AmbiguousLifestyles
+        AmbiguousLifestyles = 6
     }
 
     [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
