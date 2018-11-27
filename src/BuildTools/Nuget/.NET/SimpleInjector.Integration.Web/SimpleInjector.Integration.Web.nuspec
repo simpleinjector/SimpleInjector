@@ -8,7 +8,7 @@
     <projectUrl>https://simpleinjector.org</projectUrl>
     <iconUrl>https://simpleinjector.org/simpleinjector.ico</iconUrl>
     <dependencies>
-      <dependency id="SimpleInjector" version="{versionCore}" />
+      <dependency id="SimpleInjector" version="[{versionCore},5)" />
       <dependency id="Microsoft.Web.Infrastructure" version="1.0.0" />
     </dependencies>
     <id>SimpleInjector.Integration.Web</id>
