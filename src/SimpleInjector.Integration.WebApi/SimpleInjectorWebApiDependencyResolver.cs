@@ -41,13 +41,13 @@ namespace SimpleInjector.Integration.WebApi
         /// creates a new <see cref="AsyncScopedLifestyle"/> scope before returning. 
         /// This is the default value.
         /// </summary>
-        UseAmbientScope,
+        UseAmbientScope = 0,
 
         /// <summary>
         /// A new <see cref="AsyncScopedLifestyle"/> scope  is always created by 
         /// <see cref="IDependencyResolver.BeginScope"/> before returning.
         /// </summary>
-        RequiresNew
+        RequiresNew = 1
     }
 
     /// <summary>Simple Injector <see cref="IDependencyResolver"/> implementation.</summary>
