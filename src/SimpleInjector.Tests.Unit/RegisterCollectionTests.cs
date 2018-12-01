@@ -1881,7 +1881,7 @@
             Action action = () => collection[0] = new ConcreteCommand();
 
             // Assert
-            Assert.ThrowsException<NotSupportedException>(action, 
+            Assert.ThrowsException<NotSupportedException>(action,
                 "Changing the collection should be blocked by Simple Injector.");
         }
 
@@ -1905,7 +1905,7 @@
                 "The element in the array is expected NOT to be null. When it is null, it means that the " +
                 "array has been cached.");
         }
-        
+
         [TestMethod]
         public void GetInstance_ResolvingACollectionOfT_IsSingleton()
         {
@@ -2001,7 +2001,7 @@
 
             // Assert
             Assert.AreNotSame(commands[0], commands[0],
-                "Requesting an instance from the collection thould cause a callback into the Container " + 
+                "Requesting an instance from the collection thould cause a callback into the Container " +
                 "causing the type to be resolved again.");
 
             Assert.AreSame(Lifestyle.Singleton, container.GetRegistration(typeof(Collection<ICommand>)).Lifestyle);
@@ -2149,10 +2149,16 @@
         [TestMethod]
         public void GetAllInstances_RequestingAContravariantInterfaceWhenARegistrationForAClosedServiceTypeIsMade_ResolvesTheAssignableImplementation()
         {
+            // NOTE: CustomerMovedAbroadEvent inherits from CustomerMovedEvent
+            CustomerMovedEvent e = new CustomerMovedAbroadEvent();
+
+            // NOTE: IEventHandler is contravariant.
+            IEventHandler<CustomerMovedEvent> h1 = new CustomerMovedEventHandler();
+            IEventHandler<CustomerMovedAbroadEvent> h2 = h1;
+
             // Arrange
             var container = ContainerFactory.New();
 
-            // NOTE: CustomerMovedAbroadEvent inherits from CustomerMovedEvent.
             var expectedHandlerTypes = new[]
             {
                 typeof(CustomerMovedEventHandler), // IEventHandler<CustomerMovedEvent>

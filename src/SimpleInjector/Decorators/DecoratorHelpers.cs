@@ -116,14 +116,13 @@ namespace SimpleInjector.Decorators
         internal static IContainerControlledCollection CreateContainerControlledCollection(
             Type serviceType, Container container)
         {
-            Type allInstancesEnumerableType =
-                typeof(ContainerControlledCollection<>).MakeGenericType(serviceType);
-
-            var collection = Activator.CreateInstance(allInstancesEnumerableType, new object[] { container });
+            var collection = Activator.CreateInstance(
+                typeof(ContainerControlledCollection<>).MakeGenericType(serviceType),
+                new object[] { container });
 
             return (IContainerControlledCollection)collection;
         }
-     
+
         internal static bool IsContainerControlledCollectionExpression(Expression enumerableExpression)
         {
             var constantExpression = enumerableExpression as ConstantExpression;
@@ -207,7 +206,7 @@ namespace SimpleInjector.Decorators
             return decoratorParameters.Any();
         }
 
-        internal static Type[] GetValidDecoratorConstructorArgumentTypes(Type serviceType, 
+        internal static Type[] GetValidDecoratorConstructorArgumentTypes(Type serviceType,
             ConstructorInfo decoratorConstructor)
         {
             Type decoratingBaseType = GetDecoratingBaseType(serviceType, decoratorConstructor);
@@ -234,7 +233,7 @@ namespace SimpleInjector.Decorators
 
         internal static bool IsScopelessDecorateeFactoryDependencyType(Type dependencyType, Type decoratingType)
         {
-            return dependencyType.IsGenericType() 
+            return dependencyType.IsGenericType()
                 && dependencyType.GetGenericTypeDefinition() == typeof(Func<>)
                 && dependencyType == typeof(Func<>).MakeGenericType(decoratingType);
         }
@@ -262,10 +261,10 @@ namespace SimpleInjector.Decorators
 
             internal IContainerControlledCollection Collection { get; }
 
-            public override Expression BuildExpression() => 
+            public override Expression BuildExpression() =>
                 Expression.Constant(this.Collection, this.ImplementationType);
 
-            internal override KnownRelationship[] GetRelationshipsCore() => 
+            internal override KnownRelationship[] GetRelationshipsCore() =>
                 base.GetRelationshipsCore().Concat(this.Collection.GetRelationships()).ToArray();
         }
     }
