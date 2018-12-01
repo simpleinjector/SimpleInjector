@@ -9,8 +9,8 @@
     <iconUrl>https://simpleinjector.org/simpleinjector.ico</iconUrl>
     <dependencies>
       <dependency id="WebActivator" version="1.4.4" />
-      <dependency id="SimpleInjector" version="{versionCore}" />
-      <dependency id="SimpleInjector.Integration.Web.Mvc" version="{version_Integration_Mvc}" />
+      <dependency id="SimpleInjector" version="[{versionCore},5)" />
+      <dependency id="SimpleInjector.Integration.Web.Mvc" version="[{version_Integration_Mvc},5)" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="Microsoft.Web.Infrastructure" targetFramework=".NETFramework4.0" />

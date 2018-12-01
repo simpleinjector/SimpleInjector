@@ -226,20 +226,15 @@ namespace SimpleInjector
         }
 
         internal static ContainerControlledItem[] GetClosedGenericImplementationsFor(
-            Type closedGenericServiceType, IEnumerable<ContainerControlledItem> containerControlledItems,
-            bool includeVariantTypes = true)
+            Type closedGenericServiceType, IEnumerable<ContainerControlledItem> containerControlledItems)
         {
             return (
                 from item in containerControlledItems
                 let openGenericImplementation = item.ImplementationType
                 let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
                 let result = builder.BuildClosedGenericImplementation()
-                where result.ClosedServiceTypeSatisfiesAllTypeConstraints || (
-                    includeVariantTypes && closedGenericServiceType.IsAssignableFrom(openGenericImplementation))
-                let closedImplementation = result.ClosedServiceTypeSatisfiesAllTypeConstraints
-                    ? result.ClosedGenericImplementation
-                    : openGenericImplementation
-                select item.Registration != null ? item : ContainerControlledItem.CreateFromType(closedImplementation))
+                where result.ClosedServiceTypeSatisfiesAllTypeConstraints
+                select item.Registration != null ? item : ContainerControlledItem.CreateFromType(result.ClosedGenericImplementation))
                 .ToArray();
         }
 

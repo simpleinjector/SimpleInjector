@@ -9,6 +9,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Internals;
 
     /// <summary>Tests for RegisterCollection.</summary>
     [TestClass]
@@ -1880,7 +1881,7 @@
             Action action = () => collection[0] = new ConcreteCommand();
 
             // Assert
-            Assert.ThrowsException<NotSupportedException>(action, 
+            Assert.ThrowsException<NotSupportedException>(action,
                 "Changing the collection should be blocked by Simple Injector.");
         }
 
@@ -1904,7 +1905,7 @@
                 "The element in the array is expected NOT to be null. When it is null, it means that the " +
                 "array has been cached.");
         }
-        
+
         [TestMethod]
         public void GetInstance_ResolvingACollectionOfT_IsSingleton()
         {
@@ -2000,7 +2001,7 @@
 
             // Assert
             Assert.AreNotSame(commands[0], commands[0],
-                "Requesting an instance from the collection thould cause a callback into the Container " + 
+                "Requesting an instance from the collection thould cause a callback into the Container " +
                 "causing the type to be resolved again.");
 
             Assert.AreSame(Lifestyle.Singleton, container.GetRegistration(typeof(Collection<ICommand>)).Lifestyle);
@@ -2148,10 +2149,16 @@
         [TestMethod]
         public void GetAllInstances_RequestingAContravariantInterfaceWhenARegistrationForAClosedServiceTypeIsMade_ResolvesTheAssignableImplementation()
         {
+            // NOTE: CustomerMovedAbroadEvent inherits from CustomerMovedEvent
+            CustomerMovedEvent e = new CustomerMovedAbroadEvent();
+
+            // NOTE: IEventHandler is contravariant.
+            IEventHandler<CustomerMovedEvent> h1 = new CustomerMovedEventHandler();
+            IEventHandler<CustomerMovedAbroadEvent> h2 = h1;
+
             // Arrange
             var container = ContainerFactory.New();
 
-            // NOTE: CustomerMovedAbroadEvent inherits from CustomerMovedEvent.
             var expectedHandlerTypes = new[]
             {
                 typeof(CustomerMovedEventHandler), // IEventHandler<CustomerMovedEvent>
@@ -2485,6 +2492,31 @@
             Assert.AreEqual(0, bases.Count(), "No registrations were made for IContra<Base>.");
         }
 
+        //  Test for #638.
+        [TestMethod]
+        public void GetAllInstances_TwoOpenGenericCovariantsWithTypeConstraintsRegistered_ResolvesExpectedInstances()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Collection.Register(
+                serviceType: typeof(ICovariant<>),
+                serviceTypes: new[] { typeof(BaseClassCovariant<>), typeof(DerivedACovariant<>) });
+
+            // Act
+            var deriveds = container.GetAllInstances<ICovariant<DerivedA>>();
+            var bases = container.GetAllInstances<ICovariant<BaseClass>>();
+
+            // Assert
+            AssertThat.SequenceEquals(
+                expectedTypes: new[] { typeof(BaseClassCovariant<DerivedA>), typeof(DerivedACovariant<DerivedA>) },
+                actualTypes: deriveds.Select(d => d.GetType()).ToArray());
+
+            AssertThat.SequenceEquals(
+                expectedTypes: new[] { typeof(BaseClassCovariant<BaseClass>) },
+                actualTypes: bases.Select(d => d.GetType()).ToArray());
+        }
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +
@@ -2589,6 +2621,14 @@
         }
 
         public class DerivedBConverter : ITypeConverter<DerivedB>
+        {
+        }
+
+        public class BaseClassCovariant<T> : ICovariant<T> where T : BaseClass
+        {
+        }
+
+        public class DerivedACovariant<T> : ICovariant<T> where T : DerivedA
         {
         }
 

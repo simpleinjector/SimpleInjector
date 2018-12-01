@@ -28,9 +28,9 @@ namespace SimpleInjector.Diagnostics
     public enum DiagnosticSeverity
     {
         /// <summary>Information messages and tips about the configuration.</summary>
-        Information,
+        Information = 0,
 
         /// <summary>Warning messages that are likely to cause problems in your application.</summary>
-        Warning
+        Warning = 1
     }
 }
