@@ -9,6 +9,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Internals;
 
     /// <summary>Tests for RegisterCollection.</summary>
     [TestClass]
@@ -2485,6 +2486,31 @@
             Assert.AreEqual(0, bases.Count(), "No registrations were made for IContra<Base>.");
         }
 
+        //  Test for #637.
+        [TestMethod]
+        public void GetAllInstances_TwoOpenGenericCovariantsWithTypeConstraintsRegistered_ResolvesExpectedInstances()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Collection.Register(
+                serviceType: typeof(ICovariant<>),
+                serviceTypes: new[] { typeof(BaseClassCovariant<>), typeof(DerivedACovariant<>) });
+
+            // Act
+            var deriveds = container.GetAllInstances<ICovariant<DerivedA>>();
+            var bases = container.GetAllInstances<ICovariant<BaseClass>>();
+
+            // Assert
+            AssertThat.SequenceEquals(
+                expectedTypes: new[] { typeof(BaseClassCovariant<DerivedA>), typeof(DerivedACovariant<DerivedA>) },
+                actualTypes: deriveds.Select(d => d.GetType()).ToArray());
+
+            AssertThat.SequenceEquals(
+                expectedTypes: new[] { typeof(BaseClassCovariant<BaseClass>) },
+                actualTypes: bases.Select(d => d.GetType()).ToArray());
+        }
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +
@@ -2589,6 +2615,14 @@
         }
 
         public class DerivedBConverter : ITypeConverter<DerivedB>
+        {
+        }
+
+        public class BaseClassCovariant<T> : ICovariant<T> where T : BaseClass
+        {
+        }
+
+        public class DerivedACovariant<T> : ICovariant<T> where T : DerivedA
         {
         }
 

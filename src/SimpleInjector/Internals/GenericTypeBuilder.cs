@@ -43,12 +43,14 @@ namespace SimpleInjector.Internals
             TypesExtensions.FriendlyName + "(partialOpenGenericImplementation)),nq}")]
         private readonly Type partialOpenGenericImplementation;
 
+        private readonly Type implementation;
         private readonly bool isPartialOpenGenericImplementation;
 
         internal GenericTypeBuilder(Type closedGenericBaseType, Type openGenericImplementation)
         {
             this.closedGenericBaseType = closedGenericBaseType;
 
+            this.implementation = openGenericImplementation;
             this.openGenericImplementation = openGenericImplementation;
 
             if (openGenericImplementation.IsGenericType() && 
@@ -109,10 +111,17 @@ namespace SimpleInjector.Internals
 
         internal BuildResult BuildClosedGenericImplementation()
         {
-            // Performance optimization: In case the user registers a very large set with mainly non-generic
-            // types, we see a considerable performance improvement by adding this simple check.
-            if (this.openGenericImplementation.IsGenericType() ||
-                this.closedGenericBaseType.IsAssignableFrom(this.openGenericImplementation))
+            bool isClosedImplementation = !this.implementation.ContainsGenericParameters();
+
+            // In case the given implementation is already closed (or non-generic), we don't have to build a type.
+            // If the implementation matches, we can directly return it. This is much faster and simpler.
+            if (isClosedImplementation)
+            {
+                return this.closedGenericBaseType.IsAssignableFrom(this.implementation)
+                    ? BuildResult.Valid(this.implementation)
+                    : BuildResult.Invalid();
+            }
+            else
             {
                 var serviceType = this.FindMatchingOpenGenericServiceType();
 
