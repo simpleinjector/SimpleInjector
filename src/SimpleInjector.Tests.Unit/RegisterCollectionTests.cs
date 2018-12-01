@@ -2492,7 +2492,7 @@
             Assert.AreEqual(0, bases.Count(), "No registrations were made for IContra<Base>.");
         }
 
-        //  Test for #637.
+        //  Test for #638.
         [TestMethod]
         public void GetAllInstances_TwoOpenGenericCovariantsWithTypeConstraintsRegistered_ResolvesExpectedInstances()
         {
