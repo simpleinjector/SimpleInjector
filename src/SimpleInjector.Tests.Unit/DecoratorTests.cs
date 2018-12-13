@@ -129,7 +129,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The supplied decorator NonGenericServiceDecorator<T> is an open generic type definition",
+                "The supplied decorator NonGenericServiceDecorator<T> is an open-generic type definition",
                 action);
 
             AssertThat.ThrowsWithParamName("decoratorType", action);
@@ -196,9 +196,8 @@
         {
             // Arrange
             string expectedMessage = @"
-                Registering a closed generic service type with an open generic decorator is not supported. 
-                Instead, register the service type as open generic, and the decorator as closed generic 
-                type."
+                Registering a closed-generic service type with an open-generic decorator is not supported. 
+                Instead, register the service type as open generic, and the decorator type as closed generic."
                 .TrimInside();
 
             var container = ContainerFactory.New();
@@ -2093,9 +2092,9 @@
         public void GetInstance_RegisterDecoratorWithNonGenericServiceAndFactoryReturningAnOpenGenericDecoratorType_ThrowsExpectedException()
         {
             // Arrange
-            string expectedMessage = @"The registered decorator type factory returned open generic type 
+            string expectedMessage = @"The registered decorator type factory returned open-generic type 
                 NonGenericServiceDecorator<T> while the registered service type INonGenericService is not 
-                generic, making it impossible for a closed generic decorator type to be constructed"
+                generic, making it impossible for a closed-generic decorator type to be constructed"
                 .TrimInside();
 
             var container = new Container();
@@ -2443,7 +2442,7 @@
 
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
                 The supplied type 'ICommandHandler<List<T>>' is a partially-closed generic type, which is not 
-                supported by this method. Please supply the open generic type 'ICommandHandler<>' instead."
+                supported by this method. Please supply the open-generic type 'ICommandHandler<>' instead."
                 .TrimInside(),
                 action);
         }
@@ -2468,7 +2467,7 @@
 
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
                 The supplied type 'ICommandHandler<TCommand>' is a partially-closed generic type, which is not 
-                supported by this method. Please supply the open generic type 'ICommandHandler<>' instead."
+                supported by this method. Please supply the open-generic type 'ICommandHandler<>' instead."
                 .TrimInside(),
                 action);
         }

@@ -287,7 +287,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The supplied type Logger<T> is an open generic type.",
+                "The supplied type Logger<T> is an open-generic type.",
                 action);
         }
 

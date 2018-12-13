@@ -131,8 +131,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The request for type Lazy<T> is invalid because it is an open generic type: it is only 
-                possible to instantiate instances of closed generic types. A generic type is closed if all of 
+                The request for type Lazy<T> is invalid because it is an open-generic type: it is only 
+                possible to instantiate instances of closed-generic types. A generic type is closed if all of 
                 its type parameters have been substituted with types that are recognized by the compiler."
                 .TrimInside(),
                 action);
