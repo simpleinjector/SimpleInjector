@@ -283,7 +283,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Builds an expression that expresses the intent to get an instance by the current producer. A call 
-        /// to this method locks the container. No new registrations can't be made after a call to this method.
+        /// to this method locks the container. New registrations can't be made after a call to this method.
         /// </summary>
         /// <returns>An Expression.</returns>
         public Expression BuildExpression()
