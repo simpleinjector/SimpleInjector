@@ -164,7 +164,7 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// <para>
-        /// A call to this method locks the container. No new registrations can't be made after a call to this 
+        /// A call to this method locks the container. New registrations can't be made after a call to this 
         /// method.
         /// </para>
         /// <para>
@@ -190,7 +190,7 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// <para>
-        /// A call to this method locks the container. No new registrations can't be made after a call to this 
+        /// A call to this method locks the container. New registrations can't be made after a call to this 
         /// method.
         /// </para>
         /// <para>
