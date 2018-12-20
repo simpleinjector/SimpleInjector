@@ -610,8 +610,9 @@ namespace SimpleInjector
         internal static string TheServiceIsRequestedOutsideTheContextOfAScopedLifestyle(Type serviceType,
             ScopedLifestyle lifestyle) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The {0} is registered as '{1}' lifestyle, but the instance is requested outside the " +
-                "context of an active ({1}) scope.",
+                "{0} is registered as '{1}' lifestyle, but the instance is requested outside the " +
+                "context of an active ({1}) scope. Please see https://simpleinjector.org/scoped " + 
+                "for more information about how to manage scopes.",
                 serviceType.TypeName(),
                 lifestyle.Name);
 
