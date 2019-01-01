@@ -57,10 +57,7 @@ namespace SimpleInjector.Lifestyles
         private static ScopedLifestyle ThrowDefaultScopeLifestyleIsNotSet()
         {
             throw new InvalidOperationException(
-                "To be able to use the Lifestyle.Scoped property, please ensure that the container is " +
-                "configured with a default scoped lifestyle by setting the Container.Options." +
-                "DefaultScopedLifestyle property with the required scoped lifestyle for your type of " +
-                "application. See: https://simpleinjector.org/lifestyles#scoped");
+                StringResources.ScopePropertyCanOnlyBeUsedWhenDefaultScopedLifestyleIsConfigured());
         }
     }
 }

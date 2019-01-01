@@ -203,6 +203,12 @@ namespace SimpleInjector
                 nameof(Container) + "." + nameof(Container.Options),
                 nameof(ContainerOptions.AllowOverridingRegistrations));
 
+        internal static string ScopePropertyCanOnlyBeUsedWhenDefaultScopedLifestyleIsConfigured() =>
+            "To be able to use the Lifestyle.Scoped property, please ensure that the container is " +
+            "configured with a default scoped lifestyle by setting the Container.Options." +
+            "DefaultScopedLifestyle property with the required scoped lifestyle for your type of " +
+            "application. For more information, see https://simpleinjector.org/scoped.";
+
         internal static string MakingConditionalRegistrationsInOverridingModeIsNotSupported() =>
             string.Format(CultureInfo.InvariantCulture,
                 "The making of conditional registrations is not supported when {0} is set, because it is " +
