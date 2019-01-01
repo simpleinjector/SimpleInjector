@@ -65,7 +65,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The supplied type ICommandHandler<TCommand> is an open generic type.",
+                "The supplied type ICommandHandler<TCommand> is an open-generic type.",
                 action);
             AssertThat.ThrowsWithParamName("serviceType", action);
         }
@@ -85,7 +85,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The supplied type ICommandHandler<List<T>> is an open generic type.",
+                "The supplied type ICommandHandler<List<T>> is an open-generic type.",
                 action);
             AssertThat.ThrowsWithParamName("serviceType", action);
         }

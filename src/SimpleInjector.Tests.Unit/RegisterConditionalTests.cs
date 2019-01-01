@@ -710,8 +710,8 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 Multiple applicable registrations found for IGeneric<Int32>. The applicable registrations are
-                (1) the unconditional closed generic registration for IGeneric<Int32> using IntGenericType and
-                (2) the conditional open generic registration for IGeneric<T> using GenericType<T>.
+                (1) the unconditional closed-generic registration for IGeneric<Int32> using IntGenericType and
+                (2) the conditional open-generic registration for IGeneric<T> using GenericType<T>.
                 If your goal is to make one registration a fallback in case another registration is not
                 applicable, make the fallback registration last using RegisterConditional and make sure
                 the supplied predicate returns false in case the Handled property is true."
@@ -1190,9 +1190,9 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                @"The registered type factory returned open generic type DisposableOpenGenericWithPredicate<T> 
+                @"The registered type factory returned open-generic type DisposableOpenGenericWithPredicate<T> 
                 while the registered service type IDisposable is not generic, making it impossible for a 
-                closed generic type to be constructed"
+                closed-generic type to be constructed"
                 .TrimInside(),
                 action);
         }
@@ -1313,7 +1313,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "IGeneric<T> is an open generic type",
+                "IGeneric<T> is an open-generic type",
                 action);
         }
 

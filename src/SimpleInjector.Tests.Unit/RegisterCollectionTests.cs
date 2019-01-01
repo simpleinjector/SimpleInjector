@@ -9,7 +9,6 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Internals;
 
     /// <summary>Tests for RegisterCollection.</summary>
     [TestClass]
@@ -961,7 +960,7 @@
             }
             catch (ArgumentException ex)
             {
-                Assert.IsTrue(ex.Message.Contains("open generic type"), "Actual: " + ex.Message);
+                Assert.IsTrue(ex.Message.Contains("open-generic type"), "Actual: " + ex.Message);
             }
         }
 

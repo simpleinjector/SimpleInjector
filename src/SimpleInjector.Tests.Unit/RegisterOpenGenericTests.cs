@@ -998,7 +998,7 @@
 
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
                 The supplied type 'IService<Int32, TB>' is a partially-closed generic type, which is not 
-                supported by this method. Please supply the open generic type 'IService<,>' instead."
+                supported by this method. Please supply the open-generic type 'IService<,>' instead."
                 .TrimInside(),
                 action);
         }
@@ -1022,7 +1022,7 @@
 
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
                 The supplied type 'IService<TA, TB>' is a partially-closed generic type, which is not 
-                supported by this method. Please supply the open generic type 'IService<,>' instead."
+                supported by this method. Please supply the open-generic type 'IService<,>' instead."
                 .TrimInside(),
                 action);
         }
@@ -1071,7 +1071,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                There is already an open generic registration for IGeneric<T> (with implementation 
+                There is already an open-generic registration for IGeneric<T> (with implementation 
                 GenericType<T>) that overlaps with the registration of IGeneric<Int32> that you are trying to 
                 make. If your intention is to use GenericType<T> as fallback registration, please instead
                 call: RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), c => !c.Handled)."
@@ -1111,7 +1111,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                There is already an open generic registration for IGeneric<T> (with implementation 
+                There is already an open-generic registration for IGeneric<T> (with implementation 
                 GenericType<List<T>>) that overlaps with the registration of IGeneric<List<Int32>> that you 
                 are trying to make. If your intention is to use GenericType<List<T>> as fallback 
                 registration, please instead call: 

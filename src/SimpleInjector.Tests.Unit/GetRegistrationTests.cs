@@ -339,7 +339,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "IEnumerable<T> is invalid because it is an open generic type",
+                "IEnumerable<T> is invalid because it is an open-generic type",
                 action);
         }
 

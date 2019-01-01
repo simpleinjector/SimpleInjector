@@ -147,8 +147,8 @@ namespace SimpleInjector
 
         internal static string OpenGenericTypesCanNotBeResolved(Type serviceType) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The request for type {0} is invalid because it is an open generic type: it is only " +
-                "possible to instantiate instances of closed generic types. A generic type is closed if " +
+                "The request for type {0} is invalid because it is an open-generic type: it is only " +
+                "possible to instantiate instances of closed-generic types. A generic type is closed if " +
                 "all of its type parameters have been substituted with types that are recognized by the " +
                 "compiler.",
                 serviceType.TypeName());
@@ -202,6 +202,12 @@ namespace SimpleInjector
                 CollectionsRegisterMethodName,
                 nameof(Container) + "." + nameof(Container.Options),
                 nameof(ContainerOptions.AllowOverridingRegistrations));
+
+        internal static string ScopePropertyCanOnlyBeUsedWhenDefaultScopedLifestyleIsConfigured() =>
+            "To be able to use the Lifestyle.Scoped property, please ensure that the container is " +
+            "configured with a default scoped lifestyle by setting the Container.Options." +
+            "DefaultScopedLifestyle property with the required scoped lifestyle for your type of " +
+            "application. For more information, see https://simpleinjector.org/scoped.";
 
         internal static string MakingConditionalRegistrationsInOverridingModeIsNotSupported() =>
             string.Format(CultureInfo.InvariantCulture,
@@ -400,13 +406,13 @@ namespace SimpleInjector
 
         internal static string SuppliedTypeIsAnOpenGenericType(Type type) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The supplied type {0} is an open generic type. This type cannot be used for registration " +
+                "The supplied type {0} is an open-generic type. This type cannot be used for registration " +
                 "using this method.",
                 type.TypeName());
 
         internal static string SuppliedTypeIsAnOpenGenericTypeWhileTheServiceTypeIsNot(Type type) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The supplied type {0} is an open generic type. This type cannot be used for registration " +
+                "The supplied type {0} is an open-generic type. This type cannot be used for registration " +
                 "of collections of non-generic types.",
                 type.TypeName());
 
@@ -477,7 +483,7 @@ namespace SimpleInjector
             Type[] implementations) =>
             string.Format(CultureInfo.InvariantCulture,
                 "In the supplied list of types or assemblies, there are {0} types that represent the " +
-                "same closed generic type {1}. Did you mean to register the types as a collection " +
+                "same closed-generic type {1}. Did you mean to register the types as a collection " +
                 "using the {2} method instead? Conflicting types: {3}.",
                 implementations.Length,
                 closedServiceType.TypeName(),
@@ -503,12 +509,12 @@ namespace SimpleInjector
 
         internal static string SuppliedTypeIsNotAnOpenGenericType(Type type) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The supplied type {0} is not an open generic type.", type.TypeName());
+                "The supplied type {0} is not an open-generic type.", type.TypeName());
 
         internal static string SuppliedTypeCanNotBeOpenWhenDecoratorIsClosed() =>
-            "Registering a closed generic service type with an open generic decorator is not " +
-            "supported. Instead, register the service type as open generic, and the decorator as " +
-            "closed generic type.";
+            "Registering a closed-generic service type with an open-generic decorator is not " +
+            "supported. Instead, register the service type as open generic, and the decorator type as " +
+            "closed generic.";
 
         internal static string TheConstructorOfTypeMustContainTheServiceTypeAsArgument(Type decoratorType,
             Type serviceType) =>
@@ -535,7 +541,7 @@ namespace SimpleInjector
         internal static string DecoratorCanNotBeAGenericTypeDefinitionWhenServiceTypeIsNot(Type serviceType,
             Type decoratorType) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The supplied decorator {0} is an open generic type definition, while the supplied " +
+                "The supplied decorator {0} is an open-generic type definition, while the supplied " +
                 "service type {1} is not.", decoratorType.TypeName(), serviceType.TypeName());
 
         internal static string TheSuppliedRegistrationBelongsToADifferentContainer() =>
@@ -567,8 +573,8 @@ namespace SimpleInjector
 
         internal static string ThisOverloadDoesNotAllowOpenGenerics(IEnumerable<Type> openGenericTypes) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The supplied list of types contains one or multiple open generic types, but this method is " +
-                "unable to handle open generic types because it can only map closed generic service types " +
+                "The supplied list of types contains one or multiple open-generic types, but this method is " +
+                "unable to handle open-generic types because it can only map closed-generic service types " +
                 "to a single implementation. " +
                 "You must register the open-generic types separately using the Register(Type, Type) " +
                 "overload. Alternatively, try using {0} instead, if you expect to have multiple " +
@@ -610,8 +616,9 @@ namespace SimpleInjector
         internal static string TheServiceIsRequestedOutsideTheContextOfAScopedLifestyle(Type serviceType,
             ScopedLifestyle lifestyle) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The {0} is registered as '{1}' lifestyle, but the instance is requested outside the " +
-                "context of an active ({1}) scope.",
+                "{0} is registered as '{1}' lifestyle, but the instance is requested outside the " +
+                "context of an active ({1}) scope. Please see https://simpleinjector.org/scoped " + 
+                "for more information about how to manage scopes.",
                 serviceType.TypeName(),
                 lifestyle.Name);
 
@@ -639,8 +646,8 @@ namespace SimpleInjector
         internal static string TheDecoratorReturnedFromTheFactoryShouldNotBeOpenGeneric(
             Type serviceType, Type decoratorType) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The registered decorator type factory returned open generic type {0} while the registered " +
-                "service type {1} is not generic, making it impossible for a closed generic decorator type " +
+                "The registered decorator type factory returned open-generic type {0} while the registered " +
+                "service type {1} is not generic, making it impossible for a closed-generic decorator type " +
                 "to be constructed.",
                 decoratorType.TypeName(),
                 serviceType.TypeName());
@@ -648,8 +655,8 @@ namespace SimpleInjector
         internal static string TheTypeReturnedFromTheFactoryShouldNotBeOpenGeneric(
             Type serviceType, Type implementationType) =>
             string.Format(CultureInfo.InvariantCulture,
-                "The registered type factory returned open generic type {0} while the registered service " +
-                "type {1} is not generic, making it impossible for a closed generic type to be constructed.",
+                "The registered type factory returned open-generic type {0} while the registered service " +
+                "type {1} is not generic, making it impossible for a closed-generic type to be constructed.",
                 implementationType.TypeName(),
                 serviceType.TypeName());
 
@@ -674,7 +681,7 @@ namespace SimpleInjector
 
         internal static string MixingCallsToCollectionsRegisterIsNotSupported(Type serviceType) =>
             string.Format(CultureInfo.InvariantCulture,
-                "Mixing calls to {1} for the same open generic service type is not supported. Consider " +
+                "Mixing calls to {1} for the same open-generic service type is not supported. Consider " +
                 "making one single call to {1}(typeof({0}), types).",
                 CSharpFriendlyName(serviceType.GetGenericTypeDefinition()),
                 CollectionsRegisterMethodName);
@@ -701,7 +708,7 @@ namespace SimpleInjector
         internal static string ServiceTypeCannotBeAPartiallyClosedType(Type openGenericServiceType) =>
             string.Format(CultureInfo.InvariantCulture,
                 "The supplied type '{0}' is a partially-closed generic type, which is not supported by " +
-                "this method. Please supply the open generic type '{1}' instead.",
+                "this method. Please supply the open-generic type '{1}' instead.",
                 openGenericServiceType.TypeName(),
                 CSharpFriendlyName(openGenericServiceType.GetGenericTypeDefinition()));
 
@@ -709,7 +716,7 @@ namespace SimpleInjector
             string serviceTypeParamName, string implementationTypeParamName) =>
             string.Format(CultureInfo.InvariantCulture,
                 "The supplied type '{0}' is a partially-closed generic type, which is not supported as " +
-                "value of the {1} parameter. Instead, please supply the open generic type '{2}' and make " +
+                "value of the {1} parameter. Instead, please supply the open-generic type '{2}' and make " +
                 "the type supplied to the {3} parameter partially-closed instead.",
                 openGenericServiceType.TypeName(),
                 serviceTypeParamName,
@@ -731,7 +738,7 @@ namespace SimpleInjector
         internal static string RegistrationForClosedServiceTypeOverlapsWithOpenGenericRegistration(
             Type closedServiceType, Type overlappingGenericImplementationType) =>
             string.Format(CultureInfo.InvariantCulture,
-                "There is already an open generic registration for {0} (with implementation {1}) that " +
+                "There is already an open-generic registration for {0} (with implementation {1}) that " +
                 "overlaps with the registration of {2} that you are trying to make. If your intention is " +
                 "to use {1} as fallback registration, please instead call: " +
                 "{5}(typeof({3}), typeof({4}), c => !c.Handled).",
@@ -794,8 +801,8 @@ namespace SimpleInjector
                 index + 1,
                 producer.IsConditional ? "conditional" : "unconditional",
                 serviceType.IsGenericTypeDefinition()
-                    ? "open generic "
-                    : serviceType.IsGenericType() ? "closed generic " : string.Empty,
+                    ? "open-generic "
+                    : serviceType.IsGenericType() ? "closed-generic " : string.Empty,
                 serviceType.TypeName(),
                 implementationType.TypeName());
         }
@@ -848,7 +855,7 @@ namespace SimpleInjector
 
         private static string SuppliedTypeIsNotOpenGenericExplainingAlternatives(Type type, string registeringElement) =>
             string.Format(CultureInfo.InvariantCulture,
-                "Supply this method with the open generic type {0} to register all available " +
+                "Supply this method with the open-generic type {0} to register all available " +
                 "implementations of this type, or call {2}(Type, IEnumerable<{1}>) either with the open " +
                 "or closed version of that type to register a collection of instances based on that type.",
                 CSharpFriendlyName(type.GetGenericTypeDefinition()),
@@ -862,7 +869,7 @@ namespace SimpleInjector
 
         private static string SuppliedTypeIsNotGenericExplainingAlternatives(Type type, string registeringElement) =>
             string.Format(CultureInfo.InvariantCulture,
-                "This method only supports open generic types. " +
+                "This method only supports open-generic types. " +
                 "If you meant to register all available implementations of {0}, call " +
                 "{2}(typeof({0}), IEnumerable<{1}>) instead.",
                 type.TypeName(),

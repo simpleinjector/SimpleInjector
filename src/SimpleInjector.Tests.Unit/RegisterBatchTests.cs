@@ -45,7 +45,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The supplied type ILogger is not a generic type. This method only supports open generic types.
+                The supplied type ILogger is not a generic type. This method only supports open-generic types.
                 If you meant to register all available implementations of ILogger, call 
                 Container.Collection.Register(typeof(ILogger), IEnumerable<Assembly>) instead.".TrimInside(),
                 action);
@@ -62,7 +62,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(string.Format(@"
-                The supplied type {0} is not an open generic type. Supply this method with the open generic 
+                The supplied type {0} is not an open-generic type. Supply this method with the open-generic 
                 type {1} to register all available implementations of this type, or call 
                 Container.Collection.Register(Type, IEnumerable<Assembly>) either with the open or closed version of 
                 that type to register a collection of instances based on that type.".TrimInside(),
@@ -82,7 +82,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The supplied type ILogger is not a generic type. This method only supports open generic types.
+                The supplied type ILogger is not a generic type. This method only supports open-generic types.
                 If you meant to register all available implementations of ILogger, call 
                 Container.Collection.Register(typeof(ILogger), IEnumerable<Type>) instead.".TrimInside(),
                 action);
@@ -99,7 +99,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(string.Format(@"
-                The supplied type {0} is not an open generic type. Supply this method with the open generic 
+                The supplied type {0} is not an open-generic type. Supply this method with the open-generic 
                 type {1} to register all available implementations of this type, or call 
                 Container.Collection.Register(Type, IEnumerable<Type>) either with the open or closed version of 
                 that type to register a collection of instances based on that type.".TrimInside(),
@@ -258,7 +258,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
                 "In the supplied list of types or assemblies, there are 2 types that represent the same " +
-                "closed generic type",
+                "closed-generic type",
                 action);
         }
 
@@ -424,8 +424,8 @@
             // Assert
             AssertThat.ThrowsWithParamName("implementationTypes", action);
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The supplied list of types contains one or multiple open generic types, but this method 
-                is unable to handle open generic types because it can only map closed generic service 
+                The supplied list of types contains one or multiple open-generic types, but this method 
+                is unable to handle open-generic types because it can only map closed-generic service 
                 types to a single implementation. You must register the open-generic types separately
                 using the Register(Type, Type) overload."
                 .TrimInside(),
