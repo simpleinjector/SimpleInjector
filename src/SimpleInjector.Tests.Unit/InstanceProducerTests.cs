@@ -137,6 +137,40 @@
         }
 
         [TestMethod]
+        public void VisualizeObjectGraph_WithLifetimeInformation_BuildsTheExpectedGraph()
+        {
+            // Arrange
+            string expectedObjectGraph =
+@"PluginDecorator( // Transient
+    PluginDecoratorWithDependencyOfType<FakeTimeProvider>( // Transient
+        FakeTimeProvider( // Transient),
+        PluginDecorator<Int32>( // Transient
+            PluginWithDependencyOfType<RealTimeProvider>( // Transient
+                RealTimeProvider( // Transient)))))";
+
+            var container = ContainerFactory.New();
+
+            container.Register<IPlugin, PluginWithDependencyOfType<RealTimeProvider>>();
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator<int>));
+            container.RegisterDecorator(typeof(IPlugin),
+                typeof(PluginDecoratorWithDependencyOfType<FakeTimeProvider>));
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
+
+            container.Verify();
+
+            var pluginProducer = container.GetRegistration(typeof(IPlugin));
+
+            // Act
+            string actualObjectGraph = pluginProducer.VisualizeObjectGraph(new VisualizationOptions
+            {
+                IncludeLifestyleInformation = true,
+            });
+
+            // Assert
+            Assert.AreEqual(expectedObjectGraph, actualObjectGraph);
+        }
+
+        [TestMethod]
         public void VisualizeObjectGraph_WhenCalledBeforeInstanceIsCreated_ThrowsAnInvalidOperationException()
         {
             // Arrange

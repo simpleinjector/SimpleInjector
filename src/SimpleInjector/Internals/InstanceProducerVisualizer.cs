@@ -32,7 +32,7 @@ namespace SimpleInjector.Internals
     {
         private const string ExpressionNotCreatedYetMessage = "{ Expression not created yet }";
 
-        internal static string VisualizeIndentedObjectGraph(this InstanceProducer producer)
+        internal static string VisualizeIndentedObjectGraph(this InstanceProducer producer, VisualizationOptions options)
         {
             if (!producer.IsExpressionCreated)
             {
@@ -41,7 +41,7 @@ namespace SimpleInjector.Internals
 
             var set = new HashSet<InstanceProducer>(InstanceProducer.EqualityComparer);
 
-            return producer.VisualizeIndentedObjectGraph(indentingDepth: 0, set: set);
+            return producer.VisualizeIndentedObjectGraph(indentingDepth: 0, set: set, options: options);
         }
 
         internal static string VisualizeInlinedAndTruncatedObjectGraph(this InstanceProducer producer,
@@ -63,22 +63,23 @@ namespace SimpleInjector.Internals
         }
 
         private static string VisualizeIndentedObjectGraph(this InstanceProducer producer, int indentingDepth,
-            HashSet<InstanceProducer> set)
+            HashSet<InstanceProducer> set, VisualizationOptions options)
         {
             var visualizedDependencies =
                 from relationship in producer.GetRelationships()
                 let dependency = relationship.Dependency
-                let subGraph = dependency.VisualizeIndentedObjectSubGraph(indentingDepth + 1, set)
+                let subGraph = dependency.VisualizeIndentedObjectSubGraph(indentingDepth + 1, set, options)
                 select Environment.NewLine + subGraph;
 
-            return string.Format(CultureInfo.InvariantCulture, "{0}{1}({2})",
+            return string.Format(CultureInfo.InvariantCulture, "{0}{1}({2}{3})",
                 new string(' ', indentingDepth * 4),
                 producer.ImplementationType.ToFriendlyName(),
+                (options.IncludeLifestyleInformation) ? " // " + producer.Lifestyle.Name : string.Empty,
                 string.Join(",", visualizedDependencies));
         }
 
         private static string VisualizeIndentedObjectSubGraph(this InstanceProducer dependency, 
-            int indentingDepth, HashSet<InstanceProducer> set)
+            int indentingDepth, HashSet<InstanceProducer> set, VisualizationOptions options)
         {
             bool isCyclicGraph = set.Contains(dependency);
 
@@ -91,7 +92,7 @@ namespace SimpleInjector.Internals
 
             try
             {
-                return dependency.VisualizeIndentedObjectGraph(indentingDepth, set);
+                return dependency.VisualizeIndentedObjectGraph(indentingDepth, set, options);
             }
             finally
             {
