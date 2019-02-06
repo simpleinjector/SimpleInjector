@@ -6,7 +6,7 @@
     public class VisualizationOptions
     {
         /// <summary>
-        /// Include lifestyle information in the visualization.
+        /// Gets or sets the value indicating whether to include lifestyle information in the visualization.
         /// </summary>
         public bool IncludeLifestyleInformation { get; set; } = true;
     }

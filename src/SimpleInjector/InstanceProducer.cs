@@ -362,16 +362,13 @@ namespace SimpleInjector
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> on an instance that depends on this
         /// instance, or by calling <see cref="SimpleInjector.Container.Verify()">Verify</see> on the container.
         /// </exception>
-        public string VisualizeObjectGraph() => this.VisualizeObjectGraph(new VisualizationOptions
-        {
-            IncludeLifestyleInformation = false,
-        }); // backwards compatible.
+        public string VisualizeObjectGraph() => this.VisualizeObjectGraph(new VisualizationOptions());
 
         /// <summary>
         /// Builds a string representation of the object graph with the current instance as root of the
         /// graph.
         /// </summary>
-        /// <param name="options"></param>
+        /// <param name="options">The various visualization options for building a string representation of the object graph.</param>
         /// <returns>A string representation of the object graph.</returns>
         /// <exception cref="InvalidOperationException">Thrown when this method is called before 
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> have been called. These calls can be
@@ -696,10 +693,7 @@ namespace SimpleInjector
             // graph to be shown in compact form in the debugger in-line value field, but still allow the
             // complete formatted object graph to be shown when the user opens the text visualizer.
             [DebuggerDisplay(value: "{" + nameof(TruncatedDependencyGraph) + ", nq}")]
-            public string DependencyGraph => this.producer.VisualizeIndentedObjectGraph(new VisualizationOptions
-            {
-                IncludeLifestyleInformation = true,
-            });
+            public string DependencyGraph => this.producer.VisualizeIndentedObjectGraph(new VisualizationOptions());
 
             [DebuggerHidden]
             private string TruncatedDependencyGraph => this.producer.VisualizeInlinedAndTruncatedObjectGraph(160);

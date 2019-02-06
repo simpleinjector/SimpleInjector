@@ -110,12 +110,16 @@
         {
             // Arrange
             string expectedObjectGraph =
-@"PluginDecorator(
-    PluginDecoratorWithDependencyOfType<FakeTimeProvider>(
-        FakeTimeProvider(),
-        PluginDecorator<Int32>(
-            PluginWithDependencyOfType<RealTimeProvider>(
-                RealTimeProvider()))))";
+@"PluginDecorator( // Transient
+    PluginDecoratorWithDependencyOfType<FakeTimeProvider>( // Transient
+        FakeTimeProvider(), // Transient
+        PluginDecorator<Int32>( // Transient
+            PluginWithDependencyOfType<RealTimeProvider>( // Transient
+                RealTimeProvider() // Transient
+            )
+        )
+    )
+)";
 
             var container = ContainerFactory.New();
 
@@ -143,10 +147,14 @@
             string expectedObjectGraph =
 @"PluginDecorator( // Transient
     PluginDecoratorWithDependencyOfType<FakeTimeProvider>( // Transient
-        FakeTimeProvider( // Transient),
+        FakeTimeProvider(), // Transient
         PluginDecorator<Int32>( // Transient
             PluginWithDependencyOfType<RealTimeProvider>( // Transient
-                RealTimeProvider( // Transient)))))";
+                RealTimeProvider() // Transient
+            )
+        )
+    )
+)";
 
             var container = ContainerFactory.New();
 
@@ -164,6 +172,44 @@
             string actualObjectGraph = pluginProducer.VisualizeObjectGraph(new VisualizationOptions
             {
                 IncludeLifestyleInformation = true,
+            });
+
+            // Assert
+            Assert.AreEqual(expectedObjectGraph, actualObjectGraph);
+        }
+
+        [TestMethod]
+        public void VisualizeObjectGraph_WithoutLifetimeInformation_BuildsTheExpectedGraph()
+        {
+            // Arrange
+            string expectedObjectGraph =
+@"PluginDecorator(
+    PluginDecoratorWithDependencyOfType<FakeTimeProvider>(
+        FakeTimeProvider(),
+        PluginDecorator<Int32>(
+            PluginWithDependencyOfType<RealTimeProvider>(
+                RealTimeProvider()
+            )
+        )
+    )
+)";
+
+            var container = ContainerFactory.New();
+
+            container.Register<IPlugin, PluginWithDependencyOfType<RealTimeProvider>>();
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator<int>));
+            container.RegisterDecorator(typeof(IPlugin),
+                typeof(PluginDecoratorWithDependencyOfType<FakeTimeProvider>));
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
+
+            container.Verify();
+
+            var pluginProducer = container.GetRegistration(typeof(IPlugin));
+
+            // Act
+            string actualObjectGraph = pluginProducer.VisualizeObjectGraph(new VisualizationOptions
+            {
+                IncludeLifestyleInformation = false,
             });
 
             // Assert
@@ -194,10 +240,14 @@
         public void VisualizeObjectGraph_DelayedCyclicReference_VisualizesTheExpectedObjectGraph()
         {
             // Arrange
-            string expectedGraph = @"InstanceProducerTests.NodeFactory(
-    IEnumerable<InstanceProducerTests.INode>(
-        InstanceProducerTests.NodeFactory(
-            IEnumerable<InstanceProducerTests.INode>(/* cyclic dependency graph detected */))))";
+            string expectedGraph = 
+@"InstanceProducerTests.NodeFactory( // Transient
+    IEnumerable<InstanceProducerTests.INode>( // Singleton
+        InstanceProducerTests.NodeFactory( // Transient
+            IEnumerable<InstanceProducerTests.INode>(/* cyclic dependency graph detected */)
+        )
+    )
+)";
 
             var container = new Container();
 
@@ -226,10 +276,15 @@
 @"PluginWithDependencies<PluginWithDependencyOfType<PluginWithDependencyOfType<RealTimeProvider>>, ServiceDependingOn<PluginWithDependencyOfType<RealTimeProvider>>>(
     PluginWithDependencyOfType<PluginWithDependencyOfType<RealTimeProvider>>(
         PluginWithDependencyOfType<RealTimeProvider>(
-            RealTimeProvider())),
+            RealTimeProvider()
+        )
+    ),
     ServiceDependingOn<PluginWithDependencyOfType<RealTimeProvider>>(
         PluginWithDependencyOfType<RealTimeProvider>(
-            RealTimeProvider())))";
+            RealTimeProvider()
+        )
+    )
+)";
 
             var container = ContainerFactory.New();
 
@@ -240,7 +295,10 @@
             container.Verify();
 
             // Act
-            string actualObjectGraph = pluginProducer.VisualizeObjectGraph();
+            string actualObjectGraph = pluginProducer.VisualizeObjectGraph(new VisualizationOptions
+            {
+                IncludeLifestyleInformation = false,
+            });
 
             // Assert
             Assert.AreEqual(expectedObjectGraph, actualObjectGraph);
