@@ -68,16 +68,18 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 relationship: relationship))
             .ToArray();
 
-        private static string BuildRelationshipDescription(KnownRelationship relationship) => 
+        private static string BuildRelationshipDescription(KnownRelationship relationship) =>
             string.Format(CultureInfo.InvariantCulture,
-                "{0} ({1}) depends on {2}{3} ({4}).",
+                "{0} ({1}) depends on {2}{3} ({4}).{5}{6}",
                 relationship.ImplementationType.ToFriendlyName(),
                 relationship.Lifestyle.Name,
                 relationship.Dependency.ServiceType.ToFriendlyName(),
                 relationship.Dependency.ServiceType != relationship.Dependency.ImplementationType
                     ? " implemented by " + relationship.Dependency.ImplementationType.ToFriendlyName()
                     : string.Empty,
-                relationship.Dependency.Lifestyle.Name);
+                relationship.Dependency.Lifestyle.Name,
+                relationship.AdditionalInformation == string.Empty ? string.Empty : " ",
+                relationship.AdditionalInformation);
 
         private static string ServicePlural(int number) => number == 1 ? "service" : "services";
 

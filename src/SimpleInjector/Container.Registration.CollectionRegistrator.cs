@@ -884,8 +884,7 @@ namespace SimpleInjector
             // which allows it to be verified. To prevent memory leaks however, this external producer is
             // linked using a WeakReference to allow it to be GCed. To prevent this from happening, while
             // the application keeps referencing the collection, we let the collection reference the producer.
-            collection.ParentProducer =
-                SingletonLifestyle.CreateControlledCollectionProducer(collection, this.container);
+            collection.ParentProducer = collection.CreateInstanceProducer(this.container);
         }
 
         // This method is internal to prevent the main API of the framework from being 'polluted'. The

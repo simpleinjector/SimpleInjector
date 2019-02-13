@@ -317,7 +317,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "lifestyle mismatch is encountered",
+                "lifestyle mismatch",
                 action);
         }
 
@@ -338,7 +338,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "lifestyle mismatch is encountered",
+                "lifestyle mismatch has been detected",
                 action);
         }
 

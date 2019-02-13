@@ -441,7 +441,7 @@ namespace SimpleInjector
         {
             PropertyInfo[] properties = this.GetPropertiesToInject(implementationType);
 
-            if (properties.Any())
+            if (properties.Length > 0)
             {
                 PropertyInjectionHelper.VerifyProperties(properties);
 
@@ -450,7 +450,18 @@ namespace SimpleInjector
 
                 expressionToWrap = data.Expression;
 
-                this.AddRelationships(implementationType, data.Producers);
+                var knownRelationships =
+                    from pair in data.Producers.Zip(data.Properties, (prod, prop) => new { prod, prop })
+                    select new KnownRelationship(
+                        implementationType: implementationType,
+                        lifestyle: this.Lifestyle,
+                        consumer: new InjectionConsumerInfo(implementationType, pair.prop),
+                        dependency: pair.prod);
+
+                foreach (var knownRelationship in knownRelationships)
+                {
+                    this.AddRelationship(knownRelationship);
+                }
             }
 
             return expressionToWrap;
@@ -499,25 +510,23 @@ namespace SimpleInjector
             return new OverriddenParameter();
         }
 
-        private void AddRelationships(Type implementationType, IEnumerable<InstanceProducer> dependencies)
-        {
-            var relationships =
-                from dependency in dependencies
-                select new KnownRelationship(implementationType, this.Lifestyle, dependency);
-
-            foreach (var relationship in relationships)
-            {
-                this.AddRelationship(relationship);
-            }
-        }
-
-        private void AddRelationships(ConstructorInfo constructor, ParameterDictionary<DependencyData> parameters)
+        private void AddRelationships(
+            ConstructorInfo constructor, ParameterDictionary<DependencyData> parameters)
         {
             var knownRelationships =
                 from dependency in parameters.Values
-                select dependency.Producer ?? this.GetOverriddenParameterFor(dependency.Parameter).Producer;
+                let producer = dependency.Producer
+                    ?? this.GetOverriddenParameterFor(dependency.Parameter).Producer
+                select new KnownRelationship(
+                    implementationType: constructor.DeclaringType,
+                    lifestyle: this.Lifestyle,
+                    consumer: new InjectionConsumerInfo(dependency.Parameter),
+                    dependency: producer);
 
-            this.AddRelationships(constructor.DeclaringType, knownRelationships);
+            foreach (var knownRelationship in knownRelationships)
+            {
+                this.AddRelationship(knownRelationship);
+            }
         }
 
         private static Expression WrapWithNullChecker<TService>(Expression expression) where TService : class

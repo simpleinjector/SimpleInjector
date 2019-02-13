@@ -192,7 +192,8 @@ namespace SimpleInjector.Advanced
 
             return new PropertyInjectionData(
                 expression: Expression.Invoke(Expression.Constant(propertyInjectionDelegate), arguments),
-                producers: producers.Concat(data.Producers));
+                producers: producers.Concat(data.Producers),
+                properties: properties.Concat(data.Properties));
         }
 
         private InstanceProducer[] GetPropertyInstanceProducers(PropertyInfo[] properties)
@@ -240,11 +241,16 @@ namespace SimpleInjector.Advanced
         {
             public readonly Expression Expression;
             public readonly IEnumerable<InstanceProducer> Producers;
+            public readonly IEnumerable<PropertyInfo> Properties;
 
-            public PropertyInjectionData(Expression expression, IEnumerable<InstanceProducer> producers = null)
+            public PropertyInjectionData(
+                Expression expression,
+                IEnumerable<InstanceProducer> producers = null,
+                IEnumerable<PropertyInfo> properties = null)
             {
                 this.Expression = expression;
                 this.Producers = producers ?? Enumerable.Empty<InstanceProducer>();
+                this.Properties = properties ?? Enumerable.Empty<PropertyInfo>();
             }
         }
     }
