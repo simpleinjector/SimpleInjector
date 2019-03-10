@@ -77,7 +77,6 @@ namespace SimpleInjector.Internals
             if (!last)
             {
                 this.Append(",");
-
                 if (this.stillToWriteLifestyleEntry != null)
                 {
                     this.AppendLifestyle(this.stillToWriteLifestyleEntry);
@@ -116,7 +115,7 @@ namespace SimpleInjector.Internals
         private void AppendIndent()
         {
             const string INDENT = "    ";
-            for (int i = 0; i < indentingDepth; i++)
+            for (int i = 0; i < this.indentingDepth; i++)
             {
                 this.Append(INDENT);
             }

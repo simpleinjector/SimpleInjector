@@ -69,9 +69,9 @@ namespace SimpleInjector.Internals
             objectGraphBuilder.BeginInstanceProducer(producer);
 
             var dependencies = producer
-                                .GetRelationships()
-                                .Select(relationship => relationship.Dependency)
-                                .ToList();
+                .GetRelationships()
+                .Select(relationship => relationship.Dependency)
+                .ToList();
 
             for (int counter = 0; counter < dependencies.Count; counter++)
             {

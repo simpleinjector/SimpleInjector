@@ -28,8 +28,9 @@ namespace SimpleInjector
     public class VisualizationOptions
     {
         /// <summary>
-        /// Gets or sets the value indicating whether to include lifestyle information in the visualization.
+        /// Gets or sets a value indicating whether to include lifestyle information in the visualization.
         /// </summary>
+        /// <value>The value to include life style information.</value>
         public bool IncludeLifestyleInformation { get; set; } = true;
     }
 }
