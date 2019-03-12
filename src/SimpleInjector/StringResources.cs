@@ -155,7 +155,7 @@ namespace SimpleInjector
 
         internal static string LifestyleMismatchesReported(LifestyleMismatchDiagnosticResult error) =>
             string.Format(CultureInfo.InvariantCulture,
-                "A lifestyle mismatch is encountered. {0} Lifestyle mismatches can cause concurrency " +
+                "A lifestyle mismatch has been detected. {0} Lifestyle mismatches can cause concurrency " +
                 "bugs in your application. Please see https://simpleinjector.org/dialm to understand this " +
                 "problem and how to solve it.",
                 error.Description);
