@@ -125,20 +125,27 @@ namespace SimpleInjector.Decorators
             // registeredProducer.ServiceType and registeredServiceType are different when called by 
             // container uncontrolled decorator. producer.ServiceType will be IEnumerable<T> and 
             // registeredServiceType will be T.
-            Func<Type, InstanceProducer> producerBuilder = implementationType =>
+            var predicateCache = this.ThreadStaticServiceTypePredicateCache;
+
+            if (!predicateCache.ContainsKey(registeredProducer))
             {
+                Type implementationType =
+                    DecoratorHelpers.DetermineImplementationType(originalExpression, registeredProducer);
+
                 // The InstanceProducer created here is used to do correct diagnostics. We can't return the
                 // registeredProducer here, since the lifestyle of the original producer can change after
                 // the ExpressionBuilt event has ran, which means that this would invalidate the diagnostic
                 // results.
-                return new InstanceProducer(registeredServiceType, originalRegistration,
-                    registerExternalProducer: false);
-            };
+                var producer = new InstanceProducer(
+                    registeredServiceType, originalRegistration, registerExternalProducer: false);
 
-            return this.GetServiceTypeInfo(originalExpression, registeredProducer, producerBuilder);
+                predicateCache[registeredProducer] = new ServiceTypeDecoratorInfo(implementationType, producer);
+            }
+
+            return predicateCache[registeredProducer];
         }
 
-        protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
+        private ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
             InstanceProducer registeredProducer, Func<Type, InstanceProducer> producerBuilder)
         {
             var predicateCache = this.ThreadStaticServiceTypePredicateCache;

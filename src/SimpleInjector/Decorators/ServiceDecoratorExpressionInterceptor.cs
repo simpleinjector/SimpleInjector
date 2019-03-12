@@ -36,7 +36,6 @@ namespace SimpleInjector.Decorators
         private readonly ExpressionBuiltEventArgs e;
         private readonly Type registeredServiceType;
         private ConstructorInfo decoratorConstructor;
-        private Type decoratorType;
 
         public ServiceDecoratorExpressionInterceptor(DecoratorExpressionInterceptorData data,
             Dictionary<InstanceProducer, Registration> registrations, ExpressionBuiltEventArgs e)
@@ -67,9 +66,6 @@ namespace SimpleInjector.Decorators
             {
                 this.Lifestyle = this.Container.Options.SelectLifestyle(closedDecoratorType);
             }
-
-            // The actual decorator could be different. TODO: must... write... test... for... this.
-            this.decoratorType = this.decoratorConstructor.DeclaringType;
 
             // By creating the decorator using a Lifestyle Registration the decorator can be completely
             // incorporated into the pipeline. This means that the ExpressionBuilding can be applied,
@@ -144,7 +140,10 @@ namespace SimpleInjector.Decorators
 
             // Add the decorator to the list of applied decorators. This way users can use this information in 
             // the predicate of the next decorator they add.
-            info.AddAppliedDecorator(this.e.RegisteredServiceType, this.decoratorType, this.Container,
+            info.AddAppliedDecorator(
+                this.e.RegisteredServiceType,
+                this.decoratorConstructor.DeclaringType,
+                this.Container,
                 this.Lifestyle, this.e.Expression, decoratorRelationships);
         }
     }
