@@ -907,7 +907,8 @@ namespace SimpleInjector
                 ? string.Format(CultureInfo.InvariantCulture,
                     " There is, however, a registration for {0}; Did you mean to call GetInstance<{0}>() " +
                     "or depend on {0}? Or did you mean to register a collection of types using " +
-                    "{1}?",
+                    "{1}? Please see https://simpleinjector.org/collections for more information " +
+                    "about registering and resolving collections.",
                     collectionServiceType.GetGenericArguments()[0].TypeName(),
                     CollectionsRegisterMethodName)
                 : string.Empty;
@@ -924,7 +925,9 @@ namespace SimpleInjector
             hasCollection
                 ? string.Format(CultureInfo.InvariantCulture,
                     " There is, however, a registration for {0}; Did you mean to call " +
-                    "GetAllInstances<{1}>() or depend on {0}?",
+                    "GetAllInstances<{1}>() or depend on {0}? " +
+                    "Please see https://simpleinjector.org/collections for more information " +
+                    "about registering and resolving collections.",
                     typeof(IEnumerable<>).MakeGenericType(serviceType).TypeName(),
                     serviceType.TypeName())
                 : string.Empty;

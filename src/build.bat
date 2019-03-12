@@ -1,7 +1,9 @@
 @ECHO OFF
 
+for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /format:list') do set datetime=%%I
+
 set buildNumber=0 
-set copyrightYear=2018
+set copyrightYear=%datetime:~0,4%
 set version=%1
 set prereleasePostfix=
 
