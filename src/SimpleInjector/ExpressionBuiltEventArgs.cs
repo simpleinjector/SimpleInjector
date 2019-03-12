@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,6 +23,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
@@ -43,6 +44,7 @@ namespace SimpleInjector
     {
         private Expression expression;
         private Lifestyle lifestyle;
+        private System.Collections.IDictionary items;
 
         /// <summary>Initializes a new instance of the <see cref="ExpressionBuiltEventArgs"/> class.</summary>
         /// <param name="registeredServiceType">Type of the registered service.</param>
@@ -109,6 +111,28 @@ namespace SimpleInjector
         internal Registration ReplacedRegistration { get; set; }
 
         internal InstanceProducer InstanceProducer { get; set; }
+
+        // Cache for storing items for the lifetime of an ExpressionBuiltEventArgs instance. A single
+        // ExpressionBuiltEventArgs instance is passed along to all ExpressionBuilt handlers of a single 
+        // InstanceProducer on a single thread. This means that each InstanceProducer gets its own instance and
+        // the same producer on a different thread (which might get built in parallel) gets a different instance
+        // as well.
+        // Null is returned when the key is not found.
+        // This dictionary is NOT thread-safe.
+        internal object this[object key]
+        {
+            get => this.items?[key];
+            
+            set
+            {
+                if (this.items == null)
+                {
+                    this.items = new Dictionary<object, object>(1);
+                }
+
+                this.items[key] = value;
+            }
+        }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]

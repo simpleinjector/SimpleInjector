@@ -58,11 +58,6 @@ namespace SimpleInjector.Decorators
             this.registeredServiceType = registeredServiceType;
         }
 
-        protected override Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
-        {
-            get { return this.GetThreadStaticServiceTypePredicateCacheByKey(ContainerItemsKeyAndLock); }
-        }
-
         internal bool SatisfiesPredicate()
         {
             // We don't have an expression at this point, since the instances are not created by the container.
@@ -75,8 +70,13 @@ namespace SimpleInjector.Decorators
 
             registration.ReplaceRelationships(this.e.InstanceProducer.GetRelationships());
 
-            this.Context = this.CreatePredicateContext(this.e.InstanceProducer, registration,
-                this.registeredServiceType, expression);
+            var info = this.GetServiceTypeInfo(
+                e,
+                originalExpression: expression,
+                originalRegistration: registration,
+                registeredServiceType: registeredServiceType);
+            
+            this.Context = this.CreatePredicateContext(this.registeredServiceType, expression, info);
 
             return this.SatisfiesPredicate(this.Context);
         }
@@ -101,8 +101,10 @@ namespace SimpleInjector.Decorators
 
             registration.ReplaceRelationships(this.e.InstanceProducer.GetRelationships());
 
-            var serviceTypeInfo = this.GetServiceTypeInfo(this.e.Expression, this.e.InstanceProducer,
-                registration, this.registeredServiceType);
+            var serviceTypeInfo = this.GetServiceTypeInfo(
+                this.e,
+                originalRegistration: registration,
+                registeredServiceType: this.registeredServiceType);
 
             Registration decoratorRegistration;
 
@@ -112,7 +114,7 @@ namespace SimpleInjector.Decorators
 
             // Add the decorator to the list of applied decorator. This way users can use this
             // information in the predicate of the next decorator they add.
-            serviceTypeInfo.AddAppliedDecorator(this.registeredServiceType, this.decoratorType, 
+            serviceTypeInfo.AddAppliedDecorator(this.registeredServiceType, this.decoratorType,
                 this.Container, this.Lifestyle, decoratedExpression);
 
             this.e.KnownRelationships.AddRange(decoratorRegistration.GetRelationships());
