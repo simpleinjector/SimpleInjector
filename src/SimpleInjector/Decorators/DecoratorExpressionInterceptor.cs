@@ -91,14 +91,10 @@ namespace SimpleInjector.Decorators
             originalRegistration = originalRegistration ?? e.ReplacedRegistration;
             registeredServiceType = registeredServiceType ?? e.RegisteredServiceType;
 
-            // The info is stored in the expression cache. This way it can be reused by all decorators that get
-            // applieid to the same InstanceProducer.
-            ServiceTypeDecoratorInfo info = (ServiceTypeDecoratorInfo)e[typeof(ServiceTypeDecoratorInfo)];
-        
             // registeredProducer.ServiceType and registeredServiceType are different when called by 
             // container uncontrolled decorator. producer.ServiceType will be IEnumerable<T> and 
             // registeredServiceType will be T.
-            if (info == null)
+            if (e.DecoratorInfo == null)
             {
                 Type implementationType =
                     DecoratorHelpers.DetermineImplementationType(originalExpression, e.InstanceProducer);
@@ -110,12 +106,10 @@ namespace SimpleInjector.Decorators
                 var producer = new InstanceProducer(
                     registeredServiceType, originalRegistration, registerExternalProducer: false);
 
-                info = new ServiceTypeDecoratorInfo(implementationType, producer);
-
-                e[typeof(ServiceTypeDecoratorInfo)] = info;
+                e.DecoratorInfo = new ServiceTypeDecoratorInfo(implementationType, producer);
             }
 
-            return info;
+            return e.DecoratorInfo;
         }
 
         protected Registration CreateRegistration(Type serviceType, ConstructorInfo decoratorConstructor,

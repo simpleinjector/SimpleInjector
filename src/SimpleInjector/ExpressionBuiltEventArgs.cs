@@ -23,7 +23,6 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
@@ -44,7 +43,6 @@ namespace SimpleInjector
     {
         private Expression expression;
         private Lifestyle lifestyle;
-        private System.Collections.IDictionary items;
 
         /// <summary>Initializes a new instance of the <see cref="ExpressionBuiltEventArgs"/> class.</summary>
         /// <param name="registeredServiceType">Type of the registered service.</param>
@@ -112,6 +110,17 @@ namespace SimpleInjector
 
         internal InstanceProducer InstanceProducer { get; set; }
 
+        // By storing the ServiceTypeDecoratorInfo as part of the ExpressionBuiltEventArgs instance, we allow
+        // all applied decorators on a single InstanceProducer to reuse this info object, which allows them to,
+        // among other things, to construct DecoratorPredicateContext objects.
+        // It seems a bit ugly to let ExpressionBuiltEventArgs reference the decorator sub system, but the
+        // (more decoupled) alternative would be to expose a Items Dictionary that can be used to add arbitrary
+        // items, such as an ServiceTypeDecoratorInfo. Although great, we don't need that flexibility, and the
+        // creation of a new Dictionary object for every InstanceProducer that gets a one or multiple decorators
+        // applied can cause quite a lot of memory overhead (an empty Dictionary takes roughly 60 bytes of
+        // memory in a 32bit process).
+        internal Decorators.ServiceTypeDecoratorInfo DecoratorInfo { get; set; }
+
         // Cache for storing items for the lifetime of an ExpressionBuiltEventArgs instance. A single
         // ExpressionBuiltEventArgs instance is passed along to all ExpressionBuilt handlers of a single 
         // InstanceProducer on a single thread. This means that each InstanceProducer gets its own instance and
@@ -119,20 +128,6 @@ namespace SimpleInjector
         // as well.
         // Null is returned when the key is not found.
         // This dictionary is NOT thread-safe.
-        internal object this[object key]
-        {
-            get => this.items?[key];
-            
-            set
-            {
-                if (this.items == null)
-                {
-                    this.items = new Dictionary<object, object>(1);
-                }
-
-                this.items[key] = value;
-            }
-        }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
