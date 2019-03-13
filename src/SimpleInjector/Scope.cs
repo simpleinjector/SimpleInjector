@@ -23,6 +23,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
@@ -40,7 +41,7 @@ namespace SimpleInjector
         private readonly object syncRoot = new object();
         private readonly ScopeManager manager;
 
-        private Dictionary<object, object> items;
+        private IDictionary items;
         private Dictionary<Registration, object> cachedInstances;
         private List<Action> scopeEndActions;
         private List<IDisposable> disposables;
@@ -199,10 +200,7 @@ namespace SimpleInjector
 
             lock (this.syncRoot)
             {
-                object value;
-                return this.items != null && this.items.TryGetValue(key, out value)
-                    ? value
-                    : null;
+                return this.items?[key];
             }
         }
 
@@ -221,12 +219,12 @@ namespace SimpleInjector
 
             lock (this.syncRoot)
             {
-                if (this.items == null)
+                if (this.items is null)
                 {
                     this.items = new Dictionary<object, object>(capacity: 1);
                 }
 
-                if (object.ReferenceEquals(item, null))
+                if (item is null)
                 {
                     this.items.Remove(key);
                 }
@@ -281,6 +279,26 @@ namespace SimpleInjector
             return scope.GetInstanceInternal(registration);
         }
 
+        internal T GetOrSetItem<T>(object key, Func<Container, object, T> valueFactory)
+        {
+            lock (this.syncRoot)
+            {
+                if (this.items is null)
+                {
+                    this.items = new Dictionary<object, object>(capacity: 1);
+                }
+
+                object item = this.items[key];
+
+                if (item is null)
+                {
+                    this.items[key] = item = valueFactory(this.Container, key);
+                }
+
+                return (T)item;
+            }
+        }
+
         /// <summary>
         /// Releases all instances that are cached by the <see cref="Scope"/> object.
         /// </summary>
@@ -317,6 +335,7 @@ namespace SimpleInjector
                         this.cachedInstances = null;
                         this.scopeEndActions = null;
                         this.disposables = null;
+                        this.items = null;
 
                         this.manager?.RemoveScope(this);
                     }

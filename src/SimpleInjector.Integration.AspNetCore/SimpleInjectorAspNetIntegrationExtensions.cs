@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015-2018 Simple Injector Contributors
+ * Copyright (c) 2015-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -126,9 +126,9 @@ namespace SimpleInjector
             Requires.IsNotNull(services, nameof(services));
             Requires.IsNotNull(container, nameof(container));
 
-            if (container.GetItem(CrossWireContextKey) == null)
+            if (container.ContainerScope.GetItem(CrossWireContextKey) == null)
             {
-                container.SetItem(CrossWireContextKey, services);
+                container.ContainerScope.SetItem(CrossWireContextKey, services);
             }
         }
 
@@ -217,7 +217,7 @@ namespace SimpleInjector
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(appServices, nameof(appServices));
 
-            var services = (IServiceCollection)container.GetItem(CrossWireContextKey);
+            var services = (IServiceCollection)container.ContainerScope.GetItem(CrossWireContextKey);
 
             if (services == null)
             {
@@ -306,7 +306,7 @@ namespace SimpleInjector
                     "See: https://simpleinjector.org/lifestyles#scoped");
             }
 
-            if (container.GetItem(ServiceScopeKey) == null)
+            if (container.ContainerScope.GetItem(ServiceScopeKey) is null)
             {
                 var scopeFactory = appServices.GetRequiredService<IServiceScopeFactory>();
 
@@ -320,7 +320,7 @@ namespace SimpleInjector
                     }
                 };
 
-                container.SetItem(ServiceScopeKey, new object());
+                container.ContainerScope.SetItem(ServiceScopeKey, new object());
             }
         }
 
@@ -367,7 +367,7 @@ namespace SimpleInjector
 
         private static IServiceCollection GetServiceCollection(Container container)
         {
-            var context = (IServiceCollection)container.GetItem(CrossWireContextKey);
+            var context = (IServiceCollection)container.ContainerScope.GetItem(CrossWireContextKey);
 
             if (context == null)
             {

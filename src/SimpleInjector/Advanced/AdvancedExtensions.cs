@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2018 Simple Injector Contributors
+ * Copyright (c) 2013-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -74,12 +74,16 @@ namespace SimpleInjector.Advanced
         /// <returns>The stored item or null (Nothing in VB).</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
+        [Obsolete("Please use Container." + nameof(Container.ContainerScope) + "." +
+            nameof(ContainerScope.GetItem) + " instead. This method will be removed in a future release.",
+            error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static object GetItem(this Container container, object key)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(key, nameof(key));
 
-            return container.GetItem(key);
+            return container.ContainerScope.GetItem(key);
         }
 
         /// <summary>
@@ -94,12 +98,16 @@ namespace SimpleInjector.Advanced
         /// <param name="item">The actual item. May be null.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or
         /// <paramref name="key"/> is a null reference (Nothing in VB).</exception>
+        [Obsolete("Please use Container." + nameof(Container.ContainerScope) + "." +
+            nameof(ContainerScope.SetItem) + " instead. This method will be removed in a future release.",
+            error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void SetItem(this Container container, object key, object item)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(key, nameof(key));
 
-            container.SetItem(key, item);
+            container.ContainerScope.SetItem(key, item);
         }
 
         /// <summary>
@@ -114,13 +122,17 @@ namespace SimpleInjector.Advanced
         /// <returns>The stored item or the item from the <paramref name="valueFactory"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
         /// <paramref name="key"/> or <paramref name="valueFactory"/> is a null reference (Nothing in VB).</exception>
+        [Obsolete("Please use Container." + nameof(Container.ContainerScope) + "." +
+            nameof(ContainerScope.GetOrSetItem) + " instead. This method will be removed in a future release.",
+            error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static T GetOrSetItem<T>(this Container container, object key, Func<Container, object, T> valueFactory)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(key, nameof(key));
             Requires.IsNotNull(valueFactory, nameof(valueFactory));
 
-            return container.GetOrSetItem(key, valueFactory);
+            return container.ContainerScope.GetOrSetItem(key, valueFactory);
         }
 
         /// <summary>
@@ -139,7 +151,8 @@ namespace SimpleInjector.Advanced
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
-            nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
+            nameof(ContainerCollectionRegistrator.Append) + " instead. This method will be removed in a future release.",
+            error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void AppendToCollection(this Container container, Type serviceType, 
             Registration registration)
@@ -165,7 +178,8 @@ namespace SimpleInjector.Advanced
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
-            nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
+            nameof(ContainerCollectionRegistrator.Append) + " instead. This method will be removed in a future release.",
+            error: false)]
         public static void AppendToCollection(this Container container, Type serviceType,
             Type implementationType)
         {

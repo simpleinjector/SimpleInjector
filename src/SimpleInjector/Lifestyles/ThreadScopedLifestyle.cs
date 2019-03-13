@@ -127,7 +127,8 @@ namespace SimpleInjector.Lifestyles
         protected override Scope GetCurrentScopeCore(Container container) =>
             GetScopeManager(container).CurrentScope;
 
-        private static ScopeManager GetScopeManager(Container c) => c.GetOrSetItem(ManagerKey, CreateManager);
+        private static ScopeManager GetScopeManager(Container c) =>
+            c.ContainerScope.GetOrSetItem(ManagerKey, CreateManager);
 
         private static ScopeManager CreateManager(Container container, object key)
         {
@@ -135,7 +136,7 @@ namespace SimpleInjector.Lifestyles
 
             var manager = new ScopeManager(container, () => threadLocal.Value, s => threadLocal.Value = s);
 
-            container.RegisterForDisposal(threadLocal);
+            container.ContainerScope.RegisterForDisposal(threadLocal);
 
             return manager;
         }

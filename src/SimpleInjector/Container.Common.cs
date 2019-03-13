@@ -69,9 +69,7 @@ namespace SimpleInjector
         private readonly object locker = new object();
         private readonly List<IInstanceInitializer> instanceInitializers = new List<IInstanceInitializer>();
         private readonly List<ContextualResolveInterceptor> resolveInterceptors = new List<ContextualResolveInterceptor>();
-        private readonly IDictionary items = new Dictionary<object, object>();
         private readonly long containerId;
-        private readonly Scope disposableSingletonsScope;
 
         // Collection of (both conditional and unconditional) instance producers that are explicitly 
         // registered by the user and implicitly registered through unregistered type resolution.
@@ -104,7 +102,7 @@ namespace SimpleInjector
         {
             this.containerId = Interlocked.Increment(ref counter);
 
-            this.disposableSingletonsScope = new Scope(this);
+            this.ContainerScope = new ContainerScope(this);
 
             this.Collection = new ContainerCollectionRegistrator(this);
             this.Options = new ContainerOptions(this);
@@ -125,6 +123,12 @@ namespace SimpleInjector
         /// <summary>Gets the container options.</summary>
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
         public ContainerOptions Options { get; }
+
+        /// <summary>Gets the container scope that that manages the lifetime of singletons and other 
+        /// container-controlled instances. Use this property to register actions that need to be called
+        /// and instances that need to be disposed when the container gets disposed.</summary>
+        /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
+        public ContainerScope ContainerScope { get; }
 
         /// <summary>
         /// Gets a value indicating whether the container is currently being verified on the current thread.
@@ -317,45 +321,7 @@ namespace SimpleInjector
 
             return producers.ToArray();
         }
-
-        internal object GetItem(object key)
-        {
-            lock (this.items)
-            {
-                return this.items[key];
-            }
-        }
-
-        internal void SetItem(object key, object item)
-        {
-            lock (this.items)
-            {
-                if (object.ReferenceEquals(item, null))
-                {
-                    this.items.Remove(key);
-                }
-                else
-                {
-                    this.items[key] = item;
-                }
-            }
-        }
-
-        internal T GetOrSetItem<T>(object key, Func<Container, object, T> valueFactory)
-        {
-            lock (this.items)
-            {
-                object item = this.items[key];
-
-                if (item == null)
-                {
-                    this.items[key] = item = valueFactory(this, key);
-                }
-
-                return (T)item;
-            }
-        }
-
+        
         internal Expression OnExpressionBuilding(Registration registration, Type implementationType,
             Expression instanceCreatorExpression)
         {
@@ -443,11 +409,6 @@ namespace SimpleInjector
             return producer;
         }
 
-        internal void RegisterForDisposal(IDisposable disposable)
-        {
-            this.disposableSingletonsScope.RegisterForDisposal(disposable);
-        }
-
         internal void ThrowWhenContainerIsLockedOrDisposed()
         {
             this.ThrowWhenDisposed();
@@ -497,21 +458,17 @@ namespace SimpleInjector
             {
                 try
                 {
-                    this.disposableSingletonsScope.Dispose();
+                    this.ContainerScope.Dispose();
                 }
                 finally
                 {
                     this.isVerifying.Dispose();
-
-                    // HACK: Due to a bug (https://stackoverflow.com/questions/33156432) in ThreadLocal<T>,
-                    // the container gets rooted when decorators are applied. See issue #135.
-                    this.items.Clear();
                 }
             }
         }
 
         [DebuggerStepThrough]
-        static string GetStackTraceOrNull()
+        private static string GetStackTraceOrNull()
         {
 #if NET40 || NET45 || NETSTANDARD2_0
             return new System.Diagnostics.StackTrace(fNeedFileInfo: true, skipFrames: 2).ToString();

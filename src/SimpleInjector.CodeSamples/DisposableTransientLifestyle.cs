@@ -28,13 +28,13 @@
 
         public static void EnableForContainer(Container container)
         {
-            bool alreadyInitialized = container.GetItem(ItemKey) != null;
+            bool alreadyInitialized = container.ContainerScope.GetItem(ItemKey) != null;
 
             if (!alreadyInitialized)
             {
                 AddGlobalDisposableInitializer(container);
 
-                container.SetItem(ItemKey, ItemKey);
+                container.ContainerScope.SetItem(ItemKey, ItemKey);
             }
         }
 
@@ -46,7 +46,7 @@
 
         private static void TryEnableTransientDisposalOrThrow(Container container)
         {
-            bool alreadyInitialized = container.GetItem(ItemKey) != null;
+            bool alreadyInitialized = container.ContainerScope.GetItem(ItemKey) != null;
 
             if (!alreadyInitialized)
             {
@@ -64,7 +64,7 @@
         private static void AddGlobalDisposableInitializer(Container container) =>
             container.RegisterInitializer(RegisterForDisposal, ShouldApplyInitializer);
 
-        private static bool ShouldApplyInitializer(InitializerContext context) => 
+        private static bool ShouldApplyInitializer(InitializerContext context) =>
             context.Registration is IDisposableRegistration;
 
         private static void RegisterForDisposal(InstanceInitializationData data)
@@ -78,7 +78,7 @@
             }
         }
 
-        private sealed class DisposableRegistration<TImpl> : Registration, IDisposableRegistration 
+        private sealed class DisposableRegistration<TImpl> : Registration, IDisposableRegistration
             where TImpl : class
         {
             private readonly Func<TImpl> instanceCreator;

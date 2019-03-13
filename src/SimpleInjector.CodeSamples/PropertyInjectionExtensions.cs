@@ -15,7 +15,7 @@
         [DebuggerStepThrough]
         public static void EnablePropertyAutoWiring(this ContainerOptions options)
         {
-            if (options.Container.GetItem(RegistrationsKey) != null)
+            if (options.Container.ContainerScope.GetItem(RegistrationsKey) != null)
             {
                 throw new InvalidOperationException("EnablePropertyAutoWiring should be called just once.");
             }
@@ -24,7 +24,7 @@
 
             options.PropertySelectionBehavior = registrations;
 
-            options.Container.SetItem(RegistrationsKey, registrations);
+            options.Container.ContainerScope.SetItem(RegistrationsKey, registrations);
         }
 
         [DebuggerStepThrough]
@@ -52,7 +52,7 @@
                     "New registrations can't be made after the container was locked.");
             }
 
-            var registrations = (PropertyRegistrations)container.GetItem(RegistrationsKey);
+            var registrations = (PropertyRegistrations)container.ContainerScope.GetItem(RegistrationsKey);
 
             if (registrations == null)
             {
@@ -73,13 +73,13 @@
                 this.baseBehavior = baseBehavior;
             }
 
-            bool IPropertySelectionBehavior.SelectProperty(Type t, PropertyInfo p) => 
+            bool IPropertySelectionBehavior.SelectProperty(Type t, PropertyInfo p) =>
                 this.IsPropertyRegisteredForAutowiring(p) || this.baseBehavior.SelectProperty(t, p);
 
-            public void AddPropertySelector(Predicate<PropertyInfo> selector) => 
+            public void AddPropertySelector(Predicate<PropertyInfo> selector) =>
                 this.propertySelectors.Add(selector);
 
-            private bool IsPropertyRegisteredForAutowiring(PropertyInfo property) => 
+            private bool IsPropertyRegisteredForAutowiring(PropertyInfo property) =>
                 this.propertySelectors.Exists(selector => selector(property));
         }
     }
