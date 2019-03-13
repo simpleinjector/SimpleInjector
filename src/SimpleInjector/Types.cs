@@ -258,7 +258,9 @@ namespace SimpleInjector
         private static bool IsGenericImplementationOf(Type type, Type serviceType) =>
             type == serviceType
             || serviceType.IsVariantVersionOf(type)
-            || (type.IsGenericType() && type.GetGenericTypeDefinition() == serviceType);
+            || (type.IsGenericType()
+                && serviceType.IsGenericTypeDefinition()
+                && type.GetGenericTypeDefinition() == serviceType);
 
         private static bool IsVariantVersionOf(this Type type, Type otherType) =>
             type.IsGenericType()
