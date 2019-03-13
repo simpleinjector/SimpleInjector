@@ -502,10 +502,6 @@ namespace SimpleInjector
                 finally
                 {
                     this.isVerifying.Dispose();
-
-                    // HACK: Due to a bug (https://stackoverflow.com/questions/33156432) in ThreadLocal<T>,
-                    // the container gets rooted when decorators are applied. See issue #135.
-                    this.items.Clear();
                 }
             }
         }
