@@ -212,9 +212,7 @@
                 .Select(h => h.GetType()).ToArray();
 
             // Assert
-            Assert.AreEqual(
-                expected: expectedHandlerTypes.ToFriendlyNamesText(),
-                actual: actualHandlerTypes.ToFriendlyNamesText());
+            AssertThat.SequenceEquals(expectedHandlerTypes, actualHandlerTypes);
         }
 
         [TestMethod]
@@ -240,9 +238,7 @@
                 .Select(h => h.GetType()).ToArray();
 
             // Assert
-            Assert.AreEqual(
-                expected: expectedHandlerTypes.ToFriendlyNamesText(),
-                actual: actualHandlerTypes.ToFriendlyNamesText());
+            AssertThat.SequenceEquals(expectedHandlerTypes, actualHandlerTypes);
         }
 
         [TestMethod]
@@ -267,9 +263,7 @@
                 .Select(h => h.GetType()).ToArray();
 
             // Assert
-            Assert.AreEqual(
-                expected: expectedHandlerTypes.ToFriendlyNamesText(),
-                actual: actualHandlerTypes.ToFriendlyNamesText());
+            AssertThat.SequenceEquals(expectedHandlerTypes, actualHandlerTypes);
         }
 
         [TestMethod]
@@ -299,9 +293,7 @@
                 .Select(h => h.GetType()).ToArray();
 
             // Assert
-            Assert.AreEqual(
-                expected: expectedHandlerTypes.ToFriendlyNamesText(),
-                actual: actualHandlerTypes.ToFriendlyNamesText());
+            AssertThat.SequenceEquals(expectedHandlerTypes, actualHandlerTypes);
         }
 
         [TestMethod]
@@ -327,9 +319,62 @@
                 .Select(h => h.GetType()).ToArray();
 
             // Assert
-            Assert.AreEqual(
-                expected: expectedHandlerTypes.ToFriendlyNamesText(),
-                actual: actualHandlerTypes.ToFriendlyNamesText());
+            AssertThat.SequenceEquals(expectedHandlerTypes, actualHandlerTypes);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_AppendingInstancesOfOpenGenericImplementations_ResolvesTheExpectedCollection()
+        {
+            // Arrange
+            Type[] expectedHandlerTypes = new[]
+            {
+                typeof(NewConstraintEventHandler<StructEvent>),
+                typeof(StructConstraintEventHandler<StructEvent>),
+            };
+
+            var container = ContainerFactory.New();
+
+            container.Collection.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+
+            container.Collection
+                .AppendInstance(typeof(IEventHandler<>), new StructConstraintEventHandler<StructEvent>());
+
+            // AuditableEventEventHandler<AuditableEvent> can be registered, and resolved, but should not
+            // be resolved as part of IEnumerable<IEventHandler<StructEvent>>.
+            container.Collection
+                .AppendInstance(typeof(IEventHandler<>), new AuditableEventEventHandler<AuditableEvent>());
+
+            // Act
+            var handlers = container.GetAllInstances(typeof(IEventHandler<StructEvent>));
+            Type[] actualHandlerTypes = handlers.Select(h => h.GetType()).ToArray();
+
+            // Assert
+            AssertThat.SequenceEquals(expectedHandlerTypes, actualHandlerTypes);
+        }
+        
+        [TestMethod]
+        public void GetAllInstances_AppendingInstancesOfClosedGenericImplementation_ResolvesTheExpectedCollection()
+        {
+            // Arrange
+            Type[] expectedHandlerTypes = new[]
+            {
+                typeof(NewConstraintEventHandler<StructEvent>),
+                typeof(AuditableEventEventHandler<StructEvent>),
+            };
+
+            var container = ContainerFactory.New();
+
+            container.Collection.Register(typeof(IEventHandler<>), new[] { typeof(NewConstraintEventHandler<>) });
+
+            container.Collection
+                .AppendInstance<IEventHandler<StructEvent>>(new AuditableEventEventHandler<StructEvent>());
+
+            // Act
+            var handlers = container.GetAllInstances(typeof(IEventHandler<StructEvent>));
+            Type[] actualHandlerTypes = handlers.Select(h => h.GetType()).ToArray();
+
+            // Assert
+            AssertThat.SequenceEquals(expectedHandlerTypes, actualHandlerTypes);
         }
 
         [TestMethod]
