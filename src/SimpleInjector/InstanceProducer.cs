@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 - 2014 Simple Injector Contributors
+ * Copyright (c) 2013 - 2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -362,15 +362,32 @@ namespace SimpleInjector
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> on an instance that depends on this
         /// instance, or by calling <see cref="SimpleInjector.Container.Verify()">Verify</see> on the container.
         /// </exception>
-        public string VisualizeObjectGraph()
+        public string VisualizeObjectGraph() => this.VisualizeObjectGraph(new VisualizationOptions());
+
+        /// <summary>
+        /// Builds a string representation of the object graph with the current instance as root of the
+        /// graph.
+        /// </summary>
+        /// <param name="options">The various visualization options for building a string representation of the object graph.</param>
+        /// <returns>A string representation of the object graph.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when this method is called before 
+        /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> have been called. These calls can be
+        /// done directly and explicitly by the user on this instance, indirectly by calling
+        /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> on an instance that depends on this
+        /// instance, or by calling <see cref="SimpleInjector.Container.Verify()">Verify</see> on the container.
+        /// </exception>
+        /// <exception cref="NullReferenceException">Thrown when options is null.</exception>
+        public string VisualizeObjectGraph(VisualizationOptions options)
         {
+            Requires.IsNotNull(options, nameof(options));
+
             if (!this.IsExpressionCreated)
             {
                 throw new InvalidOperationException(
                     StringResources.VisualizeObjectGraphShouldBeCalledAfterTheExpressionIsCreated());
             }
 
-            return InstanceProducerVisualizer.VisualizeIndentedObjectGraph(this);
+            return InstanceProducerVisualizer.VisualizeIndentedObjectGraph(this, options);
         }
 
         // Throws an InvalidOperationException on failure.
@@ -676,7 +693,7 @@ namespace SimpleInjector
             // graph to be shown in compact form in the debugger in-line value field, but still allow the
             // complete formatted object graph to be shown when the user opens the text visualizer.
             [DebuggerDisplay(value: "{" + nameof(TruncatedDependencyGraph) + ", nq}")]
-            public string DependencyGraph => this.producer.VisualizeIndentedObjectGraph();
+            public string DependencyGraph => this.producer.VisualizeIndentedObjectGraph(new VisualizationOptions());
 
             [DebuggerHidden]
             private string TruncatedDependencyGraph => this.producer.VisualizeInlinedAndTruncatedObjectGraph(160);
