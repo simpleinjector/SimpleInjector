@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014 Simple Injector Contributors
+ * Copyright (c) 2014-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,11 +23,13 @@
 namespace SimpleInjector.Internals
 {
     using System;
-    
+    using System.Diagnostics;
+
     /// <summary>
     /// Container controlled collections can be supplied with both Type objects or direct Registration
     /// instances.
     /// </summary>
+    [DebuggerDisplay(nameof(ContainerControlledItem) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
     internal sealed class ContainerControlledItem
     {
         /// <summary>Will never be null. Can be open-generic.</summary>
@@ -49,10 +51,16 @@ namespace SimpleInjector.Internals
             this.ImplementationType = implementationType;
         }
 
-        public static ContainerControlledItem CreateFromRegistration(Registration registration) => 
+        internal string DebuggerDisplay =>
+            $"ImplementationType: {this.ImplementationType.ToFriendlyName()}, " + (
+            this.Registration != null
+                ? $"Registration.ImplementationType: {this.Registration.ImplementationType.ToFriendlyName()}"
+                : "Registration: <null>");
+
+        public static ContainerControlledItem CreateFromRegistration(Registration registration) =>
             new ContainerControlledItem(registration);
 
-        public static ContainerControlledItem CreateFromType(Type implementationType) => 
+        public static ContainerControlledItem CreateFromType(Type implementationType) =>
             new ContainerControlledItem(implementationType);
     }
 }

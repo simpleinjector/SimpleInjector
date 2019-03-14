@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2018 Simple Injector Contributors
+ * Copyright (c) 2018-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -31,18 +31,22 @@ namespace SimpleInjector
     using SimpleInjector.Lifestyles;
 
     /// <summary>
-    /// Contains methods for registering and creating collections in the <see cref="Container"/>.
+    /// Contains methods for registering and creating collections in the <see cref="SimpleInjector.Container"/>.
     /// </summary>
     public sealed class ContainerCollectionRegistrator
     {
-        private readonly Container container;
-
         internal ContainerCollectionRegistrator(Container container)
         {
             Requires.IsNotNull(container, nameof(container));
 
-            this.container = container;
+            this.Container = container;
         }
+
+        /// <summary>
+        /// Gets the <see cref="SimpleInjector.Container"/> for this instance.
+        /// </summary>
+        /// <value>The <see cref="SimpleInjector.Container"/> for this instance.</value>
+        public Container Container { get; }
 
         /// <summary>
         /// Creates a collection of 
@@ -84,7 +88,7 @@ namespace SimpleInjector
             Requires.IsNotNull(assemblies, nameof(assemblies));
 
             var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };
-            var types = this.container.GetTypesToRegister(typeof(TService), assemblies, compositesExcluded);
+            var types = this.Container.GetTypesToRegister(typeof(TService), assemblies, compositesExcluded);
 
             return this.Create<TService>(types);
         }
@@ -241,7 +245,7 @@ namespace SimpleInjector
             Requires.IsNotNull(assemblies, nameof(assemblies));
 
             var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };
-            var types = this.container.GetTypesToRegister(typeof(TService), assemblies, compositesExcluded);
+            var types = this.Container.GetTypesToRegister(typeof(TService), assemblies, compositesExcluded);
 
             return this.CreateRegistration<TService>(types);
         }
@@ -365,7 +369,7 @@ namespace SimpleInjector
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
+        [Obsolete("Please use Container." + nameof(SimpleInjector.Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void AppendTo(Type serviceType, Registration registration)
@@ -387,7 +391,7 @@ namespace SimpleInjector
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
+        [Obsolete("Please use Container." + nameof(SimpleInjector.Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void AppendTo(Type serviceType, Type implementationType)
@@ -418,7 +422,7 @@ namespace SimpleInjector
             Requires.IsReferenceType(serviceType, nameof(serviceType));
             Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
 
-            Requires.IsRegistrationForThisContainer(this.container, registration, nameof(registration));
+            Requires.IsRegistrationForThisContainer(this.Container, registration, nameof(registration));
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
                 registration.ImplementationType, nameof(registration));
 
@@ -470,7 +474,7 @@ namespace SimpleInjector
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
             this.AppendToCollectionInternal(typeof(TService),
-                lifestyle.CreateRegistration<TImplementation>(this.container));
+                lifestyle.CreateRegistration<TImplementation>(this.Container));
         }
 
         /// <summary>
@@ -500,10 +504,101 @@ namespace SimpleInjector
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
                 implementationType, nameof(implementationType));
 
-            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType,
-                new[] { implementationType }, nameof(implementationType));
+            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
+                serviceType, implementationType, nameof(implementationType));
 
             this.AppendToCollectionInternal(serviceType, implementationType);
+        }
+
+        /// <summary>
+        /// Appends the specified delegate <paramref name="instanceCreator"/> to existing registrations
+        /// made for a collection of <typeparamref name="TService"/> elements using one of the 
+        /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see>
+        /// overloads.
+        /// </summary>
+        /// <typeparam name="TService">The element type of the collections to register.</typeparam>
+        /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TService"/> is not a
+        /// reference type, or ambiguous.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
+        /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
+        /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
+        /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
+        public void Append<TService>(Func<TService> instanceCreator, Lifestyle lifestyle)
+            where TService : class
+        {
+            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
+
+            this.AppendToCollectionInternal(typeof(TService),
+                lifestyle.CreateRegistration(instanceCreator, this.Container));
+        }
+
+        /// <summary>
+        /// Appends a single instance to existing registrations made for a collection of 
+        /// <typeparamref name="TService"/> elements using one of the 
+        /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see>
+        /// overloads. This <paramref name="instance"/> must be thread-safe when working in a multi-threaded
+        /// environment.
+        /// <b>NOTE:</b> Do note that instances supplied by this method <b>NEVER</b> get disposed by the
+        /// container, since the instance is assumed to outlive this container instance. If disposing is
+        /// required, use 
+        /// <see cref="Container.RegisterSingleton{TService}(Func{TService})">RegisterSingleton&lt;TService&gt;(Func&lt;TService&gt;)</see>.
+        /// </summary>
+        /// <typeparam name="TService">The element type of the collections to register.</typeparam>
+        /// <param name="instance">The instance to register.</param>
+        /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TService"/> is ambiguous.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is a null reference.
+        /// </exception>
+        public void AppendInstance<TService>(TService instance) where TService : class
+        {
+            Requires.IsNotNull(instance, nameof(instance));
+            Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
+
+            this.AppendToCollectionInternal(typeof(TService),
+                SingletonLifestyle.CreateSingleInstanceRegistration(typeof(TService), instance, this.Container));
+        }
+
+        /// <summary>
+        /// Appends a single instance to existing registrations made for a collection of 
+        /// <paramref name="serviceType"/> elements using one of the 
+        /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see>
+        /// overloads. This <paramref name="instance"/> must be thread-safe when working in a multi-threaded
+        /// environment.
+        /// <b>NOTE:</b> Do note that instances supplied by this method <b>NEVER</b> get disposed by the
+        /// container, since the instance is assumed to outlive this container instance. If disposing is
+        /// required, use 
+        /// <see cref="Container.RegisterSingleton{TService}(Func{TService})">RegisterSingleton&lt;TService&gt;(Func&lt;TService&gt;)</see>.
+        /// </summary>
+        /// <param name="serviceType">TThe element type of the collections to register.</param>
+        /// <param name="instance">The instance to register.</param>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is ambiguous, or
+        /// <paramref name="instance"/> does not implement <paramref name="serviceType"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <paramref name="instance"/> are null references.
+        /// </exception>
+        public void AppendInstance(Type serviceType, object instance)
+        {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(instance, nameof(instance));
+            Requires.IsReferenceType(serviceType, nameof(serviceType));
+            Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
+
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(
+                serviceType, instance.GetType(), nameof(instance));
+
+            // We need to build a registration using the actual instance type because serviceType
+            // is allowed to be a generic type definition.
+            this.AppendToCollectionInternal(
+                serviceType,
+                SingletonLifestyle.CreateSingleInstanceRegistration(
+                    instance.GetType(), instance, this.Container));
         }
 
         /// <summary>
@@ -562,7 +657,7 @@ namespace SimpleInjector
                 select SingletonLifestyle.CreateSingleInstanceRegistration(
                     typeof(TService),
                     singleton,
-                    this.container,
+                    this.Container,
                     singleton.GetType());
 
             this.Register(typeof(TService), singletonRegistrations);
@@ -703,7 +798,7 @@ namespace SimpleInjector
             registrations = registrations.ToArray();
 
             Requires.DoesNotContainNullValues(registrations, nameof(registrations));
-            Requires.AreRegistrationsForThisContainer(this.container, registrations, nameof(registrations));
+            Requires.AreRegistrationsForThisContainer(this.Container, registrations, nameof(registrations));
             Requires.ServiceIsAssignableFromImplementations(serviceType, registrations, nameof(registrations),
                 typeCanBeServiceType: true);
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, registrations,
@@ -824,7 +919,7 @@ namespace SimpleInjector
         public void Register(Type serviceType, IEnumerable<Assembly> assemblies)
         {
             var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };
-            var types = this.container.GetTypesToRegister(serviceType, assemblies, compositesExcluded);
+            var types = this.Container.GetTypesToRegister(serviceType, assemblies, compositesExcluded);
             this.Register(serviceType, types);
         }
 
@@ -846,7 +941,7 @@ namespace SimpleInjector
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(typeof(TService), serviceTypes,
                 nameof(serviceTypes));
 
-            var collection = new ContainerControlledCollection<TService>(this.container);
+            var collection = new ContainerControlledCollection<TService>(this.Container);
 
             collection.AppendAll(serviceTypes);
 
@@ -863,13 +958,13 @@ namespace SimpleInjector
             Requires.IsNotNull(registrations, nameof(registrations));
 
             Requires.DoesNotContainNullValues(registrations, nameof(registrations));
-            Requires.AreRegistrationsForThisContainer(this.container, registrations, nameof(registrations));
+            Requires.AreRegistrationsForThisContainer(this.Container, registrations, nameof(registrations));
             Requires.ServiceIsAssignableFromImplementations(typeof(TService), registrations, nameof(registrations),
                 typeCanBeServiceType: true);
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(typeof(TService), registrations,
                 nameof(registrations));
 
-            var collection = new ContainerControlledCollection<TService>(this.container);
+            var collection = new ContainerControlledCollection<TService>(this.Container);
 
             collection.AppendAll(registrations);
 
@@ -885,7 +980,7 @@ namespace SimpleInjector
             // linked using a WeakReference to allow it to be GCed. To prevent this from happening, while
             // the application keeps referencing the collection, we let the collection reference the producer.
             collection.ParentProducer =
-                SingletonLifestyle.CreateControlledCollectionProducer(collection, this.container);
+                SingletonLifestyle.CreateControlledCollectionProducer(collection, this.Container);
         }
 
         // This method is internal to prevent the main API of the framework from being 'polluted'. The
@@ -924,7 +1019,7 @@ namespace SimpleInjector
         private void RegisterCollectionInternal(Type itemType, ContainerControlledItem[] controlledItems,
             bool appending = false)
         {
-            this.container.ThrowWhenContainerIsLockedOrDisposed();
+            this.Container.ThrowWhenContainerIsLockedOrDisposed();
 
             this.RegisterGenericContainerControlledCollection(itemType, controlledItems, appending);
         }
@@ -939,10 +1034,10 @@ namespace SimpleInjector
 
         private void RegisterGenericContainerUncontrolledCollection(Type itemType, IEnumerable collection)
         {
-            var resolver = this.container.GetContainerUncontrolledResolver(itemType);
+            var resolver = this.Container.GetContainerUncontrolledResolver(itemType);
 
             var producer = SingletonLifestyle.CreateUncontrolledCollectionProducer(
-                itemType, collection, this.container);
+                itemType, collection, this.Container);
 
             resolver.RegisterUncontrolledCollection(itemType, producer);
         }
@@ -958,7 +1053,7 @@ namespace SimpleInjector
 
         private CollectionResolver GetContainerControlledResolver(Type itemType)
         {
-            return this.container.GetCollectionResolver(itemType, containerControlled: true);
+            return this.Container.GetCollectionResolver(itemType, containerControlled: true);
         }
     }
 }
