@@ -240,7 +240,7 @@
 
                 if (local != null)
                 {
-                    if (consumer.Target.TargetType.IsValueType && this.container.IsVerifying())
+                    if (consumer.Target.TargetType.IsValueType && this.container.IsVerifying)
                     {
                         throw new InvalidOperationException(
                             "You can't use Verify() if the factory product contains value types.");

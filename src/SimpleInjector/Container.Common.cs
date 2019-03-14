@@ -133,7 +133,14 @@ namespace SimpleInjector
         /// false.</value>
         public bool IsVerifying
         {
-            get { return this.isVerifying.Value; }
+            get
+            {
+                // Need to check, because IsVerifying will throw when its ThreadLocal<T> is disposed.
+                this.ThrowWhenDisposed();
+
+                return this.isVerifying.Value;
+            }
+
             private set { this.isVerifying.Value = value; }
         }
 

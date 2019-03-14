@@ -461,7 +461,7 @@ namespace SimpleInjector
                     "Type 'Microsoft.AspNetCore.Http.IHttpContextAccessor' is not available in the " +
                     "IApplicationBuilder.ApplicationServices collection. Please make sure it is " +
                     "registered by adding it to the ConfigureServices method as follows: " + Environment.NewLine +
-                    "services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();");
+                    "services.AddHttpContextAccessor();");
             }
 
             return accessor;

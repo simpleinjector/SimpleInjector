@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2016 Simple Injector Contributors
+ * Copyright (c) 2013-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,6 +23,7 @@
 namespace SimpleInjector.Integration.Web
 {
     using System;
+    using System.Collections.Generic;
     using System.Web;
 
     /// <summary>
@@ -88,17 +89,17 @@ namespace SimpleInjector.Integration.Web
         {
             Requires.IsNotNull(context, nameof(context));
 
-            var scope = (Scope)context.Items[ScopeKey];
+            // NOTE: We explicitly don't remove the scopes from the items dictionary, because if anything
+            // is resolved from the container after this point during the request, that would cause the
+            // creation of a new Scope that will never be disposed. This would make it seem like the
+            // application is working, while instead we are failing silently. By not removing the scope,
+            // this will cause it to throw an ObjectDisposedException once it is accessed after
+            // this point; effectively making the application to fail fast.
+            var scopes = (List<Scope>)context.Items[ScopeKey];
 
-            if (scope != null)
+            if (!(scopes is null))
             {
-                // NOTE: We explicitly don't remove the object from the items dictionary, because if anything
-                // is resolved from the container after this point during the request, that would cause the
-                // creation of a new Scope, that will never be disposed. This would make it seem like the
-                // application is working, while instead we are failing silently. By not removing the object,
-                // this will cause the Scope to throw an ObjectDisposedException once it is accessed after
-                // this point; effectively making the application to fail fast.
-                scope.Dispose();
+                DisposeScopes(scopes);
             }
         }
 
@@ -128,24 +129,69 @@ namespace SimpleInjector.Integration.Web
         {
             HttpContext context = HttpContext.Current;
 
-            if (context == null)
+            if (context is null)
             {
                 return null;
             }
 
-            var scope = (Scope)context.Items[ScopeKey];
+            // The assumption is that there will only be a very limited set of containers used per request
+            // (typically just one), which makes using a List<T> much faster (and less memory intensive)
+            // than using a dictionary.
+            var scopes = (List<Scope>)context.Items[ScopeKey];
 
-            if (scope == null)
+            if (scopes is null)
             {
-                // If there are multiple container instances that run on the same request (which is a
-                // strange but valid scenario), all containers will get the same Scope instance for that
-                // request. This behavior is correct and even allows all instances that are registered for
-                // disposal to be disposed in reversed order of creation, independent of the container that
-                // created them.
-                context.Items[ScopeKey] = scope = new Scope();
+                context.Items[ScopeKey] = scopes = new List<Scope>(capacity: 2);
+            }
+
+            var scope = FindScopeForContainer(scopes, container);
+
+            if (scope is null)
+            {
+                scopes.Add(scope = new Scope(container));
             }
 
             return scope;
+        }
+
+        private static Scope FindScopeForContainer(List<Scope> scopes, Container container)
+        {
+            foreach (var scope in scopes)
+            {
+                if (scope.Container == container)
+                {
+                    return scope;
+                }
+            }
+
+            return null;
+        }
+
+        private static void DisposeScopes(List<Scope> scopes)
+        {
+            if (scopes.Count != 1)
+            {
+                DisposeScopesInReverseOrder(scopes);
+            }
+            else
+            {
+                // Optimization: don't create a master scope if there is only one scope (the common case).
+                scopes[0].Dispose();
+            }
+        }
+
+        private static void DisposeScopesInReverseOrder(List<Scope> scopes)
+        {
+            // Here we use a 'master' scope that will hold the real scopes. This allows all scopes
+            // to be disposed, even if a scope's Dispose method throws an exception. Scopes will
+            // also be disposed in opposite order of creation.
+            using (var masterScope = new Scope())
+            {
+                foreach (var scope in scopes)
+                {
+                    masterScope.RegisterForDisposal(scope);
+                }
+            }
         }
     }
 }
