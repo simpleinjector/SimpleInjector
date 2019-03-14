@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -24,11 +24,9 @@ namespace SimpleInjector.Decorators
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Threading;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
@@ -39,17 +37,6 @@ namespace SimpleInjector.Decorators
     {
         private static readonly MethodInfo ResolveWithinThreadResolveScopeMethod =
             typeof(DecoratorExpressionInterceptor).GetMethod(nameof(ResolveWithinThreadResolveScope));
-
-        private static readonly Func<Container, object, ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>> ThreadLocalDictionaryFactory =
-            (container, key) =>
-            {
-                var threadLocal = new ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>(
-                    () => new Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>());
-
-                container.ContainerScope.RegisterForDisposal(threadLocal);
-
-                return threadLocal;
-            };
 
         private readonly DecoratorExpressionInterceptorData data;
 
@@ -72,11 +59,6 @@ namespace SimpleInjector.Decorators
 
         protected Predicate<DecoratorPredicateContext> Predicate => this.data.Predicate;
 
-        protected abstract Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> ThreadStaticServiceTypePredicateCache
-        {
-            get;
-        }
-
         // NOTE: This method must be public for it to be callable through reflection when running in a sandbox.
         public static TService ResolveWithinThreadResolveScope<TService>(
             Scope scope, Func<TService> instanceCreator)
@@ -96,89 +78,60 @@ namespace SimpleInjector.Decorators
             }
         }
 
-        // Store a ServiceTypeDecoratorInfo object per closed service type. We have a dictionary per
-        // thread for thread-safety. We need a dictionary per thread, since the ExpressionBuilt event can
-        // get raised by multiple threads at the same time (especially for types resolved using
-        // unregistered type resolution) and using the same dictionary could lead to duplicate entries
-        // in the ServiceTypeDecoratorInfo.AppliedDecorators list. Because the ExpressionBuilt event gets 
-        // raised and all delegates registered to that event will get called on the same thread and before
-        // an InstanceProducer stores the Expression, we can safely store this information in a 
-        // thread-static field.
-        // The key for retrieving the threadLocal value is supplied by the caller. This way both the 
-        // DecoratorExpressionInterceptor and the ContainerUncontrolledServiceDecoratorInterceptor can have
-        // their own dictionary. This is needed because they both use the same key, but store different
-        // information.
-        protected Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> GetThreadStaticServiceTypePredicateCacheByKey(object key) =>
-            this.Container.ContainerScope.GetOrSetItem(key, ThreadLocalDictionaryFactory).Value;
-
         protected bool SatisfiesPredicate(DecoratorPredicateContext context) =>
             this.Predicate == null || this.Predicate(context);
 
-        protected ServiceTypeDecoratorInfo GetServiceTypeInfo(ExpressionBuiltEventArgs e) =>
-            this.GetServiceTypeInfo(e.Expression, e.InstanceProducer, e.ReplacedRegistration,
-                e.RegisteredServiceType);
-
-        protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
-            InstanceProducer registeredProducer, Registration originalRegistration,
-            Type registeredServiceType)
+        protected ServiceTypeDecoratorInfo GetServiceTypeInfo(
+            ExpressionBuiltEventArgs e,
+            Expression originalExpression = null,
+            Registration originalRegistration = null,
+            Type registeredServiceType = null)
         {
+            originalExpression = originalExpression ?? e.Expression;
+            originalRegistration = originalRegistration ?? e.ReplacedRegistration;
+            registeredServiceType = registeredServiceType ?? e.RegisteredServiceType;
+
             // registeredProducer.ServiceType and registeredServiceType are different when called by 
             // container uncontrolled decorator. producer.ServiceType will be IEnumerable<T> and 
             // registeredServiceType will be T.
-            Func<Type, InstanceProducer> producerBuilder = implementationType =>
+            if (e.DecoratorInfo == null)
             {
+                Type implementationType =
+                    DecoratorHelpers.DetermineImplementationType(originalExpression, e.InstanceProducer);
+
                 // The InstanceProducer created here is used to do correct diagnostics. We can't return the
                 // registeredProducer here, since the lifestyle of the original producer can change after
                 // the ExpressionBuilt event has ran, which means that this would invalidate the diagnostic
                 // results.
-                return new InstanceProducer(registeredServiceType, originalRegistration,
-                    registerExternalProducer: false);
-            };
+                var producer = new InstanceProducer(
+                    registeredServiceType, originalRegistration, registerExternalProducer: false);
 
-            return this.GetServiceTypeInfo(originalExpression, registeredProducer, producerBuilder);
-        }
-
-        protected ServiceTypeDecoratorInfo GetServiceTypeInfo(Expression originalExpression,
-            InstanceProducer registeredProducer, Func<Type, InstanceProducer> producerBuilder)
-        {
-            var predicateCache = this.ThreadStaticServiceTypePredicateCache;
-
-            if (!predicateCache.ContainsKey(registeredProducer))
-            {
-                Type implementationType =
-                    DecoratorHelpers.DetermineImplementationType(originalExpression, registeredProducer);
-
-                var producer = producerBuilder(implementationType);
-
-                predicateCache[registeredProducer] = new ServiceTypeDecoratorInfo(implementationType, producer);
+                e.DecoratorInfo = new ServiceTypeDecoratorInfo(implementationType, producer);
             }
 
-            return predicateCache[registeredProducer];
+            return e.DecoratorInfo;
         }
 
         protected Registration CreateRegistration(Type serviceType, ConstructorInfo decoratorConstructor,
             Expression decorateeExpression, InstanceProducer realProducer, ServiceTypeDecoratorInfo info)
         {
-            var overriddenParameters = this.CreateOverriddenParameters(serviceType, decoratorConstructor,
-                decorateeExpression, realProducer, info);
+            var overriddenParameters = this.CreateOverriddenParameters(
+                serviceType, decoratorConstructor, decorateeExpression, realProducer, info);
 
             return this.Lifestyle.CreateDecoratorRegistration(
-                decoratorConstructor.DeclaringType, this.Container,
-                overriddenParameters);
+                decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
         }
         
         protected DecoratorPredicateContext CreatePredicateContext(ExpressionBuiltEventArgs e)
         {
-            return this.CreatePredicateContext(e.InstanceProducer, e.ReplacedRegistration,
-                e.RegisteredServiceType, e.Expression);
+            ServiceTypeDecoratorInfo info = this.GetServiceTypeInfo(e);
+
+            return this.CreatePredicateContext(e.RegisteredServiceType, e.Expression, info);
         }
 
-        protected DecoratorPredicateContext CreatePredicateContext(InstanceProducer registeredProducer,
-            Registration originalRegistration, Type registeredServiceType, Expression expression)
+        protected DecoratorPredicateContext CreatePredicateContext(
+            Type registeredServiceType, Expression expression, ServiceTypeDecoratorInfo info)
         {
-            var info = this.GetServiceTypeInfo(expression, registeredProducer, originalRegistration,
-                registeredServiceType);
-
             // NOTE: registeredServiceType can be different from registeredProducer.ServiceType.
             // This is the case for container uncontrolled collections where producer.ServiceType is the
             // IEnumerable<T> and registeredServiceType is T.
