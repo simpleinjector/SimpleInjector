@@ -23,11 +23,17 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
     using System.Reflection;
     using Integration.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Mvc.ApplicationParts;
     using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.Razor;
     using Microsoft.AspNetCore.Mvc.Razor.Internal;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
@@ -35,7 +41,7 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorAspNetCoreMvcIntegrationExtensions
     {
-         /// <summary>
+        /// <summary>
         /// Registers a custom <see cref="SimpleInjectorTagHelperActivator"/> that allows the resolval of
         /// tag helpers using the <paramref name="container"/>. In case no <paramref name="applicationTypeSelector"/>
         /// is supplied, the custom tag helper activator will forward the creation of tag helpers that are not
@@ -48,7 +54,9 @@ namespace SimpleInjector
         /// should be resolved by Simple Injector (true) and which should be resolved by the framework (false).
         /// When not specified, all tag helpers whose namespace does not start with "Microsoft" will be forwarded
         /// to the Simple Injector container.</param>
-        public static void AddSimpleInjectorTagHelperActivation(this IServiceCollection services, Container container,
+        public static void AddSimpleInjectorTagHelperActivation(
+            this IServiceCollection services,
+            Container container,
             Predicate<Type> applicationTypeSelector = null)
         {
             if (services == null)
@@ -71,6 +79,69 @@ namespace SimpleInjector
                 container,
                 applicationTypeSelector,
                 new DefaultTagHelperActivator(p.GetRequiredService<ITypeActivatorCache>())));
+        }
+
+        /// <summary>
+        /// Registers the ASP.NET Core MVC controller instances that are defined in the application through
+        /// the <see cref="ApplicationPartManager"/>.
+        /// </summary>
+        /// <param name="container">The container the controllers should be registered in.</param>
+        /// <param name="applicationBuilder">The ASP.NET object that holds the application's configuration.
+        /// </param>
+        public static void RegisterPageModels(
+            this Container container, IApplicationBuilder applicationBuilder)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
+
+            if (applicationBuilder == null)
+            {
+                throw new ArgumentNullException(nameof(applicationBuilder));
+            }
+
+            var manager = applicationBuilder.ApplicationServices.GetService<ApplicationPartManager>();
+
+            if (manager == null)
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "A registration for the {0} is missing from the ASP.NET Core configuration " +
+                        "system. This is most likely caused by a missing call to services.AddMvcCore() or " +
+                        "services.AddMvc() as part of the ConfigureServices(IServiceCollection) method of " +
+                        "the Startup class. A call to one of those methods will ensure the registration " +
+                        "of the {1}.",
+                        typeof(ApplicationPartManager).FullName,
+                        typeof(ApplicationPartManager).Name));
+            }
+
+            // As far as I can see, page models must inherit from the PageModel class.
+            var pageModelTypes =
+                from part in manager.ApplicationParts.OfType<IApplicationPartTypeProvider>()
+                from type in part.Types
+                where type.IsSubclassOf(typeof(PageModel))
+                where !type.IsAbstract
+                where !type.IsGenericTypeDefinition
+                select type;
+
+            RegisterPageModelTypes(container, pageModelTypes);
+        }
+
+        private static void RegisterPageModelTypes(this Container container, IEnumerable<Type> types)
+        {
+            foreach (Type type in types.ToArray())
+            {
+                container.AddRegistration(type, CreateConcreteRegistration(container, type));
+            }
+        }
+
+        private static Registration CreateConcreteRegistration(Container container, Type concreteType)
+        {
+            var lifestyle = container.Options.LifestyleSelectionBehavior.SelectLifestyle(concreteType);
+
+            return lifestyle.CreateRegistration(concreteType, container);
         }
     }
 }
