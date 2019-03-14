@@ -546,7 +546,7 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "A lifestyle mismatch is encountered",
+                "lifestyle mismatch",
                 action);
         }
 
@@ -566,7 +566,7 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "A lifestyle mismatch is encountered",
+                "lifestyle mismatch",
                 action);
         }
 

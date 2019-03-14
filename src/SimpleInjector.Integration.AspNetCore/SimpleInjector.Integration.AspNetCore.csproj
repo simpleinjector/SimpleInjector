@@ -16,7 +16,7 @@
     <PackageTags>simpleinjector;dependency-injection;DI;ASP.NET;ASP.NET Core;asp.net-core</PackageTags>
     <PackageIconUrl>https://simpleinjector.org/simpleinjector.ico</PackageIconUrl>
     <PackageProjectUrl>https://simpleinjector.org/aspnetcore</PackageProjectUrl>
-    <PackageLicenseUrl>https://simpleinjector.org/license</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
