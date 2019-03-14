@@ -29,6 +29,8 @@ namespace SimpleInjector.Internals
 
     internal sealed class ObjectGraphBuilder
     {
+        private const int IndentSize = 4;
+
         private readonly StringBuilder builder = new StringBuilder();
         private readonly Stack<ProducerEntry> producers = new Stack<ProducerEntry>();
         private readonly bool writeLifestyles;
@@ -82,6 +84,7 @@ namespace SimpleInjector.Internals
                     this.AppendLifestyle(this.stillToWriteLifestyleEntry);
                     this.stillToWriteLifestyleEntry = null;
                 }
+
                 this.AppendLifestyle(entry);
             }
 
@@ -114,10 +117,9 @@ namespace SimpleInjector.Internals
 
         private void AppendIndent()
         {
-            const string INDENT = "    ";
-            for (int i = 0; i < this.indentingDepth; i++)
+            for (int i = 0; i < this.indentingDepth * IndentSize; i++)
             {
-                this.Append(INDENT);
+                this.builder.Append(' ');
             }
         }
 
