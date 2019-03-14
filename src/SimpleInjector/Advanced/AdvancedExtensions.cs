@@ -51,12 +51,13 @@ namespace SimpleInjector.Advanced
         /// <param name="container">The container.</param>
         /// <returns><c>true</c> if the specified container is verifying; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is null.</exception>
+        [Obsolete("Please use Container." + nameof(Container.IsVerifying) + " instead. " +
+            "This method will be removed in a future release.",
+            error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static bool IsVerifying(this Container container)
         {
             Requires.IsNotNull(container, nameof(container));
-
-            // Need to check, because IsVerifying will throw when its ThreadLocal<T> is disposed.
-            container.ThrowWhenDisposed();
 
             return container.IsVerifying;
         }
