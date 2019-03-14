@@ -25,7 +25,10 @@ namespace SimpleInjector.Lifestyles
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
+    using System.Threading;
+    using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
 
     internal sealed class SingletonLifestyle : Lifestyle
@@ -52,25 +55,7 @@ namespace SimpleInjector.Lifestyles
                 instance, container);
         }
 
-        internal static InstanceProducer CreateControlledCollectionProducer<TService>(
-            ContainerControlledCollection<TService> collection, Container container)
-        {
-            Registration registration = CreateControlledCollectionRegistration(collection, container);
-
-            return new InstanceProducer(typeof(IEnumerable<TService>), registration);
-        }
-
-        internal static Registration CreateControlledCollectionRegistration<TService>(
-            ContainerControlledCollection<TService> collection, Container container)
-        {
-            var registration = CreateSingleInstanceRegistration(typeof(IEnumerable<TService>), collection, container);
-
-            registration.IsCollection = true;
-
-            return registration;
-        }
-
-        internal static InstanceProducer CreateUncontrolledCollectionProducer(Type itemType, 
+        internal static InstanceProducer CreateUncontrolledCollectionProducer(Type itemType,
             IEnumerable collection, Container container)
         {
             return new InstanceProducer(
@@ -78,7 +63,7 @@ namespace SimpleInjector.Lifestyles
                 CreateUncontrolledCollectionRegistration(itemType, collection, container));
         }
 
-        internal static Registration CreateUncontrolledCollectionRegistration(Type itemType, 
+        internal static Registration CreateUncontrolledCollectionRegistration(Type itemType,
             IEnumerable collection, Container container)
         {
             Type enumerableType = typeof(IEnumerable<>).MakeGenericType(itemType);
@@ -90,10 +75,10 @@ namespace SimpleInjector.Lifestyles
             return registration;
         }
 
-        internal static bool IsSingletonInstanceRegistration(Registration registration) => 
+        internal static bool IsSingletonInstanceRegistration(Registration registration) =>
             registration is SingletonInstanceLifestyleRegistration;
 
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) => 
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
             new SingletonLifestyleRegistration<TConcrete>(container);
 
         protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
@@ -111,7 +96,7 @@ namespace SimpleInjector.Lifestyles
             private object instance;
             private bool initialized;
 
-            internal SingletonInstanceLifestyleRegistration(Type serviceType, Type implementationType, 
+            internal SingletonInstanceLifestyleRegistration(Type serviceType, Type implementationType,
                 object instance, Container container)
                 : base(Lifestyle.Singleton, container)
             {
@@ -178,9 +163,9 @@ namespace SimpleInjector.Lifestyles
                 expression = this.WrapWithInitializer(this.ServiceType, expression);
 
                 // Optimization: We don't need to compile a delegate in case all we have is a constant.
-                if (expression is ConstantExpression)
+                if (expression is ConstantExpression constantExpression)
                 {
-                    return ((ConstantExpression)expression).Value;
+                    return constantExpression.Value;
                 }
 
                 Delegate initializer = Expression.Lambda(expression).Compile();
@@ -191,7 +176,7 @@ namespace SimpleInjector.Lifestyles
             }
         }
 
-        private sealed class SingletonLifestyleRegistration<TImplementation> : Registration 
+        private sealed class SingletonLifestyleRegistration<TImplementation> : Registration
             where TImplementation : class
         {
             private readonly object locker = new object();
@@ -207,7 +192,7 @@ namespace SimpleInjector.Lifestyles
 
             public override Type ImplementationType => typeof(TImplementation);
 
-            public override Expression BuildExpression() => 
+            public override Expression BuildExpression() =>
                 Expression.Constant(this.GetInterceptedInstance(), this.ImplementationType);
 
             private object GetInterceptedInstance()
@@ -245,11 +230,75 @@ namespace SimpleInjector.Lifestyles
 
                 Func<TImplementation> func = CompileExpression(expression);
 
-                TImplementation instance = func();
+                TImplementation instance = CreateInstance(func);
 
                 EnsureInstanceIsNotNull(instance);
 
                 return instance;
+            }
+
+            // Implements #553
+            private TImplementation CreateInstance(Func<TImplementation> instanceCreator)
+            {
+                var isCurrentThread = new ThreadLocal<bool> { Value = true };
+
+                // Create a listener that can spot when an injected stream is iterated during construction.
+                Action<ServiceCreatedListenerArgs> listener = args =>
+                {
+                    // Only handle when an inner registration hasn't handled this yet.
+                    if (!args.Handled)
+                    {
+                        // Only handle when the call originates from the same thread, as calls from different
+                        // threads mean the listener is not triggered from this specific instanceCreator.
+                        if (isCurrentThread.Value)
+                        {
+                            args.Handled = true;
+                            var matchingRelationship = FindMatchingCollectionRelationship(args.Producer);
+
+                            var additionalInformation = StringResources.CollectionUsedDuringConstruction(
+                                typeof(TImplementation),
+                                args.Producer,
+                                matchingRelationship);
+
+                            // At this point, an injected ContainerControlledCollection<T> has notified the listener
+                            // about the creation of one of its elements. This has happened during the
+                            // construction of this (Singleton) instance, which might cause Lifestyle Mismatches.
+                            // That's why this is added as a known relationship. This way diagnostics can verify
+                            // the relationship.
+                            this.AddRelationship(
+                                new KnownRelationship(
+                                    implementationType: typeof(TImplementation),
+                                    lifestyle: this.Lifestyle,
+                                    consumer: matchingRelationship?.Consumer,
+                                    dependency: args.Producer,
+                                    additionalInformation: additionalInformation));
+                        }
+                    }
+                };
+
+                try
+                {
+                    ControlledCollectionHelper.AddServiceCreatedListener(listener);
+
+                    return instanceCreator();
+                }
+                finally
+                {
+                    ControlledCollectionHelper.RemoveServiceCreatedListener(listener);
+                    isCurrentThread.Dispose();
+                }
+            }
+
+            private KnownRelationship FindMatchingCollectionRelationship(
+                InstanceProducer collectionItemProducer)
+            {
+                return (
+                    from relationship in this.GetRelationships()
+                    let producer = relationship.Dependency
+                    where producer.IsContainerControlledCollection()
+                    where producer.GetContainerControlledCollectionElementType() == collectionItemProducer.ServiceType
+                    select relationship)
+                    .FirstOrDefault();
             }
 
             private static Func<TImplementation> CompileExpression(Expression expression)
@@ -268,7 +317,7 @@ namespace SimpleInjector.Lifestyles
                     throw new ActivationException(message, ex);
                 }
             }
-            
+
             private static void EnsureInstanceIsNotNull(object instance)
             {
                 if (instance == null)

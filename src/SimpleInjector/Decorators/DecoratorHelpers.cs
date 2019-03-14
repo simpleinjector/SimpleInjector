@@ -30,8 +30,6 @@ namespace SimpleInjector.Decorators
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using SimpleInjector.Advanced;
-    using SimpleInjector.Internals;
 
     internal static partial class DecoratorHelpers
     {
@@ -84,52 +82,6 @@ namespace SimpleInjector.Decorators
             {
                 collection.Add(item);
             }
-        }
-
-        internal static Registration CreateRegistrationForContainerControlledCollection(Type serviceType,
-            IContainerControlledCollection instance, Container container)
-        {
-            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(serviceType);
-
-            return new ContainerControlledCollectionRegistration(enumerableServiceType, instance, container)
-            {
-                IsCollection = true
-            };
-        }
-
-        internal static IContainerControlledCollection ExtractContainerControlledCollectionFromRegistration(
-            Registration registration)
-        {
-            var controlledRegistration = registration as ContainerControlledCollectionRegistration;
-
-            // We can only determine the value when registration is created using the 
-            // CreateRegistrationForContainerControlledCollection method. When the registration is null the
-            // collection might be registered as container-uncontrolled collection.
-            if (controlledRegistration == null)
-            {
-                return null;
-            }
-
-            return controlledRegistration.Collection;
-        }
-
-        internal static IContainerControlledCollection CreateContainerControlledCollection(
-            Type serviceType, Container container)
-        {
-            var collection = Activator.CreateInstance(
-                typeof(ContainerControlledCollection<>).MakeGenericType(serviceType),
-                new object[] { container });
-
-            return (IContainerControlledCollection)collection;
-        }
-
-        internal static bool IsContainerControlledCollectionExpression(Expression enumerableExpression)
-        {
-            var constantExpression = enumerableExpression as ConstantExpression;
-
-            object enumerable = constantExpression != null ? constantExpression.Value : null;
-
-            return enumerable is IContainerControlledCollection;
         }
 
         internal static IEnumerable Select(this IEnumerable source, Type type, Delegate selector)
@@ -243,29 +195,6 @@ namespace SimpleInjector.Decorators
             return parameterType.IsGenericType()
                 && parameterType.GetGenericTypeDefinition() == typeof(Func<,>)
                 && parameterType == typeof(Func<,>).MakeGenericType(typeof(Scope), decoratingType);
-        }
-
-        private sealed class ContainerControlledCollectionRegistration : Registration
-        {
-            internal ContainerControlledCollectionRegistration(Type serviceType,
-                IContainerControlledCollection collection, Container container)
-                : base(Lifestyle.Singleton, container)
-            {
-                this.Collection = collection;
-                this.ImplementationType = serviceType;
-            }
-
-            public override Type ImplementationType { get; }
-
-            internal override bool MustBeVerified => !this.Collection.AllProducersVerified;
-
-            internal IContainerControlledCollection Collection { get; }
-
-            public override Expression BuildExpression() =>
-                Expression.Constant(this.Collection, this.ImplementationType);
-
-            internal override KnownRelationship[] GetRelationshipsCore() =>
-                base.GetRelationshipsCore().Concat(this.Collection.GetRelationships()).ToArray();
         }
     }
 }

@@ -24,7 +24,9 @@
             };
 
             // Warmup
-            BuildContainers(BuildEmptyContainer, count: 10);
+            BuildContainers(BuildEmptyContainer, count: values.NumberOfIterations);
+            GetTotalMemory();
+            BuildContainers(BuildEmptyContainer, count: values.NumberOfIterations);
 
             values.InitialMemoryFootprint = GetTotalMemory();
 
@@ -46,7 +48,9 @@
             };
 
             // Warmup
-            BuildContainers(BuildSimpleVerifiedContainerWithDecorator, count: 10);
+            BuildContainers(BuildSimpleVerifiedContainerWithDecorator, count: values.NumberOfIterations);
+            GetTotalMemory();
+            BuildContainers(BuildSimpleVerifiedContainerWithDecorator, count: values.NumberOfIterations);
 
             values.InitialMemoryFootprint = GetTotalMemory();
 

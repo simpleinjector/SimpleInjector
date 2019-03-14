@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015 Simple Injector Contributors
+ * Copyright (c) 2015-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -34,7 +34,7 @@ namespace SimpleInjector
     /// injected into, and provides access to its meta data.
     /// </summary>
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
-    public sealed class InjectionTargetInfo
+    public sealed class InjectionTargetInfo : IEquatable<InjectionTargetInfo>
     {
         internal InjectionTargetInfo(ParameterInfo parameter)
         {
@@ -190,5 +190,28 @@ namespace SimpleInjector
             this.Parameter != null
                 ? this.Parameter.GetCustomAttributes(typeof(T), inherit).Cast<T>()
                 : this.Property.GetCustomAttributes(typeof(T), inherit).Cast<T>();
+
+        /// <summary>Serves as a hash function for a particular type.</summary>
+        /// <returns>A hash code for the current <see cref="InjectionTargetInfo"/>.</returns>
+        public override int GetHashCode() =>
+            this.Parameter?.GetHashCode() ?? 0
+            ^ this.Property?.GetHashCode() ?? 0;
+
+        /// <summary>
+        ///  Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        public override bool Equals(object obj) => this.Equals(obj as InjectionTargetInfo);
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <param name="other">An object to compare with this object.</param>
+        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        public bool Equals(InjectionTargetInfo other) =>
+            this.Parameter != null
+                ? this.Parameter.Equals(other.Parameter)
+                : this.Property.Equals(other.Property);
     }
 }

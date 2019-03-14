@@ -572,24 +572,15 @@ namespace SimpleInjector
 
             Type elementType = collectionType.GetGenericArguments()[0];
 
-            object stream = this.GetAllInstances(elementType);
+            var stream = this.GetAllInstances(elementType) as IContainerControlledCollection;
 
-            if (!(stream is IContainerControlledCollection))
+            if (stream == null)
             {
                 return null;
             }
 
-            // We need special handling for Collection<T>, because the ContainerControlledCollection does not
-            // (and can't) inherit from Collection<T>. So we have to wrap that stream into a Collection<T>.
-            if (serviceTypeDefinition == typeof(Collection<>))
-            {
-                Type listType = typeof(IList<>).MakeGenericType(elementType);
-                stream = collectionType.GetConstructor(new[] { listType }).Invoke(new[] { stream });
-            }
-
-            var registration =
-                SingletonLifestyle.CreateSingleInstanceRegistration(collectionType, stream, this);
-
+            Registration registration = stream.CreateRegistration(collectionType, this);
+            
             return new InstanceProducer(collectionType, registration)
             {
                 IsContainerAutoRegistered = !((IEnumerable<object>)stream).Any()
@@ -600,7 +591,7 @@ namespace SimpleInjector
         {
             Type elementType = enumerableType.GetGenericArguments()[0];
 
-            var collection = DecoratorHelpers.CreateContainerControlledCollection(elementType, this);
+            var collection = ControlledCollectionHelper.CreateContainerControlledCollection(elementType, this);
 
             var registration = new ExpressionRegistration(Expression.Constant(collection, enumerableType), this);
 

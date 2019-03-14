@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015 Simple Injector Contributors
+ * Copyright (c) 2015-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -25,7 +25,6 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
     using SimpleInjector;
     using SimpleInjector.Decorators;
 
@@ -55,15 +54,17 @@ namespace SimpleInjector.Internals
             ContainerControlledItem[] closedGenericImplementations =
                 this.GetClosedContainerControlledItemsFor(closedServiceType);
 
-            IContainerControlledCollection collection = DecoratorHelpers.CreateContainerControlledCollection(
-                closedServiceType, this.Container);
+            IContainerControlledCollection collection =
+                ControlledCollectionHelper.CreateContainerControlledCollection(
+                    closedServiceType, this.Container);
 
             collection.AppendAll(closedGenericImplementations);
 
+            var collectionType = typeof(IEnumerable<>).MakeGenericType(closedServiceType);
+
             return new InstanceProducer(
-                typeof(IEnumerable<>).MakeGenericType(closedServiceType),
-                DecoratorHelpers.CreateRegistrationForContainerControlledCollection(closedServiceType,
-                    collection, this.Container));
+                serviceType: collectionType,
+                registration: collection.CreateRegistration(collectionType, this.Container));
         }
 
         protected override Type[] GetAllKnownClosedServiceTypes() => (
@@ -85,7 +86,7 @@ namespace SimpleInjector.Internals
                 : items.ToArray();
         }
 
-        private IEnumerable<ContainerControlledItem> GetItemsFor(Type closedGenericServiceType) => 
+        private IEnumerable<ContainerControlledItem> GetItemsFor(Type closedGenericServiceType) =>
             from registrationGroup in this.RegistrationGroups
             where registrationGroup.ServiceType.ContainsGenericParameters() ||
                 closedGenericServiceType.IsAssignableFrom(registrationGroup.ServiceType)

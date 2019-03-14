@@ -8,35 +8,7 @@
     internal static class TestHelpers
     {
         internal static string ToFriendlyNamesText(this IEnumerable<Type> types) =>
-            string.Join(", ", types.Select(ToFriendlyName));
-
-        internal static string ToFriendlyName(this Type type)
-        {
-            if (type == null)
-            {
-                return "null";
-            }
-
-            string name = type.Name;
-
-            if (type.IsNested && !type.IsGenericParameter)
-            {
-                name = type.DeclaringType.ToFriendlyName() + "+" + type.Name;
-            }
-
-            var genericArguments = GetGenericArguments(type);
-
-            if (genericArguments.Length == 0)
-            {
-                return name;
-            }
-
-            name = name.Substring(0, name.IndexOf('`'));
-
-            var argumentNames = genericArguments.Select(argument => argument.ToFriendlyName()).ToArray();
-
-            return name + "<" + string.Join(", ", argumentNames) + ">";
-        }
+            string.Join(", ", types.Select(TypesExtensions.ToFriendlyName));
 
         private static Type[] GetGenericArguments(Type type)
         {

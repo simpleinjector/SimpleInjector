@@ -224,6 +224,25 @@ namespace SimpleInjector
         internal static string NonGenericTypeAlreadyRegisteredAsConditionalRegistration(Type serviceType) =>
             NonGenericTypeAlreadyRegistered(serviceType, existingRegistrationIsConditional: true);
 
+        internal static string CollectionUsedDuringConstruction(
+            Type consumer, InstanceProducer producer, KnownRelationship relationship = null) =>
+            string.Format(CultureInfo.InvariantCulture,
+                "{0} is part of the {3} that is injected into {2}. The problem in {2} is that instead " +
+                "of storing the injected {3} in a private field and iterating over it at the point " +
+                "its instances are required, {0} is being resolved (from the collection) during " +
+                "object construction. Resolving services from an injected collection during object " +
+                "construction (e.g. by calling {4}.ToList() in the constructor) is not advised.",
+                producer.ImplementationType.ToFriendlyName(),
+                producer.ServiceType.ToFriendlyName(),
+                consumer.ToFriendlyName(),
+                relationship != null
+                    ? relationship.Dependency.ServiceType.ToFriendlyName()
+                    : string.Format(
+                        CultureInfo.InvariantCulture,
+                        "collection of {0} services",
+                        producer.ServiceType.ToFriendlyName()),
+                relationship?.Consumer.Target.Name ?? "collection");
+
         internal static string NonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(Type serviceType) =>
             NonGenericTypeAlreadyRegistered(serviceType, existingRegistrationIsConditional: false);
 

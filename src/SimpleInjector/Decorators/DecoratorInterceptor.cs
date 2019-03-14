@@ -90,7 +90,7 @@ namespace SimpleInjector.Decorators
         private void TryToApplyDecoratorOnContainerUncontrolledCollections(ExpressionBuiltEventArgs e)
         {
             if (!IsCollectionType(e.RegisteredServiceType) ||
-                DecoratorHelpers.IsContainerControlledCollectionExpression(e.Expression))
+                ControlledCollectionHelper.IsContainerControlledCollectionExpression(e.Expression))
             {
                 // NOTE: Decorators on controlled collections will be applied by the normal mechanism.
                 return;

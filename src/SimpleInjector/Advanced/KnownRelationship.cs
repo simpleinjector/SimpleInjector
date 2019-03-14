@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -34,12 +34,13 @@ namespace SimpleInjector.Advanced
     [DebuggerDisplay(nameof(KnownRelationship))]
     public sealed class KnownRelationship : IEquatable<KnownRelationship>
     {
+        // This constructor is here for backwards compatibility: the library itself uses the internal ctor.
         /// <summary>Initializes a new instance of the <see cref="KnownRelationship"/> class.</summary>
         /// <param name="implementationType">The implementation type of the parent type.</param>
         /// <param name="lifestyle">The lifestyle of the parent type.</param>
         /// <param name="dependency">The type that the parent depends on (it is injected into the parent).</param>
-        public KnownRelationship(Type implementationType, Lifestyle lifestyle, 
-            InstanceProducer dependency)
+        public KnownRelationship(
+            Type implementationType, Lifestyle lifestyle, InstanceProducer dependency)
         {
             Requires.IsNotNull(implementationType, nameof(implementationType));
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
@@ -48,6 +49,24 @@ namespace SimpleInjector.Advanced
             this.ImplementationType = implementationType;
             this.Lifestyle = lifestyle;
             this.Dependency = dependency;
+        }
+
+        internal KnownRelationship(
+            Type implementationType,
+            Lifestyle lifestyle,
+            InjectionConsumerInfo consumer,
+            InstanceProducer dependency,
+            string additionalInformation = null)
+        {
+            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(dependency, nameof(dependency));
+
+            this.ImplementationType = implementationType;
+            this.Lifestyle = lifestyle;
+            this.Consumer = consumer;
+            this.Dependency = dependency;
+            this.AdditionalInformation = additionalInformation ?? string.Empty;
         }
 
         /// <summary>Gets the implementation type of the parent type of the relationship.</summary>
@@ -62,6 +81,11 @@ namespace SimpleInjector.Advanced
         /// <summary>Gets the type that the parent depends on (it is injected into the parent).</summary>
         /// <value>The type that the parent depends on.</value>
         public InstanceProducer Dependency { get; }
+
+        // WARNING: Can be null.
+        internal InjectionConsumerInfo Consumer { get; }
+
+        internal string AdditionalInformation { get; } = string.Empty;
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
@@ -79,8 +103,18 @@ namespace SimpleInjector.Advanced
 
         /// <summary>Serves as a hash function for a particular type.</summary>
         /// <returns>A hash code for the current <see cref="KnownRelationship"/>.</returns>
-        public override int GetHashCode() => 
-            this.ImplementationType.GetHashCode() ^ this.Lifestyle.GetHashCode() ^ this.Dependency.GetHashCode();
+        public override int GetHashCode() =>
+            this.ImplementationType.GetHashCode()
+            ^ this.Lifestyle.GetHashCode()
+            ^ this.Consumer?.GetHashCode() ?? 0
+            ^ this.Dependency.GetHashCode();
+
+        /// <summary>
+        ///  Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        public override bool Equals(object obj) => this.Equals(obj as KnownRelationship);
 
         /// <summary>
         /// Determines whether the specified <see cref="KnownRelationship"/> is equal to the current 
@@ -102,9 +136,12 @@ namespace SimpleInjector.Advanced
             }
 
             return
-                this.ImplementationType == other.ImplementationType &&
-                this.Lifestyle == other.Lifestyle &&
-                this.Dependency == other.Dependency;
+                this.ImplementationType.Equals(other.ImplementationType)
+                && this.Lifestyle.Equals(other.Lifestyle)
+                && this.Dependency.Equals(other.Dependency)
+                && (this.Consumer?.Equals(other.Consumer)
+                    ?? other.Consumer?.Equals(this.Consumer)
+                    ?? true);
         }
     }
 }

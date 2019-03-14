@@ -60,7 +60,9 @@ namespace SimpleInjector.Internals
         {
             get
             {
-                return (TService)this.producers[index].Value.GetInstance();
+                var producer = this.producers[index].Value;
+
+                return GetInstance(producer);
             }
 
             set
@@ -146,11 +148,30 @@ namespace SimpleInjector.Internals
         {
             foreach (var producer in this.producers)
             {
-                yield return (TService)producer.Value.GetInstance();
+                yield return GetInstance(producer.Value);
             }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+        private static TService GetInstance(InstanceProducer producer)
+        {
+            var service = (TService)producer.GetInstance();
+
+            // This check is an optimization that prevents always calling the helper method, while in the
+            // happy path it is not needed.
+            // This code is in the happy path, so we want the performance penalty to be minimal.
+            // That's why we don't have a lock around this field access. This might cause the value to become
+            // stale (when read by other threads), but that's not an issue here; other threads might still see
+            // an old value (for some time), but we are actually only interested in getting notifications from
+            // the same thread anyway.
+            if (ControlledCollectionHelper.ContainsServiceCreatedListeners)
+            {
+                ControlledCollectionHelper.NotifyServiceCreatedListeners(producer);
+            }
+
+            return service;
+        }
 
         private static object VerifyCreatingProducer(Lazy<InstanceProducer> lazy)
         {
@@ -167,15 +188,15 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private Lazy<InstanceProducer> ToLazyInstanceProducer(ContainerControlledItem registration) => 
+        private Lazy<InstanceProducer> ToLazyInstanceProducer(ContainerControlledItem registration) =>
             registration.Registration != null
                 ? ToLazyInstanceProducer(registration.Registration)
                 : this.ToLazyInstanceProducer(registration.ImplementationType);
 
-        private static Lazy<InstanceProducer> ToLazyInstanceProducer(Registration registration) => 
+        private static Lazy<InstanceProducer> ToLazyInstanceProducer(Registration registration) =>
             Helpers.ToLazy(new InstanceProducer(typeof(TService), registration));
 
-        private Lazy<InstanceProducer> ToLazyInstanceProducer(Type implementationType) => 
+        private Lazy<InstanceProducer> ToLazyInstanceProducer(Type implementationType) =>
             new Lazy<InstanceProducer>(() => this.GetOrCreateInstanceProducer(implementationType));
 
         // Note that the 'implementationType' could in fact be a service type as well and it is allowed
