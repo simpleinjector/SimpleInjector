@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Integration library for ASP.NET Core MVC for Simple Injector. This package adds tag helper integration on top of the core functionality.</Description>
+    <Description>Integration library for ASP.NET Core MVC for Simple Injector. This package adds tag helper and Razor Pages integration on top of the core functionality.</Description>
     <AssemblyTitle>Simple Injector ASP.NET Core MVC Integration</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
     <VersionPrefix>4.0.0</VersionPrefix>
@@ -13,7 +13,7 @@
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>SimpleInjector.Integration.AspNetCore.Mvc</PackageId>
-    <PackageTags>simpleinjector;dependency-injection;DI;ASP.NET;ASP.NET Core;asp.net-core;MVC;ASP.NET Core MVC; asp.net-core-mvc</PackageTags>
+    <PackageTags>simpleinjector;dependency-injection;DI;ASP.NET;ASP.NET Core;asp.net-core;MVC;ASP.NET Core MVC; asp.net-core-mvc;Razor Pages;razorpages;PageModel</PackageTags>
     <PackageIconUrl>https://simpleinjector.org/simpleinjector.ico</PackageIconUrl>
     <PackageProjectUrl>https://simpleinjector.org/aspnetcore</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.RazorPages" Version="2.0.0" />
     <PackageReference Include="NuSpec.ReferenceGenerator" Version="2.0.0-beta-bld14">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
