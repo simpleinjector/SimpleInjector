@@ -393,7 +393,7 @@ namespace SimpleInjector
             ScopedRegistration<TImplementation> registration)
             where TImplementation : class
         {
-            if (registration.Container.IsVerifying())
+            if (registration.Container.IsVerifying)
             {
                 return registration.Container.VerificationScope.GetInstanceInternal(registration);
             }
