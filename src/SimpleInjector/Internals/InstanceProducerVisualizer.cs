@@ -22,7 +22,6 @@
 
 namespace SimpleInjector.Internals
 {
-    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
@@ -32,7 +31,7 @@ namespace SimpleInjector.Internals
     {
         private const string ExpressionNotCreatedYetMessage = "{ Expression not created yet }";
 
-        internal static string VisualizeIndentedObjectGraph(this InstanceProducer producer)
+        internal static string VisualizeIndentedObjectGraph(this InstanceProducer producer, VisualizationOptions options)
         {
             if (!producer.IsExpressionCreated)
             {
@@ -40,8 +39,11 @@ namespace SimpleInjector.Internals
             }
 
             var set = new HashSet<InstanceProducer>(InstanceProducer.EqualityComparer);
+            var objectGraphBuilder = new ObjectGraphBuilder(options.IncludeLifestyleInformation);
 
-            return producer.VisualizeIndentedObjectGraph(indentingDepth: 0, set: set);
+            producer.VisualizeIndentedObjectGraph(indentingDepth: 0, last: true, set: set, objectGraphBuilder: objectGraphBuilder);
+
+            return objectGraphBuilder.ToString();
         }
 
         internal static string VisualizeInlinedAndTruncatedObjectGraph(this InstanceProducer producer,
@@ -62,50 +64,45 @@ namespace SimpleInjector.Internals
                 string.Join(", ", visualizedDependencies));
         }
 
-        private static string VisualizeIndentedObjectGraph(this InstanceProducer producer, int indentingDepth,
-            HashSet<InstanceProducer> set)
+        private static void VisualizeIndentedObjectGraph(this InstanceProducer producer, int indentingDepth, bool last, HashSet<InstanceProducer> set, ObjectGraphBuilder objectGraphBuilder)
         {
-            var visualizedDependencies =
-                from relationship in producer.GetRelationships()
-                let dependency = relationship.Dependency
-                let subGraph = dependency.VisualizeIndentedObjectSubGraph(indentingDepth + 1, set)
-                select Environment.NewLine + subGraph;
+            objectGraphBuilder.BeginInstanceProducer(producer);
 
-            return string.Format(CultureInfo.InvariantCulture, "{0}{1}({2})",
-                new string(' ', indentingDepth * 4),
-                producer.ImplementationType.ToFriendlyName(),
-                string.Join(",", visualizedDependencies));
+            var dependencies = producer
+                .GetRelationships()
+                .Select(relationship => relationship.Dependency)
+                .ToList();
+
+            for (int counter = 0; counter < dependencies.Count; counter++)
+            {
+                var dependency = dependencies[counter];
+                dependency.VisualizeIndentedObjectSubGraph(indentingDepth + 1, counter + 1 == dependencies.Count, set, objectGraphBuilder);
+            }
+
+            objectGraphBuilder.EndInstanceProducer(last);
         }
 
-        private static string VisualizeIndentedObjectSubGraph(this InstanceProducer dependency, 
-            int indentingDepth, HashSet<InstanceProducer> set)
+        private static void VisualizeIndentedObjectSubGraph(this InstanceProducer dependency,
+            int indentingDepth, bool last, HashSet<InstanceProducer> set, ObjectGraphBuilder objectGraphBuilder)
         {
             bool isCyclicGraph = set.Contains(dependency);
 
             if (isCyclicGraph)
             {
-                return dependency.VisualizeCyclicProducerWithoutDependencies(indentingDepth);
+                objectGraphBuilder.AppendCyclicInstanceProducer(dependency, last);
+                return;
             }
 
             set.Add(dependency);
 
             try
             {
-                return dependency.VisualizeIndentedObjectGraph(indentingDepth, set);
+                dependency.VisualizeIndentedObjectGraph(indentingDepth, last, set, objectGraphBuilder);
             }
             finally
             {
                 set.Remove(dependency);
             }
-        }
-
-        private static string VisualizeCyclicProducerWithoutDependencies(this InstanceProducer producer,
-            int indentingDepth)
-        {
-            return string.Format(CultureInfo.InvariantCulture, "{0}{1}({2})",
-                new string(' ', indentingDepth * 4),
-                producer.ImplementationType.ToFriendlyName(),
-                "/* cyclic dependency graph detected */");
         }
 
         private static IEnumerable<string> VisualizeInlinedDependencies(this InstanceProducer producer,
