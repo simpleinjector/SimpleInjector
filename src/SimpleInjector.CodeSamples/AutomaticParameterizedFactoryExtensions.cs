@@ -103,12 +103,12 @@
         private static AutomaticParameterizedFactoriesHelper GetBehavior(Container container)
         {
             return (AutomaticParameterizedFactoriesHelper)
-                container.GetItem(typeof(AutomaticParameterizedFactoriesHelper));
+                container.ContainerScope.GetItem(typeof(AutomaticParameterizedFactoriesHelper));
         }
 
         private static void SetBehavior(Container container, AutomaticParameterizedFactoriesHelper behavior)
         {
-            container.SetItem(typeof(AutomaticParameterizedFactoriesHelper), behavior);
+            container.ContainerScope.SetItem(typeof(AutomaticParameterizedFactoriesHelper), behavior);
         }
 
         private sealed class AutomaticFactoryProxy : RealProxy
@@ -215,7 +215,7 @@
             private readonly IDependencyInjectionBehavior originalBehavior;
             private readonly Dictionary<Type, Dictionary<Type, ThreadLocal<object>>> serviceLocals =
                 new Dictionary<Type, Dictionary<Type, ThreadLocal<object>>>();
-            
+
             private readonly Dictionary<Type, Dictionary<Type, ThreadLocal<object>>> implementationLocals =
                 new Dictionary<Type, Dictionary<Type, ThreadLocal<object>>>();
 

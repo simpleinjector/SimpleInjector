@@ -109,7 +109,7 @@ namespace SimpleInjector.Lifestyles
             return () => manager.CurrentScope;
         }
 
-        private static ScopeManager GetScopeManager(Container c) => c.GetOrSetItem(managerKey, CreateManager);
+        private static ScopeManager GetScopeManager(Container c) => c.ContainerScope.GetOrSetItem(managerKey, CreateManager);
 
         private static ScopeManager CreateManager(Container container, object key)
         {

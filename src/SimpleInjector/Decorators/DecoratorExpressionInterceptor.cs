@@ -46,7 +46,7 @@ namespace SimpleInjector.Decorators
                 var threadLocal = new ThreadLocal<Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>>(
                     () => new Dictionary<InstanceProducer, ServiceTypeDecoratorInfo>());
 
-                container.RegisterForDisposal(threadLocal);
+                container.ContainerScope.RegisterForDisposal(threadLocal);
 
                 return threadLocal;
             };
@@ -109,7 +109,7 @@ namespace SimpleInjector.Decorators
         // their own dictionary. This is needed because they both use the same key, but store different
         // information.
         protected Dictionary<InstanceProducer, ServiceTypeDecoratorInfo> GetThreadStaticServiceTypePredicateCacheByKey(object key) =>
-            this.Container.GetOrSetItem(key, ThreadLocalDictionaryFactory).Value;
+            this.Container.ContainerScope.GetOrSetItem(key, ThreadLocalDictionaryFactory).Value;
 
         protected bool SatisfiesPredicate(DecoratorPredicateContext context) =>
             this.Predicate == null || this.Predicate(context);

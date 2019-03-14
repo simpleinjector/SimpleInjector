@@ -19,7 +19,7 @@
                 options.DependencyInjectionBehavior =
                     new ContextualDecoratorInjectionBehavior(options.Container, predicates);
 
-                options.Container.SetItem(PredicateCollectionKey, predicates);
+                options.Container.ContainerScope.SetItem(PredicateCollectionKey, predicates);
             }
         }
 
@@ -40,7 +40,7 @@
                     "Conditional decorator " + decoratorType.ToFriendlyName() + " hasn't been applied to " +
                     "type " + c.ServiceType.ToFriendlyName() + ". Make sure that all registered " +
                     "decorators that wrap this decorator are transient and don't depend on " +
-                    "Func<" + c.ServiceType.ToFriendlyName() + "> and that " + 
+                    "Func<" + c.ServiceType.ToFriendlyName() + "> and that " +
                     c.ServiceType.ToFriendlyName() + " is not resolved as root type.");
             };
 
@@ -52,7 +52,7 @@
 
         private static ContextualPredicateCollection GetContextualPredicates(Container container)
         {
-            return (ContextualPredicateCollection)container.GetItem(PredicateCollectionKey);
+            return (ContextualPredicateCollection)container.ContainerScope.GetItem(PredicateCollectionKey);
         }
 
         private sealed class ContextualDecoratorInjectionBehavior : IDependencyInjectionBehavior

@@ -227,7 +227,7 @@ namespace SimpleInjector.Lifestyles
 
                             if (disposable != null)
                             {
-                                this.Container.RegisterForDisposal(disposable);
+                                this.Container.ContainerScope.RegisterForDisposal(disposable);
                             }
                         }
                     }
