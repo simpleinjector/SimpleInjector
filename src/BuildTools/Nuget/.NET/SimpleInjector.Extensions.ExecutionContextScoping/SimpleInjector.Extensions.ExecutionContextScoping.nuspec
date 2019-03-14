@@ -4,6 +4,7 @@
     <version>{version}</version>
     <authors>Simple Injector Contributors</authors>
     <owners>Simple Injector Contributors</owners>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
     <license type="expression">MIT</license>
     <projectUrl>https://simpleinjector.org/asyncscope</projectUrl>
     <iconUrl>https://simpleinjector.org/simpleinjector.ico</iconUrl>
