@@ -55,6 +55,8 @@ namespace SimpleInjector
         private Dictionary<Type, InstanceProducer> rootProducerCache =
             new Dictionary<Type, InstanceProducer>(ReferenceEqualityComparer<Type>.Instance);
 
+        private enum MutableCollectionType { Array, List }
+
         /// <summary>Gets an instance of the given <typeparamref name="TService"/>.</summary>
         /// <typeparam name="TService">Type of object requested.</typeparam>
         /// <returns>The requested service instance.</returns>
@@ -443,8 +445,6 @@ namespace SimpleInjector
             }
         }
 
-        private enum MutableCollectionType { Array, List };
-
         private InstanceProducer BuildInstanceProducerForMutableCollectionType(
             Type serviceType, Type elementType, MutableCollectionType type)
         {
@@ -469,7 +469,7 @@ namespace SimpleInjector
             Type serviceType, Type elementType, MutableCollectionType collectionType)
         {
             Expression expression =
-                BuildMutableCollectionExpressionFromControlledCollection(serviceType, elementType);
+                this.BuildMutableCollectionExpressionFromControlledCollection(serviceType, elementType);
 
             // Technically, we could determine the longest lifestyle out of the elements of the collection,
             // instead of using Transient here. This would make it less likely for the user to get false

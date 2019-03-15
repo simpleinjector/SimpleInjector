@@ -141,7 +141,10 @@ namespace SimpleInjector
                 return this.isVerifying.Value;
             }
 
-            private set { this.isVerifying.Value = value; }
+            private set
+            {
+                this.isVerifying.Value = value;
+            }
         }
 
         /// <summary>
@@ -518,7 +521,7 @@ namespace SimpleInjector
         }
 
         [DebuggerStepThrough]
-        static string GetStackTraceOrNull()
+        private static string GetStackTraceOrNull()
         {
 #if NET40 || NET45 || NETSTANDARD2_0
             return new System.Diagnostics.StackTrace(fNeedFileInfo: true, skipFrames: 2).ToString();
