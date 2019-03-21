@@ -23,7 +23,7 @@
 namespace SimpleInjector
 {
     /// <summary>
-    /// This enumeration has defines in which way the container should run the verification process.
+    /// This enumeration defines in which way the container should run the verification process.
     /// </summary>
     public enum VerificationOption
     {

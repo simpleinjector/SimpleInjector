@@ -439,6 +439,7 @@ namespace SimpleInjector
         {
             throw new ActivationException(
                 StringResources.ParameterTypeMustBeRegistered(
+                    this,
                     target,
                     this.GetNumberOfConditionalRegistrationsFor(target.TargetType),
                     this.ContainsOneToOneRegistrationForCollectionType(target.TargetType),

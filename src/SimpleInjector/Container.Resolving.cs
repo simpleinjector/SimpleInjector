@@ -270,6 +270,9 @@ namespace SimpleInjector
             return this.GetInstanceProducerForType(serviceType, consumer, buildProducer);
         }
 
+        internal bool IsConcreteConstructableType(Type concreteType) =>
+            this.Options.IsConstructableType(concreteType, out string errorMesssage);
+
         private Action<T> GetInitializer<T>(Type implementationType, Registration context)
         {
             Action<T>[] initializersForType = this.GetInstanceInitializersFor<T>(implementationType, context);
@@ -604,7 +607,8 @@ namespace SimpleInjector
             InjectionConsumerInfo context)
             where TConcrete : class
         {
-            if (this.IsConcreteConstructableType(typeof(TConcrete), context))
+            if (this.Options.ResolveUnregisteredConcreteTypes
+                && this.IsConcreteConstructableType(typeof(TConcrete)))
             {
                 return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), () =>
                 {
@@ -621,8 +625,11 @@ namespace SimpleInjector
         private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType(Type type,
             InjectionConsumerInfo context)
         {
-            if (type.IsAbstract() || type.IsValueType() || type.ContainsGenericParameters() ||
-                !this.IsConcreteConstructableType(type, context))
+            if (!this.Options.ResolveUnregisteredConcreteTypes
+                || type.IsAbstract()
+                || type.IsValueType()
+                || type.ContainsGenericParameters()
+                || !this.IsConcreteConstructableType(type))
             {
                 return null;
             }
@@ -670,13 +677,6 @@ namespace SimpleInjector
             producer.IsContainerAutoRegistered = true;
 
             return producer;
-        }
-
-        private bool IsConcreteConstructableType(Type concreteType, InjectionConsumerInfo context)
-        {
-            string errorMesssage;
-
-            return this.Options.IsConstructableType(concreteType, out errorMesssage);
         }
 
         // We're registering a service type after 'locking down' the container here and that means that the
@@ -753,13 +753,13 @@ namespace SimpleInjector
 
         private void ThrowNotConstructableException(Type concreteType)
         {
-            string exceptionMessage;
-
-            // Since we are at this point, we know the concreteType is NOT constructable.
-            this.Options.IsConstructableType(concreteType, out exceptionMessage);
+            // At this point we know the concreteType is either NOT constructable or
+            // Options.ResolveUnregisteredConcreteTypes is configured to not return the type.
+            this.Options.IsConstructableType(concreteType, out string exceptionMessage);
 
             throw new ActivationException(
-                StringResources.ImplicitRegistrationCouldNotBeMadeForType(concreteType, this.HasRegistrations)
+                StringResources.ImplicitRegistrationCouldNotBeMadeForType(
+                    this, concreteType, this.HasRegistrations)
                 + " " + exceptionMessage);
         }
     }

@@ -290,7 +290,7 @@ namespace SimpleInjector.Tests.Unit
             {
                 e.Register(() => { throw new Exception(); });
             };
-            
+
             // Act
             Action action = () => container.GetInstance<IUserRepository>();
 
@@ -611,6 +611,125 @@ namespace SimpleInjector.Tests.Unit
             Assert.AreEqual(1, callCount, "The result of ResolveUnregisteredType is expected to be cached.");
         }
 
+        [TestMethod]
+        public void ResolveUnregisteredConcreteTypes_SetToFalse_DoesNotAllowUnregisteredConcreteRootTypesToBeResolved()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = false;
+
+            // Add a dummy registration.
+            container.RegisterInstance(new FakeTimeProvider());
+
+            // Act
+            Action action = () => container.GetInstance<ConcreteCommand>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                No registration for type ConcreteCommand could be found and an implicit registration 
+                could not be made. Note that the container's Options.ResolveUnregisteredConcreteTypes
+                option is set to 'false'. This disallows the container to construct this unregistered
+                concrete type."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void ResolveUnregisteredConcreteTypes_SetToFalse_DoesNotAllowUnregisteredConcreteDependenciesToBeResolved()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = false;
+
+            container.Register<ServiceDependingOn<ConcreteCommand>>();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceDependingOn<ConcreteCommand>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                The constructor of type ServiceDependingOn<ConcreteCommand> contains
+                the parameter with name 'dependency' and type ConcreteCommand that is not
+                registered. Please ensure ConcreteCommand is registered, or change the constructor of 
+                ServiceDependingOn<ConcreteCommand>. Note that the container's
+                Options.ResolveUnregisteredConcreteTypes option is set to 'false'. This disallows the 
+                container to construct this unregistered concrete type."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void ResolveUnregisteredConcreteTypes_SetToNever_DoesAllowRegisteredConcreteRootTypesToBeResolved()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = false;
+
+            // Add a dummy registration.
+            container.Register<ConcreteCommand>();
+
+            // Act
+            container.GetInstance<ConcreteCommand>();
+        }
+
+        [TestMethod]
+        public void ResolveUnregisteredConcreteTypes_SetToNever_DoesAllowRegisteredConcreteDependenciesToBeResolved()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = false;
+
+            container.Register<ConcreteCommand>();
+            container.Register<ServiceDependingOn<ConcreteCommand>>();
+
+            // Act
+            container.GetInstance<ServiceDependingOn<ConcreteCommand>>();
+        }
+
+        [TestMethod]
+        public void ResolveUnregisteredConcreteTypes_SetToTrue_DoesAllowUnregisteredConcreteRootTypesToBeResolved()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
+
+            // Act
+            container.GetInstance<ConcreteCommand>();
+        }
+
+        [TestMethod]
+        public void ResolveUnregisteredConcreteTypes_SetToTrue_DoesAllowRegisteredConcreteDependenciesToBeResolved()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
+
+            // Act
+            container.GetInstance<ServiceDependingOn<ConcreteCommand>>();
+        }
+        
+        [TestMethod]
+        public void ResolveUnregisteredConcreteTypes_SetToFalseWithUnregisteredTypeHandlingType_DoesAllowUnregisteredConcreteDependenciesToBeResolved()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = false;
+
+            // Using unregistered type resolution re-enable the 'Always' behavior.
+            container.ResolveUnregisteredType += (s, e) =>
+            {
+                if (!e.Handled && !e.UnregisteredServiceType.IsAbstract)
+                {
+                    e.Register(container.Options.LifestyleSelectionBehavior
+                        .SelectLifestyle(e.UnregisteredServiceType)
+                        .CreateRegistration(e.UnregisteredServiceType, container));
+                }
+            };
+
+            // Act
+            container.GetInstance<ServiceDependingOn<ConcreteCommand>>();
+        }
+        
         public class CompositeService<T> where T : struct
         {
             public CompositeService(Nullable<T>[] dependencies)
