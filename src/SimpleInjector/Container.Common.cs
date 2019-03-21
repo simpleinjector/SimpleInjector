@@ -145,7 +145,10 @@ namespace SimpleInjector
                 return this.isVerifying.Value;
             }
 
-            private set { this.isVerifying.Value = value; }
+            private set
+            {
+                this.isVerifying.Value = value;
+            }
         }
 
         /// <summary>

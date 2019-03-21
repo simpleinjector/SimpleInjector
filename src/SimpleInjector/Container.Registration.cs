@@ -544,11 +544,11 @@ namespace SimpleInjector
         /// the exact lifestyle for the specified type. By default this will be 
         /// <see cref="Lifestyle.Transient">Transient</see>.
         /// </remarks>
-        /// <param name="concreteType">The concrete type that will be registered.</param>
+        /// <param name="concreteType">The concrete type that will be registered. This can be an open-generic type.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="concreteType"/> is a null 
         /// references (Nothing in VB).</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="concreteType"/> represents an 
-        /// open generic type or is a type that can not be created by the container.
+        /// <exception cref="ArgumentException">Thrown when <paramref name="concreteType"/> represents
+        /// a type that can not be created by the container.
         /// </exception>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when an 

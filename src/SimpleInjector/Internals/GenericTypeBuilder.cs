@@ -296,6 +296,9 @@ namespace SimpleInjector.Internals
         /// <summary>Result of the GenericTypeBuilder.</summary>
         internal sealed class BuildResult
         {
+            internal static readonly BuildResult Invalid =
+                new BuildResult { ClosedServiceTypeSatisfiesAllTypeConstraints = false };
+
             private BuildResult()
             {
             }
@@ -303,9 +306,6 @@ namespace SimpleInjector.Internals
             internal bool ClosedServiceTypeSatisfiesAllTypeConstraints { get; private set; }
 
             internal Type ClosedGenericImplementation { get; private set; }
-
-            internal static readonly BuildResult Invalid =
-                new BuildResult { ClosedServiceTypeSatisfiesAllTypeConstraints = false };
 
             internal static BuildResult Valid(Type closedGenericImplementation)
             {
