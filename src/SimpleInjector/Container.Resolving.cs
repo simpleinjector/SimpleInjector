@@ -223,7 +223,7 @@ namespace SimpleInjector
                 {
                     // The producer is created implicitly. This forces us to lock the container.
                     // Such implicit registration could be done through in numberous ways (such as
-                    // through unregistered type resotion, or because the type is concrete). Being able to
+                    // through unregistered type resolution, or because the type is concrete). Being able to
                     // make registrations after such call, could lead to unexpected behavior, which is why
                     // locking the container makes most sense.
                     // We even lock when the producer is null, because unregistered type resolution events may
