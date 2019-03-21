@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -26,7 +26,6 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
@@ -76,6 +75,9 @@ namespace SimpleInjector
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ScopedLifestyle defaultScopedLifestyle;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool resolveUnregisteredConcreteTypes = true;
 
         internal ContainerOptions(Container container)
         {
@@ -130,6 +132,30 @@ namespace SimpleInjector
         {
             get { return StringResources.UseFullyQualifiedTypeNames; }
             set { StringResources.UseFullyQualifiedTypeNames = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the container should resolve unregistered concrete types.
+        /// The default value is <code>true</code>. Consider changing the value to <code>false</code> to prevent 
+        /// accidental creation of types you haven't registered explicitly.
+        /// </summary>
+        /// <value>The value indicating whether the container should resolve unregistered concrete types.</value>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered.
+        /// </exception>
+        public bool ResolveUnregisteredConcreteTypes
+        {
+            get
+            {
+                return this.resolveUnregisteredConcreteTypes;
+            }
+
+            set
+            {
+                this.Container.ThrowWhenContainerIsLockedOrDisposed();
+
+                this.resolveUnregisteredConcreteTypes = value;
+            }
         }
 
         /// <summary>

@@ -936,6 +936,38 @@
             // Assert
             Assert.AreSame(Lifestyle.Singleton, lifestyle);
         }
+        
+        [TestMethod]
+        public void ResolveUnregisteredConcreteTypes_ByDefault_True()
+        {
+            // Arrange
+            var expectedValue = true;
+
+            var container = new Container();
+
+            // Act
+            var actualValue = container.Options.ResolveUnregisteredConcreteTypes;
+
+            // Assert
+            Assert.AreEqual(expectedValue, actualValue);
+        }
+
+        [TestMethod]
+        public void ResolveUnregisteredConcreteTypes_ChangedAfterContainerIsLocked_ThrowsAnException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.GetInstance<ConcreteCommand>();
+
+            // Act
+            Action action = () => container.Options.ResolveUnregisteredConcreteTypes = false;
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "The container can't be changed after the first call",
+                action);
+        }
 
         private static PropertyInfo GetProperty<T>(Expression<Func<T, object>> propertySelector)
         {

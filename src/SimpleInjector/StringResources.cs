@@ -242,13 +242,18 @@ namespace SimpleInjector
                 nameof(Container.Collection),
                 nameof(ContainerCollectionRegistrator.Append));
 
-        internal static string ParameterTypeMustBeRegistered(InjectionTargetInfo target, int numberOfConditionals,
-            bool hasRelatedOneToOneMapping, bool hasRelatedCollectionMapping, Type[] skippedDecorators,
+        internal static string ParameterTypeMustBeRegistered(
+            Container container,
+            InjectionTargetInfo target,
+            int numberOfConditionals,
+            bool hasRelatedOneToOneMapping,
+            bool hasRelatedCollectionMapping,
+            Type[] skippedDecorators,
             Type[] lookalikes) =>
             target.Parameter != null
                 ? string.Format(CultureInfo.InvariantCulture,
                     "The constructor of type {0} contains the parameter with name '{1}' and type {2} that " +
-                    "is not registered. Please ensure {2} is registered, or change the constructor of {0}.{3}{4}{5}{6}{7}",
+                    "is not registered. Please ensure {2} is registered, or change the constructor of {0}.{3}{4}{5}{6}{7}{8}",
                     target.Member.DeclaringType.TypeName(),
                     target.Name,
                     target.TargetType.TypeName(),
@@ -256,10 +261,11 @@ namespace SimpleInjector
                     DidYouMeanToDependOnNonCollectionInstead(hasRelatedOneToOneMapping, target.TargetType),
                     DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType),
                     NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators),
+                    NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(container, target.TargetType),
                     NoteThatTypeLookalikesAreFound(target.TargetType, lookalikes, numberOfConditionals))
                 : string.Format(CultureInfo.InvariantCulture,
                     "Type {0} contains the property with name '{1}' and type {2} that is not registered. " +
-                    "Please ensure {2} is registered, or change {0}.{3}{4}{5}{6}{7}",
+                    "Please ensure {2} is registered, or change {0}.{3}{4}{5}{6}{7}{8}",
                     target.Member.DeclaringType.TypeName(),
                     target.Name,
                     target.TargetType.TypeName(),
@@ -267,6 +273,7 @@ namespace SimpleInjector
                     DidYouMeanToDependOnNonCollectionInstead(hasRelatedOneToOneMapping, target.TargetType),
                     DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType),
                     NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators),
+                    NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(container, target.TargetType),
                     NoteThatTypeLookalikesAreFound(target.TargetType, lookalikes, numberOfConditionals));
 
         internal static string TypeMustHaveASinglePublicConstructorButItHasNone(Type serviceType) =>
@@ -334,6 +341,16 @@ namespace SimpleInjector
             string.Format(CultureInfo.InvariantCulture,
                 "No registration for type {0} could be found and an implicit registration could not be made.{1}",
                 serviceType.TypeName(),
+                ContainerHasNoRegistrationsAddition(containerHasRegistrations));
+
+        internal static string ImplicitRegistrationCouldNotBeMadeForType(
+            Container container,
+            Type serviceType,
+            bool containerHasRegistrations) =>
+            string.Format(CultureInfo.InvariantCulture,
+                "No registration for type {0} could be found and an implicit registration could not be made.{1}{2}",
+                serviceType.TypeName(),
+                NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(container, serviceType),
                 ContainerHasNoRegistrationsAddition(containerHasRegistrations));
 
         internal static string DefaultScopedLifestyleCanNotBeSetWithLifetimeScoped() =>
@@ -974,6 +991,14 @@ namespace SimpleInjector
                     serviceType.ToFriendlyName(fullyQualifiedName: true));
             }
         }
+
+        private static string NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(
+            Container container, Type serviceType) =>
+            container.IsConcreteConstructableType(serviceType)
+                && !container.Options.ResolveUnregisteredConcreteTypes
+                ? " Note that the container's Options.ResolveUnregisteredConcreteTypes option is set " +
+                  "to 'false'. This disallows the container to construct this unregistered concrete type."
+                : string.Empty;
 
         private static string BuildAssemblyLocationMessage(Type serviceType, Type duplicateAssemblyLookalike)
         {
