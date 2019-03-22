@@ -35,6 +35,7 @@ namespace SimpleInjector.Advanced
     public sealed class KnownRelationship : IEquatable<KnownRelationship>
     {
         // This constructor is here for backwards compatibility: the library itself uses the internal ctor.
+
         /// <summary>Initializes a new instance of the <see cref="KnownRelationship"/> class.</summary>
         /// <param name="implementationType">The implementation type of the parent type.</param>
         /// <param name="lifestyle">The lifestyle of the parent type.</param>

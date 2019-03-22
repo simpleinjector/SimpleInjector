@@ -39,7 +39,7 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         private readonly Container container;
 
         /// <summary>
-        /// Creates a <see cref="SimpleInjectorPageModelActivatorProvider"/>.
+        /// Initializes a new instance of the <see cref="SimpleInjectorPageModelActivatorProvider"/> class.
         /// </summary>
         /// <param name="container">The container instance that will be used to create page model instances.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is null.</exception>

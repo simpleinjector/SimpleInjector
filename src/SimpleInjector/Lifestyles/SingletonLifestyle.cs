@@ -230,7 +230,7 @@ namespace SimpleInjector.Lifestyles
 
                 Func<TImplementation> func = CompileExpression(expression);
 
-                TImplementation instance = CreateInstance(func);
+                TImplementation instance = this.CreateInstance(func);
 
                 EnsureInstanceIsNotNull(instance);
 
@@ -253,7 +253,7 @@ namespace SimpleInjector.Lifestyles
                         if (isCurrentThread.Value)
                         {
                             args.Handled = true;
-                            var matchingRelationship = FindMatchingCollectionRelationship(args.Producer);
+                            var matchingRelationship = this.FindMatchingCollectionRelationship(args.Producer);
 
                             var additionalInformation = StringResources.CollectionUsedDuringConstruction(
                                 typeof(TImplementation),

@@ -71,11 +71,11 @@ namespace SimpleInjector.Decorators
             registration.ReplaceRelationships(this.e.InstanceProducer.GetRelationships());
 
             var info = this.GetServiceTypeInfo(
-                e,
+                this.e,
                 originalExpression: expression,
                 originalRegistration: registration,
-                registeredServiceType: registeredServiceType);
-            
+                registeredServiceType: this.registeredServiceType);
+
             this.Context = this.CreatePredicateContext(this.registeredServiceType, expression, info);
 
             return this.SatisfiesPredicate(this.Context);

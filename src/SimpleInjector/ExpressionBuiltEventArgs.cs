@@ -121,14 +121,6 @@ namespace SimpleInjector
         // memory in a 32bit process).
         internal Decorators.ServiceTypeDecoratorInfo DecoratorInfo { get; set; }
 
-        // Cache for storing items for the lifetime of an ExpressionBuiltEventArgs instance. A single
-        // ExpressionBuiltEventArgs instance is passed along to all ExpressionBuilt handlers of a single 
-        // InstanceProducer on a single thread. This means that each InstanceProducer gets its own instance and
-        // the same producer on a different thread (which might get built in parallel) gets a different instance
-        // as well.
-        // Null is returned when the key is not found.
-        // This dictionary is NOT thread-safe.
-
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

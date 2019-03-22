@@ -29,35 +29,24 @@ namespace SimpleInjector.Internals
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
 
-    internal class ServiceCreatedListenerArgs
-    {
-        public ServiceCreatedListenerArgs(InstanceProducer producer)
-        {
-            this.Producer = producer;
-        }
-
-        public bool Handled { get; set; }
-        public InstanceProducer Producer { get; }
-    }
-
     // This class allows an ContainerControlledCollection<T> to notify about the creation of its wrapped items.
     // This is solely used for diagnostic verification.
     internal static class ControlledCollectionHelper
     {
-        internal static bool ContainsServiceCreatedListeners;
-
         private static readonly object ServiceCreatedListenersLocker = new object();
 
         // The boolean flag is an optimization, to prevent slowing down resolving of items inside a collection
         // too much.
-        private static List<Action<ServiceCreatedListenerArgs>> ServiceCreatedListeners;
+        private static List<Action<ServiceCreatedListenerArgs>> serviceCreatedListeners;
+
+        internal static bool ContainsServiceCreatedListeners { get; private set; }
 
         internal static void AddServiceCreatedListener(Action<ServiceCreatedListenerArgs> serviceCreated)
         {
             lock (ServiceCreatedListenersLocker)
             {
                 var listeners =
-                    ServiceCreatedListeners ?? (ServiceCreatedListeners = new List<Action<ServiceCreatedListenerArgs>>());
+                    serviceCreatedListeners ?? (serviceCreatedListeners = new List<Action<ServiceCreatedListenerArgs>>());
 
                 listeners.Add(serviceCreated);
 
@@ -69,11 +58,11 @@ namespace SimpleInjector.Internals
         {
             lock (ServiceCreatedListenersLocker)
             {
-                ServiceCreatedListeners.Remove(serviceCreated);
+                serviceCreatedListeners.Remove(serviceCreated);
 
-                if (ServiceCreatedListeners.Count == 0)
+                if (serviceCreatedListeners.Count == 0)
                 {
-                    ServiceCreatedListeners = null;
+                    serviceCreatedListeners = null;
 
                     ContainsServiceCreatedListeners = false;
                 }
@@ -84,13 +73,13 @@ namespace SimpleInjector.Internals
         {
             lock (ServiceCreatedListenersLocker)
             {
-                if (ServiceCreatedListeners != null)
+                if (serviceCreatedListeners != null)
                 {
                     var args = new ServiceCreatedListenerArgs(producer);
 
                     // Iterate the list in reverse order, as the inner most listener should
                     // be able to act first.
-                    foreach (var listener in Enumerable.Reverse(ServiceCreatedListeners))
+                    foreach (var listener in Enumerable.Reverse(serviceCreatedListeners))
                     {
                         listener(args);
                     }
