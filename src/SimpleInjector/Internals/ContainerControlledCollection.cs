@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013 Simple Injector Contributors
+ * Copyright (c) 2013-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -40,7 +40,7 @@ namespace SimpleInjector.Internals
     {
         private readonly Container container;
 
-        private List<Lazy<InstanceProducer>> producers = new List<Lazy<InstanceProducer>>();
+        private readonly List<Lazy<InstanceProducer>> producers = new List<Lazy<InstanceProducer>>();
 
         // This constructor needs to be public. It is called using reflection.
         public ContainerControlledCollection(Container container)
@@ -80,9 +80,30 @@ namespace SimpleInjector.Internals
             }
         }
 
-        int IList<TService>.IndexOf(TService item)
+        public int IndexOf(TService item)
         {
-            throw GetNotSupportedException();
+            // InstanceProducers never return null, so we can short-circuit the operation and return -1.
+            if (item == null)
+            {
+                return -1;
+            }
+
+            for (int index = 0; index < this.producers.Count; index++)
+            {
+                InstanceProducer producer = this.producers[index].Value;
+
+                // NOTE: We call GetInstance directly as we don't want to notify about the creation to the
+                // ContainsServiceCreatedListeners here; created instances will not leak out of this method
+                // and can, therefore, never cause Captive Dependencies.
+                var instance = producer.GetInstance();
+
+                if (instance.Equals(item))
+                {
+                    return index;
+                }
+            }
+
+            return -1;
         }
 
         void IList<TService>.Insert(int index, TService item)
@@ -105,10 +126,7 @@ namespace SimpleInjector.Internals
             throw GetNotSupportedBecauseCollectionIsReadOnlyException();
         }
 
-        bool ICollection<TService>.Contains(TService item)
-        {
-            throw GetNotSupportedException();
-        }
+        bool ICollection<TService>.Contains(TService item) => this.IndexOf(item) > -1;
 
         void ICollection<TService>.CopyTo(TService[] array, int arrayIndex)
         {
@@ -252,7 +270,7 @@ namespace SimpleInjector.Internals
             var producer = this.container.GetRegistrationEvenIfInvalid(implementationType,
                 InjectionConsumerInfo.Root, autoCreateConcreteTypes: false);
 
-            bool producerIsValid = producer != null && producer.IsValid;
+            bool producerIsValid = producer?.IsValid == true;
 
             // Prevent returning invalid producers
             return producerIsValid ? producer : null;
@@ -274,7 +292,5 @@ namespace SimpleInjector.Internals
 
         private static NotSupportedException GetNotSupportedBecauseCollectionIsReadOnlyException() =>
             new NotSupportedException("Collection is read-only.");
-
-        private static NotSupportedException GetNotSupportedException() => new NotSupportedException();
     }
 }

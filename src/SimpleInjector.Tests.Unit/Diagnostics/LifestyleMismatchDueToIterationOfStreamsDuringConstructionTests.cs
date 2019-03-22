@@ -342,7 +342,55 @@ $@"{typeof(CaptivatingCompositeLogger<IEnumerable<ILogger>>).ToFriendlyName()}(
                 container.GetRegistration(typeof(ILogger)).VisualizeObjectGraph());
         }
 
-        private void GetInstance_SingletonThatIteratesStreamInCtorInjectedWithStreamWithTransient_Throws(
+        // #678
+        [TestMethod]
+        public void Verify_SingletonCompositeCheckingCollectionForNullValues_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Collection.Append<ILogger, NullLogger>(Lifestyle.Scoped);
+
+            container.RegisterSingleton<ILogger>(() =>
+            {
+                // Check for null should succeed
+                container.GetAllInstances<ILogger>().Contains(null);
+
+                return new NullLogger();
+            });
+
+            // Act
+            container.Verify();
+        }
+
+        // #678
+        [TestMethod]
+        public void Verify_SingletonCompositeCheckingCollectionForAValue_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Collection.Append<ILogger, NullLogger>(Lifestyle.Scoped);
+
+            container.RegisterSingleton<ILogger>(() =>
+            {
+                // Check for a not-null value should succeed, as the Contains method does not return
+                // an instance and can, therefore, never cause a lifestyle mismatch (the user can't
+                // store such instance).
+                container.GetAllInstances<ILogger>().Contains(new NullLogger());
+
+                return new NullLogger();
+            });
+
+            // Act
+            container.Verify();
+        }
+
+        private static void GetInstance_SingletonThatIteratesStreamInCtorInjectedWithStreamWithTransient_Throws(
             Type dependencyType)
         {
             // Arrange
@@ -375,7 +423,6 @@ $@"{typeof(CaptivatingCompositeLogger<IEnumerable<ILogger>>).ToFriendlyName()}(
 
         private static string Actual(IEnumerable<DiagnosticResult> results) =>
             "actual: " + string.Join(" - ", results.Select(r => r.Description));
-
 
         public class NoncaptivatingCompositeLogger<TCollection> : ILogger
             where TCollection : IEnumerable<ILogger>
