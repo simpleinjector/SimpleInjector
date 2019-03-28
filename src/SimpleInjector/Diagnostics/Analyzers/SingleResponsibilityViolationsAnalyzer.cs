@@ -79,12 +79,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             // dependency, which will make it look as if the decorator has too many dependencies. Since the
             // container will delegate the creation of those elements back to the container, those elements
             // would by them selves still get analyzed, so the only thing we'd miss here is the decorator.
-            if (!producer.ServiceType.IsGenericType())
-            {
-                return true;
-            }
-
-            return producer.ServiceType.GetGenericTypeDefinition() != typeof(IEnumerable<>);
+            return !typeof(IEnumerable<>).IsGenericTypeDefinitionOf(producer.ServiceType);
         }
 
         private static string BuildRelationshipDescription(Type implementationType, int numberOfDependencies) =>

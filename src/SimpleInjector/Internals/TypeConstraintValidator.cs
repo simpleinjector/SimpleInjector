@@ -86,8 +86,7 @@ namespace SimpleInjector.Internals
                 return false;
             }
 
-            bool isNullable = this.Mapping.ConcreteType.IsGenericType() &&
-                this.Mapping.ConcreteType.GetGenericTypeDefinition() == typeof(Nullable<>);
+            bool isNullable = typeof(Nullable<>).IsGenericTypeDefinitionOf(this.Mapping.ConcreteType);
 
             return !isNullable;
         }

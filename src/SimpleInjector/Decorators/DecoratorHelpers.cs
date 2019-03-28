@@ -185,15 +185,13 @@ namespace SimpleInjector.Decorators
 
         internal static bool IsScopelessDecorateeFactoryDependencyType(Type dependencyType, Type decoratingType)
         {
-            return dependencyType.IsGenericType()
-                && dependencyType.GetGenericTypeDefinition() == typeof(Func<>)
+            return typeof(Func<>).IsGenericTypeDefinitionOf(dependencyType)
                 && dependencyType == typeof(Func<>).MakeGenericType(decoratingType);
         }
 
         internal static bool IsScopeDecorateeFactoryDependencyParameter(Type parameterType, Type decoratingType)
         {
-            return parameterType.IsGenericType()
-                && parameterType.GetGenericTypeDefinition() == typeof(Func<,>)
+            return typeof(Func<,>).IsGenericTypeDefinitionOf(parameterType)
                 && parameterType == typeof(Func<,>).MakeGenericType(typeof(Scope), decoratingType);
         }
     }

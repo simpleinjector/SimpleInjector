@@ -96,10 +96,8 @@ namespace SimpleInjector
         ///             var validatorType = typeof(EmptyValidator<>).MakeGenericType(
         ///                 e.UnregisteredServiceType.GetGenericArguments());
         ///     
-        ///             object emptyValidator = container.GetInstance(validatorType);
-        ///     
         ///             // Register the instance as singleton.
-        ///             e.Register(() => emptyValidator);
+        ///             e.Register(Lifestyle.Singleton.CreateRegistration(validatorType, container));
         ///         }
         ///     };
         ///     

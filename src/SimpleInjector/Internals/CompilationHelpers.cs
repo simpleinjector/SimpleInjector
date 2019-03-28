@@ -328,7 +328,7 @@ namespace SimpleInjector.Internals
                 {
                     Type type = registration.GetType();
 
-                    if (type.IsGenericType() && type.GetGenericTypeDefinition() == typeof(ScopedRegistration<>))
+                    if (typeof(ScopedRegistration<>).IsGenericTypeDefinitionOf(type))
                     {
                         return registration;
                     }
