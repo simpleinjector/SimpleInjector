@@ -39,8 +39,8 @@ namespace SimpleInjector.Internals
         {
         }
 
-        internal override void AddControlledRegistrations(Type serviceType,
-            ContainerControlledItem[] registrations, bool append)
+        internal override void AddControlledRegistrations(
+            Type serviceType, ContainerControlledItem[] registrations, bool append)
         {
             if (append)
             {

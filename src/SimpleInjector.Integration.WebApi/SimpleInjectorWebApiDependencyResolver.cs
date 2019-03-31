@@ -129,8 +129,8 @@ namespace SimpleInjector.Integration.WebApi
             if (scopeOption < DependencyResolverScopeOption.UseAmbientScope ||
                 scopeOption > DependencyResolverScopeOption.RequiresNew)
             {
-                throw new System.ComponentModel.InvalidEnumArgumentException("scopeOption", (int)scopeOption,
-                    typeof(DependencyResolverScopeOption));
+                throw new System.ComponentModel.InvalidEnumArgumentException(
+                    "scopeOption", (int)scopeOption, typeof(DependencyResolverScopeOption));
             }
 
             this.scopeOption = scopeOption;

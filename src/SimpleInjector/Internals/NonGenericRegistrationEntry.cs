@@ -25,7 +25,6 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
 
     internal sealed class NonGenericRegistrationEntry : IRegistrationEntry
     {
@@ -68,8 +67,11 @@ namespace SimpleInjector.Internals
             this.providers.Add(new SingleInstanceProducerProvider(producer));
         }
 
-        public void Add(Type serviceType, Func<TypeFactoryContext, Type> implementationTypeFactory,
-            Lifestyle lifestyle, Predicate<PredicateContext> predicate)
+        public void Add(
+            Type serviceType,
+            Func<TypeFactoryContext, Type> implementationTypeFactory,
+            Lifestyle lifestyle,
+            Predicate<PredicateContext> predicate)
         {
             Requires.IsNotNull(predicate, "only support conditional for now");
 
@@ -81,13 +83,18 @@ namespace SimpleInjector.Internals
                     StringResources.NonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(serviceType));
             }
 
-            this.providers.Add(new ImplementationTypeFactoryInstanceProducerProvider(serviceType,
-                implementationTypeFactory, lifestyle, predicate, this.container));
+            this.providers.Add(
+                new ImplementationTypeFactoryInstanceProducerProvider(
+                    serviceType,
+                    implementationTypeFactory,
+                    lifestyle,
+                    predicate,
+                    this.container));
         }
 
-        public InstanceProducer TryGetInstanceProducer(Type serviceType, InjectionConsumerInfo context)
+        public InstanceProducer TryGetInstanceProducer(Type serviceType, InjectionConsumerInfo consumer)
         {
-            var instanceProducers = this.GetInstanceProducers(context).ToArray();
+            var instanceProducers = this.GetInstanceProducers(consumer).ToArray();
 
             if (instanceProducers.Length <= 1)
             {
@@ -97,8 +104,11 @@ namespace SimpleInjector.Internals
             throw this.ThrowMultipleApplicableRegistrationsFound(instanceProducers);
         }
 
-        public void AddGeneric(Type serviceType, Type implementationType,
-            Lifestyle lifestyle, Predicate<PredicateContext> predicate)
+        public void AddGeneric(
+            Type serviceType,
+            Type implementationType,
+            Lifestyle lifestyle,
+            Predicate<PredicateContext> predicate)
         {
             throw new NotSupportedException();
         }
@@ -231,16 +241,21 @@ namespace SimpleInjector.Internals
 
         private class ImplementationTypeFactoryInstanceProducerProvider : IProducerProvider
         {
-            private readonly Dictionary<Type, InstanceProducer> cache = new Dictionary<Type, InstanceProducer>();
+            private readonly Dictionary<Type, InstanceProducer> cache =
+                new Dictionary<Type, InstanceProducer>();
+
             private readonly Func<TypeFactoryContext, Type> implementationTypeFactory;
             private readonly Lifestyle lifestyle;
             private readonly Predicate<PredicateContext> predicate;
             private readonly Type serviceType;
             private readonly Container container;
 
-            public ImplementationTypeFactoryInstanceProducerProvider(Type serviceType,
-                Func<TypeFactoryContext, Type> implementationTypeFactory, Lifestyle lifestyle,
-                Predicate<PredicateContext> predicate, Container container)
+            public ImplementationTypeFactoryInstanceProducerProvider(
+                Type serviceType,
+                Func<TypeFactoryContext, Type> implementationTypeFactory,
+                Lifestyle lifestyle,
+                Predicate<PredicateContext> predicate,
+                Container container)
             {
                 this.serviceType = serviceType;
                 this.implementationTypeFactory = implementationTypeFactory;
@@ -262,10 +277,10 @@ namespace SimpleInjector.Internals
 
             public InstanceProducer TryGetProducer(InjectionConsumerInfo consumer, bool handled)
             {
-                Func<Type> implementationTypeProvider = 
+                Func<Type> implementationTypeProvider =
                     () => this.GetImplementationTypeThroughFactory(consumer);
 
-                var context = 
+                var context =
                     new PredicateContext(this.serviceType, implementationTypeProvider, consumer, handled);
 
                 // NOTE: The producer should only get built after it matches the delegate, to prevent
@@ -282,7 +297,8 @@ namespace SimpleInjector.Internals
 
                 if (implementationType == null)
                 {
-                    throw new InvalidOperationException(StringResources.FactoryReturnedNull(this.serviceType));
+                    throw new InvalidOperationException(
+                        StringResources.FactoryReturnedNull(this.serviceType));
                 }
 
                 if (implementationType.ContainsGenericParameters())
@@ -292,7 +308,8 @@ namespace SimpleInjector.Internals
                             this.serviceType, implementationType));
                 }
 
-                Requires.FactoryReturnsATypeThatIsAssignableFromServiceType(this.serviceType, implementationType);
+                Requires.FactoryReturnsATypeThatIsAssignableFromServiceType(
+                    this.serviceType, implementationType);
 
                 return implementationType;
             }
@@ -307,7 +324,8 @@ namespace SimpleInjector.Internals
                     // We need to cache on implementation, because service type is always the same.
                     if (!this.cache.TryGetValue(context.ImplementationType, out producer))
                     {
-                        this.cache[context.ImplementationType] = producer = this.CreateNewProducerFor(context);
+                        this.cache[context.ImplementationType] =
+                            producer = this.CreateNewProducerFor(context);
                     }
                 }
 

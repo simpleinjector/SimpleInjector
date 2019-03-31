@@ -91,8 +91,8 @@ namespace SimpleInjector.Decorators
             return (IEnumerable)selectMethod.Invoke(null, new object[] { source, selector });
         }
 
-        internal static MethodCallExpression Select(Expression collectionExpression, Type type,
-            Delegate selector)
+        internal static MethodCallExpression Select(
+            Expression collectionExpression, Type type, Delegate selector)
         {
             // We make use of .NET's built in Enumerable.Select to wrap the collection with the decorators.
             var selectMethod = EnumerableSelectMethod.MakeGenericMethod(type, type);

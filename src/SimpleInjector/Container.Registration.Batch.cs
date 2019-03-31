@@ -33,7 +33,8 @@ namespace SimpleInjector
 #endif
     public partial class Container
     {
-        private readonly Dictionary<Type, List<Type>> skippedNonGenericDecorators = new Dictionary<Type, List<Type>>();
+        private readonly Dictionary<Type, List<Type>> skippedNonGenericDecorators =
+            new Dictionary<Type, List<Type>>();
 
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given set of
@@ -126,15 +127,23 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
         /// <paramref name="assemblies"/> contain multiple types that implement the same 
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
-        public void Register(Type openGenericServiceType, IEnumerable<Assembly> assemblies, Lifestyle lifestyle)
+        public void Register(
+            Type openGenericServiceType, IEnumerable<Assembly> assemblies, Lifestyle lifestyle)
         {
             Requires.IsNotNull(openGenericServiceType, nameof(openGenericServiceType));
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
             Requires.IsNotNull(assemblies, nameof(assemblies));
-            Requires.IsGenericType(openGenericServiceType, nameof(openGenericServiceType),
+
+            Requires.IsGenericType(
+                openGenericServiceType,
+                nameof(openGenericServiceType),
                 guidance: StringResources.SuppliedTypeIsNotGenericExplainingAlternativesWithAssemblies);
+
             Requires.IsNotPartiallyClosed(openGenericServiceType, nameof(openGenericServiceType));
-            Requires.IsOpenGenericType(openGenericServiceType, nameof(openGenericServiceType),
+
+            Requires.IsOpenGenericType(
+                openGenericServiceType,
+                nameof(openGenericServiceType),
                 guidance: StringResources.SuppliedTypeIsNotOpenGenericExplainingAlternativesWithAssemblies);
 
             Type[] skippedDecorators;
@@ -183,23 +192,36 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the given set of 
         /// <paramref name="implementationTypes"/> contain multiple types that implement the same 
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
-        public void Register(Type openGenericServiceType, IEnumerable<Type> implementationTypes, Lifestyle lifestyle)
+        public void Register(
+            Type openGenericServiceType, IEnumerable<Type> implementationTypes, Lifestyle lifestyle)
         {
             Requires.IsNotNull(openGenericServiceType, nameof(openGenericServiceType));
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
             Requires.IsNotNull(implementationTypes, nameof(implementationTypes));
-            Requires.IsGenericType(openGenericServiceType, nameof(openGenericServiceType),
+
+            Requires.IsGenericType(
+                openGenericServiceType,
+                nameof(openGenericServiceType),
                 guidance: StringResources.SuppliedTypeIsNotGenericExplainingAlternativesWithTypes);
+
             Requires.IsNotPartiallyClosed(openGenericServiceType, nameof(openGenericServiceType));
-            Requires.IsOpenGenericType(openGenericServiceType, nameof(openGenericServiceType),
+
+            Requires.IsOpenGenericType(
+                openGenericServiceType,
+                paramName: nameof(openGenericServiceType),
                 guidance: StringResources.SuppliedTypeIsNotOpenGenericExplainingAlternativesWithTypes);
 
             implementationTypes = implementationTypes.Distinct().ToArray();
 
             Requires.DoesNotContainNullValues(implementationTypes, nameof(implementationTypes));
-            Requires.CollectionDoesNotContainOpenGenericTypes(implementationTypes, nameof(implementationTypes));
-            Requires.ServiceIsAssignableFromImplementations(openGenericServiceType, implementationTypes,
-                nameof(implementationTypes), typeCanBeServiceType: false);
+            Requires.CollectionDoesNotContainOpenGenericTypes(
+                implementationTypes, nameof(implementationTypes));
+
+            Requires.ServiceIsAssignableFromImplementations(
+                openGenericServiceType,
+                implementationTypes,
+                paramName: nameof(implementationTypes),
+                typeCanBeServiceType: false);
 
             var mappings =
                 from mapping in BatchMapping.Build(openGenericServiceType, implementationTypes)
@@ -272,7 +294,7 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        [Obsolete("Please use Container." + nameof(Collection) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection<TService>(IEnumerable<Assembly> assemblies) where TService : class
         {
@@ -296,7 +318,7 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        [Obsolete("Please use Container." + nameof(Collection) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection(Type serviceType, params Assembly[] assemblies)
         {
@@ -320,7 +342,7 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference (Nothing in VB).</exception>
-        [Obsolete("Please use Container." + nameof(Collection) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection(Type serviceType, IEnumerable<Assembly> assemblies)
         {
@@ -515,8 +537,8 @@ namespace SimpleInjector
         /// <returns>A collection of types.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference 
         /// (Nothing in VB).</exception>
-        public IEnumerable<Type> GetTypesToRegister(Type serviceType, IEnumerable<Assembly> assemblies,
-            TypesToRegisterOptions options)
+        public IEnumerable<Type> GetTypesToRegister(
+            Type serviceType, IEnumerable<Assembly> assemblies, TypesToRegisterOptions options)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(assemblies, nameof(assemblies));
@@ -538,12 +560,13 @@ namespace SimpleInjector
             return types.ToArray();
         }
 
-        private Type[] GetNonGenericTypesToRegisterForOneToOneMapping(Type openGenericServiceType,
-            IEnumerable<Assembly> assemblies, out Type[] skippedDecorators)
+        private Type[] GetNonGenericTypesToRegisterForOneToOneMapping(
+            Type openGenericServiceType, IEnumerable<Assembly> assemblies, out Type[] skippedDecorators)
         {
             var options = new TypesToRegisterOptions { IncludeDecorators = true };
 
-            var typesIncludingDecorators = this.GetTypesToRegister(openGenericServiceType, assemblies, options);
+            var typesIncludingDecorators =
+                this.GetTypesToRegister(openGenericServiceType, assemblies, options);
 
             var partitions =
                 typesIncludingDecorators.Partition(type => this.IsDecorator(openGenericServiceType, type));
@@ -645,15 +668,20 @@ namespace SimpleInjector
 
             private static void RequiresNoDuplicateRegistrations(BatchMapping[] mappings)
             {
-                // Use of 'Count() > 1' instead of 'Skip(1).Any()' is not a performance problem here, and is actually
-                // faster in this case, because Enumerable.GroupBy returns an instance that implements ICollection<T>.
+                // Use of 'Count() > 1' instead of 'Skip(1).Any()' is not a performance problem here, and is
+                // actually faster in this case, because Enumerable.GroupBy returns an instance that
+                // implements ICollection<T>.
 #pragma warning disable RCS1083
                 var duplicateServiceTypes =
                     from mapping in mappings
                     from closedServiceType in mapping.ClosedServiceTypes
                     group mapping.ImplementationType by closedServiceType into serviceTypeGroup
                     where serviceTypeGroup.Count() > 1
-                    select new { service = serviceTypeGroup.Key, implementations = serviceTypeGroup.ToArray() };
+                    select new
+                    {
+                        service = serviceTypeGroup.Key,
+                        implementations = serviceTypeGroup.ToArray()
+                    };
 
                 var invalidRegistration = duplicateServiceTypes.FirstOrDefault();
 

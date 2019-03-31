@@ -59,8 +59,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
             }
             else
             {
-                return new DebuggerViewItem(WarningsName, "Warnings in multiple groups have been detected.",
-                    analysisResults);
+                return new DebuggerViewItem(
+                    WarningsName, "Warnings in multiple groups have been detected.", analysisResults);
             }
         }
 

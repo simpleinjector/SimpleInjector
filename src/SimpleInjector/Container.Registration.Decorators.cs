@@ -458,8 +458,11 @@ namespace SimpleInjector
         /// not contain a constructor that has exactly one argument of type 
         /// <paramref name="serviceType"/> or <see cref="Func{T}"/> where <b>T</b> is
         /// <paramref name="serviceType"/>.</exception>
-        public void RegisterDecorator(Type serviceType, Type decoratorType,
-            Lifestyle lifestyle, Predicate<DecoratorPredicateContext> predicate)
+        public void RegisterDecorator(
+            Type serviceType,
+            Type decoratorType,
+            Lifestyle lifestyle,
+            Predicate<DecoratorPredicateContext> predicate)
         {
             Requires.IsNotNull(predicate, nameof(predicate));
 
@@ -541,8 +544,10 @@ namespace SimpleInjector
         /// <param name="predicate">The predicate that determines whether the decorator must be applied to a 
         /// service type.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
-        public void RegisterDecorator(Type serviceType,
-            Func<DecoratorPredicateContext, Type> decoratorTypeFactory, Lifestyle lifestyle,
+        public void RegisterDecorator(
+            Type serviceType,
+            Func<DecoratorPredicateContext, Type> decoratorTypeFactory,
+            Lifestyle lifestyle,
             Predicate<DecoratorPredicateContext> predicate)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
@@ -619,16 +624,19 @@ namespace SimpleInjector
         /// not contain a constructor that has exactly one argument of type 
         /// <paramref name="serviceType"/> or <see cref="Func{T}"/> where <b>T</b> is
         /// <paramref name="serviceType"/>.</exception>
-        public void RegisterDecorator(Type serviceType, Type decoratorType,
-            Predicate<DecoratorPredicateContext> predicate)
+        public void RegisterDecorator(
+            Type serviceType, Type decoratorType, Predicate<DecoratorPredicateContext> predicate)
         {
             Requires.IsNotNull(predicate, nameof(predicate));
 
             this.RegisterDecoratorCore(serviceType, decoratorType, predicate);
         }
 
-        private void RegisterDecoratorCore(Type serviceType, Type decoratorType,
-            Predicate<DecoratorPredicateContext> predicate = null, Lifestyle lifestyle = null)
+        private void RegisterDecoratorCore(
+            Type serviceType,
+            Type decoratorType,
+            Predicate<DecoratorPredicateContext> predicate = null,
+            Lifestyle lifestyle = null)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(decoratorType, nameof(decoratorType));

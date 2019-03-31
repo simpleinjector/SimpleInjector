@@ -40,8 +40,8 @@ namespace SimpleInjector.Internals
             this.constantsParameter = constantsParameter;
         }
 
-        public static Expression ReplaceConstantsWithArrayIndexes(Expression node,
-            ConstantExpression[] constantExpressions, ParameterExpression constantsParameter)
+        public static Expression ReplaceConstantsWithArrayIndexes(
+            Expression node, ConstantExpression[] constantExpressions, ParameterExpression constantsParameter)
         {
             var visitor = new ConstantArrayIndexizerVisitor(constantExpressions, constantsParameter);
 

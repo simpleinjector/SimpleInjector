@@ -42,8 +42,8 @@
         /// <returns>True when the property should be injected.</returns>
         [Obsolete(PropertySelectionBehaviorObsoleteMessage, error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static bool SelectProperty(this IPropertySelectionBehavior behavior,
-            Type serviceType, PropertyInfo propertyInfo)
+        public static bool SelectProperty(
+            this IPropertySelectionBehavior behavior, Type serviceType, PropertyInfo propertyInfo)
         {
             throw new NotSupportedException(PropertySelectionBehaviorObsoleteMessage);
         }

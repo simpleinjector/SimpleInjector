@@ -201,8 +201,9 @@ namespace SimpleInjector.Internals
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
-                    typeof(TService), ex), ex);
+                throw new InvalidOperationException(
+                    StringResources.ConfigurationInvalidCreatingInstanceFailed(typeof(TService), ex),
+                    ex);
             }
         }
 
@@ -267,8 +268,10 @@ namespace SimpleInjector.Internals
 
         private InstanceProducer GetInstanceProducerThroughUnregisteredTypeResolution(Type implementationType)
         {
-            var producer = this.container.GetRegistrationEvenIfInvalid(implementationType,
-                InjectionConsumerInfo.Root, autoCreateConcreteTypes: false);
+            var producer = this.container.GetRegistrationEvenIfInvalid(
+                implementationType,
+                InjectionConsumerInfo.Root,
+                autoCreateConcreteTypes: false);
 
             bool producerIsValid = producer?.IsValid == true;
 

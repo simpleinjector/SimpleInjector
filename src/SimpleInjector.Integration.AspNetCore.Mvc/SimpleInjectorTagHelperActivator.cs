@@ -40,7 +40,7 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// <param name="container">The container instance.</param>
         [Obsolete("This constructor is deprecated. Please use the other constructor overload or use the " +
             "SimpleInjectorAspNetCoreMvcIntegrationExtensions.AddSimpleInjectorTagHelperActivation " +
-            "extension method instead.", 
+            "extension method instead.",
             error: false)]
         public SimpleInjectorTagHelperActivator(Container container)
         {
@@ -60,7 +60,9 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// by the supplied <paramref name="container"/> (when the predicate returns true) or using the 
         /// supplied <paramref name="frameworkTagHelperActivator"/> (when the predicate returns false).</param>
         /// <param name="frameworkTagHelperActivator">The framework's tag helper activator.</param>
-        public SimpleInjectorTagHelperActivator(Container container, Predicate<Type> tagHelperSelector,
+        public SimpleInjectorTagHelperActivator(
+            Container container,
+            Predicate<Type> tagHelperSelector,
             ITagHelperActivator frameworkTagHelperActivator)
         {
             if (container == null)

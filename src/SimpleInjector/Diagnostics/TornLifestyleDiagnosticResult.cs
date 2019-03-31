@@ -34,17 +34,26 @@ namespace SimpleInjector.Diagnostics
     /// and lifestyle, which might cause multiple instances to be created during the lifespan of that lifestyle.
     /// For more information, see: https://simpleinjector.org/diatl.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(TornLifestyleDiagnosticResult.DebuggerDisplay) + ", nq}")]
     public class TornLifestyleDiagnosticResult : DiagnosticResult
     {
-        internal TornLifestyleDiagnosticResult(Type serviceType, string description, Lifestyle lifestyle,
-            Type implementationType, InstanceProducer[] affectedRegistrations)
-            : base(serviceType, description, DiagnosticType.TornLifestyle, DiagnosticSeverity.Warning,
+        internal TornLifestyleDiagnosticResult(
+            Type serviceType,
+            string description,
+            Lifestyle lifestyle,
+            Type implementationType,
+            InstanceProducer[] affectedRegistrations)
+            : base(
+                serviceType,
+                description,
+                DiagnosticType.TornLifestyle,
+                DiagnosticSeverity.Warning,
                 CreateDebugValue(implementationType, lifestyle, affectedRegistrations))
         {
             this.Lifestyle = lifestyle;
             this.ImplementationType = implementationType;
-            this.AffectedRegistrations = new ReadOnlyCollection<InstanceProducer>(affectedRegistrations.ToList());
+            this.AffectedRegistrations = 
+                new ReadOnlyCollection<InstanceProducer>(affectedRegistrations.ToList());
         }
 
         /// <summary>Gets the lifestyle on which instances are torn.</summary>
@@ -59,27 +68,27 @@ namespace SimpleInjector.Diagnostics
         /// <value>A list of <see cref="InstanceProducer"/> instances.</value>
         public ReadOnlyCollection<InstanceProducer> AffectedRegistrations { get; }
 
-        private static DebuggerViewItem[] CreateDebugValue(Type implementationType, Lifestyle lifestyle,
-            InstanceProducer[] affectedRegistrations)
+        private static DebuggerViewItem[] CreateDebugValue(
+            Type implementationType, Lifestyle lifestyle, InstanceProducer[] affectedRegistrations)
         {
             return new[]
             {
                 new DebuggerViewItem(
-                    name: "ImplementationType", 
-                    description: implementationType.ToFriendlyName(), 
+                    name: "ImplementationType",
+                    description: implementationType.ToFriendlyName(),
                     value: implementationType),
                 new DebuggerViewItem(
-                    name: "Lifestyle", 
-                    description: lifestyle.Name, 
+                    name: "Lifestyle",
+                    description: lifestyle.Name,
                     value: lifestyle),
                 new DebuggerViewItem(
-                    name: "Affected Registrations", 
-                    description: ToCommaSeparatedText(affectedRegistrations), 
+                    name: "Affected Registrations",
+                    description: ToCommaSeparatedText(affectedRegistrations),
                     value: affectedRegistrations)
             };
         }
 
-        private static string ToCommaSeparatedText(IEnumerable<InstanceProducer> producers) => 
+        private static string ToCommaSeparatedText(IEnumerable<InstanceProducer> producers) =>
             producers.Select(r => r.ServiceType).Distinct().Select(TypesExtensions.ToFriendlyName)
                 .ToCommaSeparatedText();
     }

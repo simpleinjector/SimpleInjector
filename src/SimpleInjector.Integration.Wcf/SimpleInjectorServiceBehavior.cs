@@ -36,7 +36,7 @@ namespace SimpleInjector.Integration.Wcf
     /// </summary>
     public class SimpleInjectorServiceBehavior : IServiceBehavior
     {
-        private readonly Container container;        
+        private readonly Container container;
 
         /// <summary>Initializes a new instance of the <see cref="SimpleInjectorServiceBehavior"/> class.</summary>
         /// <param name="container">The container instance.</param>
@@ -58,8 +58,10 @@ namespace SimpleInjector.Integration.Wcf
         /// <param name="serviceHostBase">The host of the service.</param>
         /// <param name="endpoints">The service endpoints.</param>
         /// <param name="bindingParameters">Custom objects to which binding elements have access.</param>
-        public void AddBindingParameters(ServiceDescription serviceDescription,
-            ServiceHostBase serviceHostBase, Collection<ServiceEndpoint> endpoints,
+        public void AddBindingParameters(
+            ServiceDescription serviceDescription,
+            ServiceHostBase serviceHostBase,
+            Collection<ServiceEndpoint> endpoints,
             BindingParameterCollection bindingParameters)
         {
         }
@@ -77,7 +79,7 @@ namespace SimpleInjector.Integration.Wcf
             Requires.IsNotNull(serviceDescription, nameof(serviceDescription));
             Requires.IsNotNull(serviceHostBase, nameof(serviceHostBase));
 
-            var instanceProvider = new SimpleInjectorInstanceProvider(this.container, 
+            var instanceProvider = new SimpleInjectorInstanceProvider(this.container,
                 this.ServiceType ?? serviceDescription.ServiceType);
 
             var endpointDispatchers =

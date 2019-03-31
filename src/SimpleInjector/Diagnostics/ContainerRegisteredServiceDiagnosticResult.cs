@@ -35,13 +35,17 @@ namespace SimpleInjector.Diagnostics
     /// lifestyle.
     /// For more information, see: https://simpleinjector.org/diaut.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(ContainerRegisteredServiceDiagnosticResult.DebuggerDisplay) + ", nq}")]
     public class ContainerRegisteredServiceDiagnosticResult : DiagnosticResult
     {
-        internal ContainerRegisteredServiceDiagnosticResult(Type serviceType, string description,
-            IEnumerable<KnownRelationship> relationships)
-            : base(serviceType, description, DiagnosticType.ContainerRegisteredComponent,
-                DiagnosticSeverity.Information, relationships.ToArray())
+        internal ContainerRegisteredServiceDiagnosticResult(
+            Type serviceType, string description, IEnumerable<KnownRelationship> relationships)
+            : base(
+                serviceType,
+                description,
+                DiagnosticType.ContainerRegisteredComponent,
+                DiagnosticSeverity.Information,
+                relationships.ToArray())
         {
             this.Relationships = new ReadOnlyCollection<KnownRelationship>(relationships.ToList());
         }

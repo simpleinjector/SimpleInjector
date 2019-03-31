@@ -35,9 +35,13 @@ namespace SimpleInjector.Lifestyles
         private readonly Registration trueRegistration;
         private readonly Registration falseRegistration;
 
-        public HybridRegistration(Type implementationType, Func<bool> test,
-            Registration trueRegistration, Registration falseRegistration,
-            Lifestyle lifestyle, Container container)
+        public HybridRegistration(
+            Type implementationType,
+            Func<bool> test,
+            Registration trueRegistration,
+            Registration falseRegistration,
+            Lifestyle lifestyle,
+            Container container)
             : base(lifestyle, container)
         {
             this.ImplementationType = implementationType;
@@ -79,7 +83,7 @@ namespace SimpleInjector.Lifestyles
             }
         }
 
-        private IEnumerable<KnownRelationship> GetRelationshipsThisLifestyle(Registration registration) => 
+        private IEnumerable<KnownRelationship> GetRelationshipsThisLifestyle(Registration registration) =>
             from relationship in registration.GetRelationships()
             let mustReplace = object.ReferenceEquals(relationship.Lifestyle, registration.Lifestyle)
             select mustReplace ? this.ReplaceLifestyle(relationship) : relationship;

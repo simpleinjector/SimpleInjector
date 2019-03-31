@@ -66,7 +66,9 @@ namespace SimpleInjector.Advanced
         }
 
         internal static PropertyInjectionData BuildPropertyInjectionExpression(
-            Container container, Type implementationType, PropertyInfo[] properties,
+            Container container,
+            Type implementationType,
+            PropertyInfo[] properties,
             Expression expressionToWrap)
         {
             var helper = new PropertyInjectionHelper(container, implementationType);

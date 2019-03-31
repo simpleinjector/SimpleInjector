@@ -37,7 +37,7 @@ namespace SimpleInjector.Internals
         private static readonly ConstructorInfo LazyScopeConstructor =
             Helpers.GetConstructor(() => new LazyScope(null, null));
 
-        private static readonly MethodInfo CreateConstantValueDelegateMethod = 
+        private static readonly MethodInfo CreateConstantValueDelegateMethod =
             Helpers.GetGenericMethodDefinition(() => CreateConstantValueDelegate<object>(null));
 
         // NOTE: This method should be public. It is called using reflection.
@@ -67,7 +67,10 @@ namespace SimpleInjector.Internals
             return (Func<TResult>)CompileExpression(typeof(TResult), container, expression, null);
         }
 
-        internal static Delegate CompileExpression(Type resultType, Container container, Expression expression,
+        internal static Delegate CompileExpression(
+            Type resultType,
+            Container container,
+            Expression expression,
             Dictionary<Expression, InvocationExpression> reducedNodes = null)
         {
             if (expression is ConstantExpression)
@@ -123,8 +126,8 @@ namespace SimpleInjector.Internals
             return Expression.Lambda(delegateType, expression).Compile();
         }
 
-        static partial void TryCompileInDynamicAssembly(Type resultType, Expression expression,
-            ref Delegate compiledLambda);
+        static partial void TryCompileInDynamicAssembly(
+            Type resultType, Expression expression, ref Delegate compiledLambda);
 
         // OptimizeExpression will implement caching of the scopes of ScopedLifestyles which will optimize
         // performance in case multiple scoped registrations are used within a single delegate. Here's an
@@ -149,8 +152,8 @@ namespace SimpleInjector.Internals
         //         new SomeQueryHandler(value1.GetInstance(scope1.Value)), // hits local cache
         //         new SomeCommandHandler(value2.GetInstance(scope1.Value))); // Hits dictionary
         // };
-        private static Expression OptimizeExpression(Container container, Expression expression,
-            OptimizableLifestyleInfo[] lifestyleInfos)
+        private static Expression OptimizeExpression(
+            Container container, Expression expression, OptimizableLifestyleInfo[] lifestyleInfos)
         {
             var lifestyleAssigmentExpressions = (
                 from lifestyleInfo in lifestyleInfos
@@ -201,7 +204,9 @@ namespace SimpleInjector.Internals
         // delegates. Besides preventing the CLR from throwing stack overflow exceptions (which will happen
         // when the tree gets somewhere between 20,000 and 50,000 nodes), this can reduce the amount of code 
         // that needs to be JITted and can therefore reduce the memory footprint of the application.
-        private static Expression ReduceObjectGraphSize(Expression expression, Container container,
+        private static Expression ReduceObjectGraphSize(
+            Expression expression,
+            Container container,
             Dictionary<Expression, InvocationExpression> reducedNodes = null)
         {
             var results = NodeSizeCalculator.Calculate(expression);
@@ -236,7 +241,9 @@ namespace SimpleInjector.Internals
             return expression;
         }
 
-        private static InvocationExpression CompileToInvocation(Expression expression, Container container,
+        private static InvocationExpression CompileToInvocation(
+            Expression expression,
+            Container container,
             Dictionary<Expression, InvocationExpression> reducedNodes)
         {
             // Here we compile the expression. This will recursively reduce this sub graph again. The already

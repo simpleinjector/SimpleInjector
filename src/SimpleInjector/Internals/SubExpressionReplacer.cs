@@ -38,13 +38,8 @@ namespace SimpleInjector.Internals
             this.replacementExpression = replacementExpression;
         }
 
-        public override Expression Visit(Expression node)
-        {
-            return base.Visit(node);
-        }
-
-        internal static Expression Replace(Expression expressionToAlter,
-            ConstantExpression nodeToFind, Expression replacementNode)
+        internal static Expression Replace(
+            Expression expressionToAlter, ConstantExpression nodeToFind, Expression replacementNode)
         {
             var visitor = new SubExpressionReplacer(nodeToFind, replacementNode);
 

@@ -26,7 +26,6 @@ namespace SimpleInjector
 {
     using System;
     using System.ComponentModel;
-    using SimpleInjector.Integration.Web;
 
     /// <summary>
     /// Extension methods for integrating Simple Injector with ASP.NET web applications.
@@ -150,8 +149,9 @@ namespace SimpleInjector
             "Please use Register<TService>(new WebRequestLifestyle(false)) instead to suppress disposal.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void RegisterPerWebRequest<TService>(this Container container,
-            Func<TService> instanceCreator, bool disposeInstanceWhenWebRequestEnds) where TService : class
+        public static void RegisterPerWebRequest<TService>(
+            this Container container, Func<TService> instanceCreator, bool disposeInstanceWhenWebRequestEnds)
+            where TService : class
         {
             throw new NotSupportedException(
                 "RegisterPerWebRequest has been deprecated. " +

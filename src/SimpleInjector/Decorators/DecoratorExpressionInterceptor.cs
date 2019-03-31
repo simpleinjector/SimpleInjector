@@ -112,8 +112,12 @@ namespace SimpleInjector.Decorators
             return e.DecoratorInfo;
         }
 
-        protected Registration CreateRegistration(Type serviceType, ConstructorInfo decoratorConstructor,
-            Expression decorateeExpression, InstanceProducer realProducer, ServiceTypeDecoratorInfo info)
+        protected Registration CreateRegistration(
+            Type serviceType,
+            ConstructorInfo decoratorConstructor,
+            Expression decorateeExpression,
+            InstanceProducer realProducer,
+            ServiceTypeDecoratorInfo info)
         {
             var overriddenParameters = this.CreateOverriddenParameters(
                 serviceType, decoratorConstructor, decorateeExpression, realProducer, info);
@@ -121,7 +125,7 @@ namespace SimpleInjector.Decorators
             return this.Lifestyle.CreateDecoratorRegistration(
                 decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
         }
-        
+
         protected DecoratorPredicateContext CreatePredicateContext(ExpressionBuiltEventArgs e)
         {
             ServiceTypeDecoratorInfo info = this.GetServiceTypeInfo(e);
@@ -189,9 +193,12 @@ namespace SimpleInjector.Decorators
             producer.AddVerifier(verifier);
         }
 
-        private OverriddenParameter[] CreateOverriddenParameters(Type serviceType,
-            ConstructorInfo decoratorConstructor, Expression decorateeExpression,
-            InstanceProducer realProducer, ServiceTypeDecoratorInfo info)
+        private OverriddenParameter[] CreateOverriddenParameters(
+            Type serviceType,
+            ConstructorInfo decoratorConstructor,
+            Expression decorateeExpression,
+            InstanceProducer realProducer,
+            ServiceTypeDecoratorInfo info)
         {
             ParameterInfo decorateeParameter = GetDecorateeParameter(serviceType, decoratorConstructor);
 
@@ -251,8 +258,8 @@ namespace SimpleInjector.Decorators
         }
 
         // The constructor parameter in which the decorated instance should be injected.
-        private static Expression BuildExpressionForDecorateeDependencyParameter(ParameterInfo parameter,
-            Type serviceType, Expression expression)
+        private static Expression BuildExpressionForDecorateeDependencyParameter(
+            ParameterInfo parameter, Type serviceType, Expression expression)
         {
             if (IsDecorateeDependencyParameter(parameter, serviceType))
             {

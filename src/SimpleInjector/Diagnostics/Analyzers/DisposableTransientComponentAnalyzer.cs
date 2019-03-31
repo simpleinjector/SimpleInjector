@@ -64,8 +64,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
             var results =
                 from producer in invalidProducers
-                select new DisposableTransientComponentDiagnosticResult(producer.ServiceType, producer,
-                    BuildDescription(producer));
+                select new DisposableTransientComponentDiagnosticResult(
+                    producer.ServiceType, producer, BuildDescription(producer));
 
             return results.ToArray();
         }

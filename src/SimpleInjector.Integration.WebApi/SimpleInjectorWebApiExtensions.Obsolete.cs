@@ -212,8 +212,8 @@ namespace SimpleInjector
             "to suppress disposal.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void RegisterWebApiRequest<TService>(this Container container,
-            Func<TService> instanceCreator, bool disposeWhenScopeEnds)
+        public static void RegisterWebApiRequest<TService>(
+            this Container container, Func<TService> instanceCreator, bool disposeWhenScopeEnds)
             where TService : class
         {
             throw new NotSupportedException(

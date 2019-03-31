@@ -61,8 +61,8 @@ namespace SimpleInjector.Integration.Wcf
         /// <param name="baseAddresses">The base addresses.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
         /// reference or <paramref name="singletonInstance"/> is a null reference.</exception>
-        public SimpleInjectorServiceHost(Container container, object singletonInstance, 
-            params Uri[] baseAddresses)
+        public SimpleInjectorServiceHost(
+            Container container, object singletonInstance, params Uri[] baseAddresses)
             : base(singletonInstance, baseAddresses)
         {
             Requires.IsNotNull(container, nameof(container));
@@ -71,8 +71,8 @@ namespace SimpleInjector.Integration.Wcf
             this.container = container;
         }
 
-        internal SimpleInjectorServiceHost(Container container, Type serviceAbstraction, Type implementationType,
-            params Uri[] baseAddresses)
+        internal SimpleInjectorServiceHost(
+            Container container, Type serviceAbstraction, Type implementationType, params Uri[] baseAddresses)
             : base(implementationType, baseAddresses)
         {
             Requires.IsNotNull(container, nameof(container));

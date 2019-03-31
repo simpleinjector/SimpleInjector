@@ -23,7 +23,6 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Reflection;
 
 #if !PUBLISH
     /// <summary>Methods for conditional registrations.</summary>
@@ -155,7 +154,10 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
-        public void RegisterConditional(Type serviceType, Type implementationType, Lifestyle lifestyle,
+        public void RegisterConditional(
+            Type serviceType,
+            Type implementationType,
+            Lifestyle lifestyle,
             Predicate<PredicateContext> predicate)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
@@ -268,15 +270,15 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
-        public void RegisterConditional(Type serviceType, Registration registration,
-            Predicate<PredicateContext> predicate)
+        public void RegisterConditional(
+            Type serviceType, Registration registration, Predicate<PredicateContext> predicate)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(registration, nameof(registration));
             Requires.IsNotNull(predicate, nameof(predicate));
             Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
-            Requires.ServiceIsAssignableFromImplementation(serviceType, registration.ImplementationType,
-                nameof(serviceType));
+            Requires.ServiceIsAssignableFromImplementation(
+                serviceType, registration.ImplementationType, nameof(serviceType));
 
             this.ThrowWhenContainerIsLockedOrDisposed();
 

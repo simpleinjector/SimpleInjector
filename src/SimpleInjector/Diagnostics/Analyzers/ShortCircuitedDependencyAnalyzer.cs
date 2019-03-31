@@ -61,7 +61,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
         {
-            Dictionary<Type, IEnumerable<InstanceProducer>> registeredImplementationTypes = 
+            Dictionary<Type, IEnumerable<InstanceProducer>> registeredImplementationTypes =
                 GetRegisteredImplementationTypes(producers);
 
             Dictionary<Type, InstanceProducer> autoRegisteredRegistrationsWithLifestyleMismatch =
@@ -119,10 +119,14 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 from possibleSkippedRegistration in possibleSkippedRegistrations
                 let name = possibleSkippedRegistration.ServiceType.ToFriendlyName()
                 orderby name
-                select string.Format(CultureInfo.InvariantCulture, "{0} ({1})",
-                    name, possibleSkippedRegistration.Lifestyle.Name));
+                select string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0} ({1})",
+                    name,
+                    possibleSkippedRegistration.Lifestyle.Name));
 
-            return string.Format(CultureInfo.InvariantCulture,
+            return string.Format(
+                CultureInfo.InvariantCulture,
                 "{0} might incorrectly depend on unregistered type {1} ({2}) instead of {3}.",
                 relationship.ImplementationType.ToFriendlyName(),
                 relationship.Dependency.ServiceType.ToFriendlyName(),

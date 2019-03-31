@@ -40,7 +40,7 @@ namespace SimpleInjector
     /// <see cref="Container.RegisterConditional(System.Type, System.Type, Lifestyle, Predicate{PredicateContext})">Register</see>
     /// method for more information.
     /// </remarks>
-    [DebuggerDisplay(nameof(PredicateContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
+    [DebuggerDisplay(nameof(PredicateContext) + " ({" + nameof(PredicateContext.DebuggerDisplay) + ", nq})")]
     public sealed class PredicateContext
     {
         private readonly Func<Type> implementationTypeProvider;
@@ -51,8 +51,8 @@ namespace SimpleInjector
         {
         }
 
-        internal PredicateContext(Type serviceType, Type implementationType, InjectionConsumerInfo consumer,
-            bool handled)
+        internal PredicateContext(
+            Type serviceType, Type implementationType, InjectionConsumerInfo consumer, bool handled)
         {
             this.ServiceType = serviceType;
             this.implementationType = implementationType;
@@ -60,8 +60,11 @@ namespace SimpleInjector
             this.Handled = handled;
         }
 
-        internal PredicateContext(Type serviceType, Func<Type> implementationTypeProvider,
-            InjectionConsumerInfo consumer, bool handled)
+        internal PredicateContext(
+            Type serviceType,
+            Func<Type> implementationTypeProvider,
+            InjectionConsumerInfo consumer,
+            bool handled)
         {
             this.ServiceType = serviceType;
             this.implementationTypeProvider = implementationTypeProvider;
@@ -103,11 +106,16 @@ namespace SimpleInjector
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
+        internal string DebuggerDisplay => string.Format(
+            CultureInfo.InvariantCulture,
             "{0}: {1}, {2}: {3}, {4}: {5}, {6}: {7}",
-            nameof(this.ServiceType), this.ServiceType.ToFriendlyName(),
-            nameof(this.ImplementationType), this.ImplementationType.ToFriendlyName(),
-            nameof(this.Handled), this.Handled,
-            nameof(this.Consumer), this.Consumer);
+            nameof(this.ServiceType),
+            this.ServiceType.ToFriendlyName(),
+            nameof(this.ImplementationType),
+            this.ImplementationType.ToFriendlyName(),
+            nameof(this.Handled),
+            this.Handled,
+            nameof(this.Consumer),
+            this.Consumer);
     }
 }

@@ -25,7 +25,6 @@ namespace SimpleInjector
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
-    using System.Reflection;
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
@@ -585,8 +584,12 @@ namespace SimpleInjector
         /// </exception>
         public void Register(Type serviceType, Type implementationType)
         {
-            this.Register(serviceType, implementationType, this.SelectionBasedLifestyle,
-                nameof(serviceType), nameof(implementationType));
+            this.Register(
+                serviceType: serviceType,
+                implementationType: implementationType,
+                lifestyle: this.SelectionBasedLifestyle,
+                serviceTypeParamName: nameof(serviceType),
+                implementationTypeParamName: nameof(implementationType));
         }
 
         /// <summary>
@@ -714,8 +717,8 @@ namespace SimpleInjector
             Requires.IsNotNull(instance, nameof(instance));
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
-            var registration = SingletonLifestyle.CreateSingleInstanceRegistration(typeof(TService), instance, this,
-                instance.GetType());
+            var registration = SingletonLifestyle.CreateSingleInstanceRegistration(
+                typeof(TService), instance, this, instance.GetType());
 
             this.AddRegistration(typeof(TService), registration);
         }
@@ -867,8 +870,12 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterSingleton(Type serviceType, Type implementationType)
         {
-            this.Register(serviceType, implementationType, Lifestyle.Singleton, nameof(serviceType),
-                nameof(implementationType));
+            this.Register(
+                serviceType: serviceType,
+                implementationType: implementationType,
+                lifestyle: Lifestyle.Singleton,
+                serviceTypeParamName: nameof(serviceType),
+                implementationTypeParamName: nameof(implementationType));
         }
 
         /// <summary>
@@ -1218,31 +1225,35 @@ namespace SimpleInjector
             }
         }
 
-        internal void RegisterResolveInterceptor(ResolveInterceptor interceptor,
-            Predicate<InitializationContext> predicate)
+        internal void RegisterResolveInterceptor(
+            ResolveInterceptor interceptor, Predicate<InitializationContext> predicate)
         {
             this.resolveInterceptors.Add(new ContextualResolveInterceptor(interceptor, predicate));
         }
 
-        private void Register<TService, TImplementation>(Lifestyle lifestyle, string serviceTypeParamName,
-            string implementationTypeParamName)
-            where TImplementation : class, TService
+        private void Register<TService, TImplementation>(
+            Lifestyle lifestyle, string serviceTypeParamName, string implementationTypeParamName)
             where TService : class
+            where TImplementation : class, TService
         {
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
 
             Requires.IsNotAnAmbiguousType(typeof(TService), serviceTypeParamName);
 
-            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(typeof(TImplementation),
-                implementationTypeParamName);
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(
+                typeof(TImplementation), implementationTypeParamName);
 
             var registration = lifestyle.CreateRegistration<TImplementation>(this);
 
             this.AddRegistrationInternal(typeof(TService), registration);
         }
 
-        private void Register(Type serviceType, Type implementationType, Lifestyle lifestyle,
-            string serviceTypeParamName, string implementationTypeParamName)
+        private void Register(
+            Type serviceType,
+            Type implementationType,
+            Lifestyle lifestyle,
+            string serviceTypeParamName,
+            string implementationTypeParamName)
         {
             Requires.IsNotNull(serviceType, serviceTypeParamName);
             Requires.IsNotNull(implementationType, implementationTypeParamName);
@@ -1253,8 +1264,8 @@ namespace SimpleInjector
 
             Requires.IsNotAnAmbiguousType(serviceType, serviceTypeParamName);
 
-            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(implementationType,
-                implementationTypeParamName);
+            this.ThrowArgumentExceptionWhenTypeIsNotConstructable(
+                implementationType, implementationTypeParamName);
 
             if (serviceType.ContainsGenericParameters())
             {
@@ -1262,8 +1273,8 @@ namespace SimpleInjector
             }
             else
             {
-                Requires.ServiceIsAssignableFromImplementation(serviceType, implementationType,
-                    implementationTypeParamName);
+                Requires.ServiceIsAssignableFromImplementation(
+                    serviceType, implementationType, implementationTypeParamName);
 
                 var registration = lifestyle.CreateRegistration(implementationType, this);
 
@@ -1283,9 +1294,7 @@ namespace SimpleInjector
         private void ThrowArgumentExceptionWhenTypeIsNotConstructable(
             Type implementationType, string parameterName)
         {
-            string message;
-
-            bool constructable = this.Options.IsConstructableType(implementationType, out message);
+            bool constructable = this.Options.IsConstructableType(implementationType, out string message);
 
             if (!constructable)
             {

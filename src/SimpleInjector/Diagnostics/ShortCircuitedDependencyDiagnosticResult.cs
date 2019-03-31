@@ -37,14 +37,20 @@ namespace SimpleInjector.Diagnostics
     /// implementation.
     /// For more information, see: https://simpleinjector.org/diasc.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(ShortCircuitedDependencyDiagnosticResult.DebuggerDisplay) + ", nq}")]
     public class ShortCircuitedDependencyDiagnosticResult : DiagnosticResult
     {
-        internal ShortCircuitedDependencyDiagnosticResult(Type serviceType, string description,
-            InstanceProducer registration, KnownRelationship relationship,
+        internal ShortCircuitedDependencyDiagnosticResult(
+            Type serviceType,
+            string description,
+            InstanceProducer registration,
+            KnownRelationship relationship,
             IEnumerable<InstanceProducer> expectedDependencies)
-            : base(serviceType, description, DiagnosticType.ShortCircuitedDependency, 
-                DiagnosticSeverity.Warning, 
+            : base(
+                serviceType,
+                description,
+                DiagnosticType.ShortCircuitedDependency,
+                DiagnosticSeverity.Warning,
                 CreateDebugValue(registration, relationship, expectedDependencies.ToArray()))
         {
             this.Relationship = relationship;
@@ -64,24 +70,24 @@ namespace SimpleInjector.Diagnostics
         public ReadOnlyCollection<InstanceProducer> ExpectedDependencies { get; }
 
         private static DebuggerViewItem[] CreateDebugValue(InstanceProducer registration,
-            KnownRelationship actualDependency, 
+            KnownRelationship actualDependency,
             InstanceProducer[] possibleSkippedRegistrations)
         {
             return new[]
             {
                 new DebuggerViewItem(
-                    name: "Registration", 
-                    description: registration.ServiceType.ToFriendlyName(), 
+                    name: "Registration",
+                    description: registration.ServiceType.ToFriendlyName(),
                     value: registration),
                 new DebuggerViewItem(
-                    name: "Actual Dependency", 
-                    description: actualDependency.Dependency.ServiceType.ToFriendlyName(), 
+                    name: "Actual Dependency",
+                    description: actualDependency.Dependency.ServiceType.ToFriendlyName(),
                     value: actualDependency),
                 new DebuggerViewItem(
-                    name: "Expected Dependency", 
+                    name: "Expected Dependency",
                     description: possibleSkippedRegistrations.First().ServiceType.ToFriendlyName(),
-                    value: possibleSkippedRegistrations.Length == 1 ? 
-                        (object)possibleSkippedRegistrations[0] : 
+                    value: possibleSkippedRegistrations.Length == 1 ?
+                        (object)possibleSkippedRegistrations[0] :
                         possibleSkippedRegistrations),
             };
         }

@@ -255,8 +255,11 @@ namespace SimpleInjector.Internals
 
         private Type[] GetMatchingGenericArgumentsForOpenImplementationBasedOn(Type openCandidateServiceType)
         {
-            var finder = new GenericArgumentFinder(openCandidateServiceType, this.closedServiceType,
-                this.openGenericImplementation, this.partialOpenGenericImplementation);
+            var finder = new GenericArgumentFinder(
+                openCandidateServiceType,
+                this.closedServiceType,
+                this.openGenericImplementation,
+                this.partialOpenGenericImplementation);
 
             return finder.GetConcreteTypeArgumentsForClosedImplementation();
         }

@@ -33,8 +33,8 @@ namespace SimpleInjector.Lifestyles
         private Func<Scope> scopeFactory;
         private Func<TImplementation> instanceCreator;
 
-        internal ScopedRegistration(ScopedLifestyle lifestyle, Container container,
-            Func<TImplementation> instanceCreator)
+        internal ScopedRegistration(
+            ScopedLifestyle lifestyle, Container container, Func<TImplementation> instanceCreator)
             : this(lifestyle, container)
         {
             this.userSuppliedInstanceCreator = instanceCreator;

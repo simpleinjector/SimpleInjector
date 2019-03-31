@@ -64,8 +64,11 @@ namespace SimpleInjector.Lifestyles
             private readonly CreateLifestyleApplier lifestyleApplierFactory;
             private readonly Func<TImplementation> instanceCreator;
 
-            public CustomRegistration(CreateLifestyleApplier lifestyleApplierFactory, Lifestyle lifestyle,
-                Container container, Func<TImplementation> instanceCreator = null)
+            public CustomRegistration(
+                CreateLifestyleApplier lifestyleApplierFactory,
+                Lifestyle lifestyle,
+                Container container,
+                Func<TImplementation> instanceCreator = null)
                 : base(lifestyle, container)
             {
                 this.lifestyleApplierFactory = lifestyleApplierFactory;

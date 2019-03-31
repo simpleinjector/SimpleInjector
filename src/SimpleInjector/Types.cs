@@ -268,8 +268,8 @@ namespace SimpleInjector
             && type.GetGenericTypeDefinition() == otherType.GetGenericTypeDefinition()
             && type.IsAssignableFrom(otherType);
 
-        private static string ToFriendlyName(this Type type, bool fullyQualifiedName,
-            Func<Type[], string> argumentsFormatter)
+        private static string ToFriendlyName(
+            this Type type, bool fullyQualifiedName, Func<Type[], string> argumentsFormatter)
         {
             if (type.IsArray)
             {

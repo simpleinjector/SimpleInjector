@@ -113,10 +113,10 @@ namespace SimpleInjector
             // This construct looks a bit weird, but prevents the collection from being iterated twice.
             bool collectionContainsNullElements = false;
 
-            ThrowWhenCollectionCanNotBeIterated(collection, serviceType, item =>
-            {
-                collectionContainsNullElements |= item == null;
-            });
+            ThrowWhenCollectionCanNotBeIterated(
+                collection,
+                serviceType,
+                item => collectionContainsNullElements |= item == null);
 
             ThrowWhenCollectionContainsNullElements(serviceType, collectionContainsNullElements);
         }
@@ -192,12 +192,13 @@ namespace SimpleInjector
             }
         }
 
-        private static void ThrowWhenCollectionCanNotBeIterated(IEnumerable collection, Type serviceType,
-            Action<object> itemProcessor)
+        private static void ThrowWhenCollectionCanNotBeIterated(
+            IEnumerable collection, Type serviceType, Action<object> itemProcessor)
         {
             try
             {
                 IEnumerator enumerator = collection.GetEnumerator();
+
                 try
                 {
                     // Just iterate the collection.
@@ -208,12 +209,7 @@ namespace SimpleInjector
                 }
                 finally
                 {
-                    var disposable = enumerator as IDisposable;
-
-                    if (disposable != null)
-                    {
-                        disposable.Dispose();
-                    }
+                    (enumerator as IDisposable)?.Dispose();
                 }
             }
             catch (Exception ex)

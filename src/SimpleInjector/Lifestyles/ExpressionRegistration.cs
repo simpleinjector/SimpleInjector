@@ -28,15 +28,15 @@ namespace SimpleInjector.Lifestyles
     internal sealed class ExpressionRegistration : Registration
     {
         private readonly Expression expression;
-        private Type implementationType;
+        private readonly Type implementationType;
 
         internal ExpressionRegistration(Expression expression, Container container)
             : this(expression, GetImplementationTypeFor(expression), GetLifestyleFor(expression), container)
         {
         }
 
-        internal ExpressionRegistration(Expression expression, Type implementationType, Lifestyle lifestyle, 
-            Container container)
+        internal ExpressionRegistration(
+            Expression expression, Type implementationType, Lifestyle lifestyle, Container container)
             : base(lifestyle, container)
         {
             Requires.IsNotNull(expression, nameof(expression));
@@ -55,8 +55,8 @@ namespace SimpleInjector.Lifestyles
             if (expression is ConstantExpression)
             {
                 return Lifestyle.Singleton;
-            } 
-            
+            }
+
             if (expression is NewExpression)
             {
                 return Lifestyle.Transient;

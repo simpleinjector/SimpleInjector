@@ -117,15 +117,15 @@ namespace SimpleInjector
         /// <see cref="IPropertySelectionBehavior"/>) and by applying any initializers.
         /// </remarks>
         /// <param name="instance">The instance to initialize.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is a null
+        /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="instance"/> is not
         /// of type <see cref="ImplementationType"/>.</exception>
         public void InitializeInstance(object instance)
         {
             Requires.IsNotNull(instance, nameof(instance));
-            Requires.ServiceIsAssignableFromImplementation(this.ImplementationType, instance.GetType(),
-                nameof(instance));
+            Requires.ServiceIsAssignableFromImplementation(
+                this.ImplementationType, instance.GetType(), nameof(instance));
 
             if (this.instanceInitializer == null)
             {

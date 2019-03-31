@@ -85,8 +85,8 @@ namespace SimpleInjector
             if (types.Length > 1)
             {
                 throw new InvalidOperationException(
-                    StringResources.MultipleClosedTypesAreAssignableFromType(type, genericTypeDefinition,
-                        types, nameof(TypesExtensions.GetClosedTypesOf)));
+                    StringResources.MultipleClosedTypesAreAssignableFromType(
+                        type, genericTypeDefinition, types, nameof(TypesExtensions.GetClosedTypesOf)));
             }
 
             return types[0];

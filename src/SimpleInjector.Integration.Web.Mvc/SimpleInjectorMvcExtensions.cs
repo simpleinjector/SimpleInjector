@@ -182,8 +182,13 @@ namespace SimpleInjector
             catch (Exception ex)
             {
                 // Throw a more descriptive message containing the name of the assembly.
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
-                    "Unable to load types from assembly {0}. {1}", assembly.FullName, ex.Message), ex);
+                throw new InvalidOperationException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Unable to load types from assembly {0}. {1}",
+                        assembly.FullName,
+                        ex.Message),
+                    ex);
             }
         }
     }

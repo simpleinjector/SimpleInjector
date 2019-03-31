@@ -42,8 +42,8 @@ namespace SimpleInjector.Internals
                     controlled: false));
         }
 
-        internal override void AddControlledRegistrations(Type serviceType,
-            ContainerControlledItem[] registrations, bool append)
+        internal override void AddControlledRegistrations(
+            Type serviceType, ContainerControlledItem[] registrations, bool append)
         {
             var group = RegistrationGroup.CreateForControlledItems(serviceType, registrations, append);
             this.AddRegistrationGroup(group);

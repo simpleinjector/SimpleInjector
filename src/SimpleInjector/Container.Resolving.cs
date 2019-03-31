@@ -24,14 +24,11 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading;
-    using SimpleInjector.Advanced;
-    using SimpleInjector.Decorators;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
@@ -230,8 +227,8 @@ namespace SimpleInjector
                     // have been invoked.
                     this.LockContainer();
 
-                    producer = this.GetRegistrationEvenIfInvalid(serviceType, InjectionConsumerInfo.Root,
-                        autoCreateConcreteTypes: true);
+                    producer = this.GetRegistrationEvenIfInvalid(
+                        serviceType, InjectionConsumerInfo.Root, autoCreateConcreteTypes: true);
                 }
 
                 // Add the producer, even when it's null.
@@ -254,8 +251,8 @@ namespace SimpleInjector
             return this.GetInitializer<object>(implementationType, context);
         }
 
-        internal InstanceProducer GetRegistrationEvenIfInvalid(Type serviceType, InjectionConsumerInfo consumer,
-            bool autoCreateConcreteTypes = true)
+        internal InstanceProducer GetRegistrationEvenIfInvalid(
+            Type serviceType, InjectionConsumerInfo consumer, bool autoCreateConcreteTypes = true)
         {
             if (serviceType.ContainsGenericParameters())
             {
@@ -297,14 +294,16 @@ namespace SimpleInjector
             where TService : class
         {
             // This generic overload allows retrieving types that are internal inside a sandbox.
-            return this.GetInstanceProducerForType(typeof(TService), context,
+            return this.GetInstanceProducerForType(
+                typeof(TService),
+                context,
                 () => this.BuildInstanceProducerForType<TService>(context));
         }
 
         private InstanceProducer GetInstanceProducerForType(Type serviceType, InjectionConsumerInfo context)
         {
-            return this.GetInstanceProducerForType(serviceType, context,
-                () => this.BuildInstanceProducerForType(serviceType, context));
+            return this.GetInstanceProducerForType(
+                serviceType, context, () => this.BuildInstanceProducerForType(serviceType, context));
         }
 
         private object GetInstanceForRootType<TService>() where TService : class
@@ -347,8 +346,8 @@ namespace SimpleInjector
                 () => this.TryBuildInstanceProducerForConcreteUnregisteredType<TService>(context));
         }
 
-        private InstanceProducer BuildInstanceProducerForType(Type serviceType, InjectionConsumerInfo context,
-            bool autoCreateConcreteTypes = true)
+        private InstanceProducer BuildInstanceProducerForType(
+            Type serviceType, InjectionConsumerInfo context, bool autoCreateConcreteTypes = true)
         {
             var tryBuildInstanceProducerForConcrete = autoCreateConcreteTypes && !serviceType.IsAbstract()
                 ? () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType, context)
@@ -583,7 +582,7 @@ namespace SimpleInjector
             }
 
             Registration registration = stream.CreateRegistration(collectionType, this);
-            
+
             return new InstanceProducer(collectionType, registration)
             {
                 IsContainerAutoRegistered = !((IEnumerable<object>)stream).Any()
@@ -610,20 +609,22 @@ namespace SimpleInjector
             if (this.Options.ResolveUnregisteredConcreteTypes
                 && this.IsConcreteConstructableType(typeof(TConcrete)))
             {
-                return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), () =>
+                Func<InstanceProducer> instanceProducerBuilder = () =>
                 {
-                    var registration =
-                        this.SelectionBasedLifestyle.CreateRegistration<TConcrete>(this);
+                    var registration = this.SelectionBasedLifestyle.CreateRegistration<TConcrete>(this);
 
                     return BuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), registration);
-                });
+                };
+
+                return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(
+                    typeof(TConcrete), instanceProducerBuilder);
             }
 
             return null;
         }
 
-        private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType(Type type,
-            InjectionConsumerInfo context)
+        private InstanceProducer TryBuildInstanceProducerForConcreteUnregisteredType(
+            Type type, InjectionConsumerInfo context)
         {
             if (!this.Options.ResolveUnregisteredConcreteTypes
                 || type.IsAbstract()
@@ -634,12 +635,14 @@ namespace SimpleInjector
                 return null;
             }
 
-            return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(type, () =>
+            Func<InstanceProducer> instanceProducerBuilder = () =>
             {
                 var registration = this.SelectionBasedLifestyle.CreateRegistration(type, this);
 
                 return BuildInstanceProducerForConcreteUnregisteredType(type, registration);
-            });
+            };
+
+            return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(type, instanceProducerBuilder);
         }
 
         private InstanceProducer GetOrBuildInstanceProducerForConcreteUnregisteredType(Type concreteType,

@@ -30,15 +30,15 @@ namespace SimpleInjector.Decorators
 
     internal sealed class ServiceDecoratorExpressionInterceptor : DecoratorExpressionInterceptor
     {
-        private static readonly object ContainerItemsKeyAndLock = new object();
-
         private readonly Dictionary<InstanceProducer, Registration> registrations;
         private readonly ExpressionBuiltEventArgs e;
         private readonly Type registeredServiceType;
         private ConstructorInfo decoratorConstructor;
 
-        public ServiceDecoratorExpressionInterceptor(DecoratorExpressionInterceptorData data,
-            Dictionary<InstanceProducer, Registration> registrations, ExpressionBuiltEventArgs e)
+        public ServiceDecoratorExpressionInterceptor(
+            DecoratorExpressionInterceptorData data,
+            Dictionary<InstanceProducer, Registration> registrations,
+            ExpressionBuiltEventArgs e)
             : base(data)
         {
             this.registrations = registrations;
@@ -139,7 +139,9 @@ namespace SimpleInjector.Decorators
                 this.e.RegisteredServiceType,
                 this.decoratorConstructor.DeclaringType,
                 this.Container,
-                this.Lifestyle, this.e.Expression, decoratorRelationships);
+                this.Lifestyle,
+                this.e.Expression,
+                decoratorRelationships);
         }
     }
 }

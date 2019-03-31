@@ -118,8 +118,13 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
             string description = BuildDescription(diagnosedProducer, conflictingProducers);
 
-            return new AmbiguousLifestylesDiagnosticResult(serviceType, description,
-                lifestyles.ToArray(), implementationType, diagnosedProducer, conflictingProducers);
+            return new AmbiguousLifestylesDiagnosticResult(
+                serviceType,
+                description,
+                lifestyles.ToArray(),
+                implementationType,
+                diagnosedProducer,
+                conflictingProducers);
         }
 
         private static string BuildDescription(InstanceProducer diagnosedProducer,

@@ -119,8 +119,8 @@ namespace SimpleInjector.Diagnostics.Debugger
             select this.BuildProducerGroup(resultGroup.Key, resultGroup.ToArray(), level + 1))
             .ToArray();
 
-        private object BuildProducerGroup(Type groupType, 
-            InstanceProducer[] producersForGroup, int level)
+        private object BuildProducerGroup(
+            Type groupType, InstanceProducer[] producersForGroup, int level)
         {
             if (producersForGroup.Length == 1)
             {
@@ -143,8 +143,8 @@ namespace SimpleInjector.Diagnostics.Debugger
             }
         }
 
-        private object BuildGenericGroup(Type groupType, 
-            InstanceProducer[] producersForGroup, int level)
+        private object BuildGenericGroup(
+            Type groupType,  InstanceProducer[] producersForGroup, int level)
         {
             object[] childGroups = this.GroupProducers(producersForGroup, level);
 

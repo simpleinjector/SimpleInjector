@@ -48,9 +48,11 @@ namespace SimpleInjector.Decorators
         private ConstructorInfo decoratorConstructor;
         private Type decoratorType;
 
-        public ContainerUncontrolledServicesDecoratorInterceptor(DecoratorExpressionInterceptorData data,
+        public ContainerUncontrolledServicesDecoratorInterceptor(
+            DecoratorExpressionInterceptorData data,
             Dictionary<InstanceProducer, IEnumerable> singletonDecoratedCollectionsCache,
-            ExpressionBuiltEventArgs e, Type registeredServiceType)
+            ExpressionBuiltEventArgs e,
+            Type registeredServiceType)
             : base(data)
         {
             this.singletonDecoratedCollectionsCache = singletonDecoratedCollectionsCache;
@@ -65,8 +67,8 @@ namespace SimpleInjector.Decorators
             // have defined.
             var expression = Expression.Constant(null, this.registeredServiceType);
 
-            var registration = new ExpressionRegistration(expression, this.registeredServiceType,
-                Lifestyle.Unknown, this.Container);
+            var registration = new ExpressionRegistration(
+                expression, this.registeredServiceType, Lifestyle.Unknown, this.Container);
 
             registration.ReplaceRelationships(this.e.InstanceProducer.GetRelationships());
 
@@ -96,8 +98,8 @@ namespace SimpleInjector.Decorators
 
         internal void ApplyDecorator()
         {
-            var registration = new ExpressionRegistration(this.e.Expression, this.registeredServiceType,
-                Lifestyle.Unknown, this.Container);
+            var registration = new ExpressionRegistration(
+                this.e.Expression, this.registeredServiceType, Lifestyle.Unknown, this.Container);
 
             registration.ReplaceRelationships(this.e.InstanceProducer.GetRelationships());
 
@@ -114,8 +116,12 @@ namespace SimpleInjector.Decorators
 
             // Add the decorator to the list of applied decorator. This way users can use this
             // information in the predicate of the next decorator they add.
-            serviceTypeInfo.AddAppliedDecorator(this.registeredServiceType, this.decoratorType,
-                this.Container, this.Lifestyle, decoratedExpression);
+            serviceTypeInfo.AddAppliedDecorator(
+                this.registeredServiceType,
+                this.decoratorType,
+                this.Container,
+                this.Lifestyle,
+                decoratedExpression);
 
             this.e.KnownRelationships.AddRange(decoratorRegistration.GetRelationships());
         }

@@ -44,11 +44,15 @@ namespace SimpleInjector
     /// <see cref="Container.RegisterDecorator(Type, Type, Predicate{DecoratorPredicateContext})">RegisterDecorator</see>
     /// method for more information.
     /// </remarks>
-    [DebuggerDisplay(nameof(DecoratorPredicateContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
+    [DebuggerDisplay(nameof(DecoratorPredicateContext) + 
+        " ({" + nameof(DecoratorPredicateContext.DebuggerDisplay) + ", nq})")]
     public sealed class DecoratorPredicateContext
     {
-        internal DecoratorPredicateContext(Type serviceType, Type implementationType,
-            ReadOnlyCollection<Type> appliedDecorators, Expression expression)
+        internal DecoratorPredicateContext(
+            Type serviceType,
+            Type implementationType,
+            ReadOnlyCollection<Type> appliedDecorators,
+            Expression expression)
         {
             this.ServiceType = serviceType;
             this.ImplementationType = implementationType;
@@ -88,19 +92,22 @@ namespace SimpleInjector
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
+        internal string DebuggerDisplay => string.Format(
+            CultureInfo.InvariantCulture,
             "{0} = {1}, {2} = {3}",
-            nameof(this.ServiceType), this.ServiceType.ToFriendlyName(),
-            nameof(this.ImplementationType), this.ImplementationType.ToFriendlyName());
+            nameof(this.ServiceType),
+            this.ServiceType.ToFriendlyName(),
+            nameof(this.ImplementationType),
+            this.ImplementationType.ToFriendlyName());
 
-        internal static DecoratorPredicateContext CreateFromInfo(Type serviceType, Expression expression,
-            ServiceTypeDecoratorInfo info)
+        internal static DecoratorPredicateContext CreateFromInfo(
+            Type serviceType, Expression expression, ServiceTypeDecoratorInfo info)
         {
             var appliedDecorators = new ReadOnlyCollection<Type>(
                 info.AppliedDecorators.Select(d => d.DecoratorType).ToList());
 
-            return new DecoratorPredicateContext(serviceType, info.ImplementationType, appliedDecorators,
-                expression);
+            return new DecoratorPredicateContext(
+                serviceType, info.ImplementationType, appliedDecorators, expression);
         }
     }
 }

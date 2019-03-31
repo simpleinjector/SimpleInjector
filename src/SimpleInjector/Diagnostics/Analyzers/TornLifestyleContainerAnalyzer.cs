@@ -65,7 +65,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity",
             Justification = "FxCop is unable to recognize nicely written LINQ statements from complex code.")]
         private static IEnumerable<InstanceProducer[]> GetTornRegistrationGroups(
-            IEnumerable<InstanceProducer> producers) => 
+            IEnumerable<InstanceProducer> producers) =>
             from producer in producers
             where !producer.IsDecorated
             where producer.Registration.Lifestyle != Lifestyle.Transient
@@ -88,7 +88,11 @@ namespace SimpleInjector.Diagnostics.Analyzers
             Lifestyle lifestyle = diagnosedProducer.Registration.Lifestyle;
             string description = BuildDescription(diagnosedProducer, affectedProducers);
 
-            return new TornLifestyleDiagnosticResult(serviceType, description, lifestyle, implementationType,
+            return new TornLifestyleDiagnosticResult(
+                serviceType,
+                description,
+                lifestyle,
+                implementationType,
                 affectedProducers);
         }
 

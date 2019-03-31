@@ -25,7 +25,6 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
 
     /// <summary>
     /// Allows retrieving the concrete types of the generic type arguments of that must be used to create a
@@ -39,8 +38,11 @@ namespace SimpleInjector.Internals
         private readonly IList<Type> implementationTypeDefinitionArguments;
         private readonly Type[] partialImplementationArguments;
 
-        public GenericArgumentFinder(Type serviceTypeDefinition, Type serviceTypeToResolve,
-            Type implementationTypeDefinition, Type partialOpenGenericImplementation)
+        public GenericArgumentFinder(
+            Type serviceTypeDefinition,
+            Type serviceTypeToResolve,
+            Type implementationTypeDefinition,
+            Type partialOpenGenericImplementation)
         {
             this.serviceTypeDefinitionArguments = serviceTypeDefinition.GetGenericArguments();
             this.serviceTypeToResolveArguments = serviceTypeToResolve.GetGenericArguments();

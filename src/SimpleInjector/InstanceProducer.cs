@@ -82,7 +82,7 @@ namespace SimpleInjector
     /// ]]></code>
     /// </example>
     [DebuggerTypeProxy(typeof(InstanceProducerDebugView))]
-    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(InstanceProducer.DebuggerDisplay) + ", nq}")]
     public class InstanceProducer
     {
         internal static readonly IEqualityComparer<InstanceProducer> EqualityComparer =
@@ -107,8 +107,8 @@ namespace SimpleInjector
         public InstanceProducer(Type serviceType, Registration registration)
             : this(serviceType, registration, ShouldBeRegisteredAsAnExternalProducer(registration))
         {
-            Requires.ServiceIsAssignableFromImplementation(serviceType, registration.ImplementationType,
-                nameof(serviceType));
+            Requires.ServiceIsAssignableFromImplementation(
+                serviceType, registration.ImplementationType, nameof(serviceType));
         }
 
         internal InstanceProducer(Type serviceType, Registration registration, Predicate<PredicateContext> predicate)
@@ -211,10 +211,13 @@ namespace SimpleInjector
 
         internal bool VerifiersAreSuccessfullyCalled { get; private set; }
 
-        internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
+        internal string DebuggerDisplay => string.Format(
+            CultureInfo.InvariantCulture,
             "{0} = {1}, {2} = {3}",
-            nameof(this.ServiceType), this.ServiceType.ToFriendlyName(),
-            nameof(this.Lifestyle), this.Lifestyle.Name);
+            nameof(this.ServiceType),
+            this.ServiceType.ToFriendlyName(),
+            nameof(this.Lifestyle),
+            this.Lifestyle.Name);
 
         internal IEnumerable<InstanceProducer> SelfAndWrappedProducers =>
             this.wrappedProducers == null ? this.Self : this.wrappedProducers.Concat(this.Self);
@@ -399,8 +402,9 @@ namespace SimpleInjector
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
-                    this.ServiceType, ex), ex);
+                throw new InvalidOperationException(
+                    StringResources.ConfigurationInvalidCreatingInstanceFailed(this.ServiceType, ex),
+                    ex);
             }
         }
 
@@ -416,8 +420,10 @@ namespace SimpleInjector
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
-                    this.Registration.ImplementationType, ex), ex);
+                throw new InvalidOperationException(
+                    StringResources.ConfigurationInvalidCreatingInstanceFailed(
+                        this.Registration.ImplementationType, ex),
+                    ex);
             }
 
             return instance;
@@ -475,8 +481,9 @@ namespace SimpleInjector
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
-                    this.ServiceType, ex), ex);
+                throw new InvalidOperationException(
+                    StringResources.ConfigurationInvalidCreatingInstanceFailed(this.ServiceType, ex),
+                    ex);
             }
         }
 

@@ -111,8 +111,8 @@ namespace SimpleInjector.Decorators
         {
             var serviceType = e.RegisteredServiceType.GetGenericArguments()[0];
 
-            var uncontrolledInterceptor = new ContainerUncontrolledServicesDecoratorInterceptor(this.data,
-                this.singletonDecoratedCollectionsCache, e, serviceType);
+            var uncontrolledInterceptor = new ContainerUncontrolledServicesDecoratorInterceptor(
+                this.data, this.singletonDecoratedCollectionsCache, e, serviceType);
 
             if (uncontrolledInterceptor.SatisfiesPredicate())
             {
