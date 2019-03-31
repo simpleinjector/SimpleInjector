@@ -91,7 +91,7 @@ namespace SimpleInjector.Tests.Unit.Advanced
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentException>("registration", action);
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The supplied Registration belongs to a different container.", action);
+                "The supplied Registration belongs to a different Container", action);
         }
 
         [TestMethod]

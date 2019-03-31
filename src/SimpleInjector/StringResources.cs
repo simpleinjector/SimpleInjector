@@ -281,33 +281,30 @@ namespace SimpleInjector
             bool hasRelatedOneToOneMapping,
             bool hasRelatedCollectionMapping,
             Type[] skippedDecorators,
-            Type[] lookalikes) =>
-            target.Parameter != null
-                ? Format(
-                    "The constructor of type {0} contains the parameter with name '{1}' and type {2} that " +
+            Type[] lookalikes)
+        {
+            var formatString = target.Parameter != null
+                ? "The constructor of type {0} contains the parameter with name '{1}' and type {2} that " +
                     "is not registered. Please ensure {2} is registered, or change the constructor of {0}." +
-                    "{3}{4}{5}{6}{7}{8}",
-                    target.Member.DeclaringType.TypeName(),
-                    target.Name,
-                    target.TargetType.TypeName(),
-                    GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals),
-                    DidYouMeanToDependOnNonCollectionInstead(hasRelatedOneToOneMapping, target.TargetType),
-                    DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType),
-                    NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators),
-                    NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(container, target.TargetType),
-                    NoteThatTypeLookalikesAreFound(target.TargetType, lookalikes, numberOfConditionals))
-                : Format(
-                    "Type {0} contains the property with name '{1}' and type {2} that is not registered. " +
-                    "Please ensure {2} is registered, or change {0}.{3}{4}{5}{6}{7}{8}",
-                    target.Member.DeclaringType.TypeName(),
-                    target.Name,
-                    target.TargetType.TypeName(),
-                    GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals),
-                    DidYouMeanToDependOnNonCollectionInstead(hasRelatedOneToOneMapping, target.TargetType),
-                    DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType),
-                    NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators),
-                    NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(container, target.TargetType),
-                    NoteThatTypeLookalikesAreFound(target.TargetType, lookalikes, numberOfConditionals));
+                    "{3}"
+                : "Type {0} contains the property with name '{1}' and type {2} that is not registered. " +
+                    "Please ensure {2} is registered, or change {0}.{3}";
+
+            string extraInfo = string.Concat(
+                GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals),
+                DidYouMeanToDependOnNonCollectionInstead(hasRelatedOneToOneMapping, target.TargetType),
+                DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType),
+                NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators),
+                NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(container, target.TargetType),
+                NoteThatTypeLookalikesAreFound(target.TargetType, lookalikes, numberOfConditionals));
+
+            return Format(
+                formatString,
+                target.Member.DeclaringType.TypeName(),
+                target.Name,
+                target.TargetType.TypeName(),
+                extraInfo);
+        }
 
         internal static string TypeMustHaveASinglePublicConstructorButItHasNone(Type serviceType) =>
             Format(
@@ -431,7 +428,7 @@ namespace SimpleInjector
                 nameof(Container.Register));
 
         internal static string PropertyCanNotBeChangedAfterTheFirstRegistration(string propertyName) =>
-            "The " + propertyName + " property cannot be changed after the first registration has " +
+            $"The {propertyName} property cannot be changed after the first registration has " +
             "been made to the container.";
 
         internal static string CollectionsRegisterCalledWithTypeAsTService(IEnumerable<Type> types) =>
@@ -550,10 +547,10 @@ namespace SimpleInjector
         internal static string CantGenerateFuncForDecorator(Type serviceType, Type decoratorType) =>
             Format(
                 "It's impossible for the container to generate a Func<{0}> for injection into the {1} " +
-                "decorator, that will be wrapped around instances of the collection of {0} instances, " +
+                "decorator that will be wrapped around instances of the collection of {0} instances, " +
                 "because the registration hasn't been made using one of the {2} overloads that take a " +
-                "list of System.Type as serviceTypes. By passing in an IEnumerable<{0}> it is impossible " +
-                "for the container to determine its lifestyle, which makes it impossible to generate a" +
+                "list of System.Type as serviceTypes. By passing in an IEnumerable<{0}>, it is impossible " +
+                "for the container to determine its lifestyle, which makes it impossible to generate a " +
                 "Func<T>. Either switch to one of the other {2} overloads, or don't use a decorator that " +
                 "depends on a Func<T> for injecting the decoratee.",
                 serviceType.TypeName(),
@@ -607,13 +604,13 @@ namespace SimpleInjector
                 serviceType.TypeName());
 
         internal static string TheSuppliedRegistrationBelongsToADifferentContainer() =>
-            "The supplied Registration belongs to a different container.";
+            "The supplied Registration belongs to a different Container instance.";
 
         internal static string CanNotDecorateContainerUncontrolledCollectionWithThisLifestyle(
             Type decoratorType, Lifestyle lifestyle, Type serviceType) =>
             Format(
                 "You are trying to apply the {0} decorator with the '{1}' lifestyle to a collection of " +
-                "type {2}, but the registered collection is not controlled by the container. Since the " +
+                "type {2}, but the registered collection is not controlled by the container. Because the " +
                 "number of returned items might change on each call, the decorator with this lifestyle " +
                 "cannot be applied to the collection. Instead, register the decorator with the Transient " +
                 "lifestyle, or use one of the {3} overloads that takes a collection of System.Type types.",
@@ -652,7 +649,7 @@ namespace SimpleInjector
             Format(
                 "You are trying to append a registration to the registered collection of {0} instances, " +
                 "which is either registered using {1}<TService>(IEnumerable<TService>) or " +
-                "{1}(Type, IEnumerable). Since the number of returned items might change on each call, " +
+                "{1}(Type, IEnumerable). Because the number of returned items might change on each call, " +
                 "appending registrations to these collections is not supported. Please register the " +
                 "collection with one of the other {1} overloads if appending is required.",
                 serviceType.TypeName(),
@@ -776,7 +773,7 @@ namespace SimpleInjector
 
         internal static string ServiceTypeCannotBeAPartiallyClosedType(Type openGenericServiceType) =>
             Format(
-                "The supplied type '{0}' is a partially-closed generic type, which is not supported by " +
+                "The supplied type '{0}' is a partially closed generic type, which is not supported by " +
                 "this method. Please supply the open-generic type '{1}' instead.",
                 openGenericServiceType.TypeName(),
                 CSharpFriendlyName(openGenericServiceType.GetGenericTypeDefinition()));
@@ -784,9 +781,9 @@ namespace SimpleInjector
         internal static string ServiceTypeCannotBeAPartiallyClosedType(
             Type openGenericServiceType, string serviceTypeParamName, string implementationTypeParamName) =>
             Format(
-                "The supplied type '{0}' is a partially-closed generic type, which is not supported as " +
+                "The supplied type '{0}' is a partially closed generic type, which is not supported as " +
                 "value of the {1} parameter. Instead, please supply the open-generic type '{2}' and make " +
-                "the type supplied to the {3} parameter partially-closed instead.",
+                "the type supplied to the {3} parameter partially closed instead.",
                 openGenericServiceType.TypeName(),
                 serviceTypeParamName,
                 CSharpFriendlyName(openGenericServiceType.GetGenericTypeDefinition()),
@@ -838,7 +835,7 @@ namespace SimpleInjector
             return Format(
                 "There is already a {0}registration for {1} (with implementation {2}) that " +
                 "overlaps with the {3}registration for {4} that you are trying to make. This new " +
-                "registration would cause ambiguity, because both registrations would be used for the " +
+                "registration causes ambiguity, because both registrations would be used for the " +
                 "same closed service types. {5}",
                 isExistingRegistrationConditional ? "conditional " : string.Empty,
                 openGenericServiceType.TypeName(),
@@ -1006,7 +1003,7 @@ namespace SimpleInjector
         private static string NoteThatSkippedDecoratorsWereFound(Type serviceType, Type[] decorators) =>
             decorators.Any()
                 ? Format(
-                    " Note that {0} {1} found as implementation of {2}, but {1} skipped during batch-" +
+                    " Note that {0} {1} found as implementation of {2}, but {1} skipped during auto-" +
                     "registration by the container because {3} considered to be a decorator (because {4} " +
                     "a cyclic reference to {5}).",
                     decorators.Select(TypeName).ToCommaSeparatedText(),

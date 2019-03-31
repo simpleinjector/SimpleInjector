@@ -1550,7 +1550,7 @@
                     .TrimInside(), ex);
 
                 AssertThat.ExceptionMessageContains(@"
-                    Since the number of returned items might change on each call, the decorator with this 
+                    the number of returned items might change on each call, the decorator with this 
                     lifestyle cannot be applied to the collection. Instead, register the decorator with the 
                     Transient lifestyle, or use one of the Container.Collection.Register overloads that takes a collection of 
                     System.Type types."

@@ -521,7 +521,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "was skipped during batch-registration by the container because it is considered to be a decorator",
+                "was skipped during auto-registration by the container because it is considered to be a decorator",
                 action);
         }
 
@@ -538,7 +538,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "was skipped during batch-registration by the container because it is considered to be a decorator",
+                "was skipped during auto-registration by the container because it is considered to be a decorator",
                 action);
         }
 
