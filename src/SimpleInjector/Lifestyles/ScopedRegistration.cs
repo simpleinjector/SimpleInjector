@@ -31,7 +31,6 @@ namespace SimpleInjector.Lifestyles
         private readonly Func<TImplementation> userSuppliedInstanceCreator;
 
         private Func<Scope> scopeFactory;
-        private Func<TImplementation> instanceCreator;
 
         internal ScopedRegistration(
             ScopedLifestyle lifestyle, Container container, Func<TImplementation> instanceCreator)
@@ -46,21 +45,22 @@ namespace SimpleInjector.Lifestyles
         }
 
         public override Type ImplementationType => typeof(TImplementation);
-
         public new ScopedLifestyle Lifestyle => (ScopedLifestyle)base.Lifestyle;
 
-        internal Func<TImplementation> InstanceCreator => this.instanceCreator;
+        internal Func<TImplementation> InstanceCreator { get; private set; }
 
         public override Expression BuildExpression()
         {
-            if (this.instanceCreator == null)
+            if (this.InstanceCreator == null)
             {
                 this.scopeFactory = this.Lifestyle.CreateCurrentScopeProvider(this.Container);
 
-                this.instanceCreator = this.BuildInstanceCreator();
+                this.InstanceCreator = this.BuildInstanceCreator();
             }
 
-            return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstance"));
+            return Expression.Call(
+                instance: Expression.Constant(this),
+                method: this.GetType().GetMethod(nameof(this.GetInstance)));
         }
 
         // This method needs to be public, because the BuildExpression methods build a
@@ -72,16 +72,9 @@ namespace SimpleInjector.Lifestyles
         // is still important.
         public TImplementation GetInstance() => Scope.GetInstance(this, this.scopeFactory());
 
-        private Func<TImplementation> BuildInstanceCreator()
-        {
-            if (this.userSuppliedInstanceCreator != null)
-            {
-                return this.BuildTransientDelegate(this.userSuppliedInstanceCreator);
-            }
-            else
-            {
-                return (Func<TImplementation>)this.BuildTransientDelegate();
-            }
-        }
+        private Func<TImplementation> BuildInstanceCreator() =>
+            this.userSuppliedInstanceCreator != null
+                ? this.BuildTransientDelegate(this.userSuppliedInstanceCreator)
+                : (Func<TImplementation>)this.BuildTransientDelegate();
     }
 }

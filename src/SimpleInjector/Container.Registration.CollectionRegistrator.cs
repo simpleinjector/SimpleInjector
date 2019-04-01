@@ -473,8 +473,8 @@ namespace SimpleInjector
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
-            this.AppendToCollectionInternal(typeof(TService),
-                lifestyle.CreateRegistration<TImplementation>(this.Container));
+            this.AppendToCollectionInternal(
+                typeof(TService), lifestyle.CreateRegistration<TImplementation>(this.Container));
         }
 
         /// <summary>
@@ -534,8 +534,8 @@ namespace SimpleInjector
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
-            this.AppendToCollectionInternal(typeof(TService),
-                lifestyle.CreateRegistration(instanceCreator, this.Container));
+            this.AppendToCollectionInternal(
+                typeof(TService), lifestyle.CreateRegistration(instanceCreator, this.Container));
         }
 
         /// <summary>
@@ -1004,7 +1004,8 @@ namespace SimpleInjector
 
         private void RegisterCollectionInternal(Type itemType, IEnumerable<Registration> registrations)
         {
-            var controlledItems = registrations.Select(ContainerControlledItem.CreateFromRegistration).ToArray();
+            var controlledItems =
+                registrations.Select(ContainerControlledItem.CreateFromRegistration).ToArray();
 
             this.RegisterCollectionInternal(itemType, controlledItems);
         }
@@ -1043,8 +1044,8 @@ namespace SimpleInjector
             resolver.RegisterUncontrolledCollection(itemType, producer);
         }
 
-        private void RegisterContainerUncontrolledCollection<T>(Type itemType,
-            IEnumerable<T> containerUncontrolledCollection)
+        private void RegisterContainerUncontrolledCollection<T>(
+            Type itemType, IEnumerable<T> containerUncontrolledCollection)
         {
             IEnumerable readOnlyCollection = containerUncontrolledCollection.MakeReadOnly();
             IEnumerable castedCollection = Helpers.CastCollection(readOnlyCollection, itemType);
@@ -1052,9 +1053,7 @@ namespace SimpleInjector
             this.RegisterGenericContainerUncontrolledCollection(itemType, castedCollection);
         }
 
-        private CollectionResolver GetContainerControlledResolver(Type itemType)
-        {
-            return this.Container.GetCollectionResolver(itemType, containerControlled: true);
-        }
+        private CollectionResolver GetContainerControlledResolver(Type itemType) =>
+            this.Container.GetCollectionResolver(itemType, containerControlled: true);
     }
 }

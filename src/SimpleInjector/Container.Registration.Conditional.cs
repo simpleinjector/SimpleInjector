@@ -124,7 +124,8 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
-        public void RegisterConditional(Type serviceType, Type implementationType, Predicate<PredicateContext> predicate)
+        public void RegisterConditional(
+            Type serviceType, Type implementationType, Predicate<PredicateContext> predicate)
         {
             this.RegisterConditional(serviceType, implementationType, this.SelectionBasedLifestyle, predicate);
         }
@@ -166,9 +167,14 @@ namespace SimpleInjector
             Requires.IsNotNull(predicate, nameof(predicate));
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType), nameof(implementationType));
 
-            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, implementationType, nameof(serviceType));
-            Requires.ImplementationHasSelectableConstructor(this, implementationType, nameof(implementationType));
-            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, implementationType, nameof(implementationType));
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(
+                serviceType, implementationType, nameof(serviceType));
+
+            Requires.ImplementationHasSelectableConstructor(
+                this, implementationType, nameof(implementationType));
+
+            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
+                serviceType, implementationType, nameof(implementationType));
 
             if (serviceType.ContainsGenericParameters())
             {
@@ -244,7 +250,8 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
-        public void RegisterConditional<TService>(Registration registration, Predicate<PredicateContext> predicate)
+        public void RegisterConditional<TService>(
+            Registration registration, Predicate<PredicateContext> predicate)
         {
             this.RegisterConditional(typeof(TService), registration, predicate);
         }
@@ -255,7 +262,8 @@ namespace SimpleInjector
         /// returns true. The predicate will only be evaluated a finite number of times; the predicate is 
         /// unsuited for making decisions based on runtime conditions.
         /// </summary>
-        /// <param name="serviceType">The base type or interface to register. This can be an open-generic type.</param>
+        /// <param name="serviceType">The base type or interface to register. This can be an open-generic type.
+        /// </param>
         /// <param name="registration">The <see cref="Registration"/> instance to register.</param>
         /// <param name="predicate">The predicate that determines whether the 
         /// <paramref name="registration"/> can be applied for the requested service type. This predicate

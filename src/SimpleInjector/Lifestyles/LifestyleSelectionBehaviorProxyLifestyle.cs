@@ -23,7 +23,6 @@
 namespace SimpleInjector.Lifestyles
 {
     using System;
-    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Forwards CreateRegistration calls to the lifestyle that is returned from the registered
@@ -39,24 +38,15 @@ namespace SimpleInjector.Lifestyles
             this.options = options;
         }
 
-        public override int Length
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public override int Length => throw new NotImplementedException();
 
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
-        {
-            Lifestyle lifestyle = this.options.SelectLifestyle(typeof(TConcrete));
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
+            this.options.SelectLifestyle(typeof(TConcrete))
+                .CreateRegistration<TConcrete>(container);
 
-            return lifestyle.CreateRegistration<TConcrete>(container);
-        }
-
-        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
-            Container container)
-        {
-            Lifestyle lifestyle = this.options.SelectLifestyle(typeof(TService));
-
-            return lifestyle.CreateRegistration<TService>(instanceCreator, container);
-        }
+        protected internal override Registration CreateRegistrationCore<TService>(
+            Func<TService> instanceCreator, Container container) =>
+            this.options.SelectLifestyle(typeof(TService))
+                .CreateRegistration(instanceCreator, container);
     }
 }

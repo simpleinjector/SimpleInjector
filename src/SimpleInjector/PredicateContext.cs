@@ -76,20 +76,12 @@ namespace SimpleInjector
         /// <value>The closed generic service type.</value>
         public Type ServiceType { get; }
 
-        /// <summary>Gets the closed generic implementation type that will be created by the container.</summary>
+        /// <summary>
+        /// Gets the closed generic implementation type that will be created by the container.
+        /// </summary>
         /// <value>The implementation type.</value>
-        public Type ImplementationType
-        {
-            get
-            {
-                if (this.implementationType == null)
-                {
-                    this.implementationType = this.implementationTypeProvider();
-                }
-
-                return this.implementationType;
-            }
-        }
+        public Type ImplementationType =>
+            this.implementationType ?? (this.implementationType = this.implementationTypeProvider());
 
         /// <summary>Gets a value indicating whether a previous <b>Register</b> registration has already
         /// been applied for the given <see cref="ServiceType"/>.</summary>

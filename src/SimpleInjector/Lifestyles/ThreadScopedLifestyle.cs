@@ -127,8 +127,8 @@ namespace SimpleInjector.Lifestyles
         protected override Scope GetCurrentScopeCore(Container container) =>
             GetScopeManager(container).CurrentScope;
 
-        private static ScopeManager GetScopeManager(Container c) =>
-            c.ContainerScope.GetOrSetItem(ManagerKey, CreateManager);
+        private static ScopeManager GetScopeManager(Container container) =>
+            container.ContainerScope.GetOrSetItem(ManagerKey, CreateManager);
 
         private static ScopeManager CreateManager(Container container, object key)
         {

@@ -38,7 +38,7 @@ namespace SimpleInjector
     /// <see cref="Expression"/> property to change the component that is currently 
     /// being built. 
     /// </summary>
-    [DebuggerDisplay(nameof(ExpressionBuiltEventArgs) + " ({" + nameof(DebuggerDisplay) + "), nq})")]
+    [DebuggerDisplay(nameof(ExpressionBuiltEventArgs) + " ({" + nameof(ExpressionBuiltEventArgs.DebuggerDisplay) + "), nq})")]
     public class ExpressionBuiltEventArgs : EventArgs
     {
         private Expression expression;

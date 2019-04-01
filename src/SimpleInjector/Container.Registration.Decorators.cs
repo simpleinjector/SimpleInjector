@@ -643,11 +643,16 @@ namespace SimpleInjector
 
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
             Requires.ServiceTypeIsNotClosedWhenImplementationIsOpen(serviceType, decoratorType);
-            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType, decoratorType, nameof(serviceType));
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(
+                serviceType, decoratorType, nameof(serviceType));
+
             Requires.ImplementationHasSelectableConstructor(this, decoratorType, nameof(decoratorType));
             Requires.IsDecorator(this, serviceType, decoratorType, nameof(decoratorType));
-            Requires.DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(serviceType, decoratorType, nameof(decoratorType));
-            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, decoratorType, nameof(decoratorType));
+            Requires.DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(
+                serviceType, decoratorType, nameof(decoratorType));
+
+            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
+                serviceType, decoratorType, nameof(decoratorType));
 
             var interceptor = new DecoratorInterceptor(
                 new DecoratorExpressionInterceptorData(

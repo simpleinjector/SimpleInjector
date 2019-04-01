@@ -28,7 +28,6 @@ namespace SimpleInjector.Lifestyles
     internal sealed class ExpressionRegistration : Registration
     {
         private readonly Expression expression;
-        private readonly Type implementationType;
 
         internal ExpressionRegistration(Expression expression, Container container)
             : this(expression, GetImplementationTypeFor(expression), GetLifestyleFor(expression), container)
@@ -43,38 +42,20 @@ namespace SimpleInjector.Lifestyles
             Requires.IsNotNull(implementationType, nameof(implementationType));
 
             this.expression = expression;
-            this.implementationType = implementationType;
+            this.ImplementationType = implementationType;
         }
 
-        public override Type ImplementationType => this.implementationType;
-
+        public override Type ImplementationType { get; }
         public override Expression BuildExpression() => this.expression;
 
-        private static Lifestyle GetLifestyleFor(Expression expression)
-        {
-            if (expression is ConstantExpression)
-            {
-                return Lifestyle.Singleton;
-            }
+        private static Lifestyle GetLifestyleFor(Expression expression) =>
+            expression is ConstantExpression ? Lifestyle.Singleton :
+            expression is NewExpression ? Lifestyle.Transient :
+            Lifestyle.Unknown;
 
-            if (expression is NewExpression)
-            {
-                return Lifestyle.Transient;
-            }
-
-            return Lifestyle.Unknown;
-        }
-
-        private static Type GetImplementationTypeFor(Expression expression)
-        {
-            var newExpression = expression as NewExpression;
-
-            if (newExpression != null)
-            {
-                return newExpression.Constructor.DeclaringType;
-            }
-
-            return expression.Type;
-        }
+        private static Type GetImplementationTypeFor(Expression expression) =>
+            expression is NewExpression newExpression
+                ? newExpression.Constructor.DeclaringType
+                : expression.Type;
     }
 }

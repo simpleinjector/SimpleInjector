@@ -30,7 +30,8 @@ namespace SimpleInjector.Lifestyles
         private readonly Lifestyle trueLifestyle;
         private readonly Lifestyle falseLifestyle;
 
-        internal HybridLifestyle(Predicate<Container> lifestyleSelector, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
+        internal HybridLifestyle(
+            Predicate<Container> lifestyleSelector, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
             : base("Hybrid " + GetHybridName(trueLifestyle) + " / " + GetHybridName(falseLifestyle))
         {
             this.lifestyleSelector = lifestyleSelector;
@@ -38,10 +39,8 @@ namespace SimpleInjector.Lifestyles
             this.falseLifestyle = falseLifestyle;
         }
 
-        public override int Length
-        {
-            get { throw new NotSupportedException("The length property is not supported for this lifestyle."); }
-        }
+        public override int Length =>
+            throw new NotSupportedException("The length property is not supported for this lifestyle.");
 
         string IHybridLifestyle.GetHybridName() =>
             GetHybridName(this.trueLifestyle) + " / " + GetHybridName(this.falseLifestyle);

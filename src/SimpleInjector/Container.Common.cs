@@ -69,6 +69,7 @@ namespace SimpleInjector
         private readonly List<IInstanceInitializer> instanceInitializers = new List<IInstanceInitializer>();
         private readonly List<ContextualResolveInterceptor> resolveInterceptors =
             new List<ContextualResolveInterceptor>();
+
         private readonly long containerId;
 
         // Collection of (both conditional and unconditional) instance producers that are explicitly 
@@ -413,9 +414,7 @@ namespace SimpleInjector
             {
                 var context = new InitializationContext(instanceProducer, instanceProducer.Registration);
 
-                ResolveInterceptor[] interceptors = this.GetResolveInterceptorsFor(context);
-
-                foreach (ResolveInterceptor interceptor in interceptors)
+                foreach (ResolveInterceptor interceptor in this.GetResolveInterceptorsFor(context))
                 {
                     producer = ApplyResolveInterceptor(interceptor, context, producer);
                 }
@@ -453,10 +452,8 @@ namespace SimpleInjector
                     this.GetLookalikesForMissingType(target.TargetType)));
         }
 
-        internal CollectionResolver GetContainerUncontrolledResolver(Type itemType)
-        {
-            return this.GetCollectionResolver(itemType, containerControlled: false);
-        }
+        internal CollectionResolver GetContainerUncontrolledResolver(Type itemType) =>
+            this.GetCollectionResolver(itemType, containerControlled: false);
 
         internal CollectionResolver GetCollectionResolver(Type itemType, bool containerControlled)
         {
@@ -662,12 +659,10 @@ namespace SimpleInjector
             return this.explicitRegistrations.GetValueOrDefault(GetRegistrationKey(serviceType));
         }
 
-        private static Type GetRegistrationKey(Type serviceType)
-        {
-            return serviceType.IsGenericType()
+        private static Type GetRegistrationKey(Type serviceType) =>
+            serviceType.IsGenericType()
                 ? serviceType.GetGenericTypeDefinition()
                 : serviceType;
-        }
 
         private void AddContainerRegistrations()
         {

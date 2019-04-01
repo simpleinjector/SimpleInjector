@@ -39,7 +39,7 @@ namespace SimpleInjector
         [DebuggerStepThrough]
         internal static void IsNotNull(object instance, string paramName)
         {
-            if (instance == null)
+            if (instance is null)
             {
                 ThrowArgumentNullException(paramName);
             }

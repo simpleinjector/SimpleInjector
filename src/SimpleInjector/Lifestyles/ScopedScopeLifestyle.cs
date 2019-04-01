@@ -33,10 +33,11 @@ namespace SimpleInjector.Lifestyles
         {
         }
 
-        protected internal override Func<Scope> CreateCurrentScopeProvider(Container c) =>
-            () => this.GetScopeFromDefaultScopedLifestyle(c);
+        protected internal override Func<Scope> CreateCurrentScopeProvider(Container container) =>
+            () => this.GetScopeFromDefaultScopedLifestyle(container);
 
-        protected override Scope GetCurrentScopeCore(Container c) => this.GetScopeFromDefaultScopedLifestyle(c);
+        protected override Scope GetCurrentScopeCore(Container container) =>
+            this.GetScopeFromDefaultScopedLifestyle(container);
 
         private Scope GetScopeFromDefaultScopedLifestyle(Container container)
         {
@@ -44,25 +45,22 @@ namespace SimpleInjector.Lifestyles
 
             if (lifestyle != null)
             {
-                return lifestyle.GetCurrentScope(container) ?? ThrowThereIsNoActiveScopeException();
+                return lifestyle.GetCurrentScope(container)
+                    ?? ThrowThereIsNoActiveScopeException();
             }
 
             return container.GetVerificationOrResolveScopeForCurrentThread()
                 ?? ThrowResolveFromScopeOrRegisterDefaultScopedLifestyleException();
         }
 
-        private static Scope ThrowResolveFromScopeOrRegisterDefaultScopedLifestyleException()
-        {
+        private static Scope ThrowResolveFromScopeOrRegisterDefaultScopedLifestyleException() =>
             throw new InvalidOperationException(
                 "To be able to resolve and inject Scope instances, you need to either resolve " +
                 "instances directly from the Scope using a Scope.GetInstance overload, or you will " +
                 "have to set the Container.Options.DefaultScopedLifestyle property with the required " +
                 "scoped lifestyle for your type of application.");
-        }
 
-        private static Scope ThrowThereIsNoActiveScopeException()
-        {
+        private static Scope ThrowThereIsNoActiveScopeException() =>
             throw new InvalidOperationException("There is no active scope.");
-        }
     }
 }

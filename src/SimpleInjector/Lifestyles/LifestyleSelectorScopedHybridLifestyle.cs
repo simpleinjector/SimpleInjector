@@ -31,7 +31,9 @@ namespace SimpleInjector.Lifestyles
         private readonly ScopedLifestyle falseLifestyle;
 
         internal LifestyleSelectorScopedHybridLifestyle(
-            Predicate<Container> lifestyleSelector, ScopedLifestyle trueLifestyle, ScopedLifestyle falseLifestyle)
+            Predicate<Container> lifestyleSelector,
+            ScopedLifestyle trueLifestyle,
+            ScopedLifestyle falseLifestyle)
             : base("Hybrid " + GetHybridName(trueLifestyle) + " / " + GetHybridName(falseLifestyle))
         {
             this.selector = lifestyleSelector;

@@ -355,7 +355,7 @@ namespace SimpleInjector
             Requires.IsNotNull(trueLifestyle, nameof(trueLifestyle));
             Requires.IsNotNull(falseLifestyle, nameof(falseLifestyle));
 
-            return new HybridLifestyle(c => lifestyleSelector(), trueLifestyle, falseLifestyle);
+            return new HybridLifestyle(_ => lifestyleSelector(), trueLifestyle, falseLifestyle);
         }
 
         /// <summary>
@@ -598,8 +598,8 @@ namespace SimpleInjector
             error: false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public Registration CreateRegistration<TService, TImplementation>(Container container)
-            where TImplementation : class, TService
             where TService : class
+            where TImplementation : class, TService
         {
             return this.CreateRegistration<TImplementation>(container);
         }
@@ -623,7 +623,7 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
             Requires.IsNotNull(container, nameof(container));
 
-            var registration = this.CreateRegistrationCore<TService>(instanceCreator, container);
+            var registration = this.CreateRegistrationCore(instanceCreator, container);
 
             registration.WrapsInstanceCreationDelegate = true;
 

@@ -23,7 +23,6 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Diagnostics;
     using SimpleInjector.Lifestyles;
 
     /// <summary>
@@ -146,8 +145,8 @@ namespace SimpleInjector
         /// <param name="container">The <see cref="Container"/> instance for which a 
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
-            Container container)
+        protected internal override Registration CreateRegistrationCore<TService>(
+            Func<TService> instanceCreator, Container container)
         {
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
             Requires.IsNotNull(container, nameof(container));
@@ -216,10 +215,8 @@ namespace SimpleInjector
                 ?? this.GetCurrentScopeCore(container);
         }
 
-        private void ThrowThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope()
-        {
+        private void ThrowThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope() =>
             throw new InvalidOperationException(
                 StringResources.ThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope(this));
-        }
     }
 }

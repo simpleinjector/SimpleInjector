@@ -27,7 +27,6 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using System.Threading;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Internals;
@@ -226,7 +225,7 @@ namespace SimpleInjector
         {
             var constant = expression as ConstantExpression;
 
-            if (constant != null && constant.Value is IContainerControlledCollection collection)
+            if (constant?.Value is IContainerControlledCollection collection)
             {
                 collection.VerifyCreatingProducers();
             }
@@ -272,7 +271,7 @@ namespace SimpleInjector
                 select result)
                 .ToArray();
 
-            if (errors.Any())
+            if (errors.Length > 0)
             {
                 throw new DiagnosticVerificationException(errors);
             }

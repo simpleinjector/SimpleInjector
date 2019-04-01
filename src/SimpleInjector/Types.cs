@@ -25,7 +25,6 @@ namespace SimpleInjector
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Globalization;
     using System.Linq;
     using System.Reflection;
     using Decorators;
@@ -34,7 +33,8 @@ namespace SimpleInjector
     // Internal helper methods on System.Type.
     internal static class Types
     {
-        private static readonly Type[] AmbiguousTypes = new[] { typeof(Type), typeof(string), typeof(Scope), typeof(Container) };
+        private static readonly Type[] AmbiguousTypes =
+            new[] { typeof(Type), typeof(string), typeof(Scope), typeof(Container) };
 
         private static readonly Func<Type[], string> FullyQualifiedNameArgumentsFormatter =
             args => string.Join(", ", args.Select(a => a.ToFriendlyName(fullyQualifiedName: true)).ToArray());
@@ -43,14 +43,14 @@ namespace SimpleInjector
             args => string.Join(", ", args.Select(a => a.ToFriendlyName(fullyQualifiedName: false)).ToArray());
 
         private static readonly Func<Type[], string> CSharpFriendlyNameArgumentFormatter =
-            args => string.Join(",", args.Select(argument => string.Empty).ToArray());
+            args => string.Join(",", args.Select(_ => string.Empty).ToArray());
 
         internal static bool ContainsGenericParameter(this Type type) =>
             type.IsGenericParameter ||
                 (type.IsGenericType() && type.GetGenericArguments().Any(ContainsGenericParameter));
 
         internal static bool IsGenericArgument(this Type type) =>
-            type.IsGenericParameter || type.GetGenericArguments().Any(arg => arg.IsGenericArgument());
+            type.IsGenericParameter || type.GetGenericArguments().Any(IsGenericArgument);
 
         internal static bool IsGenericTypeDefinitionOf(this Type genericTypeDefinition, Type typeToCheck) =>
             typeToCheck.IsGenericType() && typeToCheck.GetGenericTypeDefinition() == genericTypeDefinition;
@@ -99,13 +99,15 @@ namespace SimpleInjector
         // could lead to an accidentally valid container configuration, while there is in fact an
         // error in the configuration.
         internal static bool IsConcreteType(Type serviceType) =>
-            !serviceType.IsAbstract() && !serviceType.IsArray && serviceType != typeof(object) &&
-            !typeof(Delegate).IsAssignableFrom(serviceType);
+            !serviceType.IsAbstract()
+            && !serviceType.IsArray
+            && serviceType != typeof(object)
+            && !typeof(Delegate).IsAssignableFrom(serviceType);
 
         // TODO: Find out if the call to DecoratesBaseTypes is needed (all tests pass without it).
         internal static bool IsDecorator(Type serviceType, ConstructorInfo implementationConstructor) =>
-            DecoratorHelpers.DecoratesServiceType(serviceType, implementationConstructor) &&
-            DecoratorHelpers.DecoratesBaseTypes(serviceType, implementationConstructor);
+            DecoratorHelpers.DecoratesServiceType(serviceType, implementationConstructor)
+            && DecoratorHelpers.DecoratesBaseTypes(serviceType, implementationConstructor);
 
         internal static bool IsComposite(Type serviceType, ConstructorInfo implementationConstructor) =>
             CompositeHelpers.ComposesServiceType(serviceType, implementationConstructor);
@@ -161,8 +163,8 @@ namespace SimpleInjector
         internal static IEnumerable<Type> GetBaseTypeCandidates(Type serviceType, Type implementationType) =>
             from baseType in implementationType.GetBaseTypesAndInterfaces()
             where baseType == serviceType || (
-                baseType.IsGenericType() && serviceType.IsGenericType() &&
-                baseType.GetGenericTypeDefinition() == serviceType.GetGenericTypeDefinition())
+                baseType.IsGenericType() && serviceType.IsGenericType()
+                && baseType.GetGenericTypeDefinition() == serviceType.GetGenericTypeDefinition())
             select baseType;
 
         // PERF: This method is a hot path in the registration phase and can get called thousands of times
@@ -176,7 +178,7 @@ namespace SimpleInjector
                 return true;
             }
 
-            if (implementation.IsGenericType() && implementation.GetGenericTypeDefinition() == service)
+            if (service.IsGenericTypeDefinitionOf(implementation))
             {
                 return true;
             }
@@ -285,7 +287,7 @@ namespace SimpleInjector
 
             var genericArguments = GetGenericArguments(type);
 
-            if (!genericArguments.Any())
+            if (genericArguments.Length == 0)
             {
                 return name;
             }

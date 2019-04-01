@@ -477,10 +477,10 @@ namespace SimpleInjector
         /// type is not a type that can be created by the container.
         /// </exception>
         public void Register<TService, TImplementation>(Lifestyle lifestyle)
-            where TImplementation : class, TService
             where TService : class
+            where TImplementation : class, TService
         {
-            this.Register<TService, TImplementation>(lifestyle, "TService", "TImplementation");
+            this.Register<TService, TImplementation>(lifestyle, nameof(TService), nameof(TImplementation));
         }
 
         /// <summary>
@@ -503,7 +503,7 @@ namespace SimpleInjector
         /// Thrown when <paramref name="instanceCreator"/> is a null reference.</exception>
         public void Register<TService>(Func<TService> instanceCreator) where TService : class
         {
-            this.Register<TService>(instanceCreator, this.SelectionBasedLifestyle);
+            this.Register(instanceCreator, this.SelectionBasedLifestyle);
         }
 
         /// <summary>
@@ -512,9 +512,11 @@ namespace SimpleInjector
         /// <typeparamref name="TService"/> is requested. The delegate is expected to produce new instances on
         /// each call. The instances are cached according to the supplied <paramref name="lifestyle"/>.
         /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.
+        /// </typeparam>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
-        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.
+        /// </param>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the 
         /// <typeparamref name="TService"/> has already been registered.</exception>
@@ -528,7 +530,7 @@ namespace SimpleInjector
 
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
-            var registration = lifestyle.CreateRegistration<TService>(instanceCreator, this);
+            var registration = lifestyle.CreateRegistration(instanceCreator, this);
 
             this.AddRegistration(typeof(TService), registration);
         }
@@ -555,7 +557,12 @@ namespace SimpleInjector
         /// </exception>
         public void Register(Type concreteType)
         {
-            this.Register(concreteType, concreteType, this.SelectionBasedLifestyle, nameof(concreteType), nameof(concreteType));
+            this.Register(
+                serviceType: concreteType,
+                implementationType: concreteType,
+                lifestyle: this.SelectionBasedLifestyle,
+                serviceTypeParamName: nameof(concreteType),
+                implementationTypeParamName: nameof(concreteType));
         }
 
         /// <summary>
@@ -616,7 +623,12 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle)
         {
-            this.Register(serviceType, implementationType, lifestyle, nameof(serviceType), nameof(implementationType));
+            this.Register(
+                serviceType: serviceType,
+                implementationType: implementationType,
+                lifestyle: lifestyle,
+                serviceTypeParamName: nameof(serviceType),
+                implementationTypeParamName: nameof(implementationType));
         }
 
         /// <summary>
@@ -692,7 +704,7 @@ namespace SimpleInjector
         [Obsolete("Please use " + nameof(RegisterInstance) + "<TService>(TService) instead.", error: false)]
         public void RegisterSingleton<TService>(TService instance) where TService : class
         {
-            this.RegisterInstance<TService>(instance);
+            this.RegisterInstance(instance);
         }
 
         /// <summary>
@@ -816,10 +828,13 @@ namespace SimpleInjector
         /// type is not a type that can be created by the container.
         /// </exception>
         public void RegisterSingleton<TService, TImplementation>()
-            where TImplementation : class, TService
             where TService : class
+            where TImplementation : class, TService
         {
-            this.Register<TService, TImplementation>(Lifestyle.Singleton, nameof(TService), nameof(TImplementation));
+            this.Register<TService, TImplementation>(
+                lifestyle: Lifestyle.Singleton,
+                serviceTypeParamName: nameof(TService),
+                implementationTypeParamName: nameof(TImplementation));
         }
 
         /// <summary>
@@ -845,7 +860,7 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
-            this.Register<TService>(instanceCreator, Lifestyle.Singleton);
+            this.Register(instanceCreator, Lifestyle.Singleton);
         }
 
         /// <summary>
@@ -1025,7 +1040,8 @@ namespace SimpleInjector
         /// single public constructor that only contains dependencies that can be resolved.
         /// </para>
         /// </remarks>
-        public void RegisterInitializer<TService>(Action<TService> instanceInitializer) where TService : class
+        public void RegisterInitializer<TService>(Action<TService> instanceInitializer)
+            where TService : class
         {
             Requires.IsNotNull(instanceInitializer, nameof(instanceInitializer));
 
@@ -1069,7 +1085,8 @@ namespace SimpleInjector
 
             this.ThrowWhenContainerIsLockedOrDisposed();
 
-            this.instanceInitializers.Add(ContextualInstanceInitializer.Create(instanceInitializer, predicate));
+            this.instanceInitializers.Add(
+                ContextualInstanceInitializer.Create(instanceInitializer, predicate));
         }
 
         /// <summary>

@@ -38,8 +38,8 @@ namespace SimpleInjector.Lifestyles
             return new TransientLifestyleRegistration<TConcrete>(this, container);
         }
 
-        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
-            Container container)
+        protected internal override Registration CreateRegistrationCore<TService>(
+            Func<TService> instanceCreator, Container container)
         {
             return new TransientLifestyleRegistration<TService>(this, container, instanceCreator);
         }

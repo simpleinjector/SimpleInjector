@@ -56,12 +56,10 @@ namespace SimpleInjector.Lifestyles
         }
 
         internal static InstanceProducer CreateUncontrolledCollectionProducer(
-            Type itemType, IEnumerable collection, Container container)
-        {
-            return new InstanceProducer(
+            Type itemType, IEnumerable collection, Container container) =>
+            new InstanceProducer(
                 typeof(IEnumerable<>).MakeGenericType(itemType),
                 CreateUncontrolledCollectionRegistration(itemType, collection, container));
-        }
 
         internal static Registration CreateUncontrolledCollectionRegistration(
             Type itemType, IEnumerable collection, Container container)
@@ -323,7 +321,7 @@ namespace SimpleInjector.Lifestyles
 
             private static void EnsureInstanceIsNotNull(object instance)
             {
-                if (instance == null)
+                if (instance is null)
                 {
                     throw new ActivationException(
                         StringResources.DelegateForTypeReturnedNull(typeof(TImplementation)));

@@ -37,8 +37,11 @@ namespace SimpleInjector
 #endif
     public partial class Container : IServiceProvider
     {
-        private static readonly MethodInfo EnumerableToArrayMethod = typeof(Enumerable).GetMethod("ToArray");
-        private static readonly MethodInfo EnumerableToListMethod = typeof(Enumerable).GetMethod("ToList");
+        private static readonly MethodInfo EnumerableToArrayMethod =
+            typeof(Enumerable).GetMethod(nameof(Enumerable.ToArray));
+
+        private static readonly MethodInfo EnumerableToListMethod =
+            typeof(Enumerable).GetMethod(nameof(Enumerable.ToList));
 
         private readonly Dictionary<Type, Lazy<InstanceProducer>> resolveUnregisteredTypeRegistrations =
             new Dictionary<Type, Lazy<InstanceProducer>>();
@@ -63,10 +66,8 @@ namespace SimpleInjector
             this.ThrowWhenDisposed();
             this.LockContainer();
 
-            InstanceProducer instanceProducer;
-
             // Performance optimization: This if check is a duplicate to save a call to GetInstanceForType.
-            if (!this.rootProducerCache.TryGetValue(typeof(TService), out instanceProducer))
+            if (!this.rootProducerCache.TryGetValue(typeof(TService), out InstanceProducer instanceProducer))
             {
                 return (TService)this.GetInstanceForRootType<TService>();
             }
@@ -88,9 +89,7 @@ namespace SimpleInjector
             this.ThrowWhenDisposed();
             this.LockContainer();
 
-            InstanceProducer instanceProducer;
-
-            if (!this.rootProducerCache.TryGetValue(serviceType, out instanceProducer))
+            if (!this.rootProducerCache.TryGetValue(serviceType, out InstanceProducer instanceProducer))
             {
                 return this.GetInstanceForRootType(serviceType);
             }
@@ -139,19 +138,14 @@ namespace SimpleInjector
             this.ThrowWhenDisposed();
             this.LockContainer();
 
-            InstanceProducer instanceProducer;
-
-            if (!this.rootProducerCache.TryGetValue(serviceType, out instanceProducer))
+            if (!this.rootProducerCache.TryGetValue(serviceType, out InstanceProducer instanceProducer))
             {
                 instanceProducer = this.GetRegistration(serviceType);
             }
 
-            if (instanceProducer != null && instanceProducer.IsValid)
-            {
-                return instanceProducer.GetInstance();
-            }
-
-            return null;
+            return instanceProducer?.IsValid == true
+                ? instanceProducer.GetInstance()
+                : null;
         }
 
         /// <summary>
@@ -210,9 +204,7 @@ namespace SimpleInjector
             // requested.
             this.ThrowWhenDisposed();
 
-            InstanceProducer producer;
-
-            if (!this.rootProducerCache.TryGetValue(serviceType, out producer))
+            if (!this.rootProducerCache.TryGetValue(serviceType, out InstanceProducer producer))
             {
                 producer = this.GetExplicitlyRegisteredInstanceProducer(serviceType, InjectionConsumerInfo.Root);
 
@@ -235,7 +227,7 @@ namespace SimpleInjector
                 this.AppendRootInstanceProducer(serviceType, producer);
             }
 
-            bool producerIsValid = producer != null && producer.IsValid;
+            bool producerIsValid = producer?.IsValid == true;
 
             if (!producerIsValid && throwOnFailure)
             {
@@ -256,8 +248,8 @@ namespace SimpleInjector
         {
             if (serviceType.ContainsGenericParameters())
             {
-                throw new ArgumentException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType),
-                    nameof(serviceType));
+                throw new ArgumentException(
+                    StringResources.OpenGenericTypesCanNotBeResolved(serviceType), nameof(serviceType));
             }
 
             // This Func<T> is a bit ugly, but does save us a lot of duplicate code.
@@ -356,8 +348,8 @@ namespace SimpleInjector
             return this.BuildInstanceProducerForType(serviceType, tryBuildInstanceProducerForConcrete);
         }
 
-        private InstanceProducer BuildInstanceProducerForType(Type serviceType,
-            Func<InstanceProducer> tryBuildInstanceProducerForConcreteType)
+        private InstanceProducer BuildInstanceProducerForType(
+            Type serviceType, Func<InstanceProducer> tryBuildInstanceProducerForConcreteType)
         {
             return
                 this.TryBuildInstanceProducerThroughUnregisteredTypeResolution(serviceType) ??
@@ -423,7 +415,8 @@ namespace SimpleInjector
                 // producer can cause a torn lifestyle warning in the container.
                 var producer = new InstanceProducer(e.UnregisteredServiceType, registration);
 
-                this.resolveUnregisteredTypeRegistrations[e.UnregisteredServiceType] = Helpers.ToLazy(producer);
+                this.resolveUnregisteredTypeRegistrations[e.UnregisteredServiceType] =
+                    Helpers.ToLazy(producer);
 
                 return producer;
             }
@@ -434,12 +427,16 @@ namespace SimpleInjector
             if (serviceType.IsArray)
             {
                 return this.BuildInstanceProducerForMutableCollectionType(
-                    serviceType, serviceType.GetElementType(), MutableCollectionType.Array);
+                    serviceType,
+                    serviceType.GetElementType(),
+                    MutableCollectionType.Array);
             }
             else if (typeof(List<>).IsGenericTypeDefinitionOf(serviceType))
             {
                 return this.BuildInstanceProducerForMutableCollectionType(
-                    serviceType, serviceType.GetGenericArguments().FirstOrDefault(), MutableCollectionType.List);
+                    serviceType,
+                    serviceType.GetGenericArguments().FirstOrDefault(),
+                    MutableCollectionType.List);
             }
             else
             {
@@ -459,11 +456,13 @@ namespace SimpleInjector
             // GetAllInstances locks the container
             if (this.GetAllInstances(elementType) is IContainerControlledCollection)
             {
-                return this.BuildMutableCollectionProducerFromControlledCollection(serviceType, elementType, type);
+                return this.BuildMutableCollectionProducerFromControlledCollection(
+                    serviceType, elementType, type);
             }
             else
             {
-                return this.BuildMutableCollectionProducerFromUncontrolledCollection(serviceType, elementType);
+                return this.BuildMutableCollectionProducerFromUncontrolledCollection(
+                    serviceType, elementType);
             }
         }
 
@@ -547,11 +546,10 @@ namespace SimpleInjector
 
             lock (this.emptyAndRedirectedCollectionRegistrationCache)
             {
-                InstanceProducer producer;
-
                 // We need to cache these generated producers, to prevent getting duplicate producers; which
                 // will cause (incorrect) diagnostic warnings.
-                if (!this.emptyAndRedirectedCollectionRegistrationCache.TryGetValue(serviceType, out producer))
+                if (!this.emptyAndRedirectedCollectionRegistrationCache.TryGetValue(
+                    serviceType, out InstanceProducer producer))
                 {
                     // This call might lock the container
                     producer = this.TryBuildStreamInstanceProducer(serviceType);
@@ -565,9 +563,7 @@ namespace SimpleInjector
 
         private InstanceProducer TryBuildStreamInstanceProducer(Type collectionType)
         {
-            Type serviceTypeDefinition = collectionType.GetGenericTypeDefinition();
-
-            if (serviceTypeDefinition == typeof(IEnumerable<>))
+            if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(collectionType))
             {
                 return null;
             }

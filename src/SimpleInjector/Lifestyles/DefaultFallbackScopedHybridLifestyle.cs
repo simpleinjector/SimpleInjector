@@ -29,7 +29,8 @@ namespace SimpleInjector.Lifestyles
         private readonly ScopedLifestyle defaultLifestyle;
         private readonly ScopedLifestyle fallbackLifestyle;
 
-        internal DefaultFallbackScopedHybridLifestyle(ScopedLifestyle defaultLifestyle, ScopedLifestyle fallbackLifestyle)
+        internal DefaultFallbackScopedHybridLifestyle(
+            ScopedLifestyle defaultLifestyle, ScopedLifestyle fallbackLifestyle)
             : base("Hybrid " + GetHybridName(defaultLifestyle) + " / " + GetHybridName(fallbackLifestyle))
         {
             this.defaultLifestyle = defaultLifestyle;
@@ -63,7 +64,8 @@ namespace SimpleInjector.Lifestyles
         }
 
         protected override Scope GetCurrentScopeCore(Container container) =>
-            this.defaultLifestyle.GetCurrentScope(container) ?? this.fallbackLifestyle.GetCurrentScope(container);
+            this.defaultLifestyle.GetCurrentScope(container)
+                ?? this.fallbackLifestyle.GetCurrentScope(container);
 
         private static string GetHybridName(Lifestyle lifestyle) => HybridLifestyle.GetHybridName(lifestyle);
     }

@@ -146,14 +146,12 @@ namespace SimpleInjector
                 nameof(openGenericServiceType),
                 guidance: StringResources.SuppliedTypeIsNotOpenGenericExplainingAlternativesWithAssemblies);
 
-            Type[] skippedDecorators;
+            var results =
+                this.GetNonGenericTypesToRegisterForOneToOneMapping(openGenericServiceType, assemblies);
 
-            Type[] implementationTypes = this.GetNonGenericTypesToRegisterForOneToOneMapping(
-                openGenericServiceType, assemblies, out skippedDecorators);
+            this.Register(openGenericServiceType, results.ImplementationTypes, lifestyle);
 
-            this.Register(openGenericServiceType, implementationTypes, lifestyle);
-
-            this.AddSkippedDecorators(openGenericServiceType, skippedDecorators);
+            this.AddSkippedDecorators(openGenericServiceType, results.SkippedDecorators);
         }
 
         /// <summary>
@@ -545,6 +543,12 @@ namespace SimpleInjector
             Requires.IsNotNull(options, nameof(options));
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
 
+            return this.GetTypesToRegisterInternal(serviceType, assemblies, options);
+        }
+
+        private Type[] GetTypesToRegisterInternal(
+            Type serviceType, IEnumerable<Assembly> assemblies, TypesToRegisterOptions options)
+        {
             var types =
                 from assembly in assemblies.Distinct()
                 where !assembly.IsDynamic
@@ -560,20 +564,23 @@ namespace SimpleInjector
             return types.ToArray();
         }
 
-        private Type[] GetNonGenericTypesToRegisterForOneToOneMapping(
-            Type openGenericServiceType, IEnumerable<Assembly> assemblies, out Type[] skippedDecorators)
+        private NonGenericTypesToRegisterForOneToOneMappingResults
+            GetNonGenericTypesToRegisterForOneToOneMapping(
+                Type openGenericServiceType, IEnumerable<Assembly> assemblies)
         {
             var options = new TypesToRegisterOptions { IncludeDecorators = true };
 
-            var typesIncludingDecorators =
-                this.GetTypesToRegister(openGenericServiceType, assemblies, options);
+            Type[] typesIncludingDecorators =
+                this.GetTypesToRegisterInternal(openGenericServiceType, assemblies, options);
 
             var partitions =
-                typesIncludingDecorators.Partition(type => this.IsDecorator(openGenericServiceType, type));
+                typesIncludingDecorators.Partition(type => !this.IsDecorator(openGenericServiceType, type));
 
-            skippedDecorators = partitions.Item1;
-
-            return partitions.Item2;
+            return new NonGenericTypesToRegisterForOneToOneMappingResults
+            {
+                ImplementationTypes = partitions.Item1,
+                SkippedDecorators = partitions.Item2
+            };
         }
 
         private bool IsDecorator(Type openGenericServiceType, Type implemenationType)
@@ -692,6 +699,12 @@ namespace SimpleInjector
                             invalidRegistration.service, invalidRegistration.implementations));
                 }
             }
+        }
+
+        private class NonGenericTypesToRegisterForOneToOneMappingResults
+        {
+            public List<Type> SkippedDecorators { get; set; }
+            public List<Type> ImplementationTypes { get; set; }
         }
     }
 }
