@@ -141,7 +141,7 @@
 
             // Assert
             Assert.AreEqual("Controller<T>", results.Name);
-            Assert.AreEqual("2 short circuited components.", results.Description);
+            Assert.AreEqual("2 short-circuited components.", results.Description);
             AssertThat.IsInstanceOfType(typeof(DebuggerViewItem[]), results.Value);
             Assert.AreEqual(2, ((DebuggerViewItem[])results.Value).Length);
         }
@@ -190,7 +190,7 @@
             var results = item.Value as DebuggerViewItem[];
 
             return results
-                .Single(result => result.Name == "Possible Short Circuited Dependencies")
+                .Single(result => result.Name == "Possible Short-Circuited Dependencies")
                 .Value as DebuggerViewItem[];
         }
 

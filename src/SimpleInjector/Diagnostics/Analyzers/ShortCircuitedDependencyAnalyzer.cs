@@ -38,7 +38,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
         public DiagnosticType DiagnosticType => DiagnosticType.ShortCircuitedDependency;
 
-        public string Name => "Possible Short Circuited Dependencies";
+        public string Name => "Possible Short-Circuited Dependencies";
 
         public string GetRootDescription(IEnumerable<DiagnosticResult> results)
         {
@@ -56,7 +56,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
             int count = results.Count();
 
-            return count == 1 ? "1 short circuited component." : (count + " short circuited components.");
+            return count == 1 ? "1 short-circuited component." : (count + " short-circuited components.");
         }
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
