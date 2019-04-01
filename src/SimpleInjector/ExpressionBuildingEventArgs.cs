@@ -38,13 +38,14 @@ namespace SimpleInjector
     /// <see cref="Expression"/> property to change the component that is 
     /// currently being built.
     /// </summary>
-    [DebuggerDisplay(nameof(ExpressionBuildingEventArgs) + " ({" + nameof(DebuggerDisplay) + "), nq})")]
+    [DebuggerDisplay(nameof(ExpressionBuildingEventArgs) +
+        " ({" + nameof(ExpressionBuildingEventArgs.DebuggerDisplay) + "), nq})")]
     public class ExpressionBuildingEventArgs : EventArgs
     {
         private Expression expression;
 
-        internal ExpressionBuildingEventArgs(Type knownImplementationType,
-            Expression expression, Lifestyle lifestyle)
+        internal ExpressionBuildingEventArgs(
+            Type knownImplementationType, Expression expression, Lifestyle lifestyle)
         {
             this.KnownImplementationType = knownImplementationType;
             this.Lifestyle = lifestyle;

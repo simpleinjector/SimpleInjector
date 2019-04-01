@@ -105,8 +105,8 @@ namespace SimpleInjector.Internals
                 bool canDoPublicAssign = this.partOfAssigmnent && property.GetSetMethod() != null;
                 bool canDoPublicRead = !this.partOfAssigmnent && property.GetGetMethod() != null;
 
-                this.MayAccessExpression(IsPublic(property.DeclaringType) &&
-                    (canDoPublicAssign || canDoPublicRead));
+                this.MayAccessExpression(IsPublic(property.DeclaringType)
+                    && (canDoPublicAssign || canDoPublicRead));
             }
 
             return base.VisitMember(node);

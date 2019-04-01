@@ -29,17 +29,11 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
     internal sealed class ContainerRegisteredServiceAnalyzer : IContainerAnalyzer
     {
-        internal static readonly IContainerAnalyzer Instance = new ContainerRegisteredServiceAnalyzer();
-
-        private ContainerRegisteredServiceAnalyzer()
-        {
-        }
-
         public DiagnosticType DiagnosticType => DiagnosticType.ContainerRegisteredComponent;
 
         public string Name => "Container-registered components";
 
-        public string GetRootDescription(IEnumerable<DiagnosticResult> results)
+        public string GetRootDescription(DiagnosticResult[] results)
         {
             int typeCount = GetNumberOfAutoRegisteredServices(results);
             int componentCount = GetNumberOfComponents(results);
@@ -70,13 +64,14 @@ namespace SimpleInjector.Diagnostics.Analyzers
         }
 
         private static ContainerRegisteredServiceDiagnosticResult BuildDiagnosticResult(
-            InstanceProducer registration, KnownRelationship[] relationships) => 
+            InstanceProducer registration, KnownRelationship[] relationships) =>
             new ContainerRegisteredServiceDiagnosticResult(
                 serviceType: registration.ServiceType,
                 description: BuildDescription(registration, relationships),
                 relationships: relationships);
 
-        private static string BuildDescription(InstanceProducer registration, KnownRelationship[] relationships)
+        private static string BuildDescription(
+            InstanceProducer registration, KnownRelationship[] relationships)
         {
             string componentName = BuildComponentName(registration, relationships);
             string unregisteredTypeName = BuildUnregisteredTypeDescription(relationships);
@@ -84,7 +79,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return componentName + " depends on " + unregisteredTypeName + ".";
         }
 
-        private static string BuildComponentName(InstanceProducer registration, KnownRelationship[] relationships)
+        private static string BuildComponentName(
+            InstanceProducer registration, KnownRelationship[] relationships)
         {
             var consumingTypes = (
                 from relationship in relationships
@@ -92,14 +88,9 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 .Distinct()
                 .ToArray();
 
-            if (consumingTypes.Length == 1)
-            {
-                return consumingTypes.First().ToFriendlyName();
-            }
-            else
-            {
-                return registration.ServiceType.ToFriendlyName();
-            }
+            var type = consumingTypes.Length == 1 ? consumingTypes[0] : registration.ServiceType;
+
+            return type.ToFriendlyName();
         }
 
         private static string BuildUnregisteredTypeDescription(KnownRelationship[] relationships)
@@ -110,32 +101,27 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 .Distinct()
                 .ToArray();
 
-            if (unregisteredTypes.Length == 1)
-            {
-                return "container-registered type " + unregisteredTypes[0].ToFriendlyName();
-            }
-            else
-            {
-                return unregisteredTypes.Length + " container-registered types";
-            }
+            return unregisteredTypes.Length == 1
+                ? $"container-registered type {unregisteredTypes[0].ToFriendlyName()}"
+                : $"{unregisteredTypes.Length} container-registered types";
         }
 
-        private static string GetTypeRootDescription(int number) => 
+        private static string GetTypeRootDescription(int number) =>
             number == 1
                 ? "1 container-registered type has been detected that is referenced by "
-                : number + " container-registered types have been detected that are referenced by ";
+                : $"{number} container-registered types have been detected that are referenced by ";
 
-        private static string GetTypeGroupDescription(int number) => 
+        private static string GetTypeGroupDescription(int number) =>
             number == 1
                 ? "1 container-registered type is referenced by "
-                : number + " container-registered types are referenced by ";
+                : $"{number} container-registered types are referenced by ";
 
-        private static string GetComponentDescription(int number) => 
+        private static string GetComponentDescription(int number) =>
             number == 1
                 ? "1 component"
-                : number + " components";
+                : $"{number} components";
 
-        private static int GetNumberOfComponents(IEnumerable<DiagnosticResult> results) => 
+        private static int GetNumberOfComponents(IEnumerable<DiagnosticResult> results) =>
             results.Select(result => result.ServiceType).Distinct().Count();
 
         private static int GetNumberOfAutoRegisteredServices(IEnumerable<DiagnosticResult> results) => (

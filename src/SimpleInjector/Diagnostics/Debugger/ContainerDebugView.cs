@@ -27,14 +27,13 @@ namespace SimpleInjector.Diagnostics.Debugger
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Reflection;
     using SimpleInjector.Diagnostics.Analyzers;
-    
+
     internal sealed class ContainerDebugView
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Container container;
-        
+
         public ContainerDebugView(Container container)
         {
             this.container = container;
@@ -61,7 +60,7 @@ namespace SimpleInjector.Diagnostics.Debugger
                 {
                     new DebuggerViewItem(
                         name: "How To View Diagnostic Info",
-                        description: "Analysis info is available in this debug view after Verify() is " + 
+                        description: "Analysis info is available in this debug view after Verify() is " +
                             "called on this container instance.")
                 };
 
@@ -100,16 +99,16 @@ namespace SimpleInjector.Diagnostics.Debugger
 
         private static DebuggerViewItem[] GetDebuggerTypeProxyFailureResults(Exception exception)
         {
-            return new[] 
+            return new[]
             {
                 new DebuggerViewItem(
-                    "Failure", 
-                    "We're so so sorry. The Debugger Type Proxy failed to initialize.", 
+                    "Failure",
+                    "We're so so sorry. The Debugger Type Proxy failed to initialize.",
                     exception)
             };
         }
 
-        private object[] GroupProducers(IEnumerable<InstanceProducer> producers) => 
+        private object[] GroupProducers(IEnumerable<InstanceProducer> producers) =>
             this.GroupProducers(producers, level: 0);
 
         private object[] GroupProducers(IEnumerable<InstanceProducer> producers, int level) => (
@@ -119,8 +118,8 @@ namespace SimpleInjector.Diagnostics.Debugger
             select this.BuildProducerGroup(resultGroup.Key, resultGroup.ToArray(), level + 1))
             .ToArray();
 
-        private object BuildProducerGroup(Type groupType, 
-            InstanceProducer[] producersForGroup, int level)
+        private object BuildProducerGroup(
+            Type groupType, InstanceProducer[] producersForGroup, int level)
         {
             if (producersForGroup.Length == 1)
             {
@@ -132,8 +131,7 @@ namespace SimpleInjector.Diagnostics.Debugger
                     description: producer.DebuggerDisplay,
                     value: producersForGroup[0]);
             }
-
-            if (groupType.ContainsGenericParameters())
+            else if (groupType.ContainsGenericParameters())
             {
                 return this.BuildGenericGroup(groupType, producersForGroup, level);
             }
@@ -143,8 +141,8 @@ namespace SimpleInjector.Diagnostics.Debugger
             }
         }
 
-        private object BuildGenericGroup(Type groupType, 
-            InstanceProducer[] producersForGroup, int level)
+        private object BuildGenericGroup(
+            Type groupType, InstanceProducer[] producersForGroup, int level)
         {
             object[] childGroups = this.GroupProducers(producersForGroup, level);
 
@@ -160,7 +158,8 @@ namespace SimpleInjector.Diagnostics.Debugger
                 value: childGroups);
         }
 
-        private static DebuggerViewItem BuildNonGenericGroup(Type closedType, InstanceProducer[] producersForGroup) => 
+        private static DebuggerViewItem BuildNonGenericGroup(
+            Type closedType, InstanceProducer[] producersForGroup) =>
             new DebuggerViewItem(
                 name: closedType.ToFriendlyName(),
                 description: "Count = " + producersForGroup.Length,

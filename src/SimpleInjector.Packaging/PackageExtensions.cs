@@ -138,9 +138,12 @@ namespace SimpleInjector
 
             if (invalidPackageType != null)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
-                    "The type {0} does not contain a default (public parameterless) constructor. Packages " +
-                    "must have a default constructor.", invalidPackageType.FullName));
+                throw new InvalidOperationException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "The type {0} does not contain a default (public parameterless) constructor. " +
+                        "Packages must have a default constructor.",
+                        invalidPackageType.FullName));
             }
         }
 
@@ -152,8 +155,11 @@ namespace SimpleInjector
             }
             catch (Exception ex)
             {
-                string message = string.Format(CultureInfo.InvariantCulture,
-                    "The creation of package type {0} failed. {1}", packageType.FullName, ex.Message);
+                string message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "The creation of package type {0} failed. {1}",
+                    packageType.FullName,
+                    ex.Message);
 
                 throw new InvalidOperationException(message, ex);
             }

@@ -26,30 +26,20 @@ namespace SimpleInjector.Diagnostics.Analyzers
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using System.Reflection;
 
     internal class DisposableTransientComponentAnalyzer : IContainerAnalyzer
     {
-        internal static readonly IContainerAnalyzer Instance = new DisposableTransientComponentAnalyzer();
-
-        private DisposableTransientComponentAnalyzer()
-        {
-        }
-
         public DiagnosticType DiagnosticType => DiagnosticType.DisposableTransientComponent;
 
         public string Name => "Disposable Transient Components";
 
-        public string GetRootDescription(IEnumerable<DiagnosticResult> results)
-        {
-            var count = results.Count();
-            return count + " disposable transient " + ComponentPlural(count) + " found.";
-        }
+        public string GetRootDescription(DiagnosticResult[] results) =>
+            $"{results.Length} disposable transient {ComponentPlural(results.Length)} found.";
 
         public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
         {
             var count = results.Count();
-            return count + " disposable transient " + ComponentPlural(count) + ".";
+            return $"{count} disposable transient {ComponentPlural(count)}.";
         }
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
@@ -64,14 +54,15 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
             var results =
                 from producer in invalidProducers
-                select new DisposableTransientComponentDiagnosticResult(producer.ServiceType, producer,
-                    BuildDescription(producer));
+                select new DisposableTransientComponentDiagnosticResult(
+                    producer.ServiceType, producer, BuildDescription(producer));
 
             return results.ToArray();
         }
 
-        private static string BuildDescription(InstanceProducer producer) => 
-            string.Format(CultureInfo.InvariantCulture,
+        private static string BuildDescription(InstanceProducer producer) =>
+            string.Format(
+                CultureInfo.InvariantCulture,
                 "{0} is registered as transient, but implements IDisposable.",
                 producer.Registration.ImplementationType.ToFriendlyName());
 

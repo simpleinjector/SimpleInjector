@@ -55,7 +55,7 @@ namespace SimpleInjector
     /// container.Register<ITimeProvider, CustomTimeProvider>();
     /// ]]></code>
     /// </example>
-    [DebuggerDisplay("{" + nameof(DebuggerDisplayDescription) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(ContainerOptions.DebuggerDisplayDescription) + ", nq}")]
     public class ContainerOptions
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -387,8 +387,8 @@ namespace SimpleInjector
         /// container.GetInstance<IHomeViewModel>();
         /// ]]></code>
         /// </example>
-        public void RegisterResolveInterceptor(ResolveInterceptor interceptor,
-            Predicate<InitializationContext> predicate)
+        public void RegisterResolveInterceptor(
+            ResolveInterceptor interceptor, Predicate<InitializationContext> predicate)
         {
             Requires.IsNotNull(interceptor, nameof(interceptor));
             Requires.IsNotNull(predicate, nameof(predicate));
@@ -402,7 +402,7 @@ namespace SimpleInjector
         /// <returns>A string that represents the current object.</returns>
         public override string ToString()
         {
-            var descriptions = new List<string>();
+            var descriptions = new List<string>(capacity: 1);
 
             if (this.AllowOverridingRegistrations)
             {
@@ -446,7 +446,7 @@ namespace SimpleInjector
             }
 
             errorMessage = null;
-            
+
             try
             {
                 ConstructorInfo constructor = this.SelectConstructor(implementationType);

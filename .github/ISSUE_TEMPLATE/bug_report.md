@@ -25,6 +25,7 @@ Add any other context about the problem here. e.g.:
 * .NET version
 *Used libraries or frameworks (with version) that are required
 
-**Tip**
+**Important**
 * Do *not* include screen shots of [code](https://idownvotedbecau.se/imageofcode) or [exceptions](https://idownvotedbecau.se/imageofanexception/).
+* Do ensure that code listing don't have a line width that exceeds 100 characters, as that would cause horizontal scrollbars, which make it harder to view the code.
 * Follow the guidelines given by Stack Overflow and [IDownvotedBecau.se](https://idownvotedbecau.se/).

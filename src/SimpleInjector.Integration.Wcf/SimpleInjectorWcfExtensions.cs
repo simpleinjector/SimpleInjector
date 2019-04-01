@@ -70,14 +70,14 @@ namespace SimpleInjector
 
             foreach (Type serviceType in serviceTypes)
             {
-                Lifestyle lifestyle = 
+                Lifestyle lifestyle =
                     GetAppropriateLifestyle(serviceType, container.Options.LifestyleSelectionBehavior);
 
                 container.Register(serviceType, serviceType, lifestyle);
             }
         }
 
-        internal static ServiceBehaviorAttribute GetServiceBehaviorAttribute(this Type type) => 
+        internal static ServiceBehaviorAttribute GetServiceBehaviorAttribute(this Type type) =>
             type.GetCustomAttributes(typeof(ServiceBehaviorAttribute), true)
                 .OfType<ServiceBehaviorAttribute>()
                 .FirstOrDefault();
@@ -122,7 +122,7 @@ namespace SimpleInjector
             return attribute != null && attribute.ConcurrencyMode == ConcurrencyMode.Multiple;
         }
 
-        private static Lifestyle GetAppropriateLifestyle(Type wcfServiceType, 
+        private static Lifestyle GetAppropriateLifestyle(Type wcfServiceType,
             ILifestyleSelectionBehavior behavior)
         {
             var attribute = GetServiceBehaviorAttribute(wcfServiceType);
@@ -152,8 +152,13 @@ namespace SimpleInjector
             catch (Exception ex)
             {
                 // Throw a more descriptive message containing the name of the assembly.
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
-                    "Unable to load types from assembly {0}. {1}", assembly.FullName, ex.Message), ex);
+                throw new InvalidOperationException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Unable to load types from assembly {0}. {1}",
+                        assembly.FullName,
+                        ex.Message),
+                    ex);
             }
         }
     }

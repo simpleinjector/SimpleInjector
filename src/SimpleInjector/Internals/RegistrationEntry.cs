@@ -23,7 +23,6 @@
 namespace SimpleInjector.Internals
 {
     using System;
-    using System.Reflection;
 
     internal static class RegistrationEntry
     {

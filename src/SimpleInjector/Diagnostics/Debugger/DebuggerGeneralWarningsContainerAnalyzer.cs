@@ -29,7 +29,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
     internal static class DebuggerGeneralWarningsContainerAnalyzer
     {
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification = 
+            Justification =
                 "FxCop is being smart here. The code is called by a class that is instantiated in the " +
                 "debugger.")]
         internal static DebuggerViewItem Analyze(Container container)
@@ -59,8 +59,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
             }
             else
             {
-                return new DebuggerViewItem(WarningsName, "Warnings in multiple groups have been detected.",
-                    analysisResults);
+                return new DebuggerViewItem(
+                    WarningsName, "Warnings in multiple groups have been detected.", analysisResults);
             }
         }
 

@@ -52,7 +52,7 @@ namespace SimpleInjector.Advanced
         {
             var constructors = implementationType.GetConstructors();
 
-            if (!constructors.Any())
+            if (constructors.Length == 0)
             {
                 throw new ActivationException(
                     StringResources.TypeMustHaveASinglePublicConstructorButItHasNone(implementationType));

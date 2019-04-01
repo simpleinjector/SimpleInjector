@@ -997,7 +997,7 @@
             AssertThat.ThrowsWithParamName<ArgumentException>("serviceType", action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The supplied type 'IService<Int32, TB>' is a partially-closed generic type, which is not 
+                The supplied type 'IService<Int32, TB>' is a partially closed generic type, which is not 
                 supported by this method. Please supply the open-generic type 'IService<,>' instead."
                 .TrimInside(),
                 action);
@@ -1021,7 +1021,7 @@
             AssertThat.ThrowsWithParamName<ArgumentException>("serviceType", action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The supplied type 'IService<TA, TB>' is a partially-closed generic type, which is not 
+                The supplied type 'IService<TA, TB>' is a partially closed generic type, which is not 
                 supported by this method. Please supply the open-generic type 'IService<,>' instead."
                 .TrimInside(),
                 action);

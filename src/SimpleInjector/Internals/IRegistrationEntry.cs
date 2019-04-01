@@ -31,11 +31,17 @@ namespace SimpleInjector.Internals
 
         void Add(InstanceProducer producer);
 
-        void AddGeneric(Type serviceType, Type implementationType, Lifestyle lifestyle,
+        void AddGeneric(
+            Type serviceType,
+            Type implementationType,
+            Lifestyle lifestyle,
             Predicate<PredicateContext> predicate = null);
 
-        void Add(Type serviceType, Func<TypeFactoryContext, Type> implementationTypeFactory,
-            Lifestyle lifestyle, Predicate<PredicateContext> predicate = null);
+        void Add(
+            Type serviceType,
+            Func<TypeFactoryContext, Type> implementationTypeFactory,
+            Lifestyle lifestyle,
+            Predicate<PredicateContext> predicate = null);
 
         InstanceProducer TryGetInstanceProducer(Type serviceType, InjectionConsumerInfo consumer);
 

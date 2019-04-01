@@ -30,38 +30,29 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
     internal sealed class ShortCircuitedDependencyAnalyzer : IContainerAnalyzer
     {
-        internal static readonly IContainerAnalyzer Instance = new ShortCircuitedDependencyAnalyzer();
-
-        private ShortCircuitedDependencyAnalyzer()
-        {
-        }
-
         public DiagnosticType DiagnosticType => DiagnosticType.ShortCircuitedDependency;
 
-        public string Name => "Possible Short Circuited Dependencies";
+        public string Name => "Possible Short-Circuited Dependencies";
 
-        public string GetRootDescription(IEnumerable<DiagnosticResult> results)
+        public string GetRootDescription(DiagnosticResult[] results)
         {
-            int count = results.Count();
-
-            if (count == 1)
-            {
-                return "1 component possibly short circuits to a concrete unregistered type.";
-            }
-
-            return count + " components possibly short circuit to a concrete unregistered type.";
+            return results.Length == 1
+                ? "1 component possibly short circuits to a concrete unregistered type."
+                : $"{results.Length} components possibly short circuit to a concrete unregistered type.";
         }
 
         public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
         {
             int count = results.Count();
 
-            return count == 1 ? "1 short circuited component." : (count + " short circuited components.");
+            return count == 1
+                ? "1 short-circuited component."
+                : $"{count} short-circuited components.";
         }
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
         {
-            Dictionary<Type, IEnumerable<InstanceProducer>> registeredImplementationTypes = 
+            Dictionary<Type, IEnumerable<InstanceProducer>> registeredImplementationTypes =
                 GetRegisteredImplementationTypes(producers);
 
             Dictionary<Type, InstanceProducer> autoRegisteredRegistrationsWithLifestyleMismatch =
@@ -109,7 +100,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 where registrationIsPossiblyShortCircuited
                 select registration;
 
-            return autoRegisteredRegistrationsWithLifestyleMismatch.ToDictionary(producer => producer.ServiceType);
+            return autoRegisteredRegistrationsWithLifestyleMismatch
+                .ToDictionary(producer => producer.ServiceType);
         }
 
         private static string BuildDescription(KnownRelationship relationship,
@@ -119,10 +111,14 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 from possibleSkippedRegistration in possibleSkippedRegistrations
                 let name = possibleSkippedRegistration.ServiceType.ToFriendlyName()
                 orderby name
-                select string.Format(CultureInfo.InvariantCulture, "{0} ({1})",
-                    name, possibleSkippedRegistration.Lifestyle.Name));
+                select string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0} ({1})",
+                    name,
+                    possibleSkippedRegistration.Lifestyle.Name));
 
-            return string.Format(CultureInfo.InvariantCulture,
+            return string.Format(
+                CultureInfo.InvariantCulture,
                 "{0} might incorrectly depend on unregistered type {1} ({2}) instead of {3}.",
                 relationship.ImplementationType.ToFriendlyName(),
                 relationship.Dependency.ServiceType.ToFriendlyName(),

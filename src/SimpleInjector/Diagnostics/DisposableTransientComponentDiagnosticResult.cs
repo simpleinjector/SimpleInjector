@@ -31,13 +31,17 @@ namespace SimpleInjector.Diagnostics
     /// <see cref="IDisposable"/>.
     /// For more information, see: https://simpleinjector.org/diadt.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(DisposableTransientComponentDiagnosticResult.DebuggerDisplay) + ", nq}")]
     public class DisposableTransientComponentDiagnosticResult : DiagnosticResult
     {
-        internal DisposableTransientComponentDiagnosticResult(Type serviceType, InstanceProducer registration, 
-            string description)
-            : base(serviceType, description, DiagnosticType.DisposableTransientComponent,
-                DiagnosticSeverity.Warning, registration)
+        internal DisposableTransientComponentDiagnosticResult(
+            Type serviceType, InstanceProducer registration, string description)
+            : base(
+                serviceType,
+                description,
+                DiagnosticType.DisposableTransientComponent,
+                DiagnosticSeverity.Warning,
+                registration)
         {
             this.Registration = registration;
         }

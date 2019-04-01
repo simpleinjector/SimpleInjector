@@ -23,7 +23,6 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
@@ -68,7 +67,9 @@ namespace SimpleInjector
 
         private readonly object locker = new object();
         private readonly List<IInstanceInitializer> instanceInitializers = new List<IInstanceInitializer>();
-        private readonly List<ContextualResolveInterceptor> resolveInterceptors = new List<ContextualResolveInterceptor>();
+        private readonly List<ContextualResolveInterceptor> resolveInterceptors =
+            new List<ContextualResolveInterceptor>();
+
         private readonly long containerId;
 
         // Collection of (both conditional and unconditional) instance producers that are explicitly 
@@ -175,7 +176,8 @@ namespace SimpleInjector
             }
         }
 
-        internal bool HasRegistrations => this.explicitRegistrations.Any() || this.collectionResolvers.Any();
+        internal bool HasRegistrations =>
+            this.explicitRegistrations.Count > 0 || this.collectionResolvers.Count > 0;
 
         internal bool HasResolveInterceptors => this.resolveInterceptors.Count > 0;
 
@@ -331,14 +333,16 @@ namespace SimpleInjector
 
             return producers.ToArray();
         }
-        
-        internal Expression OnExpressionBuilding(Registration registration, Type implementationType,
-            Expression instanceCreatorExpression)
+
+        internal Expression OnExpressionBuilding(
+            Registration registration, Type implementationType, Expression instanceCreatorExpression)
         {
             if (this.expressionBuilding != null)
             {
-                var e = new ExpressionBuildingEventArgs(implementationType,
-                    instanceCreatorExpression, registration.Lifestyle);
+                var e = new ExpressionBuildingEventArgs(
+                    implementationType,
+                    instanceCreatorExpression,
+                    registration.Lifestyle);
 
                 var relationships = new KnownRelationshipCollection(registration.GetRelationships().ToList());
 
@@ -397,20 +401,20 @@ namespace SimpleInjector
         {
             if (this.disposed)
             {
-                // Performance optimization: Throwing moved to another method to allow this method to be in-lined.
+                // Performance optimization: Throwing moved to another method to allow this method to be
+                // in-lined.
                 this.ThrowContainerDisposedException();
             }
         }
 
-        internal Func<object> WrapWithResolveInterceptor(InstanceProducer instanceProducer, Func<object> producer)
+        internal Func<object> WrapWithResolveInterceptor(
+            InstanceProducer instanceProducer, Func<object> producer)
         {
             if (this.HasResolveInterceptors)
             {
                 var context = new InitializationContext(instanceProducer, instanceProducer.Registration);
 
-                ResolveInterceptor[] interceptors = this.GetResolveInterceptorsFor(context);
-
-                foreach (ResolveInterceptor interceptor in interceptors)
+                foreach (ResolveInterceptor interceptor in this.GetResolveInterceptorsFor(context))
                 {
                     producer = ApplyResolveInterceptor(interceptor, context, producer);
                 }
@@ -448,10 +452,8 @@ namespace SimpleInjector
                     this.GetLookalikesForMissingType(target.TargetType)));
         }
 
-        internal CollectionResolver GetContainerUncontrolledResolver(Type itemType)
-        {
-            return this.GetCollectionResolver(itemType, containerControlled: false);
-        }
+        internal CollectionResolver GetContainerUncontrolledResolver(Type itemType) =>
+            this.GetCollectionResolver(itemType, containerControlled: false);
 
         internal CollectionResolver GetCollectionResolver(Type itemType, bool containerControlled)
         {
@@ -488,19 +490,19 @@ namespace SimpleInjector
 #endif
         }
 
-        private static Func<object> ApplyResolveInterceptor(ResolveInterceptor interceptor,
-            InitializationContext context, Func<object> wrappedProducer)
+        private static Func<object> ApplyResolveInterceptor(
+            ResolveInterceptor interceptor, InitializationContext context, Func<object> wrappedProducer)
         {
             return () => ThrowWhenResolveInterceptorReturnsNull(interceptor(context, wrappedProducer));
         }
 
-        private CollectionResolver CreateAndAddCollectionResolver(Type openGenericServiceType, bool controlled)
+        private CollectionResolver CreateAndAddCollectionResolver(Type openServiceType, bool controlled)
         {
             var resolver = controlled
-                ? (CollectionResolver)new ContainerControlledCollectionResolver(this, openGenericServiceType)
-                : (CollectionResolver)new ContainerUncontrolledCollectionResolver(this, openGenericServiceType);
+                ? (CollectionResolver)new ContainerControlledCollectionResolver(this, openServiceType)
+                : (CollectionResolver)new ContainerUncontrolledCollectionResolver(this, openServiceType);
 
-            this.collectionResolvers.Add(openGenericServiceType, resolver);
+            this.collectionResolvers.Add(openServiceType, resolver);
 
             this.ResolveUnregisteredType += resolver.ResolveUnregisteredType;
             this.Verifying += resolver.TriggerUnregisteredTypeResolutionOnAllClosedCollections;
@@ -563,15 +565,18 @@ namespace SimpleInjector
                 .ToArray();
         }
 
-        private void RegisterOpenGeneric(Type serviceType, Type implementationType,
-            Lifestyle lifestyle, Predicate<PredicateContext> predicate = null)
+        private void RegisterOpenGeneric(
+            Type serviceType,
+            Type implementationType,
+            Lifestyle lifestyle,
+            Predicate<PredicateContext> predicate = null)
         {
             Requires.IsGenericType(serviceType, nameof(serviceType));
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
-            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
-                implementationType, nameof(serviceType));
-            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType,
-                implementationType, nameof(implementationType));
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(
+                serviceType, implementationType, nameof(serviceType));
+            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
+                serviceType, implementationType, nameof(implementationType));
 
             this.GetOrCreateRegistrationalEntry(serviceType)
                 .AddGeneric(serviceType, implementationType, lifestyle, predicate);
@@ -582,7 +587,8 @@ namespace SimpleInjector
             // HACK: Conditional registrations for IEnumerable<T> are not added as uncontrolled collection,
             // because that would lose the conditional ability and would cause collections to be appended
             // together, instead of selected conditionally. (see #468).
-            if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(producer.ServiceType) && producer.IsUnconditional)
+            if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(producer.ServiceType)
+                && producer.IsUnconditional)
             {
                 this.AddUncontrolledCollectionInstanceProducer(producer);
             }
@@ -605,19 +611,14 @@ namespace SimpleInjector
             resolver.RegisterUncontrolledCollection(itemType, producer);
         }
 
-        private int GetNumberOfConditionalRegistrationsFor(Type serviceType)
-        {
-            var entry = this.GetRegistrationalEntryOrNull(serviceType);
-
-            return entry == null
-                ? 0
-                : entry.GetNumberOfConditionalRegistrationsFor(serviceType);
-        }
+        private int GetNumberOfConditionalRegistrationsFor(Type serviceType) =>
+            this.GetRegistrationalEntryOrNull(serviceType)
+                ?.GetNumberOfConditionalRegistrationsFor(serviceType) ?? 0;
 
         // Instead of using the this.registrations instance, this method takes a snapshot. This allows the
         // container to be thread-safe, without using locks.
-        private InstanceProducer GetInstanceProducerForType(Type serviceType, InjectionConsumerInfo consumer,
-            Func<InstanceProducer> buildInstanceProducer)
+        private InstanceProducer GetInstanceProducerForType(
+            Type serviceType, InjectionConsumerInfo consumer, Func<InstanceProducer> buildInstanceProducer)
         {
             return
                 this.GetExplicitlyRegisteredInstanceProducer(serviceType, consumer)
@@ -625,31 +626,19 @@ namespace SimpleInjector
                 ?? buildInstanceProducer();
         }
 
-        private InstanceProducer GetExplicitlyRegisteredInstanceProducer(Type serviceType, InjectionConsumerInfo consumer)
-        {
-            var entry = this.GetRegistrationalEntryOrNull(serviceType);
+        private InstanceProducer GetExplicitlyRegisteredInstanceProducer(
+            Type serviceType, InjectionConsumerInfo consumer) =>
+            this.GetRegistrationalEntryOrNull(serviceType)?.TryGetInstanceProducer(serviceType, consumer);
 
-            return entry != null
-                ? entry.TryGetInstanceProducer(serviceType, consumer)
-                : null;
-        }
-
-        private InstanceProducer TryGetInstanceProducerForRegisteredCollection(
-            Type enumerableServiceType) =>
+        private InstanceProducer TryGetInstanceProducerForRegisteredCollection(Type enumerableServiceType) =>
             typeof(IEnumerable<>).IsGenericTypeDefinitionOf(enumerableServiceType)
                 ? this.GetInstanceProducerForRegisteredCollection(
                     enumerableServiceType.GetGenericArguments()[0])
                 : null;
 
-        private InstanceProducer GetInstanceProducerForRegisteredCollection(Type serviceType)
-        {
-            Type key = GetRegistrationKey(serviceType);
-            var resolver = this.collectionResolvers.GetValueOrDefault(key);
-
-            return resolver != null
-                ? resolver.TryGetInstanceProducer(serviceType)
-                : null;
-        }
+        private InstanceProducer GetInstanceProducerForRegisteredCollection(Type serviceType) =>
+            this.collectionResolvers.GetValueOrDefault(GetRegistrationKey(serviceType))
+                ?.TryGetInstanceProducer(serviceType);
 
         private IRegistrationEntry GetOrCreateRegistrationalEntry(Type serviceType)
         {
@@ -670,12 +659,10 @@ namespace SimpleInjector
             return this.explicitRegistrations.GetValueOrDefault(GetRegistrationKey(serviceType));
         }
 
-        private static Type GetRegistrationKey(Type serviceType)
-        {
-            return serviceType.IsGenericType()
+        private static Type GetRegistrationKey(Type serviceType) =>
+            serviceType.IsGenericType()
                 ? serviceType.GetGenericTypeDefinition()
                 : serviceType;
-        }
 
         private void AddContainerRegistrations()
         {
@@ -740,18 +727,15 @@ namespace SimpleInjector
                 return typeHierarchy.Contains(this.serviceType);
             }
 
-            public Action<T> CreateAction<T>(InitializerContext context)
-            {
-                return Helpers.CreateAction<T>(this.instanceInitializer);
-            }
+            public Action<T> CreateAction<T>(InitializerContext context) =>
+                Helpers.CreateAction<T>(this.instanceInitializer);
 
-            internal static IInstanceInitializer Create<TImplementation>(
-                Action<TImplementation> instanceInitializer)
+            internal static IInstanceInitializer Create<TImplementation>(Action<TImplementation> initializer)
             {
                 return new TypedInstanceInitializer
                 {
                     serviceType = typeof(TImplementation),
-                    instanceInitializer = instanceInitializer
+                    instanceInitializer = initializer
                 };
             }
         }
@@ -761,12 +745,11 @@ namespace SimpleInjector
             private Predicate<InitializerContext> predicate;
             private Action<InstanceInitializationData> instanceInitializer;
 
-            public bool AppliesTo(Type implementationType, InitializerContext context) => this.predicate(context);
+            public bool AppliesTo(Type implementationType, InitializerContext context) =>
+                this.predicate(context);
 
-            public Action<T> CreateAction<T>(InitializerContext context)
-            {
-                return instance => this.instanceInitializer(new InstanceInitializationData(context, instance));
-            }
+            public Action<T> CreateAction<T>(InitializerContext context) =>
+                instance => this.instanceInitializer(new InstanceInitializationData(context, instance));
 
             internal static IInstanceInitializer Create(
                 Action<InstanceInitializationData> instanceInitializer,

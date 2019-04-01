@@ -39,11 +39,6 @@ namespace SimpleInjector
         private static readonly ReadOnlyCollection<DiagnosticResult> Empty =
             new ReadOnlyCollection<DiagnosticResult>(Helpers.Array<DiagnosticResult>.Empty);
 
-#if NET40 || NET45
-        [NonSerialized]
-#endif
-        private readonly ReadOnlyCollection<DiagnosticResult> errors = Empty;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagnosticVerificationException" /> class.
         /// </summary>
@@ -69,7 +64,7 @@ namespace SimpleInjector
         public DiagnosticVerificationException(IList<DiagnosticResult> errors)
             : base(BuildMessage(errors))
         {
-            this.errors = new ReadOnlyCollection<DiagnosticResult>(errors.ToArray());
+            this.Errors = new ReadOnlyCollection<DiagnosticResult>(errors.ToArray());
         }
 
         /// <summary>
@@ -116,12 +111,12 @@ namespace SimpleInjector
         internal DiagnosticVerificationException(string message, DiagnosticResult error)
             : base(message)
         {
-            this.errors = new ReadOnlyCollection<DiagnosticResult>(new[] { error });
+            this.Errors = new ReadOnlyCollection<DiagnosticResult>(new[] { error });
         }
 
         /// <summary>Gets the list of <see cref="DiagnosticResult"/> instances.</summary>
         /// <value>A list of <see cref="DiagnosticResult"/> instances.</value>
-        public ReadOnlyCollection<DiagnosticResult> Errors => this.errors;
+        public ReadOnlyCollection<DiagnosticResult> Errors { get; } = Empty;
 
         private static string BuildMessage(IList<DiagnosticResult> errors)
         {

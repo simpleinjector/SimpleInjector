@@ -31,7 +31,7 @@ namespace SimpleInjector.Decorators
     using System.Linq.Expressions;
     using System.Reflection;
 
-    internal static partial class DecoratorHelpers
+    internal static class DecoratorHelpers
     {
         private static readonly MethodInfo EnumerableSelectMethod =
             Helpers.GetGenericMethodDefinition(() => Enumerable.Select(null, (Func<int, int>)null));
@@ -54,8 +54,8 @@ namespace SimpleInjector.Decorators
         {
             var readOnlyCollection =
                 DecoratorHelpersReadOnlyCollectionMethod
-                .MakeGenericMethod(elementType)
-                .Invoke(null, new object[] { collection });
+                    .MakeGenericMethod(elementType)
+                    .Invoke(null, new object[] { collection });
 
             return (IEnumerable)readOnlyCollection;
         }
@@ -68,7 +68,7 @@ namespace SimpleInjector.Decorators
             var constantExpression = expression as ConstantExpression;
 
             // A ConstantExpression with null is supplied in case of a uncontrolled collection.
-            if (constantExpression != null && object.ReferenceEquals(null, constantExpression.Value))
+            if (constantExpression != null && constantExpression.Value is null)
             {
                 return constantExpression.Type;
             }
@@ -91,8 +91,8 @@ namespace SimpleInjector.Decorators
             return (IEnumerable)selectMethod.Invoke(null, new object[] { source, selector });
         }
 
-        internal static MethodCallExpression Select(Expression collectionExpression, Type type,
-            Delegate selector)
+        internal static MethodCallExpression Select(
+            Expression collectionExpression, Type type, Delegate selector)
         {
             // We make use of .NET's built in Enumerable.Select to wrap the collection with the decorators.
             var selectMethod = EnumerableSelectMethod.MakeGenericMethod(type, type);
@@ -112,8 +112,10 @@ namespace SimpleInjector.Decorators
         // be open generic, while the base type might not be).
         internal static Type GetDecoratingBaseType(Type serviceType, ConstructorInfo decoratorConstructor)
         {
+            var abstractions = Types.GetBaseTypeCandidates(serviceType, decoratorConstructor.DeclaringType);
+
             var decoratorInterfaces =
-                from abstraction in Types.GetBaseTypeCandidates(serviceType, decoratorConstructor.DeclaringType)
+                from abstraction in abstractions
                 where decoratorConstructor.GetParameters()
                     .Any(parameter => IsDecorateeParameter(parameter, abstraction))
                 select abstraction;
@@ -121,8 +123,8 @@ namespace SimpleInjector.Decorators
             return decoratorInterfaces.FirstOrDefault();
         }
 
-        internal static int GetNumberOfServiceTypeDependencies(Type serviceType,
-            ConstructorInfo decoratorConstructor)
+        internal static int GetNumberOfServiceTypeDependencies(
+            Type serviceType, ConstructorInfo decoratorConstructor)
         {
             Type decoratorType = GetDecoratingBaseType(serviceType, decoratorConstructor);
 
@@ -141,8 +143,7 @@ namespace SimpleInjector.Decorators
 
         internal static bool DecoratesBaseTypes(Type serviceType, ConstructorInfo decoratorConstructor)
         {
-            var baseTypes = GetValidDecoratorConstructorArgumentTypes(serviceType,
-                decoratorConstructor);
+            var baseTypes = GetValidDecoratorConstructorArgumentTypes(serviceType, decoratorConstructor);
 
             var constructorParameters = decoratorConstructor.GetParameters();
 
@@ -151,15 +152,16 @@ namespace SimpleInjector.Decorators
             var decoratorParameters =
                 from baseType in baseTypes
                 from parameter in constructorParameters
-                where parameter.ParameterType == baseType ||
-                    parameter.ParameterType == typeof(Func<>).MakeGenericType(baseType)
+                where parameter.ParameterType == baseType
+                    || (typeof(Func<>).IsGenericTypeDefinitionOf(parameter.ParameterType)
+                        && parameter.ParameterType == typeof(Func<>).MakeGenericType(baseType))
                 select parameter;
 
             return decoratorParameters.Any();
         }
 
-        internal static Type[] GetValidDecoratorConstructorArgumentTypes(Type serviceType,
-            ConstructorInfo decoratorConstructor)
+        internal static Type[] GetValidDecoratorConstructorArgumentTypes(
+            Type serviceType, ConstructorInfo decoratorConstructor)
         {
             Type decoratingBaseType = GetDecoratingBaseType(serviceType, decoratorConstructor);
 
@@ -183,7 +185,8 @@ namespace SimpleInjector.Decorators
             IsScopelessDecorateeFactoryDependencyType(dependencyType, decoratingType)
             || IsScopeDecorateeFactoryDependencyParameter(dependencyType, decoratingType);
 
-        internal static bool IsScopelessDecorateeFactoryDependencyType(Type dependencyType, Type decoratingType)
+        internal static bool IsScopelessDecorateeFactoryDependencyType(
+            Type dependencyType, Type decoratingType)
         {
             return typeof(Func<>).IsGenericTypeDefinitionOf(dependencyType)
                 && dependencyType == typeof(Func<>).MakeGenericType(decoratingType);

@@ -56,7 +56,7 @@ namespace SimpleInjector
     /// <remarks>
     /// This type is abstract and can be overridden to implement a custom lifestyle.
     /// </remarks>
-    [DebuggerDisplay("{" + nameof(Name) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(Lifestyle.Name) + ", nq}")]
     public abstract class Lifestyle
     {
         /// <summary>
@@ -348,14 +348,14 @@ namespace SimpleInjector
         /// Transient.
         /// </para>
         /// </example>
-        public static Lifestyle CreateHybrid(Func<bool> lifestyleSelector, Lifestyle trueLifestyle,
-            Lifestyle falseLifestyle)
+        public static Lifestyle CreateHybrid(
+            Func<bool> lifestyleSelector, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
         {
             Requires.IsNotNull(lifestyleSelector, nameof(lifestyleSelector));
             Requires.IsNotNull(trueLifestyle, nameof(trueLifestyle));
             Requires.IsNotNull(falseLifestyle, nameof(falseLifestyle));
 
-            return new HybridLifestyle(c => lifestyleSelector(), trueLifestyle, falseLifestyle);
+            return new HybridLifestyle(_ => lifestyleSelector(), trueLifestyle, falseLifestyle);
         }
 
         /// <summary>
@@ -393,14 +393,15 @@ namespace SimpleInjector
         /// container.Register<ICustomerRepository, SqlCustomerRepository>(mixedScopeLifestyle);
         /// ]]></code>
         /// </example>
-        public static ScopedLifestyle CreateHybrid(Func<bool> lifestyleSelector, ScopedLifestyle trueLifestyle,
-            ScopedLifestyle falseLifestyle)
+        public static ScopedLifestyle CreateHybrid(
+            Func<bool> lifestyleSelector, ScopedLifestyle trueLifestyle, ScopedLifestyle falseLifestyle)
         {
             Requires.IsNotNull(lifestyleSelector, nameof(lifestyleSelector));
             Requires.IsNotNull(trueLifestyle, nameof(trueLifestyle));
             Requires.IsNotNull(falseLifestyle, nameof(falseLifestyle));
 
-            return new LifestyleSelectorScopedHybridLifestyle(c => lifestyleSelector(), trueLifestyle, falseLifestyle);
+            return new LifestyleSelectorScopedHybridLifestyle(
+                _ => lifestyleSelector(), trueLifestyle, falseLifestyle);
         }
 
         /// <summary>
@@ -504,15 +505,16 @@ namespace SimpleInjector
         /// <returns>A new <see cref="InstanceProducer"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="implementationType"/> or
         /// <paramref name="container"/> are null references (Nothing in VB).</exception>
-        public InstanceProducer<TService> CreateProducer<TService>(Type implementationType, Container container)
+        public InstanceProducer<TService> CreateProducer<TService>(
+            Type implementationType, Container container)
             where TService : class
         {
             Requires.IsNotNull(implementationType, nameof(implementationType));
             Requires.IsNotNull(container, nameof(container));
 
             Requires.IsNotOpenGenericType(implementationType, nameof(implementationType));
-            Requires.ServiceIsAssignableFromImplementation(typeof(TService), implementationType,
-                nameof(implementationType));
+            Requires.ServiceIsAssignableFromImplementation(
+                typeof(TService), implementationType, nameof(implementationType));
 
             return new InstanceProducer<TService>(this.CreateRegistration(implementationType, container));
         }
@@ -596,8 +598,8 @@ namespace SimpleInjector
             error: false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public Registration CreateRegistration<TService, TImplementation>(Container container)
-            where TImplementation : class, TService
             where TService : class
+            where TImplementation : class, TService
         {
             return this.CreateRegistration<TImplementation>(container);
         }
@@ -621,7 +623,7 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
             Requires.IsNotNull(container, nameof(container));
 
-            var registration = this.CreateRegistrationCore<TService>(instanceCreator, container);
+            var registration = this.CreateRegistrationCore(instanceCreator, container);
 
             registration.WrapsInstanceCreationDelegate = true;
 
@@ -687,8 +689,8 @@ namespace SimpleInjector
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null 
         /// reference (Nothing in VB).</exception>
-        public Registration CreateRegistration(Type serviceType, Func<object> instanceCreator,
-            Container container)
+        public Registration CreateRegistration(
+            Type serviceType, Func<object> instanceCreator, Container container)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
@@ -718,14 +720,15 @@ namespace SimpleInjector
 
         internal virtual int DependencyLength(Container container) => this.Length;
 
-        internal Registration CreateRegistrationInternal<TConcrete>(Container container, bool preventTornLifestyles)
+        internal Registration CreateRegistrationInternal<TConcrete>(
+            Container container, bool preventTornLifestyles)
             where TConcrete : class =>
             preventTornLifestyles
                 ? this.CreateRegistrationFromCache<TConcrete>(container)
                 : this.CreateRegistrationCore<TConcrete>(container);
 
-        internal Registration CreateDecoratorRegistration(Type concreteType, Container container,
-            params OverriddenParameter[] overriddenParameters)
+        internal Registration CreateDecoratorRegistration(
+            Type concreteType, Container container, params OverriddenParameter[] overriddenParameters)
         {
             Registration registration =
                 this.CreateRegistrationInternal(concreteType, container, preventTornLifestyles: false);
@@ -769,12 +772,12 @@ namespace SimpleInjector
         /// to create and return a new <see cref="Registration"/>. Note that you should <b>always</b> create
         /// a new <see cref="Registration"/> instance. They should never be cached.
         /// </remarks>
-        protected internal abstract Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
-            Container container)
+        protected internal abstract Registration CreateRegistrationCore<TService>(
+            Func<TService> instanceCreator, Container container)
             where TService : class;
 
-        private Registration CreateRegistrationInternal(Type concreteType, Container container,
-            bool preventTornLifestyles)
+        private Registration CreateRegistrationInternal(
+            Type concreteType, Container container, bool preventTornLifestyles)
         {
             var closedCreateRegistrationMethod = preventTornLifestyles
                 ? OpenCreateRegistrationTConcreteMethod.MakeGenericMethod(concreteType)
@@ -786,12 +789,13 @@ namespace SimpleInjector
             }
             catch (MemberAccessException ex)
             {
-                throw BuildUnableToResolveTypeDueToSecurityConfigException(concreteType, ex,
-                    nameof(concreteType));
+                throw BuildUnableToResolveTypeDueToSecurityConfigException(
+                    concreteType, ex, nameof(concreteType));
             }
         }
 
-        private Registration CreateRegistrationFromCache<TConcrete>(Container container) where TConcrete : class
+        private Registration CreateRegistrationFromCache<TConcrete>(Container container)
+            where TConcrete : class
         {
             lock (container.LifestyleRegistrationCache)
             {
@@ -853,7 +857,8 @@ namespace SimpleInjector
             // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
             return new ArgumentException(
                 StringResources.UnableToResolveTypeDueToSecurityConfiguration(type, innerException) +
-                Environment.NewLine + "paramName: " + paramName, innerException);
+                    Environment.NewLine + "paramName: " + paramName,
+                innerException);
         }
 
         private static MethodInfo GetMethod(Expression<Action<Lifestyle>> methodCall)

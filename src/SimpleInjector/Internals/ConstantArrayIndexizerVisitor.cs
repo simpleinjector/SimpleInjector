@@ -22,12 +22,10 @@
 
 namespace SimpleInjector.Internals
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
-    
+
     internal sealed class ConstantArrayIndexizerVisitor : ExpressionVisitor
     {
         private readonly List<ConstantExpression> constantExpressions;
@@ -40,8 +38,8 @@ namespace SimpleInjector.Internals
             this.constantsParameter = constantsParameter;
         }
 
-        public static Expression ReplaceConstantsWithArrayIndexes(Expression node,
-            ConstantExpression[] constantExpressions, ParameterExpression constantsParameter)
+        public static Expression ReplaceConstantsWithArrayIndexes(
+            Expression node, ConstantExpression[] constantExpressions, ParameterExpression constantsParameter)
         {
             var visitor = new ConstantArrayIndexizerVisitor(constantExpressions, constantsParameter);
 
@@ -52,16 +50,16 @@ namespace SimpleInjector.Internals
         {
             int index = this.constantExpressions.IndexOf(node);
 
-            if (index >= 0)
-            {
-                return Expression.Convert(
-                    Expression.ArrayIndex(
-                        this.constantsParameter,
-                        Expression.Constant(index, typeof(int))),
-                    node.Type);
-            }
-
-            return base.VisitConstant(node);
+            return index >= 0
+                ? this.CreateArrayIndexerExpression(node, index)
+                : base.VisitConstant(node);
         }
+
+        private UnaryExpression CreateArrayIndexerExpression(ConstantExpression node, int index) =>
+            Expression.Convert(
+                Expression.ArrayIndex(
+                    this.constantsParameter,
+                    Expression.Constant(index, typeof(int))),
+                node.Type);
     }
 }

@@ -39,7 +39,7 @@ namespace SimpleInjector
         [DebuggerStepThrough]
         internal static void IsNotNull(object instance, string paramName)
         {
-            if (instance == null)
+            if (instance is null)
             {
                 ThrowArgumentNullException(paramName);
             }
@@ -77,30 +77,30 @@ namespace SimpleInjector
         }
 
         [DebuggerStepThrough]
-        internal static void ServiceIsAssignableFromExpression(Type service, Expression expression,
-            string paramName)
+        internal static void ServiceIsAssignableFromExpression(
+            Type service, Expression expression, string paramName)
         {
             if (!service.IsAssignableFrom(expression.Type))
             {
-                ThrowSuppliedElementDoesNotInheritFromOrImplement(service, expression.Type, "expression",
-                    paramName);
+                ThrowSuppliedElementDoesNotInheritFromOrImplement(
+                    service, expression.Type, "expression", paramName);
             }
         }
 
         [DebuggerStepThrough]
-        internal static void ServiceIsAssignableFromRegistration(Type service, Registration registration,
-            string paramName)
+        internal static void ServiceIsAssignableFromRegistration(
+            Type service, Registration registration, string paramName)
         {
             if (!service.IsAssignableFrom(registration.ImplementationType))
             {
-                ThrowSuppliedElementDoesNotInheritFromOrImplement(service, registration.ImplementationType,
-                    "registration", paramName);
+                ThrowSuppliedElementDoesNotInheritFromOrImplement(
+                    service, registration.ImplementationType, "registration", paramName);
             }
         }
 
         [DebuggerStepThrough]
-        internal static void ServiceIsAssignableFromImplementation(Type service, Type implementation,
-            string paramName)
+        internal static void ServiceIsAssignableFromImplementation(
+            Type service, Type implementation, string paramName)
         {
             if (!service.IsAssignableFrom(implementation))
             {
@@ -153,8 +153,8 @@ namespace SimpleInjector
             }
         }
 
-        internal static void DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(Type serviceType,
-            IEnumerable<Type> serviceTypes, string paramName)
+        internal static void DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(
+            Type serviceType, IEnumerable<Type> serviceTypes, string paramName)
         {
             if (!serviceType.IsGenericType())
             {
@@ -183,11 +183,11 @@ namespace SimpleInjector
             }
         }
 
-        internal static void ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(Type service,
-            Type implementation, string paramName)
+        internal static void ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(
+            Type service, Type implementation, string paramName)
         {
-            if (service != implementation &&
-                !Types.ServiceIsAssignableFromImplementation(service, implementation))
+            if (service != implementation
+                && !Types.ServiceIsAssignableFromImplementation(service, implementation))
             {
                 throw new ArgumentException(
                     StringResources.SuppliedTypeDoesNotInheritFromOrImplement(service, implementation),
@@ -195,8 +195,11 @@ namespace SimpleInjector
             }
         }
 
-        internal static void ServiceIsAssignableFromImplementations(Type serviceType,
-            IEnumerable<Type> typesToRegister, string paramName, bool typeCanBeServiceType = false)
+        internal static void ServiceIsAssignableFromImplementations(
+            Type serviceType,
+            IEnumerable<Type> typesToRegister,
+            string paramName,
+            bool typeCanBeServiceType = false)
         {
             var invalidType = (
                 from type in typesToRegister
@@ -213,20 +216,22 @@ namespace SimpleInjector
             }
         }
 
-        internal static void ServiceIsAssignableFromImplementations(Type serviceType,
-            IEnumerable<Registration> registrations, string paramName, bool typeCanBeServiceType = false)
+        internal static void ServiceIsAssignableFromImplementations(
+            Type serviceType,
+            IEnumerable<Registration> registrations,
+            string paramName,
+            bool typeCanBeServiceType = false)
         {
             var typesToRegister = registrations.Select(registration => registration.ImplementationType);
 
-            ServiceIsAssignableFromImplementations(serviceType, typesToRegister, paramName, typeCanBeServiceType);
+            ServiceIsAssignableFromImplementations(
+                serviceType, typesToRegister, paramName, typeCanBeServiceType);
         }
 
-        internal static void ImplementationHasSelectableConstructor(Container container,
-            Type implementationType, string paramName)
+        internal static void ImplementationHasSelectableConstructor(
+            Container container, Type implementationType, string paramName)
         {
-            string message;
-
-            if (!container.Options.IsConstructableType(implementationType, out message))
+            if (!container.Options.IsConstructableType(implementationType, out string message))
             {
                 throw new ArgumentException(message, paramName);
             }
@@ -248,25 +253,27 @@ namespace SimpleInjector
             }
         }
 
-        internal static void OpenGenericTypesDoNotContainUnresolvableTypeArguments(Type serviceType,
-            IEnumerable<Registration> registrations, string parameterName)
+        internal static void OpenGenericTypesDoNotContainUnresolvableTypeArguments(
+            Type serviceType, IEnumerable<Registration> registrations, string parameterName)
         {
-            OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType,
-                registrations.Select(registration => registration.ImplementationType), parameterName);
+            OpenGenericTypesDoNotContainUnresolvableTypeArguments(
+                serviceType,
+                registrations.Select(registration => registration.ImplementationType),
+                parameterName);
         }
 
-        internal static void OpenGenericTypesDoNotContainUnresolvableTypeArguments(Type serviceType,
-            IEnumerable<Type> implementationTypes, string parameterName)
+        internal static void OpenGenericTypesDoNotContainUnresolvableTypeArguments(
+            Type serviceType, IEnumerable<Type> implementationTypes, string parameterName)
         {
             foreach (Type implementationType in implementationTypes)
             {
-                OpenGenericTypeDoesNotContainUnresolvableTypeArguments(serviceType, implementationType,
-                    parameterName);
+                OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
+                    serviceType, implementationType, parameterName);
             }
         }
 
-        internal static void OpenGenericTypeDoesNotContainUnresolvableTypeArguments(Type serviceType,
-            Type implementationType, string parameterName)
+        internal static void OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
+            Type serviceType, Type implementationType, string parameterName)
         {
             if (serviceType.ContainsGenericParameters() && implementationType.ContainsGenericParameters())
             {
@@ -282,18 +289,20 @@ namespace SimpleInjector
             }
         }
 
-        internal static void DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(Type serviceType,
-            Type decoratorType, string parameterName)
+        internal static void DecoratorIsNotAnOpenGenericTypeDefinitionWhenTheServiceTypeIsNot(
+            Type serviceType, Type decoratorType, string parameterName)
         {
             if (!serviceType.ContainsGenericParameters() && decoratorType.ContainsGenericParameters())
             {
                 throw new ArgumentException(
                     StringResources.DecoratorCanNotBeAGenericTypeDefinitionWhenServiceTypeIsNot(
-                        serviceType, decoratorType), parameterName);
+                        serviceType, decoratorType),
+                    parameterName);
             }
         }
 
-        internal static void HasFactoryCreatedDecorator(Container container, Type serviceType, Type decoratorType)
+        internal static void HasFactoryCreatedDecorator(
+            Container container, Type serviceType, Type decoratorType)
         {
             try
             {
@@ -305,8 +314,8 @@ namespace SimpleInjector
             }
         }
 
-        internal static void FactoryReturnsATypeThatIsAssignableFromServiceType(Type serviceType,
-            Type implementationType)
+        internal static void FactoryReturnsATypeThatIsAssignableFromServiceType(
+            Type serviceType, Type implementationType)
         {
             if (!serviceType.IsAssignableFrom(implementationType))
             {
@@ -315,16 +324,16 @@ namespace SimpleInjector
             }
         }
 
-        internal static void IsDecorator(Container container, Type serviceType, Type decoratorType,
-            string paramName)
+        internal static void IsDecorator(
+            Container container, Type serviceType, Type decoratorType, string paramName)
         {
             ConstructorInfo decoratorConstructor = container.Options.SelectConstructor(decoratorType);
 
             Requires.DecoratesServiceType(serviceType, decoratorConstructor, paramName);
         }
 
-        internal static void AreRegistrationsForThisContainer(Container container,
-            IEnumerable<Registration> registrations, string paramName)
+        internal static void AreRegistrationsForThisContainer(
+            Container container, IEnumerable<Registration> registrations, string paramName)
         {
             foreach (Registration registration in registrations)
             {
@@ -332,8 +341,8 @@ namespace SimpleInjector
             }
         }
 
-        internal static void IsRegistrationForThisContainer(Container container, Registration registration,
-            string paramName)
+        internal static void IsRegistrationForThisContainer(
+            Container container, Registration registration, string paramName)
         {
             if (!object.ReferenceEquals(container, registration.Container))
             {
@@ -379,22 +388,23 @@ namespace SimpleInjector
             }
         }
 
-        internal static void IsNotPartiallyClosed(Type openGenericServiceType, string paramName,
-            string implementationTypeParamName)
+        internal static void IsNotPartiallyClosed(
+            Type openGenericServiceType, string paramName, string implementationTypeParamName)
         {
             if (openGenericServiceType.IsPartiallyClosed())
             {
                 throw new ArgumentException(
-                    StringResources.ServiceTypeCannotBeAPartiallyClosedType(openGenericServiceType, paramName,
-                        implementationTypeParamName),
+                    StringResources.ServiceTypeCannotBeAPartiallyClosedType(
+                        openGenericServiceType, paramName, implementationTypeParamName),
                     paramName);
             }
         }
 
-        private static void DecoratesServiceType(Type serviceType, ConstructorInfo decoratorConstructor,
-            string paramName)
+        private static void DecoratesServiceType(
+            Type serviceType, ConstructorInfo decoratorConstructor, string paramName)
         {
-            bool decoratesServiceType = DecoratorHelpers.DecoratesServiceType(serviceType, decoratorConstructor);
+            bool decoratesServiceType =
+                DecoratorHelpers.DecoratesServiceType(serviceType, decoratorConstructor);
 
             if (!decoratesServiceType)
             {
@@ -402,8 +412,8 @@ namespace SimpleInjector
             }
         }
 
-        private static void ThrowMustDecorateServiceType(Type serviceType,
-            ConstructorInfo constructor, string paramName)
+        private static void ThrowMustDecorateServiceType(
+            Type serviceType, ConstructorInfo constructor, string paramName)
         {
             int numberOfServiceTypeDependencies =
                 DecoratorHelpers.GetNumberOfServiceTypeDependencies(serviceType, constructor);
@@ -424,8 +434,8 @@ namespace SimpleInjector
             }
         }
 
-        private static void ThrowMustContainTheServiceTypeAsArgument(Type serviceType,
-            ConstructorInfo decoratorConstructor, string paramName)
+        private static void ThrowMustContainTheServiceTypeAsArgument(
+            Type serviceType, ConstructorInfo decoratorConstructor, string paramName)
         {
             string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
                 decoratorConstructor.DeclaringType, serviceType);
@@ -433,8 +443,8 @@ namespace SimpleInjector
             throw new ArgumentException(message, paramName);
         }
 
-        private static void ThrowMustContainASingleInstanceOfTheServiceTypeAsArgument(Type serviceType,
-            ConstructorInfo decoratorConstructor, string paramName)
+        private static void ThrowMustContainASingleInstanceOfTheServiceTypeAsArgument(
+            Type serviceType, ConstructorInfo decoratorConstructor, string paramName)
         {
             string message =
                 StringResources.TheConstructorOfTypeMustContainASingleInstanceOfTheServiceTypeAsArgument(
@@ -448,17 +458,17 @@ namespace SimpleInjector
             throw new ArgumentNullException(paramName);
         }
 
-        private static void ThrowSuppliedElementDoesNotInheritFromOrImplement(Type service,
-            Type implementation, string elementDescription, string paramName)
+        private static void ThrowSuppliedElementDoesNotInheritFromOrImplement(
+            Type service, Type implementation, string elementDescription, string paramName)
         {
             throw new ArgumentException(
-                StringResources.SuppliedElementDoesNotInheritFromOrImplement(service, implementation,
-                    elementDescription),
+                StringResources.SuppliedElementDoesNotInheritFromOrImplement(
+                    service, implementation, elementDescription),
                 paramName);
         }
 
-        private static void ThrowSuppliedTypeDoesNotInheritFromOrImplement(Type service, Type implementation,
-            string paramName)
+        private static void ThrowSuppliedTypeDoesNotInheritFromOrImplement(
+            Type service, Type implementation, string paramName)
         {
             throw new ArgumentException(
                 StringResources.SuppliedTypeDoesNotInheritFromOrImplement(service, implementation),

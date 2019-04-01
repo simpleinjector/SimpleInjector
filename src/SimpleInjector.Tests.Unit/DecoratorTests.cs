@@ -2441,7 +2441,7 @@
             AssertThat.ThrowsWithParamName<ArgumentException>("serviceType", action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The supplied type 'ICommandHandler<List<T>>' is a partially-closed generic type, which is not 
+                The supplied type 'ICommandHandler<List<T>>' is a partially closed generic type, which is not 
                 supported by this method. Please supply the open-generic type 'ICommandHandler<>' instead."
                 .TrimInside(),
                 action);
@@ -2466,7 +2466,7 @@
             AssertThat.ThrowsWithParamName<ArgumentException>("serviceType", action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The supplied type 'ICommandHandler<TCommand>' is a partially-closed generic type, which is not 
+                The supplied type 'ICommandHandler<TCommand>' is a partially closed generic type, which is not 
                 supported by this method. Please supply the open-generic type 'ICommandHandler<>' instead."
                 .TrimInside(),
                 action);

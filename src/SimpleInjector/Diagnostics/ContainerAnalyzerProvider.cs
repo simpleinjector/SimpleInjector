@@ -28,16 +28,16 @@ namespace SimpleInjector.Diagnostics
 
     internal static class ContainerAnalyzerProvider
     {
-        internal static readonly ReadOnlyCollection<IContainerAnalyzer> Analyzers = 
+        internal static readonly ReadOnlyCollection<IContainerAnalyzer> Analyzers =
             new ReadOnlyCollection<IContainerAnalyzer>(new List<IContainerAnalyzer>
             {
-                LifestyleMismatchAnalyzer.Instance,
-                ShortCircuitedDependencyAnalyzer.Instance,
-                SingleResponsibilityViolationsAnalyzer.Instance,
-                ContainerRegisteredServiceAnalyzer.Instance,
-                TornLifestyleContainerAnalyzer.Instance,
-                DisposableTransientComponentAnalyzer.Instance,
-                AmbiguousLifestylesAnalyzer.Instance
+                new LifestyleMismatchAnalyzer(),
+                new ShortCircuitedDependencyAnalyzer(),
+                new SingleResponsibilityViolationsAnalyzer(),
+                new ContainerRegisteredServiceAnalyzer(),
+                new TornLifestyleContainerAnalyzer(),
+                new DisposableTransientComponentAnalyzer(),
+                new AmbiguousLifestylesAnalyzer()
             });
     }
 }

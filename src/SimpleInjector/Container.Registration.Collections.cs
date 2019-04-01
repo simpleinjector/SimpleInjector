@@ -33,26 +33,30 @@ namespace SimpleInjector
     public partial class Container
     {
         /// <summary>
-        /// Registers a dynamic (container uncontrolled) collection of elements of type 
+        /// Registers a dynamic (container-uncontrolled) collection of elements of type 
         /// <typeparamref name="TService"/>. A call to <see cref="GetAllInstances{T}"/> will return the 
         /// <paramref name="containerUncontrolledCollection"/> itself, and updates to the collection will be 
         /// reflected in the result. If updates are allowed, make sure the collection can be iterated safely 
         /// if you're running a multi-threaded application.
         /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
-        /// <param name="containerUncontrolledCollection">The container-uncontrolled collection to register.</param>
+        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.
+        /// </typeparam>
+        /// <param name="containerUncontrolledCollection">The container-uncontrolled collection to register.
+        /// </param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when a <paramref name="containerUncontrolledCollection"/>
-        /// for <typeparamref name="TService"/> has already been registered.
+        /// Thrown when this container instance is locked and can not be altered, or when a 
+        /// <paramref name="containerUncontrolledCollection"/> for <typeparamref name="TService"/> has already
+        /// been registered.
         /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="containerUncontrolledCollection"/> is a null
-        /// reference.</exception>
-        [Obsolete("Please use Container." + nameof(Collection) + "." +
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="containerUncontrolledCollection"/> is a null reference.
+        /// </exception>
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection<TService>(IEnumerable<TService> containerUncontrolledCollection)
             where TService : class
         {
-            this.Collection.Register<TService>(containerUncontrolledCollection);
+            this.Collection.Register(containerUncontrolledCollection);
         }
 
         /// <summary>
@@ -70,7 +74,7 @@ namespace SimpleInjector
         /// is a null reference.</exception>
         [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly",
             Justification = "TService is the name of the generic type argument. So this warning is a false positive.")]
-        [Obsolete("Please use Container." + nameof(Collection) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection<TService>(params TService[] singletons) where TService : class
         {
@@ -95,7 +99,7 @@ namespace SimpleInjector
         /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        [Obsolete("Please use Container." + nameof(Collection) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection<TService>(IEnumerable<Type> serviceTypes) where TService : class
         {
@@ -120,7 +124,7 @@ namespace SimpleInjector
         /// (Nothing in VB) element or when <typeparamref name="TService"/> is not assignable from any of the
         /// service types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
-        [Obsolete("Please use Container." + nameof(Collection) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection<TService>(IEnumerable<Registration> registrations)
             where TService : class
@@ -146,7 +150,7 @@ namespace SimpleInjector
         /// (Nothing in VB) element, a generic type definition, or the <paramref name="serviceType"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        [Obsolete("Please use Container." + nameof(Collection) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection(Type serviceType, IEnumerable<Type> serviceTypes)
         {
@@ -172,7 +176,7 @@ namespace SimpleInjector
         /// (Nothing in VB) element or when <paramref name="serviceType"/> is not assignable from any of the
         /// service types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
-        [Obsolete("Please use Container." + nameof(Collection) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection(Type serviceType, IEnumerable<Registration> registrations)
         {
@@ -192,7 +196,7 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
-        [Obsolete("Please use Container." + nameof(Collection) + "." +
+        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
         public void RegisterCollection(Type serviceType, IEnumerable containerUncontrolledCollection)
         {

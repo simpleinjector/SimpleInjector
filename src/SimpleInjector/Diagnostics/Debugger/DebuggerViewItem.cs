@@ -25,7 +25,8 @@ namespace SimpleInjector.Diagnostics.Debugger
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
 
-    [DebuggerDisplay("{" + nameof(Description) + ", nq}", Name = "{" + nameof(Name) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerViewItem.Description) + ", nq}",
+        Name = "{" + nameof(DebuggerViewItem.Name) + ", nq}")]
     internal class DebuggerViewItem
     {
         internal DebuggerViewItem(string name, string description, object value = null)
@@ -40,7 +41,7 @@ namespace SimpleInjector.Diagnostics.Debugger
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public string Description { get; }
 
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", 
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "Called by the Visual Studio debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public string Name { get; }

@@ -31,7 +31,8 @@ namespace SimpleInjector.Internals
     {
         private const string ExpressionNotCreatedYetMessage = "{ Expression not created yet }";
 
-        internal static string VisualizeIndentedObjectGraph(this InstanceProducer producer, VisualizationOptions options)
+        internal static string VisualizeIndentedObjectGraph(
+            this InstanceProducer producer, VisualizationOptions options)
         {
             if (!producer.IsExpressionCreated)
             {
@@ -39,15 +40,16 @@ namespace SimpleInjector.Internals
             }
 
             var set = new HashSet<InstanceProducer>(InstanceProducer.EqualityComparer);
-            var objectGraphBuilder = new ObjectGraphBuilder(options.IncludeLifestyleInformation);
+            var objectGraphBuilder = new ObjectGraphStringBuilder(options.IncludeLifestyleInformation);
 
-            producer.VisualizeIndentedObjectGraph(indentingDepth: 0, last: true, set: set, objectGraphBuilder: objectGraphBuilder);
+            producer.VisualizeIndentedObjectGraph(
+                indentingDepth: 0, last: true, set: set, objectGraphBuilder: objectGraphBuilder);
 
             return objectGraphBuilder.ToString();
         }
 
-        internal static string VisualizeInlinedAndTruncatedObjectGraph(this InstanceProducer producer,
-            int maxLength)
+        internal static string VisualizeInlinedAndTruncatedObjectGraph(
+            this InstanceProducer producer, int maxLength)
         {
             if (!producer.IsExpressionCreated)
             {
@@ -59,12 +61,19 @@ namespace SimpleInjector.Internals
             var visualizedDependencies =
                 producer.VisualizeInlinedDependencies(maxLength - implementationName.Length - 2);
 
-            return string.Format(CultureInfo.InvariantCulture, "{0}({1})",
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}({1})",
                 implementationName,
                 string.Join(", ", visualizedDependencies));
         }
 
-        private static void VisualizeIndentedObjectGraph(this InstanceProducer producer, int indentingDepth, bool last, HashSet<InstanceProducer> set, ObjectGraphBuilder objectGraphBuilder)
+        private static void VisualizeIndentedObjectGraph(
+            this InstanceProducer producer,
+            int indentingDepth,
+            bool last,
+            HashSet<InstanceProducer> set,
+            ObjectGraphStringBuilder objectGraphBuilder)
         {
             objectGraphBuilder.BeginInstanceProducer(producer);
 
@@ -76,14 +85,19 @@ namespace SimpleInjector.Internals
             for (int counter = 0; counter < dependencies.Count; counter++)
             {
                 var dependency = dependencies[counter];
-                dependency.VisualizeIndentedObjectSubGraph(indentingDepth + 1, counter + 1 == dependencies.Count, set, objectGraphBuilder);
+                dependency.VisualizeIndentedObjectSubGraph(
+                    indentingDepth + 1, counter + 1 == dependencies.Count, set, objectGraphBuilder);
             }
 
             objectGraphBuilder.EndInstanceProducer(last);
         }
 
-        private static void VisualizeIndentedObjectSubGraph(this InstanceProducer dependency,
-            int indentingDepth, bool last, HashSet<InstanceProducer> set, ObjectGraphBuilder objectGraphBuilder)
+        private static void VisualizeIndentedObjectSubGraph(
+            this InstanceProducer dependency,
+            int indentingDepth,
+            bool last,
+            HashSet<InstanceProducer> set,
+            ObjectGraphStringBuilder objectGraphBuilder)
         {
             bool isCyclicGraph = set.Contains(dependency);
 
@@ -105,8 +119,8 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private static IEnumerable<string> VisualizeInlinedDependencies(this InstanceProducer producer,
-            int maxLength)
+        private static IEnumerable<string> VisualizeInlinedDependencies(
+            this InstanceProducer producer, int maxLength)
         {
             var relationships = new Stack<KnownRelationship>(producer.GetRelationships().Reverse());
 

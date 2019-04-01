@@ -23,8 +23,11 @@
             }
         }
 
-        public static void RegisterContextualDecorator(this Container container, Type serviceType,
-            Type decoratorType, Predicate<InjectionTargetInfo> contextualPredicate)
+        public static void RegisterContextualDecorator(
+            this Container container,
+            Type serviceType,
+            Type decoratorType,
+            Predicate<InjectionTargetInfo> contextualPredicate)
         {
             var predicates = GetContextualPredicates(container);
 

@@ -25,7 +25,6 @@ namespace SimpleInjector
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
@@ -36,7 +35,7 @@ namespace SimpleInjector
     /// </remarks>
     public class Scope : IDisposable
     {
-        private const int MaxRecursion = 100;
+        private const int MaximumDisposeRecursion = 100;
 
         private readonly object syncRoot = new object();
         private readonly ScopeManager manager;
@@ -386,7 +385,7 @@ namespace SimpleInjector
             {
                 // We must break out of the recursion when we reach MaxRecursion, because not doing so
                 // could cause a stack overflow.
-                if (this.recursionDuringDisposalCounter <= MaxRecursion)
+                if (this.recursionDuringDisposalCounter <= MaximumDisposeRecursion)
                 {
                     this.DisposeRecursively(operatingInException);
                 }
@@ -455,9 +454,7 @@ namespace SimpleInjector
 
             this.cachedInstances[registration] = instance;
 
-            var disposable = instance as IDisposable;
-
-            if (disposable != null)
+            if (instance is IDisposable disposable)
             {
                 this.RegisterForDisposalInternal(disposable);
             }
@@ -472,7 +469,7 @@ namespace SimpleInjector
         {
             if (this.disposables == null)
             {
-                this.disposables = new List<IDisposable>(capacity: 8);
+                this.disposables = new List<IDisposable>(capacity: 4);
             }
 
             this.disposables.Add(disposable);
@@ -511,21 +508,19 @@ namespace SimpleInjector
 #endif
         private void PreventCyclicDependenciesDuringDisposal()
         {
-            if (this.recursionDuringDisposalCounter > MaxRecursion)
+            if (this.recursionDuringDisposalCounter > MaximumDisposeRecursion)
             {
                 ThrowRecursionException();
             }
         }
 
-        private static void ThrowRecursionException()
-        {
+        private static void ThrowRecursionException() =>
             throw new InvalidOperationException(StringResources.RecursiveInstanceRegistrationDetected());
-        }
 
         // This method simulates the behavior of a set of nested 'using' statements: It ensures that dispose
         // is called on each element, even if a previous instance threw an exception. 
-        private static void DisposeInstancesInReverseOrder(List<IDisposable> disposables,
-            int startingAsIndex = int.MinValue)
+        private static void DisposeInstancesInReverseOrder(
+            List<IDisposable> disposables, int startingAsIndex = int.MinValue)
         {
             if (startingAsIndex == int.MinValue)
             {

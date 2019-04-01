@@ -50,18 +50,14 @@ namespace SimpleInjector
         {
             var names = values.ToArray();
 
-            if (names.Length <= 1)
+            switch (names.Length)
             {
-                return names.FirstOrDefault() ?? string.Empty;
-            }
-            else if (names.Length == 2)
-            {
-                return names.First() + " and " + names.Last();
-            }
-            else
-            {
-                // For three names or more, we use the Oxford comma.
-                return string.Join(", ", names.Take(names.Length - 1)) + ", and " + names.Last();
+                case 0: return string.Empty;
+                case 1: return names[0];
+                case 2: return names[0] + " and " + names[1];
+                default:
+                    // For three names or more, we use the Oxford comma.
+                    return string.Join(", ", names.Take(names.Length - 1)) + ", and " + names.Last();
             }
         }
 
@@ -101,9 +97,7 @@ namespace SimpleInjector
         [DebuggerStepThrough]
         internal static TValue GetValueOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> source, TKey key)
         {
-            TValue value;
-
-            source.TryGetValue(key, out value);
+            source.TryGetValue(key, out TValue value);
 
             return value;
         }
@@ -113,10 +107,10 @@ namespace SimpleInjector
             // This construct looks a bit weird, but prevents the collection from being iterated twice.
             bool collectionContainsNullElements = false;
 
-            ThrowWhenCollectionCanNotBeIterated(collection, serviceType, item =>
-            {
-                collectionContainsNullElements |= item == null;
-            });
+            ThrowWhenCollectionCanNotBeIterated(
+                collection,
+                serviceType,
+                item => collectionContainsNullElements |= item == null);
 
             ThrowWhenCollectionContainsNullElements(serviceType, collectionContainsNullElements);
         }
@@ -155,18 +149,25 @@ namespace SimpleInjector
         }
 
         // Partitions a collection in two separate collections, based on the predicate.
-        internal static Tuple<T[], T[]> Partition<T>(this IEnumerable<T> collection, Predicate<T> predicate)
+        internal static Tuple<List<T>, List<T>> Partition<T>(this T[] collection, Predicate<T> predicate)
         {
-            var trueList = new List<T>();
+            // PERF: Assuming the predicate will return true most of the time.
+            var trueList = new List<T>(capacity: collection.Length);
             var falseList = new List<T>();
 
             foreach (T item in collection)
             {
-                List<T> list = predicate(item) ? trueList : falseList;
-                list.Add(item);
+                if (predicate(item))
+                {
+                    trueList.Add(item);
+                }
+                else
+                {
+                    falseList.Add(item);
+                }
             }
 
-            return Tuple.Create(trueList.ToArray(), falseList.ToArray());
+            return Tuple.Create(trueList, falseList);
         }
 
         internal static MethodInfo GetMethod(Expression<Action> methodCall) =>
@@ -192,12 +193,13 @@ namespace SimpleInjector
             }
         }
 
-        private static void ThrowWhenCollectionCanNotBeIterated(IEnumerable collection, Type serviceType,
-            Action<object> itemProcessor)
+        private static void ThrowWhenCollectionCanNotBeIterated(
+            IEnumerable collection, Type serviceType, Action<object> itemProcessor)
         {
             try
             {
                 IEnumerator enumerator = collection.GetEnumerator();
+
                 try
                 {
                     // Just iterate the collection.
@@ -208,12 +210,7 @@ namespace SimpleInjector
                 }
                 finally
                 {
-                    var disposable = enumerator as IDisposable;
-
-                    if (disposable != null)
-                    {
-                        disposable.Dispose();
-                    }
+                    (enumerator as IDisposable)?.Dispose();
                 }
             }
             catch (Exception ex)

@@ -24,7 +24,6 @@ namespace SimpleInjector.Diagnostics
 {
     using System;
     using System.Linq;
-    using System.Reflection;
 
     internal static class TypeGeneralizer
     {
@@ -36,8 +35,9 @@ namespace SimpleInjector.Diagnostics
             if (nestingLevel > 100)
             {
                 // Stack overflow prevention
-                throw new ArgumentException("nesting level bigger than 100 too high. Type: " +
-                    type.ToFriendlyName(), nameof(nestingLevel));
+                throw new ArgumentException(
+                    "nesting level bigger than 100 too high. Type: " + type.ToFriendlyName(),
+                    nameof(nestingLevel));
             }
 
             // example given type: IEnumerable<IQueryProcessor<MyQuery<Alpha>, int[]>>

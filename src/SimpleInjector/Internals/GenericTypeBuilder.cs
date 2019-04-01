@@ -66,8 +66,8 @@ namespace SimpleInjector.Internals
             }
         }
 
-        internal static bool IsImplementationApplicableToEveryGenericType(Type openAbstraction,
-            Type openImplementation)
+        internal static bool IsImplementationApplicableToEveryGenericType(
+            Type openAbstraction, Type openImplementation)
         {
             try
             {
@@ -117,8 +117,8 @@ namespace SimpleInjector.Internals
         {
             bool isClosedImplementation = !this.implementation.ContainsGenericParameters();
 
-            // In case the given implementation is already closed (or non-generic), we don't have to build a type.
-            // If the implementation matches, we can directly return it. This is much faster and simpler.
+            // In case the given implementation is already closed (or non-generic), we don't have to build a
+            // type. If the implementation matches, we can directly return it. This is much faster and simpler.
             if (isClosedImplementation)
             {
                 return this.closedServiceType.IsAssignableFrom(this.implementation)
@@ -135,8 +135,8 @@ namespace SimpleInjector.Internals
                         this.BuildClosedGenericImplementationBasedOnMatchingServiceType(serviceType);
 
                     // closedGenericImplementation will be null when there was a mismatch on type constraints.
-                    if (closedGenericImplementation != null &&
-                        this.closedServiceType.IsAssignableFrom(closedGenericImplementation))
+                    if (closedGenericImplementation != null
+                        && this.closedServiceType.IsAssignableFrom(closedGenericImplementation))
                     {
                         return BuildResult.Valid(closedGenericImplementation);
                     }
@@ -190,12 +190,10 @@ namespace SimpleInjector.Internals
                 .Distinct()
                 .ToArray();
 
-            var candidates = (
+            return (
                 from type in openGenericBaseTypes
                 select this.ToCandicateServiceType(type))
                 .ToArray();
-
-            return candidates;
         }
 
         private CandicateServiceType ToCandicateServiceType(Type openCandidateServiceType)
@@ -255,8 +253,11 @@ namespace SimpleInjector.Internals
 
         private Type[] GetMatchingGenericArgumentsForOpenImplementationBasedOn(Type openCandidateServiceType)
         {
-            var finder = new GenericArgumentFinder(openCandidateServiceType, this.closedServiceType,
-                this.openGenericImplementation, this.partialOpenGenericImplementation);
+            var finder = new GenericArgumentFinder(
+                openCandidateServiceType,
+                this.closedServiceType,
+                this.openGenericImplementation,
+                this.partialOpenGenericImplementation);
 
             return finder.GetConcreteTypeArgumentsForClosedImplementation();
         }
@@ -268,7 +269,8 @@ namespace SimpleInjector.Internals
             .Distinct()
             .ToArray();
 
-        private static IEnumerable<Type> GetNestedTypeArgumentsForTypeArgument(Type argument, IList<Type> processedArguments)
+        private static IEnumerable<Type> GetNestedTypeArgumentsForTypeArgument(
+            Type argument, IList<Type> processedArguments)
         {
             processedArguments.Add(argument);
 

@@ -60,7 +60,7 @@ namespace SimpleInjector
 
             RegisterWebApiControllers(container, configuration, assemblies);
         }
-        
+
         /// <summary>
         /// Registers the Web API <see cref="IHttpController"/> types that available for the application. This
         /// method uses the configured <see cref="IHttpControllerTypeResolver"/> to determine which controller
@@ -72,8 +72,8 @@ namespace SimpleInjector
         /// <param name="assemblies">The assemblies to search.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null 
         /// reference (Nothing in VB).</exception>
-        public static void RegisterWebApiControllers(this Container container, HttpConfiguration configuration,
-            params Assembly[] assemblies)
+        public static void RegisterWebApiControllers(
+            this Container container, HttpConfiguration configuration, params Assembly[] assemblies)
         {
             container.RegisterWebApiControllers(configuration, (IEnumerable<Assembly>)assemblies);
         }
@@ -89,8 +89,8 @@ namespace SimpleInjector
         /// <param name="assemblies">The assemblies to search.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null 
         /// reference (Nothing in VB).</exception>
-        public static void RegisterWebApiControllers(this Container container, HttpConfiguration configuration,
-            IEnumerable<Assembly> assemblies)
+        public static void RegisterWebApiControllers(
+            this Container container, HttpConfiguration configuration, IEnumerable<Assembly> assemblies)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(configuration, nameof(configuration));
@@ -127,7 +127,7 @@ namespace SimpleInjector
         /// <param name="configuration">The application's configuration.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference 
         /// (Nothing in VB).</exception>
-        public static void EnableHttpRequestMessageTracking(this Container container, 
+        public static void EnableHttpRequestMessageTracking(this Container container,
             HttpConfiguration configuration)
         {
             Requires.IsNotNull(container, nameof(container));
@@ -158,13 +158,13 @@ namespace SimpleInjector
             {
                 throw new InvalidOperationException(
                     "Resolving the current HttpRequestMessage has not been enabled. Make sure " +
-                    "container.EnableHttpRequestMessageTracking(GlobalConfiguration.Configuration) has " + 
+                    "container.EnableHttpRequestMessageTracking(GlobalConfiguration.Configuration) has " +
                     "been called during startup.");
             }
 
             return SimpleInjectorHttpRequestMessageProvider.CurrentMessage;
         }
-        
+
         private static IEnumerable<Assembly> GetAvailableApplicationAssemblies(HttpConfiguration configuration)
         {
             IAssembliesResolver assembliesResolver = GetRegisteredAssembliesResolver(configuration);
@@ -180,19 +180,21 @@ namespace SimpleInjector
                     throw;
                 }
 
-                throw new InvalidOperationException(ex.Message + " " +
+                throw new InvalidOperationException(
+                    ex.Message + " " +
                     "Please note that the RegisterWebApiControllers(Container, HttpConfiguration) overload " +
                     "makes use of the configured IAssembliesResolver. Web API's default IAssembliesResolver " +
                     "uses the System.Web.Compilation.BuildManager, which can't be used in the pre-start " +
-                    "initialization phase or outside the context of ASP.NET (e.g. when running unit tests). " + 
-                    "Either make sure you call the RegisterWebApiControllers method at a later point in " + 
+                    "initialization phase or outside the context of ASP.NET (e.g. when running unit tests). " +
+                    "Either make sure you call the RegisterWebApiControllers method at a later point in " +
                     "time, register a custom IAssembliesResolver that does not depend on the BuildManager, " +
                     "or supply a list of assemblies manually using the " +
                     "RegisterWebApiControllers(Container, HttpConfiguration, IEnumerable<Assembly>) " +
-                    "overload.", ex);
+                    "overload.",
+                    ex);
             }
         }
-        
+
         private static List<Type> GetControllerTypesFromConfiguration(HttpConfiguration configuration,
             IAssembliesResolver assembliesResolver)
         {

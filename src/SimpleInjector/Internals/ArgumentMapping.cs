@@ -80,20 +80,20 @@ namespace SimpleInjector.Internals
             {
                 return true;
             }
-
-            if (!this.ConcreteType.IsGenericType() || !this.Argument.IsGenericType())
+            else if (!this.ConcreteType.IsGenericType() || !this.Argument.IsGenericType())
             {
                 return false;
             }
-
-            if (this.ConcreteType.GetGenericTypeDefinition() != this.Argument.GetGenericTypeDefinition())
+            else if (this.ConcreteType.GetGenericTypeDefinition() != this.Argument.GetGenericTypeDefinition())
             {
                 return false;
             }
-
-            return this.Argument.GetGenericArguments()
-                .Zip(this.ConcreteType.GetGenericArguments(), ArgumentMapping.Create)
-                .All(mapping => mapping.ConcreteTypeMatchesPartialArgument());
+            else
+            {
+                return this.Argument.GetGenericArguments()
+                    .Zip(this.ConcreteType.GetGenericArguments(), Create)
+                    .All(mapping => mapping.ConcreteTypeMatchesPartialArgument());
+            }
         }
     }
 }

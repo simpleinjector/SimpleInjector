@@ -367,8 +367,8 @@ namespace SimpleInjector
         /// reference type, is open generic, or ambiguous.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
-        /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
-        /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
+        /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic
+        /// collection (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         [Obsolete("Please use Container." + nameof(SimpleInjector.Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -389,8 +389,8 @@ namespace SimpleInjector
         /// reference type, or ambiguous.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
-        /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
-        /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
+        /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic
+        /// collection (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         [Obsolete("Please use Container." + nameof(SimpleInjector.Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -412,8 +412,8 @@ namespace SimpleInjector
         /// reference type, is open generic, or ambiguous.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
-        /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
-        /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
+        /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic
+        /// collection (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         public void Append(Type serviceType, Registration registration)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
@@ -423,11 +423,11 @@ namespace SimpleInjector
             Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
 
             Requires.IsRegistrationForThisContainer(this.Container, registration, nameof(registration));
-            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
-                registration.ImplementationType, nameof(registration));
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(
+                serviceType, registration.ImplementationType, nameof(registration));
 
-            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, new[] { registration },
-                nameof(registration));
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(
+                serviceType, new[] { registration }, nameof(registration));
 
             this.AppendToCollectionInternal(serviceType, registration);
         }
@@ -444,8 +444,8 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TService"/>is ambiguous.
         /// </exception>
         public void Append<TService, TImplementation>()
-            where TImplementation : class, TService
             where TService : class
+            where TImplementation : class, TService
         {
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
@@ -467,14 +467,14 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="lifestyle"/> is a null reference.
         /// </exception>
         public void Append<TService, TImplementation>(Lifestyle lifestyle)
-            where TImplementation : class, TService
             where TService : class
+            where TImplementation : class, TService
         {
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
-            this.AppendToCollectionInternal(typeof(TService),
-                lifestyle.CreateRegistration<TImplementation>(this.Container));
+            this.AppendToCollectionInternal(
+                typeof(TService), lifestyle.CreateRegistration<TImplementation>(this.Container));
         }
 
         /// <summary>
@@ -501,8 +501,8 @@ namespace SimpleInjector
             Requires.IsReferenceType(serviceType, nameof(serviceType));
             Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
 
-            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(serviceType,
-                implementationType, nameof(implementationType));
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(
+                serviceType, implementationType, nameof(implementationType));
 
             Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
                 serviceType, implementationType, nameof(implementationType));
@@ -534,8 +534,8 @@ namespace SimpleInjector
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
-            this.AppendToCollectionInternal(typeof(TService),
-                lifestyle.CreateRegistration(instanceCreator, this.Container));
+            this.AppendToCollectionInternal(
+                typeof(TService), lifestyle.CreateRegistration(instanceCreator, this.Container));
         }
 
         /// <summary>
@@ -561,7 +561,8 @@ namespace SimpleInjector
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
             this.AppendToCollectionInternal(typeof(TService),
-                SingletonLifestyle.CreateSingleInstanceRegistration(typeof(TService), instance, this.Container));
+                SingletonLifestyle.CreateSingleInstanceRegistration(
+                    typeof(TService), instance, this.Container));
         }
 
         /// <summary>
@@ -760,12 +761,12 @@ namespace SimpleInjector
             serviceTypes = serviceTypes.ToArray();
 
             Requires.DoesNotContainNullValues(serviceTypes, nameof(serviceTypes));
-            Requires.ServiceIsAssignableFromImplementations(serviceType, serviceTypes, nameof(serviceTypes),
-                typeCanBeServiceType: true);
-            Requires.DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(serviceType, serviceTypes,
-                nameof(serviceTypes));
-            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, serviceTypes,
-                nameof(serviceTypes));
+            Requires.ServiceIsAssignableFromImplementations(
+                serviceType, serviceTypes, nameof(serviceTypes), typeCanBeServiceType: true);
+            Requires.DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(
+                serviceType, serviceTypes, nameof(serviceTypes));
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(
+                serviceType, serviceTypes, nameof(serviceTypes));
 
             this.RegisterCollectionInternal(serviceType, serviceTypes);
         }
@@ -799,10 +800,10 @@ namespace SimpleInjector
 
             Requires.DoesNotContainNullValues(registrations, nameof(registrations));
             Requires.AreRegistrationsForThisContainer(this.Container, registrations, nameof(registrations));
-            Requires.ServiceIsAssignableFromImplementations(serviceType, registrations, nameof(registrations),
-                typeCanBeServiceType: true);
-            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(serviceType, registrations,
-                nameof(registrations));
+            Requires.ServiceIsAssignableFromImplementations(
+                serviceType, registrations, nameof(registrations), typeCanBeServiceType: true);
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(
+                serviceType, registrations, nameof(registrations));
 
             this.RegisterCollectionInternal(serviceType, registrations);
         }
@@ -837,7 +838,8 @@ namespace SimpleInjector
                 // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
                 throw new ArgumentException(
                     StringResources.UnableToResolveTypeDueToSecurityConfiguration(serviceType, ex) +
-                    Environment.NewLine + "paramName: " + nameof(serviceType), ex);
+                    Environment.NewLine + "paramName: " + nameof(serviceType),
+                    ex);
             }
         }
 
@@ -934,12 +936,12 @@ namespace SimpleInjector
             serviceTypes = serviceTypes.ToArray();
 
             Requires.DoesNotContainNullValues(serviceTypes, nameof(serviceTypes));
-            Requires.ServiceIsAssignableFromImplementations(typeof(TService), serviceTypes, nameof(serviceTypes),
-                typeCanBeServiceType: true);
-            Requires.DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(typeof(TService), serviceTypes,
-                nameof(serviceTypes));
-            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(typeof(TService), serviceTypes,
-                nameof(serviceTypes));
+            Requires.ServiceIsAssignableFromImplementations(
+                typeof(TService), serviceTypes, nameof(serviceTypes), typeCanBeServiceType: true);
+            Requires.DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(
+                typeof(TService), serviceTypes, nameof(serviceTypes));
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(
+                typeof(TService), serviceTypes, nameof(serviceTypes));
 
             var collection = new ContainerControlledCollection<TService>(this.Container);
 
@@ -959,10 +961,10 @@ namespace SimpleInjector
 
             Requires.DoesNotContainNullValues(registrations, nameof(registrations));
             Requires.AreRegistrationsForThisContainer(this.Container, registrations, nameof(registrations));
-            Requires.ServiceIsAssignableFromImplementations(typeof(TService), registrations, nameof(registrations),
-                typeCanBeServiceType: true);
-            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(typeof(TService), registrations,
-                nameof(registrations));
+            Requires.ServiceIsAssignableFromImplementations(
+                typeof(TService), registrations, nameof(registrations), typeCanBeServiceType: true);
+            Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(
+                typeof(TService), registrations, nameof(registrations));
 
             var collection = new ContainerControlledCollection<TService>(this.Container);
 
@@ -1002,7 +1004,8 @@ namespace SimpleInjector
 
         private void RegisterCollectionInternal(Type itemType, IEnumerable<Registration> registrations)
         {
-            var controlledItems = registrations.Select(ContainerControlledItem.CreateFromRegistration).ToArray();
+            var controlledItems =
+                registrations.Select(ContainerControlledItem.CreateFromRegistration).ToArray();
 
             this.RegisterCollectionInternal(itemType, controlledItems);
         }
@@ -1015,16 +1018,16 @@ namespace SimpleInjector
             this.RegisterCollectionInternal(itemType, controlledItems);
         }
 
-        private void RegisterCollectionInternal(Type itemType, ContainerControlledItem[] controlledItems,
-            bool appending = false)
+        private void RegisterCollectionInternal(
+            Type itemType, ContainerControlledItem[] controlledItems, bool appending = false)
         {
             this.Container.ThrowWhenContainerIsLockedOrDisposed();
 
             this.RegisterGenericContainerControlledCollection(itemType, controlledItems, appending);
         }
 
-        private void RegisterGenericContainerControlledCollection(Type itemType,
-            ContainerControlledItem[] controlledItems, bool appending)
+        private void RegisterGenericContainerControlledCollection(
+            Type itemType, ContainerControlledItem[] controlledItems, bool appending)
         {
             CollectionResolver resolver = this.GetContainerControlledResolver(itemType);
 
@@ -1041,8 +1044,8 @@ namespace SimpleInjector
             resolver.RegisterUncontrolledCollection(itemType, producer);
         }
 
-        private void RegisterContainerUncontrolledCollection<T>(Type itemType,
-            IEnumerable<T> containerUncontrolledCollection)
+        private void RegisterContainerUncontrolledCollection<T>(
+            Type itemType, IEnumerable<T> containerUncontrolledCollection)
         {
             IEnumerable readOnlyCollection = containerUncontrolledCollection.MakeReadOnly();
             IEnumerable castedCollection = Helpers.CastCollection(readOnlyCollection, itemType);
@@ -1050,9 +1053,7 @@ namespace SimpleInjector
             this.RegisterGenericContainerUncontrolledCollection(itemType, castedCollection);
         }
 
-        private CollectionResolver GetContainerControlledResolver(Type itemType)
-        {
-            return this.Container.GetCollectionResolver(itemType, containerControlled: true);
-        }
+        private CollectionResolver GetContainerControlledResolver(Type itemType) =>
+            this.Container.GetCollectionResolver(itemType, containerControlled: true);
     }
 }

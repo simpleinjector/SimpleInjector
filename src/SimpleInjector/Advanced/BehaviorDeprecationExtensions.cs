@@ -27,8 +27,8 @@
         /// <returns>Throws an exception.</returns>
         [Obsolete(DependencyInjectionBehaviorObsoleteMessage, error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static Expression BuildExpression(this IDependencyInjectionBehavior behavior,
-            InjectionConsumerInfo consumer)
+        public static Expression BuildExpression(
+            this IDependencyInjectionBehavior behavior, InjectionConsumerInfo consumer)
         {
             throw new NotSupportedException(DependencyInjectionBehaviorObsoleteMessage);
         }
@@ -42,8 +42,8 @@
         /// <returns>True when the property should be injected.</returns>
         [Obsolete(PropertySelectionBehaviorObsoleteMessage, error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static bool SelectProperty(this IPropertySelectionBehavior behavior,
-            Type serviceType, PropertyInfo propertyInfo)
+        public static bool SelectProperty(
+            this IPropertySelectionBehavior behavior, Type serviceType, PropertyInfo propertyInfo)
         {
             throw new NotSupportedException(PropertySelectionBehaviorObsoleteMessage);
         }

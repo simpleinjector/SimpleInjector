@@ -38,8 +38,8 @@ namespace SimpleInjector.Lifestyles
             return new TransientLifestyleRegistration<TConcrete>(this, container);
         }
 
-        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator, 
-            Container container)
+        protected internal override Registration CreateRegistrationCore<TService>(
+            Func<TService> instanceCreator, Container container)
         {
             return new TransientLifestyleRegistration<TService>(this, container, instanceCreator);
         }
@@ -49,8 +49,8 @@ namespace SimpleInjector.Lifestyles
         {
             private readonly Func<TImplementation> instanceCreator;
 
-            public TransientLifestyleRegistration(Lifestyle lifestyle, Container container, 
-                Func<TImplementation> instanceCreator = null)
+            public TransientLifestyleRegistration(
+                Lifestyle lifestyle, Container container, Func<TImplementation> instanceCreator = null)
                 : base(lifestyle, container)
             {
                 this.instanceCreator = instanceCreator;

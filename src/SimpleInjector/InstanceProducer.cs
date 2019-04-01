@@ -82,7 +82,7 @@ namespace SimpleInjector
     /// ]]></code>
     /// </example>
     [DebuggerTypeProxy(typeof(InstanceProducerDebugView))]
-    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(InstanceProducer.DebuggerDisplay) + ", nq}")]
     public class InstanceProducer
     {
         internal static readonly IEqualityComparer<InstanceProducer> EqualityComparer =
@@ -107,11 +107,12 @@ namespace SimpleInjector
         public InstanceProducer(Type serviceType, Registration registration)
             : this(serviceType, registration, ShouldBeRegisteredAsAnExternalProducer(registration))
         {
-            Requires.ServiceIsAssignableFromImplementation(serviceType, registration.ImplementationType,
-                nameof(serviceType));
+            Requires.ServiceIsAssignableFromImplementation(
+                serviceType, registration.ImplementationType, nameof(serviceType));
         }
 
-        internal InstanceProducer(Type serviceType, Registration registration, Predicate<PredicateContext> predicate)
+        internal InstanceProducer(
+            Type serviceType, Registration registration, Predicate<PredicateContext> predicate)
             : this(serviceType, registration)
         {
             this.Predicate = predicate ?? Always;
@@ -211,10 +212,13 @@ namespace SimpleInjector
 
         internal bool VerifiersAreSuccessfullyCalled { get; private set; }
 
-        internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
+        internal string DebuggerDisplay => string.Format(
+            CultureInfo.InvariantCulture,
             "{0} = {1}, {2} = {3}",
-            nameof(this.ServiceType), this.ServiceType.ToFriendlyName(),
-            nameof(this.Lifestyle), this.Lifestyle.Name);
+            nameof(this.ServiceType),
+            this.ServiceType.ToFriendlyName(),
+            nameof(this.Lifestyle),
+            this.Lifestyle.Name);
 
         internal IEnumerable<InstanceProducer> SelfAndWrappedProducers =>
             this.wrappedProducers == null ? this.Self : this.wrappedProducers.Concat(this.Self);
@@ -231,7 +235,8 @@ namespace SimpleInjector
         /// <param name="expression">The expression that describes the instance to be produced.</param>
         /// <param name="container">The <see cref="Container"/> instance for this registration.</param>
         /// <returns>A new <see cref="InstanceProducer"/> that describes the expression.</returns>
-        public static InstanceProducer FromExpression(Type serviceType, Expression expression, Container container)
+        public static InstanceProducer FromExpression(
+            Type serviceType, Expression expression, Container container)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(expression, nameof(expression));
@@ -242,7 +247,8 @@ namespace SimpleInjector
 
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance. Will never return null.</returns>
-        /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
+        /// <exception cref="ActivationException">When the instance could not be retrieved or is null.
+        /// </exception>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification =
             "A property is not appropriate, because get instance could possibly be a heavy operation.")]
         public object GetInstance()
@@ -368,7 +374,8 @@ namespace SimpleInjector
         /// Builds a string representation of the object graph with the current instance as root of the
         /// graph.
         /// </summary>
-        /// <param name="options">The various visualization options for building a string representation of the object graph.</param>
+        /// <param name="options">The various visualization options for building a string representation of
+        /// the object graph.</param>
         /// <returns>A string representation of the object graph.</returns>
         /// <exception cref="InvalidOperationException">Thrown when this method is called before 
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> have been called. These calls can be
@@ -399,8 +406,9 @@ namespace SimpleInjector
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
-                    this.ServiceType, ex), ex);
+                throw new InvalidOperationException(
+                    StringResources.ConfigurationInvalidCreatingInstanceFailed(this.ServiceType, ex),
+                    ex);
             }
         }
 
@@ -416,8 +424,10 @@ namespace SimpleInjector
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
-                    this.Registration.ImplementationType, ex), ex);
+                throw new InvalidOperationException(
+                    StringResources.ConfigurationInvalidCreatingInstanceFailed(
+                        this.Registration.ImplementationType, ex),
+                    ex);
             }
 
             return instance;
@@ -454,7 +464,8 @@ namespace SimpleInjector
 
         internal void ReplaceRelationships(IEnumerable<KnownRelationship> relationships)
         {
-            this.knownRelationships = new ReadOnlyCollection<KnownRelationship>(relationships.Distinct().ToArray());
+            this.knownRelationships =
+                new ReadOnlyCollection<KnownRelationship>(relationships.Distinct().ToArray());
         }
 
         internal void EnsureTypeWillBeExplicitlyVerified()
@@ -475,8 +486,9 @@ namespace SimpleInjector
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
-                    this.ServiceType, ex), ex);
+                throw new InvalidOperationException(
+                    StringResources.ConfigurationInvalidCreatingInstanceFailed(this.ServiceType, ex),
+                    ex);
             }
         }
 
@@ -517,7 +529,7 @@ namespace SimpleInjector
         {
             if (!this.Container.Options.SuppressLifestyleMismatchVerification)
             {
-                var error = LifestyleMismatchAnalyzer.Instance.Analyze(this.SelfAndWrappedProducers)
+                var error = new LifestyleMismatchAnalyzer().Analyze(this.SelfAndWrappedProducers)
                     .Cast<LifestyleMismatchDiagnosticResult>()
                     .FirstOrDefault();
 
@@ -542,11 +554,12 @@ namespace SimpleInjector
                     this.Registration));
             }
 
-            var e = new ExpressionBuiltEventArgs(this.ServiceType, expression);
-
-            e.Lifestyle = this.Lifestyle;
-            e.InstanceProducer = this;
-            e.ReplacedRegistration = this.Registration;
+            var e = new ExpressionBuiltEventArgs(this.ServiceType, expression)
+            {
+                Lifestyle = this.Lifestyle,
+                InstanceProducer = this,
+                ReplacedRegistration = this.Registration
+            };
 
             this.Container.OnExpressionBuilt(e, this);
 
@@ -566,8 +579,9 @@ namespace SimpleInjector
 
         private bool MustWrapThrownException(Exception ex)
         {
-            return this.IsContainerAutoRegistered || this.Registration.WrapsInstanceCreationDelegate ||
-                !(ex is ActivationException);
+            return this.IsContainerAutoRegistered 
+                || this.Registration.WrapsInstanceCreationDelegate
+                || !(ex is ActivationException);
         }
 
         private string BuildActivationExceptionMessage(Exception innerException)
@@ -605,10 +619,7 @@ namespace SimpleInjector
 #endif
         private void CheckForCyclicDependencies()
         {
-            if (this.validator != null)
-            {
-                this.validator.Check();
-            }
+            this.validator?.Check();
         }
 
         // This method will be inlined by the JIT.
@@ -637,10 +648,7 @@ namespace SimpleInjector
 #endif
         private void ResetCyclicDependencyValidator()
         {
-            if (this.validator != null)
-            {
-                this.validator.Reset();
-            }
+            this.validator?.Reset();
         }
 
         private Exception GetExceptionIfInvalid()

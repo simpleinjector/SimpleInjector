@@ -22,7 +22,6 @@
 
 namespace SimpleInjector.Internals
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
 
@@ -57,9 +56,6 @@ namespace SimpleInjector.Internals
         }
 
         // Resets the validator to its initial state.
-        internal void Reset()
-        {
-            this.producerVisited.Value = false;   
-        }
+        internal void Reset() => this.producerVisited.Value = false;
     }
 }

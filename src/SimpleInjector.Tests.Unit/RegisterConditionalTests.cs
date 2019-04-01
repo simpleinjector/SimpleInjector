@@ -306,7 +306,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a conditional registration for IGeneric<Int32> (with implementation 
                 IntGenericType) that overlaps with the registration for GenericType<Int32> that 
-                you are trying to make. This new registration would cause ambiguity, because both 
+                you are trying to make. This new registration causes ambiguity, because both 
                 registrations would be used for the same closed service types. Either remove one of the 
                 registrations or make them both conditional."
                 .TrimInside(),
@@ -329,7 +329,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a registration for IGeneric<Int32> (with implementation 
                 GenericType<Int32>) that overlaps with the conditional registration for IntGenericType that 
-                you are trying to make. This new registration would cause ambiguity, because both 
+                you are trying to make. This new registration causes ambiguity, because both 
                 registrations would be used for the same closed service types. Either remove one of the 
                 registrations or make them both conditional."
                 .TrimInside(),
@@ -364,7 +364,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a conditional registration for IGeneric<T> (with implementation 
                 GenericClassType<TClass>) that overlaps with the registration for DefaultGenericType<T> that 
-                you are trying to make. This new registration would cause ambiguity, because both 
+                you are trying to make. This new registration causes ambiguity, because both 
                 registrations would be used for the same closed service types. Either remove one of the 
                 registrations or make them both conditional."
                 .TrimInside(),
@@ -387,7 +387,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a registration for IGeneric<T> (with implementation GenericType<T>) that
                 overlaps with the conditional registration for GenericClassType<TClass> that you are trying 
-                to make. This new registration would cause ambiguity, because both registrations would be 
+                to make. This new registration causes ambiguity, because both registrations would be 
                 used for the same closed service types. Either remove one of the registrations or make them 
                 both conditional."
                 .TrimInside(),
@@ -412,7 +412,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a registration for IGeneric<T> (with implementation GenericClassType<TClass>) 
                 that overlaps with the conditional registration for GenericClassType<TClass> that you are 
-                trying to make. This new registration would cause ambiguity, because both registrations would
+                trying to make. This new registration causes ambiguity, because both registrations would
                 be used for the same closed service types. Either remove one of the registrations or make 
                 them both conditional."
                 .TrimInside(),
@@ -436,7 +436,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a conditional registration for IGeneric<T> (with implementation 
                 GenericType<T>) that overlaps with the conditional registration for GenericType<T> that you 
-                are trying to make. This new registration would cause ambiguity, because both registrations 
+                are trying to make. This new registration causes ambiguity, because both registrations 
                 would be used for the same closed service types. You can merge both registrations into a 
                 single conditional registration and combine both predicates into one single predicate."
                 .TrimInside(),
@@ -458,7 +458,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a conditional registration for ILogger (with implementation 
                 NullLogger) that overlaps with the conditional registration for NullLogger that you are trying
-                to make. This new registration would cause ambiguity, because both registrations would be used 
+                to make. This new registration causes ambiguity, because both registrations would be used 
                 for the same closed service types. You can merge both registrations into a single conditional 
                 registration and combine both predicates into one single predicate."
                 .TrimInside(),
@@ -499,7 +499,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a registration for IClassConstraintedGeneric<T> (with implementation 
                 ClassConstraintedGeneric<T>) that overlaps with the conditional registration for 
-                ClassConstraintedGeneric2<T> that you are trying to make. This new registration would cause 
+                ClassConstraintedGeneric2<T> that you are trying to make. This new registration causes 
                 ambiguity, because both registrations would be used for the same closed service types. Either 
                 remove one of the registrations or make them both conditional."
                 .TrimInside(),
@@ -1346,7 +1346,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "This new registration would cause ambiguity",
+                "This new registration causes ambiguity",
                 action);
         }
 
@@ -1366,7 +1366,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "This new registration would cause ambiguity",
+                "This new registration causes ambiguity",
                 action);
         }
 

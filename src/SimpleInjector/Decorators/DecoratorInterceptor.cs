@@ -25,7 +25,6 @@ namespace SimpleInjector.Decorators
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Reflection;
     using SimpleInjector.Internals;
 
     internal class DecoratorInterceptor
@@ -78,7 +77,7 @@ namespace SimpleInjector.Decorators
                         closedDecoratorType = this.GetDecoratorTypeFromDecoratorFactory(
                             e.RegisteredServiceType, decoratorInterceptor.Context);
                     }
-                    
+
                     if (closedDecoratorType != null)
                     {
                         decoratorInterceptor.ApplyDecorator(closedDecoratorType);
@@ -106,13 +105,13 @@ namespace SimpleInjector.Decorators
             }
         }
 
-        private void ApplyDecoratorOnContainerUncontrolledCollection(ExpressionBuiltEventArgs e,
-            Type decoratorType)
+        private void ApplyDecoratorOnContainerUncontrolledCollection(
+            ExpressionBuiltEventArgs e, Type decoratorType)
         {
             var serviceType = e.RegisteredServiceType.GetGenericArguments()[0];
 
-            var uncontrolledInterceptor = new ContainerUncontrolledServicesDecoratorInterceptor(this.data,
-                this.singletonDecoratedCollectionsCache, e, serviceType);
+            var uncontrolledInterceptor = new ContainerUncontrolledServicesDecoratorInterceptor(
+                this.data, this.singletonDecoratedCollectionsCache, e, serviceType);
 
             if (uncontrolledInterceptor.SatisfiesPredicate())
             {
@@ -130,7 +129,7 @@ namespace SimpleInjector.Decorators
             }
         }
 
-        private static bool IsCollectionType(Type serviceType) => 
+        private static bool IsCollectionType(Type serviceType) =>
             typeof(IEnumerable<>).IsGenericTypeDefinitionOf(serviceType);
 
         private bool MustDecorate(Type serviceType, out Type decoratorType)
@@ -169,8 +168,8 @@ namespace SimpleInjector.Decorators
             return true;
         }
 
-        private Type GetDecoratorTypeFromDecoratorFactory(Type requestedServiceType, 
-            DecoratorPredicateContext context)
+        private Type GetDecoratorTypeFromDecoratorFactory(
+            Type requestedServiceType, DecoratorPredicateContext context)
         {
             Type decoratorType = this.data.DecoratorTypeFactory(context);
 
@@ -193,12 +192,14 @@ namespace SimpleInjector.Decorators
                 // decoratorType == null when type constraints don't match.
                 if (decoratorType != null)
                 {
-                    Requires.HasFactoryCreatedDecorator(this.data.Container, requestedServiceType, decoratorType);
+                    Requires.HasFactoryCreatedDecorator(
+                        this.data.Container, requestedServiceType, decoratorType);
                 }
             }
             else
             {
-                Requires.FactoryReturnsATypeThatIsAssignableFromServiceType(requestedServiceType, decoratorType);
+                Requires.FactoryReturnsATypeThatIsAssignableFromServiceType(
+                    requestedServiceType, decoratorType);
             }
 
             return decoratorType;

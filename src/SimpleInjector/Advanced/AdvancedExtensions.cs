@@ -127,7 +127,8 @@ namespace SimpleInjector.Advanced
             nameof(ContainerScope.GetOrSetItem) + " instead. This method will be removed in a future release.",
             error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public static T GetOrSetItem<T>(this Container container, object key, Func<Container, object, T> valueFactory)
+        public static T GetOrSetItem<T>(
+            this Container container, object key, Func<Container, object, T> valueFactory)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(key, nameof(key));
@@ -155,8 +156,8 @@ namespace SimpleInjector.Advanced
             nameof(ContainerCollectionRegistrator.Append) + " instead. This method will be removed in a future release.",
             error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public static void AppendToCollection(this Container container, Type serviceType, 
-            Registration registration)
+        public static void AppendToCollection(
+            this Container container, Type serviceType, Registration registration)
         {
             Requires.IsNotNull(container, nameof(container));
 
@@ -181,8 +182,8 @@ namespace SimpleInjector.Advanced
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Append) + " instead. This method will be removed in a future release.",
             error: false)]
-        public static void AppendToCollection(this Container container, Type serviceType,
-            Type implementationType)
+        public static void AppendToCollection(
+            this Container container, Type serviceType, Type implementationType)
         {
             Requires.IsNotNull(container, nameof(container));
 

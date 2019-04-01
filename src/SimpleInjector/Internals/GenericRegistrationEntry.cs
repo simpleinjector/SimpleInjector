@@ -24,6 +24,7 @@ namespace SimpleInjector.Internals
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
 
     internal sealed class GenericRegistrationEntry : IRegistrationEntry
@@ -50,13 +51,14 @@ namespace SimpleInjector.Internals
 
             bool OverlapsWith(InstanceProducer producerToCheck);
 
-            InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer,
-                bool handled = false);
+            InstanceProducer TryGetProducer(
+                Type serviceType, InjectionConsumerInfo consumer, bool handled = false);
 
             bool MatchesServiceType(Type serviceType);
         }
 
-        public IEnumerable<InstanceProducer> CurrentProducers => this.providers.SelectMany(p => p.CurrentProducers);
+        public IEnumerable<InstanceProducer> CurrentProducers =>
+            this.providers.SelectMany(p => p.CurrentProducers);
 
         public void Add(InstanceProducer producer)
         {
@@ -73,8 +75,11 @@ namespace SimpleInjector.Internals
             this.providers.Add(new ClosedToInstanceProducerProvider(producer));
         }
 
-        public void AddGeneric(Type serviceType, Type implementationType,
-            Lifestyle lifestyle, Predicate<PredicateContext> predicate)
+        public void AddGeneric(
+            Type serviceType,
+            Type implementationType,
+            Lifestyle lifestyle,
+            Predicate<PredicateContext> predicate)
         {
             this.container.ThrowWhenContainerIsLockedOrDisposed();
 
@@ -93,8 +98,11 @@ namespace SimpleInjector.Internals
             this.providers.Add(provider);
         }
 
-        public void Add(Type serviceType, Func<TypeFactoryContext, Type> implementationTypeFactory,
-            Lifestyle lifestyle, Predicate<PredicateContext> predicate)
+        public void Add(
+            Type serviceType,
+            Func<TypeFactoryContext, Type> implementationTypeFactory,
+            Lifestyle lifestyle,
+            Predicate<PredicateContext> predicate)
         {
             this.container.ThrowWhenContainerIsLockedOrDisposed();
 
@@ -108,10 +116,11 @@ namespace SimpleInjector.Internals
             this.providers.Add(provider);
         }
 
-        public InstanceProducer TryGetInstanceProducer(Type closedGenericServiceType,
-            InjectionConsumerInfo context)
+        public InstanceProducer TryGetInstanceProducer(
+            Type serviceType, InjectionConsumerInfo consumer)
         {
-            var producers = this.GetInstanceProducers(closedGenericServiceType, context).ToArray();
+            // Pre-condition: serviceType is always a closed-generic type
+            var producers = this.GetInstanceProducers(serviceType, consumer).ToArray();
 
             if (producers.Length <= 1)
             {
@@ -119,7 +128,7 @@ namespace SimpleInjector.Internals
             }
 
             throw new ActivationException(
-                StringResources.MultipleApplicableRegistrationsFound(closedGenericServiceType, producers));
+                StringResources.MultipleApplicableRegistrationsFound(serviceType, producers));
         }
 
         public int GetNumberOfConditionalRegistrationsFor(Type serviceType) =>
@@ -202,7 +211,7 @@ namespace SimpleInjector.Internals
             bool providerToRegisterIsSuperset =
                 providerToRegister.AppliesToAllClosedServiceTypes && this.providers.Any();
 
-            bool isReplacement = providerToRegister.AppliesToAllClosedServiceTypes 
+            bool isReplacement = providerToRegister.AppliesToAllClosedServiceTypes
                 && this.container.Options.AllowOverridingRegistrations;
 
             // A provider is a superset of the providerToRegister when it can be applied to ALL generic
@@ -228,16 +237,6 @@ namespace SimpleInjector.Internals
             where provider.AppliesToAllClosedServiceTypes
                 || provider.ImplementationType == implementationType
             select provider;
-
-        private static InvalidOperationException GetAnOverlappingGenericRegistrationExistsException(
-            InstanceProducer providerToRegister, IProducerProvider overlappingProvider) =>
-            new InvalidOperationException(
-                StringResources.AnOverlappingRegistrationExists(
-                    providerToRegister.ServiceType,
-                    overlappingProvider.ImplementationType,
-                    overlappingProvider.IsConditional,
-                    providerToRegister.ImplementationType,
-            providerToRegister.IsConditional));
 
         private static InvalidOperationException GetAnOverlappingGenericRegistrationExistsException(
             IProducerProvider providerToRegister, IProducerProvider overlappingProvider) =>
@@ -288,11 +287,11 @@ namespace SimpleInjector.Internals
             public bool MatchesServiceType(Type serviceType) => serviceType == this.producer.ServiceType;
 
             public bool OverlapsWith(InstanceProducer producerToCheck) =>
-                (this.producer.IsUnconditional || producerToCheck.IsUnconditional) &&
-                this.producer.ServiceType == producerToCheck.ServiceType;
+                (this.producer.IsUnconditional || producerToCheck.IsUnconditional)
+                && this.producer.ServiceType == producerToCheck.ServiceType;
 
-            public InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer,
-                bool handled) =>
+            public InstanceProducer TryGetProducer(
+                Type serviceType, InjectionConsumerInfo consumer, bool handled) =>
                 this.MatchesServiceType(serviceType) && this.MatchesPredicate(consumer, handled)
                     ? this.producer
                     : null;
@@ -305,18 +304,24 @@ namespace SimpleInjector.Internals
         {
             internal readonly Predicate<PredicateContext> Predicate;
 
+            private readonly Dictionary<object, InstanceProducer> cache =
+                new Dictionary<object, InstanceProducer>();
+            private readonly Dictionary<Type, Registration> registrationCache =
+                new Dictionary<Type, Registration>();
+
             private readonly Lifestyle lifestyle;
             private readonly Container container;
 
-            private readonly Dictionary<object, InstanceProducer> cache = new Dictionary<object, InstanceProducer>();
-            private readonly Dictionary<Type, Registration> registrationCache = new Dictionary<Type, Registration>();
-
-            internal OpenGenericToInstanceProducerProvider(Type serviceType, Type implementationType,
-                Lifestyle lifestyle, Predicate<PredicateContext> predicate, Container container)
+            internal OpenGenericToInstanceProducerProvider(
+                Type serviceType,
+                Type implementationType,
+                Lifestyle lifestyle,
+                Predicate<PredicateContext> predicate,
+                Container container)
             {
                 this.ServiceType = serviceType;
                 this.ImplementationType = implementationType;
-                this.ImplementationTypeFactory = c => this.ImplementationType;
+                this.ImplementationTypeFactory = _ => this.ImplementationType;
                 this.lifestyle = lifestyle;
                 this.Predicate = predicate;
                 this.container = container;
@@ -326,9 +331,12 @@ namespace SimpleInjector.Internals
                 this.AppliesToAllClosedServiceTypes = this.RegistrationAppliesToAllClosedServiceTypes();
             }
 
-            internal OpenGenericToInstanceProducerProvider(Type serviceType,
-                Func<TypeFactoryContext, Type> implementationTypeFactory, Lifestyle lifestyle,
-                Predicate<PredicateContext> predicate, Container container)
+            internal OpenGenericToInstanceProducerProvider(
+                Type serviceType,
+                Func<TypeFactoryContext, Type> implementationTypeFactory,
+                Lifestyle lifestyle,
+                Predicate<PredicateContext> predicate,
+                Container container)
             {
                 this.ServiceType = serviceType;
                 this.ImplementationTypeFactory = implementationTypeFactory;
@@ -361,8 +369,8 @@ namespace SimpleInjector.Internals
                         producerToCheck.ServiceType,
                         this.ImplementationType);
 
-            public InstanceProducer TryGetProducer(Type serviceType, InjectionConsumerInfo consumer,
-                bool handled)
+            public InstanceProducer TryGetProducer(
+                Type serviceType, InjectionConsumerInfo consumer, bool handled)
             {
                 Type closedImplementation = this.ImplementationType != null
                     ? GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType)
@@ -388,7 +396,7 @@ namespace SimpleInjector.Internals
             // In case this is a type factory registration (meaning ImplementationType is null) we consider
             // the service to be matching, since we can't (and should not) invoke the factory.
             public bool MatchesServiceType(Type serviceType) =>
-                this.ImplementationType == null 
+                this.ImplementationType == null
                 || GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType) != null;
 
             private Type GetImplementationTypeThroughFactory(Type serviceType, InjectionConsumerInfo consumer)
@@ -447,11 +455,9 @@ namespace SimpleInjector.Internals
             {
                 Type key = context.ImplementationType;
 
-                Registration registration;
-
                 // Never build a registration for a particular implementation type twice. This would break
                 // the promise of returning singletons.
-                if (!this.registrationCache.TryGetValue(key, out registration))
+                if (!this.registrationCache.TryGetValue(key, out Registration registration))
                 {
                     this.registrationCache[key] = registration = this.CreateNewRegistrationFor(context);
                 }
@@ -470,7 +476,7 @@ namespace SimpleInjector.Internals
             // type doesn't have. This works, because if it doesn't add any type constraints, it will be
             // able to construct a new open service type, based on the generic type arguments of the
             // implementation. If it can't, it means that the implementionType applies to a subset.
-            private bool RegistrationAppliesToAllClosedServiceTypes() => 
+            private bool RegistrationAppliesToAllClosedServiceTypes() =>
                 this.Predicate == null
                 && this.ImplementationType.IsGenericType()
                 && !this.ImplementationType.IsPartiallyClosed()

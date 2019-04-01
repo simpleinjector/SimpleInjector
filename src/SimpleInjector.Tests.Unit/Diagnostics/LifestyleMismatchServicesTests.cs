@@ -492,8 +492,8 @@
 
         public override int Length { get; }
 
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container c) =>
-            Transient.CreateRegistration<TConcrete>(c);
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
+            Transient.CreateRegistration<TConcrete>(container);
 
         protected internal override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) =>
             Transient.CreateRegistration(creator, c);

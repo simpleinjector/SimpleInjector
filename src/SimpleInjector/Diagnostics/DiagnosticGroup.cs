@@ -31,11 +31,16 @@ namespace SimpleInjector.Diagnostics
     /// <summary>
     /// A hierarchical group of <see cref="DiagnosticResult"/>.
     /// </summary>
-    [DebuggerDisplay(nameof(DiagnosticGroup) + " (Name: {Name, nq})")]
+    [DebuggerDisplay(nameof(DiagnosticGroup) + " (Name: {" + nameof(DiagnosticGroup.Name) + ", nq})")]
     public class DiagnosticGroup
     {
-        internal DiagnosticGroup(DiagnosticType diagnosticType, Type groupType, string name, string description,
-            IEnumerable<DiagnosticGroup> children, IEnumerable<DiagnosticResult> results)
+        internal DiagnosticGroup(
+            DiagnosticType diagnosticType,
+            Type groupType,
+            string name,
+            string description,
+            IEnumerable<DiagnosticGroup> children,
+            IEnumerable<DiagnosticResult> results)
         {
             this.DiagnosticType = diagnosticType;
             this.GroupType = groupType;

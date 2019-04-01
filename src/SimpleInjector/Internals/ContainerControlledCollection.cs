@@ -67,7 +67,7 @@ namespace SimpleInjector.Internals
 
             set
             {
-                throw GetNotSupportedBecauseCollectionIsReadOnlyException();
+                throw GetNotSupportedBecauseReadOnlyException();
             }
         }
 
@@ -108,23 +108,14 @@ namespace SimpleInjector.Internals
 
         void IList<TService>.Insert(int index, TService item)
         {
-            throw GetNotSupportedBecauseCollectionIsReadOnlyException();
+            throw GetNotSupportedBecauseReadOnlyException();
         }
 
-        public void RemoveAt(int index)
-        {
-            throw GetNotSupportedBecauseCollectionIsReadOnlyException();
-        }
+        public void RemoveAt(int index) => throw GetNotSupportedBecauseReadOnlyException();
 
-        void ICollection<TService>.Add(TService item)
-        {
-            throw GetNotSupportedBecauseCollectionIsReadOnlyException();
-        }
+        void ICollection<TService>.Add(TService item) => throw GetNotSupportedBecauseReadOnlyException();
 
-        void ICollection<TService>.Clear()
-        {
-            throw GetNotSupportedBecauseCollectionIsReadOnlyException();
-        }
+        void ICollection<TService>.Clear() => throw GetNotSupportedBecauseReadOnlyException();
 
         bool ICollection<TService>.Contains(TService item) => this.IndexOf(item) > -1;
 
@@ -138,10 +129,7 @@ namespace SimpleInjector.Internals
             }
         }
 
-        bool ICollection<TService>.Remove(TService item)
-        {
-            throw GetNotSupportedBecauseCollectionIsReadOnlyException();
-        }
+        bool ICollection<TService>.Remove(TService item) => throw GetNotSupportedBecauseReadOnlyException();
 
         void IContainerControlledCollection.Clear()
         {
@@ -201,8 +189,9 @@ namespace SimpleInjector.Internals
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException(StringResources.ConfigurationInvalidCreatingInstanceFailed(
-                    typeof(TService), ex), ex);
+                throw new InvalidOperationException(
+                    StringResources.ConfigurationInvalidCreatingInstanceFailed(typeof(TService), ex),
+                    ex);
             }
         }
 
@@ -225,35 +214,34 @@ namespace SimpleInjector.Internals
             // If the implementationType is explicitly registered (using a Register call) we select this 
             // producer (but we skip any implicit registrations or anything that is assignable, since 
             // there could be more than one and it would be unclear which one to pick).
-            var instanceProducer = this.GetExplicitRegisteredInstanceProducer(implementationType);
+            InstanceProducer producer = this.GetExplicitRegisteredInstanceProducer(implementationType);
 
             // If that doesn't result in a producer, we request a registration using unregistered type
             // resolution, were we prevent concrete types from being created by the container, since
             // the creation of concrete type would 'pollute' the list of registrations, and might result
             // in two registrations (since below we need to create a new instance producer out of it),
             // and that might cause duplicate diagnostic warnings.
-            if (instanceProducer == null)
+            if (producer == null)
             {
-                instanceProducer =
-                    this.GetInstanceProducerThroughUnregisteredTypeResolution(implementationType);
+                producer = this.GetInstanceProducerThroughUnregisteredTypeResolution(implementationType);
             }
 
             // If that still hasn't resulted in a producer, we create a new producer and return (or throw
             // an exception in case the implementation type is not a concrete type).
-            if (instanceProducer == null)
+            if (producer == null)
             {
                 return this.CreateNewExternalProducer(implementationType);
             }
 
             // If there is such a producer registered we return a new one with the service type.
             // This producer will be automatically registered as external producer.
-            if (instanceProducer.ServiceType == typeof(TService))
+            if (producer.ServiceType == typeof(TService))
             {
-                return instanceProducer;
+                return producer;
             }
 
             return new InstanceProducer(typeof(TService),
-                new ExpressionRegistration(instanceProducer.BuildExpression(), this.container));
+                new ExpressionRegistration(producer.BuildExpression(), this.container));
         }
 
         private InstanceProducer GetExplicitRegisteredInstanceProducer(Type implementationType)
@@ -267,8 +255,10 @@ namespace SimpleInjector.Internals
 
         private InstanceProducer GetInstanceProducerThroughUnregisteredTypeResolution(Type implementationType)
         {
-            var producer = this.container.GetRegistrationEvenIfInvalid(implementationType,
-                InjectionConsumerInfo.Root, autoCreateConcreteTypes: false);
+            var producer = this.container.GetRegistrationEvenIfInvalid(
+                implementationType,
+                InjectionConsumerInfo.Root,
+                autoCreateConcreteTypes: false);
 
             bool producerIsValid = producer?.IsValid == true;
 
@@ -290,7 +280,7 @@ namespace SimpleInjector.Internals
             return lifestyle.CreateProducer(typeof(TService), implementationType, this.container);
         }
 
-        private static NotSupportedException GetNotSupportedBecauseCollectionIsReadOnlyException() =>
+        private static NotSupportedException GetNotSupportedBecauseReadOnlyException() =>
             new NotSupportedException("Collection is read-only.");
     }
 }

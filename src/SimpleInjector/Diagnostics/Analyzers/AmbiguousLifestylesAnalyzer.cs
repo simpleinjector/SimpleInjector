@@ -30,21 +30,18 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
     internal sealed class AmbiguousLifestylesAnalyzer : IContainerAnalyzer
     {
-        internal static readonly IContainerAnalyzer Instance = new AmbiguousLifestylesAnalyzer();
-
-        private AmbiguousLifestylesAnalyzer()
-        {
-        }
-
         public DiagnosticType DiagnosticType => DiagnosticType.AmbiguousLifestyles;
 
         public string Name => "Component with ambiguous lifestyles";
 
-        public string GetRootDescription(IEnumerable<DiagnosticResult> results) =>
-            results.Count() + " possible registrations found with ambiguous lifestyles.";
+        public string GetRootDescription(DiagnosticResult[] results) =>
+            $"{results.Length} possible {RegistrationsPlural(results.Length)} found with ambiguous lifestyles.";
 
-        public string GetGroupDescription(IEnumerable<DiagnosticResult> results) =>
-            results.Count() + " ambiguous lifestyles.";
+        public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
+        {
+            int count = results.Count();
+            return $"{count} ambiguous {LifestylesPlural(count)}.";
+        }
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
         {
@@ -61,7 +58,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification =
             "Reducing cyclomatic complexity of this method would mean breaking it up in smaller methods, " +
             "but that would force us to create a number of small classes just for this, because C# does " +
-            "not allow returning anonymous types through private methods. We think keeping everything in " +
+            "not allow returning anonymous types through private methods. I think keeping everything in " +
             "one method is the cleanest approach.")]
         private static IEnumerable<AmbiguousLifestylesDiagnosticResult> GetDiagnosticWarnings(
             IEnumerable<InstanceProducer> instanceProducers)
@@ -76,7 +73,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
             var componentLifestylePairs =
                 from registrationWithProducers in registrations
                 let r = registrationWithProducers.registration
-                let componentLifestylePair = new { r.ImplementationType, Lifestyle = r.Lifestyle.IdentificationKey }
+                let componentLifestylePair =
+                    new { r.ImplementationType, Lifestyle = r.Lifestyle.IdentificationKey }
                 group registrationWithProducers by componentLifestylePair into g
                 select new
                 {
@@ -98,7 +96,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 from component in ambiguousComponents
                 from componentLifestylePair in component.componentLifestylePairs
                 from diagnosedProducer in componentLifestylePair.Producers
-                let conflictingPairs = component.componentLifestylePairs.Except(new[] { componentLifestylePair })
+                let conflictingPairs =
+                    component.componentLifestylePairs.Except(new[] { componentLifestylePair })
                 let conflictingProducers = conflictingPairs.SelectMany(pair => pair.Producers)
                 select CreateDiagnosticResult(diagnosedProducer, conflictingProducers.ToArray());
         }
@@ -118,8 +117,13 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
             string description = BuildDescription(diagnosedProducer, conflictingProducers);
 
-            return new AmbiguousLifestylesDiagnosticResult(serviceType, description,
-                lifestyles.ToArray(), implementationType, diagnosedProducer, conflictingProducers);
+            return new AmbiguousLifestylesDiagnosticResult(
+                serviceType,
+                description,
+                lifestyles.ToArray(),
+                implementationType,
+                diagnosedProducer,
+                conflictingProducers);
         }
 
         private static string BuildDescription(InstanceProducer diagnosedProducer,
@@ -138,5 +142,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
         private static string ToFriendlyNameWithLifestyle(InstanceProducer producer) =>
             producer.ServiceType.ToFriendlyName() + " (" + producer.Registration.Lifestyle.Name + ")";
+
+        private static string RegistrationsPlural(int number) => number == 1 ? "registration" : "registrations";
+        private static string LifestylesPlural(int number) => number == 1 ? "lifestyle" : "lifestyles";
     }
 }

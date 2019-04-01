@@ -142,8 +142,8 @@ namespace SimpleInjector
         /// <typeparamref name="TService"/> has already been registered.</exception>
         [Obsolete("RegisterPerWcfOperation has been deprecated. ", error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void RegisterPerWcfOperation<TService>(this Container container,
-            Func<TService> instanceCreator, bool disposeWhenRequestEnds)
+        public static void RegisterPerWcfOperation<TService>(
+            this Container container, Func<TService> instanceCreator, bool disposeWhenRequestEnds)
             where TService : class
         {
             throw new NotSupportedException("RegisterPerWcfOperation has been deprecated.");

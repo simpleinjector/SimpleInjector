@@ -36,7 +36,7 @@ namespace SimpleInjector.Advanced
     /// allows the user to examine the given instance to decide whether the instance should be initialized or 
     /// not.
     /// </summary>
-    [DebuggerDisplay(nameof(InitializerContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
+    [DebuggerDisplay(nameof(InitializerContext) + " ({" + nameof(InitializerContext.DebuggerDisplay) + ", nq})")]
     public class InitializerContext
     {
         internal InitializerContext(Registration registration)

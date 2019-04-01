@@ -30,7 +30,7 @@ namespace SimpleInjector.Diagnostics
 
         string Name { get; }
 
-        string GetRootDescription(IEnumerable<DiagnosticResult> results);
+        string GetRootDescription(DiagnosticResult[] results);
 
         string GetGroupDescription(IEnumerable<DiagnosticResult> results);
 

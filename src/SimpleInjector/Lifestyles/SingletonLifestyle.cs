@@ -46,25 +46,23 @@ namespace SimpleInjector.Lifestyles
         // (and the extra SingletonInstanceLifestyleRegistration class), we can ensure that the
         // ExpressionBuilding event is called with a ConstantExpression, which is much more intuitive to
         // anyone handling that event.
-        internal static Registration CreateSingleInstanceRegistration(Type serviceType, object instance,
-            Container container, Type implementationType = null)
+        internal static Registration CreateSingleInstanceRegistration(
+            Type serviceType, object instance, Container container, Type implementationType = null)
         {
             Requires.IsNotNull(instance, nameof(instance));
 
-            return new SingletonInstanceLifestyleRegistration(serviceType, implementationType ?? serviceType,
-                instance, container);
+            return new SingletonInstanceLifestyleRegistration(
+                serviceType, implementationType ?? serviceType, instance, container);
         }
 
-        internal static InstanceProducer CreateUncontrolledCollectionProducer(Type itemType,
-            IEnumerable collection, Container container)
-        {
-            return new InstanceProducer(
+        internal static InstanceProducer CreateUncontrolledCollectionProducer(
+            Type itemType, IEnumerable collection, Container container) =>
+            new InstanceProducer(
                 typeof(IEnumerable<>).MakeGenericType(itemType),
                 CreateUncontrolledCollectionRegistration(itemType, collection, container));
-        }
 
-        internal static Registration CreateUncontrolledCollectionRegistration(Type itemType,
-            IEnumerable collection, Container container)
+        internal static Registration CreateUncontrolledCollectionRegistration(
+            Type itemType, IEnumerable collection, Container container)
         {
             Type enumerableType = typeof(IEnumerable<>).MakeGenericType(itemType);
 
@@ -81,8 +79,8 @@ namespace SimpleInjector.Lifestyles
         protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
             new SingletonLifestyleRegistration<TConcrete>(container);
 
-        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
-            Container container)
+        protected internal override Registration CreateRegistrationCore<TService>(
+            Func<TService> instanceCreator, Container container)
         {
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
@@ -96,8 +94,8 @@ namespace SimpleInjector.Lifestyles
             private object instance;
             private bool initialized;
 
-            internal SingletonInstanceLifestyleRegistration(Type serviceType, Type implementationType,
-                object instance, Container container)
+            internal SingletonInstanceLifestyleRegistration(
+                Type serviceType, Type implementationType, object instance, Container container)
                 : base(Lifestyle.Singleton, container)
             {
                 this.instance = instance;
@@ -140,7 +138,8 @@ namespace SimpleInjector.Lifestyles
                 catch (MemberAccessException ex)
                 {
                     throw new ActivationException(
-                        StringResources.UnableToResolveTypeDueToSecurityConfiguration(this.ImplementationType, ex));
+                        StringResources.UnableToResolveTypeDueToSecurityConfiguration(
+                            this.ImplementationType, ex));
                 }
             }
 
@@ -184,7 +183,8 @@ namespace SimpleInjector.Lifestyles
 
             private object interceptedInstance;
 
-            public SingletonLifestyleRegistration(Container container, Func<TImplementation> instanceCreator = null)
+            public SingletonLifestyleRegistration(
+                Container container, Func<TImplementation> instanceCreator = null)
                 : base(Lifestyle.Singleton, container)
             {
                 this.instanceCreator = instanceCreator;
@@ -260,11 +260,11 @@ namespace SimpleInjector.Lifestyles
                                 args.Producer,
                                 matchingRelationship);
 
-                            // At this point, an injected ContainerControlledCollection<T> has notified the listener
-                            // about the creation of one of its elements. This has happened during the
-                            // construction of this (Singleton) instance, which might cause Lifestyle Mismatches.
-                            // That's why this is added as a known relationship. This way diagnostics can verify
-                            // the relationship.
+                            // At this point, an injected ContainerControlledCollection<T> has notified the
+                            // listener about the creation of one of its elements. This has happened during
+                            // the construction of this (Singleton) instance, which might cause Lifestyle
+                            // Mismatches. That's why this is added as a known relationship. This way 
+                            // diagnostics can verify the relationship.
                             this.AddRelationship(
                                 new KnownRelationship(
                                     implementationType: typeof(TImplementation),
@@ -296,7 +296,8 @@ namespace SimpleInjector.Lifestyles
                     from relationship in this.GetRelationships()
                     let producer = relationship.Dependency
                     where producer.IsContainerControlledCollection()
-                    where producer.GetContainerControlledCollectionElementType() == collectionItemProducer.ServiceType
+                    let controlledElementType = producer.GetContainerControlledCollectionElementType()
+                    where controlledElementType == collectionItemProducer.ServiceType
                     select relationship)
                     .FirstOrDefault();
             }
@@ -320,7 +321,7 @@ namespace SimpleInjector.Lifestyles
 
             private static void EnsureInstanceIsNotNull(object instance)
             {
-                if (instance == null)
+                if (instance is null)
                 {
                     throw new ActivationException(
                         StringResources.DelegateForTypeReturnedNull(typeof(TImplementation)));

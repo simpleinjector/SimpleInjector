@@ -31,21 +31,18 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
     internal sealed class TornLifestyleContainerAnalyzer : IContainerAnalyzer
     {
-        internal static readonly IContainerAnalyzer Instance = new TornLifestyleContainerAnalyzer();
-
-        private TornLifestyleContainerAnalyzer()
-        {
-        }
-
         public DiagnosticType DiagnosticType => DiagnosticType.TornLifestyle;
 
         public string Name => "Torn Lifestyle";
 
-        public string GetRootDescription(IEnumerable<DiagnosticResult> results) =>
-            results.Count() + " possible registrations found with a torn lifestyle.";
+        public string GetRootDescription(DiagnosticResult[] results) =>
+            $"{results.Length} possible {RegistrationsPlural(results.Length)} found with a torn lifestyle.";
 
-        public string GetGroupDescription(IEnumerable<DiagnosticResult> results) =>
-            results.Count() + " torn registrations.";
+        public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
+        {
+            int count = results.Count();
+            return $"{count} torn {RegistrationsPlural(count)}.";
+        }
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
         {
@@ -65,7 +62,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity",
             Justification = "FxCop is unable to recognize nicely written LINQ statements from complex code.")]
         private static IEnumerable<InstanceProducer[]> GetTornRegistrationGroups(
-            IEnumerable<InstanceProducer> producers) => 
+            IEnumerable<InstanceProducer> producers) =>
             from producer in producers
             where !producer.IsDecorated
             where producer.Registration.Lifestyle != Lifestyle.Transient
@@ -73,7 +70,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
             where !producer.Registration.WrapsInstanceCreationDelegate
             group producer by producer.Registration into registrationGroup
             let registration = registrationGroup.Key
-            let key = new { registration.ImplementationType, Lifestyle = registration.Lifestyle.IdentificationKey }
+            let lifestyle = registration.Lifestyle.IdentificationKey
+            let key = new { registration.ImplementationType, lifestyle }
             group registrationGroup by key into registrationLifestyleGroup
             let hasConflict = registrationLifestyleGroup.Count() > 1
             where hasConflict
@@ -88,7 +86,11 @@ namespace SimpleInjector.Diagnostics.Analyzers
             Lifestyle lifestyle = diagnosedProducer.Registration.Lifestyle;
             string description = BuildDescription(diagnosedProducer, affectedProducers);
 
-            return new TornLifestyleDiagnosticResult(serviceType, description, lifestyle, implementationType,
+            return new TornLifestyleDiagnosticResult(
+                serviceType,
+                description,
+                lifestyle,
+                implementationType,
                 affectedProducers);
         }
 
@@ -116,5 +118,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 lifestyle.Name,
                 lifestyle == Lifestyle.Singleton ? string.Empty : " during a single " + lifestyle.Name);
         }
+
+        private static string RegistrationsPlural(int number) => number == 1 ? "registration" : "registrations";
     }
 }

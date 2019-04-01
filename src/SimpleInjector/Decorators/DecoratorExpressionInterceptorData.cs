@@ -26,8 +26,12 @@ namespace SimpleInjector.Decorators
 
     internal sealed class DecoratorExpressionInterceptorData
     {
-        public DecoratorExpressionInterceptorData(Container container, Type serviceType, Type decoratorType,
-            Predicate<DecoratorPredicateContext> predicate, Lifestyle lifestyle,
+        public DecoratorExpressionInterceptorData(
+            Container container,
+            Type serviceType,
+            Type decoratorType,
+            Predicate<DecoratorPredicateContext> predicate,
+            Lifestyle lifestyle,
             Func<DecoratorPredicateContext, Type> decoratorTypeFactory = null)
         {
             this.Container = container;

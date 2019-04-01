@@ -35,13 +35,11 @@ namespace SimpleInjector.Advanced
             this.options = options;
         }
 
-        private Lifestyle Lifestyle => this.options.DefaultLifestyle;
-
         public Lifestyle SelectLifestyle(Type implementationType)
         {
             Requires.IsNotNull(implementationType, nameof(implementationType));
 
-            return this.Lifestyle;
+            return this.options.DefaultLifestyle;
         }
     }
 }

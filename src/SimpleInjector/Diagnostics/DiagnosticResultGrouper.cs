@@ -25,7 +25,6 @@ namespace SimpleInjector.Diagnostics
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
 
     internal class DiagnosticResultGrouper
     {
@@ -61,17 +60,17 @@ namespace SimpleInjector.Diagnostics
             select this.BuildDiagnosticGroup(resultGroup.Key, resultGroup, level + 1))
             .ToArray();
 
-        private static Type MakeTypePartiallyGenericUpToLevel(Type serviceType, int level) => 
+        private static Type MakeTypePartiallyGenericUpToLevel(Type serviceType, int level) =>
             TypeGeneralizer.MakeTypePartiallyGenericUpToLevel(serviceType, level);
 
-        private DiagnosticGroup BuildDiagnosticGroup(Type groupType, IEnumerable<DiagnosticResult> results, 
-            int level) => 
+        private DiagnosticGroup BuildDiagnosticGroup(
+            Type groupType, IEnumerable<DiagnosticResult> results, int level) =>
             groupType.ContainsGenericParameters()
                 ? this.BuildGenericGroup(groupType, results, level)
                 : this.BuildNonGenericGroup(groupType, results);
 
-        private DiagnosticGroup BuildGenericGroup(Type groupType, IEnumerable<DiagnosticResult> results,
-            int level)
+        private DiagnosticGroup BuildGenericGroup(
+            Type groupType, IEnumerable<DiagnosticResult> results, int level)
         {
             DiagnosticGroup[] childGroups = this.GroupResults(results, level);
 
@@ -92,7 +91,7 @@ namespace SimpleInjector.Diagnostics
                 results: groupResults);
         }
 
-        private DiagnosticGroup BuildNonGenericGroup(Type closedType, IEnumerable<DiagnosticResult> results) => 
+        private DiagnosticGroup BuildNonGenericGroup(Type closedType, IEnumerable<DiagnosticResult> results) =>
             new DiagnosticGroup(
                 diagnosticType: this.analyzer.DiagnosticType,
                 groupType: closedType,

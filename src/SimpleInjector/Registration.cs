@@ -117,15 +117,15 @@ namespace SimpleInjector
         /// <see cref="IPropertySelectionBehavior"/>) and by applying any initializers.
         /// </remarks>
         /// <param name="instance">The instance to initialize.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is a null
+        /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="instance"/> is not
         /// of type <see cref="ImplementationType"/>.</exception>
         public void InitializeInstance(object instance)
         {
             Requires.IsNotNull(instance, nameof(instance));
-            Requires.ServiceIsAssignableFromImplementation(this.ImplementationType, instance.GetType(),
-                nameof(instance));
+            Requires.ServiceIsAssignableFromImplementation(
+                this.ImplementationType, instance.GetType(), nameof(instance));
 
             if (this.instanceInitializer == null)
             {
@@ -307,11 +307,14 @@ namespace SimpleInjector
         /// registered <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> that are 
         /// applicable to the given <typeparamref name="TService"/> (if any).
         /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
+        /// <typeparam name="TService">
+        /// The interface or base type that can be used to retrieve instances.
+        /// </typeparam>
         /// <param name="instanceCreator">
         /// The delegate supplied by the user that allows building or creating new instances.</param>
         /// <returns>An <see cref="Expression"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
         protected Expression BuildTransientExpression<TService>(Func<TService> instanceCreator)
             where TService : class
         {
@@ -355,8 +358,9 @@ namespace SimpleInjector
                 expression = this.WrapWithPropertyInjector(this.ImplementationType, expression);
                 expression = this.InterceptInstanceCreation(this.ImplementationType, expression);
                 expression = this.WrapWithInitializer(this.ImplementationType, expression);
+                expression = this.ReplacePlaceHoldersWithOverriddenParameters(expression);
 
-                return this.ReplacePlaceHoldersWithOverriddenParameters(expression);
+                return expression;
             }
             catch (CyclicDependencyException ex)
             {

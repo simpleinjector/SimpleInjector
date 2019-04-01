@@ -141,8 +141,8 @@ namespace SimpleInjector.Internals
         private bool MappingConcreteTypeHasConstraint(GenericParameterAttributes constraint) =>
             GenericParameterHasConstraint(this.Mapping.ConcreteType, constraint);
 
-        private static bool GenericParameterHasConstraint(Type genericParameter, 
-            GenericParameterAttributes constraint)
+        private static bool GenericParameterHasConstraint(
+            Type genericParameter, GenericParameterAttributes constraint)
         {
             if (!genericParameter.IsGenericParameter)
             {

@@ -25,7 +25,6 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
     using SimpleInjector;
     using SimpleInjector.Decorators;
 
@@ -51,12 +50,12 @@ namespace SimpleInjector.Internals
 
         protected Container Container { get; }
 
-        internal abstract void AddControlledRegistrations(Type serviceType, 
-            ContainerControlledItem[] registrations, bool append);
+        internal abstract void AddControlledRegistrations(
+            Type serviceType, ContainerControlledItem[] registrations, bool append);
 
         internal abstract void RegisterUncontrolledCollection(Type serviceType, InstanceProducer producer);
 
-        internal InstanceProducer TryGetInstanceProducer(Type elementType) => 
+        internal InstanceProducer TryGetInstanceProducer(Type elementType) =>
             this.ServiceType == elementType || this.ServiceType.IsGenericTypeDefinitionOf(elementType)
                 ? this.GetInstanceProducerFromCache(elementType)
                 : null;
@@ -159,7 +158,7 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private IEnumerable<RegistrationGroup> GetOverlappingGroupsFor(Type serviceType) => 
+        private IEnumerable<RegistrationGroup> GetOverlappingGroupsFor(Type serviceType) =>
             from registrationGroup in this.RegistrationGroups
             where !registrationGroup.Appended
             where registrationGroup.ServiceType == serviceType
@@ -178,15 +177,15 @@ namespace SimpleInjector.Internals
             internal bool Appended { get; private set; }
 
             internal static RegistrationGroup CreateForUncontrolledProducer(Type serviceType,
-                InstanceProducer producer) => 
+                InstanceProducer producer) =>
                 new RegistrationGroup
                 {
                     ServiceType = serviceType,
                     UncontrolledProducer = producer
                 };
 
-            internal static RegistrationGroup CreateForControlledItems(Type serviceType,
-                ContainerControlledItem[] registrations, bool appended) => 
+            internal static RegistrationGroup CreateForControlledItems(
+                Type serviceType, ContainerControlledItem[] registrations, bool appended) =>
                 new RegistrationGroup
                 {
                     ServiceType = serviceType,
