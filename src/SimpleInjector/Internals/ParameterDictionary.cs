@@ -58,7 +58,7 @@ namespace SimpleInjector.Internals
             // it is valid for all parameter names of the same member to be null, we have to have use the
             // ParameterType as well to compare two ParameterInfo objects.
             public int GetHashCode(ParameterInfo obj) =>
-                (obj?.Name ?? string.Empty).GetHashCode() 
+                (obj?.Name ?? string.Empty).GetHashCode()
                 ^ obj.ParameterType.GetHashCode()
                 ^ GetHashCode(obj.Member);
 

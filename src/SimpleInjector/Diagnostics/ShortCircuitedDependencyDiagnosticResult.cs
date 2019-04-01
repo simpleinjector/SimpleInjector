@@ -85,7 +85,7 @@ namespace SimpleInjector.Diagnostics
                     value: actualDependency),
                 new DebuggerViewItem(
                     name: "Expected Dependency",
-                    description: possibleSkippedRegistrations.First().ServiceType.ToFriendlyName(),
+                    description: possibleSkippedRegistrations[0].ServiceType.ToFriendlyName(),
                     value: possibleSkippedRegistrations.Length == 1 ?
                         (object)possibleSkippedRegistrations[0] :
                         possibleSkippedRegistrations),

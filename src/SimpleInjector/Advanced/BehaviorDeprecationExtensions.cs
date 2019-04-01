@@ -27,8 +27,8 @@
         /// <returns>Throws an exception.</returns>
         [Obsolete(DependencyInjectionBehaviorObsoleteMessage, error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static Expression BuildExpression(this IDependencyInjectionBehavior behavior,
-            InjectionConsumerInfo consumer)
+        public static Expression BuildExpression(
+            this IDependencyInjectionBehavior behavior, InjectionConsumerInfo consumer)
         {
             throw new NotSupportedException(DependencyInjectionBehaviorObsoleteMessage);
         }

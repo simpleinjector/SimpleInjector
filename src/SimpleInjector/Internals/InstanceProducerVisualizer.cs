@@ -31,7 +31,8 @@ namespace SimpleInjector.Internals
     {
         private const string ExpressionNotCreatedYetMessage = "{ Expression not created yet }";
 
-        internal static string VisualizeIndentedObjectGraph(this InstanceProducer producer, VisualizationOptions options)
+        internal static string VisualizeIndentedObjectGraph(
+            this InstanceProducer producer, VisualizationOptions options)
         {
             if (!producer.IsExpressionCreated)
             {
@@ -39,15 +40,16 @@ namespace SimpleInjector.Internals
             }
 
             var set = new HashSet<InstanceProducer>(InstanceProducer.EqualityComparer);
-            var objectGraphBuilder = new ObjectGraphBuilder(options.IncludeLifestyleInformation);
+            var objectGraphBuilder = new ObjectGraphStringBuilder(options.IncludeLifestyleInformation);
 
-            producer.VisualizeIndentedObjectGraph(indentingDepth: 0, last: true, set: set, objectGraphBuilder: objectGraphBuilder);
+            producer.VisualizeIndentedObjectGraph(
+                indentingDepth: 0, last: true, set: set, objectGraphBuilder: objectGraphBuilder);
 
             return objectGraphBuilder.ToString();
         }
 
-        internal static string VisualizeInlinedAndTruncatedObjectGraph(this InstanceProducer producer,
-            int maxLength)
+        internal static string VisualizeInlinedAndTruncatedObjectGraph(
+            this InstanceProducer producer, int maxLength)
         {
             if (!producer.IsExpressionCreated)
             {
@@ -71,7 +73,7 @@ namespace SimpleInjector.Internals
             int indentingDepth,
             bool last,
             HashSet<InstanceProducer> set,
-            ObjectGraphBuilder objectGraphBuilder)
+            ObjectGraphStringBuilder objectGraphBuilder)
         {
             objectGraphBuilder.BeginInstanceProducer(producer);
 
@@ -95,7 +97,7 @@ namespace SimpleInjector.Internals
             int indentingDepth,
             bool last,
             HashSet<InstanceProducer> set,
-            ObjectGraphBuilder objectGraphBuilder)
+            ObjectGraphStringBuilder objectGraphBuilder)
         {
             bool isCyclicGraph = set.Contains(dependency);
 
@@ -117,8 +119,8 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private static IEnumerable<string> VisualizeInlinedDependencies(this InstanceProducer producer,
-            int maxLength)
+        private static IEnumerable<string> VisualizeInlinedDependencies(
+            this InstanceProducer producer, int maxLength)
         {
             var relationships = new Stack<KnownRelationship>(producer.GetRelationships().Reverse());
 

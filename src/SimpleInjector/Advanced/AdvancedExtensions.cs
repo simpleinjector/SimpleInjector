@@ -127,7 +127,8 @@ namespace SimpleInjector.Advanced
             nameof(ContainerScope.GetOrSetItem) + " instead. This method will be removed in a future release.",
             error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public static T GetOrSetItem<T>(this Container container, object key, Func<Container, object, T> valueFactory)
+        public static T GetOrSetItem<T>(
+            this Container container, object key, Func<Container, object, T> valueFactory)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(key, nameof(key));

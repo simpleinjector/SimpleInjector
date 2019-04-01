@@ -26,34 +26,23 @@ namespace SimpleInjector.Diagnostics.Analyzers
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using System.Reflection;
 
     internal sealed class SingleResponsibilityViolationsAnalyzer : IContainerAnalyzer
     {
-        internal static readonly IContainerAnalyzer Instance = new SingleResponsibilityViolationsAnalyzer();
-
         private const int MaximumValidNumberOfDependencies = 7;
-
-        private SingleResponsibilityViolationsAnalyzer()
-        {
-        }
 
         public DiagnosticType DiagnosticType => DiagnosticType.SingleResponsibilityViolation;
 
         public string Name => "Potential Single Responsibility Violations";
 
-        public string GetRootDescription(IEnumerable<DiagnosticResult> results)
-        {
-            int count = results.Count();
-
-            return count + " possible single responsibility " + ViolationPlural(count) + ".";
-        }
+        public string GetRootDescription(DiagnosticResult[] results) =>
+            $"{results.Length} possible single responsibility {ViolationPlural(results.Length)}.";
 
         public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
         {
             int count = results.Count();
 
-            return count + " possible " + ViolationPlural(count) + ".";
+            return $"{count} possible {ViolationPlural(count)}.";
         }
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers) => (

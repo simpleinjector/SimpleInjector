@@ -29,7 +29,7 @@ namespace SimpleInjector.Internals
     /// Container controlled collections can be supplied with both Type objects or direct Registration
     /// instances.
     /// </summary>
-    [DebuggerDisplay(nameof(ContainerControlledItem) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
+    [DebuggerDisplay(nameof(ContainerControlledItem) + " ({" + nameof(ContainerControlledItem.DebuggerDisplay) + ", nq})")]
     internal sealed class ContainerControlledItem
     {
         /// <summary>Will never be null. Can be open-generic.</summary>
@@ -41,6 +41,7 @@ namespace SimpleInjector.Internals
         private ContainerControlledItem(Registration registration)
         {
             Requires.IsNotNull(registration, nameof(registration));
+
             this.Registration = registration;
             this.ImplementationType = registration.ImplementationType;
         }
@@ -48,6 +49,7 @@ namespace SimpleInjector.Internals
         private ContainerControlledItem(Type implementationType)
         {
             Requires.IsNotNull(implementationType, nameof(implementationType));
+
             this.ImplementationType = implementationType;
         }
 

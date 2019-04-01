@@ -524,7 +524,7 @@ namespace SimpleInjector
         {
             if (!this.Container.Options.SuppressLifestyleMismatchVerification)
             {
-                var error = LifestyleMismatchAnalyzer.Instance.Analyze(this.SelfAndWrappedProducers)
+                var error = new LifestyleMismatchAnalyzer().Analyze(this.SelfAndWrappedProducers)
                     .Cast<LifestyleMismatchDiagnosticResult>()
                     .FirstOrDefault();
 

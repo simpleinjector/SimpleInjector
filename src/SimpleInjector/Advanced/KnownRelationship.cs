@@ -31,7 +31,7 @@ namespace SimpleInjector.Advanced
     /// A known relationship defines a relationship between two types. The Diagnostics Debug View uses this
     /// information to spot possible misconfigurations. 
     /// </summary>
-    [DebuggerDisplay(nameof(KnownRelationship))]
+    [DebuggerDisplay("{" + nameof(KnownRelationship.DebuggerDisplay) + ",nq}")]
     public sealed class KnownRelationship : IEquatable<KnownRelationship>
     {
         // This constructor is here for backwards compatibility: the library itself uses the internal ctor.

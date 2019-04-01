@@ -30,9 +30,9 @@ namespace SimpleInjector.Decorators
     {
         internal static bool ComposesServiceType(Type serviceType, ConstructorInfo constructor) =>
             GetNumberOfCompositeServiceTypeDependencies(serviceType, constructor) > 0;
-        
-        private static int GetNumberOfCompositeServiceTypeDependencies(Type serviceType,
-            ConstructorInfo compositeConstructor)
+
+        private static int GetNumberOfCompositeServiceTypeDependencies(
+            Type serviceType, ConstructorInfo compositeConstructor)
         {
             Type compositeServiceType = GetCompositeBaseType(serviceType, compositeConstructor);
 
@@ -54,7 +54,7 @@ namespace SimpleInjector.Decorators
         private static Type GetCompositeBaseType(Type serviceType, ConstructorInfo compositeConstructor)
         {
             // This list can only contain serviceType and closed and partially closed versions of serviceType.
-            var baseTypeCandidates = 
+            var baseTypeCandidates =
                 Types.GetBaseTypeCandidates(serviceType, compositeConstructor.DeclaringType);
 
             var compositeInterfaces =
@@ -65,12 +65,13 @@ namespace SimpleInjector.Decorators
             return compositeInterfaces.FirstOrDefault();
         }
 
-        private static bool ContainsCompositeParameters(ConstructorInfo compositeConstructor, Type serviceType) =>
+        private static bool ContainsCompositeParameters(
+            ConstructorInfo compositeConstructor, Type serviceType) =>
             compositeConstructor.GetParameters()
                 .Any(parameter => IsCompositeParameter(parameter, serviceType));
 
         private static bool IsCompositeParameter(ParameterInfo parameter, Type serviceType) =>
-            Types.IsGenericCollectionType(parameter.ParameterType) &&
-                parameter.ParameterType.GetGenericArguments()[0] == serviceType;
+            Types.IsGenericCollectionType(parameter.ParameterType)
+                && parameter.ParameterType.GetGenericArguments()[0] == serviceType;
     }
 }

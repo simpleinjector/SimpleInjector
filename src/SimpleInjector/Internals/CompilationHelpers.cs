@@ -174,7 +174,8 @@ namespace SimpleInjector.Internals
                 select Expression.Assign(registrationInfo.Variable, newExpression))
                 .ToArray();
 
-            var optimizedExpression = ObjectGraphOptimizerExpressionVisitor.Optimize(expression, registrationInfos);
+            var optimizedExpression =
+                ObjectGraphOptimizerExpressionVisitor.Optimize(expression, registrationInfos);
 
             return Expression.Block(
                 variables: lifestyleInfos.Select(l => l.Variable)
@@ -184,7 +185,8 @@ namespace SimpleInjector.Internals
                         .Concat(new[] { optimizedExpression })));
         }
 
-        private static NewExpression CreateNewLazyScopeExpression(Func<Scope> scopeFactory, Container container) =>
+        private static NewExpression CreateNewLazyScopeExpression(
+            Func<Scope> scopeFactory, Container container) =>
             Expression.New(
                 LazyScopeConstructor,
                 Expression.Constant(scopeFactory, typeof(Func<Scope>)),
@@ -233,7 +235,8 @@ namespace SimpleInjector.Internals
 
                 reducedNodes[mostReductiveNode] = replacementNode;
 
-                expression = NodeReplacer.Replace(expression, oldNode: mostReductiveNode, newNode: replacementNode);
+                expression =
+                    NodeReplacer.Replace(expression, oldNode: mostReductiveNode, newNode: replacementNode);
 
                 results = NodeSizeCalculator.Calculate(expression);
             }
@@ -248,12 +251,14 @@ namespace SimpleInjector.Internals
         {
             // Here we compile the expression. This will recursively reduce this sub graph again. The already
             // reduced nodes are passed on; hopefully they can be reused while reducing this sub graph.
-            Delegate compiledDelegate = CompileExpression(expression.Type, container, expression, reducedNodes);
+            Delegate compiledDelegate =
+                CompileExpression(expression.Type, container, expression, reducedNodes);
+
             return Expression.Invoke(Expression.Constant(compiledDelegate));
         }
 
-        private static Expression FindMostReductiveNodeOrNull(NodeSizes results,
-            int maximumNumberOfNodesPerDelegate)
+        private static Expression FindMostReductiveNodeOrNull(
+            NodeSizes results, int maximumNumberOfNodesPerDelegate)
         {
             // By setting a maximum size, we prevent that the one of the root nodes will be selected as most
             // reductive node. Although this would reduce the expression to a few nodes, this will leave us
@@ -282,7 +287,7 @@ namespace SimpleInjector.Internals
 
             var nodeWithLargestCost = nodesByTotalCost.FirstOrDefault();
 
-            return nodeWithLargestCost != null ? nodeWithLargestCost.Node : null;
+            return nodeWithLargestCost?.Node;
         }
 
         private sealed class PerObjectGraphOptimizableRegistrationFinder : ExpressionVisitor
@@ -294,9 +299,7 @@ namespace SimpleInjector.Internals
 
             public static OptimizableLifestyleInfo[] Find(Expression expression, Container container)
             {
-                var finder = new PerObjectGraphOptimizableRegistrationFinder();
-
-                finder.container = container;
+                var finder = new PerObjectGraphOptimizableRegistrationFinder { container = container };
 
                 finder.Visit(expression);
 
@@ -327,18 +330,14 @@ namespace SimpleInjector.Internals
 
             private Registration GetScopedRegistration(MethodCallExpression node)
             {
-                var instance = node.Object as ConstantExpression;
+                var registration = node.Object is ConstantExpression instance
+                    ? instance.Value as Registration
+                    : null;
 
-                var registration = instance != null ? instance.Value as Registration : null;
-
-                if (registration != null && object.ReferenceEquals(registration.Container, this.container))
+                if (object.ReferenceEquals(registration?.Container, this.container)
+                    && typeof(ScopedRegistration<>).IsGenericTypeDefinitionOf(registration.GetType()))
                 {
-                    Type type = registration.GetType();
-
-                    if (type.IsGenericType() && type.GetGenericTypeDefinition() == typeof(ScopedRegistration<>))
-                    {
-                        return registration;
-                    }
+                    return registration;
                 }
 
                 return null;
@@ -361,14 +360,12 @@ namespace SimpleInjector.Internals
 
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
-                var registration = this.registrationsToOptimize.FirstOrDefault(r => r.OriginalExpression == node);
+                var registration =
+                    this.registrationsToOptimize.FirstOrDefault(r => r.OriginalExpression == node);
 
-                if (registration != null)
-                {
-                    return registration.LazyScopeRegistrationGetInstanceExpression;
-                }
-
-                return base.VisitMethodCall(node);
+                return registration != null
+                    ? registration.LazyScopeRegistrationGetInstanceExpression
+                    : base.VisitMethodCall(node);
             }
         }
 
@@ -438,7 +435,11 @@ namespace SimpleInjector.Internals
                     Expression.Property(this.LifestyleInfo.Variable, "Value"));
         }
 
-        [DebuggerDisplay("TotalCost: {TotalCost}, Count: {Count}, NumberOfNodes: {NumberOfNodes}, Node: {Node}")]
+        [DebuggerDisplay(
+            nameof(ExpressionInfo.TotalCost) + ": {" + nameof(ExpressionInfo.TotalCost) + "}, " +
+            nameof(ExpressionInfo.Count) + ": {" + nameof(ExpressionInfo.Count) + "}, " +
+            nameof(ExpressionInfo.TreeSize) + ": {" + nameof(ExpressionInfo.TreeSize) + "}, " +
+            nameof(ExpressionInfo.Node) + ": {" + nameof(ExpressionInfo.Node) + "}")]
         private sealed class ExpressionInfo
         {
             public Expression Node { get; set; }
@@ -498,9 +499,16 @@ namespace SimpleInjector.Internals
             {
                 ExpressionInfo info;
 
-                return this.nodes.TryGetValue(node, out info)
-                    ? info
-                    : this.nodes[node] = new ExpressionInfo { Node = node };
+                if (this.nodes.TryGetValue(node, out info))
+                {
+                    return info;
+                }
+                else
+                {
+                    info = new ExpressionInfo { Node = node };
+                    this.nodes[node] = info;
+                    return info;
+                }
             }
         }
 
@@ -509,16 +517,14 @@ namespace SimpleInjector.Internals
             private Expression oldNode;
             private Expression newNode;
 
-            public static Expression Replace(Expression expression, Expression oldNode, Expression newNode)
-            {
-                var replacer = new NodeReplacer { oldNode = oldNode, newNode = newNode };
-                return replacer.Visit(expression);
-            }
+            public static Expression Replace(Expression expression, Expression oldNode, Expression newNode) =>
+                new NodeReplacer { oldNode = oldNode, newNode = newNode }
+                    .Visit(expression);
 
-            public override Expression Visit(Expression node)
-            {
-                return object.ReferenceEquals(node, this.oldNode) ? this.newNode : base.Visit(node);
-            }
+            public override Expression Visit(Expression node) =>
+                object.ReferenceEquals(node, this.oldNode)
+                    ? this.newNode
+                    : base.Visit(node);
         }
     }
 }

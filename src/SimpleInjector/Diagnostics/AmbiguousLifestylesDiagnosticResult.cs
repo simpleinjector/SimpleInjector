@@ -54,7 +54,7 @@ namespace SimpleInjector.Diagnostics
             this.Lifestyles = new ReadOnlyCollection<Lifestyle>(lifestyles.ToList());
             this.ImplementationType = implementationType;
             this.DiagnosedRegistration = diagnosedProducer;
-            this.ConflictingRegistrations = 
+            this.ConflictingRegistrations =
                 new ReadOnlyCollection<InstanceProducer>(conflictingProducers.ToList());
         }
 

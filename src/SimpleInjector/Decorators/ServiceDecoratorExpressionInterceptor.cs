@@ -88,9 +88,7 @@ namespace SimpleInjector.Decorators
         private void MarkDecorateeFactoryRelationshipAsInstanceCreationDelegate(
             KnownRelationship[] relationships)
         {
-            var decorateeFactoryDependencies = this.GetDecorateeFactoryDependencies(relationships);
-
-            foreach (Registration dependency in decorateeFactoryDependencies)
+            foreach (Registration dependency in this.GetDecorateeFactoryDependencies(relationships))
             {
                 // Mark the dependency of the decoratee factory
                 dependency.WrapsInstanceCreationDelegate = true;

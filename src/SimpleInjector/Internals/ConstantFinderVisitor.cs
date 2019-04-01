@@ -24,7 +24,6 @@ namespace SimpleInjector.Internals
 {
     using System.Collections.Generic;
     using System.Linq.Expressions;
-    using System.Reflection;
 
     internal sealed class ConstantFinderVisitor : ExpressionVisitor
     {

@@ -27,7 +27,7 @@ namespace SimpleInjector.Internals
     using System.Linq;
     using System.Text;
 
-    internal sealed class ObjectGraphBuilder
+    internal sealed class ObjectGraphStringBuilder
     {
         private const int IndentSize = 4;
 
@@ -38,7 +38,7 @@ namespace SimpleInjector.Internals
         private ProducerEntry stillToWriteLifestyleEntry;
         private int indentingDepth;
 
-        public ObjectGraphBuilder(bool writeLifestyles)
+        public ObjectGraphStringBuilder(bool writeLifestyles)
         {
             this.writeLifestyles = writeLifestyles;
         }

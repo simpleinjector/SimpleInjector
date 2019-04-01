@@ -137,18 +137,18 @@ namespace SimpleInjector.Decorators
             Type registeredServiceType, Expression expression, ServiceTypeDecoratorInfo info)
         {
             // NOTE: registeredServiceType can be different from registeredProducer.ServiceType.
-            // This is the case for container uncontrolled collections where producer.ServiceType is the
+            // This is the case for container-uncontrolled collections where producer.ServiceType is the
             // IEnumerable<T> and registeredServiceType is T.
             return DecoratorPredicateContext.CreateFromInfo(registeredServiceType, expression, info);
         }
 
         protected Expression GetExpressionForDecorateeDependencyParameterOrNull(
-            ParameterInfo parameter, Type serviceType, Expression expression)
+            ParameterInfo param, Type serviceType, Expression expr)
         {
             return
-                BuildExpressionForDecorateeDependencyParameter(parameter, serviceType, expression) ??
-                this.BuildExpressionForDecorateeFactoryDependencyParameter(parameter, serviceType, expression) ??
-                this.BuildExpressionForScopedDecorateeFactoryDependencyParameter(parameter, serviceType, expression);
+                BuildExpressionForDecorateeDependencyParameter(param, serviceType, expr)
+                ?? this.BuildExpressionForDecorateeFactoryDependencyParameter(param, serviceType, expr)
+                ?? this.BuildExpressionForScopedDecorateeFactoryDependencyParameter(param, serviceType, expr);
         }
 
         protected static ParameterInfo GetDecorateeParameter(
@@ -183,8 +183,8 @@ namespace SimpleInjector.Decorators
             return new InstanceProducer(parameter.ParameterType, registration);
         }
 
-        private static void AddVerifierForDecorateeFactoryDependency(Expression decorateeExpression,
-            InstanceProducer producer)
+        private static void AddVerifierForDecorateeFactoryDependency(
+            Expression decorateeExpression, InstanceProducer producer)
         {
             // Func<T> dependencies for the decoratee must be explicitly added to the InstanceProducer as 
             // verifier. This allows those dependencies to be verified when calling Container.Verify().
@@ -261,12 +261,7 @@ namespace SimpleInjector.Decorators
         private static Expression BuildExpressionForDecorateeDependencyParameter(
             ParameterInfo parameter, Type serviceType, Expression expression)
         {
-            if (IsDecorateeDependencyParameter(parameter, serviceType))
-            {
-                return expression;
-            }
-
-            return null;
+            return IsDecorateeDependencyParameter(parameter, serviceType) ? expression : null;
         }
 
         private static bool IsDecorateeDependencyParameter(ParameterInfo parameter, Type registeredServiceType)
@@ -276,17 +271,17 @@ namespace SimpleInjector.Decorators
 
         // The constructor parameter in which the factory for creating decorated instances should be injected.
         private Expression BuildExpressionForDecorateeFactoryDependencyParameter(
-            ParameterInfo parameter, Type serviceType, Expression expression)
+            ParameterInfo param, Type serviceType, Expression expr)
         {
-            if (DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(parameter.ParameterType, serviceType))
+            if (DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(param.ParameterType, serviceType))
             {
                 // We can't call CompilationHelpers.CompileExpression here, because it has a generic type and
                 // we don't know the type at runtime here. We need to do some refactoring to CompilationHelpers
                 // to get that working.
-                expression = CompilationHelpers.OptimizeScopedRegistrationsInObjectGraph(this.Container, expression);
+                expr = CompilationHelpers.OptimizeScopedRegistrationsInObjectGraph(this.Container, expr);
 
                 var instanceCreator =
-                    Expression.Lambda(Expression.Convert(expression, serviceType)).Compile();
+                    Expression.Lambda(Expression.Convert(expr, serviceType)).Compile();
 
                 return Expression.Constant(instanceCreator);
             }
@@ -296,14 +291,14 @@ namespace SimpleInjector.Decorators
 
         // The constructor parameter in which the factory for creating decorated instances should be injected.
         private Expression BuildExpressionForScopedDecorateeFactoryDependencyParameter(
-            ParameterInfo parameter, Type serviceType, Expression expression)
+            ParameterInfo param, Type serviceType, Expression expr)
         {
-            if (DecoratorHelpers.IsScopeDecorateeFactoryDependencyParameter(parameter.ParameterType, serviceType))
+            if (DecoratorHelpers.IsScopeDecorateeFactoryDependencyParameter(param.ParameterType, serviceType))
             {
-                expression = CompilationHelpers.OptimizeScopedRegistrationsInObjectGraph(this.Container, expression);
+                expr = CompilationHelpers.OptimizeScopedRegistrationsInObjectGraph(this.Container, expr);
 
                 var instanceCreator =
-                    Expression.Lambda(Expression.Convert(expression, serviceType)).Compile();
+                    Expression.Lambda(Expression.Convert(expr, serviceType)).Compile();
 
                 var scopeParameter = Expression.Parameter(typeof(Scope), "scope");
 

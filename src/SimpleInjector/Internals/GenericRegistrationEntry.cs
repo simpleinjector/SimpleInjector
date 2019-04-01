@@ -24,6 +24,7 @@ namespace SimpleInjector.Internals
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
 
     internal sealed class GenericRegistrationEntry : IRegistrationEntry
@@ -116,9 +117,10 @@ namespace SimpleInjector.Internals
         }
 
         public InstanceProducer TryGetInstanceProducer(
-            Type closedGenericServiceType, InjectionConsumerInfo consumer)
+            Type serviceType, InjectionConsumerInfo consumer)
         {
-            var producers = this.GetInstanceProducers(closedGenericServiceType, consumer).ToArray();
+            // Pre-condition: serviceType is always a closed-generic type
+            var producers = this.GetInstanceProducers(serviceType, consumer).ToArray();
 
             if (producers.Length <= 1)
             {
@@ -126,7 +128,7 @@ namespace SimpleInjector.Internals
             }
 
             throw new ActivationException(
-                StringResources.MultipleApplicableRegistrationsFound(closedGenericServiceType, producers));
+                StringResources.MultipleApplicableRegistrationsFound(serviceType, producers));
         }
 
         public int GetNumberOfConditionalRegistrationsFor(Type serviceType) =>
@@ -237,16 +239,6 @@ namespace SimpleInjector.Internals
             select provider;
 
         private static InvalidOperationException GetAnOverlappingGenericRegistrationExistsException(
-            InstanceProducer providerToRegister, IProducerProvider overlappingProvider) =>
-            new InvalidOperationException(
-                StringResources.AnOverlappingRegistrationExists(
-                    providerToRegister.ServiceType,
-                    overlappingProvider.ImplementationType,
-                    overlappingProvider.IsConditional,
-                    providerToRegister.ImplementationType,
-            providerToRegister.IsConditional));
-
-        private static InvalidOperationException GetAnOverlappingGenericRegistrationExistsException(
             IProducerProvider providerToRegister, IProducerProvider overlappingProvider) =>
             new InvalidOperationException(
                 StringResources.AnOverlappingRegistrationExists(
@@ -295,8 +287,8 @@ namespace SimpleInjector.Internals
             public bool MatchesServiceType(Type serviceType) => serviceType == this.producer.ServiceType;
 
             public bool OverlapsWith(InstanceProducer producerToCheck) =>
-                (this.producer.IsUnconditional || producerToCheck.IsUnconditional) &&
-                this.producer.ServiceType == producerToCheck.ServiceType;
+                (this.producer.IsUnconditional || producerToCheck.IsUnconditional)
+                && this.producer.ServiceType == producerToCheck.ServiceType;
 
             public InstanceProducer TryGetProducer(
                 Type serviceType, InjectionConsumerInfo consumer, bool handled) =>
@@ -463,11 +455,9 @@ namespace SimpleInjector.Internals
             {
                 Type key = context.ImplementationType;
 
-                Registration registration;
-
                 // Never build a registration for a particular implementation type twice. This would break
                 // the promise of returning singletons.
-                if (!this.registrationCache.TryGetValue(key, out registration))
+                if (!this.registrationCache.TryGetValue(key, out Registration registration))
                 {
                     this.registrationCache[key] = registration = this.CreateNewRegistrationFor(context);
                 }

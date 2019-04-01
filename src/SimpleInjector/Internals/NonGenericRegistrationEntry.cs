@@ -45,10 +45,17 @@ namespace SimpleInjector.Internals
             InstanceProducer TryGetProducer(InjectionConsumerInfo consumer, bool handled);
         }
 
-        public IEnumerable<InstanceProducer> CurrentProducers => this.providers.SelectMany(p => p.CurrentProducers);
-        private IEnumerable<InstanceProducer> ConditionalProducers => this.CurrentProducers.Where(p => p.IsConditional);
-        private IEnumerable<InstanceProducer> UnconditionalProducers => this.CurrentProducers.Where(p => !p.IsConditional);
-        public int GetNumberOfConditionalRegistrationsFor(Type serviceType) => this.CurrentProducers.Count(p => p.IsConditional);
+        public IEnumerable<InstanceProducer> CurrentProducers =>
+            this.providers.SelectMany(p => p.CurrentProducers);
+
+        private IEnumerable<InstanceProducer> ConditionalProducers =>
+            this.CurrentProducers.Where(p => p.IsConditional);
+
+        private IEnumerable<InstanceProducer> UnconditionalProducers =>
+            this.CurrentProducers.Where(p => !p.IsConditional);
+
+        public int GetNumberOfConditionalRegistrationsFor(Type serviceType) =>
+            this.CurrentProducers.Count(p => p.IsConditional);
 
         public void Add(InstanceProducer producer)
         {
@@ -131,10 +138,12 @@ namespace SimpleInjector.Internals
 
         private void ThrowWhenTypeAlreadyRegistered(InstanceProducer producer)
         {
-            if (producer.IsUnconditional && this.providers.Any() &&
-                !this.container.Options.AllowOverridingRegistrations)
+            if (producer.IsUnconditional 
+                && this.providers.Any()
+                && !this.container.Options.AllowOverridingRegistrations)
             {
-                throw new InvalidOperationException(StringResources.TypeAlreadyRegistered(this.nonGenericServiceType));
+                throw new InvalidOperationException(
+                    StringResources.TypeAlreadyRegistered(this.nonGenericServiceType));
             }
         }
 

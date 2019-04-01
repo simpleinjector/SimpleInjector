@@ -37,15 +37,15 @@ namespace SimpleInjector.Diagnostics
     public class SingleResponsibilityViolationDiagnosticResult : DiagnosticResult
     {
         internal SingleResponsibilityViolationDiagnosticResult(
-            Type serviceType, 
+            Type serviceType,
             string description,
-            Type implementationType, 
+            Type implementationType,
             IEnumerable<InstanceProducer> dependencies)
             : base(
-                serviceType, 
-                description, 
+                serviceType,
+                description,
                 DiagnosticType.SingleResponsibilityViolation,
-                DiagnosticSeverity.Information, 
+                DiagnosticSeverity.Information,
                 GetDebugValue(implementationType, dependencies.ToArray()))
         {
             this.ImplementationType = implementationType;

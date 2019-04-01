@@ -39,8 +39,6 @@ namespace SimpleInjector.Decorators
     // -Collections.Register(Type serviceType, IEnumerable uncontrolledCollection).
     internal sealed class ContainerUncontrolledServicesDecoratorInterceptor : DecoratorExpressionInterceptor
     {
-        private static readonly object ContainerItemsKeyAndLock = new object();
-
         private readonly Dictionary<InstanceProducer, IEnumerable> singletonDecoratedCollectionsCache;
         private readonly ExpressionBuiltEventArgs e;
         private readonly Type registeredServiceType;
@@ -108,9 +106,7 @@ namespace SimpleInjector.Decorators
                 originalRegistration: registration,
                 registeredServiceType: this.registeredServiceType);
 
-            Registration decoratorRegistration;
-
-            var decoratedExpression = this.BuildDecoratorExpression(out decoratorRegistration);
+            var decoratedExpression = this.BuildDecoratorExpression(out Registration decoratorRegistration);
 
             this.e.Expression = decoratedExpression;
 
@@ -248,7 +244,8 @@ namespace SimpleInjector.Decorators
 
             if (this.Lifestyle == Lifestyle.Singleton)
             {
-                Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(this.registeredServiceType);
+                Type enumerableServiceType =
+                    typeof(IEnumerable<>).MakeGenericType(this.registeredServiceType);
 
                 Func<IEnumerable> collectionCreator = () =>
                 {
@@ -274,8 +271,8 @@ namespace SimpleInjector.Decorators
 
             if (needsADecorateeFactory)
             {
-                string message = StringResources.CantGenerateFuncForDecorator(this.registeredServiceType,
-                    this.DecoratorTypeDefinition);
+                string message = StringResources.CantGenerateFuncForDecorator(
+                    this.registeredServiceType, this.DecoratorTypeDefinition);
 
                 throw new ActivationException(message);
             }
@@ -283,7 +280,8 @@ namespace SimpleInjector.Decorators
 
         private bool DecoratorNeedsADecorateeFactory() => (
             from parameter in this.decoratorConstructor.GetParameters()
-            where DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(parameter.ParameterType, this.registeredServiceType)
+            where DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(
+                parameter.ParameterType, this.registeredServiceType)
             select parameter)
             .Any();
 
@@ -309,8 +307,8 @@ namespace SimpleInjector.Decorators
             {
                 IEnumerable collection;
 
-                if (!this.singletonDecoratedCollectionsCache.TryGetValue(this.e.InstanceProducer,
-                    out collection))
+                if (!this.singletonDecoratedCollectionsCache.TryGetValue(
+                    this.e.InstanceProducer, out collection))
                 {
                     collection = collectionCreator();
 

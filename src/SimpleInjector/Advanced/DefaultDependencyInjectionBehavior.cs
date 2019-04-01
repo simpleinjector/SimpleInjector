@@ -52,8 +52,9 @@ namespace SimpleInjector.Advanced
 
             InjectionTargetInfo target = consumer.Target;
 
-            InstanceProducer producer = this.container.GetRegistrationEvenIfInvalid(target.TargetType, consumer);
-            
+            InstanceProducer producer =
+                this.container.GetRegistrationEvenIfInvalid(target.TargetType, consumer);
+
             if (producer == null && throwOnFailure)
             {
                 // By redirecting to Verify() we let the verify throw an expressive exception. If it doesn't

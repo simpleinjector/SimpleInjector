@@ -45,8 +45,8 @@ namespace SimpleInjector.Internals
         {
             lock (ServiceCreatedListenersLocker)
             {
-                var listeners =
-                    serviceCreatedListeners ?? (serviceCreatedListeners = new List<Action<ServiceCreatedListenerArgs>>());
+                var listeners = serviceCreatedListeners ?? 
+                    (serviceCreatedListeners = new List<Action<ServiceCreatedListenerArgs>>());
 
                 listeners.Add(serviceCreated);
 
@@ -130,9 +130,7 @@ namespace SimpleInjector.Internals
 
         internal static bool IsContainerControlledCollectionExpression(Expression enumerableExpression)
         {
-            var constantExpression = enumerableExpression as ConstantExpression;
-
-            object enumerable = constantExpression != null ? constantExpression.Value : null;
+            object enumerable = (enumerableExpression as ConstantExpression)?.Value;
 
             return enumerable is IContainerControlledCollection;
         }

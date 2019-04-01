@@ -26,7 +26,6 @@ namespace SimpleInjector.Internals
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
     using SimpleInjector;
     using SimpleInjector.Lifestyles;
 
@@ -51,8 +50,8 @@ namespace SimpleInjector.Internals
             else
             {
                 throw new NotSupportedException(
-                    StringResources.MixingRegistrationsWithControlledAndUncontrolledIsNotSupported(serviceType,
-                        controlled: true));
+                    StringResources.MixingRegistrationsWithControlledAndUncontrolledIsNotSupported(
+                        serviceType, controlled: true));
             }
         }
 
