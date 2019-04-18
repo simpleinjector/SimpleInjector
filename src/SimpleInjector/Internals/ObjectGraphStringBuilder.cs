@@ -33,14 +33,14 @@ namespace SimpleInjector.Internals
 
         private readonly StringBuilder builder = new StringBuilder();
         private readonly Stack<ProducerEntry> producers = new Stack<ProducerEntry>();
-        private readonly bool writeLifestyles;
+        private readonly VisualizationOptions visualizationOptions;
 
         private ProducerEntry stillToWriteLifestyleEntry;
         private int indentingDepth;
 
-        public ObjectGraphStringBuilder(bool writeLifestyles)
+        public ObjectGraphStringBuilder(VisualizationOptions visualizationOptions)
         {
-            this.writeLifestyles = writeLifestyles;
+            this.visualizationOptions = visualizationOptions;
         }
 
         public override string ToString() => this.builder.ToString();
@@ -55,7 +55,7 @@ namespace SimpleInjector.Internals
 
             this.producers.Push(new ProducerEntry(producer));
 
-            this.Append(producer.ImplementationType.ToFriendlyName());
+            this.Append(producer.ImplementationType.ToFriendlyName(this.visualizationOptions.UseFullyQualifiedTypeNames));
             this.Append("(");
 
             this.indentingDepth++;
@@ -107,7 +107,7 @@ namespace SimpleInjector.Internals
 
         private void AppendLifestyle(ProducerEntry entry)
         {
-            if (this.writeLifestyles && !entry.LifestyleWritten)
+            if (this.visualizationOptions.IncludeLifestyleInformation && !entry.LifestyleWritten)
             {
                 this.Append(" // ");
                 this.Append(entry.Producer.Lifestyle.Name);
