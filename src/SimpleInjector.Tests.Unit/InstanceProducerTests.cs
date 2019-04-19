@@ -205,6 +205,42 @@
         }
 
         [TestMethod]
+        public void VisualizeObjectGraph_UseFullyQualifiedTypeNames_BuildsTheExpectedGraph()
+        {
+            // Arrange
+            string expectedObjectGraph =
+@"SimpleInjector.Tests.Unit.PluginDecorator(
+    SimpleInjector.Tests.Unit.PluginDecoratorWithDependencyOfType<SimpleInjector.Tests.Unit.FakeTimeProvider>(
+        SimpleInjector.Tests.Unit.FakeTimeProvider(),
+        SimpleInjector.Tests.Unit.PluginDecorator<System.Int32>(
+            SimpleInjector.Tests.Unit.PluginWithDependencyOfType<SimpleInjector.Tests.Unit.RealTimeProvider>(
+                SimpleInjector.Tests.Unit.RealTimeProvider()))))";
+
+            var container = ContainerFactory.New();
+
+            container.Register<IPlugin, PluginWithDependencyOfType<RealTimeProvider>>();
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator<int>));
+            container.RegisterDecorator(typeof(IPlugin),
+                typeof(PluginDecoratorWithDependencyOfType<FakeTimeProvider>));
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
+
+            container.Verify();
+
+            var pluginProducer = container.GetRegistration(typeof(IPlugin));
+
+            // Act
+            string actualObjectGraph = pluginProducer.VisualizeObjectGraph(new VisualizationOptions
+            {
+                IncludeLifestyleInformation = false,
+                UseFullyQualifiedTypeNames = true,
+            });
+
+            // Assert
+            Assert.AreEqual(expectedObjectGraph, actualObjectGraph);
+        }
+
+
+        [TestMethod]
         public void VisualizeObjectGraph_WhenCalledBeforeInstanceIsCreated_ThrowsAnInvalidOperationException()
         {
             // Arrange
