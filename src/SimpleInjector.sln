@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3BEF8719-6153-4397-9075-F1AC5AAF1AA6}"
 	ProjectSection(SolutionItems) = preProject
@@ -65,6 +65,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.Integration.AspNetCore.Mvc.Core", "SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj", "{635BDB92-7697-467F-AC72-1DD309660A5C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PartialTrustTestRunner", "PartialTrustTestRunner\PartialTrustTestRunner.csproj", "{E710BB05-06B6-40FC-9BA0-D02FFF69A532}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleInjector.Integration.ServiceCollection", "SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj", "{FF421E48-A7B5-4CFF-BDAB-CC26B01F9DED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -262,6 +264,18 @@ Global
 		{E710BB05-06B6-40FC-9BA0-D02FFF69A532}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{E710BB05-06B6-40FC-9BA0-D02FFF69A532}.Release|x86.ActiveCfg = Release|Any CPU
 		{E710BB05-06B6-40FC-9BA0-D02FFF69A532}.Release|x86.Build.0 = Release|Any CPU
+		{FF421E48-A7B5-4CFF-BDAB-CC26B01F9DED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF421E48-A7B5-4CFF-BDAB-CC26B01F9DED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF421E48-A7B5-4CFF-BDAB-CC26B01F9DED}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FF421E48-A7B5-4CFF-BDAB-CC26B01F9DED}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FF421E48-A7B5-4CFF-BDAB-CC26B01F9DED}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FF421E48-A7B5-4CFF-BDAB-CC26B01F9DED}.Debug|x86.Build.0 = Debug|Any CPU
+		{FF421E48-A7B5-4CFF-BDAB-CC26B01F9DED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF421E48-A7B5-4CFF-BDAB-CC26B01F9DED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF421E48-A7B5-4CFF-BDAB-CC26B01F9DED}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{FF421E48-A7B5-4CFF-BDAB-CC26B01F9DED}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{FF421E48-A7B5-4CFF-BDAB-CC26B01F9DED}.Release|x86.ActiveCfg = Release|Any CPU
+		{FF421E48-A7B5-4CFF-BDAB-CC26B01F9DED}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
