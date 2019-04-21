@@ -53,7 +53,11 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
             this.container = container;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Creates a Razor Page model activator.
+        /// </summary>
+        /// <param name="descriptor">The <see cref="CompiledPageActionDescriptor"/>.</param>
+        /// <returns>The delegate used to activate the page model.</returns>
         public Func<PageContext, object> CreateActivator(CompiledPageActionDescriptor descriptor)
         {
             if (descriptor == null)
@@ -92,7 +96,11 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
             return _ => producer.GetInstance();
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Releases a Razor Page model.
+        /// </summary>
+        /// <param name="descriptor">The <see cref="CompiledPageActionDescriptor"/>.</param>
+        /// <returns>The delegate used to dispose the activated Razor Page model or null.</returns>
         public Action<PageContext, object> CreateReleaser(CompiledPageActionDescriptor descriptor) => null;
 
         // By searching through the current registrations, we ensure that the page model is not auto-registered, 
