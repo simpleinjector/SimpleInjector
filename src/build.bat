@@ -55,11 +55,11 @@ set version_Integration_AspNetCore=%version_Core%
 set version_Integration_AspNetCore_Mvc_Core=%version_Core%
 set version_Integration_AspNetCore_Mvc=%version_Core%
 
-set vsvars32_bat="%programfiles(x86)%\Microsoft Visual Studio\2017\Community\Common7\Tools\VsMSBuildCmd.bat"
+set vsvars32_bat="%programfiles(x86)%\Microsoft Visual Studio\2019\Community\Common7\Tools\VsMSBuildCmd.bat"
 if not exist %vsvars32_bat% goto :vsvars32_bat_missing
 @call %vsvars32_bat%
 
-set msbuild="%programfiles(x86)%\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe"
+set msbuild="%programfiles(x86)%\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
 if not exist %msbuild% goto :msbuild_exe_missing
 
 set attrib=%systemroot%\System32\attrib.exe
