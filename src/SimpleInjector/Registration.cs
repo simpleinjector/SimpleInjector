@@ -49,7 +49,7 @@ namespace SimpleInjector
     /// </example>
     public abstract class Registration
     {
-        private static readonly Action<object> NoOp = instance => { };
+        private static readonly Action<object> NoOp = _ => { };
 
         private readonly HashSet<KnownRelationship> knownRelationships = new HashSet<KnownRelationship>();
 
@@ -379,7 +379,7 @@ namespace SimpleInjector
 
             Expression expression = castedParameter;
 
-            expression = this.WrapWithPropertyInjector(type, castedParameter);
+            expression = this.WrapWithPropertyInjector(type, expression);
             expression = this.InterceptInstanceCreation(type, expression);
 
             // NOTE: We can't wrap with the instance created callback, since the InitializeInstance is called
@@ -558,7 +558,8 @@ namespace SimpleInjector
         {
             try
             {
-                return CompilationHelpers.CompileExpression(this.ImplementationType, this.Container, expression);
+                return CompilationHelpers.CompileExpression(
+                    this.ImplementationType, this.Container, expression);
             }
             catch (Exception ex)
             {
