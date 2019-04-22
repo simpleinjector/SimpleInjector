@@ -25,10 +25,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj" />
     <ProjectReference Include="..\SimpleInjector\SimpleInjector.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" />
     <PackageReference Include="NuSpec.ReferenceGenerator" Version="2.0.0-beta-bld14">

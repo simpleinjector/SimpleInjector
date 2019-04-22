@@ -47,8 +47,16 @@ namespace SimpleInjector
         /// <param name="container">The container the controllers should be registered in.</param>
         /// <param name="applicationBuilder">The ASP.NET object that holds the application's configuration.
         /// </param>
-        public static void RegisterMvcControllers(this Container container,
-            IApplicationBuilder applicationBuilder)
+        [Obsolete(
+            "Please use " + nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions) + "." +
+            nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddControllerActivation) + " instead" +
+            "—e.g. 'services.AddSimpleInjector(container, options => options." +
+            nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddControllerActivation) + "());'. " +
+            "Please see https://simpleinjector.org/aspnetcore for more details. " +
+            "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
+            error: false)]
+        public static void RegisterMvcControllers(
+            this Container container, IApplicationBuilder applicationBuilder)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(applicationBuilder, nameof(applicationBuilder));
@@ -82,8 +90,16 @@ namespace SimpleInjector
         /// <param name="applicationBuilder">The ASP.NET object that holds the 
         /// <see cref="IViewComponentDescriptorProvider"/> that allows retrieving the application's controller types.
         /// </param>
-        public static void RegisterMvcViewComponents(this Container container,
-            IApplicationBuilder applicationBuilder)
+        [Obsolete(
+            "Please use " + nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions) + "." +
+            nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddViewComponentActivation) + " instead" +
+            "—e.g. 'services.AddSimpleInjector(container, options => options." +
+            nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddViewComponentActivation) + "());'. " +
+            "Please see https://simpleinjector.org/aspnetcore for more details. " +
+            "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
+            error: false)]
+        public static void RegisterMvcViewComponents(
+            this Container container, IApplicationBuilder applicationBuilder)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(applicationBuilder, nameof(applicationBuilder));
@@ -116,8 +132,16 @@ namespace SimpleInjector
         /// <param name="container">The container the controllers should be registered in.</param>
         /// <param name="viewComponentDescriptorProvider">The provider that contains the list of view
         /// components to register.</param>
-        public static void RegisterMvcViewComponents(this Container container,
-            IViewComponentDescriptorProvider viewComponentDescriptorProvider)
+        [Obsolete(
+            "Please use " + nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions) + "." +
+            nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddViewComponentActivation) + " instead" +
+            "—e.g. 'services.AddSimpleInjector(container, options => options." +
+            nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddViewComponentActivation) + "());'. " +
+            "Please see https://simpleinjector.org/aspnetcore for more details. " +
+            "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
+            error: false)]
+        public static void RegisterMvcViewComponents(
+            this Container container, IViewComponentDescriptorProvider viewComponentDescriptorProvider)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(viewComponentDescriptorProvider, nameof(viewComponentDescriptorProvider));
