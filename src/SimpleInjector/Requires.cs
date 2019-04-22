@@ -163,7 +163,8 @@ namespace SimpleInjector
                 if (openGenericType != null)
                 {
                     throw new ArgumentException(
-                        StringResources.SuppliedTypeIsAnOpenGenericTypeWhileTheServiceTypeIsNot(openGenericType),
+                        StringResources.SuppliedTypeIsAnOpenGenericTypeWhileTheServiceTypeIsNot(
+                            openGenericType),
                         paramName);
                 }
             }
@@ -179,7 +180,8 @@ namespace SimpleInjector
 
             if (implementationIsOpen && serviceTypeIsClosed)
             {
-                throw new NotSupportedException(StringResources.SuppliedTypeCanNotBeOpenWhenDecoratorIsClosed());
+                throw new NotSupportedException(
+                    StringResources.SuppliedTypeCanNotBeOpenWhenDecoratorIsClosed());
             }
         }
 

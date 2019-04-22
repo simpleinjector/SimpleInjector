@@ -579,7 +579,7 @@ namespace SimpleInjector
 
         private bool MustWrapThrownException(Exception ex)
         {
-            return this.IsContainerAutoRegistered 
+            return this.IsContainerAutoRegistered
                 || this.Registration.WrapsInstanceCreationDelegate
                 || !(ex is ActivationException);
         }

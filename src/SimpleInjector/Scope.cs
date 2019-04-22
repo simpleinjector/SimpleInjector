@@ -438,9 +438,7 @@ namespace SimpleInjector
                         new Dictionary<Registration, object>(ReferenceEqualityComparer<Registration>.Instance);
                 }
 
-                object instance;
-
-                return !cacheIsEmpty && this.cachedInstances.TryGetValue(registration, out instance)
+                return !cacheIsEmpty && this.cachedInstances.TryGetValue(registration, out object instance)
                     ? (TImplementation)instance
                     : this.CreateAndCacheInstance(registration);
             }
