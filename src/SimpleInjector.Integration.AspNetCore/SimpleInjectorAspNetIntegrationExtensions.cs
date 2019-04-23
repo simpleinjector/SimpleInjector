@@ -339,10 +339,16 @@ namespace SimpleInjector
         private static Registration CreateSingletonRegistration(
             Container container, Type serviceType, IServiceProvider appServices)
         {
-            return Lifestyle.Singleton.CreateRegistration(
+            var registration = Lifestyle.Singleton.CreateRegistration(
                 serviceType,
                 () => appServices.GetRequiredService(serviceType),
                 container);
+
+            // This registration is managed and disposed by IServiceProvider and should, therefore, not be
+            // disposed (again) by Simple Injector.
+            registration.SuppressDisposal = true;
+
+            return registration;
         }
 
         private static Registration CreateNonSingletonRegistration(
@@ -354,6 +360,10 @@ namespace SimpleInjector
                 serviceType,
                 () => GetServiceProvider(accessor, container, lifestyle).GetRequiredService(serviceType),
                 container);
+
+            // This registration is managed and disposed by IServiceProvider and should, therefore, not be
+            // disposed (again) by Simple Injector.
+            registration.SuppressDisposal = true;
 
             if (lifestyle == Lifestyle.Transient && typeof(IDisposable).IsAssignableFrom(serviceType))
             {
