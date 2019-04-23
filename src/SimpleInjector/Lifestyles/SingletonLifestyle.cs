@@ -210,7 +210,7 @@ namespace SimpleInjector.Lifestyles
 
                             var disposable = this.interceptedInstance as IDisposable;
 
-                            if (disposable != null)
+                            if (disposable != null && !this.SuppressDisposal)
                             {
                                 this.Container.ContainerScope.RegisterForDisposal(disposable);
                             }
