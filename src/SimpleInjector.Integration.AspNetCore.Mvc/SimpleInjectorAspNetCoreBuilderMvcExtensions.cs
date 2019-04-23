@@ -57,9 +57,10 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            var manager = GetApplicationPartManager(builder.Services, nameof(AddPageModelActivation));
+            ApplicationPartManager manager =
+                GetApplicationPartManager(builder.Services, nameof(AddPageModelActivation));
 
-            builder.Container.RegisterPageModels(manager);
+            RegisterPageModels(builder.Container, manager);
 
             builder.Services.AddSingleton<IPageModelActivatorProvider>(
                 new SimpleInjectorPageModelActivatorProvider(builder.Container));
@@ -155,6 +156,20 @@ namespace SimpleInjector
                 where !type.IsAbstract
                 where !type.IsGenericTypeDefinition
                 where applicationTypeSelector(type)
+                select type;
+
+            RegisterConcreteTypes(container, pageModelTypes);
+        }
+
+        private static void RegisterPageModels(Container container, ApplicationPartManager manager)
+        {
+            // As far as I can see, page models must inherit from the PageModel class.
+            var pageModelTypes =
+                from part in manager.ApplicationParts.OfType<IApplicationPartTypeProvider>()
+                from type in part.Types
+                where type.IsSubclassOf(typeof(PageModel))
+                where !type.IsAbstract
+                where !type.IsGenericTypeDefinition
                 select type;
 
             RegisterConcreteTypes(container, pageModelTypes);
