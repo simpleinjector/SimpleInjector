@@ -256,6 +256,10 @@ namespace SimpleInjector
                     : BuildScopedInstanceCreator(serviceType, builder.ServiceProviderAccessor),
                 builder.Container);
 
+            // This registration is managed and disposed by IServiceProvider and should, therefore, not be
+            // disposed (again) by Simple Injector.
+            registration.SuppressDisposal = true;
+
             if (lifestyle == Lifestyle.Transient && typeof(IDisposable).IsAssignableFrom(serviceType))
             {
                 registration.SuppressDiagnosticWarning(
