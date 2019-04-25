@@ -30,7 +30,6 @@ namespace SimpleInjector
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
-    using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Lifestyles;
 
@@ -46,19 +45,20 @@ namespace SimpleInjector
         /// <param name="applicationBuilder">The ASP.NET application builder instance that references all
         /// framework components.</param>
         /// <param name="container">The container.</param>
-        [Obsolete(nameof(UseSimpleInjectorAspNetRequestScoping) + "(IApplicationBuilder, Container) " +
-            "is deprecated. Please use " +
+        [Obsolete("Please use " +
             nameof(UseSimpleInjectorAspNetRequestScoping) + "(IServiceCollection, Container) " +
             "instead. This new overload can be called from within the ConfigureServices method of the " +
-            "Startup class. See https://simpleinjector.org/aspnetcore for more information.", error: false)]
+            "Startup class. See https://simpleinjector.org/aspnetcore for more information. " +
+            "Will be removed in version 5.0.",
+            error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public static void UseSimpleInjectorAspNetRequestScoping(this IApplicationBuilder applicationBuilder,
-            Container container)
+        public static void UseSimpleInjectorAspNetRequestScoping(
+            this IApplicationBuilder applicationBuilder, Container container)
         {
             Requires.IsNotNull(applicationBuilder, nameof(applicationBuilder));
             Requires.IsNotNull(container, nameof(container));
 
-            applicationBuilder.Use(async (context, next) =>
+            applicationBuilder.Use(async (_, next) =>
             {
                 using (AsyncScopedLifestyle.BeginScope(container))
                 {

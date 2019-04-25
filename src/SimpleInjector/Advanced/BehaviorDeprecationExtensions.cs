@@ -14,10 +14,12 @@
             nameof(IDependencyInjectionBehavior.GetInstanceProducer) + " instead. " +
             "In case you need to change the expression while need to return an InstanceProducer, use the " +
             "InstanceProducer." + nameof(InstanceProducer.FromExpression) + " method to wrap the " +
-            "expression.";
+            "expression." +
+            "This method will be removed in version 5.0.";
 
         private const string PropertySelectionBehaviorObsoleteMessage =
-            "This interface method has been removed. Please call SelectProperty(PropertyInfo) instead.";
+            "This interface method has been removed. Please call SelectProperty(PropertyInfo) instead. " +
+            "This method will be removed in version 5.0.";
 
         /// <summary>
         /// This interface method has been removed. Please call GetInstanceProducerFor instead.
