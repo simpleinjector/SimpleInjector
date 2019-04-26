@@ -106,28 +106,17 @@ namespace SimpleInjector.Advanced
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string ImplementationTypeDebuggerDisplay => this.ImplementationType.ToFriendlyName();
 
-        /// <summary>Serves as a hash function for a particular type.</summary>
-        /// <returns>A hash code for the current <see cref="KnownRelationship"/>.</returns>
+        /// <inheritdoc />
         public override int GetHashCode() =>
             this.ImplementationType.GetHashCode()
             ^ this.Lifestyle.GetHashCode()
             ^ this.Consumer?.GetHashCode() ?? 0
             ^ this.Dependency.GetHashCode();
 
-        /// <summary>
-        ///  Determines whether the specified object is equal to the current object.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        /// <inheritdoc />
         public override bool Equals(object obj) => this.Equals(obj as KnownRelationship);
 
-        /// <summary>
-        /// Determines whether the specified <see cref="KnownRelationship"/> is equal to the current 
-        /// <see cref="KnownRelationship"/>.
-        /// </summary>
-        /// <param name="other">The object to compare with the current object.</param>
-        /// <returns>True if the specified <see cref="KnownRelationship"/> is equal to the current 
-        /// <see cref="KnownRelationship"/>; otherwise, false.</returns>
+        /// <inheritdoc />
         public bool Equals(KnownRelationship other)
         {
             if (other == null)

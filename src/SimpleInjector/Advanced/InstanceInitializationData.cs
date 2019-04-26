@@ -61,23 +61,16 @@ namespace SimpleInjector.Advanced
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay => this.Context.DebuggerDisplay;
 
-        /// <summary>Returns the hash code for this instance.</summary>
-        /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
+        /// <inheritdoc />
         public override int GetHashCode() =>
             (this.Context == null ? 0 : this.Context.GetHashCode()) ^
             (this.Instance == null ? 0 : this.Instance.GetHashCode());
 
-        /// <summary>Indicates whether this instance and a specified object are equal.</summary>
-        /// <param name="obj">Another object to compare to.</param>
-        /// <returns>True if the current object is equal to the other parameter; otherwise, false.</returns>
+        /// <inheritdoc />
         public override bool Equals(object obj) =>
             obj is InstanceInitializationData && this.Equals((InstanceInitializationData)obj);
 
-        /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.
-        /// </summary>
-        /// <param name="other">An object to compare with this object.</param>
-        /// <returns>True if the current object is equal to the other parameter; otherwise, false.</returns>
+        /// <inheritdoc />
         public bool Equals(InstanceInitializationData other) => this == other;
 
         /// <summary>

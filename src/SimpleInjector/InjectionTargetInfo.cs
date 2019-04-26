@@ -191,24 +191,15 @@ namespace SimpleInjector
                 ? this.Parameter.GetCustomAttributes(typeof(T), inherit).Cast<T>()
                 : this.Property.GetCustomAttributes(typeof(T), inherit).Cast<T>();
 
-        /// <summary>Serves as a hash function for a particular type.</summary>
-        /// <returns>A hash code for the current <see cref="InjectionTargetInfo"/>.</returns>
+        /// <inheritdoc />
         public override int GetHashCode() =>
             this.Parameter?.GetHashCode() ?? 0
             ^ this.Property?.GetHashCode() ?? 0;
 
-        /// <summary>
-        ///  Determines whether the specified object is equal to the current object.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        /// <inheritdoc />
         public override bool Equals(object obj) => this.Equals(obj as InjectionTargetInfo);
 
-        /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.
-        /// </summary>
-        /// <param name="other">An object to compare with this object.</param>
-        /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
+        /// <inheritdoc />
         public bool Equals(InjectionTargetInfo other) =>
             this.Parameter != null
                 ? this.Parameter.Equals(other.Parameter)
