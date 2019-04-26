@@ -236,7 +236,10 @@ namespace SimpleInjector
                 let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
                 let result = builder.BuildClosedGenericImplementation()
                 where result.ClosedServiceTypeSatisfiesAllTypeConstraints
-                select item.Registration != null ? item : ContainerControlledItem.CreateFromType(result.ClosedGenericImplementation))
+                select item.Registration != null
+                    ? item
+                    : ContainerControlledItem.CreateFromType(
+                        openGenericImplementation, result.ClosedGenericImplementation))
                 .ToArray();
         }
 

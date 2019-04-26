@@ -72,7 +72,7 @@ namespace SimpleInjector.Internals
             from item in registrationGroup.ControlledItems
             let implementation = item.ImplementationType
             where !implementation.ContainsGenericParameters()
-            from service in implementation.GetBaseTypesAndInterfacesFor(this.ServiceType)
+            from service in implementation.GetTypeBaseTypesAndInterfacesFor(this.ServiceType)
             select service)
             .Distinct()
             .ToArray();

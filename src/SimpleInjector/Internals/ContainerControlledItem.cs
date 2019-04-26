@@ -44,6 +44,7 @@ namespace SimpleInjector.Internals
 
             this.Registration = registration;
             this.ImplementationType = registration.ImplementationType;
+            this.RegisteredImplementationType = registration.ImplementationType;
         }
 
         private ContainerControlledItem(Type implementationType)
@@ -51,8 +52,11 @@ namespace SimpleInjector.Internals
             Requires.IsNotNull(implementationType, nameof(implementationType));
 
             this.ImplementationType = implementationType;
+            this.RegisteredImplementationType = implementationType;
         }
 
+        internal Type RegisteredImplementationType { get; private set; }
+        
         internal string DebuggerDisplay =>
             $"ImplementationType: {this.ImplementationType.ToFriendlyName()}, " + (
             this.Registration != null
@@ -64,5 +68,12 @@ namespace SimpleInjector.Internals
 
         public static ContainerControlledItem CreateFromType(Type implementationType) =>
             new ContainerControlledItem(implementationType);
+
+        public static ContainerControlledItem CreateFromType(
+            Type registeredImplementationType, Type closedImplementationType) =>
+            new ContainerControlledItem(closedImplementationType)
+            {
+                RegisteredImplementationType = registeredImplementationType
+            };
     }
 }

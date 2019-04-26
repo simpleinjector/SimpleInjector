@@ -297,7 +297,9 @@ namespace SimpleInjector.Tests.Unit
         public void Verify_RegisterCollectionCalledWithUnregisteredType_ThrowsExpectedException()
         {
             // Arrange
-            string expectedException = "No registration for type IUserRepository could be found.";
+            string expectedException =
+                "The registration for the collection of IUserRepository (i.e. IEnumerable<IUserRepository>) " +
+                "is supplied with the abstract type IUserRepository, which hasn't been registered explicitly";
 
             var container = ContainerFactory.New();
 
@@ -305,19 +307,80 @@ namespace SimpleInjector.Tests.Unit
 
             container.Collection.Register<IUserRepository>(types);
 
-            try
-            {
-                // Act
-                container.Verify();
+            // Act
+            Action action = () => container.Verify();
 
-                Assert.Fail("Exception expected.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                string actualMessage = ex.Message;
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                expectedException, action);
+        }
 
-                AssertThat.StringContains(expectedException, actualMessage, "Info:\n" + ex.ToString());
-            }
+        // See issue #690.
+        [TestMethod]
+        public void Verify_CollectionRegistrationPointingToAnUnregisteredAbstractType_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Register IPlugin as part of the collection, while omitting container.Register<IPlugin>
+            container.Collection.Register<IPlugin>(typeof(PluginBase));
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                The registration for the collection of IPlugin (i.e. IEnumerable<IPlugin>) is supplied with
+                the abstract type PluginBase, which hasn't been registered explicitly, and wasn't resolved
+                using unregistered type resolution. For Simple Injector to be able to resolve this collection,
+                an explicit one-to-one registration is required, e.g. Container.Register<PluginBase, MyImpl>().
+                Otherwise, in case PluginBase was supplied by accident, make sure it is removed."
+                .TrimInside(),
+                action);
+        }
+
+        // See issue #690.
+        [TestMethod]
+        public void Verify_CollectionRegistrationPointingToItsAbstraction_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Register IPlugin as part of the collection, while omitting container.Register<IPlugin>
+            container.Collection.Register<IPlugin>(typeof(IPlugin));
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                The registration for the collection of IPlugin (i.e. IEnumerable<IPlugin>) is supplied with
+                the abstract type IPlugin, which hasn't been registered explicitly"
+                .TrimInside(),
+                action);
+        }
+
+        // See issue #690.
+        [TestMethod]
+        public void Verify_GenericCollectionRegistrationPointingToItsAbstraction_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var types = new[] { typeof(IEventHandler<>), typeof(AuditableEventEventHandler) };
+
+            container.Collection.Register(typeof(IEventHandler<>), types);
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                The registration for the collection of IEventHandler<AuditableEvent>
+                (i.e. IEnumerable<IEventHandler<AuditableEvent>>) is supplied with the abstract type
+                IEventHandler<TEvent>, which hasn't been registered explicitly"
+                .TrimInside(),
+                action);
         }
 
         [TestMethod]

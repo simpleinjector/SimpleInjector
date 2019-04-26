@@ -198,19 +198,18 @@ namespace SimpleInjector.Internals
         private Lazy<InstanceProducer> ToLazyInstanceProducer(ContainerControlledItem registration) =>
             registration.Registration != null
                 ? ToLazyInstanceProducer(registration.Registration)
-                : this.ToLazyInstanceProducer(registration.ImplementationType);
+                : new Lazy<InstanceProducer>(() => this.GetOrCreateInstanceProducer(registration));
 
         private static Lazy<InstanceProducer> ToLazyInstanceProducer(Registration registration) =>
             Helpers.ToLazy(new InstanceProducer(typeof(TService), registration));
 
-        private Lazy<InstanceProducer> ToLazyInstanceProducer(Type implementationType) =>
-            new Lazy<InstanceProducer>(() => this.GetOrCreateInstanceProducer(implementationType));
-
         // Note that the 'implementationType' could in fact be a service type as well and it is allowed
         // for the implementationType to equal TService. This will happen when someone does the following:
         // container.Collections.Register<ILogger>(typeof(ILogger));
-        private InstanceProducer GetOrCreateInstanceProducer(Type implementationType)
+        private InstanceProducer GetOrCreateInstanceProducer(ContainerControlledItem item)
         {
+            Type implementationType = item.ImplementationType;
+
             // If the implementationType is explicitly registered (using a Register call) we select this 
             // producer (but we skip any implicit registrations or anything that is assignable, since 
             // there could be more than one and it would be unclear which one to pick).
@@ -230,7 +229,7 @@ namespace SimpleInjector.Internals
             // an exception in case the implementation type is not a concrete type).
             if (producer == null)
             {
-                return this.CreateNewExternalProducer(implementationType);
+                return this.CreateNewExternalProducer(item);
             }
 
             // If there is such a producer registered we return a new one with the service type.
@@ -266,18 +265,21 @@ namespace SimpleInjector.Internals
             return producerIsValid ? producer : null;
         }
 
-        private InstanceProducer CreateNewExternalProducer(Type implementationType)
+        private InstanceProducer CreateNewExternalProducer(ContainerControlledItem item)
         {
-            if (!Types.IsConcreteConstructableType(implementationType))
+            if (!Types.IsConcreteConstructableType(item.ImplementationType))
             {
-                // This method will throw an (expressive) exception since implementationType is not concrete.
-                this.container.GetRegistration(implementationType, throwOnFailure: true);
+                throw new ActivationException(
+                    StringResources.UnregisteredAbstractionFoundInCollection(
+                        serviceType: typeof(TService),
+                        registeredType: item.RegisteredImplementationType,
+                        foundAbstractType: item.ImplementationType));
             }
 
             Lifestyle lifestyle = this.container.SelectionBasedLifestyle;
 
             // This producer will be automatically registered as external producer.
-            return lifestyle.CreateProducer(typeof(TService), implementationType, this.container);
+            return lifestyle.CreateProducer(typeof(TService), item.ImplementationType, this.container);
         }
 
         private static NotSupportedException GetNotSupportedBecauseReadOnlyException() =>

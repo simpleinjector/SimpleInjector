@@ -256,6 +256,20 @@ namespace SimpleInjector
                         producer.ServiceType.ToFriendlyName()),
                 relationship?.Consumer.Target.Name ?? "collection");
 
+        internal static string UnregisteredAbstractionFoundInCollection(
+            Type serviceType, Type registeredType, Type foundAbstractType) =>
+            Format(
+                "The registration for the collection of {0} (i.e. IEnumerable<{0}>) is supplied with the " +
+                "abstract type {1}, which hasn't been registered explicitly, and wasn't resolved using " +
+                "unregistered type resolution. For Simple Injector to be able to resolve this collection, " +
+                "an explicit one-to-one registration is required, e.g. " +
+                "Container.Register<{2}, MyImpl>(). Otherwise, in case {1} was supplied by accident, make " +
+                "sure it is removed. Please see https://simpleinjector.org/collections for more " +
+                "information about registering and resolving collections.",
+                serviceType.TypeName(),
+                registeredType.TypeName(),
+                foundAbstractType.TypeName());
+
         internal static string NonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(Type serviceType) =>
             NonGenericTypeAlreadyRegistered(serviceType, existingRegistrationIsConditional: false);
 
