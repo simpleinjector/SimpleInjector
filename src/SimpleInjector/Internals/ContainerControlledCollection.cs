@@ -138,9 +138,9 @@ namespace SimpleInjector.Internals
             this.producers.Clear();
         }
 
-        void IContainerControlledCollection.Append(ContainerControlledItem registration)
+        void IContainerControlledCollection.Append(ContainerControlledItem item)
         {
-            this.producers.Add(this.ToLazyInstanceProducer(registration));
+            this.producers.Add(this.ToLazyInstanceProducer(item));
         }
 
         KnownRelationship[] IContainerControlledCollection.GetRelationships() => (
@@ -195,10 +195,10 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private Lazy<InstanceProducer> ToLazyInstanceProducer(ContainerControlledItem registration) =>
-            registration.Registration != null
-                ? ToLazyInstanceProducer(registration.Registration)
-                : new Lazy<InstanceProducer>(() => this.GetOrCreateInstanceProducer(registration));
+        private Lazy<InstanceProducer> ToLazyInstanceProducer(ContainerControlledItem item) =>
+            item.Registration != null
+                ? ToLazyInstanceProducer(item.Registration)
+                : new Lazy<InstanceProducer>(() => this.GetOrCreateInstanceProducer(item));
 
         private static Lazy<InstanceProducer> ToLazyInstanceProducer(Registration registration) =>
             Helpers.ToLazy(new InstanceProducer(typeof(TService), registration));

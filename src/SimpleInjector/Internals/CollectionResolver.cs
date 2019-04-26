@@ -31,6 +31,7 @@ namespace SimpleInjector.Internals
     internal abstract class CollectionResolver
     {
         private readonly List<RegistrationGroup> registrationGroups = new List<RegistrationGroup>();
+
         private readonly Dictionary<Type, InstanceProducer> producerCache =
             new Dictionary<Type, InstanceProducer>();
 
@@ -51,7 +52,7 @@ namespace SimpleInjector.Internals
         protected Container Container { get; }
 
         internal abstract void AddControlledRegistrations(
-            Type serviceType, ContainerControlledItem[] registrations, bool append);
+            Type serviceType, ContainerControlledItem[] items, bool append);
 
         internal abstract void RegisterUncontrolledCollection(Type serviceType, InstanceProducer producer);
 
@@ -185,11 +186,11 @@ namespace SimpleInjector.Internals
                 };
 
             internal static RegistrationGroup CreateForControlledItems(
-                Type serviceType, ContainerControlledItem[] registrations, bool appended) =>
+                Type serviceType, ContainerControlledItem[] items, bool appended) =>
                 new RegistrationGroup
                 {
                     ServiceType = serviceType,
-                    ControlledItems = registrations,
+                    ControlledItems = items,
                     Appended = appended
                 };
         }

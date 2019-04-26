@@ -43,9 +43,9 @@ namespace SimpleInjector.Internals
         }
 
         internal override void AddControlledRegistrations(
-            Type serviceType, ContainerControlledItem[] registrations, bool append)
+            Type serviceType, ContainerControlledItem[] items, bool append)
         {
-            var group = RegistrationGroup.CreateForControlledItems(serviceType, registrations, append);
+            var group = RegistrationGroup.CreateForControlledItems(serviceType, items, append);
             this.AddRegistrationGroup(group);
         }
 
@@ -82,7 +82,7 @@ namespace SimpleInjector.Internals
             var items = this.GetItemsFor(serviceType);
 
             return serviceType.IsGenericType()
-                ? Types.GetClosedGenericImplementationsFor(serviceType, items)
+                ? GetClosedGenericImplementationsFor(serviceType, items)
                 : items.ToArray();
         }
 
@@ -92,5 +92,21 @@ namespace SimpleInjector.Internals
                 closedGenericServiceType.IsAssignableFrom(registrationGroup.ServiceType)
             from item in registrationGroup.ControlledItems
             select item;
+
+        private static ContainerControlledItem[] GetClosedGenericImplementationsFor(
+            Type closedGenericServiceType, IEnumerable<ContainerControlledItem> containerControlledItems)
+        {
+            return (
+                from item in containerControlledItems
+                let openGenericImplementation = item.ImplementationType
+                let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
+                let result = builder.BuildClosedGenericImplementation()
+                where result.ClosedServiceTypeSatisfiesAllTypeConstraints
+                select item.Registration != null
+                    ? item
+                    : ContainerControlledItem.CreateFromType(
+                        openGenericImplementation, result.ClosedGenericImplementation))
+                .ToArray();
+        }
     }
 }

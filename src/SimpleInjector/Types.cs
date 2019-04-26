@@ -227,22 +227,6 @@ namespace SimpleInjector
             return thisType.Concat(type.GetBaseTypesAndInterfaces());
         }
 
-        internal static ContainerControlledItem[] GetClosedGenericImplementationsFor(
-            Type closedGenericServiceType, IEnumerable<ContainerControlledItem> containerControlledItems)
-        {
-            return (
-                from item in containerControlledItems
-                let openGenericImplementation = item.ImplementationType
-                let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
-                let result = builder.BuildClosedGenericImplementation()
-                where result.ClosedServiceTypeSatisfiesAllTypeConstraints
-                select item.Registration != null
-                    ? item
-                    : ContainerControlledItem.CreateFromType(
-                        openGenericImplementation, result.ClosedGenericImplementation))
-                .ToArray();
-        }
-
         private static IEnumerable<Type> GetBaseTypes(this Type type)
         {
             Type baseType = type.BaseType() ?? (type != typeof(object) ? typeof(object) : null);
