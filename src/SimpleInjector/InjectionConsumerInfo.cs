@@ -89,11 +89,12 @@ namespace SimpleInjector
             this.ImplementationType.GetHashCode() ^ this.Target.GetHashCode();
 
         /// <inheritdoc />
-        public override bool Equals(object obj) => this.Equals(obj as InjectionConsumerInfo);
+        public override bool Equals(object obj) => obj is InjectionConsumerInfo info && this.Equals(info);
 
         /// <inheritdoc />
         public bool Equals(InjectionConsumerInfo other) =>
-            this.ImplementationType.Equals(other.ImplementationType)
+            other != null
+            && this.ImplementationType.Equals(other.ImplementationType)
             && this.Target.Equals(other.Target);
 
         /// <inheritdoc />
