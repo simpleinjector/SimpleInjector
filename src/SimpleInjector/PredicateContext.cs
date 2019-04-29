@@ -43,6 +43,7 @@ namespace SimpleInjector
     [DebuggerDisplay(nameof(PredicateContext) + " ({" + nameof(PredicateContext.DebuggerDisplay) + ", nq})")]
     public sealed class PredicateContext
     {
+        private readonly InjectionConsumerInfo consumer;
         private readonly Func<Type> implementationTypeProvider;
         private Type implementationType;
 
@@ -54,9 +55,13 @@ namespace SimpleInjector
         internal PredicateContext(
             Type serviceType, Type implementationType, InjectionConsumerInfo consumer, bool handled)
         {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(consumer, nameof(consumer));
+
             this.ServiceType = serviceType;
             this.implementationType = implementationType;
-            this.Consumer = consumer;
+            this.consumer = consumer;
             this.Handled = handled;
         }
 
@@ -66,9 +71,13 @@ namespace SimpleInjector
             InjectionConsumerInfo consumer,
             bool handled)
         {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationTypeProvider, nameof(implementationTypeProvider));
+            Requires.IsNotNull(consumer, nameof(consumer));
+
             this.ServiceType = serviceType;
             this.implementationTypeProvider = implementationTypeProvider;
-            this.Consumer = consumer;
+            this.consumer = consumer;
             this.Handled = handled;
         }
 
@@ -93,7 +102,8 @@ namespace SimpleInjector
         /// service. This property will return null in case the service is resolved directly from the container.
         /// </summary>
         /// <value>The <see cref="InjectionConsumerInfo"/> or null.</value>
-        public InjectionConsumerInfo Consumer { get; }
+        public InjectionConsumerInfo Consumer =>
+            this.consumer != InjectionConsumerInfo.Root ? this.consumer : null;
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]

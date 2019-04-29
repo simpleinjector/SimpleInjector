@@ -50,6 +50,7 @@ namespace SimpleInjector.Advanced
             this.ImplementationType = implementationType;
             this.Lifestyle = lifestyle;
             this.Dependency = dependency;
+            this.Consumer = InjectionConsumerInfo.Root;
         }
 
         internal KnownRelationship(
@@ -61,6 +62,7 @@ namespace SimpleInjector.Advanced
         {
             Requires.IsNotNull(implementationType, nameof(implementationType));
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(consumer, nameof(consumer));
             Requires.IsNotNull(dependency, nameof(dependency));
 
             this.ImplementationType = implementationType;
@@ -83,7 +85,6 @@ namespace SimpleInjector.Advanced
         /// <value>The type that the parent depends on.</value>
         public InstanceProducer Dependency { get; }
 
-        // WARNING: Can be null.
         internal InjectionConsumerInfo Consumer { get; }
 
         internal string AdditionalInformation { get; } = string.Empty;
@@ -110,7 +111,7 @@ namespace SimpleInjector.Advanced
         public override int GetHashCode() =>
             this.ImplementationType.GetHashCode()
             ^ this.Lifestyle.GetHashCode()
-            ^ this.Consumer?.GetHashCode() ?? 0
+            ^ this.Consumer.GetHashCode()
             ^ this.Dependency.GetHashCode();
 
         /// <inheritdoc />
@@ -133,9 +134,7 @@ namespace SimpleInjector.Advanced
                 this.ImplementationType.Equals(other.ImplementationType)
                 && this.Lifestyle.Equals(other.Lifestyle)
                 && this.Dependency.Equals(other.Dependency)
-                && (this.Consumer?.Equals(other.Consumer)
-                    ?? other.Consumer?.Equals(this.Consumer)
-                    ?? true);
+                && this.Consumer.Equals(other.Consumer);
         }
     }
 }
