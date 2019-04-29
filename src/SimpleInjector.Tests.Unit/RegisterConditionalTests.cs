@@ -20,7 +20,7 @@
             var container = ContainerFactory.New();
 
             container.Options.AllowOverridingRegistrations = true;
-
+            
             // Act
             Action action = () => container.RegisterConditional(typeof(ILogger), typeof(NullLogger),
                 Lifestyle.Singleton, c => true);
@@ -1705,6 +1705,26 @@
             // Assert
             Assert.AreEqual(expected: "foo, bar, foobar", actual: string.Join(", ", stringService.Dependency));
             Assert.AreEqual(expected: "4, 5, 6", actual: string.Join(", ", intService.Dependency));
+        }
+
+        // See #698
+        [TestMethod]
+        public void GetInstance_ConditionalRegistrationAsRootType_PredicateContextConsumerPropertyIsNull()
+        {
+            // Arrange
+            var container = new Container();
+            
+            PredicateContext context = null;
+
+            container.RegisterConditional<ILogger, NullLogger>(c => { context = c; return true; });
+
+            // Act
+            container.GetInstance<ILogger>();
+
+            // Assert
+            Assert.IsNotNull(context, "PredicateContext should not be null.");
+            Assert.IsNull(context.Consumer,
+                "When requesint a root type, the Consumer property should be null.");
         }
 
         private static void RegisterConditionalConstant<T>(Container container, T constant,

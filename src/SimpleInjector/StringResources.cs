@@ -254,7 +254,9 @@ namespace SimpleInjector
                     : Format(
                         "collection of {0} services",
                         producer.ServiceType.ToFriendlyName()),
-                relationship?.Consumer.Target.Name ?? "collection");
+                relationship != null && !relationship.Consumer.IsRoot
+                    ? relationship.Consumer.Target.Name
+                    : "collection");
 
         internal static string NonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(Type serviceType) =>
             NonGenericTypeAlreadyRegistered(serviceType, existingRegistrationIsConditional: false);
