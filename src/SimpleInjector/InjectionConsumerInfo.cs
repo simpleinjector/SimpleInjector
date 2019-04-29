@@ -25,12 +25,13 @@ namespace SimpleInjector
     using System;
     using System.ComponentModel;
     using System.Reflection;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Contains contextual information about the direct consumer for which the given dependency is injected
     /// into.
     /// </summary>
-    public class InjectionConsumerInfo : IEquatable<InjectionConsumerInfo>
+    public class InjectionConsumerInfo : ApiObject, IEquatable<InjectionConsumerInfo>
     {
         // Bogus values for implementationType and property. They will never be used, but can't be null.
         internal static readonly InjectionConsumerInfo Root =

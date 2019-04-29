@@ -28,13 +28,14 @@ namespace SimpleInjector
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Discovers the attributes of the code element (a property or parameter) where a dependency will be
     /// injected into, and provides access to its meta data.
     /// </summary>
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
-    public sealed class InjectionTargetInfo : IEquatable<InjectionTargetInfo>
+    public sealed class InjectionTargetInfo : ApiObject, IEquatable<InjectionTargetInfo>
     {
         internal InjectionTargetInfo(ParameterInfo parameter)
         {

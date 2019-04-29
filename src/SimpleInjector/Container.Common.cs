@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2018 Simple Injector Contributors
+ * Copyright (c) 2013-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -24,7 +24,6 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
@@ -58,7 +57,7 @@ namespace SimpleInjector
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling",
         Justification = "Not much we can do about this. Container is the facade where users work with.")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
-    public partial class Container : IDisposable
+    public partial class Container : ApiObject, IDisposable
     {
         internal readonly Dictionary<object, Dictionary<Type, WeakReference>> LifestyleRegistrationCache =
             new Dictionary<object, Dictionary<Type, WeakReference>>();
@@ -247,40 +246,6 @@ namespace SimpleInjector
 
             return this.GetRootRegistrations(includeInvalidContainerRegisteredTypes: false);
         }
-
-        /// <summary>Determines whether the specified System.Object is equal to the current System.Object.
-        /// </summary>
-        /// <param name="obj">The System.Object to compare with the current System.Object.</param>
-        /// <returns>
-        /// True if the specified System.Object is equal to the current System.Object; otherwise, false.
-        /// </returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override bool Equals(object obj) => base.Equals(obj);
-
-        /// <summary>Returns the hash code of the current instance.</summary>
-        /// <returns>The hash code of the current instance.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override int GetHashCode() => base.GetHashCode();
-
-        /// <summary>
-        /// Returns a <see cref="System.String"/> that represents the <see cref="Container"/>.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String"/> that represents the <see cref="Container"/>.
-        /// </returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override string ToString() => base.ToString();
-
-        /// <summary>Gets the <see cref="System.Type"/> of the current instance.</summary>
-        /// <returns>The <see cref="System.Type"/> instance that represents the exact runtime 
-        /// type of the current instance.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = @"
-            This FxCop warning is valid, but this method is used to be able to attach an 
-            EditorBrowsableAttribute to the GetType method, which will hide the method when the user browses 
-            the methods of the Container class with IntelliSense. The GetType method has no value for the user
-            who will only use this class for registration.")]
-        public new Type GetType() => base.GetType();
 
         /// <summary>Releases all instances that are cached by the <see cref="Container"/> object.</summary>
         public void Dispose()
