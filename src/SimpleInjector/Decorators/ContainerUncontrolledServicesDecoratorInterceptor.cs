@@ -267,23 +267,27 @@ namespace SimpleInjector.Decorators
 
         private void ThrowWhenDecoratorNeedsAFunc()
         {
-            bool needsADecorateeFactory = this.DecoratorNeedsADecorateeFactory();
+            Type decorateeFactoryType = this.GetDecorateeFactoryTypeOrNull();
 
-            if (needsADecorateeFactory)
+            if (decorateeFactoryType != null)
             {
                 string message = StringResources.CantGenerateFuncForDecorator(
-                    this.registeredServiceType, this.DecoratorTypeDefinition);
+                    this.registeredServiceType,
+                    decorateeFactoryType,
+                    this.DecoratorTypeDefinition ?? this.decoratorType);
 
                 throw new ActivationException(message);
             }
         }
 
-        private bool DecoratorNeedsADecorateeFactory() => (
+        private Type GetDecorateeFactoryTypeOrNull() => (
             from parameter in this.decoratorConstructor.GetParameters()
             where DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(
                 parameter.ParameterType, this.registeredServiceType)
-            select parameter)
-            .Any();
+                || DecoratorHelpers.IsScopeDecorateeFactoryDependencyParameter(
+                    parameter.ParameterType, this.registeredServiceType)
+            select parameter.ParameterType)
+            .FirstOrDefault();
 
         private void ThrownWhenLifestyleIsNotSupported()
         {
@@ -297,7 +301,9 @@ namespace SimpleInjector.Decorators
             {
                 throw new NotSupportedException(
                     StringResources.CanNotDecorateContainerUncontrolledCollectionWithThisLifestyle(
-                        this.DecoratorTypeDefinition, this.Lifestyle, this.registeredServiceType));
+                        this.DecoratorTypeDefinition ?? this.decoratorType,
+                        this.Lifestyle,
+                        this.registeredServiceType));
             }
         }
 

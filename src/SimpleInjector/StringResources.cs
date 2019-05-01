@@ -546,18 +546,22 @@ namespace SimpleInjector
                 CollectionsRegisterMethodName,
                 implementations.Select(TypeName).ToCommaSeparatedText());
 
-        internal static string CantGenerateFuncForDecorator(Type serviceType, Type decoratorType) =>
+        internal static string CantGenerateFuncForDecorator(
+            Type serviceType, Type decorateeFactoryType, Type decoratorType) =>
             Format(
-                "It's impossible for the container to generate a Func<{0}> for injection into the {1} " +
+                "It's impossible for the container to generate a {3} for injection into the {1} " +
                 "decorator that will be wrapped around instances of the collection of {0} instances, " +
-                "because the registration hasn't been made using one of the {2} overloads that take a " +
-                "list of System.Type as serviceTypes. By passing in an IEnumerable<{0}>, it is impossible " +
-                "for the container to determine its lifestyle, which makes it impossible to generate a " +
-                "Func<T>. Either switch to one of the other {2} overloads, or don't use a decorator that " +
-                "depends on a Func<T> for injecting the decoratee.",
+                "because the registered collection is not controlled by the container. The collection is " +
+                "considered to be container-uncontrolled collection, because the registration was made " +
+                "using either the {2}<{0}>(IEnumerable<{0}>) or {2}(Type, IEnumerable) overloads. " +
+                "It is impossible for the container to determine its lifestyle of an element in a " +
+                "container-uncontrolled collections, which makes it impossible to generate a {3} for {1}. " +
+                "Either switch to one of the other {2} overloads, or use a decorator that depends on {0} " +
+                "instead of {3}.",
                 serviceType.TypeName(),
                 decoratorType.TypeName(),
-                CollectionsRegisterMethodName);
+                CollectionsRegisterMethodName,
+                decorateeFactoryType.TypeName());
 
         internal static string SuppliedTypeIsNotAGenericType(Type type) =>
             Format("The supplied type {0} is not a generic type.", type.TypeName());
