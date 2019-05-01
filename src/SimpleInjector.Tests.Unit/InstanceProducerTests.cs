@@ -239,7 +239,6 @@
             Assert.AreEqual(expectedObjectGraph, actualObjectGraph);
         }
 
-
         [TestMethod]
         public void VisualizeObjectGraph_WhenCalledBeforeInstanceIsCreated_ThrowsAnInvalidOperationException()
         {

@@ -209,7 +209,7 @@ namespace SimpleInjector
         public override int GetHashCode() => this.Target.GetHashCode();
 
         /// <inheritdoc />
-        public override bool Equals(object obj) => obj is InjectionConsumerInfo info && this.Equals(info);
+        public override bool Equals(object obj) => this.Equals(obj as InjectionConsumerInfo);
 
         /// <inheritdoc />
         public bool Equals(InjectionTargetInfo other) => this.Target.Equals(other?.Target);
