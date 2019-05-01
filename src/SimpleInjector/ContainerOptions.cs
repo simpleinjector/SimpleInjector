@@ -56,7 +56,7 @@ namespace SimpleInjector
     /// ]]></code>
     /// </example>
     [DebuggerDisplay("{" + nameof(ContainerOptions.DebuggerDisplayDescription) + ", nq}")]
-    public class ContainerOptions
+    public class ContainerOptions : ApiObject
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorResolutionBehavior resolutionBehavior;

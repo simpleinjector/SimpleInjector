@@ -27,13 +27,14 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Contains methods for registering and creating collections in the <see cref="SimpleInjector.Container"/>.
     /// </summary>
-    public sealed class ContainerCollectionRegistrator
+    public sealed class ContainerCollectionRegistrator : ApiObject
     {
         internal ContainerCollectionRegistrator(Container container)
         {

@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -25,6 +25,7 @@ namespace SimpleInjector
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
@@ -33,7 +34,7 @@ namespace SimpleInjector
     /// <see cref="Scope"/> is thread-safe can be used over multiple threads concurrently, but note that the
     /// cached instances might not be thread-safe.
     /// </remarks>
-    public class Scope : IDisposable
+    public class Scope : ApiObject, IDisposable
     {
         private const int MaximumDisposeRecursion = 100;
 
@@ -272,7 +273,7 @@ namespace SimpleInjector
         {
             if (scope == null)
             {
-                return GetScopelessInstance(registration);
+                return Scope.GetScopelessInstance(registration);
             }
 
             return scope.GetInstanceInternal(registration);
