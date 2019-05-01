@@ -168,14 +168,14 @@ namespace SimpleInjector.Integration.Web
 
         private static void DisposeScopes(List<Scope> scopes)
         {
-            if (scopes.Count != 1)
-            {
-                DisposeScopesInReverseOrder(scopes);
-            }
-            else
+            if (scopes.Count == 1)
             {
                 // Optimization: don't create a master scope if there is only one scope (the common case).
                 scopes[0].Dispose();
+            }
+            else if (scopes.Count > 1)
+            {
+                DisposeScopesInReverseOrder(scopes);
             }
         }
 
@@ -184,7 +184,7 @@ namespace SimpleInjector.Integration.Web
             // Here we use a 'master' scope that will hold the real scopes. This allows all scopes
             // to be disposed, even if a scope's Dispose method throws an exception. Scopes will
             // also be disposed in opposite order of creation.
-            using (var masterScope = new Scope())
+            using (var masterScope = new Scope(scopes[0].Container))
             {
                 foreach (var scope in scopes)
                 {
