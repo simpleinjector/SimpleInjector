@@ -152,7 +152,7 @@ namespace SimpleInjector.Internals
                             "in that case.")]
         [MethodImpl(MethodImplOptions.NoInlining)]
         static partial void TryCompileInDynamicAssembly(Type resultType, Expression expression,
-            ref Delegate compiledLambda)
+            ref Delegate? compiledLambda)
         {
             // HACK: Prevent "JIT Compiler encountered an internal limitation" exception while running in 
             // the debugger with VS2013 (See work item 20904).

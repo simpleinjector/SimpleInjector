@@ -36,7 +36,7 @@ namespace SimpleInjector.Lifestyles
         internal override int DependencyLength(Container container) =>
             GetDefaultScopedLifestyle(container).DependencyLength(container);
 
-        protected internal override Func<Scope> CreateCurrentScopeProvider(Container container) =>
+        protected internal override Func<Scope?> CreateCurrentScopeProvider(Container container) =>
             GetDefaultScopedLifestyle(container).CreateCurrentScopeProvider(container);
 
         protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
@@ -46,7 +46,7 @@ namespace SimpleInjector.Lifestyles
             Func<TService> instanceCreator, Container container) =>
             GetDefaultScopedLifestyle(container).CreateRegistrationCore(instanceCreator, container);
 
-        protected override Scope GetCurrentScopeCore(Container container) =>
+        protected override Scope? GetCurrentScopeCore(Container container) =>
             GetDefaultScopedLifestyle(container).GetCurrentScope(container);
 
 #if !NET40

@@ -45,7 +45,7 @@ namespace SimpleInjector.Diagnostics.Debugger
 
         [DebuggerDisplay("")]
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        public DebuggerViewItem[] Items { get; private set; }
+        public DebuggerViewItem[]? Items { get; private set; }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = @"

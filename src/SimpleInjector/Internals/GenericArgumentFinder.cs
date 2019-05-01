@@ -42,7 +42,7 @@ namespace SimpleInjector.Internals
             Type serviceTypeDefinition,
             Type serviceTypeToResolve,
             Type implementationTypeDefinition,
-            Type partialOpenGenericImplementation)
+            Type? partialOpenGenericImplementation)
         {
             this.serviceTypeDefinitionArguments = serviceTypeDefinition.GetGenericArguments();
             this.serviceTypeToResolveArguments = serviceTypeToResolve.GetGenericArguments();

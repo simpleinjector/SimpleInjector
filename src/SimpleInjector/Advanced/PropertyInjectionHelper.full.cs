@@ -33,7 +33,7 @@ namespace SimpleInjector.Advanced
     {
         private static long injectorClassCounter;
 
-        partial void TryCompileLambdaInDynamicAssembly(LambdaExpression expression, ref Delegate compiledDelegate)
+        partial void TryCompileLambdaInDynamicAssembly(LambdaExpression expression, ref Delegate? compiledDelegate)
         {
             compiledDelegate = null;
 
@@ -47,7 +47,7 @@ namespace SimpleInjector.Advanced
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "Not all delegates can be JITted. We fall back to the slower expression.Compile " +
                             "in that case.")]
-        private static Delegate CompileLambdaInDynamicAssemblyWithFallback(LambdaExpression expression)
+        private static Delegate? CompileLambdaInDynamicAssemblyWithFallback(LambdaExpression expression)
         {
             try
             {

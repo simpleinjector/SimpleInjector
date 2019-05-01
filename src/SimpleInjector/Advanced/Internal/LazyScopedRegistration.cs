@@ -39,7 +39,7 @@ namespace SimpleInjector.Advanced.Internal
     {
         private readonly Registration registration;
 
-        private TImplementation instance;
+        private TImplementation? instance;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LazyScopedRegistration{TImplementation}"/> 

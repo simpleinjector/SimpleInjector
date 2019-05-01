@@ -32,7 +32,7 @@ namespace SimpleInjector.Advanced
     /// information to spot possible misconfigurations. 
     /// </summary>
     [DebuggerDisplay("{" + nameof(KnownRelationship.DebuggerDisplay) + ",nq}")]
-    public sealed class KnownRelationship : IEquatable<KnownRelationship>
+    public sealed class KnownRelationship : IEquatable<KnownRelationship?>
     {
         // This constructor is here for backwards compatibility: the library itself uses the internal ctor.
 
@@ -58,7 +58,7 @@ namespace SimpleInjector.Advanced
             Lifestyle lifestyle,
             InjectionConsumerInfo consumer,
             InstanceProducer dependency,
-            string additionalInformation = null)
+            string? additionalInformation = null)
         {
             Requires.IsNotNull(implementationType, nameof(implementationType));
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
@@ -118,7 +118,7 @@ namespace SimpleInjector.Advanced
         public override bool Equals(object obj) => this.Equals(obj as KnownRelationship);
 
         /// <inheritdoc />
-        public bool Equals(KnownRelationship other)
+        public bool Equals(KnownRelationship? other)
         {
             if (other == null)
             {

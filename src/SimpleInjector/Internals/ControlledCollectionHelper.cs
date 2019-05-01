@@ -37,7 +37,7 @@ namespace SimpleInjector.Internals
 
         // The boolean flag is an optimization, to prevent slowing down resolving of items inside a collection
         // too much.
-        private static List<Action<ServiceCreatedListenerArgs>> serviceCreatedListeners;
+        private static List<Action<ServiceCreatedListenerArgs>>? serviceCreatedListeners;
 
         internal static bool ContainsServiceCreatedListeners { get; private set; }
 
@@ -58,7 +58,7 @@ namespace SimpleInjector.Internals
         {
             lock (ServiceCreatedListenersLocker)
             {
-                serviceCreatedListeners.Remove(serviceCreated);
+                serviceCreatedListeners!.Remove(serviceCreated);
 
                 if (serviceCreatedListeners.Count == 0)
                 {
@@ -87,7 +87,7 @@ namespace SimpleInjector.Internals
             }
         }
 
-        internal static IContainerControlledCollection ExtractContainerControlledCollectionFromRegistration(
+        internal static IContainerControlledCollection? ExtractContainerControlledCollectionFromRegistration(
             Registration registration)
         {
             var controlledRegistration = registration as ContainerControlledCollectionRegistration;
@@ -130,7 +130,7 @@ namespace SimpleInjector.Internals
 
         internal static bool IsContainerControlledCollectionExpression(Expression enumerableExpression)
         {
-            object enumerable = (enumerableExpression as ConstantExpression)?.Value;
+            object? enumerable = (enumerableExpression as ConstantExpression)?.Value;
 
             return enumerable is IContainerControlledCollection;
         }
@@ -179,7 +179,7 @@ namespace SimpleInjector.Internals
 
             internal Type ElementType => this.ImplementationType.GetGenericArguments()[0];
 
-            internal ConstantExpression Expression { get; set; }
+            internal ConstantExpression? Expression { get; set; }
 
             public override Expression BuildExpression() => this.Expression
                 ?? System.Linq.Expressions.Expression.Constant(this.Collection, this.ImplementationType);

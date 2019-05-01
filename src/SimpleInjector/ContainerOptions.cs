@@ -74,7 +74,7 @@ namespace SimpleInjector
         private Lifestyle defaultLifestyle = Lifestyle.Transient;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private ScopedLifestyle defaultScopedLifestyle;
+        private ScopedLifestyle? defaultScopedLifestyle;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool resolveUnregisteredConcreteTypes = true;
@@ -291,7 +291,7 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when the container already contains registrations.
         /// </exception>
-        public ScopedLifestyle DefaultScopedLifestyle
+        public ScopedLifestyle? DefaultScopedLifestyle
         {
             get
             {
@@ -437,7 +437,7 @@ namespace SimpleInjector
             return string.Join(", ", descriptions);
         }
 
-        internal bool IsConstructableType(Type implementationType, out string errorMessage)
+        internal bool IsConstructableType(Type implementationType, out string? errorMessage)
         {
             if (!Types.IsConcreteType(implementationType))
             {

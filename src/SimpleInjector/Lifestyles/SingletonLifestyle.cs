@@ -47,7 +47,7 @@ namespace SimpleInjector.Lifestyles
         // ExpressionBuilding event is called with a ConstantExpression, which is much more intuitive to
         // anyone handling that event.
         internal static Registration CreateSingleInstanceRegistration(
-            Type serviceType, object instance, Container container, Type implementationType = null)
+            Type serviceType, object instance, Container container, Type? implementationType = null)
         {
             Requires.IsNotNull(instance, nameof(instance));
 
@@ -179,12 +179,12 @@ namespace SimpleInjector.Lifestyles
             where TImplementation : class
         {
             private readonly object locker = new object();
-            private readonly Func<TImplementation> instanceCreator;
+            private readonly Func<TImplementation>? instanceCreator;
 
-            private object interceptedInstance;
+            private object? interceptedInstance;
 
             public SingletonLifestyleRegistration(
-                Container container, Func<TImplementation> instanceCreator = null)
+                Container container, Func<TImplementation>? instanceCreator = null)
                 : base(Lifestyle.Singleton, container)
             {
                 this.instanceCreator = instanceCreator;

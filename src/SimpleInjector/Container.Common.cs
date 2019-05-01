@@ -88,14 +88,14 @@ namespace SimpleInjector
 
         // Flag to signal that the container can't be altered by using any of the Register methods.
         private bool locked;
-        private string stackTraceThatLockedTheContainer;
+        private string? stackTraceThatLockedTheContainer;
         private bool disposed;
-        private string stackTraceThatDisposedTheContainer;
+        private string? stackTraceThatDisposedTheContainer;
 
-        private EventHandler<UnregisteredTypeEventArgs> resolveUnregisteredType;
-        private EventHandler<ExpressionBuildingEventArgs> expressionBuilding;
+        private EventHandler<UnregisteredTypeEventArgs>? resolveUnregisteredType;
+        private EventHandler<ExpressionBuildingEventArgs>? expressionBuilding;
 
-        private EventHandler<ExpressionBuiltEventArgs> expressionBuilt;
+        private EventHandler<ExpressionBuiltEventArgs>? expressionBuilt;
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
@@ -304,14 +304,13 @@ namespace SimpleInjector
         {
             if (this.expressionBuilding != null)
             {
+                var relationships = new KnownRelationshipCollection(registration.GetRelationships().ToList());
+
                 var e = new ExpressionBuildingEventArgs(
                     implementationType,
                     instanceCreatorExpression,
-                    registration.Lifestyle);
-
-                var relationships = new KnownRelationshipCollection(registration.GetRelationships().ToList());
-
-                e.KnownRelationships = relationships;
+                    registration.Lifestyle,
+                    knownRelationships: relationships);
 
                 this.expressionBuilding(this, e);
 
@@ -327,21 +326,33 @@ namespace SimpleInjector
             return instanceCreatorExpression;
         }
 
-        internal void OnExpressionBuilt(ExpressionBuiltEventArgs e, InstanceProducer instanceProducer)
+        internal ExpressionBuiltEventArgs? OnExpressionBuilt(
+            InstanceProducer instanceProducer, Expression expression)
         {
             if (this.expressionBuilt != null)
             {
                 var relationships =
                     new KnownRelationshipCollection(instanceProducer.GetRelationships().ToList());
 
-                e.KnownRelationships = relationships;
-
+                var e = new ExpressionBuiltEventArgs(
+                    instanceProducer.ServiceType,
+                    expression,
+                    instanceProducer,
+                    replacedRegistration: instanceProducer.Registration,
+                    knownRelationships: relationships);
+                
                 this.expressionBuilt(this, e);
 
                 if (relationships.HasChanged)
                 {
                     instanceProducer.ReplaceRelationships(e.KnownRelationships);
                 }
+
+                return e;
+            }
+            else
+            {
+                return null;
             }
         }
 
@@ -446,7 +457,7 @@ namespace SimpleInjector
         }
 
         [DebuggerStepThrough]
-        private static string GetStackTraceOrNull()
+        private static string? GetStackTraceOrNull()
         {
 #if NET40 || NET45 || NETSTANDARD2_0
             return new System.Diagnostics.StackTrace(fNeedFileInfo: true, skipFrames: 2).ToString();
@@ -495,7 +506,7 @@ namespace SimpleInjector
                     this.stackTraceThatDisposedTheContainer));
         }
 
-        private static object ThrowWhenResolveInterceptorReturnsNull(object instance)
+        private static object ThrowWhenResolveInterceptorReturnsNull(object? instance)
         {
             if (instance == null)
             {
@@ -534,7 +545,7 @@ namespace SimpleInjector
             Type serviceType,
             Type implementationType,
             Lifestyle lifestyle,
-            Predicate<PredicateContext> predicate = null)
+            Predicate<PredicateContext>? predicate = null)
         {
             Requires.IsGenericType(serviceType, nameof(serviceType));
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
@@ -582,8 +593,8 @@ namespace SimpleInjector
 
         // Instead of using the this.registrations instance, this method takes a snapshot. This allows the
         // container to be thread-safe, without using locks.
-        private InstanceProducer GetInstanceProducerForType(
-            Type serviceType, InjectionConsumerInfo consumer, Func<InstanceProducer> buildInstanceProducer)
+        private InstanceProducer? GetInstanceProducerForType(
+            Type serviceType, InjectionConsumerInfo consumer, Func<InstanceProducer?> buildInstanceProducer)
         {
             return
                 this.GetExplicitlyRegisteredInstanceProducer(serviceType, consumer)
@@ -591,17 +602,17 @@ namespace SimpleInjector
                 ?? buildInstanceProducer();
         }
 
-        private InstanceProducer GetExplicitlyRegisteredInstanceProducer(
+        private InstanceProducer? GetExplicitlyRegisteredInstanceProducer(
             Type serviceType, InjectionConsumerInfo consumer) =>
             this.GetRegistrationalEntryOrNull(serviceType)?.TryGetInstanceProducer(serviceType, consumer);
 
-        private InstanceProducer TryGetInstanceProducerForRegisteredCollection(Type enumerableServiceType) =>
+        private InstanceProducer? TryGetInstanceProducerForRegisteredCollection(Type enumerableServiceType) =>
             typeof(IEnumerable<>).IsGenericTypeDefinitionOf(enumerableServiceType)
                 ? this.GetInstanceProducerForRegisteredCollection(
                     enumerableServiceType.GetGenericArguments()[0])
                 : null;
 
-        private InstanceProducer GetInstanceProducerForRegisteredCollection(Type serviceType) =>
+        private InstanceProducer? GetInstanceProducerForRegisteredCollection(Type serviceType) =>
             this.collectionResolvers.GetValueOrDefault(GetRegistrationKey(serviceType))
                 ?.TryGetInstanceProducer(serviceType);
 
@@ -619,7 +630,7 @@ namespace SimpleInjector
             return entry;
         }
 
-        private IRegistrationEntry GetRegistrationalEntryOrNull(Type serviceType)
+        private IRegistrationEntry? GetRegistrationalEntryOrNull(Type serviceType)
         {
             return this.explicitRegistrations.GetValueOrDefault(GetRegistrationKey(serviceType));
         }
@@ -633,10 +644,11 @@ namespace SimpleInjector
         {
             // Add the default registrations. This adds them as registration, but only in case some component
             // starts depending on them.
+            // HACK: ScopedScopeLifestyle.GetCurrentScopeCore will never return null.
             var scopeLifestyle = new ScopedScopeLifestyle();
 
             this.resolveUnregisteredTypeRegistrations[typeof(Scope)] = new Lazy<InstanceProducer>(
-                () => scopeLifestyle.CreateProducer(() => scopeLifestyle.GetCurrentScope(this), this));
+                () => scopeLifestyle.CreateProducer(() => scopeLifestyle.GetCurrentScope(this)!, this));
 
             this.resolveUnregisteredTypeRegistrations[typeof(Container)] = new Lazy<InstanceProducer>(
                 () => Lifestyle.Singleton.CreateProducer(() => this, this));
@@ -682,8 +694,14 @@ namespace SimpleInjector
 
         private sealed class TypedInstanceInitializer : IInstanceInitializer
         {
-            private Type serviceType;
-            private object instanceInitializer;
+            private readonly Type serviceType;
+            private readonly object instanceInitializer;
+
+            private TypedInstanceInitializer(Type serviceType, object instanceInitializer)
+            {
+                this.serviceType = serviceType;
+                this.instanceInitializer = instanceInitializer;
+            }
 
             public bool AppliesTo(Type implementationType, InitializerContext context)
             {
@@ -697,34 +715,36 @@ namespace SimpleInjector
 
             internal static IInstanceInitializer Create<TImplementation>(Action<TImplementation> initializer)
             {
-                return new TypedInstanceInitializer
-                {
-                    serviceType = typeof(TImplementation),
-                    instanceInitializer = initializer
-                };
+                return new TypedInstanceInitializer(
+                    serviceType: typeof(TImplementation),
+                    instanceInitializer: initializer);
             }
         }
 
         private sealed class ContextualInstanceInitializer : IInstanceInitializer
         {
-            private Predicate<InitializerContext> predicate;
-            private Action<InstanceInitializationData> instanceInitializer;
+            private readonly Predicate<InitializerContext> predicate;
+            private readonly Action<InstanceInitializationData> instanceInitializer;
+
+            private ContextualInstanceInitializer(
+                Predicate<InitializerContext> predicate,
+                Action<InstanceInitializationData> instanceInitializer)
+            {
+                this.predicate = predicate;
+                this.instanceInitializer = instanceInitializer;
+            }
 
             public bool AppliesTo(Type implementationType, InitializerContext context) =>
                 this.predicate(context);
 
             public Action<T> CreateAction<T>(InitializerContext context) =>
-                instance => this.instanceInitializer(new InstanceInitializationData(context, instance));
+                instance => this.instanceInitializer(new InstanceInitializationData(context, instance!));
 
             internal static IInstanceInitializer Create(
                 Action<InstanceInitializationData> instanceInitializer,
                 Predicate<InitializerContext> predicate)
             {
-                return new ContextualInstanceInitializer
-                {
-                    instanceInitializer = instanceInitializer,
-                    predicate = predicate,
-                };
+                return new ContextualInstanceInitializer(predicate, instanceInitializer);
             }
         }
     }

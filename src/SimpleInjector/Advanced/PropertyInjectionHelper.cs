@@ -36,7 +36,6 @@ namespace SimpleInjector.Advanced
 
         private static readonly ReadOnlyCollection<Type> FuncTypes = new ReadOnlyCollection<Type>(new Type[]
             {
-                null,
                 typeof(Func<>),
                 typeof(Func<,>),
                 typeof(Func<,,>),
@@ -149,7 +148,7 @@ namespace SimpleInjector.Advanced
 
         private static void VerifyProperty(PropertyInfo property)
         {
-            MethodInfo setMethod = property.GetSetMethod(nonPublic: true);
+            MethodInfo? setMethod = property.GetSetMethod(nonPublic: true);
 
             if (setMethod == null)
             {
@@ -223,21 +222,21 @@ namespace SimpleInjector.Advanced
 
             int numberOfInputArguments = genericTypeArguments.Count;
 
-            Type openGenericFuncType = FuncTypes[numberOfInputArguments];
+            Type openGenericFuncType = FuncTypes[numberOfInputArguments - 1];
 
             return openGenericFuncType.MakeGenericType(genericTypeArguments.ToArray());
         }
 
         private Delegate CompilePropertyInjectorLambda(LambdaExpression expression)
         {
-            Delegate compiledDelegate = null;
+            Delegate? compiledDelegate = null;
 
             this.TryCompileLambdaInDynamicAssembly(expression, ref compiledDelegate);
 
             return compiledDelegate ?? expression.Compile();
         }
 
-        partial void TryCompileLambdaInDynamicAssembly(LambdaExpression expression, ref Delegate compiledDelegate);
+        partial void TryCompileLambdaInDynamicAssembly(LambdaExpression expression, ref Delegate? compiledDelegate);
 
         internal struct PropertyInjectionData
         {
@@ -247,8 +246,8 @@ namespace SimpleInjector.Advanced
 
             public PropertyInjectionData(
                 Expression expression,
-                IEnumerable<InstanceProducer> producers = null,
-                IEnumerable<PropertyInfo> properties = null)
+                IEnumerable<InstanceProducer>? producers = null,
+                IEnumerable<PropertyInfo>? properties = null)
             {
                 this.Expression = expression;
                 this.Producers = producers ?? Enumerable.Empty<InstanceProducer>();

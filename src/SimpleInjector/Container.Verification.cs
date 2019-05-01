@@ -39,17 +39,17 @@ namespace SimpleInjector
         // Flag to signal that the container's configuration is currently being verified.
         private readonly ThreadLocal<bool> isVerifying = new ThreadLocal<bool>();
 
-        private readonly ThreadLocal<Scope> resolveScope = new ThreadLocal<Scope>();
+        private readonly ThreadLocal<Scope?> resolveScope = new ThreadLocal<Scope?>();
 
         private bool usingCurrentThreadResolveScope;
 
         // Flag to signal that the container's configuration has been verified (at least once).
         internal bool SuccesfullyVerified { get; private set; }
 
-        internal Scope VerificationScope { get; private set; }
+        internal Scope? VerificationScope { get; private set; }
 
         // Allows to resolve directly from a scope instead of relying on an ambient context.
-        internal Scope CurrentThreadResolveScope
+        internal Scope? CurrentThreadResolveScope
         {
             get
             {
@@ -111,7 +111,7 @@ namespace SimpleInjector
         // different thread.
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        internal Scope GetVerificationOrResolveScopeForCurrentThread() =>
+        internal Scope? GetVerificationOrResolveScopeForCurrentThread() =>
             this.VerificationScope != null && this.IsVerifying
                 ? this.VerificationScope
                 : this.usingCurrentThreadResolveScope
@@ -145,7 +145,7 @@ namespace SimpleInjector
 
                     this.Verifying();
                     this.VerifyThatAllExpressionsCanBeBuilt();
-                    this.VerifyThatAllRootObjectsCanBeCreated();
+                    this.VerifyThatAllRootObjectsCanBeCreated(this.VerificationScope);
                     this.SuccesfullyVerified = true;
                 }
                 finally
@@ -187,7 +187,7 @@ namespace SimpleInjector
             while (maximumNumberOfIterations > 0 && producersToVerify.Any());
         }
 
-        private void VerifyThatAllRootObjectsCanBeCreated()
+        private void VerifyThatAllRootObjectsCanBeCreated(Scope verificationScope)
         {
             var rootProducers = this.GetRootRegistrations(includeInvalidContainerRegisteredTypes: true);
 
@@ -198,7 +198,7 @@ namespace SimpleInjector
                 where !producer.InstanceSuccessfullyCreated || !producer.VerifiersAreSuccessfullyCalled
                 select producer;
 
-            this.VerifyInstanceCreation(producersToVerify.ToArray());
+            this.VerifyInstanceCreation(producersToVerify.ToArray(), verificationScope);
         }
 
         private IEnumerable<InstanceProducer> GetProducersThatNeedExplicitVerification()
@@ -231,7 +231,7 @@ namespace SimpleInjector
             }
         }
 
-        private void VerifyInstanceCreation(InstanceProducer[] producersToVerify)
+        private void VerifyInstanceCreation(InstanceProducer[] producersToVerify, Scope verificationScope)
         {
             foreach (var producer in producersToVerify)
             {
@@ -244,7 +244,7 @@ namespace SimpleInjector
 
                 if (!producer.VerifiersAreSuccessfullyCalled)
                 {
-                    producer.DoExtraVerfication(this.VerificationScope);
+                    producer.DoExtraVerfication(verificationScope);
                 }
             }
         }

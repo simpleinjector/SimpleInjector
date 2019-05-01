@@ -43,8 +43,8 @@ namespace SimpleInjector.Decorators
         private readonly ExpressionBuiltEventArgs e;
         private readonly Type registeredServiceType;
 
-        private ConstructorInfo decoratorConstructor;
-        private Type decoratorType;
+        private ConstructorInfo? decoratorConstructor;
+        private Type? decoratorType;
 
         public ContainerUncontrolledServicesDecoratorInterceptor(
             DecoratorExpressionInterceptorData data,
@@ -114,7 +114,7 @@ namespace SimpleInjector.Decorators
             // information in the predicate of the next decorator they add.
             serviceTypeInfo.AddAppliedDecorator(
                 this.registeredServiceType,
-                this.decoratorType,
+                this.decoratorType!,
                 this.Container,
                 this.Lifestyle,
                 decoratedExpression);
@@ -126,8 +126,10 @@ namespace SimpleInjector.Decorators
             Justification = "This is not a performance critical path.")]
         private Expression BuildDecoratorExpression(out Registration decoratorRegistration)
         {
-            this.ThrowWhenDecoratorNeedsAFunc();
-            this.ThrownWhenLifestyleIsNotSupported();
+            Type decoratorTypeDefinition = this.DecoratorTypeDefinition!;
+
+            this.ThrowWhenDecoratorNeedsAFunc(decoratorTypeDefinition);
+            this.ThrownWhenLifestyleIsNotSupported(decoratorTypeDefinition);
 
             ParameterExpression parameter = Expression.Parameter(this.registeredServiceType, "decoratee");
 
@@ -147,7 +149,7 @@ namespace SimpleInjector.Decorators
                 var collection = ((ConstantExpression)originalEnumerableExpression).Value as IEnumerable;
 
                 return this.BuildDecoratorEnumerableExpressionForConstantEnumerable(wrapInstanceWithDecorator,
-                    collection);
+                    collection!);
             }
             else
             {
@@ -162,17 +164,17 @@ namespace SimpleInjector.Decorators
 
             // Create the decorator as transient. Caching is applied later on.
             return Lifestyle.Transient.CreateDecoratorRegistration(
-                this.decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
+                this.decoratorConstructor!.DeclaringType, this.Container, overriddenParameters);
         }
 
         private OverriddenParameter[] CreateOverriddenParameters(Expression decorateeExpression)
         {
             ParameterInfo decorateeParameter =
-                GetDecorateeParameter(this.registeredServiceType, this.decoratorConstructor);
+                GetDecorateeParameter(this.registeredServiceType, this.decoratorConstructor!);
 
             decorateeExpression =
                 this.GetExpressionForDecorateeDependencyParameterOrNull(
-                    decorateeParameter, this.registeredServiceType, decorateeExpression);
+                    decorateeParameter, this.registeredServiceType, decorateeExpression)!;
 
             var currentProducer = this.GetServiceTypeInfo(this.e).GetCurrentInstanceProducer();
 
@@ -192,9 +194,9 @@ namespace SimpleInjector.Decorators
             InstanceProducer currentProducer)
         {
             return
-                from parameter in this.decoratorConstructor.GetParameters()
+                from parameter in this.decoratorConstructor!.GetParameters()
                 where parameter.ParameterType == typeof(DecoratorContext)
-                let contextExpression = Expression.Constant(new DecoratorContext(this.Context))
+                let contextExpression = Expression.Constant(new DecoratorContext(this.Context!))
                 select new OverriddenParameter(parameter, contextExpression, currentProducer);
         }
 
@@ -265,27 +267,27 @@ namespace SimpleInjector.Decorators
             return callExpression;
         }
 
-        private void ThrowWhenDecoratorNeedsAFunc()
+        private void ThrowWhenDecoratorNeedsAFunc(Type decoratorTypeDefinition)
         {
             bool needsADecorateeFactory = this.DecoratorNeedsADecorateeFactory();
 
             if (needsADecorateeFactory)
             {
                 string message = StringResources.CantGenerateFuncForDecorator(
-                    this.registeredServiceType, this.DecoratorTypeDefinition);
+                    this.registeredServiceType, decoratorTypeDefinition);
 
                 throw new ActivationException(message);
             }
         }
 
         private bool DecoratorNeedsADecorateeFactory() => (
-            from parameter in this.decoratorConstructor.GetParameters()
+            from parameter in this.decoratorConstructor!.GetParameters()
             where DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(
                 parameter.ParameterType, this.registeredServiceType)
             select parameter)
             .Any();
 
-        private void ThrownWhenLifestyleIsNotSupported()
+        private void ThrownWhenLifestyleIsNotSupported(Type decoratorTypeDefinition)
         {
             // Because the user registered an IEnumerable<TService>, this collection can be dynamic in nature,
             // and the number of elements could change on each enumeration. It's impossible to detect if a
@@ -297,7 +299,7 @@ namespace SimpleInjector.Decorators
             {
                 throw new NotSupportedException(
                     StringResources.CanNotDecorateContainerUncontrolledCollectionWithThisLifestyle(
-                        this.DecoratorTypeDefinition, this.Lifestyle, this.registeredServiceType));
+                        decoratorTypeDefinition, this.Lifestyle, this.registeredServiceType));
             }
         }
 

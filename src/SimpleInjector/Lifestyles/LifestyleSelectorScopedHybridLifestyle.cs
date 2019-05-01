@@ -54,7 +54,7 @@ namespace SimpleInjector.Lifestyles
                 this.trueLifestyle.DependencyLength(container),
                 this.falseLifestyle.DependencyLength(container));
 
-        protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
+        protected internal override Func<Scope?> CreateCurrentScopeProvider(Container container)
         {
             var selector = this.selector;
             var trueProvider = this.trueLifestyle.CreateCurrentScopeProvider(container);
@@ -68,7 +68,7 @@ namespace SimpleInjector.Lifestyles
             return () => selector(container) ? trueProvider() : falseProvider();
         }
 
-        protected override Scope GetCurrentScopeCore(Container container) =>
+        protected override Scope? GetCurrentScopeCore(Container container) =>
             this.CurrentLifestyle(container).GetCurrentScope(container);
 
         private ScopedLifestyle CurrentLifestyle(Container container) =>

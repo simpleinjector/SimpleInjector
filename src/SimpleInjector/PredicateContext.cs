@@ -45,8 +45,7 @@ namespace SimpleInjector
     public sealed class PredicateContext : ApiObject
     {
         private readonly InjectionConsumerInfo consumer;
-        private readonly Func<Type> implementationTypeProvider;
-        private Type implementationType;
+        private readonly Lazy<Type?> implementationType;
 
         internal PredicateContext(InstanceProducer producer, InjectionConsumerInfo consumer, bool handled)
             : this(producer.ServiceType, producer.Registration.ImplementationType, consumer, handled)
@@ -61,14 +60,14 @@ namespace SimpleInjector
             Requires.IsNotNull(consumer, nameof(consumer));
 
             this.ServiceType = serviceType;
-            this.implementationType = implementationType;
+            this.implementationType = Helpers.ToLazy<Type?>(implementationType);
             this.consumer = consumer;
             this.Handled = handled;
         }
 
         internal PredicateContext(
             Type serviceType,
-            Func<Type> implementationTypeProvider,
+            Func<Type?> implementationTypeProvider,
             InjectionConsumerInfo consumer,
             bool handled)
         {
@@ -77,7 +76,7 @@ namespace SimpleInjector
             Requires.IsNotNull(consumer, nameof(consumer));
 
             this.ServiceType = serviceType;
-            this.implementationTypeProvider = implementationTypeProvider;
+            this.implementationType = new Lazy<Type?>(implementationTypeProvider);
             this.consumer = consumer;
             this.Handled = handled;
         }
@@ -90,8 +89,7 @@ namespace SimpleInjector
         /// Gets the closed generic implementation type that will be created by the container.
         /// </summary>
         /// <value>The implementation type.</value>
-        public Type ImplementationType =>
-            this.implementationType ?? (this.implementationType = this.implementationTypeProvider());
+        public Type? ImplementationType => this.implementationType.Value;
 
         /// <summary>Gets a value indicating whether a previous <b>Register</b> registration has already
         /// been applied for the given <see cref="ServiceType"/>.</summary>
@@ -103,7 +101,7 @@ namespace SimpleInjector
         /// service. This property will return null in case the service is resolved directly from the container.
         /// </summary>
         /// <value>The <see cref="InjectionConsumerInfo"/> or null.</value>
-        public InjectionConsumerInfo Consumer =>
+        public InjectionConsumerInfo? Consumer =>
             this.consumer != InjectionConsumerInfo.Root ? this.consumer : null;
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
@@ -115,7 +113,7 @@ namespace SimpleInjector
             nameof(this.ServiceType),
             this.ServiceType.ToFriendlyName(),
             nameof(this.ImplementationType),
-            this.ImplementationType.ToFriendlyName(),
+            this.ImplementationType?.ToFriendlyName(),
             nameof(this.Handled),
             this.Handled,
             nameof(this.Consumer),

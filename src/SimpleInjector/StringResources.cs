@@ -45,7 +45,7 @@ namespace SimpleInjector
 
         internal static bool UseFullyQualifiedTypeNames { get; set; }
 
-        internal static string ContainerCanNotBeChangedAfterUse(string stackTrace)
+        internal static string ContainerCanNotBeChangedAfterUse(string? stackTrace)
         {
             string message = Format(
                 "The container can't be changed after the first call to {0}, {1}, {2}, and some calls of {3}. " +
@@ -65,7 +65,7 @@ namespace SimpleInjector
                 Environment.NewLine + Environment.NewLine + stackTrace;
         }
 
-        internal static string ContainerCanNotBeUsedAfterDisposal(Type type, string stackTrace)
+        internal static string ContainerCanNotBeUsedAfterDisposal(Type type, string? stackTrace)
         {
             string message = Format(
                 "Cannot access a disposed object.{0}Object name: '{1}'.",
@@ -239,7 +239,7 @@ namespace SimpleInjector
             NonGenericTypeAlreadyRegistered(serviceType, existingRegistrationIsConditional: true);
 
         internal static string CollectionUsedDuringConstruction(
-            Type consumer, InstanceProducer producer, KnownRelationship relationship = null) =>
+            Type consumer, InstanceProducer producer, KnownRelationship? relationship = null) =>
             Format(
                 "{0} is part of the {3} that is injected into {2}. The problem in {2} is that instead " +
                 "of storing the injected {3} in a private field and iterating over it at the point " +
@@ -1076,8 +1076,8 @@ namespace SimpleInjector
 
         private static string BuildAssemblyLocationMessage(Type serviceType, Type duplicateAssemblyLookalike)
         {
-            string serviceTypeLocation = GetAssemblyLocationOrNull(serviceType);
-            string lookalikeLocation = GetAssemblyLocationOrNull(duplicateAssemblyLookalike);
+            string? serviceTypeLocation = GetAssemblyLocationOrNull(serviceType);
+            string? lookalikeLocation = GetAssemblyLocationOrNull(duplicateAssemblyLookalike);
 
             if (serviceTypeLocation != lookalikeLocation
                 && (lookalikeLocation != null || serviceTypeLocation != null))
@@ -1092,7 +1092,7 @@ namespace SimpleInjector
             return string.Empty;
         }
 
-        private static string GetAssemblyLocationOrNull(Type type) =>
+        private static string? GetAssemblyLocationOrNull(Type type) =>
             AssemblyLocationProperty != null && !type.GetAssembly().IsDynamic
                 ? (string)AssemblyLocationProperty.GetValue(type.GetAssembly(), null)
                 : null;
@@ -1115,7 +1115,7 @@ namespace SimpleInjector
         private static string CSharpFriendlyName(Type type) =>
             Types.ToCSharpFriendlyName(type, UseFullyQualifiedTypeNames);
 
-        private static string Format(string format, params object[] args) =>
+        private static string Format(string format, params object?[] args) =>
             string.Format(CultureInfo.InvariantCulture, format, args);
     }
 }

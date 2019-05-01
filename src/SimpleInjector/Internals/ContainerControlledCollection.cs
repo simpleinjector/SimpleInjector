@@ -54,7 +54,7 @@ namespace SimpleInjector.Internals
 
         bool ICollection<TService>.IsReadOnly => true;
 
-        internal InstanceProducer ParentProducer { get; set; }
+        internal InstanceProducer? ParentProducer { get; set; }
 
         public TService this[int index]
         {
@@ -213,7 +213,7 @@ namespace SimpleInjector.Internals
             // If the implementationType is explicitly registered (using a Register call) we select this 
             // producer (but we skip any implicit registrations or anything that is assignable, since 
             // there could be more than one and it would be unclear which one to pick).
-            InstanceProducer producer = this.GetExplicitRegisteredInstanceProducer(implementationType);
+            InstanceProducer? producer = this.GetExplicitRegisteredInstanceProducer(implementationType);
 
             // If that doesn't result in a producer, we request a registration using unregistered type
             // resolution, were we prevent concrete types from being created by the container, since
@@ -243,7 +243,7 @@ namespace SimpleInjector.Internals
                 new ExpressionRegistration(producer.BuildExpression(), this.container));
         }
 
-        private InstanceProducer GetExplicitRegisteredInstanceProducer(Type implementationType)
+        private InstanceProducer? GetExplicitRegisteredInstanceProducer(Type implementationType)
         {
             var registrations = this.container.GetCurrentRegistrations(
                 includeInvalidContainerRegisteredTypes: true,
@@ -252,7 +252,7 @@ namespace SimpleInjector.Internals
             return registrations.FirstOrDefault(p => p.ServiceType == implementationType);
         }
 
-        private InstanceProducer GetInstanceProducerThroughUnregisteredTypeResolution(Type implementationType)
+        private InstanceProducer? GetInstanceProducerThroughUnregisteredTypeResolution(Type implementationType)
         {
             var producer = this.container.GetRegistrationEvenIfInvalid(
                 implementationType,

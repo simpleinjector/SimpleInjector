@@ -45,6 +45,7 @@ namespace SimpleInjector.Internals
         protected CyclicDependencyException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
+            this.OriginatingProducer = null!;
         }
 #endif
 

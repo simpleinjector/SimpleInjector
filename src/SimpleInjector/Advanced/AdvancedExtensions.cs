@@ -79,7 +79,7 @@ namespace SimpleInjector.Advanced
             nameof(ContainerScope.GetItem) + " instead. This method will be removed in a future release.",
             error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public static object GetItem(this Container container, object key)
+        public static object? GetItem(this Container container, object key)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(key, nameof(key));

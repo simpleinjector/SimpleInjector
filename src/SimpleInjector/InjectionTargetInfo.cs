@@ -35,7 +35,7 @@ namespace SimpleInjector
     /// injected into, and provides access to its meta data.
     /// </summary>
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
-    public sealed class InjectionTargetInfo : ApiObject, IEquatable<InjectionTargetInfo>
+    public sealed class InjectionTargetInfo : ApiObject, IEquatable<InjectionTargetInfo?>
     {
         internal InjectionTargetInfo(ParameterInfo parameter)
         {
@@ -55,7 +55,7 @@ namespace SimpleInjector
         /// </summary>
         /// <value>The <see cref="ParameterInfo"/> or null when the dependency is injected into a property.
         /// </value>
-        public ParameterInfo Parameter { get; }
+        public ParameterInfo? Parameter { get; }
 
         /// <summary>
         /// Gets the property of the consumer of the component where the dependency will be injected into. 
@@ -63,21 +63,21 @@ namespace SimpleInjector
         /// </summary>
         /// <value>The <see cref="PropertyInfo"/> or null when the dependency is injected into a constructor
         /// argument instead.</value>
-        public PropertyInfo Property { get; }
+        public PropertyInfo? Property { get; }
 
         /// <summary>Gets the name of the target.</summary>
         /// <value>A string containing the name of the target.</value>
-        public string Name => this.Parameter != null ? this.Parameter.Name : this.Property.Name;
+        public string Name => this.Parameter != null ? this.Parameter.Name : this.Property!.Name;
 
         /// <summary>Gets the type of the target.</summary>
         /// <value>A <see cref="System.Type"/> containing the type of the target.</value>
         public Type TargetType =>
-            this.Parameter != null ? this.Parameter.ParameterType : this.Property.PropertyType;
+            this.Parameter != null ? this.Parameter.ParameterType : this.Property!.PropertyType;
 
         /// <summary>Gets the member of the target. This is either the constructor of the parameter, or in
         /// case the target is a property, the property itself will be returned.</summary>
         /// <value>A <see cref="TargetType"/> containing the type of the target.</value>
-        public MemberInfo Member => this.Parameter != null ? this.Parameter.Member : this.Property;
+        public MemberInfo Member => this.Parameter != null ? this.Parameter.Member : this.Property!;
 
         internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
             "{0} {{ Name = \"{1}\", Type = {2} }}",
@@ -85,7 +85,7 @@ namespace SimpleInjector
             this.Name,
             this.TargetType.ToFriendlyName());
 
-        private object Target => this.Parameter ?? (object)this.Property;
+        private object Target => this.Parameter ?? (object)this.Property!;
 
         /// <summary>
         /// Returns an array of all of the custom attributes defined on either the <see cref="Parameter"/> or
@@ -100,7 +100,7 @@ namespace SimpleInjector
         public object[] GetCustomAttributes(bool inherit) =>
             this.Parameter != null
                 ? this.Parameter.GetCustomAttributes(inherit).ToArray()
-                : this.Property.GetCustomAttributes(inherit).ToArray();
+                : this.Property!.GetCustomAttributes(inherit).ToArray();
 
         /// <summary>
         /// Returns an array of custom attributes defined on either the <see cref="Parameter"/> or
@@ -115,7 +115,7 @@ namespace SimpleInjector
         public object[] GetCustomAttributes(Type attributeType, bool inherit) =>
             this.Parameter != null
                 ? this.Parameter.GetCustomAttributes(attributeType, inherit).ToArray()
-                : this.Property.GetCustomAttributes(attributeType, inherit).ToArray();
+                : this.Property!.GetCustomAttributes(attributeType, inherit).ToArray();
 
         /// <summary>
         /// Indicates whether one or more instance of attributeType is defined on this either the 
@@ -127,7 +127,7 @@ namespace SimpleInjector
         public bool IsDefined(Type attributeType, bool inherit) =>
             this.Parameter != null
                 ? this.Parameter.IsDefined(attributeType, inherit)
-                : this.Property.IsDefined(attributeType, inherit);
+                : this.Property!.IsDefined(attributeType, inherit);
 
         /// <summary>
         /// Retrieves a custom attribute of a specified type that is applied to a specified parameter.
@@ -147,11 +147,11 @@ namespace SimpleInjector
 #if !NET40
             this.Parameter != null
                 ? this.Parameter.GetCustomAttribute<T>(inherit)
-                : this.Property.GetCustomAttribute<T>(inherit);
+                : this.Property!.GetCustomAttribute<T>(inherit);
 #else
             this.Parameter != null
                 ? (T)Attribute.GetCustomAttribute(this.Parameter, typeof(T), inherit)
-                : (T)Attribute.GetCustomAttribute(this.Property, typeof(T), inherit);
+                : (T)Attribute.GetCustomAttribute(this.Property!, typeof(T), inherit);
 #endif
 
         /// <summary>
@@ -175,11 +175,11 @@ namespace SimpleInjector
 #if !NET40
             this.Parameter != null
                 ? this.Parameter.GetCustomAttribute(attributeType, inherit)
-                : this.Property.GetCustomAttribute(attributeType, inherit);
+                : this.Property!.GetCustomAttribute(attributeType, inherit);
 #else
             this.Parameter != null
                 ? Attribute.GetCustomAttribute(this.Parameter, attributeType, inherit)
-                : Attribute.GetCustomAttribute(this.Property, attributeType, inherit);
+                : Attribute.GetCustomAttribute(this.Property!, attributeType, inherit);
 #endif
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace SimpleInjector
         public IEnumerable<T> GetCustomAttributes<T>(bool inherit) where T : Attribute =>
             this.Parameter != null
                 ? this.Parameter.GetCustomAttributes(typeof(T), inherit).Cast<T>()
-                : this.Property.GetCustomAttributes(typeof(T), inherit).Cast<T>();
+                : this.Property!.GetCustomAttributes(typeof(T), inherit).Cast<T>();
 
         /// <inheritdoc />
         public override int GetHashCode() => this.Target.GetHashCode();
@@ -212,6 +212,6 @@ namespace SimpleInjector
         public override bool Equals(object obj) => obj is InjectionConsumerInfo info && this.Equals(info);
 
         /// <inheritdoc />
-        public bool Equals(InjectionTargetInfo other) => this.Target.Equals(other?.Target);
+        public bool Equals(InjectionTargetInfo? other) => this.Target.Equals(other?.Target);
     }
 }

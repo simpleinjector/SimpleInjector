@@ -53,6 +53,6 @@ namespace SimpleInjector.Advanced
         /// <returns>An <see cref="InstanceProducer"/> that describes the intend of creating that 
         /// <see cref="InjectionConsumerInfo.Target">Target</see>. This method never returns null.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the argument is a null reference.</exception>
-        InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure);
+        InstanceProducer? GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure);
     }
 }

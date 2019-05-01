@@ -31,7 +31,7 @@ namespace SimpleInjector
     /// Contains contextual information about the direct consumer for which the given dependency is injected
     /// into.
     /// </summary>
-    public class InjectionConsumerInfo : ApiObject, IEquatable<InjectionConsumerInfo>
+    public class InjectionConsumerInfo : ApiObject, IEquatable<InjectionConsumerInfo?>
     {
         // Bogus values for implementationType and property. They will never be used, but can't be null.
         internal static readonly InjectionConsumerInfo Root =
@@ -120,17 +120,17 @@ namespace SimpleInjector
             }
         }
 
-        internal bool IsRoot => ReferenceEquals(this, Root);
+        internal bool IsRoot => object.ReferenceEquals(this, Root);
 
         /// <inheritdoc />
         public override int GetHashCode() =>
             this.implementationType.GetHashCode() ^ this.target.GetHashCode();
 
         /// <inheritdoc />
-        public override bool Equals(object obj) => obj is InjectionConsumerInfo info && this.Equals(info);
+        public override bool Equals(object obj) => this.Equals(obj as InjectionConsumerInfo);
 
         /// <inheritdoc />
-        public bool Equals(InjectionConsumerInfo other) =>
+        public bool Equals(InjectionConsumerInfo? other) =>
             other != null
             && this.implementationType.Equals(other.implementationType)
             && this.target.Equals(other.target);

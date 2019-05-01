@@ -35,8 +35,8 @@ namespace SimpleInjector.Advanced.Internal
     public struct LazyScope
     {
         private readonly Container container;
-        private Func<Scope> scopeFactory;
-        private Scope value;
+        private Func<Scope>? scopeFactory;
+        private Scope? value;
 
         /// <summary>Initializes a new instance of the <see cref="LazyScope"/> struct.</summary>
         /// <param name="scopeFactory">The scope factory.</param>
@@ -61,7 +61,7 @@ namespace SimpleInjector.Advanced.Internal
                     this.scopeFactory = null;
                 }
 
-                return this.value;
+                return this.value!;
             }
         }
     }

@@ -47,10 +47,10 @@ namespace SimpleInjector.Lifestyles
         private sealed class TransientLifestyleRegistration<TImplementation> : Registration
             where TImplementation : class
         {
-            private readonly Func<TImplementation> instanceCreator;
+            private readonly Func<TImplementation>? instanceCreator;
 
             public TransientLifestyleRegistration(
-                Lifestyle lifestyle, Container container, Func<TImplementation> instanceCreator = null)
+                Lifestyle lifestyle, Container container, Func<TImplementation>? instanceCreator = null)
                 : base(lifestyle, container)
             {
                 this.instanceCreator = instanceCreator;

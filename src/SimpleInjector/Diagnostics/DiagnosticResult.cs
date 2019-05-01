@@ -73,7 +73,7 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>Gets the hierarchical group to which this diagnostic result belongs.</summary>
         /// <value>The <see cref="DiagnosticGroup"/>.</value>
-        public DiagnosticGroup Group { get; internal set; }
+        public DiagnosticGroup? Group { get; internal set; }
 
         [DebuggerHidden]
         internal object Value { get; }

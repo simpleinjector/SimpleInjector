@@ -194,7 +194,7 @@ namespace SimpleInjector
             }
 
             // PERF: We don't call GetBaseTypes(), to prevent memory allocations.
-            Type baseType = implementation.BaseType() ?? (implementation != typeof(object) ? typeof(object) : null);
+            Type? baseType = implementation.BaseType() ?? (implementation != typeof(object) ? typeof(object) : null);
 
             while (baseType != null)
             {
@@ -229,7 +229,7 @@ namespace SimpleInjector
 
         private static IEnumerable<Type> GetBaseTypes(this Type type)
         {
-            Type baseType = type.BaseType() ?? (type != typeof(object) ? typeof(object) : null);
+            Type? baseType = type.BaseType() ?? (type != typeof(object) ? typeof(object) : null);
 
             while (baseType != null)
             {

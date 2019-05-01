@@ -140,15 +140,15 @@ namespace SimpleInjector
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly MethodInfo OpenCreateRegistrationTConcreteMethod =
-            GetMethod(lifestyle => lifestyle.CreateRegistration<object>(null));
+            GetMethod(lifestyle => lifestyle.CreateRegistration<object>(null!));
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly MethodInfo OpenCreateRegistrationCoreTConcreteMethod =
-            GetMethod(lifestyle => lifestyle.CreateRegistrationCore<object>(null));
+            GetMethod(lifestyle => lifestyle.CreateRegistrationCore<object>(null!));
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly MethodInfo OpenCreateRegistrationTServiceFuncMethod =
-            GetMethod(lifestyle => lifestyle.CreateRegistration<object>(null, null));
+            GetMethod(lifestyle => lifestyle.CreateRegistration<object>(null!, null!));
 
         /// <summary>Initializes a new instance of the <see cref="Lifestyle"/> class.</summary>
         /// <param name="name">The user friendly name of this lifestyle.</param>
@@ -863,7 +863,7 @@ namespace SimpleInjector
 
         private static MethodInfo GetMethod(Expression<Action<Lifestyle>> methodCall)
         {
-            var body = methodCall.Body as MethodCallExpression;
+            var body = (MethodCallExpression)methodCall.Body;
             return body.Method.GetGenericMethodDefinition();
         }
     }

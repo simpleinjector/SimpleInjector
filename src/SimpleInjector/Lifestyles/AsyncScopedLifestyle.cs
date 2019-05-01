@@ -92,7 +92,7 @@ namespace SimpleInjector.Lifestyles
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        protected override Scope GetCurrentScopeCore(Container container) =>
+        protected override Scope? GetCurrentScopeCore(Container container) =>
             GetScopeManager(container).CurrentScope;
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace SimpleInjector.Lifestyles
         /// </summary>
         /// <param name="container">The container for which the delegate gets created.</param>
         /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
-        protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
+        protected internal override Func<Scope?> CreateCurrentScopeProvider(Container container)
         {
             ScopeManager manager = GetScopeManager(container);
 
@@ -113,7 +113,7 @@ namespace SimpleInjector.Lifestyles
 
         private static ScopeManager CreateManager(Container container, object key)
         {
-            var asyncLocal = new AsyncLocal<Scope>();
+            var asyncLocal = new AsyncLocal<Scope?>();
 
             return new ScopeManager(container, () => asyncLocal.Value, s => asyncLocal.Value = s);
         }
@@ -155,7 +155,7 @@ namespace SimpleInjector.Lifestyles
         /// </summary>
         /// <param name="container">The container for which the delegate gets created.</param>
         /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
-        protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
+        protected internal override Func<Scope?> CreateCurrentScopeProvider(Container container)
         {
             throw new NotSupportedException(Error);
         }

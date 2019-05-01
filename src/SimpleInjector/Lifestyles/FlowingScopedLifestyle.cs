@@ -35,15 +35,17 @@ namespace SimpleInjector.Lifestyles
         {
         }
 
-        protected internal override Func<Scope> CreateCurrentScopeProvider(Container container)
+        protected internal override Func<Scope?> CreateCurrentScopeProvider(Container container)
         {
+            Requires.IsNotNull(container, nameof(container));
+
             // Notify the container that we're using the thread-resolve scope.
             container.UseCurrentThreadResolveScope();
 
-            return () => container.GetVerificationOrResolveScopeForCurrentThread();
+            return () => container!.GetVerificationOrResolveScopeForCurrentThread();
         }
 
-        protected override Scope GetCurrentScopeCore(Container container) =>
+        protected override Scope? GetCurrentScopeCore(Container container) =>
             container.GetVerificationOrResolveScopeForCurrentThread();
     }
 }

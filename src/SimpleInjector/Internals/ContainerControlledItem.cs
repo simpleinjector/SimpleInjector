@@ -32,11 +32,9 @@ namespace SimpleInjector.Internals
     [DebuggerDisplay(nameof(ContainerControlledItem) + " ({" + nameof(ContainerControlledItem.DebuggerDisplay) + ", nq})")]
     internal sealed class ContainerControlledItem
     {
-        /// <summary>Will never be null. Can be open-generic.</summary>
         public readonly Type ImplementationType;
 
-        /// <summary>Can be null.</summary>
-        public readonly Registration Registration;
+        public readonly Registration? Registration;
 
         private ContainerControlledItem(Registration registration)
         {

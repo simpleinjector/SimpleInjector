@@ -45,11 +45,14 @@ namespace SimpleInjector
         private Expression expression;
 
         internal ExpressionBuildingEventArgs(
-            Type knownImplementationType, Expression expression, Lifestyle lifestyle)
+            Type knownImplementationType,
+            Expression expression,
+            Lifestyle lifestyle,
+            Collection<KnownRelationship> knownRelationships)
         {
             this.KnownImplementationType = knownImplementationType;
             this.Lifestyle = lifestyle;
-
+            this.KnownRelationships = knownRelationships;
             this.expression = expression;
         }
 

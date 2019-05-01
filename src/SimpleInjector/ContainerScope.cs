@@ -85,7 +85,7 @@ namespace SimpleInjector
         /// <returns>The stored item or null (Nothing in VB).</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
-        public object GetItem(object key) => this.scope.GetItem(key);
+        public object? GetItem(object key) => this.scope.GetItem(key);
 
         /// <summary>Stores an item by the given <paramref name="key"/> in the scope.</summary>
         /// <remarks>
