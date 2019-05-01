@@ -24,7 +24,6 @@ namespace SimpleInjector
 {
     using System;
     using System.ComponentModel;
-    using SimpleInjector.Integration.WebApi;
 
     /// <content>Deprecated methods.</content>>
     public static partial class SimpleInjectorWebApiExtensions
@@ -45,9 +44,8 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        [Obsolete("RegisterWebApiRequest has been deprecated. " +
-            "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
-            "See: https://simpleinjector.org/webapi",
+        [Obsolete("Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/webapi. Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterWebApiRequest<TConcrete>(this Container container)
@@ -76,9 +74,8 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
-        [Obsolete("RegisterWebApiRequest has been deprecated. " +
-            "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
-            "See: https://simpleinjector.org/webapi",
+        [Obsolete("Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/webapi. Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterWebApiRequest<TService, TImplementation>(
@@ -107,9 +104,8 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
-        [Obsolete("RegisterWebApiRequest has been deprecated. " +
-            "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
-            "See: https://simpleinjector.org/webapi",
+        [Obsolete("Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/webapi. Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterWebApiRequest<TService>(this Container container,
@@ -140,9 +136,8 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        [Obsolete("RegisterWebApiRequest has been deprecated. " +
-            "Please use Register<TConcrete>(new WebApiRequesstLifestyle(false)) instead " +
-            "to suppress disposal.",
+        [Obsolete("Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
+            "Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterWebApiRequest<TConcrete>(this Container container,
@@ -174,15 +169,14 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
-        [Obsolete("RegisterWebApiRequest has been deprecated. " +
-            "Please use Register<TService, TImplementation>(new WebApiRequesstLifestyle(false)) instead " +
-            "to suppress disposal.",
+        [Obsolete("Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
+            "Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterWebApiRequest<TService, TImplementation>(
             this Container container, bool disposeWhenScopeEnds)
-            where TImplementation : class, TService, IDisposable
             where TService : class
+            where TImplementation : class, TService, IDisposable
         {
             throw new NotSupportedException(
                 "RegisterWebApiRequest has been deprecated. " +
@@ -208,8 +202,8 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
         [Obsolete("RegisterWebApiRequest has been deprecated. " +
-            "Please use Register<TService>(Func<TService>, new WebApiRequesstLifestyle(false)) instead " +
-            "to suppress disposal.",
+            "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
+            "Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterWebApiRequest<TService>(

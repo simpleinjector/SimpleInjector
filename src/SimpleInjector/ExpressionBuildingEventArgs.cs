@@ -56,8 +56,8 @@ namespace SimpleInjector
         /// <summary>Gets the registered service type that is currently requested.</summary>
         /// <value>The registered service type that is currently requested.</value>
         [Obsolete(
-            "This property has been removed. Please use KnownImplementationType instead. " +
-            "See https://simpleinjector.org/depr3.",
+            "Please use KnownImplementationType instead. See https://simpleinjector.org/depr3. " +
+            "Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public Type RegisteredServiceType

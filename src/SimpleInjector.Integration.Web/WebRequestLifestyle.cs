@@ -55,8 +55,7 @@ namespace SimpleInjector.Integration.Web
         /// Specifies whether the created and cached instance will be disposed after the execution of the web
         /// request ended and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
-        [Obsolete("This constructor has been deprecated. Please use WebRequestLifestyle() instead.",
-            error: true)]
+        [Obsolete("Please use WebRequestLifestyle() instead. Will be removed in version 5.0.", error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public WebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds) : this()
         {
@@ -74,8 +73,8 @@ namespace SimpleInjector.Integration.Web
         /// (Nothing in VB).</exception>
         /// <exception cref="InvalidOperationException">Will be thrown when the current thread isn't running
         /// in the context of a web request.</exception>
-        [Obsolete("WhenCurrentRequestEnds has been deprecated. " +
-            "Please use Lifestyle.Scoped.WhenScopeEnds(Container, Action) instead.",
+        [Obsolete("Please use Lifestyle.Scoped.WhenScopeEnds(Container, Action) instead. " +
+            "Will be removed in version 5.0.",
             error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void WhenCurrentRequestEnds(Container container, Action action)

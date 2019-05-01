@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AssemblyName>SimpleInjector.Tests.Unit</AssemblyName>
+    <AssemblyOriginatorKeyFile>../fake.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>SimpleInjector.Tests.Unit</PackageId>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <RuntimeIdentifiers>win10-x86</RuntimeIdentifiers>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <RootNamespace>SimpleInjector.Tests.Unit</RootNamespace>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj" />
+    <ProjectReference Include="..\SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj" />
+    <ProjectReference Include="..\SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj" />
+    <ProjectReference Include="..\SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj" />
+    <ProjectReference Include="..\SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj" />
+    <ProjectReference Include="..\SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj" />
+    <ProjectReference Include="..\SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj" />
+    <ProjectReference Include="..\SimpleInjector.Packaging\SimpleInjector.Packaging.csproj" />
+    <ProjectReference Include="..\SimpleInjector\SimpleInjector.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <ProjectReference Include="..\PartialTrustTestRunner\PartialTrustTestRunner.csproj" />
+    <Reference Include="System.Linq.Expressions" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.2.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
+  </ItemGroup>
+
+
+</Project>
+ 

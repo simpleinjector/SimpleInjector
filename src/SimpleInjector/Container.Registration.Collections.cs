@@ -52,7 +52,10 @@ namespace SimpleInjector
         /// Thrown when <paramref name="containerUncontrolledCollection"/> is a null reference.
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
-            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
+            nameof(ContainerCollectionRegistrator.Register) + " instead. " +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
+            error: false)]
         public void RegisterCollection<TService>(IEnumerable<TService> containerUncontrolledCollection)
             where TService : class
         {
@@ -75,7 +78,10 @@ namespace SimpleInjector
         [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly",
             Justification = "TService is the name of the generic type argument. So this warning is a false positive.")]
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
-            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
+            nameof(ContainerCollectionRegistrator.Register) + " instead. " +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
+            error: false)]
         public void RegisterCollection<TService>(params TService[] singletons) where TService : class
         {
             this.Collection.Register<TService>(singletons);
@@ -100,7 +106,10 @@ namespace SimpleInjector
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
-            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
+            nameof(ContainerCollectionRegistrator.Register) + " instead. " +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
+            error: false)]
         public void RegisterCollection<TService>(IEnumerable<Type> serviceTypes) where TService : class
         {
             this.RegisterCollection(typeof(TService), serviceTypes);
@@ -125,7 +134,10 @@ namespace SimpleInjector
         /// service types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
-            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
+            nameof(ContainerCollectionRegistrator.Register) + " instead. " +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
+            error: false)]
         public void RegisterCollection<TService>(IEnumerable<Registration> registrations)
             where TService : class
         {
@@ -151,7 +163,10 @@ namespace SimpleInjector
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
-            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
+            nameof(ContainerCollectionRegistrator.Register) + " instead. " +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
+            error: false)]
         public void RegisterCollection(Type serviceType, IEnumerable<Type> serviceTypes)
         {
             this.Collection.Register(serviceType, serviceTypes);
@@ -177,7 +192,10 @@ namespace SimpleInjector
         /// service types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
-            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
+            nameof(ContainerCollectionRegistrator.Register) + " instead. " +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
+            error: false)]
         public void RegisterCollection(Type serviceType, IEnumerable<Registration> registrations)
         {
             this.Collection.Register(serviceType, registrations);
@@ -197,7 +215,10 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
-            nameof(ContainerCollectionRegistrator.Register) + " instead.", error: false)]
+            nameof(ContainerCollectionRegistrator.Register) + " instead. " +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
+            error: false)]
         public void RegisterCollection(Type serviceType, IEnumerable containerUncontrolledCollection)
         {
             this.Collection.Register(serviceType, containerUncontrolledCollection);
