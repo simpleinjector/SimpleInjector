@@ -554,12 +554,7 @@ namespace SimpleInjector
                     this.Registration));
             }
 
-            var e = new ExpressionBuiltEventArgs(this.ServiceType, expression)
-            {
-                Lifestyle = this.Lifestyle,
-                InstanceProducer = this,
-                ReplacedRegistration = this.Registration
-            };
+            var e = new ExpressionBuiltEventArgs(this.ServiceType, expression, this, this.Registration);
 
             this.Container.OnExpressionBuilt(e, this);
 
