@@ -452,7 +452,7 @@ namespace SimpleInjector
 
             this.cachedInstances[registration] = instance;
 
-            if (instance is IDisposable disposable)
+            if (instance is IDisposable disposable && !registration.SuppressDisposal)
             {
                 this.RegisterForDisposalInternal(disposable);
             }
