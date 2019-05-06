@@ -1030,9 +1030,10 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                you need to either resolve instances directly from the Scope using a Scope.GetInstance
-                overload, or you will have to set the Container.Options.DefaultScopedLifestyle property with
-                the required scoped lifestyle"
+                you need to either resolve instances directly from a Scope (i.e. using a Scope.GetInstance
+                overload), or you need to set the Container.Options.DefaultScopedLifestyle property with the
+                required scoped lifestyle for your type of application.
+                Neither one of these two conditions was met."
                 .TrimInside(),
                 action);
         }
@@ -1050,8 +1051,11 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                resolve instances directly from the Scope using a Scope.GetInstance
-                overload, or you will have to set the Container.Options.DefaultScopedLifestyle property"
+                To be able to inject SimpleInjector.Scope instances into consumers, you need to either
+                resolve instances directly from a Scope (i.e. using a Scope.GetInstance overload), or you
+                need to set the Container.Options.DefaultScopedLifestyle property with the required scoped
+                lifestyle for your type of application.
+                Neither one of these two conditions was met."
                 .TrimInside(),
                 action);
         }
@@ -1067,7 +1071,7 @@
 
             // Act
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "you will have to set the Container.Options.DefaultScopedLifestyle property",
+                "you need to set the Container.Options.DefaultScopedLifestyle property",
                 action);
         }
 
@@ -1082,7 +1086,12 @@
             Action action = () => container.GetInstance<ServiceDependingOn<Scope>>();
 
             // Act
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>("There is no active scope",
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                To be able to inject SimpleInjector.Scope instances into consumers, you need to either
+                resolve instances directly from a Scope (i.e. using a Scope.GetInstance overload), or you
+                need to set the Container.Options.DefaultScopedLifestyle property with the required
+                scoped lifestyle for your type of application."
+                .TrimInside(),
                 action);
         }
 

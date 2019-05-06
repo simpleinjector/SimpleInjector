@@ -668,10 +668,12 @@ namespace SimpleInjector
         {
             // Add the default registrations. This adds them as registration, but only in case some component
             // starts depending on them.
-            var scopeLifestyle = new ScopedScopeLifestyle();
+            this.resolveUnregisteredTypeRegistrations[typeof(Scope)] = new Lazy<InstanceProducer>(() =>
+                {
+                    var lifestyle = ScopedScopeLifestyle.Instance;
 
-            this.resolveUnregisteredTypeRegistrations[typeof(Scope)] = new Lazy<InstanceProducer>(
-                () => scopeLifestyle.CreateProducer(() => scopeLifestyle.GetCurrentScope(this), this));
+                    return lifestyle.CreateProducer(() => lifestyle.GetCurrentScope(this), this);
+                });
 
             this.resolveUnregisteredTypeRegistrations[typeof(Container)] = new Lazy<InstanceProducer>(
                 () => Lifestyle.Singleton.CreateProducer(() => this, this));

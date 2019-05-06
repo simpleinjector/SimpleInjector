@@ -29,6 +29,12 @@ namespace SimpleInjector.Lifestyles
     {
         internal static readonly ScopedScopeLifestyle Instance = new ScopedScopeLifestyle();
 
+        private const string ErrorMessage =
+           "To be able to inject SimpleInjector.Scope instances into consumers, you need to either " +
+           "resolve instances directly from a Scope (i.e. using a Scope.GetInstance overload), or " +
+           "you need to set the Container.Options.DefaultScopedLifestyle property with the required " +
+           "scoped lifestyle for your type of application.";
+
         internal ScopedScopeLifestyle() : base("Scoped")
         {
         }
@@ -46,7 +52,7 @@ namespace SimpleInjector.Lifestyles
             if (lifestyle != null)
             {
                 return lifestyle.GetCurrentScope(container)
-                    ?? ThrowThereIsNoActiveScopeException();
+                    ?? ThrowThereIsNoActiveScopeException(lifestyle);
             }
 
             return container.GetVerificationOrResolveScopeForCurrentThread()
@@ -55,12 +61,13 @@ namespace SimpleInjector.Lifestyles
 
         private static Scope ThrowResolveFromScopeOrRegisterDefaultScopedLifestyleException() =>
             throw new InvalidOperationException(
-                "To be able to resolve and inject Scope instances, you need to either resolve " +
-                "instances directly from the Scope using a Scope.GetInstance overload, or you will " +
-                "have to set the Container.Options.DefaultScopedLifestyle property with the required " +
-                "scoped lifestyle for your type of application.");
+                ErrorMessage + " Neither one of these two conditions was met.");
 
-        private static Scope ThrowThereIsNoActiveScopeException() =>
-            throw new InvalidOperationException("There is no active scope.");
+        private static Scope ThrowThereIsNoActiveScopeException(ScopedLifestyle scopedLifestyle) =>
+            throw new InvalidOperationException(
+                ErrorMessage +
+                $" You configured {scopedLifestyle.Name} as the container's DefaultScopedLifestyle, " +
+                "but are resolving the object graph that consists of the Scope instance outside the " +
+                $"context of an active ({scopedLifestyle.Name}) scope.");
     }
 }
