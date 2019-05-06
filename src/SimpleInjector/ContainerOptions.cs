@@ -56,7 +56,7 @@ namespace SimpleInjector
     /// ]]></code>
     /// </example>
     [DebuggerDisplay("{" + nameof(ContainerOptions.DebuggerDisplayDescription) + ", nq}")]
-    public class ContainerOptions
+    public class ContainerOptions : ApiObject
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorResolutionBehavior resolutionBehavior;
@@ -116,8 +116,9 @@ namespace SimpleInjector
         /// <summary>Gets or sets a value indicating whether. 
         /// This method is deprecated. Changing its value will have no effect.</summary>
         /// <value>The value indicating whether the container will return an empty collection.</value>
-        [Obsolete("ResolveUnregisteredCollections has been deprecated. " +
-            "Please register collections explicitly instead.",
+        [Obsolete("This method is not used any longer. Setting it has no effect. " +
+            "Please register collections explicitly instead. " +
+            "Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool ResolveUnregisteredCollections { get; set; }

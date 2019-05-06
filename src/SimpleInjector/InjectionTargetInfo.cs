@@ -28,13 +28,14 @@ namespace SimpleInjector
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Discovers the attributes of the code element (a property or parameter) where a dependency will be
     /// injected into, and provides access to its meta data.
     /// </summary>
     [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
-    public sealed class InjectionTargetInfo : IEquatable<InjectionTargetInfo>
+    public sealed class InjectionTargetInfo : ApiObject, IEquatable<InjectionTargetInfo>
     {
         internal InjectionTargetInfo(ParameterInfo parameter)
         {
@@ -48,13 +49,18 @@ namespace SimpleInjector
             this.Property = property;
         }
 
-        /// <summary>Gets the constructor argument of the consumer of the component where the dependency will be
-        /// injected into. The property can return null.</summary>
-        /// <value>The <see cref="ParameterInfo"/> or null when the dependency is injected into a property.</value>
+        /// <summary>
+        /// Gets the constructor argument of the consumer of the component where the dependency will be
+        /// injected into. The property can return null.
+        /// </summary>
+        /// <value>The <see cref="ParameterInfo"/> or null when the dependency is injected into a property.
+        /// </value>
         public ParameterInfo Parameter { get; }
 
-        /// <summary>Gets the property of the consumer of the component where the dependency will be injected into. 
-        /// The property can return null.</summary>
+        /// <summary>
+        /// Gets the property of the consumer of the component where the dependency will be injected into. 
+        /// The property can return null.
+        /// </summary>
         /// <value>The <see cref="PropertyInfo"/> or null when the dependency is injected into a constructor
         /// argument instead.</value>
         public PropertyInfo Property { get; }
@@ -65,7 +71,8 @@ namespace SimpleInjector
 
         /// <summary>Gets the type of the target.</summary>
         /// <value>A <see cref="System.Type"/> containing the type of the target.</value>
-        public Type TargetType => this.Parameter != null ? this.Parameter.ParameterType : this.Property.PropertyType;
+        public Type TargetType =>
+            this.Parameter != null ? this.Parameter.ParameterType : this.Property.PropertyType;
 
         /// <summary>Gets the member of the target. This is either the constructor of the parameter, or in
         /// case the target is a property, the property itself will be returned.</summary>
@@ -77,6 +84,8 @@ namespace SimpleInjector
             this.Parameter != null ? "Parameter" : "Property",
             this.Name,
             this.TargetType.ToFriendlyName());
+
+        private object Target => this.Parameter ?? (object)this.Property;
 
         /// <summary>
         /// Returns an array of all of the custom attributes defined on either the <see cref="Parameter"/> or
@@ -149,8 +158,10 @@ namespace SimpleInjector
         /// Retrieves a custom attribute of a specified type that is applied to a specified parameter.
         /// </summary>
         /// <param name="attributeType">The type of attribute to search for.</param>
-        /// <returns>A custom attribute that matches attributeType, or null if no such attribute is found.</returns>
-        public Attribute GetCustomAttribute(Type attributeType) => this.GetCustomAttribute(attributeType, inherit: true);
+        /// <returns>A custom attribute that matches attributeType, or null if no such attribute is found.
+        /// </returns>
+        public Attribute GetCustomAttribute(Type attributeType) =>
+            this.GetCustomAttribute(attributeType, inherit: true);
 
         /// <summary>
         /// Retrieves a custom attribute of a specified type that is applied to a specified parameter, and 
@@ -158,7 +169,8 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="attributeType">The type of attribute to search for.</param>
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
-        /// <returns>A custom attribute matching attributeType, or null if no such attribute is found.</returns>
+        /// <returns>A custom attribute matching attributeType, or null if no such attribute is found.
+        /// </returns>
         public Attribute GetCustomAttribute(Type attributeType, bool inherit) =>
 #if !NET40
             this.Parameter != null
@@ -171,12 +183,14 @@ namespace SimpleInjector
 #endif
 
         /// <summary>
-        /// Retrieves a collection of custom attributes of a specified type that are applied to a specified parameter.
+        /// Retrieves a collection of custom attributes of a specified type that are applied to a specified 
+        /// parameter.
         /// </summary>
         /// <typeparam name="T">The type of attribute to search for.</typeparam>
         /// <returns>A collection of the custom attributes that are applied to element and that match T, or 
         /// an empty collection if no such attributes exist.</returns>
-        public IEnumerable<T> GetCustomAttributes<T>() where T : Attribute => this.GetCustomAttributes<T>(inherit: true);
+        public IEnumerable<T> GetCustomAttributes<T>() where T : Attribute =>
+            this.GetCustomAttributes<T>(inherit: true);
 
         /// <summary>
         /// Retrieves a collection of custom attributes of a specified type that are applied to a specified 
@@ -192,17 +206,12 @@ namespace SimpleInjector
                 : this.Property.GetCustomAttributes(typeof(T), inherit).Cast<T>();
 
         /// <inheritdoc />
-        public override int GetHashCode() =>
-            this.Parameter?.GetHashCode() ?? 0
-            ^ this.Property?.GetHashCode() ?? 0;
+        public override int GetHashCode() => this.Target.GetHashCode();
 
         /// <inheritdoc />
-        public override bool Equals(object obj) => this.Equals(obj as InjectionTargetInfo);
+        public override bool Equals(object obj) => this.Equals(obj as InjectionConsumerInfo);
 
         /// <inheritdoc />
-        public bool Equals(InjectionTargetInfo other) =>
-            this.Parameter != null
-                ? this.Parameter.Equals(other.Parameter)
-                : this.Property.Equals(other.Property);
+        public bool Equals(InjectionTargetInfo other) => this.Target.Equals(other?.Target);
     }
 }

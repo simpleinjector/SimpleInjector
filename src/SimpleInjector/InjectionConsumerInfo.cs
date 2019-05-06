@@ -25,12 +25,13 @@ namespace SimpleInjector
     using System;
     using System.ComponentModel;
     using System.Reflection;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Contains contextual information about the direct consumer for which the given dependency is injected
     /// into.
     /// </summary>
-    public class InjectionConsumerInfo : IEquatable<InjectionConsumerInfo>
+    public class InjectionConsumerInfo : ApiObject, IEquatable<InjectionConsumerInfo>
     {
         // Bogus values for implementationType and property. They will never be used, but can't be null.
         internal static readonly InjectionConsumerInfo Root =
@@ -66,8 +67,8 @@ namespace SimpleInjector
         /// <summary>Gets the service type of the consumer of the component that should be created.</summary>
         /// <value>The closed generic service type.</value>
         [Obsolete(
-            "This property has been removed. Please use ImplementationType instead. " +
-            "See https://simpleinjector.org/depr3.",
+            "Please use ImplementationType instead. See https://simpleinjector.org/depr3. " +
+            "Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public Type ServiceType
@@ -119,7 +120,7 @@ namespace SimpleInjector
             }
         }
 
-        internal bool IsRoot => ReferenceEquals(this, Root);
+        internal bool IsRoot => object.ReferenceEquals(this, InjectionConsumerInfo.Root);
 
         /// <inheritdoc />
         public override int GetHashCode() =>
@@ -130,7 +131,8 @@ namespace SimpleInjector
 
         /// <inheritdoc />
         public bool Equals(InjectionConsumerInfo other) =>
-            this.implementationType.Equals(other.implementationType)
+            other != null
+            && this.implementationType.Equals(other.implementationType)
             && this.target.Equals(other.target);
 
         /// <inheritdoc />

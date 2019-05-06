@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2014 Simple Injector Contributors
+ * Copyright (c) 2014-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -27,6 +27,7 @@ namespace SimpleInjector
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// An instance of this type can be injected into constructors of decorator classes that are registered
@@ -35,7 +36,7 @@ namespace SimpleInjector
     /// to make runtime decisions.
     /// </summary>
     [DebuggerDisplay(nameof(DecoratorContext) + " ({" + nameof(DecoratorContext.DebuggerDisplay) + ", nq})")]
-    public sealed class DecoratorContext
+    public sealed class DecoratorContext : ApiObject
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly DecoratorPredicateContext context;

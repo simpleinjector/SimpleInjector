@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015 Simple Injector Contributors
+ * Copyright (c) 2015-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -23,6 +23,7 @@
 namespace SimpleInjector
 {
     using System.Reflection;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Defines options to control the types returned from the
@@ -33,7 +34,7 @@ namespace SimpleInjector
     /// <see cref="IncludeGenericTypeDefinitions"/>, <see cref="IncludeDecorators"/> and 
     /// <see cref="IncludeComposites"/> are set to true.
     /// </summary>
-    public class TypesToRegisterOptions
+    public class TypesToRegisterOptions : ApiObject
     {
         /// <summary>Initializes a new instance of the <see cref="TypesToRegisterOptions"/> class.</summary>
         public TypesToRegisterOptions()
