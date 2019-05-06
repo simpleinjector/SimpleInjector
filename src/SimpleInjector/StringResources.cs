@@ -559,6 +559,22 @@ namespace SimpleInjector
                 decoratorType.TypeName(),
                 CollectionsRegisterMethodName);
 
+        internal static string ScopeSuppliedToScopedDecorateeFactoryMustHaveAContainer<TService>() =>
+            Format(
+                "For scoped decoratee factories to function, they have to be supplied with a Scope " +
+                "instance that references the Container for which the object graph has been built. But the " +
+                "Scope instance, provided to this {0} delegate does not belong to any container. Please " +
+                "ensure the supplied Scope instance is created using the constructor overload that accepts " +
+                "a Container instance.",
+                typeof(Func<Scope, TService>).TypeName());
+
+        internal static string ScopeSuppliedToScopedDecorateeFactoryMustBeForSameContainer<TService>() =>
+            Format(
+                "For scoped decoratee factories to function, they have to be supplied with a Scope " +
+                "instance that references the Container for which the object graph has been built. But the " +
+                "Scope instance, provided to this {0} delegate, references a different Container instance.",
+                typeof(Func<Scope, TService>).TypeName());
+
         internal static string SuppliedTypeIsNotAGenericType(Type type) =>
             Format("The supplied type {0} is not a generic type.", type.TypeName());
 
