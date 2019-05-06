@@ -2537,7 +2537,9 @@
             var proxy = (ScopedPluginProxy)container.GetInstance<IPlugin>();
             Func<Scope, IPlugin> factory = proxy.Factory;
 
+#pragma warning disable CS0618 // Type or member is obsolete
             var containerlessScope = new Scope();
+#pragma warning restore CS0618 // Type or member is obsolete
 
             // Act
             Action action = () => factory(containerlessScope);
