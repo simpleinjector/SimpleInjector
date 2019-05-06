@@ -43,7 +43,9 @@ namespace SimpleInjector.Lifestyles
             return () => container.GetVerificationOrResolveScopeForCurrentThread();
         }
 
-        protected override Scope GetCurrentScopeCore(Container container) =>
-            container.GetVerificationOrResolveScopeForCurrentThread();
+        // This method gets called by ScopedLifestyle.GetCurrentScopeInternal, and it already calls
+        // GetVerificationOrResolveScopeForCurrentThread() and falls back to this method if there is not
+        // scope. So there's nothing left to do here.
+        protected override Scope GetCurrentScopeCore(Container container) => null;
     }
 }
