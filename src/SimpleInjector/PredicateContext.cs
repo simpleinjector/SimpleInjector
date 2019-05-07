@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
+ * Copyright (c) 2013-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -26,6 +26,7 @@ namespace SimpleInjector
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="Predicate{T}"/>
@@ -41,8 +42,9 @@ namespace SimpleInjector
     /// method for more information.
     /// </remarks>
     [DebuggerDisplay(nameof(PredicateContext) + " ({" + nameof(PredicateContext.DebuggerDisplay) + ", nq})")]
-    public sealed class PredicateContext
+    public sealed class PredicateContext : ApiObject
     {
+        private readonly InjectionConsumerInfo consumer;
         private readonly Func<Type> implementationTypeProvider;
         private Type implementationType;
 
@@ -54,9 +56,13 @@ namespace SimpleInjector
         internal PredicateContext(
             Type serviceType, Type implementationType, InjectionConsumerInfo consumer, bool handled)
         {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(consumer, nameof(consumer));
+
             this.ServiceType = serviceType;
             this.implementationType = implementationType;
-            this.Consumer = consumer;
+            this.consumer = consumer;
             this.Handled = handled;
         }
 
@@ -66,9 +72,13 @@ namespace SimpleInjector
             InjectionConsumerInfo consumer,
             bool handled)
         {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationTypeProvider, nameof(implementationTypeProvider));
+            Requires.IsNotNull(consumer, nameof(consumer));
+
             this.ServiceType = serviceType;
             this.implementationTypeProvider = implementationTypeProvider;
-            this.Consumer = consumer;
+            this.consumer = consumer;
             this.Handled = handled;
         }
 
@@ -93,7 +103,8 @@ namespace SimpleInjector
         /// service. This property will return null in case the service is resolved directly from the container.
         /// </summary>
         /// <value>The <see cref="InjectionConsumerInfo"/> or null.</value>
-        public InjectionConsumerInfo Consumer { get; }
+        public InjectionConsumerInfo Consumer =>
+            this.consumer != InjectionConsumerInfo.Root ? this.consumer : null;
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]

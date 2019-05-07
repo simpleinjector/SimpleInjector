@@ -40,7 +40,7 @@ namespace SimpleInjector.Internals
             }
 
             var set = new HashSet<InstanceProducer>(InstanceProducer.EqualityComparer);
-            var objectGraphBuilder = new ObjectGraphStringBuilder(options.IncludeLifestyleInformation);
+            var objectGraphBuilder = new ObjectGraphStringBuilder(options);
 
             producer.VisualizeIndentedObjectGraph(
                 indentingDepth: 0, last: true, set: set, objectGraphBuilder: objectGraphBuilder);
