@@ -42,7 +42,9 @@ namespace SimpleInjector.Integration.AspNetCore
     /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(Lifestyle.Scoped);
     /// ]]></code>
     /// </example>
-    [Obsolete("This lifestyle is obsolete. Please use SimpleInjector.Lifestyles.AsyncScopedLifestyle instead.", error: false)]
+    [Obsolete("Please use SimpleInjector.Lifestyles.AsyncScopedLifestyle instead. " +
+        "Will be removed in version 5.0.",
+        error: true)]
     public sealed class AspNetRequestLifestyle : AsyncScopedLifestyle
     {
         /// <summary>Initializes a new instance of the <see cref="AspNetRequestLifestyle"/> class.
@@ -58,8 +60,8 @@ namespace SimpleInjector.Integration.AspNetCore
         /// Specifies whether the created and cached instance will be disposed when the Web API request ends,
         /// and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
-        [Obsolete("This constructor overload has been deprecated. " +
-            "Please use ExecutionContextScopeLifestyle() instead.",
+        [Obsolete("Please use SimpleInjector.Lifestyles.AsyncScopedLifestyle instead. " +
+            "Will be removed in version 5.0.",
             error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public AspNetRequestLifestyle(bool disposeInstanceWhenScopeEnds)

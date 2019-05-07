@@ -269,7 +269,7 @@ namespace SimpleInjector.Lifestyles
                                 new KnownRelationship(
                                     implementationType: typeof(TImplementation),
                                     lifestyle: this.Lifestyle,
-                                    consumer: matchingRelationship?.Consumer,
+                                    consumer: matchingRelationship?.Consumer ?? InjectionConsumerInfo.Root,
                                     dependency: args.Producer,
                                     additionalInformation: additionalInformation));
                         }

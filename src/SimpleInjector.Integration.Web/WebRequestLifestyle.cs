@@ -55,8 +55,7 @@ namespace SimpleInjector.Integration.Web
         /// Specifies whether the created and cached instance will be disposed after the execution of the web
         /// request ended and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
-        [Obsolete("This constructor has been deprecated. Please use WebRequestLifestyle() instead.",
-            error: true)]
+        [Obsolete("Please use WebRequestLifestyle() instead. Will be removed in version 5.0.", error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public WebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds) : this()
         {
@@ -74,8 +73,8 @@ namespace SimpleInjector.Integration.Web
         /// (Nothing in VB).</exception>
         /// <exception cref="InvalidOperationException">Will be thrown when the current thread isn't running
         /// in the context of a web request.</exception>
-        [Obsolete("WhenCurrentRequestEnds has been deprecated. " +
-            "Please use Lifestyle.Scoped.WhenScopeEnds(Container, Action) instead.",
+        [Obsolete("Please use Lifestyle.Scoped.WhenScopeEnds(Container, Action) instead. " +
+            "Will be removed in version 5.0.",
             error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void WhenCurrentRequestEnds(Container container, Action action)
@@ -169,14 +168,14 @@ namespace SimpleInjector.Integration.Web
 
         private static void DisposeScopes(List<Scope> scopes)
         {
-            if (scopes.Count != 1)
-            {
-                DisposeScopesInReverseOrder(scopes);
-            }
-            else
+            if (scopes.Count == 1)
             {
                 // Optimization: don't create a master scope if there is only one scope (the common case).
                 scopes[0].Dispose();
+            }
+            else if (scopes.Count > 1)
+            {
+                DisposeScopesInReverseOrder(scopes);
             }
         }
 
@@ -185,7 +184,7 @@ namespace SimpleInjector.Integration.Web
             // Here we use a 'master' scope that will hold the real scopes. This allows all scopes
             // to be disposed, even if a scope's Dispose method throws an exception. Scopes will
             // also be disposed in opposite order of creation.
-            using (var masterScope = new Scope())
+            using (var masterScope = new Scope(scopes[0].Container))
             {
                 foreach (var scope in scopes)
                 {

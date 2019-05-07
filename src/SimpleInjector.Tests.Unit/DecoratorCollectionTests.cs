@@ -8,6 +8,7 @@
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// This set of tests test whether individual items of registered collections are correctly decorated.
@@ -1996,6 +1997,63 @@
             AssertThat.AreEqual(typeof(ICommandHandler<RealCommand>), context.ImplementationType);
         }
 
+        // #703
+        [TestMethod]
+        public void GetAllInstances_DecoratorTypeFactoryReturningProxyDecoratorWrappingUncontrolledCollection_ThrowsExpressiveException()
+        {
+            // Act
+            var container = new Container();
+
+            IEnumerable<IPlugin> collection = new[] { new PluginImpl() };
+
+            container.Collection.Register(containerUncontrolledCollection: collection);
+            container.RegisterDecorator(
+                typeof(IPlugin),
+                _ => typeof(PluginProxy), // factory returning (func-wrapping) proxy
+                Lifestyle.Transient,
+                _ => true);
+
+            // Act
+            Action action = () => container.GetAllInstances<IPlugin>().ToArray();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "It's impossible for the container to generate a Func<IPlugin> for injection into the " +
+                $"{typeof(PluginProxy).ToFriendlyName()} decorator that will be wrapped around instances " +
+                "of the collection of IPlugin instances",
+                action);
+        }
+
+        // #703
+        [TestMethod]
+        public void GetAllInstances_DecoratorTypeFactoryAndScopedLifestyleWrappingUncontrolledCollection_ThrowsExpressiveException()
+        {
+            // Act
+            string decoratorName = typeof(PluginDecorator).ToFriendlyName();
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            IEnumerable<IPlugin> collection = new[] { new PluginImpl() };
+
+            container.Collection.Register(containerUncontrolledCollection: collection);
+
+            container.RegisterDecorator(
+                typeof(IPlugin),
+                _ => typeof(PluginDecorator), // using factory
+                Lifestyle.Scoped, // lifestyle other than singleton or transient
+                _ => true);
+
+            // Act
+            Action action = () => container.GetAllInstances<IPlugin>().ToArray();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                $"You are trying to apply the {decoratorName} decorator with the 'Scoped' lifestyle to " +
+                "a collection of type IPlugin, but the registered collection is not controlled by the " +
+                "container.",
+                action);
+        }
+
         private static KnownRelationship GetValidRelationship()
         {
             var container = new Container();
@@ -2016,13 +2074,18 @@
                 ex.Message);
 
             AssertThat.StringContains(
-                "the registration hasn't been made using one of the Container.Collection.Register overloads that take " +
-                "a list of System.Type",
+                string.Format(
+                    "the registration was made using either the " +
+                    "Container.Collection.Register<{0}>(IEnumerable<{0}>) or " +
+                    "Container.Collection.Register(Type, IEnumerable) overloads",
+                    typeof(ICommandHandler<RealCommand>).ToFriendlyName()),
                 ex.Message);
 
             AssertThat.StringContains(
-                "switch to one of the other Container.Collection.Register overloads, or don't use a decorator that " +
-                "depends on a Func<T>",
+                string.Format(
+                    "switch to one of the other Container.Collection.Register overloads, " +
+                    "or use a decorator that depends on {0} instead of Func<{0}>.",
+                    typeof(ICommandHandler<RealCommand>).ToFriendlyName()),
                 ex.Message);
         }
 
@@ -2082,6 +2145,20 @@
             public DeriveDecorator(IDerive decoratee)
             {
                 this.Decoratee = decoratee;
+            }
+        }
+
+        public class PluginProxy : IPlugin
+        {
+            public PluginProxy(Func<IPlugin> pluginFactory)
+            {
+            }
+        }
+
+        public class PluginDecorator : IPlugin
+        {
+            public PluginDecorator(IPlugin plugin)
+            {
             }
         }
     }

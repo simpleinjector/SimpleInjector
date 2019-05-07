@@ -50,7 +50,9 @@ namespace SimpleInjector.Advanced
         /// Gets a null reference. This property has been deprecated.
         /// </summary>
         /// <value>The null (Nothing in VB).</value>
-        [Obsolete("The Producer property has been deprecated. Please use Registration instead.", error: true)]
+        [Obsolete("The Producer property has been deprecated. Please use Registration instead. " +
+            "Will be removed in version 5.0.",
+            error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public InstanceProducer Producer { get; }
 

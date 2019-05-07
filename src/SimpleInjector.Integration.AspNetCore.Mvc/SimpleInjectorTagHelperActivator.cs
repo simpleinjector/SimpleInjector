@@ -38,10 +38,11 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// Initializes a new instance of the <see cref="SimpleInjectorTagHelperActivator"/> class.
         /// </summary>
         /// <param name="container">The container instance.</param>
-        [Obsolete("This constructor is deprecated. Please use the other constructor overload or use the " +
+        [Obsolete("Please use the other constructor overload or use the " +
             "SimpleInjectorAspNetCoreMvcIntegrationExtensions.AddSimpleInjectorTagHelperActivation " +
-            "extension method instead.",
-            error: false)]
+            "extension method instead. " +
+            "Will be removed in version 5.0.",
+            error: true)]
         public SimpleInjectorTagHelperActivator(Container container)
         {
             if (container == null)

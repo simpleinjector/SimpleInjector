@@ -1,7 +1,7 @@
 ﻿#region Copyright Simple Injector Contributors
 /* The Simple Injector is an easy-to-use Inversion of Control library for .NET
  * 
- * Copyright (c) 2015 Simple Injector Contributors
+ * Copyright (c) 2015-2019 Simple Injector Contributors
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
  * associated documentation files (the "Software"), to deal in the Software without restriction, including 
@@ -26,6 +26,7 @@ namespace SimpleInjector
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Contains contextual information for creating an implementation type.
@@ -36,7 +37,7 @@ namespace SimpleInjector
     /// method for more information.
     /// </remarks>
     [DebuggerDisplay(nameof(TypeFactoryContext) + " ({" + nameof(TypeFactoryContext.DebuggerDisplay) + ", nq})")]
-    public sealed class TypeFactoryContext
+    public sealed class TypeFactoryContext : ApiObject
     {
         internal TypeFactoryContext(Type serviceType, InjectionConsumerInfo consumer)
         {

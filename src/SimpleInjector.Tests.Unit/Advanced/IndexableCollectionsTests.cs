@@ -215,6 +215,23 @@
         }
 
         [TestMethod]
+        public void GetAllInstances_NonGenericAppendTypeWithLifestyle_RegistersTypeAccordingToExpectedLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Append(typeof(IPlugin), typeof(Plugin0), Lifestyle.Singleton);
+            container.Collection.Append(typeof(IPlugin), typeof(Plugin1), Lifestyle.Transient);
+
+            // Act
+            var plugins = container.GetAllInstances<IPlugin>();
+
+            // Assert
+            Assert.AreSame(plugins.First(), plugins.First(), "Plugin0 should be Singleton.");
+            Assert.AreNotSame(plugins.Last(), plugins.Last(), "Plugin1 should be Transient.");
+        }
+        
+        [TestMethod]
         public void Index_ValuePartOfTheCollection1_ReturnsCorrectIndex()
         {
             // Arrange

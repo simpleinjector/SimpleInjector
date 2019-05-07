@@ -30,8 +30,7 @@ namespace SimpleInjector
     /// <summary>
     /// Extension methods for integrating Simple Injector with ASP.NET web applications.
     /// </summary>
-    [Obsolete("SimpleInjectorWebExtensions has been deprecated. " +
-        "See: https://simpleinjector.org/mvc",
+    [Obsolete("Will be removed in version 5.0. See: https://simpleinjector.org/mvc for alternative uses.",
         error: true)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class SimpleInjectorWebExtensions
@@ -53,7 +52,7 @@ namespace SimpleInjector
         /// reference.</exception>
         [Obsolete("RegisterPerWebRequest has been deprecated. " +
             "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
-            "See: https://simpleinjector.org/mvc",
+            "See: https://simpleinjector.org/mvc. Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterPerWebRequest<TConcrete>(this Container container)
@@ -85,7 +84,7 @@ namespace SimpleInjector
         /// reference.</exception>
         [Obsolete("RegisterPerWebRequest has been deprecated. " +
             "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
-            "See: https://simpleinjector.org/mvc",
+            "See: https://simpleinjector.org/mvc. Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterPerWebRequest<TService, TImplementation>(this Container container)
@@ -115,7 +114,7 @@ namespace SimpleInjector
         /// references.</exception>
         [Obsolete("RegisterPerWebRequest has been deprecated. " +
             "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
-            "See: https://simpleinjector.org/mvc",
+            "See: https://simpleinjector.org/mvc. Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterPerWebRequest<TService>(this Container container,
@@ -145,8 +144,7 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when either <paramref name="container"/> or <paramref name="instanceCreator"/> are null
         /// references.</exception>
-        [Obsolete("RegisterPerWebRequest has been deprecated. " +
-            "Please use Register<TService>(new WebRequestLifestyle(false)) instead to suppress disposal.",
+        [Obsolete("Please use Register<TService>(Lifestyle.Scoped). Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterPerWebRequest<TService>(

@@ -24,11 +24,12 @@ namespace SimpleInjector.Integration.ServiceCollection
 {
     using System;
     using Microsoft.Extensions.DependencyInjection;
+    using SimpleInjector.Advanced;
 
     /// <summary>
     /// Provides programmatic configuration for the Simple Injector on top of <see cref="IServiceCollection"/>.
     /// </summary>
-    public sealed class SimpleInjectorAddOptions
+    public sealed class SimpleInjectorAddOptions : ApiObject
     {
         private IServiceProviderAccessor serviceProviderAccessor;
 
@@ -75,23 +76,5 @@ namespace SimpleInjector.Integration.ServiceCollection
                 this.serviceProviderAccessor = value;
             }
         }
-
-        /// <inheritdoc />
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public override string ToString() => base.ToString();
-
-        /// <inheritdoc />
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public override bool Equals(object obj) => base.Equals(obj);
-
-        /// <summary>Gets the <see cref="System.Type"/> of the current instance.</summary>
-        /// <returns>The <see cref="System.Type"/> instance that represents the exact runtime 
-        /// type of the current instance.</returns>
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public new Type GetType() => base.GetType();
-
-        /// <inheritdoc />
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public override int GetHashCode() => base.GetHashCode();
     }
 }

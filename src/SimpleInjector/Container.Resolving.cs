@@ -122,6 +122,8 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public IEnumerable<object> GetAllInstances(Type serviceType)
         {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+
             Type collectionType = typeof(IEnumerable<>).MakeGenericType(serviceType);
 
             return (IEnumerable<object>)this.GetInstance(collectionType);
@@ -135,6 +137,7 @@ namespace SimpleInjector
             Justification = "Users are not expected to inherit from this class and override this implementation.")]
         object IServiceProvider.GetService(Type serviceType)
         {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
             this.ThrowWhenDisposed();
             this.LockContainer();
 
@@ -200,6 +203,8 @@ namespace SimpleInjector
         //// 7.1 DO NOT have public members that can either throw or not based on some option.
         public InstanceProducer GetRegistration(Type serviceType, bool throwOnFailure)
         {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+
             // GetRegistration might lock the container, but only when not-explicitly made registrations are
             // requested.
             this.ThrowWhenDisposed();

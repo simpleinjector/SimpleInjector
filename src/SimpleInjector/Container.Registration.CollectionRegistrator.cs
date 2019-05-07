@@ -27,13 +27,14 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Contains methods for registering and creating collections in the <see cref="SimpleInjector.Container"/>.
     /// </summary>
-    public sealed class ContainerCollectionRegistrator
+    public sealed class ContainerCollectionRegistrator : ApiObject
     {
         internal ContainerCollectionRegistrator(Container container)
         {
@@ -370,7 +371,9 @@ namespace SimpleInjector
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic
         /// collection (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         [Obsolete("Please use Container." + nameof(SimpleInjector.Container.Collection) + "." +
-            nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
+            nameof(ContainerCollectionRegistrator.Append) + " instead. " +
+            "Will be removed in version 5.0.",
+            error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void AppendTo(Type serviceType, Registration registration)
         {
@@ -392,7 +395,9 @@ namespace SimpleInjector
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic
         /// collection (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         [Obsolete("Please use Container." + nameof(SimpleInjector.Container.Collection) + "." +
-            nameof(ContainerCollectionRegistrator.Append) + " instead.", error: false)]
+            nameof(ContainerCollectionRegistrator.Append) + " instead. " +
+            "Will be removed in version 5.0.",
+            error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void AppendTo(Type serviceType, Type implementationType)
         {
@@ -510,6 +515,43 @@ namespace SimpleInjector
             this.AppendToCollectionInternal(serviceType, implementationType);
         }
 
+        /// <summary>
+        /// Appends a new registration to existing registrations made for a collection of 
+        /// <paramref name="serviceType"/> elements using one of the 
+        /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see>
+        /// overloads.
+        /// </summary>
+        /// <param name="serviceType">The service type of the collection.</param>
+        /// <param name="implementationType">The implementation type to append.</param>
+        /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
+        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is not a
+        /// reference type, or ambiguous.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
+        /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
+        /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
+        /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
+        public void Append(Type serviceType, Type implementationType, Lifestyle lifestyle)
+        {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+
+            Requires.IsReferenceType(serviceType, nameof(serviceType));
+            Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
+
+            Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(
+                serviceType, implementationType, nameof(implementationType));
+
+            Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
+                serviceType, implementationType, nameof(implementationType));
+
+            var registration = lifestyle.CreateRegistration(implementationType, this.Container);
+
+            this.AppendToCollectionInternal(serviceType, registration);
+        }
+        
         /// <summary>
         /// Appends the specified delegate <paramref name="instanceCreator"/> to existing registrations
         /// made for a collection of <typeparamref name="TService"/> elements using one of the 

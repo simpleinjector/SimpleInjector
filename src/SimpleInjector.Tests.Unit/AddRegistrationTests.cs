@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Lifestyles;
 
     [TestClass]
     public class AddRegistrationTests
@@ -90,8 +91,114 @@
             AssertThat.ThrowsWithParamName("serviceType", action);
         }
 
+        [TestMethod]
+        public void ScpopeDispose_RegistrationSetToSuppressDisposal_DisposesThatInstance()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            var registration = Lifestyle.Scoped.CreateRegistration<DisposableImplementation>(container);
+
+            registration.SuppressDisposal = true;
+
+            container.AddRegistration<DisposableImplementation>(registration);
+
+            DisposableImplementation instance;
+
+            // Act
+            using (AsyncScopedLifestyle.BeginScope(container))
+            {
+                instance = container.GetInstance<DisposableImplementation>();
+            }
+
+            // Assert
+            Assert.IsFalse(instance.Disposed);
+        }
+
+        [TestMethod]
+        public void ScpopeDispose_RegistrationFuncSetToSuppressDisposal_DisposesThatInstance()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            var registration = Lifestyle.Scoped.CreateRegistration(
+                () => new DisposableImplementation(),
+                container);
+
+            registration.SuppressDisposal = true;
+
+            container.AddRegistration<DisposableImplementation>(registration);
+
+            DisposableImplementation instance;
+
+            // Act
+            using (AsyncScopedLifestyle.BeginScope(container))
+            {
+                instance = container.GetInstance<DisposableImplementation>();
+            }
+
+            // Assert
+            Assert.IsFalse(instance.Disposed);
+        }
+
+        [TestMethod]
+        public void ContainerDispose_RegistrationSetToSuppressDisposal_DisposesThatInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            var registration = Lifestyle.Singleton.CreateRegistration<DisposableImplementation>(container);
+
+            registration.SuppressDisposal = true;
+
+            container.AddRegistration<DisposableImplementation>(registration);
+
+            var instance = container.GetInstance<DisposableImplementation>();
+
+            // Act
+            container.Dispose();
+
+            // Assert
+            Assert.IsFalse(instance.Disposed);
+        }
+
+        [TestMethod]
+        public void ContainerDispose_RegistrationFuncSetToSuppressDisposal_DisposesThatInstance()
+        {
+            // Arrange
+            var container = new Container();
+
+            var registration = Lifestyle.Singleton.CreateRegistration(
+                () => new DisposableImplementation(),
+                container);
+
+            registration.SuppressDisposal = true;
+
+            container.AddRegistration<DisposableImplementation>(registration);
+
+            var instance = container.GetInstance<DisposableImplementation>();
+
+            // Act
+            container.Dispose();
+
+            // Assert
+            Assert.IsFalse(instance.Disposed);
+        }
+
         public class Implementation : IService1, IService2
         {
+        }
+
+        public class DisposableImplementation : IService1, IDisposable
+        {
+            public bool Disposed { get; private set; }
+
+            public void Dispose()
+            {
+                this.Disposed = true;
+            }
         }
     }
 }
