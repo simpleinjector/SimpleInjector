@@ -15,7 +15,7 @@
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>SimpleInjector.Integration.GenericHost</PackageId>
-    <PackageTags>simpleinjector;dependency-injection;DI;.NET;ASP.NET Core;Generic Host;GenericHost;IHost;HostBuildere</PackageTags>
+    <PackageTags>simpleinjector;dependency-injection;DI;.NET;ASP.NET Core;Generic Host;GenericHost;IHost;HostBuilder</PackageTags>
     <PackageIconUrl>https://simpleinjector.org/simpleinjector.ico</PackageIconUrl>
     <PackageProjectUrl>https://simpleinjector.org/generichost</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
