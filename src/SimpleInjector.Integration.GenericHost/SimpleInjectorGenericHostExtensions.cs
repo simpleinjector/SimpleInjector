@@ -48,9 +48,15 @@ namespace SimpleInjector.Integration.GenericHost
                 throw new ArgumentNullException(nameof(options));
             }
 
-            options.Container.RegisterSingleton<THostedService>();
+            var registration = Lifestyle.Singleton.CreateRegistration<THostedService>(options.Container);
 
-            options.Services.AddSingleton(_ => options.Container.GetInstance<THostedService>());
+            // Let the built-in configuration system dispose this instance.
+            registration.SuppressDisposal = true;
+
+            options.Container.AddRegistration<THostedService>(registration);
+
+            options.Services.AddSingleton<IHostedService>(
+                _ => options.Container.GetInstance<THostedService>());
 
             return options;
         }
