@@ -26,6 +26,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Reflection;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Integration.ServiceCollection;
     using SimpleInjector.Lifestyles;
@@ -74,7 +75,7 @@ namespace SimpleInjector
 
             // This stores the options, which includes the IServiceCollection. IServiceCollection is required
             // when calling UseSimpleInjector to enable auto cross wiring.
-            AddOptions(container, options);
+            AddSimpleInjectorOptions(container, options);
 
             // Set lifestyle before calling setupAction. Code in the delegate might depend on that.
             TrySetDefaultScopedLifestyle(container);
@@ -133,12 +134,13 @@ namespace SimpleInjector
         /// </summary>
         /// <typeparam name="TService">The type of service object to cross-wire.</typeparam>
         /// <param name="options">The options.</param>
+        /// <returns>The supplied <paramref name="options"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the parameter is a null reference.
         /// </exception>
-        public static void CrossWire<TService>(this SimpleInjectorUseOptions options)
+        public static SimpleInjectorUseOptions CrossWire<TService>(this SimpleInjectorUseOptions options)
             where TService : class
         {
-            CrossWire(options, typeof(TService));
+            return CrossWire(options, typeof(TService));
         }
 
         /// <summary>
@@ -147,9 +149,11 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="options">The options.</param>
         /// <param name="serviceType">The type of service object to ross-wire.</param>
+        /// <returns>The supplied <paramref name="options"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the parameters is a null reference.
         /// </exception>
-        public static void CrossWire(this SimpleInjectorUseOptions options, Type serviceType)
+        public static SimpleInjectorUseOptions CrossWire(
+            this SimpleInjectorUseOptions options, Type serviceType)
         {
             if (options is null)
             {
@@ -168,6 +172,8 @@ namespace SimpleInjector
                 DetermineLifestyle(serviceType, options.Services));
 
             options.Container.AddRegistration(serviceType, registration);
+
+            return options;
         }
 
         private static void RegisterServiceScope(IServiceProvider provider, Container container)
@@ -314,7 +320,7 @@ namespace SimpleInjector
             }
         }
 
-        private static void AddOptions(Container container, SimpleInjectorAddOptions builder)
+        private static void AddSimpleInjectorOptions(Container container, SimpleInjectorAddOptions builder)
         {
             var current = container.ContainerScope.GetItem(SimpleInjectorAddOptionsKey);
 
