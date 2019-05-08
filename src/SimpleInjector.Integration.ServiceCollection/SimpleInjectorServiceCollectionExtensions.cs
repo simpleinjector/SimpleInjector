@@ -129,6 +129,55 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// Allows components that are built by Simple Injector to depend on the (non-generic)
+        /// <see cref="ILogger">Microsoft.Extensions.Logging.ILogger</see> abstraction. Components are
+        /// injected with an contextual implementation. Using this method, application components can simply
+        /// depend on <b>ILogger</b> instead of its generic counter part, <b>ILogger&lt;T&gt;</b>, which
+        /// simplifies development.
+        /// </summary>
+        /// <param name="options">The options.</param>
+        /// <returns>The supplied <paramref name="options"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="options"/> is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when no <see cref="ILoggerFactory"/> entry
+        /// can be found in the framework's list of services defined by <see cref="IServiceCollection"/>.
+        /// </exception>
+        public static SimpleInjectorUseOptions UseLogging(this SimpleInjectorUseOptions options)
+        {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            // Both RootLogger and Logger<T> depend on ILoggerFactory
+            var loggerFactory = options.ApplicationServices.GetService<ILoggerFactory>();
+
+            if (loggerFactory is null)
+            {
+                throw new InvalidOperationException(
+                    $"The IServiceCollection is missing an entry for {typeof(ILoggerFactory).FullName}. " +
+                    "This is most likely caused by a missing call to .AddLogging(). Make sure that the " +
+                    "AddLogging() extension method is called on the IServiceCollection. This method is " +
+                    "part of the LoggingServiceCollectionExtensions class of the Microsoft.Extensions" +
+                    ".Logging assembly.");
+            }
+
+            // Register logger factory explicitly. This allows the Logger<T> conditional registration to work
+            // even when auto cross wiring is disabled.
+            options.Container.RegisterInstance(loggerFactory);
+
+            options.Container.RegisterConditional(
+                typeof(ILogger),
+                c => c.Consumer is null
+                    ? typeof(RootLogger)
+                    : typeof(Logger<>).MakeGenericType(c.Consumer.ImplementationType),
+                Lifestyle.Singleton,
+                _ => true);
+
+            return options;
+        }
+
+        /// <summary>
         /// Cross wires an ASP.NET Core or third-party service to the container, to allow the service to be
         /// injected into components that are built by Simple Injector.
         /// </summary>
@@ -340,6 +389,37 @@ namespace SimpleInjector
             if (container.Options.DefaultScopedLifestyle is null)
             {
                 container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+            }
+        }
+
+        private sealed class RootLogger : ILogger
+        {
+            private readonly ILogger logger;
+
+            // This constructor needs to be public for Simple Injector to create this type.
+            public RootLogger(ILoggerFactory factory) => this.logger = factory.CreateLogger(string.Empty);
+
+            public IDisposable BeginScope<TState>(TState state) => this.logger.BeginScope(state);
+
+            public bool IsEnabled(LogLevel logLevel) => this.logger.IsEnabled(logLevel);
+
+            public void Log<TState>(
+                LogLevel logLevel,
+                EventId eventId,
+                TState state,
+                Exception exception,
+                Func<TState, Exception, string> formatter) =>
+                this.logger.Log(logLevel, eventId, state, exception, formatter);
+        }
+
+        // This class wouldn't strictly be required, but since Microsoft could decide to add an extra ctor
+        // to the Microsoft.Extensions.Logging.Logger<T> class, this sub type prevents this integration
+        // package to break when this happens.
+        private sealed class Logger<T> : Microsoft.Extensions.Logging.Logger<T>
+        {
+            // This constructor needs to be public for Simple Injector to create this type.
+            public Logger(ILoggerFactory factory) : base(factory)
+            {
             }
         }
     }
