@@ -51,6 +51,8 @@ set version_Integration_WebForms=%version_Core%
 set version_Integration_Mvc=%version_Core%
 set version_Integration_Wcf=%version_Core%
 set version_Integration_WebApi=%version_Core%
+set version_Integration_ServiceCollection=%version_Core%
+set version_Integration_GenericHost=%version_Core%
 set version_Integration_AspNetCore=%version_Core%
 set version_Integration_AspNetCore_Mvc_Core=%version_Core%
 set version_Integration_AspNetCore_Mvc=%version_Core%
@@ -81,6 +83,8 @@ set targetPathCoreClr=%targetPath%\DOTNET
 set named_version=%version%%prereleasePostfix%
 
 set named_version_Core=%version_Core%%prereleasePostfix%
+set named_version_Integration_ServiceCollection=%version_Integration_ServiceCollection%%prereleasePostfix%
+set named_version_Integration_GenericHost=%version_Integration_GenericHost%%prereleasePostfix%
 set named_version_Integration_AspNetCore=%version_Integration_AspNetCore%%prereleasePostfix%
 set named_version_Integration_AspNetCore_Mvc_Core=%version_Integration_AspNetCore_Mvc_Core%%prereleasePostfix%
 set named_version_Integration_AspNetCore_Mvc=%version_Integration_AspNetCore_Mvc%%prereleasePostfix%
@@ -91,6 +95,8 @@ set named_version_Integration_WebApi=%version_Integration_WebApi%%prereleasePost
 set named_version_Packaging=%version_Packaging%%prereleasePostfix%
 
 set numeric_version_Core=%version_Core%.%buildNumber%
+set numeric_version_Integration_ServiceCollection=%version_Integration_ServiceCollection%.%buildNumber%
+set numeric_version_Integration_GenericHost=%version_Integration_GenericHost%.%buildNumber%
 set numeric_version_Integration_AspNetCore=%version_Integration_AspNetCore%.%buildNumber%
 set numeric_version_Integration_AspNetCore_Mvc=%version_Integration_AspNetCore_Mvc%.%buildNumber%
 set numeric_version_Integration_Wcf=%version_Integration_Wcf%.%buildNumber%
@@ -118,6 +124,8 @@ IF %step%==1 (
 
 	echo SET VERSION NUMBERS
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Core%</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
+	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_ServiceCollection%</VersionPrefix>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
+	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_GenericHost%</VersionPrefix>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_AspNetCore%</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_AspNetCore_Mvc_Core%</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_AspNetCore_Mvc%</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj
@@ -130,6 +138,7 @@ IF %step%==1 (
 	rem echo BUILD SOLUTION
 
 	rem %msbuild% "SimpleInjector\SimpleInjector.csproj" /nologo
+	rem %msbuild% "SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj" /nologo
 	rem %msbuild% "SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj" /nologo
 	rem %msbuild% "SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj" /nologo
 	rem %msbuild% "SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj" /nologo
@@ -311,6 +320,8 @@ IF %step%==4 (
 
 	ren "%CD%\Releases\v%named_version%\*.zip" "*.nupkg"
 
+	copy "SimpleInjector.Integration.ServiceCollection\bin\Release\SimpleInjector.Integration.ServiceCollection.%named_version_Integration_ServiceCollection%.nupkg" Releases\v%named_version%\
+	copy "SimpleInjector.Integration.GenericHost\bin\Release\SimpleInjector.Integration.GenericHost.%named_version_Integration_GenericHost%.nupkg" Releases\v%named_version%\
 	copy "SimpleInjector.Integration.AspNetCore\bin\Release\SimpleInjector.Integration.AspNetCore.%named_version_Integration_AspNetCore%.nupkg" Releases\v%named_version%\
 	copy "SimpleInjector.Integration.AspNetCore.Mvc.Core\bin\Release\SimpleInjector.Integration.AspNetCore.Mvc.Core.%named_version_Integration_AspNetCore_Mvc_Core%.nupkg" Releases\v%named_version%\
 	copy "SimpleInjector.Integration.AspNetCore.Mvc\bin\Release\SimpleInjector.Integration.AspNetCore.Mvc.%named_version_Integration_AspNetCore_Mvc%.nupkg" Releases\v%named_version%\
@@ -322,6 +333,8 @@ IF %step%==4 (
 IF %step%==5 (
 	echo RESTORE VERSION NUMBERS
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj
