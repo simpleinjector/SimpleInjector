@@ -54,6 +54,14 @@ namespace SimpleInjector
         /// should be resolved by Simple Injector (true) and which should be resolved by the framework (false).
         /// When not specified, all tag helpers whose namespace does not start with "Microsoft" will be forwarded
         /// to the Simple Injector container.</param>
+        [Obsolete(
+            "Please use " + nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions) + "." +
+            nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions.AddTagHelperActivation) + " instead—e.g. " +
+            "'services.AddSimpleInjector(container, options => options." +
+            nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions.AddTagHelperActivation) + "());'. " +
+            "Please see https://simpleinjector.org/aspnetcore for more details. " +
+            "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
+            error: false)]
         public static void AddSimpleInjectorTagHelperActivation(
             this IServiceCollection services,
             Container container,
@@ -88,6 +96,14 @@ namespace SimpleInjector
         /// <param name="container">The container the controllers should be registered in.</param>
         /// <param name="applicationBuilder">The ASP.NET object that holds the application's configuration.
         /// </param>
+        [Obsolete(
+            "Please use " + nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions) + "." +
+            nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions.AddPageModelActivation) + " instead—e.g. " +
+            "'services.AddSimpleInjector(container, options => options." +
+            nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions.AddPageModelActivation) + "());'. " +
+            "Please see https://simpleinjector.org/aspnetcore for more details. " +
+            "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
+            error: false)]
         public static void RegisterPageModels(
             this Container container, IApplicationBuilder applicationBuilder)
         {

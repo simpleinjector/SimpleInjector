@@ -91,7 +91,7 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// <param name="context">The <see cref="ViewContext"/> for the executing view.</param>
         /// <returns>The tag helper.</returns>
         public TTagHelper Create<TTagHelper>(ViewContext context) where TTagHelper : ITagHelper =>
-            this.tagHelperSelector(typeof(TTagHelper))
+            this.tagHelperSelector?.Invoke(typeof(TTagHelper)) ?? true
                 ? (TTagHelper)this.container.GetInstance(typeof(TTagHelper))
                 : this.frameworkTagHelperActivator.Create<TTagHelper>(context);
     }
