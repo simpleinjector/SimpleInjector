@@ -17,7 +17,7 @@
     <PackageId>SimpleInjector.Integration.ServiceCollection</PackageId>
     <PackageTags>simpleinjector;dependency-injection;DI;ASP.NET Core;IServiceCollection</PackageTags>
     <PackageIconUrl>https://simpleinjector.org/simpleinjector.ico</PackageIconUrl>
-    <PackageProjectUrl>https://simpleinjector.org/netcoreconsole</PackageProjectUrl>
+    <PackageProjectUrl>https://simpleinjector.org/servicecollection</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
