@@ -1,21 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Integration library for ASP.NET Core for Simple Injector.</Description>
-    <AssemblyTitle>Simple Injector ASP.NET Core Integration</AssemblyTitle>
+    <Description>
+      Integrates Simple Injector with applications that require the use of IServiceCollection for registration of framework components.
+    </Description>
+    <AssemblyTitle>Simple Injector IServiceCollection Integration</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
     <VersionPrefix>4.0.0</VersionPrefix>
     <Authors>Simple Injector Contributors</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>SimpleInjector.Integration.AspNetCore</AssemblyName>
+    <AssemblyName>SimpleInjector.Integration.ServiceCollection</AssemblyName>
     <AssemblyOriginatorKeyFile>../SimpleInjector.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>SimpleInjector.Integration.AspNetCore</PackageId>
-    <PackageTags>simpleinjector;dependency-injection;DI;ASP.NET;ASP.NET Core;asp.net-core</PackageTags>
+    <PackageId>SimpleInjector.Integration.ServiceCollection</PackageId>
+    <PackageTags>simpleinjector;dependency-injection;DI;ASP.NET Core;IServiceCollection</PackageTags>
     <PackageIconUrl>https://simpleinjector.org/simpleinjector.ico</PackageIconUrl>
-    <PackageProjectUrl>https://simpleinjector.org/aspnetcore</PackageProjectUrl>
+    <PackageProjectUrl>https://simpleinjector.org/servicecollection</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -25,22 +27,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj" />
-    <ProjectReference Include="..\SimpleInjector\SimpleInjector.csproj" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" />
+    <ProjectReference Include="..\SimpleInjector\SimpleInjector.csproj" />
     <PackageReference Include="NuSpec.ReferenceGenerator" Version="2.0.0-beta-bld14">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
   <Target Name="PostcompileScript" AfterTargets="Build" Condition=" '$(IsCrossTargetingBuild)' != 'true' ">
@@ -48,3 +43,4 @@
   </Target>
 
 </Project>
+ 

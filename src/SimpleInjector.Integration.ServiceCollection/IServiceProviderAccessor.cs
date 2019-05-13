@@ -20,25 +20,22 @@
 */
 #endregion
 
-namespace SimpleInjector
+namespace SimpleInjector.Integration.ServiceCollection
 {
-    using SimpleInjector.Advanced;
+    using System;
 
     /// <summary>
-    /// Visualization options for providing various information about instances.
+    /// Allows access to the request's <see cref="IServiceProvider"/> instance.
+    /// This interface is used by Simple Injector and allow it to resolve transient and scoped services from the
+    /// framework's <see cref="IServiceProvider"/> through cross wiring.
     /// </summary>
-    public class VisualizationOptions : ApiObject
+    public interface IServiceProviderAccessor
     {
         /// <summary>
-        /// Gets or sets a value indicating whether to include lifestyle information in the visualization.
+        /// Gets the current <see cref="IServiceProvider"/> for the current scope or request.
+        /// This operation will never return null.
         /// </summary>
-        /// <value>The value to include life style information.</value>
-        public bool IncludeLifestyleInformation { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to use fully qualified type names in the visualization.
-        /// </summary>
-        /// <value>The value to use fully qualified type names.</value>
-        public bool UseFullyQualifiedTypeNames { get; set; } = false;
+        /// <value>An <see cref="IServiceProvider"/> instance.</value>
+        IServiceProvider Current { get; }
     }
 }

@@ -151,9 +151,8 @@
         public void CreateHybrid_TwoScopedLifestyles_ResolvesFromBothLifestyles()
         {
             // Arrange
-            var scope = new Scope();
-
             var container = new Container();
+            var scope = new Scope(container);
 
             container.Options.DefaultScopedLifestyle = Lifestyle.CreateHybrid(
                 defaultLifestyle: new ThreadScopedLifestyle(),

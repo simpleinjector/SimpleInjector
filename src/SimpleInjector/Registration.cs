@@ -85,6 +85,17 @@ namespace SimpleInjector
         /// <value>The <see cref="Container"/> instance for this registration.</value>
         public Container Container { get; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the disposal of created instances for this registration
+        /// should be suppressed or not. The default is false. Having a value of false, does not force an
+        /// instance to be disposed of, though; Transient instances, for instance, will never be disposed of.
+        /// </summary>
+        /// <value>
+        /// Gets or sets a value indicating whether the disposal of created instances for this registration
+        /// should be suppressed or not.
+        /// </value>
+        public bool SuppressDisposal { get; set; }
+
         internal bool IsCollection { get; set; }
 
         internal virtual bool MustBeVerified => false;

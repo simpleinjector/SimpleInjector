@@ -49,9 +49,9 @@ namespace SimpleInjector
         /// <param name="container">The container to which the packages will be applied to.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null
         /// reference.</exception>
-        [Obsolete("RegisterPackages has been deprecated. " +
-            "Please use RegisterPackages(Container, IEnumerable<Assembly>) instead.",
-            error: false)]
+        [Obsolete("Please use RegisterPackages(Container, IEnumerable<Assembly>) instead. " +
+            "Will be removed in version 5.0.",
+            error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void RegisterPackages(this Container container)
         {

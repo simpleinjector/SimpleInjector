@@ -48,9 +48,8 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        [Obsolete("RegisterPerWcfOperation has been deprecated. " +
-            "Please use Register<TConcrete>(Lifestyle.Scoped) instead. " +
-            "See: https://simpleinjector.org/wcf",
+        [Obsolete("Please use Container.Register<TConcrete>(Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/wcf. Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterPerWcfOperation<TConcrete>(this Container container)
@@ -76,15 +75,14 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
         /// type is not a type that can be created by the container.
         /// </exception>
-        [Obsolete("RegisterPerWcfOperation has been deprecated. " +
-            "Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
-            "See: https://simpleinjector.org/wcf",
+        [Obsolete("Please use Container.Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/wcf. Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterPerWcfOperation<TService, TImplementation>(
             this Container container)
-            where TImplementation : class, TService
             where TService : class
+            where TImplementation : class, TService
         {
             throw new NotSupportedException(
                 "RegisterPerWcfOperation has been deprecated. " +
@@ -107,9 +105,8 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
-        [Obsolete("RegisterPerWcfOperation has been deprecated. " +
-            "Please use Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
-            "See: https://simpleinjector.org/wcf",
+        [Obsolete("Please use Container.Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
+            "See: https://simpleinjector.org/wcf. Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterPerWcfOperation<TService>(this Container container,
@@ -140,7 +137,9 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
-        [Obsolete("RegisterPerWcfOperation has been deprecated. ", error: true)]
+        [Obsolete("Please use Container.Register<TService>(Func<TService>, Lifestyle.Scoped) instead. " +
+            "Will be removed in version 5.0.",
+            error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void RegisterPerWcfOperation<TService>(
             this Container container, Func<TService> instanceCreator, bool disposeWhenRequestEnds)
@@ -172,8 +171,8 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the current <paramref name="container"/>
         /// has both no <b>LifetimeScope</b> registrations.
         /// </exception>
-        [Obsolete("GetCurrentWcfOperationScope has been deprecated. " +
-            "Please use Lifestyle.Scoped.GetCurrentScope(Container) instead.",
+        [Obsolete("Please use Lifestyle.Scoped.GetCurrentScope(Container) instead. " +
+            "Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static Scope GetCurrentWcfOperationScope(this Container container)

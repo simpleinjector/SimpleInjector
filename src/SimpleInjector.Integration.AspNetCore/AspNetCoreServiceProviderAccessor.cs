@@ -20,25 +20,26 @@
 */
 #endregion
 
-namespace SimpleInjector
+namespace SimpleInjector.Integration.AspNetCore
 {
-    using SimpleInjector.Advanced;
+    using System;
+    using Microsoft.AspNetCore.Http;
+    using SimpleInjector.Integration.ServiceCollection;
 
-    /// <summary>
-    /// Visualization options for providing various information about instances.
-    /// </summary>
-    public class VisualizationOptions : ApiObject
+    internal class AspNetCoreServiceProviderAccessor : IServiceProviderAccessor
     {
-        /// <summary>
-        /// Gets or sets a value indicating whether to include lifestyle information in the visualization.
-        /// </summary>
-        /// <value>The value to include life style information.</value>
-        public bool IncludeLifestyleInformation { get; set; } = true;
+        private readonly IHttpContextAccessor accessor;
+        private readonly IServiceProviderAccessor decoratee;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether to use fully qualified type names in the visualization.
-        /// </summary>
-        /// <value>The value to use fully qualified type names.</value>
-        public bool UseFullyQualifiedTypeNames { get; set; } = false;
+        internal AspNetCoreServiceProviderAccessor(
+            IHttpContextAccessor accessor,
+            IServiceProviderAccessor decoratee)
+        {
+            this.decoratee = decoratee;
+            this.accessor = accessor;
+        }
+
+        public IServiceProvider Current =>
+            this.accessor.HttpContext?.RequestServices ?? this.decoratee.Current;
     }
 }

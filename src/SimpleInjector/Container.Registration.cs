@@ -392,7 +392,8 @@ namespace SimpleInjector
         /// <summary>This property is obsolete. Please use <see cref="Collection"/> instead.</summary>
         /// <value>The <see cref="ContainerCollectionRegistrator"/> instance for this container.</value>
         [Obsolete("Please use the " + nameof(Collection) + " property instead. " +
-            "This property will be removed in a later release", error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public ContainerCollectionRegistrator Collections => this.Collection;
 
@@ -699,7 +700,11 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="instance"/> is a null reference.
         /// </exception>
-        [Obsolete("Please use " + nameof(RegisterInstance) + "<TService>(TService) instead.", error: false)]
+        [Obsolete("Please use " + nameof(RegisterInstance) + "<TService>(TService) instead. " +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
+            error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void RegisterSingleton<TService>(TService instance) where TService : class
         {
             this.RegisterInstance(instance);
@@ -748,7 +753,11 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when an 
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
-        [Obsolete("Please use " + nameof(RegisterInstance) + "(Type, object) instead.", error: false)]
+        [Obsolete("Please use " + nameof(RegisterInstance) + "(Type, object) instead. " +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
+            error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void RegisterSingleton(Type serviceType, object instance)
         {
             this.RegisterInstance(serviceType, instance);

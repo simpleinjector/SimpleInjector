@@ -20,25 +20,34 @@
 */
 #endregion
 
-namespace SimpleInjector
+namespace SimpleInjector.Integration.AspNetCore
 {
-    using SimpleInjector.Advanced;
+    using Microsoft.Extensions.DependencyInjection;
+    using SimpleInjector.Integration.ServiceCollection;
 
     /// <summary>
-    /// Visualization options for providing various information about instances.
+    /// Builder object returned by <see cref="SimpleInjectorAddOptionsAspNetCoreExtensions.AddAspNetCore"/>
+    /// that allows additional integration options to be applied.
     /// </summary>
-    public class VisualizationOptions : ApiObject
+    public sealed class SimpleInjectorAspNetCoreBuilder
     {
-        /// <summary>
-        /// Gets or sets a value indicating whether to include lifestyle information in the visualization.
-        /// </summary>
-        /// <value>The value to include life style information.</value>
-        public bool IncludeLifestyleInformation { get; set; } = true;
+        private readonly SimpleInjectorAddOptions options;
+
+        internal SimpleInjectorAspNetCoreBuilder(SimpleInjectorAddOptions options)
+        {
+            this.options = options;
+        }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to use fully qualified type names in the visualization.
+        /// Gets the <see cref="IServiceCollection"/> that contains the collection of framework components.
         /// </summary>
-        /// <value>The value to use fully qualified type names.</value>
-        public bool UseFullyQualifiedTypeNames { get; set; } = false;
+        /// <value>The <see cref="IServiceCollection"/> instance.</value>
+        public IServiceCollection Services => this.options.Services;
+
+        /// <summary>
+        /// Gets the <see cref="Container"/> instance used by the application.
+        /// </summary>
+        /// <value>The <see cref="Container"/> instance.</value>
+        public Container Container => this.options.Container;
     }
 }

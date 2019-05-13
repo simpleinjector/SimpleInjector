@@ -41,9 +41,9 @@ namespace SimpleInjector.Integration.Wcf
     /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(Lifestyle.Scoped);
     /// ]]></code>
     /// </example>
-    [Obsolete("WcfOperationLifestyle has been deprecated. " +
-        "Please use SimpleInjector.Lifestyles.AsyncScopedLifestyle instead.",
-        error: false)]
+    [Obsolete("Please use SimpleInjector.Lifestyles.AsyncScopedLifestyle instead. " +
+        "Will be removed in version 5.0.",
+        error: true)]
     public class WcfOperationLifestyle : AsyncScopedLifestyle
     {
         /// <summary>Initializes a new instance of the <see cref="WcfOperationLifestyle"/> class. The instance
@@ -58,7 +58,8 @@ namespace SimpleInjector.Integration.Wcf
         /// Specifies whether the created and cached instance will be disposed after the execution of the WCF
         /// operation ended and when the created object implements <see cref="IDisposable"/>. 
         /// </param>
-        [Obsolete("This constructor has been deprecated. Please use WcfOperationLifestyle() instead.",
+        [Obsolete("Please use WcfOperationLifestyle() instead. " +
+            "Will be removed in version 5.0.",
             error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public WcfOperationLifestyle(bool disposeInstanceWhenOperationEnds) : this()
@@ -77,8 +78,8 @@ namespace SimpleInjector.Integration.Wcf
         /// (Nothing in VB).</exception>
         /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
         /// WCF operation in the supplied <paramref name="container"/> instance.</exception>
-        [Obsolete("WhenWcfOperationEnds has been deprecated. " +
-            "Please use Lifestyle.Scoped.WhenScopeEnds(Container, Action) instead.",
+        [Obsolete("Please use Lifestyle.Scoped.WhenScopeEnds(Container, Action) instead. " +
+            "Will be removed in version 5.0.",
             error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void WhenWcfOperationEnds(Container container, Action action)

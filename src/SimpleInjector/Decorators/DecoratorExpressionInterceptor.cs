@@ -61,10 +61,21 @@ namespace SimpleInjector.Decorators
 
         // NOTE: This method must be public for it to be callable through reflection when running in a sandbox.
         public static TService ResolveWithinThreadResolveScope<TService>(
-            Scope scope, Func<TService> instanceCreator)
+            Scope scope, Func<TService> instanceCreator, Container container)
         {
-            var container = scope.Container
-                ?? throw new InvalidOperationException("Scope.Container should not be null.");
+            if (!object.ReferenceEquals(container, scope.Container))
+            {
+                if (scope.Container is null)
+                {
+                    throw new InvalidOperationException(
+                        StringResources.ScopeSuppliedToScopedDecorateeFactoryMustHaveAContainer<TService>());
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        StringResources.ScopeSuppliedToScopedDecorateeFactoryMustBeForSameContainer<TService>());
+                }
+            }
 
             Scope? originalScope = container.CurrentThreadResolveScope;
 
@@ -309,7 +320,8 @@ namespace SimpleInjector.Decorators
                     Expression.Call(
                         ResolveWithinThreadResolveScopeMethod.MakeGenericMethod(serviceType),
                         scopeParameter,
-                        Expression.Constant(instanceCreator)),
+                        Expression.Constant(instanceCreator),
+                        Expression.Constant(this.Container)),
                     scopeParameter)
                     .Compile();
 

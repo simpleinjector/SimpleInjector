@@ -49,6 +49,9 @@ namespace SimpleInjector
         private int recursionDuringDisposalCounter;
 
         /// <summary>Initializes a new instance of the <see cref="Scope"/> class.</summary>
+        [Obsolete("Use the overloaded Scope(Container) constructor instead. " +
+            "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
+            error: false)]
         public Scope()
         {
         }
@@ -456,7 +459,7 @@ namespace SimpleInjector
 
             cache[registration] = instance;
 
-            if (instance is IDisposable disposable)
+            if (instance is IDisposable disposable && !registration.SuppressDisposal)
             {
                 this.RegisterForDisposalInternal(disposable);
             }

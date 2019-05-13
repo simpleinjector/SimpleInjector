@@ -53,6 +53,10 @@
       <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore.Mvc.Core\bin\Release\netstandard2.0\SimpleInjector.Integration.AspNetCore.Mvc.Core.xml" />
       <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore.Mvc\bin\Release\netstandard2.0\SimpleInjector.Integration.AspNetCore.Mvc.dll" />
       <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore.Mvc\bin\Release\netstandard2.0\SimpleInjector.Integration.AspNetCore.Mvc.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.ServiceCollection\bin\Release\netstandard2.0\SimpleInjector.Integration.ServiceCollection.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.ServiceCollection\bin\Release\netstandard2.0\SimpleInjector.Integration.ServiceCollection.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.GenericHost\bin\Release\netstandard2.0\SimpleInjector.Integration.GenericHost.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.GenericHost\bin\Release\netstandard2.0\SimpleInjector.Integration.GenericHost.xml" />
     </DocumentationSources>
     <HelpAttributes />
     <NamespaceSummaries>

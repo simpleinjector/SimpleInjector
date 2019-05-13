@@ -67,8 +67,8 @@ namespace SimpleInjector
         /// <summary>Gets the service type of the consumer of the component that should be created.</summary>
         /// <value>The closed generic service type.</value>
         [Obsolete(
-            "This property has been removed. Please use ImplementationType instead. " +
-            "See https://simpleinjector.org/depr3.",
+            "Please use ImplementationType instead. See https://simpleinjector.org/depr3. " +
+            "Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public Type ServiceType
@@ -120,7 +120,7 @@ namespace SimpleInjector
             }
         }
 
-        internal bool IsRoot => object.ReferenceEquals(this, Root);
+        internal bool IsRoot => object.ReferenceEquals(this, InjectionConsumerInfo.Root);
 
         /// <inheritdoc />
         public override int GetHashCode() =>

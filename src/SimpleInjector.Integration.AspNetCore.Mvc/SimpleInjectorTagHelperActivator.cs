@@ -38,10 +38,11 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// Initializes a new instance of the <see cref="SimpleInjectorTagHelperActivator"/> class.
         /// </summary>
         /// <param name="container">The container instance.</param>
-        [Obsolete("This constructor is deprecated. Please use the other constructor overload or use the " +
+        [Obsolete("Please use the other constructor overload or use the " +
             "SimpleInjectorAspNetCoreMvcIntegrationExtensions.AddSimpleInjectorTagHelperActivation " +
-            "extension method instead.",
-            error: false)]
+            "extension method instead. " +
+            "Will be removed in version 5.0.",
+            error: true)]
         public SimpleInjectorTagHelperActivator(Container container)
         {
             if (container == null)
@@ -90,7 +91,7 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// <param name="context">The <see cref="ViewContext"/> for the executing view.</param>
         /// <returns>The tag helper.</returns>
         public TTagHelper Create<TTagHelper>(ViewContext context) where TTagHelper : ITagHelper =>
-            this.tagHelperSelector(typeof(TTagHelper))
+            this.tagHelperSelector?.Invoke(typeof(TTagHelper)) ?? true
                 ? (TTagHelper)this.container.GetInstance(typeof(TTagHelper))
                 : this.frameworkTagHelperActivator.Create<TTagHelper>(context);
     }

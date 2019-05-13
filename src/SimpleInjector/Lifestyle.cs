@@ -594,8 +594,9 @@ namespace SimpleInjector
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
         /// reference (Nothing in VB).</exception>
-        [Obsolete("This overload has been deprecated. Please call CreateRegistration<TConcrete>(Container) instead.",
-            error: false)]
+        [Obsolete("Please use CreateRegistration<TConcrete>(Container) instead. " +
+            "Will be removed in version 5.0.",
+            error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public Registration CreateRegistration<TService, TImplementation>(Container container)
             where TService : class
@@ -667,11 +668,13 @@ namespace SimpleInjector
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null 
         /// reference (Nothing in VB).</exception>
-        [Obsolete("This overload has been deprecated. Please call CreateRegistration(Type, Container) instead.",
-            error: false)]
+        [Obsolete("Please use CreateRegistration(Type, Container) instead. " +
+            "Will be removed in version 5.0.",
+            error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public Registration CreateRegistration(Type serviceType, Type implementationType, Container container)
         {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(implementationType, nameof(implementationType));
 
             return this.CreateRegistration(implementationType, container);

@@ -52,7 +52,7 @@ namespace SimpleInjector.Advanced
         /// <returns><c>true</c> if the specified container is verifying; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is null.</exception>
         [Obsolete("Please use Container." + nameof(Container.IsVerifying) + " instead. " +
-            "This method will be removed in a future release.",
+            "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
             error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static bool IsVerifying(this Container container)
@@ -75,8 +75,9 @@ namespace SimpleInjector.Advanced
         /// <returns>The stored item or null (Nothing in VB).</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
-        [Obsolete("Please use Container." + nameof(Container.ContainerScope) + "." +
-            nameof(ContainerScope.GetItem) + " instead. This method will be removed in a future release.",
+        [Obsolete("Please use Container.ContainerScope.GetItem instead." +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
             error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static object? GetItem(this Container container, object key)
@@ -99,8 +100,9 @@ namespace SimpleInjector.Advanced
         /// <param name="item">The actual item. May be null.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or
         /// <paramref name="key"/> is a null reference (Nothing in VB).</exception>
-        [Obsolete("Please use Container." + nameof(Container.ContainerScope) + "." +
-            nameof(ContainerScope.SetItem) + " instead. This method will be removed in a future release.",
+        [Obsolete("Please use Container.ContainerScope.SetItem instead. " +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
             error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void SetItem(this Container container, object key, object item)
@@ -123,8 +125,9 @@ namespace SimpleInjector.Advanced
         /// <returns>The stored item or the item from the <paramref name="valueFactory"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
         /// <paramref name="key"/> or <paramref name="valueFactory"/> is a null reference (Nothing in VB).</exception>
-        [Obsolete("Please use Container." + nameof(Container.ContainerScope) + "." +
-            nameof(ContainerScope.GetOrSetItem) + " instead. This method will be removed in a future release.",
+        [Obsolete("Please use Container.ContainerScope.GetOrSetItem instead. " +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
             error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static T GetOrSetItem<T>(
@@ -152,8 +155,9 @@ namespace SimpleInjector.Advanced
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
-            nameof(ContainerCollectionRegistrator.Append) + " instead. This method will be removed in a future release.",
+        [Obsolete("Please use Container.Collection.Append instead. " +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
             error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void AppendToCollection(
@@ -179,8 +183,9 @@ namespace SimpleInjector.Advanced
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
-            nameof(ContainerCollectionRegistrator.Append) + " instead. This method will be removed in a future release.",
+        [Obsolete("Please use Container.Collection.Append instead. " +
+            "Will be treated as an error from version 5.0. " +
+            "Will be removed in version 6.0.",
             error: false)]
         public static void AppendToCollection(
             this Container container, Type serviceType, Type implementationType)
