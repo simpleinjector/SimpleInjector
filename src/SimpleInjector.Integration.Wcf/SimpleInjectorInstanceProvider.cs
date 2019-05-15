@@ -58,14 +58,14 @@ namespace SimpleInjector.Integration.Wcf
 
         private static void Attach(InstanceContext instanceContext, Scope scope)
         {
-            var extension = instanceContext.Extensions.Find<InstanceContextScopeWrapper>();
+            InstanceContextScopeWrapper? extension = instanceContext.Extensions.Find<InstanceContextScopeWrapper>();
 
-            if (extension == null)
+            if (extension is null)
             {
                 instanceContext.Extensions.Add(extension = new InstanceContextScopeWrapper());
             }
 
-            if (extension.Scope == null)
+            if (extension.Scope is null)
             {
                 extension.Scope = scope;
             }
@@ -73,7 +73,7 @@ namespace SimpleInjector.Integration.Wcf
 
         private sealed class InstanceContextScopeWrapper : IExtension<InstanceContext>
         {
-            internal Scope Scope { get; set; }
+            internal Scope? Scope { get; set; }
 
             public void Attach(InstanceContext owner)
             {
