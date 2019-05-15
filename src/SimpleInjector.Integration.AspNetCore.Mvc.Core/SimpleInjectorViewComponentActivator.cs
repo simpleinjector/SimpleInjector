@@ -15,8 +15,8 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
     /// </summary>
     public sealed class SimpleInjectorViewComponentActivator : IViewComponentActivator
     {
-        private readonly ConcurrentDictionary<Type, InstanceProducer> viewComponentProducers =
-            new ConcurrentDictionary<Type, InstanceProducer>();
+        private readonly ConcurrentDictionary<Type, InstanceProducer?> viewComponentProducers =
+            new ConcurrentDictionary<Type, InstanceProducer?>();
 
         private readonly Container container;
 
@@ -38,9 +38,10 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         {
             Type viewComponentType = context.ViewComponentDescriptor.TypeInfo.AsType();
 
-            var producer = this.viewComponentProducers.GetOrAdd(viewComponentType, this.GetViewComponentProducer);
+            InstanceProducer? producer =
+                this.viewComponentProducers.GetOrAdd(viewComponentType, this.GetViewComponentProducer);
 
-            if (producer == null)
+            if (producer is null)
             {
                 throw new InvalidOperationException(
                     string.Format(
@@ -70,7 +71,7 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
 
         // By searching through the current registrations, we ensure that the component is not auto-registered, because
         // that might cause it to be resolved from ASP.NET Core, in case auto cross-wiring is enabled.
-        private InstanceProducer GetViewComponentProducer(Type viewComponentType) =>
+        private InstanceProducer? GetViewComponentProducer(Type viewComponentType) =>
             this.container.GetCurrentRegistrations().SingleOrDefault(r => r.ServiceType == viewComponentType);
     }
 }

@@ -13,8 +13,8 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
     /// <summary>Controller activator for Simple Injector.</summary>
     public sealed class SimpleInjectorControllerActivator : IControllerActivator
     {
-        private readonly ConcurrentDictionary<Type, InstanceProducer> controllerProducers =
-            new ConcurrentDictionary<Type, InstanceProducer>();
+        private readonly ConcurrentDictionary<Type, InstanceProducer?> controllerProducers =
+            new ConcurrentDictionary<Type, InstanceProducer?>();
 
         private readonly Container container;
 
@@ -36,9 +36,10 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         {
             Type controllerType = context.ActionDescriptor.ControllerTypeInfo.AsType();
 
-            var producer = this.controllerProducers.GetOrAdd(controllerType, this.GetControllerProducer);
+            InstanceProducer? producer =
+                this.controllerProducers.GetOrAdd(controllerType, this.GetControllerProducer);
 
-            if (producer == null)
+            if (producer is null)
             {
                 throw new InvalidOperationException(
                     string.Format(
@@ -67,7 +68,7 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
 
         // By searching through the current registrations, we ensure that the controller is not auto-registered, because
         // that might cause it to be resolved from ASP.NET Core, in case auto cross-wiring is enabled.
-        private InstanceProducer GetControllerProducer(Type controllerType) =>
+        private InstanceProducer? GetControllerProducer(Type controllerType) =>
             this.container.GetCurrentRegistrations().SingleOrDefault(r => r.ServiceType == controllerType);
     }
 }
