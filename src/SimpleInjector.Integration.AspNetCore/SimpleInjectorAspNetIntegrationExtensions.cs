@@ -52,8 +52,8 @@ namespace SimpleInjector
         /// <param name="services">The ASP.NET application builder instance that references all
         /// framework components.</param>
         /// <param name="container">The container.</param>
-        public static void UseSimpleInjectorAspNetRequestScoping(this IServiceCollection services,
-            Container container)
+        public static void UseSimpleInjectorAspNetRequestScoping(
+            this IServiceCollection services, Container container)
         {
             Requires.IsNotNull(services, nameof(services));
             Requires.IsNotNull(container, nameof(container));
@@ -109,7 +109,7 @@ namespace SimpleInjector
             Requires.IsNotNull(services, nameof(services));
             Requires.IsNotNull(container, nameof(container));
 
-            if (container.ContainerScope.GetItem(CrossWireContextKey) == null)
+            if (container.ContainerScope.GetItem(CrossWireContextKey) is null)
             {
                 container.ContainerScope.SetItem(CrossWireContextKey, services);
             }
@@ -211,9 +211,9 @@ namespace SimpleInjector
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(appServices, nameof(appServices));
 
-            var services = (IServiceCollection)container.ContainerScope.GetItem(CrossWireContextKey);
+            var services = (IServiceCollection?)container.ContainerScope.GetItem(CrossWireContextKey);
 
-            if (services == null)
+            if (services is null)
             {
                 throw new InvalidOperationException(
                     "To use this method, please make sure cross-wiring is enabled, by invoking " +
@@ -222,7 +222,7 @@ namespace SimpleInjector
                     "See https://simpleinjector.org/aspnetcore for more information.");
             }
 
-            if (container.Options.DefaultScopedLifestyle == null)
+            if (container.Options.DefaultScopedLifestyle is null)
             {
                 throw new InvalidOperationException(
                     "To be able to allow auto cross-wiring, please ensure that the container is configured " +
@@ -373,7 +373,7 @@ namespace SimpleInjector
 
         private static IServiceCollection GetServiceCollection(Container container)
         {
-            var context = (IServiceCollection)container.ContainerScope.GetItem(CrossWireContextKey);
+            var context = (IServiceCollection?)container.ContainerScope.GetItem(CrossWireContextKey);
 
             if (context == null)
             {
@@ -406,7 +406,7 @@ namespace SimpleInjector
                     $"You are trying to resolve a {lifestyle.Name} cross-wired service, but are doing so " +
                     "outside the context of a web request. To be able to resolve this service, the " +
                     "operation must run in the context of an active " +
-                    $"({container.Options.DefaultScopedLifestyle.Name}) scope.");
+                    $"({container.Options.DefaultScopedLifestyle!.Name}) scope.");
 
         private static Lifestyle DetermineLifestyle(Type serviceType, IServiceCollection services)
         {
