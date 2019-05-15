@@ -61,7 +61,7 @@ namespace SimpleInjector
         /// <returns>The supplied <paramref name="builder"/> instance.</returns>
         public static SimpleInjectorAspNetCoreBuilder AddTagHelperActivation(
             this SimpleInjectorAspNetCoreBuilder builder,
-            Predicate<Type> applicationTypeSelector = null)
+            Predicate<Type>? applicationTypeSelector = null)
         {
             if (builder is null)
             {
@@ -71,16 +71,16 @@ namespace SimpleInjector
             // There are tag helpers OOTB in MVC. Letting the application container try to create them will
             // fail because of the dependencies these tag helpers have. This means that OOTB tag helpers need
             // to remain created by the framework's DefaultTagHelperActivator, hence the selector predicate.
-            applicationTypeSelector = applicationTypeSelector ??
+            Predicate<Type> selector = applicationTypeSelector ??
                 (type => !type.GetTypeInfo().Namespace.StartsWith("Microsoft"));
 
             var manager = GetApplicationPartManager(builder.Services, nameof(AddTagHelperActivation));
 
-            builder.Container.RegisterTagHelpers(manager, applicationTypeSelector);
+            builder.Container.RegisterTagHelpers(manager, selector);
 
             builder.Services.AddSingleton<ITagHelperActivator>(p => new SimpleInjectorTagHelperActivator(
                 builder.Container,
-                applicationTypeSelector,
+                selector,
                 new DefaultTagHelperActivator(p.GetRequiredService<ITypeActivatorCache>())));
 
             return builder;
@@ -89,7 +89,7 @@ namespace SimpleInjector
         private static ApplicationPartManager GetApplicationPartManager(
             this IServiceCollection services, string methodName)
         {
-            ServiceDescriptor descriptor = services
+            ServiceDescriptor? descriptor = services
                 .LastOrDefault(d => d.ServiceType == typeof(ApplicationPartManager));
 
             if (descriptor is null)
