@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2013-2018 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Internals
 {
@@ -150,7 +131,7 @@ namespace SimpleInjector.Internals
         private CandicateServiceType FindMatchingOpenGenericServiceType()
         {
             // There can be more than one service that exactly matches, but they will never have a different
-            // set of generic type arguments; the type system ensures this. 
+            // set of generic type arguments; the type system ensures this.
             return (
                 from openCandidateServiceType in this.GetOpenCandidateServiceTypes()
                 where this.MatchesClosedGenericBaseType(openCandidateServiceType)
@@ -224,9 +205,9 @@ namespace SimpleInjector.Internals
 
         private bool SatisfiesGenericTypeConstraints(CandicateServiceType openCandidateServiceType)
         {
-            // Type arguments that don't match are left out of the list. 
-            // When the length of the result does not match the actual length, this means that the generic 
-            // type constraints don't match and the given service type does not satisfy the generic type 
+            // Type arguments that don't match are left out of the list.
+            // When the length of the result does not match the actual length, this means that the generic
+            // type constraints don't match and the given service type does not satisfy the generic type
             // constraints.
             return openCandidateServiceType.Arguments.Length ==
                 this.openGenericImplementation.GetGenericArguments().Length;

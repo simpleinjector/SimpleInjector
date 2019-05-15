@@ -141,7 +141,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.ExceptionMessageContains(@"
-                    ConcreteCommand is registered as 'Thread Scoped' lifestyle, but the instance is 
+                    ConcreteCommand is registered as 'Thread Scoped' lifestyle, but the instance is
                     requested outside the context of an active (Thread Scoped) scope."
                     .TrimInside(),
                     ex);
@@ -677,7 +677,7 @@
             // This way we can check in which order the instances are disposed.
             container.RegisterInstance<Action<object>>(instance => actualOrderOfDisposal.Add(instance.GetType()));
 
-            // Outer depends on Middle that depends on Inner. 
+            // Outer depends on Middle that depends on Inner.
             // Registration is deliberately made in a different order to prevent that the order of
             // registration might influence the order of disposing.
             container.Register<Middle>(Lifestyle.Scoped);
@@ -724,14 +724,14 @@
             var container = new Container();
             container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
-            // Allow PropertyDependency to be injected as property on Inner 
+            // Allow PropertyDependency to be injected as property on Inner
             container.Options.PropertySelectionBehavior = new InjectProperties<ImportAttribute>();
 
             // PropertyDependency, Middle and Inner all depend on Func<object> and call it when disposed.
             // This way we can check in which order the instances are disposed.
             container.RegisterInstance<Action<object>>(instance => actualOrderOfDisposal.Add(instance.GetType()));
 
-            // Middle depends on Inner that depends on property PropertyDependency. 
+            // Middle depends on Inner that depends on property PropertyDependency.
             // Registration is deliberately made in a different order to prevent that the order of
             // registration might influence the order of disposing.
             container.Register<PropertyDependency>(Lifestyle.Scoped);

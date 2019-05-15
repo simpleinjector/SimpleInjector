@@ -120,7 +120,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                typeof(ServiceWithAttributedProperty).Name + 
+                typeof(ServiceWithAttributedProperty).Name +
                 " could be found and an implicit registration could not be made.",
                 action);
 
@@ -136,7 +136,7 @@
             var container = new Container();
 
             // This attribute must be applied before RegisterWithContext gets applied, since the registered
-            // events adds new 
+            // events adds new
             container.Options.AutoWirePropertiesWithAttribute<Inject2Attribute>();
 
             container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));

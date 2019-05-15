@@ -91,7 +91,7 @@ namespace SimpleInjector.Tests.Unit
             container.Collection.Register<IUserRepository>(Type.EmptyTypes);
             var repositories = container.GetAllInstances<IUserRepository>();
 
-            // Calling count will iterate the collections. 
+            // Calling count will iterate the collections.
             // The container will only get locked when the first item is retrieved.
             var count = repositories.Count();
 
@@ -108,7 +108,7 @@ namespace SimpleInjector.Tests.Unit
             // Arrange
             var container = ContainerFactory.New();
 
-            // This registration will make the DelegateBuilder call the 
+            // This registration will make the DelegateBuilder call the
             // SingletonInstanceProducer.BuildExpression method.
             container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
 

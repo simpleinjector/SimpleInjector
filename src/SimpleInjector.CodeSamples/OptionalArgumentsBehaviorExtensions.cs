@@ -42,8 +42,8 @@
 
         private InstanceProducer CreateConstantValueProducer(ParameterInfo parameter) =>
             InstanceProducer.FromExpression(
-                parameter.ParameterType, 
-                Expression.Constant(parameter.DefaultValue, parameter.ParameterType), 
+                parameter.ParameterType,
+                Expression.Constant(parameter.DefaultValue, parameter.ParameterType),
                 this.container);
 
         private static bool IsOptional(ParameterInfo parameter) =>

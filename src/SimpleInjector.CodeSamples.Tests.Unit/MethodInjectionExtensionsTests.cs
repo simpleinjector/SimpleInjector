@@ -97,7 +97,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.StringContains(
-                    $"Method {typeof(ClassWithStaticInjectionMethod).ToFriendlyName()}.Initialize is static", 
+                    $"Method {typeof(ClassWithStaticInjectionMethod).ToFriendlyName()}.Initialize is static",
                     ex.Message);
             }
         }

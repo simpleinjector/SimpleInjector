@@ -50,7 +50,7 @@
 
             private MethodInfo[] GetMethodsToInject(Type type)
             {
-                var all = 
+                var all =
                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
 
                 return (
@@ -82,7 +82,7 @@
                 AddKnownRelationships(e, dependencies);
             }
 
-            private static void ReplaceExpression(ExpressionBuildingEventArgs e, MethodInfo method, 
+            private static void ReplaceExpression(ExpressionBuildingEventArgs e, MethodInfo method,
                 InstanceProducer[] dependencies)
             {
                 Delegate injectorDelegate = BuildInjectorDelegate(e.KnownImplementationType, method);
@@ -96,7 +96,7 @@
                 e.Expression = Expression.Invoke(Expression.Constant(injectorDelegate), parameters);
             }
 
-            private static void AddKnownRelationships(ExpressionBuildingEventArgs e, 
+            private static void AddKnownRelationships(ExpressionBuildingEventArgs e,
                 InstanceProducer[] dependencies)
             {
                 var relationships =
@@ -177,14 +177,14 @@
                 {
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                         "Method {0}.{1} returns {2}, but injection is only supported the return type is " +
-                        "void.", 
+                        "void.",
                         method.DeclaringType.ToFriendlyName(), method.Name, method.ReturnType.ToFriendlyName()));
                 }
 
                 if (!method.GetParameters().Any())
                 {
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
-                        "Method {0}.{1} has no parameters. What do you expect me to inject here?", 
+                        "Method {0}.{1} has no parameters. What do you expect me to inject here?",
                         method.DeclaringType.ToFriendlyName(), method.Name));
                 }
 

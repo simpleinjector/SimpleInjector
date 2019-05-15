@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2013 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -26,11 +7,11 @@ namespace SimpleInjector
     using System.Linq.Expressions;
 
     /// <summary>
-    /// Provides data for and interaction with the 
-    /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event of 
-    /// the <see cref="Container"/>. An observer can check the 
+    /// Provides data for and interaction with the
+    /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event of
+    /// the <see cref="Container"/>. An observer can check the
     /// <see cref="UnregisteredServiceType"/> to see whether the unregistered type can be handled. The
-    /// <see cref="Register(Func{object})"/> method can be called to register a <see cref="Func{T}"/> delegate 
+    /// <see cref="Register(Func{object})"/> method can be called to register a <see cref="Func{T}"/> delegate
     /// that allows creation of instances of the unregistered for this and future requests.
     /// </summary>
     public class UnregisteredTypeEventArgs : EventArgs
@@ -45,7 +26,7 @@ namespace SimpleInjector
         public Type UnregisteredServiceType { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the event represented by this instance has been handled. 
+        /// Gets a value indicating whether the event represented by this instance has been handled.
         /// This property will return <b>true</b> when <see cref="Register(Func{object})"/> has been called on
         /// this instance.
         /// </summary>
@@ -114,7 +95,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers a <see cref="Registration"/> that describes the creation of instances of the type
-        /// expressed by the <see cref="UnregisteredServiceType"/> for this and future requests. The 
+        /// expressed by the <see cref="UnregisteredServiceType"/> for this and future requests. The
         /// registration will be cached and future requests will directly call unon that registration, the
         /// expression that it generates or the delegate that gets compiled from that expression.
         /// </summary>

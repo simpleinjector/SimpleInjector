@@ -57,7 +57,7 @@
             // Arrange
             Assert.IsTrue(container.IsLocked, @"
                 Whenever a not explicitly made registration can be returned, the container needs to be locked,
-                since in most cases, changing the container might invalidate the registration. For instance, 
+                since in most cases, changing the container might invalidate the registration. For instance,
                 building concrete type registrations will create a transient registration, while making the
                 registration later might be done with a different lifestyle.");
         }
@@ -81,8 +81,8 @@
 
             // Arrange
             Assert.IsTrue(container.IsLocked, @"
-            Whenever a not explicitly made registration can be returned using unregistered type resolution, 
-            the container needs to be locked, changing the container might invalidate the registration. 
+            Whenever a not explicitly made registration can be returned using unregistered type resolution,
+            the container needs to be locked, changing the container might invalidate the registration.
             For instance, adding unregistered type resolution events later, might cause a different registration to
             be returned when GetRegistration is called again.");
         }

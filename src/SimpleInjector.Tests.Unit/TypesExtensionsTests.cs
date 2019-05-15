@@ -45,8 +45,8 @@
         {
             bool actual = type.IsClosedTypeOf(genericTypeDefinition);
 
-            Assert.AreEqual(expected, actual, 
-                message: 
+            Assert.AreEqual(expected, actual,
+                message:
                     "type: " + type.ToFriendlyName() + ", " +
                     "genericTypeDefinition: " + genericTypeDefinition.ToFriendlyName());
         }
@@ -104,9 +104,9 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                Your request is ambiguous. There are multiple closed version of TypesExtensionsTests.IX<T> 
-                that are assignable from TypesExtensionsTests.IntFloatX, namely: 
-                TypesExtensionsTests.IX<Int32> and TypesExtensionsTests.IX<Single>. Use GetClosedTypesOf 
+                Your request is ambiguous. There are multiple closed version of TypesExtensionsTests.IX<T>
+                that are assignable from TypesExtensionsTests.IntFloatX, namely:
+                TypesExtensionsTests.IX<Int32> and TypesExtensionsTests.IX<Single>. Use GetClosedTypesOf
                 instead to get this list of closed types to select the proper type."
                 .TrimInside(),
                 action);

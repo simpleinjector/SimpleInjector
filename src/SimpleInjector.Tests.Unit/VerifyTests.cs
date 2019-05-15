@@ -439,7 +439,7 @@ namespace SimpleInjector.Tests.Unit
             Action action = () => container.Verify();
 
             // Assert
-            // This test verifies a bug: Calling InstanceProducer.BuildExpression flagged the producer to be 
+            // This test verifies a bug: Calling InstanceProducer.BuildExpression flagged the producer to be
             // skipped when calling Verify() while it was still possible that creating the instance would fail.
             AssertThat.Throws<InvalidOperationException>(action,
                 "The call to BuildExpression should not trigger the verification of IPlugin to be skipped.");
@@ -513,7 +513,7 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                contains parameter 'isInUserContext' of type Boolean, which can not be used for constructor 
+                contains parameter 'isInUserContext' of type Boolean, which can not be used for constructor
                 injection because it is a value type."
                 .TrimInside(),
                 action);

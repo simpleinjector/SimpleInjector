@@ -14,8 +14,8 @@
         {
         }
 
-        // These methods don't seem to really do anything but were used to 
-        // identify and fix a StackOverflowException and so have been left 
+        // These methods don't seem to really do anything but were used to
+        // identify and fix a StackOverflowException and so have been left
         // in to capture the problem if it is erroneously reintroduced
         [TestMethod]
         public void RegisterOpenGeneric_CuriouslyRecurringTemplatePattern_Succeeds()

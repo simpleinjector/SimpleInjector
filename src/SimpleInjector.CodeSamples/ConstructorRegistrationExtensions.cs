@@ -40,7 +40,7 @@
         public static ConstructorSelectorConvention RegisterConstructorSelectorConvention(
             this Container container)
         {
-            var convention = new ConstructorSelectorConvention(container, 
+            var convention = new ConstructorSelectorConvention(container,
                 container.Options.ConstructorResolutionBehavior);
 
             container.Options.ConstructorResolutionBehavior = convention;

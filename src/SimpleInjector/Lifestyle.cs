@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2013-2016 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -33,7 +14,7 @@ namespace SimpleInjector
     using SimpleInjector.Lifestyles;
 
     /// <summary>
-    /// Factory for the creation of a delegate that applies caching to the supplied 
+    /// Factory for the creation of a delegate that applies caching to the supplied
     /// <paramref name="transientInstanceCreator"/>.
     /// </summary>
     /// <param name="transientInstanceCreator">A factory for creating new instances.</param>
@@ -42,15 +23,15 @@ namespace SimpleInjector
 
     /// <summary>
     /// Instances returned from the container can be cached. The <see cref="Container"/> contains several
-    /// overloads of the <b>Register</b> method that take a <b>Lifestyle</b> instance as argument to define 
+    /// overloads of the <b>Register</b> method that take a <b>Lifestyle</b> instance as argument to define
     /// how returned instances should be cached. The core library contains two lifestyles out of the box. By
     /// supplying <see cref="Lifestyle.Transient">Lifestyle.Transient</see>, the registered instance is not
     /// cached; a new instance is returned every time it is requested or injected. By supplying
     /// <see cref="Lifestyle.Singleton">Lifestyle.Singleton</see> instances can be cached indefinitely; only
     /// a single instance of the registered component will be returned by that container instance. Other
-    /// lifestyles are defined in integration and extension packages. The 
-    /// <see cref="Lifestyle.CreateCustom">CreateCustom</see> method allows defining a custom lifestyle and 
-    /// the <see cref="Lifestyle.CreateHybrid(Func{bool}, Lifestyle, Lifestyle)">CreateHybrid</see> method 
+    /// lifestyles are defined in integration and extension packages. The
+    /// <see cref="Lifestyle.CreateCustom">CreateCustom</see> method allows defining a custom lifestyle and
+    /// the <see cref="Lifestyle.CreateHybrid(Func{bool}, Lifestyle, Lifestyle)">CreateHybrid</see> method
     /// allows creating a lifestyle that mixes multiple other lifestyles.
     /// </summary>
     /// <remarks>
@@ -68,14 +49,14 @@ namespace SimpleInjector
         /// <c>ISomeService</c> service type using the <b>Transient</b> lifestyle:
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
-        /// 
+        ///
         /// container.Register<ISomeService, SomeServiceImpl>(Lifestyle.Transient);
         /// ]]></code>
         /// Note that <b>Transient</b> is the default lifestyle, the previous registration can be reduced to
         /// the following:
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
-        /// 
+        ///
         /// // Transient registration.
         /// container.Register<ISomeService, SomeServiceImpl>();
         /// ]]></code>
@@ -100,7 +81,7 @@ namespace SimpleInjector
         /// <code lang="cs"><![CDATA[
         /// // Create a Container instance, configured with a scoped lifestyle.
         /// var container = new Container(new WebRequestLifestyle());
-        /// 
+        ///
         /// container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Scoped);
         /// ]]></code>
         /// </example>
@@ -114,7 +95,7 @@ namespace SimpleInjector
         /// and guarantees that only a single instance of that component is created for that instance. Since
         /// general use is to create a single <b>Container</b> instance for the lifetime of the application /
         /// AppDomain, this would mean that only a single instance of that component would exist during the
-        /// lifetime of the application. In a multi-threaded applications, implementations registered using 
+        /// lifetime of the application. In a multi-threaded applications, implementations registered using
         /// this lifestyle must be thread-safe.
         /// </para>
         /// <para>
@@ -127,7 +108,7 @@ namespace SimpleInjector
         /// <c>ITimeProvider</c> service type using the <b>Singleton</b> lifestyle:
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
-        /// 
+        ///
         /// container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
         /// ]]></code>
         /// </example>
@@ -152,7 +133,7 @@ namespace SimpleInjector
 
         /// <summary>Initializes a new instance of the <see cref="Lifestyle"/> class.</summary>
         /// <param name="name">The user friendly name of this lifestyle.</param>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB) 
+        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB)
         /// or an empty string.</exception>
         protected Lifestyle(string name)
         {
@@ -169,7 +150,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Gets the length of the lifestyle. Implementers must implement this property. The diagnostic
-        /// services use this value to compare lifestyles with each other to determine lifestyle 
+        /// services use this value to compare lifestyles with each other to determine lifestyle
         /// misconfigurations.
         /// </summary>
         /// <value>The <see cref="int"/> representing the length of this lifestyle.</value>
@@ -179,13 +160,13 @@ namespace SimpleInjector
 
         /// <summary>
         /// The hybrid lifestyle allows mixing two lifestyles in a single registration. The hybrid will use
-        /// the <paramref name="defaultLifestyle"/> in case its 
+        /// the <paramref name="defaultLifestyle"/> in case its
         /// <see cref="ScopedLifestyle.GetCurrentScope(Container)">GetCurrentScope</see> method returns a
-        /// scope; otherwise the <paramref name="fallbackLifestyle"/> is used. The hybrid lifestyle will 
-        /// redirect the creation of the instance to the selected lifestyle. By nesting hybrid lifestyles, 
+        /// scope; otherwise the <paramref name="fallbackLifestyle"/> is used. The hybrid lifestyle will
+        /// redirect the creation of the instance to the selected lifestyle. By nesting hybrid lifestyles,
         /// any number of lifestyles can be mixed.
         /// </summary>
-        /// <param name="defaultLifestyle">The lifestyle to use when its 
+        /// <param name="defaultLifestyle">The lifestyle to use when its
         /// <see cref="ScopedLifestyle.GetCurrentScope(Container)">GetCurrentScope</see> method returns a
         /// scope..</param>
         /// <param name="fallbackLifestyle">The lifestyle to use when the
@@ -196,7 +177,7 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         /// <example>
         /// <para>
-        /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an 
+        /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an
         /// <b>ThreadScopedLifestyle</b> and <b>Transient</b>:
         /// </para>
         /// <code lang="cs"><![CDATA[
@@ -204,7 +185,7 @@ namespace SimpleInjector
         /// var hybridLifestyle = Lifestyle.CreateHybrid(
         ///     defaultLifestyle: new ThreadScopedLifestyle(),
         ///     fallbackLifestyle: Lifestyle.Transient);
-        /// 
+        ///
         /// // The created lifestyle can be reused for many registrations.
         /// container.Register<IUserRepository, SqlUserRepository>(hybridLifestyle);
         /// container.Register<ICustomerRepository, SqlCustomerRepository>(hybridLifestyle);
@@ -216,13 +197,13 @@ namespace SimpleInjector
         /// var mixedThreadScopedTransientLifestyle = Lifestyle.CreateHybrid(
         ///     new ThreadScopedLifestyle(),
         ///     Lifestyle.Transient);
-        /// 
+        ///
         /// var hybridLifestyle = Lifestyle.CreateHybrid(
         ///     new WebRequestLifestyle(),
         ///     mixedThreadScopedTransientLifestyle);
         /// ]]></code>
         /// <para>
-        /// The <b>mixedScopeLifestyle</b> now mixed three lifestyles: Web Request, Thread Scoped and 
+        /// The <b>mixedScopeLifestyle</b> now mixed three lifestyles: Web Request, Thread Scoped and
         /// Transient.
         /// </para>
         /// </example>
@@ -239,13 +220,13 @@ namespace SimpleInjector
 
         /// <summary>
         /// The hybrid lifestyle allows mixing two lifestyles in a single registration. The hybrid will use
-        /// the <paramref name="defaultLifestyle"/> in case its 
+        /// the <paramref name="defaultLifestyle"/> in case its
         /// <see cref="ScopedLifestyle.GetCurrentScope(Container)">GetCurrentScope</see> method returns a
-        /// scope; otherwise the <paramref name="fallbackLifestyle"/> is used. The hybrid lifestyle will 
-        /// redirect the creation of the instance to the selected lifestyle. By nesting hybrid lifestyles, 
+        /// scope; otherwise the <paramref name="fallbackLifestyle"/> is used. The hybrid lifestyle will
+        /// redirect the creation of the instance to the selected lifestyle. By nesting hybrid lifestyles,
         /// any number of lifestyles can be mixed.
         /// </summary>
-        /// <param name="defaultLifestyle">The lifestyle to use when its 
+        /// <param name="defaultLifestyle">The lifestyle to use when its
         /// <see cref="ScopedLifestyle.GetCurrentScope(Container)">GetCurrentScope</see> method returns a
         /// scope..</param>
         /// <param name="fallbackLifestyle">The lifestyle to use when the
@@ -256,7 +237,7 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         /// <example>
         /// <para>
-        /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an 
+        /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an
         /// <b>ThreadScopedLifestyle</b> and <b>Transient</b>:
         /// </para>
         /// <code lang="cs"><![CDATA[
@@ -264,7 +245,7 @@ namespace SimpleInjector
         /// ScopedLifestyle hybridLifestyle = Lifestyle.CreateHybrid(
         ///     defaultLifestyle: new ThreadScopedLifestyle(),
         ///     fallbackLifestyle: new WebRequestLifestyle());
-        /// 
+        ///
         /// // The created lifestyle can be reused for many registrations.
         /// container.Register<IUserRepository, SqlUserRepository>(hybridLifestyle);
         /// container.Register<ICustomerRepository, SqlCustomerRepository>(hybridLifestyle);
@@ -276,11 +257,11 @@ namespace SimpleInjector
         /// ScopedLifestyle hybridLifestyle = Lifestyle.CreateHybrid(
         ///     defaultLifestyle: new ThreadScopedLifestyle(),
         ///     fallbackLifestyle: new WebRequestLifestyle());
-        /// 
+        ///
         /// var hybridLifestyle = Lifestyle.CreateHybrid(hybridLifestyle, Lifestyle.Transient);
         /// ]]></code>
         /// <para>
-        /// The <b>mixedScopeLifestyle</b> now mixed three lifestyles: Web Request, Thread Scoped and 
+        /// The <b>mixedScopeLifestyle</b> now mixed three lifestyles: Web Request, Thread Scoped and
         /// Transient.
         /// </para>
         /// </example>
@@ -296,25 +277,25 @@ namespace SimpleInjector
 
         /// <summary>
         /// The hybrid lifestyle allows mixing two lifestyles in a single registration. Based on the supplied
-        /// <paramref name="lifestyleSelector"/> delegate the hybrid lifestyle will redirect the creation of 
-        /// the instance to the correct lifestyle. The result of the <paramref name="lifestyleSelector"/> 
-        /// delegate will not be cached; it is invoked each time an instance is requested or injected. By 
+        /// <paramref name="lifestyleSelector"/> delegate the hybrid lifestyle will redirect the creation of
+        /// the instance to the correct lifestyle. The result of the <paramref name="lifestyleSelector"/>
+        /// delegate will not be cached; it is invoked each time an instance is requested or injected. By
         /// nesting hybrid lifestyles, any number of lifestyles can be mixed.
         /// </summary>
-        /// <param name="lifestyleSelector">The <see cref="Func{TResult}"/> delegate that determines which 
-        /// lifestyle should be used. The <paramref name="trueLifestyle"/> will be used if <b>true</b> is 
+        /// <param name="lifestyleSelector">The <see cref="Func{TResult}"/> delegate that determines which
+        /// lifestyle should be used. The <paramref name="trueLifestyle"/> will be used if <b>true</b> is
         /// returned; the <paramref name="falseLifestyle"/> otherwise. This delegate will be called every
         /// time an instance needs to be resolved or injected.</param>
-        /// <param name="trueLifestyle">The lifestyle to use when <paramref name="lifestyleSelector"/> 
+        /// <param name="trueLifestyle">The lifestyle to use when <paramref name="lifestyleSelector"/>
         /// returns <b>true</b>.</param>
-        /// <param name="falseLifestyle">The lifestyle to use when <paramref name="lifestyleSelector"/> 
+        /// <param name="falseLifestyle">The lifestyle to use when <paramref name="lifestyleSelector"/>
         /// returns <b>false</b>.</param>
         /// <returns>A new hybrid lifestyle that wraps the supplied lifestyles.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
         /// <example>
         /// <para>
-        /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an 
+        /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an
         /// <b>WebRequestLifestyle</b> and <b>ThreadScopedLifestyle</b>:
         /// </para>
         /// <code lang="cs"><![CDATA[
@@ -323,7 +304,7 @@ namespace SimpleInjector
         ///     () => HttpContext.Current != null,
         ///     new WebRequestLifestyle(),
         ///     new ThreadScopedLifestyle());
-        /// 
+        ///
         /// // The created lifestyle can be reused for many registrations.
         /// container.Register<IUserRepository, SqlUserRepository>(mixedScopeLifestyle);
         /// container.Register<ICustomerRepository, SqlCustomerRepository>(mixedScopeLifestyle);
@@ -337,14 +318,14 @@ namespace SimpleInjector
         ///     () => lifestyle.GetCurrentScope(container) != null,
         ///     lifestyle,
         ///     Lifestyle.Transient);
-        /// 
+        ///
         /// var mixedScopeLifestyle = Lifestyle.CreateHybrid(
         ///     () => HttpContext.Current != null,
         ///     new WebRequestLifestyle(),
         ///     mixedLifetimeTransientLifestyle);
         /// ]]></code>
         /// <para>
-        /// The <b>mixedScopeLifestyle</b> now mixed three lifestyles: Web Request, Lifetime Scope and 
+        /// The <b>mixedScopeLifestyle</b> now mixed three lifestyles: Web Request, Lifetime Scope and
         /// Transient.
         /// </para>
         /// </example>
@@ -360,25 +341,25 @@ namespace SimpleInjector
 
         /// <summary>
         /// The hybrid lifestyle allows mixing two lifestyles in a single registration. Based on the supplied
-        /// <paramref name="lifestyleSelector"/> delegate the hybrid lifestyle will redirect the creation of 
-        /// the instance to the correct lifestyle. The result of the <paramref name="lifestyleSelector"/> 
-        /// delegate will not be cached; it is invoked each time an instance is requested or injected. By 
+        /// <paramref name="lifestyleSelector"/> delegate the hybrid lifestyle will redirect the creation of
+        /// the instance to the correct lifestyle. The result of the <paramref name="lifestyleSelector"/>
+        /// delegate will not be cached; it is invoked each time an instance is requested or injected. By
         /// nesting hybrid lifestyles, any number of lifestyles can be mixed.
         /// </summary>
-        /// <param name="lifestyleSelector">The <see cref="Func{TResult}"/> delegate that determines which 
-        /// lifestyle should be used. The <paramref name="trueLifestyle"/> will be used if <b>true</b> is 
+        /// <param name="lifestyleSelector">The <see cref="Func{TResult}"/> delegate that determines which
+        /// lifestyle should be used. The <paramref name="trueLifestyle"/> will be used if <b>true</b> is
         /// returned; the <paramref name="falseLifestyle"/> otherwise. This delegate will be called every
         /// time an instance needs to be resolved or injected.</param>
-        /// <param name="trueLifestyle">The scoped lifestyle to use when <paramref name="lifestyleSelector"/> 
+        /// <param name="trueLifestyle">The scoped lifestyle to use when <paramref name="lifestyleSelector"/>
         /// returns <b>true</b>.</param>
-        /// <param name="falseLifestyle">The scoped lifestyle to use when <paramref name="lifestyleSelector"/> 
+        /// <param name="falseLifestyle">The scoped lifestyle to use when <paramref name="lifestyleSelector"/>
         /// returns <b>false</b>.</param>
         /// <returns>A new scoped hybrid lifestyle that wraps the supplied lifestyles.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
         /// <example>
         /// <para>
-        /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an 
+        /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an
         /// <b>WebRequestLifestyle</b> and <b>ThreadScopedLifestyle</b>:
         /// </para>
         /// <code lang="cs"><![CDATA[
@@ -387,7 +368,7 @@ namespace SimpleInjector
         ///     () => HttpContext.Current != null,
         ///     new WebRequestLifestyle(),
         ///     new ThreadScopedLifestyle());
-        /// 
+        ///
         /// // The created lifestyle can be reused for many registrations.
         /// container.Register<IUserRepository, SqlUserRepository>(mixedScopeLifestyle);
         /// container.Register<ICustomerRepository, SqlCustomerRepository>(mixedScopeLifestyle);
@@ -408,19 +389,19 @@ namespace SimpleInjector
         /// Creates a custom lifestyle using the supplied <paramref name="lifestyleApplierFactory"/> delegate.
         /// </summary>
         /// <remarks>
-        /// The supplied <paramref name="lifestyleApplierFactory" /> will be called just once per registered 
+        /// The supplied <paramref name="lifestyleApplierFactory" /> will be called just once per registered
         /// service. The supplied <paramref name="lifestyleApplierFactory" /> will be called by the framework
         /// when the type is resolved for the first time, and the framework will supply the factory with a
         /// <b>Func&lt;object&gt;</b> for creating new (transient) instances of that type (that might
         /// have been <see cref="Container.ExpressionBuilding">intercepted</see> and
-        /// <see cref="Container.RegisterInitializer{TService}">initializers</see> might have been applied). 
+        /// <see cref="Container.RegisterInitializer{TService}">initializers</see> might have been applied).
         /// It is the job of the <paramref name="lifestyleApplierFactory" /> to return a <b>Func&lt;object&gt;</b>
-        /// that applies the proper caching. The <b>Func&lt;object&gt;</b> that is returned by the 
-        /// <paramref name="lifestyleApplierFactory" /> will be stored for that registration (every 
+        /// that applies the proper caching. The <b>Func&lt;object&gt;</b> that is returned by the
+        /// <paramref name="lifestyleApplierFactory" /> will be stored for that registration (every
         /// registration will store its own <b>Func&lt;object&gt;</b> delegate) and this delegate will be
-        /// called every time the service is resolved (by calling 
+        /// called every time the service is resolved (by calling
         /// <code>container.GetInstance&lt;TService&gt;</code> or when that service is injected into another
-        /// type). 
+        /// type).
         /// </remarks>
         /// <param name="name">The name of the lifestyle to create. The name is used to display the lifestyle
         /// in the debugger.</param>
@@ -440,7 +421,7 @@ namespace SimpleInjector
         ///     var syncRoot = new object();
         ///     var expirationTime = DateTime.MinValue;
         ///     object instance = null;
-        /// 
+        ///
         ///     // If the application has multiple registrations using this lifestyle, each registration
         ///     // will get its own Func<object> delegate (created here) and therefore get its own set
         ///     // of variables as defined above.
@@ -453,14 +434,14 @@ namespace SimpleInjector
         ///                 instance = instanceCreator();
         ///                 expirationTime = DateTime.UtcNow.Add(timeout);
         ///             }
-        /// 
+        ///
         ///             return instance;
         ///         }
         ///     };
         /// });
-        /// 
+        ///
         /// var container = new Container();
-        /// 
+        ///
         /// // We can reuse the created lifestyle for multiple registrations.
         /// container.Register<IService, MyService>(customLifestyle);
         /// container.Register<AnotherService, MeTwoService>(customLifestyle);
@@ -476,12 +457,12 @@ namespace SimpleInjector
 
         /// <summary>
         /// Creates a new <see cref="InstanceProducer"/> instance for the given <typeparamref name="TService"/>
-        /// that will create new instances of specified <typeparamref name="TImplementation"/> with the 
+        /// that will create new instances of specified <typeparamref name="TImplementation"/> with the
         /// caching as specified by this lifestyle.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be created.</typeparam>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="InstanceProducer"/> must be created.</param>
         /// <returns>A new <see cref="InstanceProducer"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
@@ -495,12 +476,12 @@ namespace SimpleInjector
 
         /// <summary>
         /// Creates a new <see cref="InstanceProducer"/> instance for the given <typeparamref name="TService"/>
-        /// that will create new instances of specified <paramref name="implementationType"/> caching as 
+        /// that will create new instances of specified <paramref name="implementationType"/> caching as
         /// specified by this lifestyle.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <param name="implementationType">The concrete type that will be created.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="InstanceProducer"/> must be created.</param>
         /// <returns>A new <see cref="InstanceProducer"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="implementationType"/> or
@@ -521,13 +502,13 @@ namespace SimpleInjector
 
         /// <summary>
         /// Creates a new <see cref="InstanceProducer"/> instance for the given <typeparamref name="TService"/>
-        /// that will create new instances instance using the supplied <paramref name="instanceCreator"/> 
+        /// that will create new instances instance using the supplied <paramref name="instanceCreator"/>
         /// with the caching as specified by this lifestyle.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <param name="instanceCreator">A delegate that will create a new instance of 
+        /// <param name="instanceCreator">A delegate that will create a new instance of
         /// <typeparamref name="TService"/> every time it is called.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="InstanceProducer"/> must be created.</param>
         /// <returns>A new <see cref="InstanceProducer"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="instanceCreator"/> or
@@ -543,15 +524,15 @@ namespace SimpleInjector
 
         /// <summary>
         /// Creates a new <see cref="InstanceProducer"/> instance for the given <paramref name="serviceType"/>
-        /// that will create new instances of specified <paramref name="implementationType"/> with the 
+        /// that will create new instances of specified <paramref name="implementationType"/> with the
         /// caching as specified by this lifestyle.
         /// </summary>
         /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.</param>
         /// <param name="implementationType">The concrete type that will be registered.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="InstanceProducer"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null 
+        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
         public InstanceProducer CreateProducer(Type serviceType, Type implementationType, Container container)
         {
@@ -570,7 +551,7 @@ namespace SimpleInjector
         /// + type combination.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new or cached <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
@@ -589,7 +570,7 @@ namespace SimpleInjector
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be created.</typeparam>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
@@ -607,13 +588,13 @@ namespace SimpleInjector
 
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
+        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/>
         /// with the caching as specified by this lifestyle.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <param name="instanceCreator">A delegate that will create a new instance of 
+        /// <param name="instanceCreator">A delegate that will create a new instance of
         /// <typeparamref name="TService"/> every time it is called.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="instanceCreator"/> or
@@ -640,10 +621,10 @@ namespace SimpleInjector
         /// is an internal type.
         /// </summary>
         /// <param name="concreteType">The concrete type that will be registered.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null 
+        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
         public Registration CreateRegistration(Type concreteType, Container container)
         {
@@ -663,10 +644,10 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.</param>
         /// <param name="implementationType">The concrete type that will be registered.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null 
+        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
         [Obsolete("Please use CreateRegistration(Type, Container) instead. " +
             "Will be removed in version 5.0.",
@@ -682,15 +663,15 @@ namespace SimpleInjector
 
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <paramref name="serviceType"/>  using the supplied <paramref name="instanceCreator"/> 
+        /// specified <paramref name="serviceType"/>  using the supplied <paramref name="instanceCreator"/>
         /// with the caching as specified by this lifestyle.
         /// </summary>
         /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.</param>
         /// <param name="instanceCreator">The delegate that will be responsible for creating new instances.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null 
+        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
         public Registration CreateRegistration(
             Type serviceType, Func<object> instanceCreator, Container container)
@@ -742,16 +723,16 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// When overridden in a derived class, 
+        /// When overridden in a derived class,
         /// creates a new <see cref="Registration"/> instance defining the creation of the
         /// specified <typeparamref name="TConcrete"/> with the caching as specified by this lifestyle.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <remarks>
-        /// If you are implementing your own lifestyle, override this method to implement the code necessary 
+        /// If you are implementing your own lifestyle, override this method to implement the code necessary
         /// to create and return a new <see cref="Registration"/>. Note that you should <b>always</b> create
         /// a new <see cref="Registration"/> instance. They should never be cached.
         /// </remarks>
@@ -759,19 +740,19 @@ namespace SimpleInjector
             where TConcrete : class;
 
         /// <summary>
-        /// When overridden in a derived class, 
+        /// When overridden in a derived class,
         /// creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
+        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/>
         /// with the caching as specified by this lifestyle.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <param name="instanceCreator">A delegate that will create a new instance of 
+        /// <param name="instanceCreator">A delegate that will create a new instance of
         /// <typeparamref name="TService"/> every time it is called.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <remarks>
-        /// If you are implementing your own lifestyle, override this method to implement the code necessary 
+        /// If you are implementing your own lifestyle, override this method to implement the code necessary
         /// to create and return a new <see cref="Registration"/>. Note that you should <b>always</b> create
         /// a new <see cref="Registration"/> instance. They should never be cached.
         /// </remarks>

@@ -384,7 +384,7 @@
             var container = ContainerFactory.New();
 
             container.Collection.Register(typeof(IEventHandler<>), new[]
-            { 
+            {
                 // Here we make a closed registration; this causes an explicit registration for the
                 // IEventHandlerStructEvent> collection.
                 typeof(NewConstraintEventHandler<StructEvent>),

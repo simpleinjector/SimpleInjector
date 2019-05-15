@@ -12,7 +12,7 @@ namespace SimpleInjector.CodeSamples
     container.InterceptWith<MonitoringInterceptor>(type => type == typeof(IUserRepository));
     container.InterceptWith<YetAnotherInterceptor>(type => type == typeof(IUserRepository));
     
-    // Ensures that all registered (interface) service that who's name end with 'CommandHandler' get 
+    // Ensures that all registered (interface) service that who's name end with 'CommandHandler' get
     // intercepted using with a MonitoringInterceptor.
     container.InterceptWith<MonitoringInterceptor>(type => type.Name.EndsWith("CommandHandler"));
 
@@ -106,7 +106,7 @@ namespace SimpleInjector.CodeSamples
         [DebuggerStepThrough]
         private static Expression BuildInterceptorExpression<TInterceptor>(
             Container container)
-            where TInterceptor : class 
+            where TInterceptor : class
         {
             var interceptorRegistration = container.GetRegistration(typeof(TInterceptor));
 
@@ -182,7 +182,7 @@ namespace SimpleInjector.CodeSamples
 
     public static class Interceptor
     {
-        public static T CreateProxy<T>(IInterceptor interceptor, T realInstance) => 
+        public static T CreateProxy<T>(IInterceptor interceptor, T realInstance) =>
             (T)CreateProxy(typeof(T), interceptor, realInstance);
 
         [DebuggerStepThrough]
@@ -218,7 +218,7 @@ namespace SimpleInjector.CodeSamples
 
             private IMessage InvokeMethodCall(IMethodCallMessage msg) {
                 var i = new Invocation { Proxy = this, Message = msg, Arguments = msg.Args };
-                i.Proceeding = () => 
+                i.Proceeding = () =>
                     i.ReturnValue = msg.MethodBase.Invoke(this.realInstance, i.Arguments);
                 this.interceptor.Intercept(i);
                 return new ReturnMessage(i.ReturnValue, i.Arguments,

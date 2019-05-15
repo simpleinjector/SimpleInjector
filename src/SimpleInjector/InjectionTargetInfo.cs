@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2015-2019 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -58,7 +39,7 @@ namespace SimpleInjector
         public ParameterInfo? Parameter { get; }
 
         /// <summary>
-        /// Gets the property of the consumer of the component where the dependency will be injected into. 
+        /// Gets the property of the consumer of the component where the dependency will be injected into.
         /// The property can return null.
         /// </summary>
         /// <value>The <see cref="PropertyInfo"/> or null when the dependency is injected into a constructor
@@ -89,13 +70,13 @@ namespace SimpleInjector
 
         /// <summary>
         /// Returns an array of all of the custom attributes defined on either the <see cref="Parameter"/> or
-        /// the <see cref="Property"/>, excluding named attributes, or an empty array if there are no custom 
+        /// the <see cref="Property"/>, excluding named attributes, or an empty array if there are no custom
         /// attributes.
         /// </summary>
         /// <param name="inherit">When true, look up the hierarchy chain for the inherited custom attribute.</param>
         /// <returns>An array of Objects representing custom attributes, or an empty array.</returns>
         /// <exception cref="TypeLoadException">The custom attribute type cannot be loaded.</exception>
-        /// <exception cref="AmbiguousMatchException">There is more than one attribute of type attributeType 
+        /// <exception cref="AmbiguousMatchException">There is more than one attribute of type attributeType
         /// defined on this member.</exception>
         public object[] GetCustomAttributes(bool inherit) =>
             this.Parameter != null
@@ -104,7 +85,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Returns an array of custom attributes defined on either the <see cref="Parameter"/> or
-        /// the <see cref="Property"/>, identified by type, or an empty array if there are no custom 
+        /// the <see cref="Property"/>, identified by type, or an empty array if there are no custom
         /// attributes of that type.
         /// </summary>
         /// <param name="attributeType">The type of the custom attributes.</param>
@@ -118,7 +99,7 @@ namespace SimpleInjector
                 : this.Property!.GetCustomAttributes(attributeType, inherit).ToArray();
 
         /// <summary>
-        /// Indicates whether one or more instance of attributeType is defined on this either the 
+        /// Indicates whether one or more instance of attributeType is defined on this either the
         /// <see cref="Parameter"/> or the <see cref="Property"/>.
         /// </summary>
         /// <param name="attributeType">The type of the custom attributes.</param>
@@ -137,7 +118,7 @@ namespace SimpleInjector
         public T GetCustomAttribute<T>() where T : Attribute => this.GetCustomAttribute<T>(inherit: true);
 
         /// <summary>
-        /// Retrieves a custom attribute of a specified type that is applied to a specified parameter, and 
+        /// Retrieves a custom attribute of a specified type that is applied to a specified parameter, and
         /// optionally inspects the ancestors of that parameter.
         /// </summary>
         /// <typeparam name="T">The parameter to inspect.The parameter to inspect.</typeparam>
@@ -164,7 +145,7 @@ namespace SimpleInjector
             this.GetCustomAttribute(attributeType, inherit: true);
 
         /// <summary>
-        /// Retrieves a custom attribute of a specified type that is applied to a specified parameter, and 
+        /// Retrieves a custom attribute of a specified type that is applied to a specified parameter, and
         /// optionally inspects the ancestors of that parameter.
         /// </summary>
         /// <param name="attributeType">The type of attribute to search for.</param>
@@ -183,22 +164,22 @@ namespace SimpleInjector
 #endif
 
         /// <summary>
-        /// Retrieves a collection of custom attributes of a specified type that are applied to a specified 
+        /// Retrieves a collection of custom attributes of a specified type that are applied to a specified
         /// parameter.
         /// </summary>
         /// <typeparam name="T">The type of attribute to search for.</typeparam>
-        /// <returns>A collection of the custom attributes that are applied to element and that match T, or 
+        /// <returns>A collection of the custom attributes that are applied to element and that match T, or
         /// an empty collection if no such attributes exist.</returns>
         public IEnumerable<T> GetCustomAttributes<T>() where T : Attribute =>
             this.GetCustomAttributes<T>(inherit: true);
 
         /// <summary>
-        /// Retrieves a collection of custom attributes of a specified type that are applied to a specified 
+        /// Retrieves a collection of custom attributes of a specified type that are applied to a specified
         /// parameter, and optionally inspects the ancestors of that parameter.
         /// </summary>
         /// <typeparam name="T">The type of attribute to search for.</typeparam>
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
-        /// <returns>A collection of the custom attributes that are applied to element and that match T, or an 
+        /// <returns>A collection of the custom attributes that are applied to element and that match T, or an
         /// empty collection if no such attributes exist.</returns>
         public IEnumerable<T> GetCustomAttributes<T>(bool inherit) where T : Attribute =>
             this.Parameter != null

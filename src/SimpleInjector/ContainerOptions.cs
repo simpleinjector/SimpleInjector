@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2013-2019 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -31,7 +12,7 @@ namespace SimpleInjector
     using SimpleInjector.Advanced;
 
     /// <summary>
-    /// Delegate that allows intercepting calls to <see cref="Container.GetInstance"/> and 
+    /// Delegate that allows intercepting calls to <see cref="Container.GetInstance"/> and
     /// <see cref="InstanceProducer.GetInstance"/>.
     /// </summary>
     /// <param name="context">Contextual information about the to be created object.</param>
@@ -45,12 +26,12 @@ namespace SimpleInjector
     /// The following example shows the typical usage of the <b>ContainerOptions</b> class.
     /// <code lang="cs"><![CDATA[
     /// var container = new Container();
-    /// 
+    ///
     /// container.Register<ITimeProvider, DefaultTimeProvider>();
-    /// 
+    ///
     /// // Use of ContainerOptions class here.
     /// container.Options.AllowOverridingRegistrations = true;
-    /// 
+    ///
     /// // Replaces the previous registration of ITimeProvider
     /// container.Register<ITimeProvider, CustomTimeProvider>();
     /// ]]></code>
@@ -113,7 +94,7 @@ namespace SimpleInjector
         /// mismatches.</value>
         public bool SuppressLifestyleMismatchVerification { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether. 
+        /// <summary>Gets or sets a value indicating whether.
         /// This method is deprecated. Changing its value will have no effect.</summary>
         /// <value>The value indicating whether the container will return an empty collection.</value>
         [Obsolete("This method is not used any longer. Setting it has no effect. " +
@@ -137,7 +118,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Gets or sets a value indicating whether the container should resolve unregistered concrete types.
-        /// The default value is <code>true</code>. Consider changing the value to <code>false</code> to prevent 
+        /// The default value is <code>true</code>. Consider changing the value to <code>false</code> to prevent
         /// accidental creation of types you haven't registered explicitly.
         /// </summary>
         /// <value>The value indicating whether the container should resolve unregistered concrete types.</value>
@@ -317,13 +298,13 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the container will use dynamic assemblies for compilation. 
-        /// By default, this value is <b>true</b> for the first few containers that are created in an AppDomain 
+        /// Gets or sets a value indicating whether the container will use dynamic assemblies for compilation.
+        /// By default, this value is <b>true</b> for the first few containers that are created in an AppDomain
         /// and <b>false</b> for all other containers. You can set this value explicitly to <b>false</b>
         /// to prevent the use of dynamic assemblies or you can set this value explicitly to <b>true</b> to
         /// force more container instances to use dynamic assemblies. Note that creating an infinite number
-        /// of <see cref="SimpleInjector.Container">Container</see> instances (for instance one per web request) 
-        /// with this property set to <b>true</b> will result in a memory leak; dynamic assemblies take up 
+        /// of <see cref="SimpleInjector.Container">Container</see> instances (for instance one per web request)
+        /// with this property set to <b>true</b> will result in a memory leak; dynamic assemblies take up
         /// memory and will only be unloaded when the AppDomain is unloaded.
         /// </summary>
         /// <value>A boolean indicating whether the container should use a dynamic assembly for compilation.
@@ -338,23 +319,23 @@ namespace SimpleInjector
         internal string DebuggerDisplayDescription => this.ToString();
 
         // This property enables a hidden hook to allow to get notified just before expression trees get
-        // compiled. It isn't used internally, but enables debugging in case compiling expressions crashes 
-        // the process (which has happened in the past). A user can add the hook using reflection to find out 
-        // which expression crashes the system. This property is internal, its not part of the official API, 
+        // compiled. It isn't used internally, but enables debugging in case compiling expressions crashes
+        // the process (which has happened in the past). A user can add the hook using reflection to find out
+        // which expression crashes the system. This property is internal, its not part of the official API,
         // and we might remove it again in the future.
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal Action<Expression> ExpressionCompiling { get; set; } = _ => { };
 
         /// <summary>
         /// Registers an <see cref="ResolveInterceptor"/> delegate that allows intercepting calls to
-        /// <see cref="SimpleInjector.Container.GetInstance">GetInstance</see> and 
+        /// <see cref="SimpleInjector.Container.GetInstance">GetInstance</see> and
         /// <see cref="InstanceProducer.GetInstance()"/>.
         /// </summary>
         /// <remarks>
         /// If multiple registered <see cref="ResolveInterceptor"/> instances must be applied, they will be
-        /// applied/wrapped in the order of registration, i.e. the first registered interceptor will call the 
-        /// original instance producer delegate, the second interceptor will call the first interceptor, etc. 
-        /// The last registered interceptor will become the outermost method in the chain and will be called 
+        /// applied/wrapped in the order of registration, i.e. the first registered interceptor will call the
+        /// original instance producer delegate, the second interceptor will call the first interceptor, etc.
+        /// The last registered interceptor will become the outermost method in the chain and will be called
         /// first.
         /// </remarks>
         /// <param name="interceptor">The <see cref="ResolveInterceptor"/> delegate to register.</param>
@@ -362,7 +343,7 @@ namespace SimpleInjector
         /// be applied to a registration or not. The given predicate will be called once for each registration
         /// in the container.</param>
         /// <exception cref="ArgumentNullException">
-        /// Thrown when either the <paramref name="interceptor"/> or <paramref name="predicate"/> are 
+        /// Thrown when either the <paramref name="interceptor"/> or <paramref name="predicate"/> are
         /// null references.
         /// </exception>
         /// <exception cref="InvalidOperationException">
@@ -372,7 +353,7 @@ namespace SimpleInjector
         /// The following example shows the usage of the <see cref="RegisterResolveInterceptor" /> method:
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
-        /// 
+        ///
         /// container.Options.RegisterResolveInterceptor((context, producer) =>
         ///     {
         ///         object instance = producer.Invoke();
@@ -380,10 +361,10 @@ namespace SimpleInjector
         ///         return instance;
         ///     },
         ///     context => context.Producer.ServiceType.Name.EndsWith("Controller"));
-        ///     
+        ///
         /// container.Register<IHomeViewModel, HomeViewModel>();
         /// container.Register<IUserRepository, SqlUserRepository>();
-        /// 
+        ///
         /// // This line will write "HomeViewModel resolved for IHomeViewModel" to the console.
         /// container.GetInstance<IHomeViewModel>();
         /// ]]></code>

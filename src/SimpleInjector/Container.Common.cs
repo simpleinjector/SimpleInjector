@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2013-2019 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -44,10 +25,10 @@ namespace SimpleInjector
     /// Resolving instances can be done safely from multiple threads concurrently, but registration needs to
     /// be done from one single thread.
     /// </para>
-    /// <para> 
-    /// It is therefore safe to call <see cref="GetInstance"/>, <see cref="GetAllInstances"/>, 
+    /// <para>
+    /// It is therefore safe to call <see cref="GetInstance"/>, <see cref="GetAllInstances"/>,
     /// <see cref="IServiceProvider.GetService">GetService</see>, <see cref="GetRegistration(System.Type)"/> and
-    /// <see cref="GetCurrentRegistrations()"/> and anything related to resolving instances from multiple thread 
+    /// <see cref="GetCurrentRegistrations()"/> and anything related to resolving instances from multiple thread
     /// concurrently. It is however <b>unsafe</b> to call
     /// <see cref="Register{TService, TImplementation}(Lifestyle)">RegisterXXX</see>,
     /// <see cref="ExpressionBuilding"/>, <see cref="ExpressionBuilt"/>, <see cref="ResolveUnregisteredType"/>,
@@ -71,7 +52,7 @@ namespace SimpleInjector
 
         private readonly long containerId;
 
-        // Collection of (both conditional and unconditional) instance producers that are explicitly 
+        // Collection of (both conditional and unconditional) instance producers that are explicitly
         // registered by the user and implicitly registered through unregistered type resolution.
         private readonly Dictionary<Type, IRegistrationEntry> explicitRegistrations =
             new Dictionary<Type, IRegistrationEntry>(64);
@@ -124,7 +105,7 @@ namespace SimpleInjector
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
         public ContainerOptions Options { get; }
 
-        /// <summary>Gets the container scope that that manages the lifetime of singletons and other 
+        /// <summary>Gets the container scope that that manages the lifetime of singletons and other
         /// container-controlled instances. Use this property to register actions that need to be called
         /// and instances that need to be disposed when the container gets disposed.</summary>
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
@@ -152,7 +133,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Gets the intermediate lifestyle that forwards CreateRegistration calls to the lifestyle that is 
+        /// Gets the intermediate lifestyle that forwards CreateRegistration calls to the lifestyle that is
         /// returned from the registered container.Options.LifestyleSelectionBehavior.
         /// </summary>
         internal LifestyleSelectionBehaviorProxyLifestyle SelectionBasedLifestyle { get; }
@@ -182,10 +163,10 @@ namespace SimpleInjector
 
         /// <summary>
         /// Returns an array with the current registrations. This list contains all explicitly registered
-        /// types, and all implicitly registered instances. Implicit registrations are  all concrete 
+        /// types, and all implicitly registered instances. Implicit registrations are  all concrete
         /// unregistered types that have been requested, all types that have been resolved using
         /// unregistered type resolution (using the <see cref="ResolveUnregisteredType"/> event), and
-        /// requested unregistered collections. Note that the result of this method may change over time, 
+        /// requested unregistered collections. Note that the result of this method may change over time,
         /// because of these implicit registrations.
         /// </summary>
         /// <remarks>
@@ -194,11 +175,11 @@ namespace SimpleInjector
         /// critical path of the application.
         /// </para>
         /// <para>
-        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same 
-        /// <see cref="InstanceProducer"/> instance for a given registration. It will however either 
-        /// always return a producer that is able to return the expected instance. Because of this, do not 
-        /// compare sets of instances returned by different calls to <see cref="GetCurrentRegistrations()"/> 
-        /// by reference. The way of comparing lists is by the actual type. The type of each instance is 
+        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same
+        /// <see cref="InstanceProducer"/> instance for a given registration. It will however either
+        /// always return a producer that is able to return the expected instance. Because of this, do not
+        /// compare sets of instances returned by different calls to <see cref="GetCurrentRegistrations()"/>
+        /// by reference. The way of comparing lists is by the actual type. The type of each instance is
         /// guaranteed to be unique in the returned list.
         /// </para>
         /// </remarks>
@@ -218,18 +199,18 @@ namespace SimpleInjector
         /// critical path of the application.
         /// </para>
         /// <para>
-        /// This list contains the root objects of all explicitly registered types, and all implicitly 
-        /// registered instances. Implicit registrations are all concrete unregistered types that have been 
-        /// requested, all types that have been resolved using unregistered type resolution (using the 
-        /// <see cref="ResolveUnregisteredType"/> event), and requested unregistered collections. Note that 
+        /// This list contains the root objects of all explicitly registered types, and all implicitly
+        /// registered instances. Implicit registrations are all concrete unregistered types that have been
+        /// requested, all types that have been resolved using unregistered type resolution (using the
+        /// <see cref="ResolveUnregisteredType"/> event), and requested unregistered collections. Note that
         /// the result of this method may change over time, because of these implicit registrations.
         /// </para>
         /// <para>
-        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same 
-        /// <see cref="InstanceProducer"/> instance for a given registration. It will however either 
-        /// always return a producer that is able to return the expected instance. Because of this, do not 
-        /// compare sets of instances returned by different calls to <see cref="GetCurrentRegistrations()"/> 
-        /// by reference. The way of comparing lists is by the actual type. The type of each instance is 
+        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same
+        /// <see cref="InstanceProducer"/> instance for a given registration. It will however either
+        /// always return a producer that is able to return the expected instance. Because of this, do not
+        /// compare sets of instances returned by different calls to <see cref="GetCurrentRegistrations()"/>
+        /// by reference. The way of comparing lists is by the actual type. The type of each instance is
         /// guaranteed to be unique in the returned list.
         /// </para>
         /// </remarks>

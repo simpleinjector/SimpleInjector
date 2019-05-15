@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2016-2018 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -90,9 +71,9 @@ namespace SimpleInjector
         internal static bool IsConcreteConstructableType(Type serviceType) =>
             !serviceType.ContainsGenericParameters() && IsConcreteType(serviceType);
 
-        // About arrays: While array types are in fact concrete, we cannot create them and creating 
+        // About arrays: While array types are in fact concrete, we cannot create them and creating
         // them would be pretty useless.
-        // About object: System.Object is concrete and even contains a single public (default) 
+        // About object: System.Object is concrete and even contains a single public (default)
         // constructor. Allowing it to be created however, would lead to confusion, since this allows
         // injecting System.Object into constructors, even though it is not registered explicitly.
         // This is bad, since creating an System.Object on the fly (transient) has no purpose and this
@@ -146,11 +127,11 @@ namespace SimpleInjector
 
         /// <summary>
         /// Returns a list of base types and interfaces of implementationType that either
-        /// equal to serviceType or are closed or partially closed version of serviceType (in case 
+        /// equal to serviceType or are closed or partially closed version of serviceType (in case
         /// serviceType itself is generic).
         /// So:
         /// -in case serviceType is non generic, only serviceType will be returned.
-        /// -If implementationType is open generic, serviceType will be returned (or a partially closed 
+        /// -If implementationType is open generic, serviceType will be returned (or a partially closed
         ///  version of serviceType is returned).
         /// -If serviceType is generic and implementationType is not, a closed version of serviceType will
         ///  be returned.
@@ -168,8 +149,8 @@ namespace SimpleInjector
             select baseType;
 
         // PERF: This method is a hot path in the registration phase and can get called thousands of times
-        // during application startup. For that reason it is heavily optimized to prevent unneeded memory 
-        // allocations as much as possible. This method is called in a loop by Container.GetTypesToRegister 
+        // during application startup. For that reason it is heavily optimized to prevent unneeded memory
+        // allocations as much as possible. This method is called in a loop by Container.GetTypesToRegister
         // and GetTypesToRegister is called by overloads of Register and Collections.Register.
         internal static bool ServiceIsAssignableFromImplementation(Type service, Type implementation)
         {

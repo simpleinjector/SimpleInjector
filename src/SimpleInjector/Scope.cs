@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2013-2019 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -130,8 +111,8 @@ namespace SimpleInjector
         /// <remarks>
         /// During the call to <see cref="Scope.Dispose()"/> all registered <see cref="Action"/> delegates are
         /// processed in the order of registration. Do note that registered actions <b>are not guaranteed
-        /// to run</b>. In case an exception is thrown during the call to <see cref="Dispose()"/>, the 
-        /// <see cref="Scope"/> will stop running any actions that might not have been invoked at that point. 
+        /// to run</b>. In case an exception is thrown during the call to <see cref="Dispose()"/>, the
+        /// <see cref="Scope"/> will stop running any actions that might not have been invoked at that point.
         /// Instances that are registered for disposal using <see cref="RegisterForDisposal"/> on the other
         /// hand, are guaranteed to be disposed. Note that registered actions won't be invoked during a call
         /// to <see cref="Container.Verify()" />.
@@ -164,7 +145,7 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// Instances that are registered for disposal, will be disposed in opposite order of registration and
-        /// they are guaranteed to be disposed when <see cref="Scope.Dispose()"/> is called (even when 
+        /// they are guaranteed to be disposed when <see cref="Scope.Dispose()"/> is called (even when
         /// exceptions are thrown). This mimics the behavior of the C# and VB <code>using</code> statements,
         /// where the <see cref="IDisposable.Dispose"/> method is called inside the <code>finally</code> block.
         /// </remarks>
@@ -214,7 +195,7 @@ namespace SimpleInjector
         /// </remarks>
         /// <param name="key">The key of the item to insert or override.</param>
         /// <param name="item">The actual item. May be null.</param>
-        /// <exception cref="ArgumentNullException">Thrown when paramref name="key"/> is a null reference 
+        /// <exception cref="ArgumentNullException">Thrown when paramref name="key"/> is a null reference
         /// (Nothing in VB).</exception>
         public void SetItem(object key, object? item)
         {
@@ -240,9 +221,9 @@ namespace SimpleInjector
 
         /// <summary>
         /// Returns the list of <see cref="IDisposable"/> instances that will be disposed of when this <see cref="Scope"/>
-        /// instance is being disposed. The list contains scoped instances that are cached in this <see cref="Scope"/> instance, 
+        /// instance is being disposed. The list contains scoped instances that are cached in this <see cref="Scope"/> instance,
         /// and instances explicitly registered for disposal using <see cref="RegisterForDisposal"/>. The instances are returned
-        /// in order of creation/registration. When <see cref="Dispose()">Scope.Dispose</see> is called, the scope will ensure 
+        /// in order of creation/registration. When <see cref="Dispose()">Scope.Dispose</see> is called, the scope will ensure
         /// <see cref="IDisposable.Dispose"/> is called on each instance in this list. The instance will be disposed in opposite
         /// order as they appear in the list.
         /// </summary>
@@ -311,8 +292,8 @@ namespace SimpleInjector
             if (disposing)
             {
                 // We completely block the Dispose method from running in parallel, because there's all kinds
-                // of state that needs to be read/written, such as this.state, this.disposables, and 
-                // this.scopeEndActions. Making this thread-safe with smaller granular locks will be much 
+                // of state that needs to be read/written, such as this.state, this.disposables, and
+                // this.scopeEndActions. Making this thread-safe with smaller granular locks will be much
                 // harder and simply not necessarily, since Dispose should normally only be called from one thread.
                 lock (this.syncRoot)
                 {
@@ -377,7 +358,7 @@ namespace SimpleInjector
 
                 if (firstException)
                 {
-                    // We must reset the counter here, because even if a recursion was detected in one of the 
+                    // We must reset the counter here, because even if a recursion was detected in one of the
                     // actions, we still want to try disposing all instances.
                     this.recursionDuringDisposalCounter = 0;
                     operatingInException = true;
@@ -523,7 +504,7 @@ namespace SimpleInjector
             throw new InvalidOperationException(StringResources.RecursiveInstanceRegistrationDetected());
 
         // This method simulates the behavior of a set of nested 'using' statements: It ensures that dispose
-        // is called on each element, even if a previous instance threw an exception. 
+        // is called on each element, even if a previous instance threw an exception.
         private static void DisposeInstancesInReverseOrder(
             List<IDisposable> disposables, int startingAsIndex = int.MinValue)
         {

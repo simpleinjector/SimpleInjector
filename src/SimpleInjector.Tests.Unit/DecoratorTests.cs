@@ -196,7 +196,7 @@
         {
             // Arrange
             string expectedMessage = @"
-                Registering a closed-generic service type with an open-generic decorator is not supported. 
+                Registering a closed-generic service type with an open-generic decorator is not supported.
                 Instead, register the service type as open generic, and the decorator type as closed generic."
                 .TrimInside();
 
@@ -594,7 +594,7 @@
 
             var container = ContainerFactory.New();
 
-            // Because we register a Func<TServiceType> there is no way we can determine the implementation 
+            // Because we register a Func<TServiceType> there is no way we can determine the implementation
             // type. In that case the ImplementationType should equal the ServiceType.
             container.Register<ICommandHandler<RealCommand>>(() => new StubCommandHandler());
 
@@ -842,8 +842,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                For the container to be able to use InvalidDecoratorCommandHandlerDecorator<T> as  
-                a decorator, its constructor must include a single parameter of type 
+                For the container to be able to use InvalidDecoratorCommandHandlerDecorator<T> as
+                a decorator, its constructor must include a single parameter of type
                 ICommandHandler<T>".TrimInside(),
                 action);
         }
@@ -892,7 +892,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                    The supplied type KeyValuePair<TKey, TValue> does not implement 
+                    The supplied type KeyValuePair<TKey, TValue> does not implement
                     ICommandHandler<TCommand>.
                     ".TrimInside(),
                 action);
@@ -1078,7 +1078,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            // CommandHandlerDecoratorWithUnresolvableArgument<T, TUnresolved> contains a not-mappable 
+            // CommandHandlerDecoratorWithUnresolvableArgument<T, TUnresolved> contains a not-mappable
             // type argument TUnresolved.
             Action action = () => container.RegisterDecorator(typeof(ICommandHandler<>),
                 typeof(CommandHandlerDecoratorWithUnresolvableArgument<,>));
@@ -1153,8 +1153,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                The constructor of type LoggingHandlerDecorator1<RealCommand> 
-                contains the parameter with name 'logger' and type ILogger that is 
+                The constructor of type LoggingHandlerDecorator1<RealCommand>
+                contains the parameter with name 'logger' and type ILogger that is
                 not registered.".TrimInside(),
                 action);
         }
@@ -1167,7 +1167,7 @@
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Singleton);
 
-            // Register the same decorator twice. 
+            // Register the same decorator twice.
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
                 typeof(TransactionHandlerDecorator<>),
@@ -1595,7 +1595,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            // Somehow the "where T : class" always works, while things like "where T : struct" or 
+            // Somehow the "where T : class" always works, while things like "where T : struct" or
             // "where T : ISpecialCommand" (used here) doesn't.
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(SpecialCommandHandlerDecorator<>));
         }
@@ -1756,7 +1756,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                The configuration is invalid. 
+                The configuration is invalid.
                 Creating the instance for type ICommandHandler<RealCommand> failed.
                 Failure."
                 .TrimInside(),
@@ -1920,8 +1920,8 @@
 
             // Assert
             Assert.IsFalse(decoratorTypeFactoryCalled, @"
-                The factory should not be called if the predicate returns false. This prevents the user from 
-                having to do specific handling when the decorator type can't be constructed because of generic 
+                The factory should not be called if the predicate returns false. This prevents the user from
+                having to do specific handling when the decorator type can't be constructed because of generic
                 type constraints.");
         }
 
@@ -2092,8 +2092,8 @@
         public void GetInstance_RegisterDecoratorWithNonGenericServiceAndFactoryReturningAnOpenGenericDecoratorType_ThrowsExpectedException()
         {
             // Arrange
-            string expectedMessage = @"The registered decorator type factory returned open-generic type 
-                NonGenericServiceDecorator<T> while the registered service type INonGenericService is not 
+            string expectedMessage = @"The registered decorator type factory returned open-generic type
+                NonGenericServiceDecorator<T> while the registered service type INonGenericService is not
                 generic, making it impossible for a closed-generic decorator type to be constructed"
                 .TrimInside();
 
@@ -2122,8 +2122,8 @@
         {
             // Arrange
             string expectedMessage = @"
-                For the container to be able to use InvalidDecoratorCommandHandlerDecorator<RealCommand> as  
-                a decorator, its constructor must include a single parameter of type 
+                For the container to be able to use InvalidDecoratorCommandHandlerDecorator<RealCommand> as
+                a decorator, its constructor must include a single parameter of type
                 ICommandHandler<RealCommand> (or Func<ICommandHandler<RealCommand>>)"
                 .TrimInside();
 
@@ -2163,7 +2163,7 @@
 
             parameters.ServiceType = typeof(ICommandHandler<RealCommand>);
 
-            // CommandHandlerDecoratorWithUnresolvableArgument<T, TUnresolved> contains an unmappable 
+            // CommandHandlerDecoratorWithUnresolvableArgument<T, TUnresolved> contains an unmappable
             // type argument TUnresolved.
             parameters.DecoratorTypeFactory =
                 context => typeof(CommandHandlerDecoratorWithUnresolvableArgument<,>);
@@ -2441,7 +2441,7 @@
             AssertThat.ThrowsWithParamName<ArgumentException>("serviceType", action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The supplied type 'ICommandHandler<List<T>>' is a partially closed generic type, which is not 
+                The supplied type 'ICommandHandler<List<T>>' is a partially closed generic type, which is not
                 supported by this method. Please supply the open-generic type 'ICommandHandler<>' instead."
                 .TrimInside(),
                 action);
@@ -2466,7 +2466,7 @@
             AssertThat.ThrowsWithParamName<ArgumentException>("serviceType", action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The supplied type 'ICommandHandler<TCommand>' is a partially closed generic type, which is not 
+                The supplied type 'ICommandHandler<TCommand>' is a partially closed generic type, which is not
                 supported by this method. Please supply the open-generic type 'ICommandHandler<>' instead."
                 .TrimInside(),
                 action);

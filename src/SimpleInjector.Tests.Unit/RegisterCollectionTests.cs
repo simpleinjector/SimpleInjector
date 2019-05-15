@@ -99,7 +99,7 @@
 
             // Act
             // Here the user might think he calls RegisterCollection(Type, params Type[]), but instead
-            // RegisterCollection<Type>(new[] { typeof(ILogger), typeof(NullLogger) }) is called. 
+            // RegisterCollection<Type>(new[] { typeof(ILogger), typeof(NullLogger) }) is called.
             Action action = () => container.Collection.Register(typeof(ILogger), typeof(NullLogger));
 
             // Assert
@@ -732,7 +732,7 @@
             catch (ArgumentException ex)
             {
                 AssertThat.ExceptionMessageContains(
-                    @"You are trying to register Type as a service type, 
+                    @"You are trying to register Type as a service type,
                       but registering this type is not allowed to be registered"
                     .TrimInside(),
                     ex,
@@ -1551,7 +1551,7 @@
 
             container.Collection.Register(typeof(IEventHandler<>), new[]
             {
-                // This closed generic type has an ILogger constructor dependency, but ILogger is not 
+                // This closed generic type has an ILogger constructor dependency, but ILogger is not
                 // registered, and Verify() should catch this.
                 typeof(EventHandlerWithDependency<AuditableEvent, ILogger>)
             });
@@ -2219,8 +2219,8 @@
 
             // Assert
             Assert.IsTrue(expectedHandlerTypes.SequenceEqual(actualHandlerTypes),
-                @"The registrations for IEventHandler<CustomerMovedEvent> that are assignable to 
-                IEventHandler<CustomerMovedAbroadEvent> are expected to 'flow' to the 
+                @"The registrations for IEventHandler<CustomerMovedEvent> that are assignable to
+                IEventHandler<CustomerMovedAbroadEvent> are expected to 'flow' to the
                 IEventHandler<CustomerMovedAbroadEvent> collection, because the expected way for users to
                 register generic types by supplying the RegisterCollection(Type, Type[]) overload as follows:
                 container.RegisterManyForOpenGeneric(type, container.Collection.Register, assemblies)."
@@ -2282,8 +2282,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
-                You already made a registration for IEventHandler<TEvent> using one of the 
-                Container.Collection.Register overloads that registers container-uncontrolled collections, while this 
+                You already made a registration for IEventHandler<TEvent> using one of the
+                Container.Collection.Register overloads that registers container-uncontrolled collections, while this
                 method registers container-controlled collections. Mixing calls is not supported."
                 .TrimInside(),
                 action);
@@ -2304,8 +2304,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
-                You already made a registration for IEventHandler<TEvent> using one of the 
-                Container.Collection.Register overloads that registers container-controlled collections, while this 
+                You already made a registration for IEventHandler<TEvent> using one of the
+                Container.Collection.Register overloads that registers container-controlled collections, while this
                 method registers container-uncontrolled collections. Mixing calls is not supported."
                 .TrimInside(),
                 action);

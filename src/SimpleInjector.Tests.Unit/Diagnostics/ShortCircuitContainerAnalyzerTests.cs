@@ -146,7 +146,7 @@
             Assert.AreEqual(2, ((DebuggerViewItem[])results.Value).Length);
         }
 
-        // Checks #248. 
+        // Checks #248.
         [TestMethod]
         public void Analyze_ShortCiruitedRegistrationWithSameLifestyle_ReportsExpectedWarning()
         {

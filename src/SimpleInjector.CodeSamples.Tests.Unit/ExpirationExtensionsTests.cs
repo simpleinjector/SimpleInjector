@@ -73,7 +73,7 @@
             var instance2 = container.GetInstance<ICommand>();
 
             // Assert
-            Assert.AreEqual(instance1, instance2, string.Format("Timing only begins during first call to " + 
+            Assert.AreEqual(instance1, instance2, string.Format("Timing only begins during first call to " +
                 "GetInstance. The timeout is {0} ms. and {1} ms. is within this timeout. We should get the " +
                 "same instance.", ThreeTimeUnits, TwoTimeUnits));
         }
@@ -94,7 +94,7 @@
             var instance2 = container.GetInstance<ICommand>();
 
             // Assert
-            Assert.IsFalse(object.ReferenceEquals(instance1, instance2), 
+            Assert.IsFalse(object.ReferenceEquals(instance1, instance2),
                 "A new instance was expected to be returned when it is requested after it timed out.");
         }
 

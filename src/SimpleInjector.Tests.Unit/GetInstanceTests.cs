@@ -50,7 +50,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                The constructor of type ServiceWithUnregisteredDependencies contains the parameter 
+                The constructor of type ServiceWithUnregisteredDependencies contains the parameter
                 with name 'a' and type IDisposable that is not registered."
                 .TrimInside(),
                 action);
@@ -67,7 +67,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                The constructor of type ServiceWithUnregisteredDependencies contains the parameter 
+                The constructor of type ServiceWithUnregisteredDependencies contains the parameter
                 with name 'a' and type IDisposable that is not registered."
                 .TrimInside(),
                 action);
@@ -131,8 +131,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The request for type Lazy<T> is invalid because it is an open-generic type: it is only 
-                possible to instantiate instances of closed-generic types. A generic type is closed if all of 
+                The request for type Lazy<T> is invalid because it is an open-generic type: it is only
+                possible to instantiate instances of closed-generic types. A generic type is closed if all of
                 its type parameters have been substituted with types that are recognized by the compiler."
                 .TrimInside(),
                 action);
@@ -231,7 +231,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                No registration for type FakeUserService could be found and an implicit registration 
+                No registration for type FakeUserService could be found and an implicit registration
                 could not be made."
                 .TrimInside(),
                 action);
@@ -346,7 +346,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                No registration for type ILogger could be found. 
+                No registration for type ILogger could be found.
                 There is, however, a registration for IEnumerable<ILogger>;
                 Did you mean to call GetAllInstances<ILogger>() or depend on IEnumerable<ILogger>?"
                 .TrimInside(),
@@ -366,9 +366,9 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                There is, however, a registration for IEnumerable<ILogger>; 
+                There is, however, a registration for IEnumerable<ILogger>;
                 Did you mean to depend on IEnumerable<ILogger>?
-                If you meant to depend on ILogger, 
+                If you meant to depend on ILogger,
                 you should use one of the Register overloads instead of using Container.Collection.Register"
                 .TrimInside(),
                 action);
@@ -407,7 +407,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 No registration for type IEnumerable<ILogger> could be found.
-                There is, however, a registration for ILogger; 
+                There is, however, a registration for ILogger;
                 Did you mean to call GetInstance<ILogger>() or depend on ILogger?"
                 .TrimInside(),
                 action);
@@ -531,8 +531,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                Note that there exists a registration for a different type 
-                SimpleInjector.Tests.Unit.IDuplicate while the requested type is 
+                Note that there exists a registration for a different type
+                SimpleInjector.Tests.Unit.IDuplicate while the requested type is
                 SimpleInjector.Tests.Unit.Duplicates.IDuplicate."
                 .TrimInside(),
                 action);

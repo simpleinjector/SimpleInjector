@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2013-2016 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -131,7 +112,7 @@ namespace SimpleInjector
 
         /// <summary>Gets the service object of the specified type.</summary>
         /// <param name="serviceType">An object that specifies the type of service object to get.</param>
-        /// <returns>A service object of type serviceType.  -or- null if there is no service object of type 
+        /// <returns>A service object of type serviceType.  -or- null if there is no service object of type
         /// <paramref name="serviceType"/>.</returns>
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes",
             Justification = "Users are not expected to inherit from this class and override this implementation.")]
@@ -160,12 +141,12 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// <para>
-        /// A call to this method locks the container. New registrations can't be made after a call to this 
+        /// A call to this method locks the container. New registrations can't be made after a call to this
         /// method.
         /// </para>
         /// <para>
-        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same 
-        /// <see cref="InstanceProducer"/> instance for a given <see cref="System.Type"/>. It will however either 
+        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same
+        /// <see cref="InstanceProducer"/> instance for a given <see cref="System.Type"/>. It will however either
         /// always return <b>null</b> or always return a producer that is able to return the expected instance.
         /// </para>
         /// </remarks>
@@ -186,12 +167,12 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// <para>
-        /// A call to this method locks the container. New registrations can't be made after a call to this 
+        /// A call to this method locks the container. New registrations can't be made after a call to this
         /// method.
         /// </para>
         /// <para>
-        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same 
-        /// <see cref="InstanceProducer"/> instance for a given <see cref="System.Type"/>. It will however either 
+        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same
+        /// <see cref="InstanceProducer"/> instance for a given <see cref="System.Type"/>. It will however either
         /// always return <b>null</b> or always return a producer that is able to return the expected instance.
         /// </para>
         /// </remarks>
@@ -369,8 +350,8 @@ namespace SimpleInjector
                 this.TryBuildInstanceProducerForStream(serviceType);
         }
 
-        // Instead of wrapping the complete method in a lock, we lock inside the individual methods. We 
-        // don't want to hold a lock while calling back into user code, because who knows what the user 
+        // Instead of wrapping the complete method in a lock, we lock inside the individual methods. We
+        // don't want to hold a lock while calling back into user code, because who knows what the user
         // is doing there. We don't want a dead lock.
         private InstanceProducer? TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType) =>
             this.TryGetInstanceProducerForUnregisteredTypeResolutionFromCache(serviceType)
@@ -686,7 +667,7 @@ namespace SimpleInjector
 
         // We're registering a service type after 'locking down' the container here and that means that the
         // type is added to a copy of the registrations dictionary and the original replaced with a new one.
-        // This 'reference swapping' is thread-safe, but can result in types disappearing again from the 
+        // This 'reference swapping' is thread-safe, but can result in types disappearing again from the
         // registrations when multiple threads simultaneously add different types. This however, does not
         // result in a consistency problem, because the missing type will be again added later. This type of
         // swapping safes us from using locks.

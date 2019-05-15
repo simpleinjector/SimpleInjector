@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2013-2016 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -37,12 +18,12 @@ namespace SimpleInjector
     /// </summary>
     /// <remarks>
     /// <see cref="Lifestyle"/> implementations create a new <b>Registration</b> instance for each registered
-    /// service type. <see cref="Expression"/>s returned from the 
-    /// <see cref="Registration.BuildExpression()">BuildExpression</see> method can be 
-    /// intercepted by any event registered with <see cref="SimpleInjector.Container.ExpressionBuilding" />, have 
-    /// <see cref="SimpleInjector.Container.RegisterInitializer{TService}(Action{TService})">initializers</see> 
-    /// applied, and the caching particular to its lifestyle have been applied. Interception using the 
-    /// <see cref="SimpleInjector.Container.ExpressionBuilt">Container.ExpressionBuilt</see> will <b>not</b> 
+    /// service type. <see cref="Expression"/>s returned from the
+    /// <see cref="Registration.BuildExpression()">BuildExpression</see> method can be
+    /// intercepted by any event registered with <see cref="SimpleInjector.Container.ExpressionBuilding" />, have
+    /// <see cref="SimpleInjector.Container.RegisterInitializer{TService}(Action{TService})">initializers</see>
+    /// applied, and the caching particular to its lifestyle have been applied. Interception using the
+    /// <see cref="SimpleInjector.Container.ExpressionBuilt">Container.ExpressionBuilt</see> will <b>not</b>
     /// be applied in the <b>Registration</b>, but will be applied in <see cref="InstanceProducer"/>.</remarks>
     /// <example>
     /// See the <see cref="Lifestyle"/> documentation for an example.
@@ -100,7 +81,7 @@ namespace SimpleInjector
 
         internal virtual bool MustBeVerified => false;
 
-        /// <summary>Gets or sets a value indicating whether this registration object contains a user 
+        /// <summary>Gets or sets a value indicating whether this registration object contains a user
         /// supplied instanceCreator factory delegate.</summary>
         internal bool WrapsInstanceCreationDelegate { get; set; }
 
@@ -151,7 +132,7 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="type">The <see cref="DiagnosticType"/>.</param>
         /// <param name="justification">The justification of why the warning must be suppressed.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="justification"/> is a null  
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="justification"/> is a null
         /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when either <paramref name="justification"/> is an
         /// empty string or when <paramref name="type"/> is not a valid value of <see cref="DiagnosticType"/>.
@@ -252,10 +233,10 @@ namespace SimpleInjector
         /// <summary>
         /// Builds a <see cref="Func{T}"/> delegate for the creation of the <typeparamref name="TService"/>
         /// using the supplied <paramref name="instanceCreator"/>. The returned <see cref="Func{T}"/> might
-        /// be intercepted by a 
-        /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event, 
+        /// be intercepted by a
+        /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event,
         /// and the <paramref name="instanceCreator"/> will have been wrapped with a delegate that executes the
-        /// registered <see cref="SimpleInjector.Container.RegisterInitializer{TService}">initializers</see> 
+        /// registered <see cref="SimpleInjector.Container.RegisterInitializer{TService}">initializers</see>
         /// that are applicable to the given <typeparamref name="TService"/> (if any).
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
@@ -285,11 +266,11 @@ namespace SimpleInjector
 
         /// <summary>
         /// Builds a <see cref="Func{T}"/> delegate for the creation of <see cref="ImplementationType"/>.
-        /// The returned <see cref="Func{T}"/> might be intercepted by a 
-        /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event, 
-        /// and the creation of the <see cref="ImplementationType"/> will have been wrapped with a 
-        /// delegate that executes the registered 
-        /// <see cref="SimpleInjector.Container.RegisterInitializer{TService}">initializers</see> 
+        /// The returned <see cref="Func{T}"/> might be intercepted by a
+        /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event,
+        /// and the creation of the <see cref="ImplementationType"/> will have been wrapped with a
+        /// delegate that executes the registered
+        /// <see cref="SimpleInjector.Container.RegisterInitializer{TService}">initializers</see>
         /// that are applicable to the given <see cref="ImplementationType"/> (if any).
         /// </summary>
         /// <returns>A <see cref="Func{T}"/> delegate.</returns>
@@ -312,10 +293,10 @@ namespace SimpleInjector
         /// <summary>
         /// Builds an <see cref="Expression"/> that describes the creation of the <typeparamref name="TService"/>
         /// using the supplied <paramref name="instanceCreator"/>. The returned <see cref="Expression"/> might
-        /// be intercepted by a 
-        /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event, 
+        /// be intercepted by a
+        /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event,
         /// and the <paramref name="instanceCreator"/> will have been wrapped with a delegate that executes the
-        /// registered <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> that are 
+        /// registered <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> that are
         /// applicable to the given <typeparamref name="TService"/> (if any).
         /// </summary>
         /// <typeparam name="TService">
@@ -350,12 +331,12 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Builds an <see cref="Expression"/> that describes the creation of <see cref="ImplementationType"/>. 
+        /// Builds an <see cref="Expression"/> that describes the creation of <see cref="ImplementationType"/>.
         /// The returned <see cref="Expression"/> might be intercepted
         /// by a <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see>
         /// event, and the creation of the <see cref="ImplementationType"/> will have been wrapped with
-        /// a delegate that executes the registered 
-        /// <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> that are applicable 
+        /// a delegate that executes the registered
+        /// <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> that are applicable
         /// to the InstanceProducer's <see cref="InstanceProducer.ServiceType">ServiceType</see> (if any).
         /// </summary>
         /// <returns>An <see cref="Expression"/>.</returns>

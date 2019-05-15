@@ -107,7 +107,7 @@
                 return suitableParameters[0];
             }
 
-            throw new ActivationException(string.Format(CultureInfo.CurrentCulture, 
+            throw new ActivationException(string.Format(CultureInfo.CurrentCulture,
                 "Multiple parameter registrations found for type " +
                 "{0} that match to parameter with name '{1}' of type {2}.",
                 parameter.Member.DeclaringType.Name, parameter.Name, parameter.ParameterType.Name));

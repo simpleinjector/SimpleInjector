@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2013-2016 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -44,7 +25,7 @@ namespace SimpleInjector
 
         /// <summary>Initializes a new instance of the <see cref="ScopedLifestyle"/> class.</summary>
         /// <param name="name">The user friendly name of this lifestyle.</param>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB) 
+        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB)
         /// or an empty string.</exception>
         protected ScopedLifestyle(string name) : base(name)
         {
@@ -54,7 +35,7 @@ namespace SimpleInjector
         /// <param name="name">The user friendly name of this lifestyle.</param>
         /// <param name="disposeInstances">Signals the lifestyle whether instances should be
         /// disposed or not.</param>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB) 
+        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB)
         /// or an empty string.</exception>
         [Obsolete(
             "This constructor overload is deprecated. The disposal of instances can't be suppressed anymore",
@@ -74,8 +55,8 @@ namespace SimpleInjector
         /// <remarks>
         /// During the call to <see cref="Scope.Dispose()"/> all registered <see cref="Action"/> delegates are
         /// processed in the order of registration. Do note that registered actions <b>are not guaranteed
-        /// to run</b>. In case an exception is thrown during the call to <see cref="Scope.Dispose()"/>, the 
-        /// <see cref="Scope"/> will stop running any actions that might not have been invoked at that point. 
+        /// to run</b>. In case an exception is thrown during the call to <see cref="Scope.Dispose()"/>, the
+        /// <see cref="Scope"/> will stop running any actions that might not have been invoked at that point.
         /// Instances that are registered for disposal using <see cref="RegisterForDisposal"/> on the other
         /// hand, are guaranteed to be disposed. Note that registered actions won't be invoked during a call
         /// to <see cref="Container.Verify()" />.
@@ -113,7 +94,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
+        /// Returns the current <see cref="Scope"/> for this lifestyle and the given
         /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>
@@ -136,13 +117,13 @@ namespace SimpleInjector
 
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/> 
+        /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/>
         /// with the caching as specified by this lifestyle.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <param name="instanceCreator">A delegate that will create a new instance of 
+        /// <param name="instanceCreator">A delegate that will create a new instance of
         /// <typeparamref name="TService"/> every time it is called.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         protected internal override Registration CreateRegistrationCore<TService>(
@@ -159,7 +140,7 @@ namespace SimpleInjector
         /// specified <typeparamref name="TConcrete"/> with the caching as specified by this lifestyle.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
-        /// <param name="container">The <see cref="Container"/> instance for which a 
+        /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
@@ -170,7 +151,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
+        /// Returns the current <see cref="Scope"/> for this lifestyle and the given
         /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
         /// </summary>
         /// <remarks>

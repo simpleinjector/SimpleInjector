@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2014-2016 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -43,13 +24,13 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers the Web API <see cref="IHttpController"/> types that available for the application. This
-        /// method uses the configured <see cref="IAssembliesResolver"/> and 
+        /// method uses the configured <see cref="IAssembliesResolver"/> and
         /// <see cref="IHttpControllerTypeResolver"/> to determine which controller types to register.
         /// </summary>
         /// <param name="container">The container the controllers should be registered in.</param>
         /// <param name="configuration">The <see cref="HttpConfiguration"/> to use to get the Controller
         /// types to register.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null 
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null
         /// reference (Nothing in VB).</exception>
         public static void RegisterWebApiControllers(this Container container, HttpConfiguration configuration)
         {
@@ -70,7 +51,7 @@ namespace SimpleInjector
         /// <param name="configuration">The <see cref="HttpConfiguration"/> to use to get the Controller
         /// types to register.</param>
         /// <param name="assemblies">The assemblies to search.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null 
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null
         /// reference (Nothing in VB).</exception>
         public static void RegisterWebApiControllers(
             this Container container, HttpConfiguration configuration, params Assembly[] assemblies)
@@ -87,7 +68,7 @@ namespace SimpleInjector
         /// <param name="configuration">The <see cref="HttpConfiguration"/> to use to get the Controller
         /// types to register.</param>
         /// <param name="assemblies">The assemblies to search.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null 
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null
         /// reference (Nothing in VB).</exception>
         public static void RegisterWebApiControllers(
             this Container container, HttpConfiguration configuration, IEnumerable<Assembly> assemblies)
@@ -125,7 +106,7 @@ namespace SimpleInjector
         /// <param name="container">The container instance for which HttpRequestMessageTracking should be
         /// enabled.</param>
         /// <param name="configuration">The application's configuration.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference 
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
         public static void EnableHttpRequestMessageTracking(this Container container,
             HttpConfiguration configuration)
@@ -146,7 +127,7 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="container">The container.</param>
         /// <returns>The <see cref="HttpRequestMessage"/> for the current request.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when this method is called before 
+        /// <exception cref="InvalidOperationException">Thrown when this method is called before
         /// <see cref="EnableHttpRequestMessageTracking"/> is called.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> argument
         /// is a null reference (Nothing in VB).</exception>

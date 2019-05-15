@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2014-2015 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Internals
 {
@@ -88,13 +69,13 @@ namespace SimpleInjector.Internals
                 foreach (Type closedServiceType in this.GetAllKnownClosedServiceTypes())
                 {
                     // When registering a generic collection, the container keeps track of all open and closed
-                    // elements in the resolver. This resolver allows unregistered type resolution and this 
-                    // allows all closed versions of the collection to be resolved. But if we only used 
-                    // unregistered type resolution, this could cause these registrations to be hidden from 
-                    // the verification mechanism in case the collections are root types in the application. 
-                    // This could cause the container to verify, while still failing at runtime when resolving 
+                    // elements in the resolver. This resolver allows unregistered type resolution and this
+                    // allows all closed versions of the collection to be resolved. But if we only used
+                    // unregistered type resolution, this could cause these registrations to be hidden from
+                    // the verification mechanism in case the collections are root types in the application.
+                    // This could cause the container to verify, while still failing at runtime when resolving
                     // a collection. So by explicitly resolving the known closed-generic versions here, we
-                    // ensure that all non-generic registrations (and because of that, most open-generic 
+                    // ensure that all non-generic registrations (and because of that, most open-generic
                     // registrations as well) will be validated.
                     this.Container.GetRegistration(typeof(IEnumerable<>).MakeGenericType(closedServiceType));
                 }

@@ -17,7 +17,7 @@
             // Arrange
             var container = new Container();
 
-            var factory = new KeyedFactory<string, IPlugin>(container, 
+            var factory = new KeyedFactory<string, IPlugin>(container,
                 StringComparer.OrdinalIgnoreCase);
 
             // Act

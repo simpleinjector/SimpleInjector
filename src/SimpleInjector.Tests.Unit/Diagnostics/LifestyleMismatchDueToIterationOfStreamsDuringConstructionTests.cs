@@ -415,7 +415,7 @@ $@"{typeof(CaptivatingCompositeLogger<IEnumerable<ILogger>>).ToFriendlyName()}(
                 The problem in {name} is that instead of storing the injected {collectionName}
                 in a private field and iterating over it at the point its instances are
                 required, ConsoleLogger is being resolved (from the collection) during object
-                construction. Resolving services from an injected collection during object 
+                construction. Resolving services from an injected collection during object
                 construction (e.g. by calling loggers.ToList() in the constructor) is not advised."
                 .TrimInside(),
                 action);

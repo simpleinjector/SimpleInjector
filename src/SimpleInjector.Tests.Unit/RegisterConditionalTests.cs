@@ -304,10 +304,10 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                There is already a conditional registration for IGeneric<Int32> (with implementation 
-                IntGenericType) that overlaps with the registration for GenericType<Int32> that 
-                you are trying to make. This new registration causes ambiguity, because both 
-                registrations would be used for the same closed service types. Either remove one of the 
+                There is already a conditional registration for IGeneric<Int32> (with implementation
+                IntGenericType) that overlaps with the registration for GenericType<Int32> that
+                you are trying to make. This new registration causes ambiguity, because both
+                registrations would be used for the same closed service types. Either remove one of the
                 registrations or make them both conditional."
                 .TrimInside(),
                 action);
@@ -327,10 +327,10 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                There is already a registration for IGeneric<Int32> (with implementation 
-                GenericType<Int32>) that overlaps with the conditional registration for IntGenericType that 
-                you are trying to make. This new registration causes ambiguity, because both 
-                registrations would be used for the same closed service types. Either remove one of the 
+                There is already a registration for IGeneric<Int32> (with implementation
+                GenericType<Int32>) that overlaps with the conditional registration for IntGenericType that
+                you are trying to make. This new registration causes ambiguity, because both
+                registrations would be used for the same closed service types. Either remove one of the
                 registrations or make them both conditional."
                 .TrimInside(),
                 action);
@@ -362,10 +362,10 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                There is already a conditional registration for IGeneric<T> (with implementation 
-                GenericClassType<TClass>) that overlaps with the registration for DefaultGenericType<T> that 
-                you are trying to make. This new registration causes ambiguity, because both 
-                registrations would be used for the same closed service types. Either remove one of the 
+                There is already a conditional registration for IGeneric<T> (with implementation
+                GenericClassType<TClass>) that overlaps with the registration for DefaultGenericType<T> that
+                you are trying to make. This new registration causes ambiguity, because both
+                registrations would be used for the same closed service types. Either remove one of the
                 registrations or make them both conditional."
                 .TrimInside(),
                 action);
@@ -386,9 +386,9 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 There is already a registration for IGeneric<T> (with implementation GenericType<T>) that
-                overlaps with the conditional registration for GenericClassType<TClass> that you are trying 
-                to make. This new registration causes ambiguity, because both registrations would be 
-                used for the same closed service types. Either remove one of the registrations or make them 
+                overlaps with the conditional registration for GenericClassType<TClass> that you are trying
+                to make. This new registration causes ambiguity, because both registrations would be
+                used for the same closed service types. Either remove one of the registrations or make them
                 both conditional."
                 .TrimInside(),
                 action);
@@ -410,10 +410,10 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                There is already a registration for IGeneric<T> (with implementation GenericClassType<TClass>) 
-                that overlaps with the conditional registration for GenericClassType<TClass> that you are 
+                There is already a registration for IGeneric<T> (with implementation GenericClassType<TClass>)
+                that overlaps with the conditional registration for GenericClassType<TClass> that you are
                 trying to make. This new registration causes ambiguity, because both registrations would
-                be used for the same closed service types. Either remove one of the registrations or make 
+                be used for the same closed service types. Either remove one of the registrations or make
                 them both conditional."
                 .TrimInside(),
                 action);
@@ -434,10 +434,10 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                There is already a conditional registration for IGeneric<T> (with implementation 
-                GenericType<T>) that overlaps with the conditional registration for GenericType<T> that you 
-                are trying to make. This new registration causes ambiguity, because both registrations 
-                would be used for the same closed service types. You can merge both registrations into a 
+                There is already a conditional registration for IGeneric<T> (with implementation
+                GenericType<T>) that overlaps with the conditional registration for GenericType<T> that you
+                are trying to make. This new registration causes ambiguity, because both registrations
+                would be used for the same closed service types. You can merge both registrations into a
                 single conditional registration and combine both predicates into one single predicate."
                 .TrimInside(),
                 action);
@@ -456,10 +456,10 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                There is already a conditional registration for ILogger (with implementation 
+                There is already a conditional registration for ILogger (with implementation
                 NullLogger) that overlaps with the conditional registration for NullLogger that you are trying
-                to make. This new registration causes ambiguity, because both registrations would be used 
-                for the same closed service types. You can merge both registrations into a single conditional 
+                to make. This new registration causes ambiguity, because both registrations would be used
+                for the same closed service types. You can merge both registrations into a single conditional
                 registration and combine both predicates into one single predicate."
                 .TrimInside(),
                 action);
@@ -489,7 +489,7 @@
 
             // Act
             // ConstraintedGeneric<T> can be applied to every possible IConstraintedGeneric<T> and that means
-            // that the following conditional registration will always overlap with the previous and is 
+            // that the following conditional registration will always overlap with the previous and is
             // therefore invalid.
             Action action = () => container.RegisterConditional(typeof(IClassConstraintedGeneric<>),
                 typeof(ClassConstraintedGeneric2<>),
@@ -497,10 +497,10 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                There is already a registration for IClassConstraintedGeneric<T> (with implementation 
-                ClassConstraintedGeneric<T>) that overlaps with the conditional registration for 
-                ClassConstraintedGeneric2<T> that you are trying to make. This new registration causes 
-                ambiguity, because both registrations would be used for the same closed service types. Either 
+                There is already a registration for IClassConstraintedGeneric<T> (with implementation
+                ClassConstraintedGeneric<T>) that overlaps with the conditional registration for
+                ClassConstraintedGeneric2<T> that you are trying to make. This new registration causes
+                ambiguity, because both registrations would be used for the same closed service types. Either
                 remove one of the registrations or make them both conditional."
                 .TrimInside(),
                 action);
@@ -578,10 +578,10 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                The constructor of type ServiceWithDependency<ILogger> contains the parameter with name 
-                'dependency' and type ILogger that is not registered. Please ensure ILogger is registered, or 
-                change the constructor of ServiceWithDependency<ILogger>. 1 conditional registration for ILogger 
-                exists, but its supplied predicate didn't return true when provided with the contextual 
+                The constructor of type ServiceWithDependency<ILogger> contains the parameter with name
+                'dependency' and type ILogger that is not registered. Please ensure ILogger is registered, or
+                change the constructor of ServiceWithDependency<ILogger>. 1 conditional registration for ILogger
+                exists, but its supplied predicate didn't return true when provided with the contextual
                 information for ServiceWithDependency<ILogger>."
                 .TrimInside(),
                 action);
@@ -602,14 +602,14 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                The constructor of type ServiceWithDependency<IGeneric<Int32>> contains the parameter with 
+                The constructor of type ServiceWithDependency<IGeneric<Int32>> contains the parameter with
                 name 'dependency' and type IGeneric<Int32> that is not registered."
                 .TrimInside(),
                 action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<Int32>, 
-                but its supplied predicate didn't return true when provided with the contextual information 
+                1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<Int32>,
+                but its supplied predicate didn't return true when provided with the contextual information
                 for ServiceWithDependency<IGeneric<Int32>>."
                 .TrimInside(),
                 action);
@@ -630,7 +630,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 2 conditional registrations for IGeneric<T> exist that are applicable to IGeneric<String>, but
-                none of the supplied predicates returned true when provided with the contextual information for 
+                none of the supplied predicates returned true when provided with the contextual information for
                 ServiceWithDependency<IGeneric<String>>."
                 .TrimInside(),
                 action);
@@ -650,7 +650,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                2 conditional registrations for ILogger exist, but none of the supplied predicates returned 
+                2 conditional registrations for ILogger exist, but none of the supplied predicates returned
                 true when provided with the contextual information for ServiceWithDependency<ILogger>."
                 .TrimInside(),
                 action);
@@ -805,7 +805,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                The constructor of type PluginWithDependency<ILogger> contains the parameter with name 
+                The constructor of type PluginWithDependency<ILogger> contains the parameter with name
                 'dependency' and type ILogger that is not registered."
                 .TrimInside(),
                 action);
@@ -1009,7 +1009,7 @@
             // Assert
             Assert.IsNull(actualImplementationType, @"
                 Since the returned OpenGenericWithPredicateWithClassConstraint<T> can't be applied to
-                IOpenGenericWithPredicate<int> (due to its type constraints), the ImplementationType 
+                IOpenGenericWithPredicate<int> (due to its type constraints), the ImplementationType
                 property is expected to return null.");
         }
 
@@ -1190,8 +1190,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                @"The registered type factory returned open-generic type DisposableOpenGenericWithPredicate<T> 
-                while the registered service type IDisposable is not generic, making it impossible for a 
+                @"The registered type factory returned open-generic type DisposableOpenGenericWithPredicate<T>
+                while the registered service type IDisposable is not generic, making it impossible for a
                 closed-generic type to be constructed"
                 .TrimInside(),
                 action);
@@ -1673,7 +1673,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                @"1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<Int32>, 
+                @"1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<Int32>,
                 but its supplied predicate didn't return true"
                 .TrimInside(),
                 action);

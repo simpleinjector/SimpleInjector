@@ -15,14 +15,14 @@
         {
             // Arrange
             string expectedMessage1 = @"
-                The registration for IFoo (Singleton) maps to the same implementation (FooBar) as the 
-                registration for IBar (Transient) does, but the registration maps to a different lifestyle. 
+                The registration for IFoo (Singleton) maps to the same implementation (FooBar) as the
+                registration for IBar (Transient) does, but the registration maps to a different lifestyle.
                 This will cause each registration to resolve to a different instance."
                 .TrimInside();
 
             string expectedMessage2 = @"
-                The registration for IBar (Transient) maps to the same implementation (FooBar) as the 
-                registration for IFoo (Singleton) does, but the registration maps to a different lifestyle. 
+                The registration for IBar (Transient) maps to the same implementation (FooBar) as the
+                registration for IFoo (Singleton) does, but the registration maps to a different lifestyle.
                 This will cause each registration to resolve to a different instance."
                 .TrimInside();
 
@@ -97,12 +97,12 @@
         {
             // Arrange
             string expectedMessage1 = @"
-                The registration for IFoo (Thread Scoped) maps to the same implementation (FooBar) as the 
+                The registration for IFoo (Thread Scoped) maps to the same implementation (FooBar) as the
                 registrations for IFooExt (Singleton) and IBarExt (Singleton) do"
                 .TrimInside();
 
             string expectedMessage2 = @"
-                The registration for IFooExt (Singleton) maps to the same implementation (FooBar) as the 
+                The registration for IFooExt (Singleton) maps to the same implementation (FooBar) as the
                 registrations for IFoo (Thread Scoped) and IBar (Thread Scoped) do"
                 .TrimInside();
 
@@ -135,7 +135,7 @@
         {
             // Arrange
             string expectedMessage = @"
-                The registration for IFoo (Transient) maps to the same implementation (FooBar) as the 
+                The registration for IFoo (Transient) maps to the same implementation (FooBar) as the
                 registrations for IBar (Thread Scoped) and IFooExt (Singleton) do"
                 .TrimInside();
 

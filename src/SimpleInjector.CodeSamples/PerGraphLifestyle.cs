@@ -41,7 +41,7 @@
             }
             finally
             {
-                // We deliberately don't dispose the Scope here, since this lifestyle should not 
+                // We deliberately don't dispose the Scope here, since this lifestyle should not
                 // dispose instances, because they outlive their scope.
                 // WARNING: Although per-graph instances are not disposed, the diagnostic sub system
                 // will not warn in case a disposable instance is registered as per-graph.

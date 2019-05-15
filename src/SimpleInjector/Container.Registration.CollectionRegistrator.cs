@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2018-2019 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -50,11 +31,11 @@ namespace SimpleInjector
         public Container Container { get; }
 
         /// <summary>
-        /// Creates a collection of 
+        /// Creates a collection of
         /// all concrete, non-generic types (both public and internal) that are defined in the given
         /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
         /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
-        /// Unless overridden using a custom 
+        /// Unless overridden using a custom
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
         /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// </summary>
@@ -70,11 +51,11 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Creates a collection of 
+        /// Creates a collection of
         /// all concrete, non-generic types (both public and internal) that are defined in the given
         /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
         /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
-        /// Unless overridden using a custom 
+        /// Unless overridden using a custom
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
         /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// </summary>
@@ -97,17 +78,17 @@ namespace SimpleInjector
         /// <summary>
         /// Creates a collection of <paramref name="serviceTypes"/>, whose instances will be resolved lazily
         /// each time the returned collection of <typeparamref name="TService"/> is enumerated.
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
         /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
         /// every time the collection is enumerated.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
@@ -122,17 +103,17 @@ namespace SimpleInjector
         /// <summary>
         /// Creates a collection of <paramref name="serviceTypes"/>, whose instances will be resolved lazily
         /// each time the returned collection of <typeparamref name="TService"/> is enumerated.
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
         /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
         /// every time the collection is enumerated.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
@@ -146,18 +127,18 @@ namespace SimpleInjector
 
         /// <summary>
         /// Creates a collection of <paramref name="registrations"/>, whose instances will be resolved lazily
-        /// each time the returned collection of <typeparamref name="TService"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// each time the returned collection of <typeparamref name="TService"/> is enumerated.
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
         /// will be requested from the container.</param>
         /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
         /// every time the collection is enumerated.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="registrations"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="registrations"/> is a null
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
@@ -171,18 +152,18 @@ namespace SimpleInjector
 
         /// <summary>
         /// Creates a collection of <paramref name="registrations"/>, whose instances will be resolved lazily
-        /// each time the returned collection of <typeparamref name="TService"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// each time the returned collection of <typeparamref name="TService"/> is enumerated.
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
         /// will be requested from the container.</param>
         /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
         /// every time the collection is enumerated.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="registrations"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="registrations"/> is a null
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
@@ -196,19 +177,19 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of 
+        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of
         /// all concrete, non-generic types (both public and internal) that are defined in the given
         /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
         /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
-        /// Unless overridden using a custom 
+        /// Unless overridden using a custom
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
         /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// The collection's instances will be resolved lazily
-        /// each time the returned collection of <typeparamref name="TService"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// each time the returned collection of <typeparamref name="TService"/> is enumerated.
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
@@ -221,19 +202,19 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of 
+        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of
         /// all concrete, non-generic types (both public and internal) that are defined in the given
         /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
         /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
-        /// Unless overridden using a custom 
+        /// Unless overridden using a custom
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
         /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// The collection's instances will be resolved lazily
-        /// each time the returned collection of <typeparamref name="TService"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// each time the returned collection of <typeparamref name="TService"/> is enumerated.
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
@@ -252,19 +233,19 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of 
+        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of
         /// <paramref name="serviceTypes"/>, whose instances will be resolved lazily
-        /// each time the returned collection of <typeparamref name="TService"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// each time the returned collection of <typeparamref name="TService"/> is enumerated.
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
@@ -277,19 +258,19 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of 
+        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of
         /// <paramref name="serviceTypes"/>, whose instances will be resolved lazily
-        /// each time the returned collection of <typeparamref name="TService"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// each time the returned collection of <typeparamref name="TService"/> is enumerated.
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
@@ -305,19 +286,19 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of 
+        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of
         /// <paramref name="registrations"/>, whose instances will be resolved lazily
-        /// each time the returned collection of <typeparamref name="TService"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// each time the returned collection of <typeparamref name="TService"/> is enumerated.
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
         /// will be requested from the container.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="registrations"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="registrations"/> is a null
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
@@ -331,19 +312,19 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of 
+        /// Creates a new <see cref="Registration"/> instance defining the creation of a collection of
         /// <paramref name="registrations"/>, whose instances will be resolved lazily
-        /// each time the returned collection of <typeparamref name="TService"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// each time the returned collection of <typeparamref name="TService"/> is enumerated.
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
         /// will be requested from the container.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="registrations"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="registrations"/> is a null
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
@@ -438,8 +419,8 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Appends a new registration of <typeparamref name="TImplementation"/> to existing registrations 
-        /// made for a collection of <typeparamref name="TService"/> elements using one of the 
+        /// Appends a new registration of <typeparamref name="TImplementation"/> to existing registrations
+        /// made for a collection of <typeparamref name="TService"/> elements using one of the
         /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see>
         /// overloads.
         /// </summary>
@@ -458,8 +439,8 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Appends a new registration of <typeparamref name="TImplementation"/> to existing registrations 
-        /// made for a collection of <typeparamref name="TService"/> elements using one of the 
+        /// Appends a new registration of <typeparamref name="TImplementation"/> to existing registrations
+        /// made for a collection of <typeparamref name="TService"/> elements using one of the
         /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see>
         /// overloads with the given <paramref name="lifestyle"/>.
         /// </summary>
@@ -483,8 +464,8 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Appends a new registration to existing registrations made for a collection of 
-        /// <paramref name="serviceType"/> elements using one of the 
+        /// Appends a new registration to existing registrations made for a collection of
+        /// <paramref name="serviceType"/> elements using one of the
         /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see>
         /// overloads.
         /// </summary>
@@ -516,8 +497,8 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Appends a new registration to existing registrations made for a collection of 
-        /// <paramref name="serviceType"/> elements using one of the 
+        /// Appends a new registration to existing registrations made for a collection of
+        /// <paramref name="serviceType"/> elements using one of the
         /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see>
         /// overloads.
         /// </summary>
@@ -554,7 +535,7 @@ namespace SimpleInjector
         
         /// <summary>
         /// Appends the specified delegate <paramref name="instanceCreator"/> to existing registrations
-        /// made for a collection of <typeparamref name="TService"/> elements using one of the 
+        /// made for a collection of <typeparamref name="TService"/> elements using one of the
         /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see>
         /// overloads.
         /// </summary>
@@ -581,14 +562,14 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Appends a single instance to existing registrations made for a collection of 
-        /// <typeparamref name="TService"/> elements using one of the 
+        /// Appends a single instance to existing registrations made for a collection of
+        /// <typeparamref name="TService"/> elements using one of the
         /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see>
         /// overloads. This <paramref name="instance"/> must be thread-safe when working in a multi-threaded
         /// environment.
         /// <b>NOTE:</b> Do note that instances supplied by this method <b>NEVER</b> get disposed by the
         /// container, since the instance is assumed to outlive this container instance. If disposing is
-        /// required, use 
+        /// required, use
         /// <see cref="Container.RegisterSingleton{TService}(Func{TService})">RegisterSingleton&lt;TService&gt;(Func&lt;TService&gt;)</see>.
         /// </summary>
         /// <typeparam name="TService">The element type of the collections to register.</typeparam>
@@ -608,14 +589,14 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Appends a single instance to existing registrations made for a collection of 
-        /// <paramref name="serviceType"/> elements using one of the 
+        /// Appends a single instance to existing registrations made for a collection of
+        /// <paramref name="serviceType"/> elements using one of the
         /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see>
         /// overloads. This <paramref name="instance"/> must be thread-safe when working in a multi-threaded
         /// environment.
         /// <b>NOTE:</b> Do note that instances supplied by this method <b>NEVER</b> get disposed by the
         /// container, since the instance is assumed to outlive this container instance. If disposing is
-        /// required, use 
+        /// required, use
         /// <see cref="Container.RegisterSingleton{TService}(Func{TService})">RegisterSingleton&lt;TService&gt;(Func&lt;TService&gt;)</see>.
         /// </summary>
         /// <param name="serviceType">TThe element type of the collections to register.</param>
@@ -623,7 +604,7 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is ambiguous, or
         /// <paramref name="instance"/> does not implement <paramref name="serviceType"/>.
         /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or
         /// <paramref name="instance"/> are null references.
         /// </exception>
         public void AppendInstance(Type serviceType, object instance)
@@ -645,10 +626,10 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers a dynamic (container uncontrolled) collection of elements of type 
-        /// <typeparamref name="TService"/>. A call to <see cref="Container.GetAllInstances{T}"/> will return the 
-        /// <paramref name="containerUncontrolledCollection"/> itself, and updates to the collection will be 
-        /// reflected in the result. If updates are allowed, make sure the collection can be iterated safely 
+        /// Registers a dynamic (container uncontrolled) collection of elements of type
+        /// <typeparamref name="TService"/>. A call to <see cref="Container.GetAllInstances{T}"/> will return the
+        /// <paramref name="containerUncontrolledCollection"/> itself, and updates to the collection will be
+        /// reflected in the result. If updates are allowed, make sure the collection can be iterated safely
         /// if you're running a multi-threaded application.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
@@ -708,16 +689,16 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers a collection of <paramref name="serviceTypes"/>, whose instances will be resolved lazily
-        /// each time the resolved collection of <typeparamref name="TService"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// each time the resolved collection of <typeparamref name="TService"/> is enumerated.
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
@@ -731,16 +712,16 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers a collection of <paramref name="serviceTypes"/>, whose instances will be resolved lazily
-        /// each time the resolved collection of <typeparamref name="TService"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// each time the resolved collection of <typeparamref name="TService"/> is enumerated.
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
@@ -754,16 +735,16 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers a collection of <paramref name="registrations"/>, whose instances will be resolved lazily
-        /// each time the resolved collection of <typeparamref name="TService"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// each time the resolved collection of <typeparamref name="TService"/> is enumerated.
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
         /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
@@ -778,16 +759,16 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers a collection of <paramref name="serviceTypes"/>, whose instances will be resolved lazily
-        /// each time the resolved collection of <paramref name="serviceType"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// each time the resolved collection of <paramref name="serviceType"/> is enumerated.
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
@@ -815,17 +796,17 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers a collection of <paramref name="registrations"/>, whose instances will be resolved lazily
-        /// each time the resolved collection of <paramref name="serviceType"/> is enumerated. 
-        /// The underlying collection is a stream that will return individual instances based on their 
-        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>. 
-        /// The order in which the types appear in the collection is the exact same order that the items were 
-        /// supplied to this method, i.e the resolved collection is deterministic.   
+        /// each time the resolved collection of <paramref name="serviceType"/> is enumerated.
+        /// The underlying collection is a stream that will return individual instances based on their
+        /// specific registered lifestyle, for each call to <see cref="IEnumerator{T}.Current"/>.
+        /// The order in which the types appear in the collection is the exact same order that the items were
+        /// supplied to this method, i.e the resolved collection is deterministic.
         /// </summary>
         /// <param name="serviceType">The base type or interface for elements in the collection. This can be
         /// an a non-generic type, closed generic type or generic type definition.</param>
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
         /// will be requested from the container.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
@@ -851,15 +832,15 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers a dynamic (container uncontrolled) collection of elements of type 
-        /// <paramref name="serviceType"/>. A call to <see cref="Container.GetAllInstances{T}"/> will return the 
-        /// <paramref name="containerUncontrolledCollection"/> itself, and updates to the collection will be 
-        /// reflected in the result. If updates are allowed, make sure the collection can be iterated safely 
+        /// Registers a dynamic (container uncontrolled) collection of elements of type
+        /// <paramref name="serviceType"/>. A call to <see cref="Container.GetAllInstances{T}"/> will return the
+        /// <paramref name="containerUncontrolledCollection"/> itself, and updates to the collection will be
+        /// reflected in the result. If updates are allowed, make sure the collection can be iterated safely
         /// if you're running a multi-threaded application.
         /// </summary>
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
         /// <param name="containerUncontrolledCollection">The collection of items to register.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null 
+        /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
@@ -889,7 +870,7 @@ namespace SimpleInjector
         /// Registers all concrete, non-generic types (both public and internal) that are defined in the given
         /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
         /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
-        /// Unless overridden using a custom 
+        /// Unless overridden using a custom
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
         /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// </summary>
@@ -907,7 +888,7 @@ namespace SimpleInjector
         /// Registers all concrete, non-generic types (both public and internal) that are defined in the given
         /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
         /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
-        /// Unless overridden using a custom 
+        /// Unless overridden using a custom
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
         /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// </summary>
@@ -923,11 +904,11 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers all concrete, non-generic types (both public and internal) that are defined in the given
-        /// set of <paramref name="assemblies"/> and that implement the given <paramref name="serviceType"/> 
+        /// set of <paramref name="assemblies"/> and that implement the given <paramref name="serviceType"/>
         /// with a default lifestyle and register them as a collection of <paramref name="serviceType"/>.
-        /// Unless overridden using a custom 
+        /// Unless overridden using a custom
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
-        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>. 
+        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// <see cref="TypesToRegisterOptions.IncludeComposites">Composites</see>,
         /// <see cref="TypesToRegisterOptions.IncludeDecorators">decorators</see> and
         /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
@@ -945,9 +926,9 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers all concrete, non-generic types (both public and internal) that are defined in the given
-        /// set of <paramref name="assemblies"/> and that implement the given <paramref name="serviceType"/> 
+        /// set of <paramref name="assemblies"/> and that implement the given <paramref name="serviceType"/>
         /// with a default lifestyle and register them as a collection of <paramref name="serviceType"/>.
-        /// Unless overridden using a custom 
+        /// Unless overridden using a custom
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
         /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// <see cref="TypesToRegisterOptions.IncludeComposites">Composites</see>,

@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2015-2019 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -87,7 +68,7 @@ namespace SimpleInjector
         /// <typeparam name="T">The type of service object to get.</typeparam>
         /// <param name="builder">The IApplicationBuilder to retrieve the service object from.</param>
         /// <returns>A service object of type T or null if there is no such service.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the method is called outside the 
+        /// <exception cref="InvalidOperationException">Thrown when the method is called outside the
         /// context of a web request.</exception>
         public static T GetRequestService<T>(this IApplicationBuilder builder)
         {
@@ -103,7 +84,7 @@ namespace SimpleInjector
         /// <typeparam name="T"> The type of service object to get.</typeparam>
         /// <param name="builder">The IApplicationBuilder to retrieve the service object from.</param>
         /// <returns>A service object of type T.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the method is called outside the 
+        /// <exception cref="InvalidOperationException">Thrown when the method is called outside the
         /// context of a web request, or when there is no service of type <typeparamref name="T"/>.</exception>
         public static T GetRequiredRequestService<T>(this IApplicationBuilder builder)
         {
@@ -114,9 +95,9 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Enables ASP.NET Core services to be cross-wired in the Container. This method should be called 
+        /// Enables ASP.NET Core services to be cross-wired in the Container. This method should be called
         /// in the <b>ConfigureServices</b> method of the application's <b>Startup</b> class. When cross-wiring
-        /// is enabled, individual cross-wire registrations can be made by calling 
+        /// is enabled, individual cross-wire registrations can be made by calling
         /// <see cref="CrossWire{TService}(Container, IApplicationBuilder)"/>.
         /// </summary>
         /// <param name="services">The ASP.NET application builder instance that references all
@@ -410,7 +391,7 @@ namespace SimpleInjector
         private static IServiceProvider GetServiceProvider(
             IHttpContextAccessor accessor, Container container, Lifestyle lifestyle)
         {
-            // Pull the IServiceProvider from the current request. If there is no request, pull it from an 
+            // Pull the IServiceProvider from the current request. If there is no request, pull it from an
             // IServiceScope that that will be managed by Simple Injector as scoped registration
             // (see CrossWireServiceScope).
             return accessor.HttpContext?.RequestServices

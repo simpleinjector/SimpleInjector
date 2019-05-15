@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
 {
@@ -31,19 +12,19 @@ namespace SimpleInjector
     public partial class Container
     {
         /// <summary>
-        /// Ensures that the supplied <typeparamref name="TDecorator"/> decorator is returned, wrapping the 
-        /// original registered <typeparamref name="TService"/>, by injecting that service type into the 
-        /// constructor of the supplied <typeparamref name="TDecorator"/>. Multiple decorators may be applied 
-        /// to the same <typeparamref name="TService"/>. By default, a new <typeparamref name="TDecorator"/> 
-        /// instance will be returned on each request (according the 
-        /// <see cref="Lifestyle.Transient">Transient</see> lifestyle), independently of the lifestyle of the 
+        /// Ensures that the supplied <typeparamref name="TDecorator"/> decorator is returned, wrapping the
+        /// original registered <typeparamref name="TService"/>, by injecting that service type into the
+        /// constructor of the supplied <typeparamref name="TDecorator"/>. Multiple decorators may be applied
+        /// to the same <typeparamref name="TService"/>. By default, a new <typeparamref name="TDecorator"/>
+        /// instance will be returned on each request (according the
+        /// <see cref="Lifestyle.Transient">Transient</see> lifestyle), independently of the lifestyle of the
         /// wrapped service.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// This method uses the container's 
+        /// This method uses the container's
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
-        /// the exact lifestyle for the specified type. By default this will be 
+        /// the exact lifestyle for the specified type. By default this will be
         /// <see cref="Lifestyle.Transient">Transient</see>.
         /// </para>
         /// <para>
@@ -59,31 +40,31 @@ namespace SimpleInjector
         /// wraps the original service type.
         /// </para>
         /// <para>
-        /// Constructor injection will be used on that type, and although it may have many constructor 
-        /// arguments, it must have exactly one argument of the type of <typeparamref name="TService"/>, or an 
+        /// Constructor injection will be used on that type, and although it may have many constructor
+        /// arguments, it must have exactly one argument of the type of <typeparamref name="TService"/>, or an
         /// argument of type <see cref="Func{TResult}"/> where <b>TResult</b> is <typeparamref name="TService"/>.
         /// An exception will be thrown when this is not the case.
         /// </para>
         /// <para>
         /// The registered <typeparamref name="TDecorator"/> may have a constructor with an argument of type
         /// <see cref="Func{T}"/> where <b>T</b> is <typeparamref name="TService"/>. In this case, an decorated
-        /// instance will not injected into the <typeparamref name="TService"/>, but it will inject a 
+        /// instance will not injected into the <typeparamref name="TService"/>, but it will inject a
         /// <see cref="Func{TResult}"/> that allows creating instances of the decorated type, according to the
-        /// lifestyle of that type. This enables more advanced scenarios, such as executing the decorated 
-        /// types on a different thread, or executing decorated instance within a certain scope (such as a 
+        /// lifestyle of that type. This enables more advanced scenarios, such as executing the decorated
+        /// types on a different thread, or executing decorated instance within a certain scope (such as a
         /// lifetime scope).
         /// </para>
         /// </remarks>
         /// <example>
         /// Please see <see cref="RegisterDecorator(Type, Type)"/> for an example.
         /// </example>
-        /// <typeparam name="TService">The service type that will be wrapped by the given 
+        /// <typeparam name="TService">The service type that will be wrapped by the given
         /// <typeparamref name="TDecorator"/>.</typeparam>
         /// <typeparam name="TDecorator">The decorator type that will be used to wrap the original service type.
         /// </typeparam>
         /// <exception cref="ArgumentException">Thrown when <typeparamref name="TDecorator"/> does not
         /// have a single public constructor, or when <typeparamref name="TDecorator"/> does not
-        /// contain a constructor that has exactly one argument of type <typeparamref name="TService"/> or 
+        /// contain a constructor that has exactly one argument of type <typeparamref name="TService"/> or
         /// <see cref="Func{T}"/> where <b>T</b> is <typeparamref name="TService"/>.</exception>
         public void RegisterDecorator<TService, TDecorator>()
             where TService : class
@@ -94,10 +75,10 @@ namespace SimpleInjector
 
         /// <summary>
         /// Ensures that the supplied <typeparamref name="TDecorator"/> decorator is returned and cached with
-        /// the given <paramref name="lifestyle"/>, wrapping the original registered 
-        /// <typeparamref name="TService"/>, by injecting that service type into the constructor of the 
-        /// supplied <typeparamref name="TDecorator"/>. Multiple decorators may be applied to the same 
-        /// <typeparamref name="TService"/>. Decorators can be applied to both open, closed, and non-generic 
+        /// the given <paramref name="lifestyle"/>, wrapping the original registered
+        /// <typeparamref name="TService"/>, by injecting that service type into the constructor of the
+        /// supplied <typeparamref name="TDecorator"/>. Multiple decorators may be applied to the same
+        /// <typeparamref name="TService"/>. Decorators can be applied to both open, closed, and non-generic
         /// service types.
         /// </summary>
         /// <remarks>
@@ -114,15 +95,15 @@ namespace SimpleInjector
         /// wraps the original service type.
         /// </para>
         /// <para>
-        /// Constructor injection will be used on that type, and although it may have many constructor 
-        /// arguments, it must have exactly one argument of the type of <typeparamref name="TService"/>, or an 
+        /// Constructor injection will be used on that type, and although it may have many constructor
+        /// arguments, it must have exactly one argument of the type of <typeparamref name="TService"/>, or an
         /// argument of type <see cref="Func{TResult}"/> where <b>TResult</b> is <typeparamref name="TService"/>.
         /// An exception will be thrown when this is not the case.
         /// </para>
         /// <para>
         /// The registered <typeparamref name="TDecorator"/> may have a constructor with an argument of type
         /// <see cref="Func{T}"/> where <b>T</b> is <typeparamref name="TService"/>. In this case, the
-        /// will not inject the decorated <typeparamref name="TService"/> itself into the 
+        /// will not inject the decorated <typeparamref name="TService"/> itself into the
         /// <typeparamref name="TDecorator"/> instance, but it will inject a <see cref="Func{T}"/> that allows
         /// creating instances of the decorated type, according to the lifestyle of that type. This enables
         /// more advanced scenarios, such as executing the decorated types on a different thread, or executing
@@ -132,14 +113,14 @@ namespace SimpleInjector
         /// <example>
         /// Please see <see cref="RegisterDecorator(Type, Type)"/> for an example.
         /// </example>
-        /// <typeparam name="TService">The service type that will be wrapped by the given 
+        /// <typeparam name="TService">The service type that will be wrapped by the given
         /// <typeparamref name="TDecorator"/>.</typeparam>
         /// <typeparam name="TDecorator">The decorator type that will be used to wrap the original service type.</typeparam>
         /// <param name="lifestyle">The lifestyle that specifies how the returned decorator will be cached.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <typeparamref name="TDecorator"/>
-        /// does not have a single public constructor, or when <typeparamref name="TDecorator"/> does 
-        /// not contain a constructor that has exactly one argument of type 
+        /// does not have a single public constructor, or when <typeparamref name="TDecorator"/> does
+        /// not contain a constructor that has exactly one argument of type
         /// <typeparamref name="TService"/> or <see cref="Func{T}"/> where <b>T</b> is
         /// <typeparamref name="TService"/>.</exception>
         public void RegisterDecorator<TService, TDecorator>(Lifestyle lifestyle)
@@ -150,19 +131,19 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Ensures that the supplied <paramref name="decoratorType"/> decorator is returned, wrapping the 
-        /// original registered <paramref name="serviceType"/>, by injecting that service type into the 
-        /// constructor of the supplied <paramref name="decoratorType"/>. Multiple decorators may be applied 
-        /// to the same <paramref name="serviceType"/>. Decorators can be applied to both open, closed, and 
-        /// non-generic service types. By default, a new <paramref name="decoratorType"/> instance will be 
+        /// Ensures that the supplied <paramref name="decoratorType"/> decorator is returned, wrapping the
+        /// original registered <paramref name="serviceType"/>, by injecting that service type into the
+        /// constructor of the supplied <paramref name="decoratorType"/>. Multiple decorators may be applied
+        /// to the same <paramref name="serviceType"/>. Decorators can be applied to both open, closed, and
+        /// non-generic service types. By default, a new <paramref name="decoratorType"/> instance will be
         /// returned on each request (according the <see cref="Lifestyle.Transient">Transient</see> lifestyle),
         /// independently of the lifestyle of the wrapped service.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// This method uses the container's 
+        /// This method uses the container's
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
-        /// the exact lifestyle for the specified type. By default this will be 
+        /// the exact lifestyle for the specified type. By default this will be
         /// <see cref="Lifestyle.Transient">Transient</see>.
         /// </para>
         /// <para>
@@ -178,35 +159,35 @@ namespace SimpleInjector
         /// wraps the original service type.
         /// </para>
         /// <para>
-        /// Constructor injection will be used on that type, and although it may have many constructor 
-        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an 
+        /// Constructor injection will be used on that type, and although it may have many constructor
+        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an
         /// argument of type <see cref="Func{TResult}"/> where <b>TResult</b> is <paramref name="serviceType"/>.
         /// An exception will be thrown when this is not the case.
         /// </para>
         /// <para>
         /// The registered <paramref name="decoratorType"/> may have a constructor with an argument of type
         /// <see cref="Func{T}"/> where <b>T</b> is <paramref name="serviceType"/>. In this case, an decorated
-        /// instance will not injected into the <paramref name="decoratorType"/>, but it will inject a 
+        /// instance will not injected into the <paramref name="decoratorType"/>, but it will inject a
         /// <see cref="Func{TResult}"/> that allows creating instances of the decorated type, according to the
-        /// lifestyle of that type. This enables more advanced scenarios, such as executing the decorated 
-        /// types on a different thread, or executing decorated instance within a certain scope (such as a 
+        /// lifestyle of that type. This enables more advanced scenarios, such as executing the decorated
+        /// types on a different thread, or executing decorated instance within a certain scope (such as a
         /// lifetime scope).
         /// </para>
         /// </remarks>
         /// <example>
         /// The following example shows the definition of a generic <b>ICommandHandler&lt;T&gt;</b> interface,
-        /// a <b>CustomerMovedCommandHandler</b> implementing that interface, and a 
+        /// a <b>CustomerMovedCommandHandler</b> implementing that interface, and a
         /// <b>ValidatorCommandHandlerDecorator&lt;T&gt;</b> that acts as a decorator for that interface.
         /// <code lang="cs"><![CDATA[
         /// using System.ComponentModel.DataAnnotations;
         /// using System.Diagnostics;
         /// using System.Linq;
-        /// 
+        ///
         /// using Microsoft.VisualStudio.TestTools.UnitTesting;
-        /// 
+        ///
         /// using SimpleInjector;
         /// using SimpleInjector.Extensions;
-        /// 
+        ///
         /// public interface ICommandHandler<TCommand>
         /// {
         ///     void Handle(TCommand command);
@@ -260,7 +241,7 @@ namespace SimpleInjector
         ///         Validator.ValidateObject(command, validationContext);
         ///     }
         /// }
-        /// 
+        ///
         /// // Decorator that measures the time it takes to execute a command.
         /// public class MonitoringCommandHandlerDecorator<TCommand>
         ///     : ICommandHandler<TCommand>
@@ -286,7 +267,7 @@ namespace SimpleInjector
         ///             command.GetType().Name, watch.ElapsedMilliseconds));
         ///     }
         /// }
-        /// 
+        ///
         /// [TestMethod]
         /// public static void TestRegisterOpenGenericDecorator()
         /// {
@@ -295,7 +276,7 @@ namespace SimpleInjector
         ///
         ///     container.Register<ILogger, DebugLogger>(Lifestyle.Singleton);
         ///
-        ///     // Search the given assembly and register all concrete types that 
+        ///     // Search the given assembly and register all concrete types that
         ///     // implement ICommandHandler<TCommand>.
         ///     container.RegisterManyForOpenGeneric(typeof(ICommandHandler<>),
         ///         typeof(ICommandHandler<>).Assembly);
@@ -317,25 +298,25 @@ namespace SimpleInjector
         ///         });
         ///
         ///     // Act
-        ///     var handler = 
+        ///     var handler =
         ///         container.GetInstance<ICommandHandler<CustomerMovedCommand>>();
         ///
         ///     // Assert
-        ///     Assert.IsInstanceOfType(handler, 
+        ///     Assert.IsInstanceOfType(handler,
         ///         typeof(ValidatorCommandHandlerDecorator<CustomerMovedCommand>));
         /// }
         /// ]]></code>
         /// </example>
-        /// <param name="serviceType">The (possibly open generic) service type that will be wrapped by the 
+        /// <param name="serviceType">The (possibly open generic) service type that will be wrapped by the
         /// given <paramref name="decoratorType"/>.</param>
         /// <param name="decoratorType">The (possibly the open generic) decorator type that will
         /// be used to wrap the original service type.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/>  is not
-        /// an open generic type, when <paramref name="decoratorType"/> does not inherit from or implement 
+        /// an open generic type, when <paramref name="decoratorType"/> does not inherit from or implement
         /// <paramref name="serviceType"/>, when <paramref name="decoratorType"/> does not
         /// have a single public constructor, or when <paramref name="decoratorType"/> does not
-        /// contain a constructor that has exactly one argument of type 
+        /// contain a constructor that has exactly one argument of type
         /// <paramref name="serviceType"/> or <see cref="Func{T}"/> where <b>T</b> is
         /// <paramref name="serviceType"/>.</exception>
         public void RegisterDecorator(Type serviceType, Type decoratorType)
@@ -345,10 +326,10 @@ namespace SimpleInjector
 
         /// <summary>
         /// Ensures that the supplied <paramref name="decoratorType"/> decorator is returned and cached with
-        /// the given <paramref name="lifestyle"/>, wrapping the original registered 
-        /// <paramref name="serviceType"/>, by injecting that service type into the constructor of the 
-        /// supplied <paramref name="decoratorType"/>. Multiple decorators may be applied to the same 
-        /// <paramref name="serviceType"/>. Decorators can be applied to both open, closed, and non-generic 
+        /// the given <paramref name="lifestyle"/>, wrapping the original registered
+        /// <paramref name="serviceType"/>, by injecting that service type into the constructor of the
+        /// supplied <paramref name="decoratorType"/>. Multiple decorators may be applied to the same
+        /// <paramref name="serviceType"/>. Decorators can be applied to both open, closed, and non-generic
         /// service types.
         /// </summary>
         /// <remarks>
@@ -365,15 +346,15 @@ namespace SimpleInjector
         /// wraps the original service type.
         /// </para>
         /// <para>
-        /// Constructor injection will be used on that type, and although it may have many constructor 
-        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an 
+        /// Constructor injection will be used on that type, and although it may have many constructor
+        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an
         /// argument of type <see cref="Func{TResult}"/> where <b>TResult</b> is <paramref name="serviceType"/>.
         /// An exception will be thrown when this is not the case.
         /// </para>
         /// <para>
         /// The registered <paramref name="decoratorType"/> may have a constructor with an argument of type
         /// <see cref="Func{T}"/> where <b>T</b> is <paramref name="serviceType"/>. In this case, the
-        /// will not inject the decorated <paramref name="serviceType"/> itself into the 
+        /// will not inject the decorated <paramref name="serviceType"/> itself into the
         /// <paramref name="decoratorType"/> instance, but it will inject a <see cref="Func{T}"/> that allows
         /// creating instances of the decorated type, according to the lifestyle of that type. This enables
         /// more advanced scenarios, such as executing the decorated types on a different thread, or executing
@@ -391,10 +372,10 @@ namespace SimpleInjector
         /// <param name="lifestyle">The lifestyle that specifies how the returned decorator will be cached.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is not
-        /// an open generic type, when <paramref name="decoratorType"/> does not inherit from or 
+        /// an open generic type, when <paramref name="decoratorType"/> does not inherit from or
         /// implement <paramref name="serviceType"/>, when <paramref name="decoratorType"/>
-        /// does not have a single public constructor, or when <paramref name="decoratorType"/> does 
-        /// not contain a constructor that has exactly one argument of type 
+        /// does not have a single public constructor, or when <paramref name="decoratorType"/> does
+        /// not contain a constructor that has exactly one argument of type
         /// <paramref name="serviceType"/> or <see cref="Func{T}"/> where <b>T</b> is
         /// <paramref name="serviceType"/>.</exception>
         public void RegisterDecorator(Type serviceType, Type decoratorType, Lifestyle lifestyle)
@@ -404,10 +385,10 @@ namespace SimpleInjector
 
         /// <summary>
         /// Ensures that the supplied <paramref name="decoratorType"/> decorator is returned when the supplied
-        /// <paramref name="predicate"/> returns <b>true</b> and cached with the given 
-        /// <paramref name="lifestyle"/>, wrapping the original registered <paramref name="serviceType"/>, by 
-        /// injecting that service type into the constructor of the supplied <paramref name="decoratorType"/>. 
-        /// Multiple decorators may be applied to the same <paramref name="serviceType"/>. Decorators can be 
+        /// <paramref name="predicate"/> returns <b>true</b> and cached with the given
+        /// <paramref name="lifestyle"/>, wrapping the original registered <paramref name="serviceType"/>, by
+        /// injecting that service type into the constructor of the supplied <paramref name="decoratorType"/>.
+        /// Multiple decorators may be applied to the same <paramref name="serviceType"/>. Decorators can be
         /// applied to both open, closed, and non-generic service types.
         /// </summary>
         /// <remarks>
@@ -424,15 +405,15 @@ namespace SimpleInjector
         /// wraps the original service type.
         /// </para>
         /// <para>
-        /// Constructor injection will be used on that type, and although it may have many constructor 
-        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an 
+        /// Constructor injection will be used on that type, and although it may have many constructor
+        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an
         /// argument of type <see cref="Func{TResult}"/> where <b>TResult</b> is <paramref name="serviceType"/>.
         /// An exception will be thrown when this is not the case.
         /// </para>
         /// <para>
         /// The registered <paramref name="decoratorType"/> may have a constructor with an argument of type
         /// <see cref="Func{T}"/> where <b>T</b> is <paramref name="serviceType"/>. In this case, the
-        /// will not inject the decorated <paramref name="serviceType"/> itself into the 
+        /// will not inject the decorated <paramref name="serviceType"/> itself into the
         /// <paramref name="decoratorType"/> instance, but it will inject a <see cref="Func{T}"/> that allows
         /// creating instances of the decorated type, according to the lifestyle of that type. This enables
         /// more advanced scenarios, such as executing the decorated types on a different thread, or executing
@@ -448,14 +429,14 @@ namespace SimpleInjector
         /// <param name="decoratorType">The definition of the (possibly open generic) decorator type that will
         /// be used to wrap the original service type.</param>
         /// <param name="lifestyle">The lifestyle that specifies how the returned decorator will be cached.</param>
-        /// <param name="predicate">The predicate that determines whether the 
+        /// <param name="predicate">The predicate that determines whether the
         /// <paramref name="decoratorType"/> must be applied to a service type.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is not
-        /// an open generic type, when <paramref name="decoratorType"/> does not inherit from or 
+        /// an open generic type, when <paramref name="decoratorType"/> does not inherit from or
         /// implement <paramref name="serviceType"/>, when <paramref name="decoratorType"/>
-        /// does not have a single public constructor, or when <paramref name="decoratorType"/> does 
-        /// not contain a constructor that has exactly one argument of type 
+        /// does not have a single public constructor, or when <paramref name="decoratorType"/> does
+        /// not contain a constructor that has exactly one argument of type
         /// <paramref name="serviceType"/> or <see cref="Func{T}"/> where <b>T</b> is
         /// <paramref name="serviceType"/>.</exception>
         public void RegisterDecorator(
@@ -470,18 +451,18 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Ensures that the decorator type that is returned from <paramref name="decoratorTypeFactory"/> is 
-        /// supplied when the supplied <paramref name="predicate"/> returns <b>true</b> and cached with the given 
-        /// <paramref name="lifestyle"/>, wrapping the original registered <paramref name="serviceType"/>, by 
+        /// Ensures that the decorator type that is returned from <paramref name="decoratorTypeFactory"/> is
+        /// supplied when the supplied <paramref name="predicate"/> returns <b>true</b> and cached with the given
+        /// <paramref name="lifestyle"/>, wrapping the original registered <paramref name="serviceType"/>, by
         /// injecting that service type into the constructor of the decorator type that is returned by the
-        /// supplied <paramref name="decoratorTypeFactory"/>. 
-        /// Multiple decorators may be applied to the same <paramref name="serviceType"/>. Decorators can be 
+        /// supplied <paramref name="decoratorTypeFactory"/>.
+        /// Multiple decorators may be applied to the same <paramref name="serviceType"/>. Decorators can be
         /// applied to both open, closed, and non-generic service types.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// The types returned from the <paramref name="decoratorTypeFactory"/> may be non-generic, 
-        /// closed-generic, open-generic and even partially-closed generic. The container will try to fill in 
+        /// The types returned from the <paramref name="decoratorTypeFactory"/> may be non-generic,
+        /// closed-generic, open-generic and even partially-closed generic. The container will try to fill in
         /// the generic parameters based on the resolved service type.
         /// </para>
         /// <para>
@@ -497,15 +478,15 @@ namespace SimpleInjector
         /// wraps the original service type.
         /// </para>
         /// <para>
-        /// Constructor injection will be used on that type, and although it may have many constructor 
-        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an 
+        /// Constructor injection will be used on that type, and although it may have many constructor
+        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an
         /// argument of type <see cref="Func{TResult}"/> where <b>TResult</b> is <paramref name="serviceType"/>.
         /// An exception will be thrown when this is not the case.
         /// </para>
         /// <para>
-        /// The type returned from <paramref name="decoratorTypeFactory"/> may have a constructor with an 
-        /// argument of type <see cref="Func{T}"/> where <b>T</b> is <paramref name="serviceType"/>. In this 
-        /// case, the library will not inject the decorated <paramref name="serviceType"/> itself into the 
+        /// The type returned from <paramref name="decoratorTypeFactory"/> may have a constructor with an
+        /// argument of type <see cref="Func{T}"/> where <b>T</b> is <paramref name="serviceType"/>. In this
+        /// case, the library will not inject the decorated <paramref name="serviceType"/> itself into the
         /// decorator instance, but it will inject a <see cref="Func{T}"/> that allows
         /// creating instances of the decorated type, according to the lifestyle of that type. This enables
         /// more advanced scenarios, such as executing the decorated types on a different thread, or executing
@@ -516,7 +497,7 @@ namespace SimpleInjector
         /// The following is an example of the registration of a decorator through the factory delegate:
         /// <code lang="cs"><![CDATA[
         /// container.Register<ICommandHandler<MoveCustomerCommand>, MoveCustomerCommandHandler>();
-        /// 
+        ///
         /// container.RegisterDecorator(
         ///     typeof(ICommandHandler<>),
         ///     context => typeof(LoggingCommandHandler<,>).MakeGenericType(
@@ -524,12 +505,12 @@ namespace SimpleInjector
         ///         context.ImplementationType),
         ///     Lifestyle.Transient,
         ///     context => true);
-        ///     
+        ///
         /// var handler = container.GetInstance<ICommandHandler<MoveCustomerCommand>>();
-        /// 
+        ///
         /// Assert.IsInstanceOfType(handler,
         ///     typeof(LoggingCommandHandler<MoveCustomerCommand, MoveCustomerCommandHandler>));
-        /// 
+        ///
         /// ]]></code>
         /// The code above allows a generic <b>LoggingCommandHandler&lt;TCommand, TImplementation&gt;</b> to
         /// be applied to command handlers, where the second generic argument will be filled in using the
@@ -541,7 +522,7 @@ namespace SimpleInjector
         /// decorators to inject, based on the given contextual information. The delegate is allowed to return
         /// (partially) open-generic types.</param>
         /// <param name="lifestyle">The lifestyle that specifies how the returned decorator will be cached.</param>
-        /// <param name="predicate">The predicate that determines whether the decorator must be applied to a 
+        /// <param name="predicate">The predicate that determines whether the decorator must be applied to a
         /// service type.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         public void RegisterDecorator(
@@ -564,19 +545,19 @@ namespace SimpleInjector
 
         /// <summary>
         /// Ensures that the supplied <paramref name="decoratorType"/> decorator is returned when the supplied
-        /// <paramref name="predicate"/> returns <b>true</b>, wrapping the original registered 
-        /// <paramref name="serviceType"/>, by injecting that service type into the constructor of the 
-        /// supplied <paramref name="decoratorType"/>. Multiple decorators may be applied to the same 
-        /// <paramref name="serviceType"/>. Decorators can be applied to both open, closed, and non-generic 
-        /// service types. By default, a new <paramref name="decoratorType"/> instance will be returned on 
-        /// each request (according the <see cref="Lifestyle.Transient">Transient</see> lifestyle), 
+        /// <paramref name="predicate"/> returns <b>true</b>, wrapping the original registered
+        /// <paramref name="serviceType"/>, by injecting that service type into the constructor of the
+        /// supplied <paramref name="decoratorType"/>. Multiple decorators may be applied to the same
+        /// <paramref name="serviceType"/>. Decorators can be applied to both open, closed, and non-generic
+        /// service types. By default, a new <paramref name="decoratorType"/> instance will be returned on
+        /// each request (according the <see cref="Lifestyle.Transient">Transient</see> lifestyle),
         /// independently of the lifestyle of the wrapped service.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// This method uses the container's 
+        /// This method uses the container's
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
-        /// the exact lifestyle for the specified type. By default this will be 
+        /// the exact lifestyle for the specified type. By default this will be
         /// <see cref="Lifestyle.Transient">Transient</see>.
         /// </para>
         /// <para>
@@ -592,15 +573,15 @@ namespace SimpleInjector
         /// wraps the original service type.
         /// </para>
         /// <para>
-        /// Constructor injection will be used on that type, and although it may have many constructor 
-        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an 
+        /// Constructor injection will be used on that type, and although it may have many constructor
+        /// arguments, it must have exactly one argument of the type of <paramref name="serviceType"/>, or an
         /// argument of type <see cref="Func{TResult}"/> where <b>TResult</b> is <paramref name="serviceType"/>.
         /// An exception will be thrown when this is not the case.
         /// </para>
         /// <para>
         /// The registered <paramref name="decoratorType"/> may have a constructor with an argument of type
         /// <see cref="Func{T}"/> where <b>T</b> is <paramref name="serviceType"/>. In this case, the
-        /// will not inject the decorated <paramref name="serviceType"/> itself into the 
+        /// will not inject the decorated <paramref name="serviceType"/> itself into the
         /// <paramref name="decoratorType"/> instance, but it will inject a <see cref="Func{T}"/> that allows
         /// creating instances of the decorated type, according to the lifestyle of that type. This enables
         /// more advanced scenarios, such as executing the decorated types on a different thread, or executing
@@ -615,13 +596,13 @@ namespace SimpleInjector
         /// be wrapped by the given <paramref name="decoratorType"/>.</param>
         /// <param name="decoratorType">The definition of the (possibly open generic) decorator type that will
         /// be used to wrap the original service type.</param>
-        /// <param name="predicate">The predicate that determines whether the 
+        /// <param name="predicate">The predicate that determines whether the
         /// <paramref name="decoratorType"/> must be applied to a service type.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="decoratorType"/> does not inherit 
+        /// <exception cref="ArgumentException">Thrown when <paramref name="decoratorType"/> does not inherit
         /// from or implement <paramref name="serviceType"/>, when <paramref name="decoratorType"/>
-        /// does not have a single public constructor, or when <paramref name="decoratorType"/> does 
-        /// not contain a constructor that has exactly one argument of type 
+        /// does not have a single public constructor, or when <paramref name="decoratorType"/> does
+        /// not contain a constructor that has exactly one argument of type
         /// <paramref name="serviceType"/> or <see cref="Func{T}"/> where <b>T</b> is
         /// <paramref name="serviceType"/>.</exception>
         public void RegisterDecorator(

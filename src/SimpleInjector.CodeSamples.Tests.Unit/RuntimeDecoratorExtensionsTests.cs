@@ -77,14 +77,14 @@
             container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerProxy<>), Lifestyle.Singleton);
 
             // Act
-            var handler1 = 
+            var handler1 =
                 ((CommandHandlerProxy<RealCommand>)container.GetInstance<ICommandHandler<RealCommand>>())
                 .DecorateeFactory();
 
             // Runtime switch
             decorateHandler = true;
 
-            var handler2 = 
+            var handler2 =
                 ((CommandHandlerProxy<RealCommand>)container.GetInstance<ICommandHandler<RealCommand>>())
                 .DecorateeFactory();
 
@@ -99,7 +99,7 @@
             // Arrange
             var container = new Container();
 
-            container.Options.LifestyleSelectionBehavior = 
+            container.Options.LifestyleSelectionBehavior =
                 new CustomLifestyleSelectionBehavior(Lifestyle.Singleton);
 
             container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();

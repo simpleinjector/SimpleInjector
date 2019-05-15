@@ -221,7 +221,7 @@
             container.GetInstance<ConcreteCommand>();
 
             // Assert
-            Assert.AreEqual(1, numberOfCalls, 
+            Assert.AreEqual(1, numberOfCalls,
                 "The initializer was expected to be called just once for singletons.");
         }
 
@@ -244,8 +244,8 @@
             container.GetInstance<ICommand>();
             container.GetInstance<ICommand>();
 
-            // The registered delegate for type RegisterInitializerTests+ICommand threw an exception. 
-            // Attempt by method 'Expression.CreateLambda(Type, Expression, String, Boolean, ReadOnlyCollection`1)' 
+            // The registered delegate for type RegisterInitializerTests+ICommand threw an exception.
+            // Attempt by method 'Expression.CreateLambda(Type, Expression, String, Boolean, ReadOnlyCollection`1)'
             // to access method 'Expression`1>.Create(Expression, String, Boolean, ReadOnlyCollection`1)' failed.
 
             // Assert
@@ -271,7 +271,7 @@
 
             // Assert
             Assert.IsFalse(initializerWasCalled,
-                "Since only ICommand is 'staticly' available information, the initializer for " + 
+                "Since only ICommand is 'staticly' available information, the initializer for " +
                 "ConcreteCommand should never fire. The performance hit would be too big.");
         }
 

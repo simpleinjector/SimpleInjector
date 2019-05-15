@@ -14,7 +14,7 @@ namespace SimpleInjector.CodeSamples
     // Register this as follows:
     // container.Options.ConstructorResolutionBehavior =
     //     new MostResolvableParametersConstructorResolutionBehavior(container);
-    public class MostResolvableParametersConstructorResolutionBehavior 
+    public class MostResolvableParametersConstructorResolutionBehavior
         : IConstructorResolutionBehavior {
         private readonly Container container;
 
@@ -62,7 +62,7 @@ namespace SimpleInjector.CodeSamples
         private static string TypeShouldHaveConstructorWithResolvableTypes(Type type) =>
             string.Format(CultureInfo.InvariantCulture,
                 "For the container to be able to create {0}, it should contain a public " +
-                "constructor that only contains parameters that can be resolved.", 
+                "constructor that only contains parameters that can be resolved.",
                 type.ToFriendlyName());
     }
 }

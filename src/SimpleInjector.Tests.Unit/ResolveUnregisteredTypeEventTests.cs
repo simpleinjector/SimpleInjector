@@ -113,9 +113,9 @@ namespace SimpleInjector.Tests.Unit
         {
             // Arrange
             string expectedMessage = @"
-                No registration for type RealUserService could be found and an implicit registration could not 
+                No registration for type RealUserService could be found and an implicit registration could not
                 be made. The constructor of type RealUserService contains the parameter with name 'repository'
-                and type IUserRepository that is not registered. Please ensure IUserRepository 
+                and type IUserRepository that is not registered. Please ensure IUserRepository
                 is registered, or change the constructor of RealUserService."
                 .TrimInside();
 
@@ -123,7 +123,7 @@ namespace SimpleInjector.Tests.Unit
             var container = ContainerFactory.New();
 
             // Act
-            // RealUserService is a concrete class with a constructor with a single argument of type 
+            // RealUserService is a concrete class with a constructor with a single argument of type
             // IUserRepository.
             Action action = () => container.GetInstance<RealUserService>();
 
@@ -147,7 +147,7 @@ namespace SimpleInjector.Tests.Unit
             };
 
             // Act
-            // IUserRepository wasn't registered. Therefore, the concrete RealUserService type can not be 
+            // IUserRepository wasn't registered. Therefore, the concrete RealUserService type can not be
             // created without unregistered type resolution.
             var actualInstance = container.GetInstance<RealUserService>();
 
@@ -428,10 +428,10 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                The delegate that was registered for service type IUserRepository using the 
+                The delegate that was registered for service type IUserRepository using the
                 UnregisteredTypeEventArgs.Register(Func<object>) method returned an object that couldn't
-                be casted to IUserRepository. 
-                Unable to cast object of type 'SimpleInjector.Tests.Unit.RealUserService' 
+                be casted to IUserRepository.
+                Unable to cast object of type 'SimpleInjector.Tests.Unit.RealUserService'
                 to type 'SimpleInjector.Tests.Unit.IUserRepository'.".TrimInside(),
                 action,
                 "Exception message was not descriptive enough.");
@@ -459,8 +459,8 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                The delegate that was registered for service type IUserRepository using the 
-                UnregisteredTypeEventArgs.Register(Func<object>) method threw an exception. 
+                The delegate that was registered for service type IUserRepository using the
+                UnregisteredTypeEventArgs.Register(Func<object>) method threw an exception.
                 Some stupid exception.".TrimInside(),
                 action,
                 "Exception message was not descriptive enough.");
@@ -626,7 +626,7 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                No registration for type ConcreteCommand could be found and an implicit registration 
+                No registration for type ConcreteCommand could be found and an implicit registration
                 could not be made. Note that the container's Options.ResolveUnregisteredConcreteTypes
                 option is set to 'false'. This disallows the container to construct this unregistered
                 concrete type."
@@ -650,9 +650,9 @@ namespace SimpleInjector.Tests.Unit
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 The constructor of type ServiceDependingOn<ConcreteCommand> contains
                 the parameter with name 'dependency' and type ConcreteCommand that is not
-                registered. Please ensure ConcreteCommand is registered, or change the constructor of 
+                registered. Please ensure ConcreteCommand is registered, or change the constructor of
                 ServiceDependingOn<ConcreteCommand>. Note that the container's
-                Options.ResolveUnregisteredConcreteTypes option is set to 'false'. This disallows the 
+                Options.ResolveUnregisteredConcreteTypes option is set to 'false'. This disallows the
                 container to construct this unregistered concrete type."
                 .TrimInside(),
                 action);

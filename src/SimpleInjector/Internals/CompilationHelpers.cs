@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2013-2014 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Internals
 {
@@ -48,7 +29,7 @@ namespace SimpleInjector.Internals
 
             var singleton = (TResult)value;
 
-            // This lambda will be a tiny little bit faster than a compiled delegate and 
+            // This lambda will be a tiny little bit faster than a compiled delegate and
             return () => singleton;
         }
 
@@ -88,9 +69,9 @@ namespace SimpleInjector.Internals
 
             Delegate? compiledLambda = null;
 
-            // In the common case, the developer will/should only create a single container during the 
+            // In the common case, the developer will/should only create a single container during the
             // lifetime of the application (this is the recommended approach). In this case, we can optimize
-            // the performance by compiling delegates in an dynamic assembly. We can't do this when the 
+            // the performance by compiling delegates in an dynamic assembly. We can't do this when the
             // developer creates many containers, because this will create a memory leak (dynamic assemblies
             // are never unloaded).
             if (container.Options.EnableDynamicAssemblyCompilation)
@@ -140,7 +121,7 @@ namespace SimpleInjector.Internals
         //         new SomeQueryHandler(reg1.GetInstance()), // Hits ThreadLocal, hits dictionary
         //         new SomeCommandHandler(reg2.GetInstance())); // Hits ThreadLocal, hits dictionary
         // };
-        // After: 
+        // After:
         // Func<HomeController> factory = () =>
         // {
         //     var scope1 = new LazyScope(scopeFactory1, container);
@@ -204,7 +185,7 @@ namespace SimpleInjector.Internals
 
         // Reduces the size of a supplied expression tree by compiling parts of the tree into individual
         // delegates. Besides preventing the CLR from throwing stack overflow exceptions (which will happen
-        // when the tree gets somewhere between 20,000 and 50,000 nodes), this can reduce the amount of code 
+        // when the tree gets somewhere between 20,000 and 50,000 nodes), this can reduce the amount of code
         // that needs to be JITted and can therefore reduce the memory footprint of the application.
         private static Expression ReduceObjectGraphSize(
             Expression expression,

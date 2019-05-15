@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2013-2016 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 // This class is placed in the root namespace to allow users to start using these extension methods after
 // adding the assembly reference, without find and add the correct namespace.
@@ -37,13 +18,13 @@ namespace SimpleInjector
     {
         /// <summary>
         /// Registers that one instance of <typeparamref name="TConcrete"/> will be returned for every web
-        /// request and ensures that -if <typeparamref name="TConcrete"/> implements 
-        /// <see cref="IDisposable"/>- this instance will get disposed on the end of the web request. 
+        /// request and ensures that -if <typeparamref name="TConcrete"/> implements
+        /// <see cref="IDisposable"/>- this instance will get disposed on the end of the web request.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <typeparamref name="TConcrete"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
@@ -65,9 +46,9 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers that one instance of <typeparamref name="TImplementation"/> will be returned for every 
-        /// web request every time a <typeparamref name="TService"/> is requested and ensures that -if 
-        /// <typeparamref name="TImplementation"/> implements <see cref="IDisposable"/>- this instance 
+        /// Registers that one instance of <typeparamref name="TImplementation"/> will be returned for every
+        /// web request every time a <typeparamref name="TService"/> is requested and ensures that -if
+        /// <typeparamref name="TImplementation"/> implements <see cref="IDisposable"/>- this instance
         /// will get disposed on the end of the web request.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.
@@ -75,9 +56,9 @@ namespace SimpleInjector
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
         /// <param name="container">The container to make the registrations in.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <typeparamref name="TService"/> has already been registered.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/>
         /// type is not a type that can be created by the container.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null

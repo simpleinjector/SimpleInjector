@@ -8,10 +8,10 @@
     /// </summary>
     public static class ResolvingExtensions
     {
-        public static bool CanGetInstance<T>(this Container container) => 
+        public static bool CanGetInstance<T>(this Container container) =>
             container.GetRegistration(typeof(T)) != null;
 
-        public static bool CanGetInstance(this Container container, Type serviceType) => 
+        public static bool CanGetInstance(this Container container, Type serviceType) =>
             container.GetRegistration(serviceType) != null;
 
         public static bool TryGetInstance<T>(this Container container, out T instance)

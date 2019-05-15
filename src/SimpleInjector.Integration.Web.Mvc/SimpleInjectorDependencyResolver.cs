@@ -1,24 +1,5 @@
-﻿#region Copyright Simple Injector Contributors
-/* The Simple Injector is an easy-to-use Inversion of Control library for .NET
- * 
- * Copyright (c) 2013-2015 Simple Injector Contributors
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
- * associated documentation files (the "Software"), to deal in the Software without restriction, including 
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
- * copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the 
- * following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial 
- * portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
- * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
- * EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-#endregion
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Integration.Web.Mvc
 {
@@ -37,10 +18,10 @@ namespace SimpleInjector.Integration.Web.Mvc
     ///     protected void Application_Start()
     ///     {
     ///         var container = new Container();
-    /// 
+    ///
     ///         // Make the container registrations, example:
     ///         // container.Register<IUserRepository, SqlUserRepository>();
-    /// 
+    ///
     ///         container.RegisterMvcControllers(Assembly.GetExecutingAssembly());
     ///         container.RegisterMvcIntegratedFilterProvider();
     ///
@@ -48,16 +29,16 @@ namespace SimpleInjector.Integration.Web.Mvc
     ///         // container, and register that resolver in MVC.
     ///         System.Web.Mvc.DependencyResolver.SetResolver(
     ///             new SimpleInjectorDependencyResolver(container));
-    /// 
+    ///
     ///         // Normal MVC stuff here
     ///         AreaRegistration.RegisterAllAreas();
-    /// 
+    ///
     ///         RegisterGlobalFilters(GlobalFilters.Filters);
     ///         RegisterRoutes(RouteTable.Routes);
     ///     }
     /// }
     /// ]]></code>
-    /// The previous example show the use of the 
+    /// The previous example show the use of the
     /// <see cref="SimpleInjectorMvcExtensions.RegisterMvcControllers">RegisterMvcControllers</see> and
     /// <see cref="SimpleInjectorMvcExtensions.RegisterMvcIntegratedFilterProvider">RegisterMvcIntegratedFilterProvider</see>
     /// extension methods and how the <b>SimpleInjectorDependencyResolver</b> can be used to set the created
@@ -95,7 +76,7 @@ namespace SimpleInjector.Integration.Web.Mvc
             // By calling GetInstance instead of GetService when resolving a controller, we prevent the
             // container from returning null when the controller isn't registered explicitly and can't be
             // created because of an configuration error. GetInstance will throw a descriptive exception
-            // instead. Not doing this will cause MVC to throw a non-descriptive "Make sure that the 
+            // instead. Not doing this will cause MVC to throw a non-descriptive "Make sure that the
             // controller has a parameterless public constructor" exception.
             if (!serviceType.IsAbstract && typeof(IController).IsAssignableFrom(serviceType))
             {
