@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -14,7 +14,7 @@ namespace SimpleInjector
 #if NET40 || NET45
     public partial class Container
     {
-        private static readonly Lazy<ModuleBuilder> LazyBuilder = new Lazy<ModuleBuilder>(() => 
+        private static readonly Lazy<ModuleBuilder> LazyBuilder = new Lazy<ModuleBuilder>(() =>
             AppDomain.CurrentDomain.DefineDynamicAssembly(
                 new AssemblyName("SimpleInjector.Compiled"),
                 AssemblyBuilderAccess.Run)

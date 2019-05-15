@@ -263,7 +263,7 @@
         public void VisualizeObjectGraph_DelayedCyclicReference_VisualizesTheExpectedObjectGraph()
         {
             // Arrange
-            string expectedGraph = 
+            string expectedGraph =
 @"InstanceProducerTests.NodeFactory( // Transient
     IEnumerable<InstanceProducerTests.INode>( // Singleton
         InstanceProducerTests.NodeFactory( // Transient

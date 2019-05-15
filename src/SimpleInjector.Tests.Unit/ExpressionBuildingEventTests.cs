@@ -555,9 +555,9 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 You are trying to set the ExpressionBuildingEventArgs.Expression property with an Expression
-                instance that has a type of String. The expression type however should be a 
+                instance that has a type of String. The expression type however should be a
                 SqlUserRepository (or a sub type). You can't change the type of the expression using the
-                ExpressionBuilding event. If you need to change the implementation, please use the 
+                ExpressionBuilding event. If you need to change the implementation, please use the
                 ExpressionBuilt event instead."
                 .TrimInside(),
                 action);

@@ -332,7 +332,7 @@
             container.Register<ILogger, NullLogger>(Lifestyle.Transient);
 
             // Act
-            // Resolve graph: 
+            // Resolve graph:
             // ServiceWithDependency<T> (Transient) -> ServiceDependingOn<T> (Singleton) -> NullLogger (Transient)
             Action action = () => container.GetInstance(typeof(ServiceWithDependency<ServiceDependingOn<ILogger>>));
 

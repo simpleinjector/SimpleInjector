@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Integration.Wcf
@@ -28,7 +28,7 @@ namespace SimpleInjector.Integration.Wcf
 
             Scope scope = AsyncScopedLifestyle.BeginScope(this.container);
 
-            // During the time that WCF calls ReleaseInstance, the ambient context provided by AsyncLocal<T> will be reset and 
+            // During the time that WCF calls ReleaseInstance, the ambient context provided by AsyncLocal<T> will be reset and
             // AsyncScopedLifestyle.GetCurrentScope will return null. That's why we have to attach the scope to the current
             // InstanceContext. This way we can still dispose the Scope during ReleaseInstance.
             Attach(instanceContext, scope);

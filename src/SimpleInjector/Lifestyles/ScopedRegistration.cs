@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Lifestyles
@@ -45,7 +45,7 @@ namespace SimpleInjector.Lifestyles
         }
 
         // This method needs to be public, because the BuildExpression methods build a
-        // MethodCallExpression using this method, and this would fail in partial trust when the 
+        // MethodCallExpression using this method, and this would fail in partial trust when the
         // method is not public.
         // Simple Injector does some aggressive optimizations for scoped lifestyles and this method will
         // is most cases not be called. It will however be called when the expression that is built by

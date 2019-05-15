@@ -7,7 +7,7 @@
 
     // There is no support for a Thread lifestyle in the core library, because this lifestyle is considered
     // harmful. It should not be used in web applications, because ASP.NET can finish a request on a different
-    // thread. This can cause a Per Thread instance to be used from another thread, which can cause all sorts 
+    // thread. This can cause a Per Thread instance to be used from another thread, which can cause all sorts
     // of race conditions. Even letting transient component depend on a per-thread component can cause trouble.
     // Instead of using Per Thread lifestyle, use ThreadScopedLifestyle instead.
     public sealed class ThreadLifestyle : Lifestyle
@@ -45,7 +45,7 @@
 
             private Func<TImplementation> instanceProducer;
 
-            public PerThreadRegistration(Lifestyle lifestyle, Container container, 
+            public PerThreadRegistration(Lifestyle lifestyle, Container container,
                 Func<TImplementation> instanceCreator = null)
                 : base(lifestyle, container)
             {

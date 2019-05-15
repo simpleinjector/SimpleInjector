@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Internals
@@ -8,7 +8,7 @@ namespace SimpleInjector.Internals
 
     /// <summary>
     /// Allows verifying whether a given type has a direct or indirect dependency on itself. Verifying is done
-    /// by preventing recursive calls to an InstanceProducer. A CyclicDependencyValidator instance checks a 
+    /// by preventing recursive calls to an InstanceProducer. A CyclicDependencyValidator instance checks a
     /// single InstanceProducer and therefore a single service type.
     /// </summary>
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",

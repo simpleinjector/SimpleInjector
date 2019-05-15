@@ -7,7 +7,7 @@
 
     internal static class TestHelpers
     {
-        public static string ToFriendlyNamesText(this IEnumerable<Type> types) => 
+        public static string ToFriendlyNamesText(this IEnumerable<Type> types) =>
             types.Select(type => type.ToFriendlyName()).ToCommaSeparatedText();
 
         public static Attribute[] GetCustomAttributes(this Type type, Type attributeType, bool inherit) =>

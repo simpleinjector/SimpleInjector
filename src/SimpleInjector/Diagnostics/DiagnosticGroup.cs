@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Diagnostics
@@ -35,7 +35,7 @@ namespace SimpleInjector.Diagnostics
         }
 
         /// <summary>
-        /// Gets the base <see cref="DiagnosticType"/> that describes the service types of its 
+        /// Gets the base <see cref="DiagnosticType"/> that describes the service types of its
         /// <see cref="Results"/>. The value often be either <see cref="System.Object"/> (in case this is a
         /// root group) or a partial generic type to allow hierarchical grouping of a large number of related
         /// generic types.

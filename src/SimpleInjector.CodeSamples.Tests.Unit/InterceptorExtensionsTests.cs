@@ -626,7 +626,7 @@
         [TestMethod]
         public void CallingAnInterceptedMethod_InterceptorThatChangesTheInputParameters_GetsForwardedToTheInterceptee()
         {
-            // Arrange  
+            // Arrange
             string expectedValue = "XYZ";
 
             var container = new Container();
@@ -657,7 +657,7 @@
         [TestMethod]
         public void CallingAnInterceptedMethod_InterceptorThatChangesAnOutputParameter_OutputParameterFlowsBackToTheCaller()
         {
-            // Arrange  
+            // Arrange
             string expectedOutValue = "KLM";
 
             var container = new Container();

@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Diagnostics
@@ -11,7 +11,7 @@ namespace SimpleInjector.Diagnostics
     using SimpleInjector.Diagnostics.Debugger;
 
     /// <summary>
-    /// Diagnostic result that warns about when a multiple registrations map to the same implementation type 
+    /// Diagnostic result that warns about when a multiple registrations map to the same implementation type
     /// and lifestyle, which might cause multiple instances to be created during the lifespan of that lifestyle.
     /// For more information, see: https://simpleinjector.org/diaal.
     /// </summary>

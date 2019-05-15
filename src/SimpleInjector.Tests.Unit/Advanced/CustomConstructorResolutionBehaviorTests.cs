@@ -21,11 +21,11 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The CustomConstructorResolutionBehaviorTests.NullReturningConstructorResolutionBehavior that 
-                was registered through Container.Options.ConstructorResolutionBehavior returned a null 
-                reference after its GetConstructor method was supplied with implementationType 
-                'RealTimeProvider'. IConstructorResolutionBehavior.GetConstructor implementations should 
-                never return null, but should throw a SimpleInjector.ActivationException with an expressive 
+                The CustomConstructorResolutionBehaviorTests.NullReturningConstructorResolutionBehavior that
+                was registered through Container.Options.ConstructorResolutionBehavior returned a null
+                reference after its GetConstructor method was supplied with implementationType
+                'RealTimeProvider'. IConstructorResolutionBehavior.GetConstructor implementations should
+                never return null, but should throw a SimpleInjector.ActivationException with an expressive
                 message instead."
                 .TrimInside(),
                 action);

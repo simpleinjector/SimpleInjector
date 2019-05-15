@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -12,7 +12,7 @@ namespace SimpleInjector
     using SimpleInjector.Lifestyles;
 
     /// <summary>
-    /// Extensions for configuring Simple Injector with ASP.NET Core using 
+    /// Extensions for configuring Simple Injector with ASP.NET Core using
     /// <see cref="SimpleInjectorAddOptions"/>.
     /// </summary>
     public static class SimpleInjectorAddOptionsAspNetCoreExtensions

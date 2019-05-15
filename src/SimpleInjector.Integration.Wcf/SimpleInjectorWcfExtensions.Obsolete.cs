@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 // This class is placed in the root namespace to allow users to start using these extension methods after
@@ -24,7 +24,7 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <typeparamref name="TConcrete"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
@@ -42,7 +42,7 @@ namespace SimpleInjector
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TImplementation"/> will be returned during
         /// the WCF configured lifetime of the WCF service class. When the WCF service class is released by
-        /// WCF and <typeparamref name="TImplementation"/> implements <see cref="IDisposable"/>, the cached 
+        /// WCF and <typeparamref name="TImplementation"/> implements <see cref="IDisposable"/>, the cached
         /// instance will be disposed as well.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
@@ -51,9 +51,9 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <typeparamref name="TService"/> has already been registered.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/>
         /// type is not a type that can be created by the container.
         /// </exception>
         [Obsolete("Please use Container.Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
@@ -74,7 +74,7 @@ namespace SimpleInjector
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>,
         /// and returned instances are cached during the WCF configured lifetime of the WCF service class.
-        /// When the WCF service class is released by WCF and the cached instance implements 
+        /// When the WCF service class is released by WCF and the cached instance implements
         /// <see cref="IDisposable"/>, that cached instance will be disposed as well.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
@@ -104,7 +104,7 @@ namespace SimpleInjector
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>,
         /// and returned instances are cached during the WCF configured lifetime of the WCF service class.
         /// When the WCF service class is released by WCF, <paramref name="disposeWhenRequestEnds"/> is set to
-        /// <b>true</b>, and the cached instance implements <see cref="IDisposable"/>, that cached instance 
+        /// <b>true</b>, and the cached instance implements <see cref="IDisposable"/>, that cached instance
         /// will be disposed as well.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>

@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Internals
@@ -84,7 +84,7 @@ namespace SimpleInjector.Internals
 
             var lambda = Expression.Lambda(
                 typeof(Func<,>).MakeGenericType(typeof(object[]), resultType),
-                replacedExpression, 
+                replacedExpression,
                 constantsParameter);
 
             Delegate create = CompileDelegateInDynamicAssembly(lambda);
@@ -105,8 +105,8 @@ namespace SimpleInjector.Internals
         private static Delegate CompileInDynamicAssemblyAsStatic(Type resultType, Expression expression)
         {
             LambdaExpression lambda = Expression.Lambda(
-                typeof(Func<>).MakeGenericType(resultType), 
-                expression, 
+                typeof(Func<>).MakeGenericType(resultType),
+                expression,
                 Helpers.Array<ParameterExpression>.Empty);
 
             return CompileDelegateInDynamicAssembly(lambda);
@@ -119,11 +119,11 @@ namespace SimpleInjector.Internals
                 constants, constantsParameter);
         }
 
-        private static Delegate CompileDelegateInDynamicAssembly(LambdaExpression lambda) => 
+        private static Delegate CompileDelegateInDynamicAssembly(LambdaExpression lambda) =>
             CompileLambdaInDynamicAssembly(lambda,
                 "DynamicInstanceProducer" + GetNextDynamicClassId(), "GetInstance");
 
-        private static List<ConstantExpression> GetConstants(Expression expression) => 
+        private static List<ConstantExpression> GetConstants(Expression expression) =>
             ConstantFinderVisitor.FindConstants(expression);
 
         private static long GetNextDynamicClassId() => Interlocked.Increment(ref dynamicClassCounter);
@@ -135,7 +135,7 @@ namespace SimpleInjector.Internals
         static partial void TryCompileInDynamicAssembly(Type resultType, Expression expression,
             ref Delegate compiledLambda)
         {
-            // HACK: Prevent "JIT Compiler encountered an internal limitation" exception while running in 
+            // HACK: Prevent "JIT Compiler encountered an internal limitation" exception while running in
             // the debugger with VS2013 (See work item 20904).
             if (Debugger.IsAttached)
             {
@@ -156,7 +156,7 @@ namespace SimpleInjector.Internals
                 {
                     var @delegate = CompileInDynamicAssembly(resultType, expression);
 
-                    // Test the creation. Since we're using a dynamically created assembly, we can't create 
+                    // Test the creation. Since we're using a dynamically created assembly, we can't create
                     // every delegate we can create using expression.Compile(), so we need to test this.
                     JitCompileDelegate(@delegate);
 

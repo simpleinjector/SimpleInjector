@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Internals
@@ -26,7 +26,7 @@ namespace SimpleInjector.Internals
         {
             lock (ServiceCreatedListenersLocker)
             {
-                var listeners = serviceCreatedListeners ?? 
+                var listeners = serviceCreatedListeners ??
                     (serviceCreatedListeners = new List<Action<ServiceCreatedListenerArgs>>());
 
                 listeners.Add(serviceCreated);
@@ -73,7 +73,7 @@ namespace SimpleInjector.Internals
         {
             var controlledRegistration = registration as ContainerControlledCollectionRegistration;
 
-            // We can only determine the value when registration is created using the 
+            // We can only determine the value when registration is created using the
             // CreateRegistrationForContainerControlledCollection method. When the registration is null the
             // collection might be registered as container-uncontrolled collection.
             return controlledRegistration?.Collection;

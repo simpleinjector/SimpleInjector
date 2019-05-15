@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Integration.Wcf
@@ -8,7 +8,7 @@ namespace SimpleInjector.Integration.Wcf
     using System.ServiceModel.Activation;
 
     /// <summary>
-    /// Factory that provides instances of <see cref="SimpleInjectorServiceHost"/> in managed hosting 
+    /// Factory that provides instances of <see cref="SimpleInjectorServiceHost"/> in managed hosting
     /// environments where the host instance is created dynamically in response to incoming messages.
     /// </summary>
     public class SimpleInjectorServiceHostFactory : ServiceHostFactory
@@ -34,21 +34,21 @@ namespace SimpleInjector.Integration.Wcf
             serviceType.GetServiceBehaviorAttribute()?.InstanceContextMode == InstanceContextMode.Single;
 
         /// <summary>
-        /// Creates a <see cref="SimpleInjectorServiceHost"/> for a specified type of service with a specific 
-        /// base address. 
+        /// Creates a <see cref="SimpleInjectorServiceHost"/> for a specified type of service with a specific
+        /// base address.
         /// </summary>
         /// <returns>
-        /// A <see cref="SimpleInjectorServiceHost"/> for the type of service specified with a specific base 
+        /// A <see cref="SimpleInjectorServiceHost"/> for the type of service specified with a specific base
         /// address.
         /// </returns>
         /// <param name="serviceType">
-        /// Specifies the type of service to host. 
+        /// Specifies the type of service to host.
         /// </param>
         /// <param name="baseAddresses">
-        /// The <see cref="T:System.Array"/> of type <see cref="T:System.Uri"/> that contains the base 
+        /// The <see cref="T:System.Array"/> of type <see cref="T:System.Uri"/> that contains the base
         /// addresses for the service hosted.
         /// </param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceType"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceType"/> is a null
         /// reference.</exception>
         protected override ServiceHost CreateServiceHost(Type serviceType, Uri[] baseAddresses)
         {
@@ -67,7 +67,7 @@ namespace SimpleInjector.Integration.Wcf
 
             InstanceProducer producer = container.GetRegistration(serviceType, true);
 
-            // Force building the expression tree. Decorators and interceptors might be applied at this point, 
+            // Force building the expression tree. Decorators and interceptors might be applied at this point,
             // causing the lifestyle and registration properties to change.
             producer.BuildExpression();
 

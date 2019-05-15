@@ -33,7 +33,7 @@
             container.Register<IContextualLogger, ContextualLogger>();
 
             // Act
-            Action action = () => 
+            Action action = () =>
                 container.RegisterWithContext<IContextualLogger>(context => new ContextualLogger(context));
 
             // Assert
@@ -195,7 +195,7 @@
 
             container.Register<IRepository, RepositoryThatDependsOnLogger>(Lifestyle.Transient);
 
-            // Since InterceptWith alters the Expression of ILogger, this would make it harder for 
+            // Since InterceptWith alters the Expression of ILogger, this would make it harder for
             // the Expression visitor of RegisterWithContext to find and alter this expression. So this is
             // an interesting test.
             container.InterceptWith<FakeInterceptor>(type => type == typeof(IContextualLogger));

@@ -325,7 +325,7 @@
             // Arrange
             var container = new Container();
 
-            AddConventions(container, 
+            AddConventions(container,
                 new OptionalParameterConvention(container.Options.DependencyInjectionBehavior));
 
             // Act

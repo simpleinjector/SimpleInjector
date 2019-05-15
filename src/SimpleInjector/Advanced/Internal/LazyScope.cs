@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Advanced.Internal
@@ -7,7 +7,7 @@ namespace SimpleInjector.Advanced.Internal
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// This is an internal type. Only depend on this type when you want to be absolutely sure a future 
+    /// This is an internal type. Only depend on this type when you want to be absolutely sure a future
     /// version of the framework will break your code.
     /// </summary>
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]

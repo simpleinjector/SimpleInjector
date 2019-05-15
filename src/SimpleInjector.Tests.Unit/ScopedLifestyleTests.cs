@@ -134,7 +134,7 @@
             Exception lastThrownException = new Exception();
 
             var disposables = new List<DisposableObject>
-            { 
+            {
                 // Since the objects are disposed in reverse order, the first object is disposed last, and
                 // this exception is expected to bubble up.
                 new DisposableObject(exceptionToThrow: lastThrownException),
@@ -516,8 +516,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                The registered delegate for type IPlugin threw an exception. A recursive registration of 
-                Action or IDisposable instances was detected during disposal of the scope. 
+                The registered delegate for type IPlugin threw an exception. A recursive registration of
+                Action or IDisposable instances was detected during disposal of the scope.
                 This is possibly caused by a component that is directly or indirectly depending on itself"
                 .TrimInside(),
                 action);
@@ -550,8 +550,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                The registered delegate for type IPlugin threw an exception. A recursive registration of 
-                Action or IDisposable instances was detected during disposal of the scope. 
+                The registered delegate for type IPlugin threw an exception. A recursive registration of
+                Action or IDisposable instances was detected during disposal of the scope.
                 This is possibly caused by a component that is directly or indirectly depending on itself"
                 .TrimInside(),
                 action);

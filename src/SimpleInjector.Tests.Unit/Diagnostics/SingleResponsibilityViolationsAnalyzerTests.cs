@@ -1,4 +1,4 @@
-namespace SimpleInjector.Diagnostics.Tests.Unit
+﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System;
     using System.Collections.Generic;

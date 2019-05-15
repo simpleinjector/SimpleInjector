@@ -27,7 +27,7 @@
                 this.baseBehavior = baseBehavior;
             }
 
-            public bool SelectProperty(Type t, PropertyInfo p) => 
+            public bool SelectProperty(Type t, PropertyInfo p) =>
                 this.IsPropertyDecoratedWithAttribute(p) || this.baseBehavior.SelectProperty(t, p);
 
             private bool IsPropertyDecoratedWithAttribute(PropertyInfo property) =>

@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Lifestyles
@@ -10,8 +10,8 @@ namespace SimpleInjector.Lifestyles
     /// Defines a lifestyle that caches instances during the lifetime of an explicitly defined scope using the
     /// <see cref="BeginScope(Container)">BeginScope</see>
     /// method. An execution context scope flows with the logical execution context. Scopes can be nested and
-    /// nested scopes will get their own instance. Instances created by this lifestyle can be disposed when 
-    /// the created scope gets disposed. 
+    /// nested scopes will get their own instance. Instances created by this lifestyle can be disposed when
+    /// the created scope gets disposed.
     /// </summary>
     /// <example>
     /// The following example shows the usage of the <b>ExecutionContextScopeLifestyle</b> class:
@@ -19,7 +19,7 @@ namespace SimpleInjector.Lifestyles
     /// var container = new Container();
     /// container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
     /// container.Register<IUnitOfWork, EntityFrameworkUnitOfWork>(Lifestyle.Scoped);
-    /// 
+    ///
     /// using (AsyncScopedLifestyle.BeginScope(container))
     /// {
     ///     var instance1 = container.GetInstance<IUnitOfWork>();
@@ -33,8 +33,8 @@ namespace SimpleInjector.Lifestyles
         private static readonly object managerKey = new object();
 
         /// <summary>Initializes a new instance of the <see cref="AsyncScopedLifestyle"/> class.
-        /// The created and cached instance will be disposed when the created 
-        /// <see cref="Scope"/> instance gets disposed and when the created object implements 
+        /// The created and cached instance will be disposed when the created
+        /// <see cref="Scope"/> instance gets disposed and when the created object implements
         /// <see cref="IDisposable"/>.
         /// </summary>
         public AsyncScopedLifestyle() : base("Async Scoped")
@@ -42,8 +42,8 @@ namespace SimpleInjector.Lifestyles
         }
 
         /// <summary>
-        /// Begins a new scope for the given <paramref name="container"/>. 
-        /// Services, registered using the <see cref="AsyncScopedLifestyle"/> are cached during the 
+        /// Begins a new scope for the given <paramref name="container"/>.
+        /// Services, registered using the <see cref="AsyncScopedLifestyle"/> are cached during the
         /// lifetime of that scope. The scope should be disposed explicitly.
         /// </summary>
         /// <param name="container">The container.</param>
@@ -68,7 +68,7 @@ namespace SimpleInjector.Lifestyles
         }
         
         /// <summary>
-        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
+        /// Returns the current <see cref="Scope"/> for this lifestyle and the given
         /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>
@@ -118,7 +118,7 @@ namespace SimpleInjector.Lifestyles
         }
 
         /// <summary>
-        /// Begins a new scope for the given <paramref name="container"/>. 
+        /// Begins a new scope for the given <paramref name="container"/>.
         /// </summary>
         /// <param name="container">The container.</param>
         /// <returns>A new <see cref="Scope"/> instance.</returns>

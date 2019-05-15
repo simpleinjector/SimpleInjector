@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Advanced
@@ -11,10 +11,10 @@ namespace SimpleInjector.Advanced
 
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="System.Predicate{T}" />
-    /// delegate that is that is supplied to the 
+    /// delegate that is that is supplied to the
     /// <see cref="SimpleInjector.Container.RegisterInitializer(Action{InstanceInitializationData}, Predicate{InitializerContext})">RegisterInitializer</see>
-    /// overload that takes this delegate. This type contains contextual information about the creation and it 
-    /// allows the user to examine the given instance to decide whether the instance should be initialized or 
+    /// overload that takes this delegate. This type contains contextual information about the creation and it
+    /// allows the user to examine the given instance to decide whether the instance should be initialized or
     /// not.
     /// </summary>
     [DebuggerDisplay(nameof(InitializerContext) + " ({" + nameof(InitializerContext.DebuggerDisplay) + ", nq})")]

@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -20,45 +20,45 @@ namespace SimpleInjector
     /// <summary>
     /// Produces instances for a given registration. Instances of this type are generally created by the
     /// container when calling one of the <b>Register</b> overloads. Instances can be retrieved by calling
-    /// <see cref="SimpleInjector.Container.GetCurrentRegistrations()">GetCurrentRegistrations()</see> or 
+    /// <see cref="SimpleInjector.Container.GetCurrentRegistrations()">GetCurrentRegistrations()</see> or
     /// <see cref="SimpleInjector.Container.GetRegistration(Type, bool)">GetRegistration(Type, bool)</see>.
     /// </summary>
     /// <remarks>
     /// The <b>Register</b> method overloads create <b>InstanceProducer</b> instances internally, but
-    /// <b>InstanceProducer</b>s can be created manually to implement special scenarios. An 
+    /// <b>InstanceProducer</b>s can be created manually to implement special scenarios. An
     /// <b>InstanceProducer</b> wraps <see cref="Registration"/> instance. The <b>Registration</b> builds an
     /// <see cref="Expression"/> that describes the intend to create the instance according to a certain
     /// lifestyle. The <b>InstanceProducer</b> on the other hand transforms this <b>Expression</b> to a
     /// delegate and allows the actual instance to be created. A <b>Registration</b> itself can't create any
     /// instance. The <b>InsanceProducer</b> allows intercepting created instances by hooking onto the
     /// <see cref="SimpleInjector.Container.ExpressionBuilt">Container.ExpressionBuilt</see> event. The
-    /// <see cref="SimpleInjector.Container.RegisterDecorator(Type, Type)">RegisterDecorator</see> methods for 
-    /// instance work by hooking onto the <b>ExpressionBuilt</b> event and allow wrapping the returned instance 
+    /// <see cref="SimpleInjector.Container.RegisterDecorator(Type, Type)">RegisterDecorator</see> methods for
+    /// instance work by hooking onto the <b>ExpressionBuilt</b> event and allow wrapping the returned instance
     /// with a decorator.
     /// </remarks>
     /// <example>
     /// The following example shows the creation of two different <b>InstanceProducer</b> instances that wrap
-    /// the same <b>Registration</b> instance. Since the <b>Registration</b> is created using the 
-    /// <see cref="SimpleInjector.Lifestyle.Singleton">Singleton</see> lifestyle, both producers will return 
+    /// the same <b>Registration</b> instance. Since the <b>Registration</b> is created using the
+    /// <see cref="SimpleInjector.Lifestyle.Singleton">Singleton</see> lifestyle, both producers will return
     /// the same instance. The <b>InstanceProducer</b> for the <code>Interface1</code> however, will wrap that
     /// instance in a (transient) <code>Interface1Decorator</code>.
     /// <code lang="cs"><![CDATA[
     /// var container = new Container();
-    /// 
+    ///
     /// // ServiceImpl implements both Interface1 and Interface2.
     /// var registration = Lifestyle.Singleton.CreateRegistration<ServiceImpl, ServiceImpl>(container);
-    /// 
+    ///
     /// var producer1 = new InstanceProducer(typeof(Interface1), registration);
     /// var producer2 = new InstanceProducer(typeof(Interface2), registration);
-    /// 
+    ///
     /// container.RegisterDecorator(typeof(Interface1), typeof(Interface1Decorator));
-    /// 
+    ///
     /// var instance1 = (Interface1)producer1.GetInstance();
     /// var instance2 = (Interface2)producer2.GetInstance();
-    /// 
+    ///
     /// Assert.IsInstanceOfType(instance1, typeof(Interface1Decorator));
     /// Assert.IsInstanceOfType(instance2, typeof(ServiceImpl));
-    /// 
+    ///
     /// Assert.AreSame(((Interface1Decorator)instance1).DecoratedInstance, instance2);
     /// ]]></code>
     /// </example>
@@ -131,7 +131,7 @@ namespace SimpleInjector
         /// <summary>
         /// Gets the <see cref="Lifestyle"/> for this registration. The returned lifestyle can differ from the
         /// lifestyle that is used during the registration. This can happen for instance when the registration
-        /// is changed by an <see cref="SimpleInjector.Container.ExpressionBuilt">ExpressionBuilt</see> 
+        /// is changed by an <see cref="SimpleInjector.Container.ExpressionBuilt">ExpressionBuilt</see>
         /// registration or gets decorated.
         /// </summary>
         /// <value>The <see cref="Lifestyle"/> for this registration.</value>
@@ -207,7 +207,7 @@ namespace SimpleInjector
         private IEnumerable<InstanceProducer> Self => new[] { this };
 
         /// <summary>
-        /// Creates a new <see cref="InstanceProducer"/> based on the given <paramref name="serviceType"/> 
+        /// Creates a new <see cref="InstanceProducer"/> based on the given <paramref name="serviceType"/>
         /// and <paramref name="expression"/> where the <paramref name="expression"/> will be used as-is;
         /// no interception (using <see cref="Container.ExpressionBuilt">ExpressionBuilt</see>) such as
         /// decorators will be applied.
@@ -269,7 +269,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Builds an expression that expresses the intent to get an instance by the current producer. A call 
+        /// Builds an expression that expresses the intent to get an instance by the current producer. A call
         /// to this method locks the container. New registrations can't be made after a call to this method.
         /// </summary>
         /// <returns>An Expression.</returns>
@@ -307,10 +307,10 @@ namespace SimpleInjector
             finally
             {
                 // NOTE:  We don't remove the cyclic dependency validator while building the expression.
-                // Instead we reset it so it can be checked later on again. We do this because only if 
-                // GetInstance has been called we can know for sure that there's no cyclic dependency. There 
-                // could be a 'runtime cyclic dependency' caused by a registered delegate that calls back into 
-                // the container manually. This will not be detected during building the expression, because 
+                // Instead we reset it so it can be checked later on again. We do this because only if
+                // GetInstance has been called we can know for sure that there's no cyclic dependency. There
+                // could be a 'runtime cyclic dependency' caused by a registered delegate that calls back into
+                // the container manually. This will not be detected during building the expression, because
                 // the delegate won't (always) get executed at this point.
                 this.ResetCyclicDependencyValidator();
             }
@@ -318,14 +318,14 @@ namespace SimpleInjector
 
         /// <summary>
         /// Gets the collection of relationships for this instance that the container knows about.
-        /// This includes relationships between the registered type and its dependencies and relationships 
-        /// between applied decorators and their dependencies. Note that types that are not newed up by the 
+        /// This includes relationships between the registered type and its dependencies and relationships
+        /// between applied decorators and their dependencies. Note that types that are not newed up by the
         /// container and properties that are injected inside a custom delegate that is registered using the
-        /// <see cref="SimpleInjector.Container.RegisterInitializer{TService}">RegisterInitializer</see> 
+        /// <see cref="SimpleInjector.Container.RegisterInitializer{TService}">RegisterInitializer</see>
         /// method are unknown to the container and are not returned from this method.
         /// Also note that this method will return an empty collection when called before the
-        /// registered type is requested from the container (or before 
-        /// <see cref="SimpleInjector.Container.Verify()">Verify</see> is called). 
+        /// registered type is requested from the container (or before
+        /// <see cref="SimpleInjector.Container.Verify()">Verify</see> is called).
         /// </summary>
         /// <returns>An array of <see cref="KnownRelationship"/> instances.</returns>
         public KnownRelationship[] GetRelationships()
@@ -343,7 +343,7 @@ namespace SimpleInjector
         /// graph.
         /// </summary>
         /// <returns>A string representation of the object graph.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when this method is called before 
+        /// <exception cref="InvalidOperationException">Thrown when this method is called before
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> have been called. These calls can be
         /// done directly and explicitly by the user on this instance, indirectly by calling
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> on an instance that depends on this
@@ -358,7 +358,7 @@ namespace SimpleInjector
         /// <param name="options">The various visualization options for building a string representation of
         /// the object graph.</param>
         /// <returns>A string representation of the object graph.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when this method is called before 
+        /// <exception cref="InvalidOperationException">Thrown when this method is called before
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> have been called. These calls can be
         /// done directly and explicitly by the user on this instance, indirectly by calling
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> on an instance that depends on this
@@ -415,7 +415,7 @@ namespace SimpleInjector
         }
 
         // A verifier is an Action delegate that will be called during the object creation step in the
-        // verification process (when the user calls Verify()) to enable verification of the whole object 
+        // verification process (when the user calls Verify()) to enable verification of the whole object
         // graph.
         internal void AddVerifier(Action<Scope> action)
         {
@@ -649,7 +649,7 @@ namespace SimpleInjector
             // in the registrations dictionary anyway, or it is used to build up an InstanceProducer (by
             // the decorator sub system) that is only used for diagnostics. Allowing the latter producers to
             // be added, will clutter the diagnostic API and will cause the Verify() method to verify those
-            // producers needlessly.   
+            // producers needlessly.
             return !(registration is ExpressionRegistration);
         }
 

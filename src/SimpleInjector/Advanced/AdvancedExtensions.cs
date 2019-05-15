@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Advanced
@@ -70,7 +70,7 @@ namespace SimpleInjector.Advanced
         }
 
         /// <summary>
-        /// Stores an item by the given <paramref name="key"/> in the container. 
+        /// Stores an item by the given <paramref name="key"/> in the container.
         /// </summary>
         /// <remarks>
         /// <b>Thread-safety:</b> Calls to this method are thread-safe, but users should take proper

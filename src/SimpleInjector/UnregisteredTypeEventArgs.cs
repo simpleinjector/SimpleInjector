@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -7,11 +7,11 @@ namespace SimpleInjector
     using System.Linq.Expressions;
 
     /// <summary>
-    /// Provides data for and interaction with the 
-    /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event of 
-    /// the <see cref="Container"/>. An observer can check the 
+    /// Provides data for and interaction with the
+    /// <see cref="Container.ResolveUnregisteredType">ResolveUnregisteredType</see> event of
+    /// the <see cref="Container"/>. An observer can check the
     /// <see cref="UnregisteredServiceType"/> to see whether the unregistered type can be handled. The
-    /// <see cref="Register(Func{object})"/> method can be called to register a <see cref="Func{T}"/> delegate 
+    /// <see cref="Register(Func{object})"/> method can be called to register a <see cref="Func{T}"/> delegate
     /// that allows creation of instances of the unregistered for this and future requests.
     /// </summary>
     public class UnregisteredTypeEventArgs : EventArgs
@@ -26,7 +26,7 @@ namespace SimpleInjector
         public Type UnregisteredServiceType { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the event represented by this instance has been handled. 
+        /// Gets a value indicating whether the event represented by this instance has been handled.
         /// This property will return <b>true</b> when <see cref="Register(Func{object})"/> has been called on
         /// this instance.
         /// </summary>
@@ -95,7 +95,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers a <see cref="Registration"/> that describes the creation of instances of the type
-        /// expressed by the <see cref="UnregisteredServiceType"/> for this and future requests. The 
+        /// expressed by the <see cref="UnregisteredServiceType"/> for this and future requests. The
         /// registration will be cached and future requests will directly call unon that registration, the
         /// expression that it generates or the delegate that gets compiled from that expression.
         /// </summary>

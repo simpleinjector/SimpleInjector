@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Integration.Wcf
@@ -48,8 +48,8 @@ namespace SimpleInjector.Integration.Wcf
         }
 
         /// <summary>
-        /// Provides the ability to change run-time property values or insert custom extension objects such as 
-        /// error handlers, message or parameter interceptors, security extensions, and other custom extension 
+        /// Provides the ability to change run-time property values or insert custom extension objects such as
+        /// error handlers, message or parameter interceptors, security extensions, and other custom extension
         /// objects.
         /// </summary>
         /// <param name="serviceDescription">The service description.</param>
@@ -73,7 +73,7 @@ namespace SimpleInjector.Integration.Wcf
         }
 
         /// <summary>
-        /// Provides the ability to inspect the service host and the service description to confirm that the 
+        /// Provides the ability to inspect the service host and the service description to confirm that the
         /// service can run successfully.
         /// </summary>
         /// <param name="serviceDescription">The service description.</param>

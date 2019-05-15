@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Packaging
@@ -21,8 +21,8 @@ namespace SimpleInjector.Packaging
     ///     }
     /// }
     /// ]]></code>
-    /// The following example shows how to load all defined packages, using the 
-    /// <see cref="PackageExtensions.RegisterPackages(Container, IEnumerable{Assembly})">RegisterPackages</see> method. 
+    /// The following example shows how to load all defined packages, using the
+    /// <see cref="PackageExtensions.RegisterPackages(Container, IEnumerable{Assembly})">RegisterPackages</see> method.
     /// <code lang="cs"><![CDATA[
     /// container.RegisterPackages();
     /// ]]></code>

@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Diagnostics
@@ -11,8 +11,8 @@ namespace SimpleInjector.Diagnostics
     using SimpleInjector.Advanced;
 
     /// <summary>
-    /// Diagnostic result for a warning about a concrete type that was not registered explicitly and was not 
-    /// resolved using unregistered type resolution, but was created by the container using the transient 
+    /// Diagnostic result for a warning about a concrete type that was not registered explicitly and was not
+    /// resolved using unregistered type resolution, but was created by the container using the transient
     /// lifestyle.
     /// For more information, see: https://simpleinjector.org/diaut.
     /// </summary>
@@ -31,7 +31,7 @@ namespace SimpleInjector.Diagnostics
             this.Relationships = new ReadOnlyCollection<KnownRelationship>(relationships.ToList());
         }
 
-        /// <summary>Gets a collection of <see cref="KnownRelationship"/> instances that describe all 
+        /// <summary>Gets a collection of <see cref="KnownRelationship"/> instances that describe all
         /// container-registered dependencies for the given component.</summary>
         /// <value>List of <see cref="KnownRelationship"/> objects.</value>
         public ReadOnlyCollection<KnownRelationship> Relationships { get; }

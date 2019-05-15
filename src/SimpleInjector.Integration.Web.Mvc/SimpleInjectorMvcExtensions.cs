@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 // This class is placed in the root namespace to allow users to start using these extension methods after
@@ -25,9 +25,9 @@ namespace SimpleInjector
     public static class SimpleInjectorMvcExtensions
     {
         /// <summary>Registers a <see cref="IFilterProvider"/> that allows filter attributes to go through the
-        /// Simple Injector pipeline (https://simpleinjector.org/pipel). This allows any registered property to be 
-        /// injected if a custom <see cref="IPropertySelectionBehavior"/> in configured in the container, and 
-        /// allows any<see cref="Container.RegisterInitializer">initializers</see> to be called on those 
+        /// Simple Injector pipeline (https://simpleinjector.org/pipel). This allows any registered property to be
+        /// injected if a custom <see cref="IPropertySelectionBehavior"/> in configured in the container, and
+        /// allows any<see cref="Container.RegisterInitializer">initializers</see> to be called on those
         /// attributes.
         /// <b>Please note that attributes are cached by MVC, so only dependencies should be injected that
         /// have the singleton lifestyle.</b>
@@ -62,12 +62,12 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers the MVC <see cref="IController"/> instances (which name end with 'Controller') that are 
+        /// Registers the MVC <see cref="IController"/> instances (which name end with 'Controller') that are
         /// declared as public non-abstract in the supplied set of <paramref name="assemblies"/>.
         /// </summary>
         /// <param name="container">The container the controllers should be registered in.</param>
         /// <param name="assemblies">The assemblies to search.</param>
-        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null
         /// reference (Nothing in VB).</exception>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mvc",
             Justification = "By postfixing 'Register' with 'Mvc', all MVC related methods are nicely " +
@@ -92,7 +92,7 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// Use this method to retrieve the list of <see cref="Controller"/> types for manual registration.
-        /// In most cases, this method doesn't have to be called directly, but the 
+        /// In most cases, this method doesn't have to be called directly, but the
         /// <see cref="RegisterMvcControllers"/> method can be used instead.
         /// </remarks>
         /// <param name="container">The container to use.</param>
@@ -151,7 +151,7 @@ namespace SimpleInjector
             }
             catch (NotSupportedException)
             {
-                // A type load exception would typically happen on an Anonymously Hosted DynamicMethods 
+                // A type load exception would typically happen on an Anonymously Hosted DynamicMethods
                 // Assembly and it would be safe to skip this exception.
                 return Type.EmptyTypes;
             }

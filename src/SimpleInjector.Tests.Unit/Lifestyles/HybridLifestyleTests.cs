@@ -26,8 +26,8 @@
 
             // Assert
             Assert.AreEqual(@"
-                IIF(Invoke(value(System.Func`1[System.Boolean])), 
-                    Convert(new SqlUserRepository()), 
+                IIF(Invoke(value(System.Func`1[System.Boolean])),
+                    Convert(new SqlUserRepository()),
                     Convert(value(SimpleInjector.Tests.Unit.SqlUserRepository)))".TrimInside(),
                 expression);
         }
@@ -309,8 +309,8 @@
                 "to the whole expression.");
 
             Assert.AreEqual(@"
-                IIF(Invoke(value(System.Func`1[System.Boolean])), 
-                    Convert(new SqlUserRepository()), 
+                IIF(Invoke(value(System.Func`1[System.Boolean])),
+                    Convert(new SqlUserRepository()),
                     Convert(new SqlUserRepository()))".TrimInside(),
                 expression.ToString());
         }

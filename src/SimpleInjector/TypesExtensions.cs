@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -16,7 +16,7 @@ namespace SimpleInjector
             "SimpleInjector." + nameof(TypesExtensions) + "." + nameof(TypesExtensions.ToFriendlyName);
 
         /// <summary>
-        /// Builds an easy to read type name. Namespaces will be omitted, and generic types will be displayed 
+        /// Builds an easy to read type name. Namespaces will be omitted, and generic types will be displayed
         /// in a C#-like syntax. Ideal for reporting type names in exception messages.
         /// </summary>
         /// <param name="type">The type to convert.</param>
@@ -26,7 +26,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Returns true is there is a closed version of the supplied <paramref name="genericTypeDefinition"/>
-        /// that is assignable from the current <paramref name="type"/>. This method returns true when either 
+        /// that is assignable from the current <paramref name="type"/>. This method returns true when either
         /// <paramref name="type"/> itself, one of its base classes or one of its implemented interfaces is a
         /// closed version of <paramref name="genericTypeDefinition"/>; otherwise false.
         /// </summary>
@@ -37,10 +37,10 @@ namespace SimpleInjector
             GetClosedTypesOfInternal(type, genericTypeDefinition).Any();
 
         /// <summary>
-        /// Gets the single closed version of <paramref name="genericTypeDefinition"/> that the current 
-        /// <paramref name="type"/> is assignable from. In case none or multiple matching closed types are 
-        /// found, and exception is thrown. Example: When <paramref name="type"/> is a type 
-        /// <c>class X : IX&lt;int&gt;, IFoo&lt;string&gt;</c> and <paramref name="genericTypeDefinition"/> 
+        /// Gets the single closed version of <paramref name="genericTypeDefinition"/> that the current
+        /// <paramref name="type"/> is assignable from. In case none or multiple matching closed types are
+        /// found, and exception is thrown. Example: When <paramref name="type"/> is a type
+        /// <c>class X : IX&lt;int&gt;, IFoo&lt;string&gt;</c> and <paramref name="genericTypeDefinition"/>
         /// is type <c>IX&lt;T&gt;</c>: this method will return type <c>IX&lt;int&gt;</c>.
         /// </summary>
         /// <param name="type">The type to check.</param>
@@ -75,8 +75,8 @@ namespace SimpleInjector
 
         /// <summary>
         /// Gets the list of closed versions of <paramref name="genericTypeDefinition"/> that the current
-        /// <paramref name="type"/> is assignable from. Example: When <paramref name="type"/> is a type 
-        /// <c>class X : IX&lt;int&gt;, IFoo&lt;string&gt;</c> and <paramref name="genericTypeDefinition"/> 
+        /// <paramref name="type"/> is assignable from. Example: When <paramref name="type"/> is a type
+        /// <c>class X : IX&lt;int&gt;, IFoo&lt;string&gt;</c> and <paramref name="genericTypeDefinition"/>
         /// is type <c>IX&lt;T&gt;</c>: this method will return type <c>IX&lt;int&gt;</c>.
         /// </summary>
         /// <param name="type">The type to check.</param>

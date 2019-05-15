@@ -6,7 +6,7 @@
     using System.Runtime.Remoting;
 
     /// <summary>
-    /// Allows running tests for a given test assembly in a partial trust sandbox. 
+    /// Allows running tests for a given test assembly in a partial trust sandbox.
     /// Allows verifying whether Simple Injector runs correctly in partial trust.
     /// </summary>
     public static class Program
@@ -24,7 +24,7 @@
                 domain.Load(AssemblyName.GetAssemblyName(dll));
             }
 
-            ObjectHandle handle = Activator.CreateInstanceFrom(domain, 
+            ObjectHandle handle = Activator.CreateInstanceFrom(domain,
                 assemblyFile: typeof(TestRunner).Assembly.Location,
                 typeName: typeof(TestRunner).FullName);
 

@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -30,7 +30,7 @@ namespace SimpleInjector
                 BindingFlags.NonPublic | BindingFlags.Public);
         public static Assembly GetAssembly(this Type type) => type.Assembly;
         public static Guid GetGuid(this Type type) => type.GUID;
-#endif        
+#endif
 #if NETSTANDARD1_0 || NETSTANDARD1_3 || NETSTANDARD2_0
         public static MethodInfo GetSetMethod(this PropertyInfo property, bool nonPublic = true) =>
             nonPublic || property.SetMethod?.IsPublic == true ? property.SetMethod : null;

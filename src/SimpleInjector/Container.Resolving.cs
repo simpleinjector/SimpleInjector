@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -112,7 +112,7 @@ namespace SimpleInjector
 
         /// <summary>Gets the service object of the specified type.</summary>
         /// <param name="serviceType">An object that specifies the type of service object to get.</param>
-        /// <returns>A service object of type serviceType.  -or- null if there is no service object of type 
+        /// <returns>A service object of type serviceType.  -or- null if there is no service object of type
         /// <paramref name="serviceType"/>.</returns>
         [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes",
             Justification = "Users are not expected to inherit from this class and override this implementation.")]
@@ -141,12 +141,12 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// <para>
-        /// A call to this method locks the container. New registrations can't be made after a call to this 
+        /// A call to this method locks the container. New registrations can't be made after a call to this
         /// method.
         /// </para>
         /// <para>
-        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same 
-        /// <see cref="InstanceProducer"/> instance for a given <see cref="System.Type"/>. It will however either 
+        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same
+        /// <see cref="InstanceProducer"/> instance for a given <see cref="System.Type"/>. It will however either
         /// always return <b>null</b> or always return a producer that is able to return the expected instance.
         /// </para>
         /// </remarks>
@@ -167,12 +167,12 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// <para>
-        /// A call to this method locks the container. New registrations can't be made after a call to this 
+        /// A call to this method locks the container. New registrations can't be made after a call to this
         /// method.
         /// </para>
         /// <para>
-        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same 
-        /// <see cref="InstanceProducer"/> instance for a given <see cref="System.Type"/>. It will however either 
+        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same
+        /// <see cref="InstanceProducer"/> instance for a given <see cref="System.Type"/>. It will however either
         /// always return <b>null</b> or always return a producer that is able to return the expected instance.
         /// </para>
         /// </remarks>
@@ -350,8 +350,8 @@ namespace SimpleInjector
                 this.TryBuildInstanceProducerForStream(serviceType);
         }
 
-        // Instead of wrapping the complete method in a lock, we lock inside the individual methods. We 
-        // don't want to hold a lock while calling back into user code, because who knows what the user 
+        // Instead of wrapping the complete method in a lock, we lock inside the individual methods. We
+        // don't want to hold a lock while calling back into user code, because who knows what the user
         // is doing there. We don't want a dead lock.
         private InstanceProducer TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType) =>
             this.TryGetInstanceProducerForUnregisteredTypeResolutionFromCache(serviceType)
@@ -666,7 +666,7 @@ namespace SimpleInjector
 
         // We're registering a service type after 'locking down' the container here and that means that the
         // type is added to a copy of the registrations dictionary and the original replaced with a new one.
-        // This 'reference swapping' is thread-safe, but can result in types disappearing again from the 
+        // This 'reference swapping' is thread-safe, but can result in types disappearing again from the
         // registrations when multiple threads simultaneously add different types. This however, does not
         // result in a consistency problem, because the missing type will be again added later. This type of
         // swapping safes us from using locks.

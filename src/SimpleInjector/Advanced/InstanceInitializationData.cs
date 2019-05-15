@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Advanced
@@ -28,7 +28,7 @@ namespace SimpleInjector.Advanced
             this.Instance = instance;
         }
 
-        /// <summary>Gets the <see cref="InitializationContext"/> with contextual information about the 
+        /// <summary>Gets the <see cref="InitializationContext"/> with contextual information about the
         /// created instance.</summary>
         /// <value>The <see cref="InitializationContext"/>.</value>
         public InitializerContext Context { get; }
@@ -65,7 +65,7 @@ namespace SimpleInjector.Advanced
             object.ReferenceEquals(first.Instance, second.Instance);
 
         /// <summary>
-        /// Indicates whether the values of two specified  <see cref="InstanceInitializationData"/>  objects are 
+        /// Indicates whether the values of two specified  <see cref="InstanceInitializationData"/>  objects are
         /// not equal.
         /// </summary>
         /// <param name="first">The first object to compare.</param>

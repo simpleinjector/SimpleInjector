@@ -41,7 +41,7 @@
 
         /// <summary>
         /// Automatically resolves an implementation of an unregistered abstraction, by searching the supplied
-        /// list of assemblies for a type with the identical name as the interface, but without the 'I'. 
+        /// list of assemblies for a type with the identical name as the interface, but without the 'I'.
         /// In other words, if an IProductService is being resolved, the concrete type with name "ProductService"
         /// will be registered.
         /// </summary>

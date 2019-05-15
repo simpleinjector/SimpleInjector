@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -11,8 +11,8 @@ namespace SimpleInjector
     {
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TConcrete"/> will be returned within the
-        /// Web API request. When the Web API request ends and 
-        /// <typeparamref name="TConcrete"/> implements <see cref="IDisposable"/>, the cached instance will be 
+        /// Web API request. When the Web API request ends and
+        /// <typeparamref name="TConcrete"/> implements <see cref="IDisposable"/>, the cached instance will be
         /// disposed.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
@@ -20,7 +20,7 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <typeparamref name="TConcrete"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
@@ -39,9 +39,9 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers that a single instance of <typeparamref name="TImplementation"/> will be returned  will 
-        /// be returned within the Web API request. When the Web API request ends and 
-        /// <typeparamref name="TImplementation"/> implements <see cref="IDisposable"/>, the cached instance 
+        /// Registers that a single instance of <typeparamref name="TImplementation"/> will be returned  will
+        /// be returned within the Web API request. When the Web API request ends and
+        /// <typeparamref name="TImplementation"/> implements <see cref="IDisposable"/>, the cached instance
         /// will be disposed.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
@@ -50,9 +50,9 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <typeparamref name="TService"/> has already been registered.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/>
         /// type is not a type that can be created by the container.
         /// </exception>
         [Obsolete("Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
@@ -73,7 +73,7 @@ namespace SimpleInjector
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>,
         /// and returned instances are cached during the lifetime of a Web API request. When the Web API
-        /// request ends, and the cached instance implements <see cref="IDisposable"/>, that cached instance 
+        /// request ends, and the cached instance implements <see cref="IDisposable"/>, that cached instance
         /// will be disposed.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
@@ -101,7 +101,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TConcrete"/> will be returned for
-        /// each Web API request. When the Web API request ends, and <typeparamref name="TConcrete"/> 
+        /// each Web API request. When the Web API request ends, and <typeparamref name="TConcrete"/>
         /// implements <see cref="IDisposable"/>, the cached instance will be disposed.
         /// Scopes can be nested, and each scope gets its own instance.
         /// </summary>
@@ -112,7 +112,7 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <typeparamref name="TConcrete"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
@@ -133,7 +133,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers that a single instance of <typeparamref name="TImplementation"/> will be returned for
-        /// the duration of a single Web API request. When the Web API request ends, 
+        /// the duration of a single Web API request. When the Web API request ends,
         /// <paramref name="disposeWhenScopeEnds"/> is set to <b>true</b>, and the cached instance
         /// implements <see cref="IDisposable"/>, that cached instance will be disposed.
         /// </summary>
@@ -145,9 +145,9 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when the <paramref name="container"/> is a null reference.</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <typeparamref name="TService"/> has already been registered.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/>
         /// type is not a type that can be created by the container.
         /// </exception>
         [Obsolete("Please use Register<TService, TImplementation>(Lifestyle.Scoped) instead. " +
@@ -168,7 +168,7 @@ namespace SimpleInjector
         /// <summary>
         /// Registers the specified delegate that allows returning instances of <typeparamref name="TService"/>,
         /// and returned instances are cached during the lifetime of single Web API request. When the Web API
-        /// request ends, <paramref name="disposeWhenScopeEnds"/> is set to <b>true</b>, and the cached 
+        /// request ends, <paramref name="disposeWhenScopeEnds"/> is set to <b>true</b>, and the cached
         /// instance implements <see cref="IDisposable"/>, that cached instance will be disposed.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>

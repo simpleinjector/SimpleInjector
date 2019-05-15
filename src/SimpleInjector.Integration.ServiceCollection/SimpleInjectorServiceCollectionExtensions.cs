@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -22,8 +22,8 @@ namespace SimpleInjector
         /// <summary>
         /// Sets up the basic configuration that allows Simple Injector to be used in frameworks that require
         /// the use of <see cref="IServiceCollection"/> for registration of framework components.
-        /// In case of the absense of a 
-        /// <see cref="ContainerOptions.DefaultScopedLifestyle">DefaultScopedLifestyle</see>, this method 
+        /// In case of the absense of a
+        /// <see cref="ContainerOptions.DefaultScopedLifestyle">DefaultScopedLifestyle</see>, this method
         /// will configure <see cref="AsyncScopedLifestyle"/> as the default scoped lifestyle.
         /// In case a <paramref name="setupAction"/> is supplied, that delegate will be called that allow
         /// further configuring the container.

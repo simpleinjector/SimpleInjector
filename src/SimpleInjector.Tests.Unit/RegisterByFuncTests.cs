@@ -168,7 +168,7 @@ namespace SimpleInjector.Tests.Unit
             // Arrange
             var container = ContainerFactory.New();
 
-            // This registration will make the DelegateBuilder call the 
+            // This registration will make the DelegateBuilder call the
             // SingletonInstanceProducer.BuildExpression method.
             container.Register<IUserRepository>(() => new SqlUserRepository());
 

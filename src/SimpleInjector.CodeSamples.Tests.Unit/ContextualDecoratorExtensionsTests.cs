@@ -83,14 +83,14 @@
             container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();
 
             container.RegisterContextualDecorator(
-                typeof(ICommandHandler<>), 
+                typeof(ICommandHandler<>),
                 typeof(CommandHandlerDecorator<>),
                 parameter => true);
 
             container.RegisterContextualDecorator(
-                typeof(ICommandHandler<>), 
+                typeof(ICommandHandler<>),
                 typeof(AnotherCommandHandlerDecorator<>),
-                parameter => true);            
+                parameter => true);
 
             // Act
             var consumer = container.GetInstance<Consumer<ICommandHandler<RealCommand>>>();

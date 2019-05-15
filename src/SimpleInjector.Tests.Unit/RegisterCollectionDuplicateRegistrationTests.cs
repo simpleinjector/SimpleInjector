@@ -7,7 +7,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
-    /// This set of tests control whether the container correctly prevents duplicate registrations of 
+    /// This set of tests control whether the container correctly prevents duplicate registrations of
     /// collections and correctly replaces a collection in case overriding registrations is allowed.
     /// </summary>
     [TestClass]
@@ -289,7 +289,7 @@
                 typeof(AuditableEventEventHandler)
             });
 
-            // Act 
+            // Act
             Action action = () => container.Collection.Register(typeof(IEventHandler<>), new[] { typeof(StructEventHandler) });
 
             // Assert

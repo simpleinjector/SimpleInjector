@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Lifestyles
@@ -130,8 +130,8 @@ namespace SimpleInjector.Lifestyles
 
                 // NOTE: We pass on producer.ServiceType as the implementation type for the following three
                 // methods. This will the initialization to be only done based on information of the service
-                // type; not on that of the implementation. Although now the initialization could be 
-                // incomplete, this behavior is consistent with the initialization of 
+                // type; not on that of the implementation. Although now the initialization could be
+                // incomplete, this behavior is consistent with the initialization of
                 // Register<TService>(Func<TService>, Lifestyle), which doesn't have the proper static type
                 // information available to use the implementation type.
                 // TODO: This behavior should be reconsidered, because now it is incompatible with
@@ -244,7 +244,7 @@ namespace SimpleInjector.Lifestyles
                             // At this point, an injected ContainerControlledCollection<T> has notified the
                             // listener about the creation of one of its elements. This has happened during
                             // the construction of this (Singleton) instance, which might cause Lifestyle
-                            // Mismatches. That's why this is added as a known relationship. This way 
+                            // Mismatches. That's why this is added as a known relationship. This way
                             // diagnostics can verify the relationship.
                             this.AddRelationship(
                                 new KnownRelationship(

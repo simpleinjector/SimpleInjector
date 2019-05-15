@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -13,7 +13,7 @@ namespace SimpleInjector
     /// Contains contextual information for creating an implementation type.
     /// </summary>
     /// <remarks>
-    /// Please see the 
+    /// Please see the
     /// <see cref="Container.RegisterConditional(System.Type, System.Type, Lifestyle, Predicate{PredicateContext})">Register</see>
     /// method for more information.
     /// </remarks>

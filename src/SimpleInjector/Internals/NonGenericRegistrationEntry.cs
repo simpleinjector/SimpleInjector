@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Internals
@@ -119,7 +119,7 @@ namespace SimpleInjector.Internals
 
         private void ThrowWhenTypeAlreadyRegistered(InstanceProducer producer)
         {
-            if (producer.IsUnconditional 
+            if (producer.IsUnconditional
                 && this.providers.Any()
                 && !this.container.Options.AllowOverridingRegistrations)
             {
@@ -274,7 +274,7 @@ namespace SimpleInjector.Internals
                     new PredicateContext(this.serviceType, implementationTypeProvider, consumer, handled);
 
                 // NOTE: The producer should only get built after it matches the delegate, to prevent
-                // unneeded producers from being created, because this might cause diagnostic warnings, 
+                // unneeded producers from being created, because this might cause diagnostic warnings,
                 // such as torn lifestyle warnings.
                 return this.predicate(context) ? this.GetProducer(context) : null;
             }

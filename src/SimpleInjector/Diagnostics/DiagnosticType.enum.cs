@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Diagnostics
@@ -8,17 +8,17 @@ namespace SimpleInjector.Diagnostics
     using System.Reflection;
 
     /// <summary>
-    /// Specifies the list of diagnostic types that are currently supported by the diagnostic 
+    /// Specifies the list of diagnostic types that are currently supported by the diagnostic
     /// <see cref="Analyzer"/>. Note that new diagnostic types might be added in future versions.
-    /// For more information, please read the 
-    /// <a href="https://simpleinjector.org/diagnostics">Diagnosing your configuration using the Diagnostic 
+    /// For more information, please read the
+    /// <a href="https://simpleinjector.org/diagnostics">Diagnosing your configuration using the Diagnostic
     /// Services</a> wiki documentation.
     /// </summary>
     public enum DiagnosticType
     {
         /// <summary>
-        /// Diagnostic type that warns about 
-        /// a concrete type that was not registered explicitly and was not resolved using unregistered type 
+        /// Diagnostic type that warns about
+        /// a concrete type that was not registered explicitly and was not resolved using unregistered type
         /// resolution, but was created by the container using the transient lifestyle.
         /// For more information, see: https://simpleinjector.org/diaut.
         /// </summary>
@@ -26,7 +26,7 @@ namespace SimpleInjector.Diagnostics
         ContainerRegisteredComponent = 0,
 
         /// <summary>
-        /// Diagnostic type that warns when a 
+        /// Diagnostic type that warns when a
         /// component depends on a service with a lifestyle that is shorter than that of the component.
         /// For more information, see: https://simpleinjector.org/dialm.
         /// </summary>
@@ -35,8 +35,8 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>
         /// Diagnostic type that warns when a
-        /// component depends on an unregistered concrete type and this concrete type has a lifestyle that is 
-        /// different than the lifestyle of an explicitly registered type that uses this concrete type as its 
+        /// component depends on an unregistered concrete type and this concrete type has a lifestyle that is
+        /// different than the lifestyle of an explicitly registered type that uses this concrete type as its
         /// implementation.
         /// For more information, see: https://simpleinjector.org/diasc.
         /// </summary>

@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Advanced
@@ -10,9 +10,9 @@ namespace SimpleInjector.Advanced
 
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="System.Predicate{T}" />
-    /// delegate that is that is supplied to the 
+    /// delegate that is that is supplied to the
     /// <see cref="ContainerOptions.RegisterResolveInterceptor(ResolveInterceptor, Predicate{InitializationContext})">RegisterResolveInterceptor</see>
-    /// method that takes this delegate. This type contains contextual information about a resolved type and it 
+    /// method that takes this delegate. This type contains contextual information about a resolved type and it
     /// allows the user to examine the given instance to decide whether the <see cref="ResolveInterceptor"/>
     /// should be applied or not.
     /// </summary>
@@ -23,7 +23,7 @@ namespace SimpleInjector.Advanced
         internal InitializationContext(InstanceProducer producer, Registration registration)
         {
             // producer will be null when a user calls Registration.BuildExpression() directly, instead of
-            // calling InstanceProducer.BuildExpression() or InstanceProducer.GetInstance(). 
+            // calling InstanceProducer.BuildExpression() or InstanceProducer.GetInstance().
             Requires.IsNotNull(registration, nameof(registration));
 
             this.Producer = producer;

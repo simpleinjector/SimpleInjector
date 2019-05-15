@@ -65,7 +65,7 @@
             factory.ToString();
         }
 
-        public class Service : IService 
+        public class Service : IService
         {
         }
     }

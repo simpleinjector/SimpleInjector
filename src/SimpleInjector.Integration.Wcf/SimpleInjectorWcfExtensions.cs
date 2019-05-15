@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 // This class is placed in the root namespace to allow users to start using these extension methods after
@@ -21,12 +21,12 @@ namespace SimpleInjector
     {
         /// <summary>
         /// Registers the WCF services instances (public classes that implement an interface that
-        /// is decorated with a <see cref="ServiceContractAttribute"/>) that are 
+        /// is decorated with a <see cref="ServiceContractAttribute"/>) that are
         /// declared as public non-abstract in the supplied set of <paramref name="assemblies"/>.
         /// </summary>
         /// <param name="container">The container the services should be registered in.</param>
         /// <param name="assemblies">The assemblies to search.</param>
-        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is 
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is
         /// a null reference (Nothing in VB).</exception>
         public static void RegisterWcfServices(this Container container, params Assembly[] assemblies)
         {
@@ -121,7 +121,7 @@ namespace SimpleInjector
             }
             catch (NotSupportedException)
             {
-                // A type load exception would typically happen on an Anonymously Hosted DynamicMethods 
+                // A type load exception would typically happen on an Anonymously Hosted DynamicMethods
                 // Assembly and it would be safe to skip this exception.
                 return Type.EmptyTypes;
             }

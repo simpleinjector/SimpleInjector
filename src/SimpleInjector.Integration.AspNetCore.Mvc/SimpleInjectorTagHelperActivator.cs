@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Integration.AspNetCore.Mvc
@@ -39,7 +39,7 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// </summary>
         /// <param name="container">The container instance.</param>
         /// <param name="tagHelperSelector">The predicate that determines which tag helpers should be created
-        /// by the supplied <paramref name="container"/> (when the predicate returns true) or using the 
+        /// by the supplied <paramref name="container"/> (when the predicate returns true) or using the
         /// supplied <paramref name="frameworkTagHelperActivator"/> (when the predicate returns false).</param>
         /// <param name="frameworkTagHelperActivator">The framework's tag helper activator.</param>
         public SimpleInjectorTagHelperActivator(

@@ -136,7 +136,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            // Use the Register<T>(Func<T>) method. This is a strange (not adviced), but valid way of 
+            // Use the Register<T>(Func<T>) method. This is a strange (not adviced), but valid way of
             // registering collections.
             container.Register<IEnumerable<ICommandHandler<RealCommand>>>(
                 () => new[] { new RealCommandHandler() });
@@ -167,7 +167,7 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            // Use the Register<T>(Func<T>) method. This is a strange (not adviced), but valid way of 
+            // Use the Register<T>(Func<T>) method. This is a strange (not adviced), but valid way of
             // registering collections.
             container.Register<IEnumerable<ICommandHandler<RealCommand>>>(
                 () => new[] { new RealCommandHandler() });
@@ -1297,7 +1297,7 @@
             // Uses the RegisterCollection<T>(IEnumerable<T>) that registers a dynamic list.
             container.Collection.Register<ICommandHandler<RealCommand>>(dynamicList);
 
-            // Register the same decorator twice. 
+            // Register the same decorator twice.
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
                 typeof(TransactionalCommandHandlerDecorator<>),
@@ -1544,16 +1544,16 @@
             catch (Exception ex)
             {
                 AssertThat.ExceptionMessageContains(@"
-                    You are trying to apply the RealCommandHandlerDecorator decorator with the 
-                    'Hybrid Singleton / Singleton' lifestyle to a collection of type 
+                    You are trying to apply the RealCommandHandlerDecorator decorator with the
+                    'Hybrid Singleton / Singleton' lifestyle to a collection of type
                     ICommandHandler<RealCommand>, but the registered collection is not controlled by the
                     container."
                     .TrimInside(), ex);
 
                 AssertThat.ExceptionMessageContains(@"
-                    the number of returned items might change on each call, the decorator with this 
-                    lifestyle cannot be applied to the collection. Instead, register the decorator with the 
-                    Transient lifestyle, or use one of the Container.Collection.Register overloads that takes a collection of 
+                    the number of returned items might change on each call, the decorator with this
+                    lifestyle cannot be applied to the collection. Instead, register the decorator with the
+                    Transient lifestyle, or use one of the Container.Collection.Register overloads that takes a collection of
                     System.Type types."
                     .TrimInside(), ex);
             }
@@ -1812,8 +1812,8 @@
 
             // Assert
             Assert.IsFalse(decoratorTypeFactoryCalled, @"
-                The factory should not be called if the predicate returns false. This prevents the user from 
-                having to do specific handling when the decorator type can't be constructed because of generic 
+                The factory should not be called if the predicate returns false. This prevents the user from
+                having to do specific handling when the decorator type can't be constructed because of generic
                 type constraints.");
         }
 

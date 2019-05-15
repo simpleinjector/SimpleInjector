@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -15,32 +15,32 @@ namespace SimpleInjector
     public partial class Container
     {
         /// <summary>
-        /// Occurs when an instance of a type is requested that has not been registered explicitly, allowing 
+        /// Occurs when an instance of a type is requested that has not been registered explicitly, allowing
         /// resolution of unregistered types before the container tries to create the type.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// The <see cref="ResolveUnregisteredType"/> event is called by the container every time an 
-        /// unregistered type is requested for the first time, allowing a developer to do unregistered type 
-        /// resolution. By calling the 
+        /// The <see cref="ResolveUnregisteredType"/> event is called by the container every time an
+        /// unregistered type is requested for the first time, allowing a developer to do unregistered type
+        /// resolution. By calling the
         /// <see cref="UnregisteredTypeEventArgs.Register(Registration)">Register</see> method on the
         /// <see cref="UnregisteredTypeEventArgs"/>, a <see cref="Registration"/>, <see cref="Expression"/> or
-        /// <see cref="Func{TResult}"/> delegate can be registered allowing the container to retrieve 
-        /// instances of the requested type. This registration is cached and it prevents the 
+        /// <see cref="Func{TResult}"/> delegate can be registered allowing the container to retrieve
+        /// instances of the requested type. This registration is cached and it prevents the
         /// <b>ResolveUnregisteredType</b> event from being called again for the same type.
         /// </para>
         /// <para>
         /// When no registered event handled the registration of an unregistered type, the container will try
         /// to create the type when this type is either concrete or is the <see cref="IEnumerable{T}"/>
         /// interface. Concrete types will be registered with the <see cref="Lifestyle.Transient">Transient</see>
-        /// lifestyle and <see cref="IEnumerable{T}"/> registrations will return an empty collection. When no 
+        /// lifestyle and <see cref="IEnumerable{T}"/> registrations will return an empty collection. When no
         /// even handled the registration and the container could not create it, an exception is thrown.
         /// </para>
         /// <para>
         /// <b>Thread-safety:</b> Please note that the container will not ensure that the hooked delegates
         /// are executed only once. While the calls to <see cref="ResolveUnregisteredType" /> for a given type
-        /// are finite (and will in most cases happen just once), a container can call the delegate multiple 
-        /// times and make parallel calls to the delegate. You must make sure that the code can be called 
+        /// are finite (and will in most cases happen just once), a container can call the delegate multiple
+        /// times and make parallel calls to the delegate. You must make sure that the code can be called
         /// multiple times and is thread-safe.
         /// </para>
         /// </remarks>
@@ -60,13 +60,13 @@ namespace SimpleInjector
         ///         // Does nothing.
         ///     }
         /// }
-        /// 
+        ///
         /// [TestMethod]
         /// public void TestResolveUnregisteredType()
         /// {
         ///     // Arrange
         ///     var container = new Container();
-        /// 
+        ///
         ///     // Register an EmptyValidator<T> to be returned when a IValidator<T> is requested:
         ///     container.ResolveUnregisteredType += (sender, e) =>
         ///     {
@@ -75,16 +75,16 @@ namespace SimpleInjector
         ///         {
         ///             var validatorType = typeof(EmptyValidator<>).MakeGenericType(
         ///                 e.UnregisteredServiceType.GetGenericArguments());
-        ///     
+        ///
         ///             // Register the instance as singleton.
         ///             e.Register(Lifestyle.Singleton.CreateRegistration(validatorType, container));
         ///         }
         ///     };
-        ///     
+        ///
         ///     // Act
         ///     var orderValidator = container.GetInstance<IValidator<Order>>();
         ///     var customerValidator = container.GetInstance<IValidator<Customer>>();
-        /// 
+        ///
         ///     // Assert
         ///     Assert.IsInstanceOfType(orderValidator, typeof(EmptyValidator<Order>));
         ///     Assert.IsInstanceOfType(customerValidator, typeof(EmptyValidator<Customer>));
@@ -93,10 +93,10 @@ namespace SimpleInjector
         /// <para>
         /// The example above registers a delegate that is raised every time an unregistered type is requested
         /// from the container. The delegate checks whether the requested type is a closed generic
-        /// implementation of the <b>IValidator&lt;T&gt;</b> interface (such as 
+        /// implementation of the <b>IValidator&lt;T&gt;</b> interface (such as
         /// <b>IValidator&lt;Order&gt;</b> or <b>IValidator&lt;Customer&gt;</b>). In that case it
         /// will request the container for a concrete <b>EmptyValidator&lt;T&gt;</b> implementation that
-        /// implements the given 
+        /// implements the given
         /// <see cref="UnregisteredTypeEventArgs.UnregisteredServiceType">UnregisteredServiceType</see>, and
         /// registers a delegate that will return this created instance. The <b>e.Register</b> call
         /// registers the method in the container, preventing the <see cref="ResolveUnregisteredType"/> from
@@ -104,11 +104,11 @@ namespace SimpleInjector
         /// </para>
         /// <para>
         /// Please note that given example is just an uhhmm... example. In the case of the example the
-        /// <b>EmptyValidator&lt;T&gt;</b> can be better registered using of the built-in 
-        /// <see cref="Register(System.Type, System.Type, Lifestyle)">Register</see> methods instead. These methods take 
-        /// care of any given generic type constraint and allow the implementation to be integrated into the 
-        /// container's pipeline, which allows it to be intercepted using the <see cref="ExpressionBuilding"/> 
-        /// event and allow any registered <see cref="RegisterInitializer{TService}">initializers</see> to be 
+        /// <b>EmptyValidator&lt;T&gt;</b> can be better registered using of the built-in
+        /// <see cref="Register(System.Type, System.Type, Lifestyle)">Register</see> methods instead. These methods take
+        /// care of any given generic type constraint and allow the implementation to be integrated into the
+        /// container's pipeline, which allows it to be intercepted using the <see cref="ExpressionBuilding"/>
+        /// event and allow any registered <see cref="RegisterInitializer{TService}">initializers</see> to be
         /// applied.
         /// </para>
         /// </example>
@@ -130,23 +130,23 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Occurs after the creation of the <see cref="Expression" /> of a registered type is complete (the 
-        /// lifestyle has been applied), allowing the created <see cref="Expression" /> to be wrapped, 
+        /// Occurs after the creation of the <see cref="Expression" /> of a registered type is complete (the
+        /// lifestyle has been applied), allowing the created <see cref="Expression" /> to be wrapped,
         /// changed, or replaced. Multiple delegates may handle the same service type.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// The <b>ExpressionBuilt</b> event is called by the container every time an registered type is 
+        /// The <b>ExpressionBuilt</b> event is called by the container every time an registered type is
         /// getting compiled, allowing a developer to change the way the type is created. The delegate that
-        /// hooks to the <b>ExpressionBuilt</b> event, can change the 
-        /// <see cref="ExpressionBuiltEventArgs.Expression" /> property on the 
+        /// hooks to the <b>ExpressionBuilt</b> event, can change the
+        /// <see cref="ExpressionBuiltEventArgs.Expression" /> property on the
         /// <see cref="ExpressionBuiltEventArgs"/>, which allows changing the way the type is constructed.
         /// </para>
         /// <para>
         /// <b>Thread-safety:</b> Please note that the container will not ensure that the hooked delegates
-        /// are executed only once per service type. While the calls to <see cref="ExpressionBuilt" /> for a 
-        /// given type are finite (and will in most cases happen just once), a container can call the delegate 
-        /// multiple times and make parallel calls to the delegate. You must make sure that the code can be 
+        /// are executed only once per service type. While the calls to <see cref="ExpressionBuilt" /> for a
+        /// given type are finite (and will in most cases happen just once), a container can call the delegate
+        /// multiple times and make parallel calls to the delegate. You must make sure that the code can be
         /// called multiple times and is thread-safe.
         /// </para>
         /// </remarks>
@@ -223,7 +223,7 @@ namespace SimpleInjector
         /// <para>
         /// The example above registers a delegate that is raised every time the container compiles the
         /// expression for an registered type. The delegate checks whether the requested type is a closed generic
-        /// implementation of the <b>IValidator&lt;T&gt;</b> interface (such as 
+        /// implementation of the <b>IValidator&lt;T&gt;</b> interface (such as
         /// <b>IValidator&lt;Order&gt;</b> or <b>IValidator&lt;Customer&gt;</b>). In that case it
         /// will changes the current <see cref="ExpressionBuiltEventArgs.Expression"/> with a new one that creates
         /// a new <b>MonitoringValidator&lt;T&gt;</b> that takes the current validator (and an <b>ILogger</b>)
@@ -232,7 +232,7 @@ namespace SimpleInjector
         /// <para>
         /// Please note that given example is just an uhhmm... example. In the case of the example the
         /// <b>MonitoringValidator&lt;T&gt;</b> is a decorator and instead of manually writing this code that
-        /// many limitations, you can use one of the built-in 
+        /// many limitations, you can use one of the built-in
         /// <see cref="Container.RegisterDecorator(System.Type, System.Type, Lifestyle)">RegisterDecorator</see> methods instead.
         /// These extension methods take care of any given generic type constraint, allow to register decorators
         /// conditionally and allow the decorator to be integrated into the container's pipeline, which allows
@@ -260,35 +260,35 @@ namespace SimpleInjector
         /// <summary>
         /// Occurs directly after the creation of the <see cref="Expression" /> of a registered type is made,
         /// but before any <see cref="RegisterInitializer">initializer</see> and lifestyle specific caching
-        /// has been applied, allowing the created <see cref="Expression" /> to be altered. Multiple delegates 
+        /// has been applied, allowing the created <see cref="Expression" /> to be altered. Multiple delegates
         /// may handle the same service type.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// The <b>ExpressionBuilding</b> event is called by the container every time an registered type is 
+        /// The <b>ExpressionBuilding</b> event is called by the container every time an registered type is
         /// getting compiled, allowing a developer to change the way the type is created. The delegate that
-        /// hooks to the <b>ExpressionBuilding</b> event, can change the 
-        /// <see cref="ExpressionBuildingEventArgs.Expression" /> property on the 
+        /// hooks to the <b>ExpressionBuilding</b> event, can change the
+        /// <see cref="ExpressionBuildingEventArgs.Expression" /> property on the
         /// <see cref="ExpressionBuildingEventArgs"/>, which allows changing the way the type is constructed.
         /// </para>
         /// <para>
-        /// The exact <see cref="Expression"/> type supplied depends on the type of registration. 
-        /// Registrations that explicitly supply the implementation type (such as 
+        /// The exact <see cref="Expression"/> type supplied depends on the type of registration.
+        /// Registrations that explicitly supply the implementation type (such as
         /// <see cref="Register{TService, TImplementation}()">Register&lt;TService, TImplementation&gt;()</see>)
         /// will result in an <see cref="NewExpression"/>, while registrations that take a delegate (such as
         /// <see cref="Register{TService}(Func{TService})">Register&lt;TService&gt;(Func&lt;TService&gt;)</see>)
         /// will result in an <see cref="InvocationExpression"/>. Singletons that are passed in using their
         /// value (<see cref="RegisterInstance{TService}(TService)">RegisterInstance&lt;TService&gt;(TService)</see>)
-        /// will result in an <see cref="ConstantExpression"/>. Note that other <b>ExpressionBuilding</b> 
-        /// registrations might have changed the <see cref="ExpressionBuildingEventArgs.Expression" /> 
+        /// will result in an <see cref="ConstantExpression"/>. Note that other <b>ExpressionBuilding</b>
+        /// registrations might have changed the <see cref="ExpressionBuildingEventArgs.Expression" />
         /// property and might have supplied an <see cref="Expression"/> of a different type. The order in
         /// which these events are registered might be of importance to you.
         /// </para>
         /// <para>
         /// <b>Thread-safety:</b> Please note that the container will not ensure that the hooked delegates
         /// are executed only once per service type. While the calls to registered <b>ExpressionBuilding</b>
-        /// events for a  given type are finite (and will in most cases happen just once), a container can 
-        /// call the delegate multiple times and make parallel calls to the delegate. You must make sure that 
+        /// events for a  given type are finite (and will in most cases happen just once), a container can
+        /// call the delegate multiple times and make parallel calls to the delegate. You must make sure that
         /// the code can be called multiple times and is thread-safe.
         /// </para>
         /// </remarks>
@@ -296,15 +296,15 @@ namespace SimpleInjector
         /// The following example shows the usage of the <b>ExpressionBuilding</b> event:
         /// <code lang="cs"><![CDATA[
         /// public class MyInjectPropertyAttribute : Attribute { }
-        /// 
+        ///
         /// public static void Bootstrap()
         /// {
         ///     var container = new Container();
-        ///     
+        ///
         ///     container.ExpressionBuilding += (sender, e) =>
         ///     {
         ///         var expression = e.Expression as NewExpression;
-        ///     
+        ///
         ///         if (expression != null)
         ///         {
         ///             var propertiesToInject =
@@ -312,7 +312,7 @@ namespace SimpleInjector
         ///                 where property.GetCustomAttributes(typeof(MyInjectPropertyAttribute), true).Any()
         ///                 let registration = container.GetRegistration(property.PropertyType, true)
         ///                 select Tuple.Create(property, registration);
-        ///     
+        ///
         ///             if (propertiesToInject.Any())
         ///             {
         ///                 Func<object, Tuple<PropertyInfo, InstanceProducer>[], object> injectorDelegate =
@@ -322,10 +322,10 @@ namespace SimpleInjector
         ///                         {
         ///                             dependency.Item1.SetValue(instance, dependency.Item2.GetInstance(), null);
         ///                         }
-        ///     
+        ///
         ///                         return instance;
         ///                     };
-        ///     
+        ///
         ///                 e.Expression = Expression.Convert(
         ///                     Expression.Invoke(
         ///                         Expression.Constant(injectorDelegate),
@@ -379,18 +379,18 @@ namespace SimpleInjector
         public ContainerCollectionRegistrator Collections => this.Collection;
 
         /// <summary>
-        /// Registers that a new instance of <typeparamref name="TConcrete"/> will be returned every time it 
+        /// Registers that a new instance of <typeparamref name="TConcrete"/> will be returned every time it
         /// is requested (transient).
         /// </summary>
         /// <remarks>
-        /// This method uses the container's 
+        /// This method uses the container's
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
-        /// the exact lifestyle for the specified type. By default this will be 
+        /// the exact lifestyle for the specified type. By default this will be
         /// <see cref="Lifestyle.Transient">Transient</see>.
         /// </remarks>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <typeparamref name="TConcrete"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
@@ -401,13 +401,13 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers that an  instance of <typeparamref name="TConcrete"/> will be returned when it 
+        /// Registers that an  instance of <typeparamref name="TConcrete"/> will be returned when it
         /// is requested. The instance is cached according to the supplied <paramref name="lifestyle"/>.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <typeparamref name="TConcrete"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
@@ -422,17 +422,17 @@ namespace SimpleInjector
         /// <typeparamref name="TService"/> is requested (transient).
         /// </summary>
         /// <remarks>
-        /// This method uses the container's 
+        /// This method uses the container's
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
-        /// the exact lifestyle for the specified type. By default this will be 
+        /// the exact lifestyle for the specified type. By default this will be
         /// <see cref="Lifestyle.Transient">Transient</see>.
         /// </remarks>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <typeparamref name="TService"/> has already been registered.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/>
         /// type is not a type that can be created by the container.
         /// </exception>
         public void Register<TService, TImplementation>()
@@ -444,16 +444,16 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers that an instance of <typeparamref name="TImplementation"/> will be returned when an
-        /// instance of type <typeparamref name="TService"/> is requested. The instance is cached according to 
+        /// instance of type <typeparamref name="TService"/> is requested. The instance is cached according to
         /// the supplied <paramref name="lifestyle"/>.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
         /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <typeparamref name="TService"/> has already been registered.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/>
         /// type is not a type that can be created by the container.
         /// </exception>
         public void Register<TService, TImplementation>(Lifestyle lifestyle)
@@ -464,20 +464,20 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers the specified delegate that allows returning transient instances of 
+        /// Registers the specified delegate that allows returning transient instances of
         /// <typeparamref name="TService"/>. The delegate is expected to always return a new instance on
         /// each call.
         /// </summary>
         /// <remarks>
-        /// This method uses the container's 
+        /// This method uses the container's
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
-        /// the exact lifestyle for the specified type. By default this will be 
+        /// the exact lifestyle for the specified type. By default this will be
         /// <see cref="Lifestyle.Transient">Transient</see>.
         /// </remarks>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="instanceCreator"/> is a null reference.</exception>
@@ -488,7 +488,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers the specified delegate <paramref name="instanceCreator"/> that will produce instances of
-        /// type <typeparamref name="TService"/> and will be returned when an instance of type 
+        /// type <typeparamref name="TService"/> and will be returned when an instance of type
         /// <typeparamref name="TService"/> is requested. The delegate is expected to produce new instances on
         /// each call. The instances are cached according to the supplied <paramref name="lifestyle"/>.
         /// </summary>
@@ -498,7 +498,7 @@ namespace SimpleInjector
         /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.
         /// </param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
         /// <exception cref="ArgumentNullException">
         /// Thrown when one of the supplied arguments is a null reference (Nothing in VB).</exception>
@@ -516,23 +516,23 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers that a new instance of <paramref name="concreteType"/> will be returned every time it 
+        /// Registers that a new instance of <paramref name="concreteType"/> will be returned every time it
         /// is requested (transient).
         /// </summary>
         /// <remarks>
-        /// This method uses the container's 
+        /// This method uses the container's
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
-        /// the exact lifestyle for the specified type. By default this will be 
+        /// the exact lifestyle for the specified type. By default this will be
         /// <see cref="Lifestyle.Transient">Transient</see>.
         /// </remarks>
         /// <param name="concreteType">The concrete type that will be registered. This can be an open-generic type.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="concreteType"/> is a null 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="concreteType"/> is a null
         /// references (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="concreteType"/> represents
         /// a type that can not be created by the container.
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="concreteType"/> has already been registered.
         /// </exception>
         public void Register(Type concreteType)
@@ -547,26 +547,26 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers that a new instance of <paramref name="implementationType"/> will be returned every time a
-        /// <paramref name="serviceType"/> is requested. If <paramref name="serviceType"/> and 
+        /// <paramref name="serviceType"/> is requested. If <paramref name="serviceType"/> and
         /// <paramref name="implementationType"/> represent the same type, the type is registered by itself.
         /// Open and closed generic types are supported.
         /// </summary>
         /// <remarks>
-        /// This method uses the container's 
+        /// This method uses the container's
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
-        /// the exact lifestyle for the specified type. By default this will be 
+        /// the exact lifestyle for the specified type. By default this will be
         /// <see cref="Lifestyle.Transient">Transient</see>.
         /// </remarks>
         /// <param name="serviceType">The base type or interface to register. This can be an open-generic type.</param>
-        /// <param name="implementationType">The actual type that will be returned when requested. 
+        /// <param name="implementationType">The actual type that will be returned when requested.
         /// This can be an open-generic type.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceType"/> or 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceType"/> or
         /// <paramref name="implementationType"/> are null references (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="implementationType"/> is
         /// no sub type from <paramref name="serviceType"/> (or the same type).
         /// </exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
         public void Register(Type serviceType, Type implementationType)
@@ -581,7 +581,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers that an instance of type <paramref name="implementationType"/> will be returned when an
-        /// instance of type <paramref name="serviceType"/> is requested. The instance is cached according to 
+        /// instance of type <paramref name="serviceType"/> is requested. The instance is cached according to
         /// the supplied <paramref name="lifestyle"/>. Open and closed generic types are supported.
         /// </summary>
         /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.
@@ -592,11 +592,11 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// Thrown when this container instance is locked and can not be altered, or when the
         /// <paramref name="serviceType"/> has already been registered.</exception>
         /// <exception cref="ArgumentException">Thrown when the given <paramref name="implementationType"/>
         /// type is not a type that can be created by the container, when either <paramref name="serviceType"/>
-        /// or <paramref name="implementationType"/> are open generic types, or when 
+        /// or <paramref name="implementationType"/> are open generic types, or when
         /// <paramref name="serviceType"/> is not assignable from the <paramref name="implementationType"/>.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
@@ -615,19 +615,19 @@ namespace SimpleInjector
         /// Registers the specified delegate that allows returning instances of <paramref name="serviceType"/>.
         /// </summary>
         /// <remarks>
-        /// This method uses the container's 
+        /// This method uses the container's
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see> to select
-        /// the exact lifestyle for the specified type. By default this will be 
+        /// the exact lifestyle for the specified type. By default this will be
         /// <see cref="Lifestyle.Transient">Transient</see>.
         /// </remarks>
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="instanceCreator">The delegate that will be used for creating new instances.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or
         /// <paramref name="instanceCreator"/> are null references (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
         public void Register(Type serviceType, Func<object> instanceCreator)
@@ -637,15 +637,15 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers the specified delegate <paramref name="instanceCreator"/> that will produce instances of
-        /// type <paramref name="serviceType"/> and will be returned when an instance of type 
-        /// <paramref name="serviceType"/> is requested. The delegate is expected to produce new instances on 
+        /// type <paramref name="serviceType"/> and will be returned when an instance of type
+        /// <paramref name="serviceType"/> is requested. The delegate is expected to produce new instances on
         /// each call. The instances are cached according to the supplied <paramref name="lifestyle"/>.
         /// </summary>
         /// <param name="serviceType">The interface or base type that can be used to retrieve instances.</param>
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
         /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// Thrown when this container instance is locked and can not be altered, or when the
         /// <paramref name="serviceType"/> has already been registered.</exception>
         /// <exception cref="ArgumentNullException">
         /// Thrown when one of the supplied arguments is a null reference (Nothing in VB).</exception>
@@ -666,7 +666,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers a single instance that will be returned when an instance of type 
+        /// Registers a single instance that will be returned when an instance of type
         /// <typeparamref name="TService"/> is requested. This <paramref name="instance"/> must be thread-safe
         /// when working in a multi-threaded environment.
         /// <b>NOTE:</b> Do note that instances supplied by this method <b>NEVER</b> get disposed by the
@@ -676,7 +676,7 @@ namespace SimpleInjector
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instance.</typeparam>
         /// <param name="instance">The instance to register.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="instance"/> is a null reference.
@@ -692,18 +692,18 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers a single instance that will be returned when an instance of type 
+        /// Registers a single instance that will be returned when an instance of type
         /// <typeparamref name="TService"/> is requested. This <paramref name="instance"/> must be thread-safe
         /// when working in a multi-threaded environment.
         /// <b>NOTE:</b> Do note that instances supplied by this method <b>NEVER</b> get disposed by the
         /// container, since the instance is assumed to outlive this container instance. If disposing is
-        /// required, use 
+        /// required, use
         /// <see cref="RegisterSingleton{TService}(Func{TService})">RegisterSingleton&lt;TService&gt;(Func&lt;TService&gt;)</see>.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instance.</typeparam>
         /// <param name="instance">The instance to register.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="instance"/> is a null reference.
@@ -720,18 +720,18 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers a single instance that will be returned when an instance of type 
+        /// Registers a single instance that will be returned when an instance of type
         /// <paramref name="serviceType"/> is requested. This <paramref name="instance"/> must be thread-safe
         /// when working in a multi-threaded environment.
         /// </summary>
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="instance">The instance to register.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or
         /// <paramref name="instance"/> are null references (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="instance"/> is
         /// no sub type from <paramref name="serviceType"/>.</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
         [Obsolete("Please use " + nameof(RegisterInstance) + "(Type, object) instead. " +
@@ -745,22 +745,22 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers a single instance that will be returned when an instance of type 
+        /// Registers a single instance that will be returned when an instance of type
         /// <paramref name="serviceType"/> is requested. This <paramref name="instance"/> must be thread-safe
         /// when working in a multi-threaded environment.
         /// <b>NOTE:</b> Do note that instances supplied by this method <b>NEVER</b> get disposed by the
         /// container, since the instance is assumed to outlive this container instance. If disposing is
-        /// required, use 
+        /// required, use
         /// <see cref="RegisterSingleton(Type, Func{object})">RegisterSingleton(Type, Func&lt;object&gt;)</see>.
         /// </summary>
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="instance">The instance to register.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or
         /// <paramref name="instance"/> are null references (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="instance"/> is
         /// no sub type from <paramref name="serviceType"/>.</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
         public void RegisterInstance(Type serviceType, object instance)
@@ -778,15 +778,15 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers a single concrete instance that will be constructed using constructor injection and will
-        /// be returned when this instance is requested by type <typeparamref name="TConcrete"/>. 
-        /// This <typeparamref name="TConcrete"/> must be thread-safe when working in a multi-threaded 
+        /// be returned when this instance is requested by type <typeparamref name="TConcrete"/>.
+        /// This <typeparamref name="TConcrete"/> must be thread-safe when working in a multi-threaded
         /// environment.
         /// If <typeparamref name="TConcrete"/> implements <see cref="IDisposable"/>, a created instance will
         /// get disposed when <see cref="Container.Dispose()">Container.Dispose</see> gets called.
         /// </summary>
         /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when 
+        /// Thrown when this container instance is locked and can not be altered, or when
         /// <typeparamref name="TConcrete"/> has already been registered.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
@@ -797,10 +797,10 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers that the same a single instance of type <typeparamref name="TImplementation"/> will be 
-        /// returned every time an <typeparamref name="TService"/> type is requested. If 
-        /// <typeparamref name="TService"/> and <typeparamref name="TImplementation"/>  represent the same 
-        /// type, the type is registered by itself. <typeparamref name="TImplementation"/> must be thread-safe 
+        /// Registers that the same a single instance of type <typeparamref name="TImplementation"/> will be
+        /// returned every time an <typeparamref name="TService"/> type is requested. If
+        /// <typeparamref name="TService"/> and <typeparamref name="TImplementation"/>  represent the same
+        /// type, the type is registered by itself. <typeparamref name="TImplementation"/> must be thread-safe
         /// when working in a multi-threaded environment.
         /// If <typeparamref name="TImplementation"/> implements <see cref="IDisposable"/>, a created instance will
         /// get disposed when <see cref="Container.Dispose()">Container.Dispose</see> gets called.
@@ -810,9 +810,9 @@ namespace SimpleInjector
         /// </typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be registered.</typeparam>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when the 
+        /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
-        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/> 
+        /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/>
         /// type is not a type that can be created by the container.
         /// </exception>
         public void RegisterSingleton<TService, TImplementation>()
@@ -826,22 +826,22 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers the specified delegate that allows constructing a single instance of 
-        /// <typeparamref name="TService"/>. This delegate will be called at most once during the lifetime of 
-        /// the application. The returned instance must be thread-safe when working in a multi-threaded 
+        /// Registers the specified delegate that allows constructing a single instance of
+        /// <typeparamref name="TService"/>. This delegate will be called at most once during the lifetime of
+        /// the application. The returned instance must be thread-safe when working in a multi-threaded
         /// environment.
-        /// If the instance returned from <paramref name="instanceCreator"/> implements <see cref="IDisposable"/>, 
-        /// the created instance will get disposed when <see cref="Container.Dispose()">Container.Dispose</see> 
+        /// If the instance returned from <paramref name="instanceCreator"/> implements <see cref="IDisposable"/>,
+        /// the created instance will get disposed when <see cref="Container.Dispose()">Container.Dispose</see>
         /// gets called.
         /// </summary>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">The delegate that allows building or creating this single
         /// instance.</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when a 
+        /// Thrown when this container instance is locked and can not be altered, or when a
         /// <paramref name="instanceCreator"/> for <typeparamref name="TService"/> has already been registered.
         /// </exception>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instanceCreator"/> is a 
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instanceCreator"/> is a
         /// null reference.</exception>
         public void RegisterSingleton<TService>(Func<TService> instanceCreator) where TService : class
         {
@@ -852,23 +852,23 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers that the same instance of type <paramref name="implementationType"/> will be returned every 
-        /// time an instance of type <paramref name="serviceType"/> type is requested. If 
-        /// <paramref name="serviceType"/> and <paramref name="implementationType"/> represent the same type, the 
-        /// type is registered by itself. <paramref name="implementationType"/> must be thread-safe when working 
+        /// Registers that the same instance of type <paramref name="implementationType"/> will be returned every
+        /// time an instance of type <paramref name="serviceType"/> type is requested. If
+        /// <paramref name="serviceType"/> and <paramref name="implementationType"/> represent the same type, the
+        /// type is registered by itself. <paramref name="implementationType"/> must be thread-safe when working
         /// in a multi-threaded environment. Open and closed generic types are supported.
         /// </summary>
         /// <param name="serviceType">The base type or interface to register.
         /// This can be an open-generic type.</param>
         /// <param name="implementationType">The actual type that will be returned when requested.
         /// This can be an open-generic type.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or
         /// <paramref name="implementationType"/> are null references (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="implementationType"/> is
         /// no sub type from <paramref name="serviceType"/>, or when one of them represents an open generic
         /// type.</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
         public void RegisterSingleton(Type serviceType, Type implementationType)
@@ -882,18 +882,18 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers the specified delegate that allows constructing a single <paramref name="serviceType"/> 
+        /// Registers the specified delegate that allows constructing a single <paramref name="serviceType"/>
         /// instance. The container will call this delegate at most once during the lifetime of the application.
         /// </summary>
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="instanceCreator">The delegate that will be used for creating that single instance.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an open
         /// generic type.</exception>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or 
+        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or
         /// <paramref name="instanceCreator"/> are null references (Nothing in
         /// VB).</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
         public void RegisterSingleton(Type serviceType, Func<object> instanceCreator)
@@ -916,7 +916,7 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered.</exception>
         /// <remarks>
         /// <para>
-        /// Multiple <paramref name="instanceInitializer"/> delegates can be registered per 
+        /// Multiple <paramref name="instanceInitializer"/> delegates can be registered per
         /// <typeparamref name="TService"/> and multiple initializers can be applied on a created instance,
         /// before it is returned. For instance, when registering a <paramref name="instanceInitializer"/>
         /// for type <see cref="System.Object"/>, the delegate will be called for every instance created by
@@ -926,65 +926,65 @@ namespace SimpleInjector
         /// Note: Initializers are guaranteed to be executed in the order they are registered.
         /// </para>
         /// <para>
-        /// The following example shows the usage of the 
+        /// The following example shows the usage of the
         /// <see cref="RegisterInitializer{TService}(Action{TService})">RegisterInitializer</see> method:
         /// </para>
         /// <code lang="cs"><![CDATA[
         /// public interface ITimeProvider { DateTime Now { get; } }
         /// public interface ICommand { bool SendAsync { get; set; } }
-        /// 
+        ///
         /// public abstract class CommandBase : ICommand
         /// {
         ///     ITimeProvider Clock { get; set; }
-        ///     
+        ///
         ///     public bool SendAsync { get; set; }
         /// }
-        /// 
+        ///
         /// public class ConcreteCommand : CommandBase { }
-        /// 
+        ///
         /// [TestMethod]
         /// public static void TestRegisterInitializer()
         /// {
         ///     // Arrange
         ///     var container = new Container();
-        /// 
+        ///
         ///     container.Register<ICommand, ConcreteCommand>();
-        /// 
+        ///
         ///     // Configuring property injection for types that implement ICommand:
         ///     container.RegisterInitializer<ICommand>(command =>
         ///     {
         ///         command.SendAsync = true;
         ///     });
-        /// 
+        ///
         ///     // Configuring property injection for types that implement CommandBase:
         ///     container.RegisterInitializer<CommandBase>(command =>
         ///     {
         ///         command.Clock = container.GetInstance<ITimeProvider>();
         ///     });
-        ///     
+        ///
         ///     // Act
         ///     var command = (ConcreteCommand)container.GetInstance<ICommand>();
-        /// 
+        ///
         ///     // Assert
-        ///     // Because ConcreteCommand implements both ICommand and CommandBase, 
+        ///     // Because ConcreteCommand implements both ICommand and CommandBase,
         ///     // both the initializers will have been executed.
         ///     Assert.IsTrue(command.SendAsync);
         ///     Assert.IsNotNull(command.Clock);
         /// }
         /// ]]></code>
         /// <para>
-        /// The container does not use the type information of the requested service type, but it uses the 
-        /// type information of the actual implementation to find all initialized that apply for that 
+        /// The container does not use the type information of the requested service type, but it uses the
+        /// type information of the actual implementation to find all initialized that apply for that
         /// type. This makes it possible to have multiple initializers to be applied on a single returned
         /// instance while keeping performance high.
         /// </para>
         /// <para>
         /// Registered initializers will only be applied to instances that are created by the container self
-        /// (using constructor injection). Types that are newed up manually by supplying a 
-        /// <see cref="Func{T}"/> delegate to the container (using the 
+        /// (using constructor injection). Types that are newed up manually by supplying a
+        /// <see cref="Func{T}"/> delegate to the container (using the
         /// <see cref="Register{TService}(Func{TService})"/> method) or registered as single instance
         /// (using <see cref="RegisterInstance{TService}(TService)"/>) will not trigger initialization.
-        /// When initialization of these instances is needed, this must be done manually, as can be seen in 
+        /// When initialization of these instances is needed, this must be done manually, as can be seen in
         /// the following example:
         /// <code lang="cs"><![CDATA[
         /// [TestMethod]
@@ -992,32 +992,32 @@ namespace SimpleInjector
         /// {
         ///     // Arrange
         ///     int initializerCallCount = 0;
-        ///     
+        ///
         ///     var container = new Container();
-        ///     
+        ///
         ///     // Define a initializer for ICommand
         ///     Action<ICommand> commandInitializer = command =>
         ///     {
         ///         initializerCallCount++;
         ///     });
-        ///     
+        ///
         ///     // Configuring that initializer.
         ///     container.RegisterInitializer<ICommand>(commandInitializer);
-        ///     
+        ///
         ///     container.Register<ICommand>(() =>
         ///     {
         ///         // Create a ConcreteCommand manually: will not be initialized.
         ///         var command = new ConcreteCommand("Data Source=.;Initial Catalog=db;");
-        ///     
+        ///
         ///         // Run the initializer manually.
         ///         commandInitializer(command);
-        ///     
+        ///
         ///         return command;
         ///     });
-        ///     
+        ///
         ///     // Act
         ///     var command = container.GetInstance<ICommand>();
-        /// 
+        ///
         ///     // Assert
         ///     // The initializer will only be called once.
         ///     Assert.AreEqual(1, initializerCallCount);
@@ -1039,8 +1039,8 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers an <see cref="Action{InstanceInitializationData}"/> delegate that runs after the 
-        /// creation of instances for which the supplied <paramref name="predicate"/> returns true. Please 
+        /// Registers an <see cref="Action{InstanceInitializationData}"/> delegate that runs after the
+        /// creation of instances for which the supplied <paramref name="predicate"/> returns true. Please
         /// note that only instances that are created by the container can be initialized this way.
         /// </summary>
         /// <param name="instanceInitializer">The delegate that will be called after the instance has been
@@ -1049,7 +1049,7 @@ namespace SimpleInjector
         /// be applied to a registration or not. The given predicate will be called once for each registration
         /// in the container.</param>
         /// <exception cref="ArgumentNullException">
-        /// Thrown when either the <paramref name="instanceInitializer"/> or <paramref name="predicate"/> are 
+        /// Thrown when either the <paramref name="instanceInitializer"/> or <paramref name="predicate"/> are
         /// null references.
         /// </exception>
         /// <exception cref="InvalidOperationException">
@@ -1083,17 +1083,17 @@ namespace SimpleInjector
         /// types.
         /// </summary>
         /// <typeparam name="TService">The base type or interface to register.</typeparam>
-        /// <param name="registration">The registration that should be stored for the given 
+        /// <param name="registration">The registration that should be stored for the given
         /// <paramtyperef name="TService"/>.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramtyperef name="TService"/> is ambiguous, 
-        /// when it is not assignable from the 
+        /// <exception cref="ArgumentException">Thrown when <paramtyperef name="TService"/> is ambiguous,
+        /// when it is not assignable from the
         /// <paramref name="registration"/>'s <see cref="Registration.ImplementationType">ImplementationType</see>
-        /// or when the supplied <paramref name="registration"/> is created for a different 
+        /// or when the supplied <paramref name="registration"/> is created for a different
         /// <see cref="Container"/> instance.</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramtyperef name="TService"/> has already been registered.
         /// </exception>
         public void AddRegistration<TService>(Registration registration) where TService : class
@@ -1109,83 +1109,83 @@ namespace SimpleInjector
         /// types.
         /// </summary>
         /// <param name="serviceType">The base type or interface to register.</param>
-        /// <param name="registration">The registration that should be stored for the given 
+        /// <param name="registration">The registration that should be stored for the given
         /// <paramref name="serviceType"/>.</param>
         /// <example>
         /// <code lang="cs"><![CDATA[
         /// public interface IFoo { }
         /// public interface IBar { }
         /// public class FooBar : IFoo, IBar { }
-        /// 
+        ///
         /// public void AddRegistration_SuppliedWithSameSingletonRegistrationTwice_ReturnsSameInstance()
         /// {
         ///     // Arrange
         ///     Registration registration =
         ///         Lifestyle.Singleton.CreateRegistration<FooBar, FooBar>(container);
-        /// 
+        ///
         ///     container.AddRegistration(typeof(IFoo), registration);
         ///     container.AddRegistration(typeof(IBar), registration);
-        /// 
+        ///
         ///     // Act
         ///     IFoo foo = container.GetInstance<IFoo>();
         ///     IBar bar  = container.GetInstance<IBar>();
-        /// 
+        ///
         ///     // Assert
         ///     bool fooAndBareAreTheSameInstance = object.ReferenceEquals(foo, bar);
         ///     Assert.IsTrue(fooAndBareAreTheSameInstance);
         /// }
         /// ]]></code>
         /// <para>
-        /// In the example above a singleton registration is created for type <c>FooBar</c> and this 
+        /// In the example above a singleton registration is created for type <c>FooBar</c> and this
         /// registration is added to the container for each interface (<c>IFoo</c> and <c>IBar</c>) that it
-        /// implements. Since both services use the same singleton registration, requesting those services 
+        /// implements. Since both services use the same singleton registration, requesting those services
         /// will result in the return of the same (singleton) instance.
         /// </para>
         /// <para>
         /// <see cref="ExpressionBuilding"/> events are applied to the <see cref="Expression"/> of the
-        /// <see cref="Registration"/> instance and are therefore applied once. <see cref="ExpressionBuilt"/> 
+        /// <see cref="Registration"/> instance and are therefore applied once. <see cref="ExpressionBuilt"/>
         /// events on the other hand get applied to the <b>Expression</b> of the <see cref="InstanceProducer"/>.
-        /// Since each <b>AddRegistration</b> gets its own instance producer (that wraps the 
-        /// <b>Registration</b> instance), this means that the <b>ExpressionBuilt</b> events will be 
+        /// Since each <b>AddRegistration</b> gets its own instance producer (that wraps the
+        /// <b>Registration</b> instance), this means that the <b>ExpressionBuilt</b> events will be
         /// applied for each registered service type.
         /// </para>
         /// <para>
-        /// The most practical example of this is the use of decorators using one of the 
-        /// <see cref="RegisterDecorator(System.Type, System.Type)">RegisterDecorator</see> overloads (decorator registration 
+        /// The most practical example of this is the use of decorators using one of the
+        /// <see cref="RegisterDecorator(System.Type, System.Type)">RegisterDecorator</see> overloads (decorator registration
         /// use the <b>ExpressionBuilt</b> event under the covers). Take a look at the following example:
         /// </para>
         /// <code lang="cs"><![CDATA[
         /// public interface IFoo { }
         /// public interface IBar { }
         /// public class FooBar : IFoo, IBar { }
-        /// 
+        ///
         /// public class BarDecorator : IBar
         /// {
         ///     public BarDecorator(IBar decoratedBar)
         ///     {
         ///         this.DecoratedBar = decoratedBar;
         ///     }
-        ///     
+        ///
         ///     public IBar DecoratedBar { get; private set; }
         /// }
-        /// 
+        ///
         /// public void AddRegistration_SameSingletonRegistrationTwiceAndOneDecoratorApplied_ReturnsSameInstance()
         /// {
         ///     // Arrange
         ///     Registration registration =
         ///         Lifestyle.Singleton.CreateRegistration<FooBar, FooBar>(container);
-        /// 
+        ///
         ///     container.AddRegistration(typeof(IFoo), registration);
         ///     container.AddRegistration(typeof(IBar), registration);
-        ///     
+        ///
         ///     // Registere a decorator for IBar, but not for IFoo
         ///     container.RegisterDecorator(typeof(IBar), typeof(BarDecorator));
-        /// 
+        ///
         ///     // Act
         ///     var foo = container.GetInstance<IFoo>();
         ///     var decorator = container.GetInstance<IBar>() as BarDecorator;
         ///     var bar = decorator.DecoratedBar;
-        /// 
+        ///
         ///     // Assert
         ///     bool fooAndBareAreTheSameInstance = object.ReferenceEquals(foo, bar);
         ///     Assert.IsTrue(fooAndBareAreTheSameInstance);
@@ -1197,12 +1197,12 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is not a reference
-        /// type, is open generic, is ambiguous, when it is not assignable from the 
+        /// type, is open generic, is ambiguous, when it is not assignable from the
         /// <paramref name="registration"/>'s <see cref="Registration.ImplementationType">ImplementationType</see>
-        /// or when the supplied <paramref name="registration"/> is created for a different 
+        /// or when the supplied <paramref name="registration"/> is created for a different
         /// <see cref="Container"/> instance.</exception>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an 
+        /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
         public void AddRegistration(Type serviceType, Registration registration)
@@ -1304,9 +1304,9 @@ namespace SimpleInjector
             if (!constructable)
             {
                 // After some doubt (and even after reading https://stackoverflow.com/questions/1412598/)
-                // I decided to throw an ArgumentException when the given generic type argument was 
-                // invalid. Mainly because a generic type argument is just an argument, and 
-                // ArgumentException even allows us to supply the name of the argument. No developer 
+                // I decided to throw an ArgumentException when the given generic type argument was
+                // invalid. Mainly because a generic type argument is just an argument, and
+                // ArgumentException even allows us to supply the name of the argument. No developer
                 // will be surprised to see an ArgumentException in this case.
                 throw new ArgumentException(message, parameterName);
             }

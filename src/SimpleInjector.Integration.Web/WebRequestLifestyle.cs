@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Integration.Web
@@ -34,7 +34,7 @@ namespace SimpleInjector.Integration.Web
         /// <summary>Initializes a new instance of the <see cref="WebRequestLifestyle"/> class.</summary>
         /// <param name="disposeInstanceWhenWebRequestEnds">
         /// Specifies whether the created and cached instance will be disposed after the execution of the web
-        /// request ended and when the created object implements <see cref="IDisposable"/>. 
+        /// request ended and when the created object implements <see cref="IDisposable"/>.
         /// </param>
         [Obsolete("Please use WebRequestLifestyle() instead. Will be removed in version 5.0.", error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -84,7 +84,7 @@ namespace SimpleInjector.Integration.Web
         }
 
         /// <summary>
-        /// Returns the current <see cref="Scope"/> for this lifestyle and the given 
+        /// Returns the current <see cref="Scope"/> for this lifestyle and the given
         /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>

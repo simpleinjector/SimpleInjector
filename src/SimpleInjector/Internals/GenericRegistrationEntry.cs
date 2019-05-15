@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Internals
@@ -364,7 +364,7 @@ namespace SimpleInjector.Internals
                 var context = new PredicateContext(serviceType, implementationTypeProvider, consumer, handled);
 
                 // NOTE: The producer should only get built after it matches the delegate, to prevent
-                // unneeded producers from being created, because this might cause diagnostic warnings, 
+                // unneeded producers from being created, because this might cause diagnostic warnings,
                 // such as torn lifestyle warnings.
                 var shouldBuildProducer =
                     (this.ImplementationType == null || closedImplementation != null)

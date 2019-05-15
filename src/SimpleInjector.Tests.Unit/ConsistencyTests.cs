@@ -15,7 +15,7 @@
 
             var container = ContainerFactory.New();
 
-            // We 'abuse' ResolveUnregisteredType to simulate multi-threading. ResolveUnregisteredType is 
+            // We 'abuse' ResolveUnregisteredType to simulate multi-threading. ResolveUnregisteredType is
             // called during GetInstance, but before the IInstanceProvider<Concrete> is added to the
             // registrations dictionary.
             container.ResolveUnregisteredType += (s, e) =>
@@ -31,7 +31,7 @@
             };
 
             // Act
-            // What we in fact test here is whether the container correctly makes a snapshot of the 
+            // What we in fact test here is whether the container correctly makes a snapshot of the
             // registrations dictionary. This call would fail in that case, because the snapshot is needed
             // for consistency.
             container.GetInstance<Concrete>();

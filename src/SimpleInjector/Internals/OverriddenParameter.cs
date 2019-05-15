@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Internals
@@ -7,7 +7,7 @@ namespace SimpleInjector.Internals
     using System.Reflection;
 
     // An Overridden parameter prevents the Registration class from calling back into the container to build
-    // an expression for the given constructor parameter. Instead the Registration will 
+    // an expression for the given constructor parameter. Instead the Registration will
     internal struct OverriddenParameter
     {
         // The parameter to ignore.
@@ -31,7 +31,7 @@ namespace SimpleInjector.Internals
             this.Expression = expression;
             this.Producer = producer;
 
-            // A placeholder is a fake expression that we inject into the NewExpression. After the 
+            // A placeholder is a fake expression that we inject into the NewExpression. After the
             // NewExpression is created, it is ran through the ExpressionBuilding interception. By using
             // placeholders instead of the real overridden expressions we prevent those expressions from
             // being processed twice by the ExpressionBuilding event (since we expect the supplied expressions

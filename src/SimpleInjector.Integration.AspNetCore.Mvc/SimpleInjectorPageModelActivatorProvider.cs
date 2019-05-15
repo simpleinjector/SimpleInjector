@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Integration.AspNetCore.Mvc
@@ -84,7 +84,7 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// <returns>The delegate used to dispose the activated Razor Page model or null.</returns>
         public Action<PageContext, object> CreateReleaser(CompiledPageActionDescriptor descriptor) => null;
 
-        // By searching through the current registrations, we ensure that the page model is not auto-registered, 
+        // By searching through the current registrations, we ensure that the page model is not auto-registered,
         // because that might cause it to be resolved from ASP.NET Core, in case auto cross-wiring is enabled.
         private InstanceProducer GetPageModelProducer(Type pageModelType) =>
             this.container.GetCurrentRegistrations().SingleOrDefault(r => r.ServiceType == pageModelType);

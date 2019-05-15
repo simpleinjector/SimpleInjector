@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -49,7 +49,7 @@ namespace SimpleInjector
         [DebuggerStepThrough]
         internal static void IsNotOpenGenericType(Type type, string paramName)
         {
-            // We check for ContainsGenericParameters to see whether there is a Generic Parameter 
+            // We check for ContainsGenericParameters to see whether there is a Generic Parameter
             // to find out if this type can be created.
             if (type.ContainsGenericParameters())
             {

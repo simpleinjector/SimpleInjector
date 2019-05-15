@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -12,8 +12,8 @@ namespace SimpleInjector
 
     /// <summary>
     /// An instance of this type can be injected into constructors of decorator classes that are registered
-    /// using <see cref="Container.RegisterDecorator(Type, Type)">RegisterDecorator</see>. This type contains 
-    /// contextual information about the applied decoration and it allows users to examine the given instance 
+    /// using <see cref="Container.RegisterDecorator(Type, Type)">RegisterDecorator</see>. This type contains
+    /// contextual information about the applied decoration and it allows users to examine the given instance
     /// to make runtime decisions.
     /// </summary>
     [DebuggerDisplay(nameof(DecoratorContext) + " ({" + nameof(DecoratorContext.DebuggerDisplay) + ", nq})")]

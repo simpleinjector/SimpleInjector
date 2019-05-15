@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Diagnostics
@@ -8,7 +8,7 @@ namespace SimpleInjector.Diagnostics
     using SimpleInjector.Advanced;
 
     /// <summary>
-    /// Diagnostic result for a warning about a component that is registered as transient, but implements 
+    /// Diagnostic result for a warning about a component that is registered as transient, but implements
     /// <see cref="IDisposable"/>.
     /// For more information, see: https://simpleinjector.org/diadt.
     /// </summary>

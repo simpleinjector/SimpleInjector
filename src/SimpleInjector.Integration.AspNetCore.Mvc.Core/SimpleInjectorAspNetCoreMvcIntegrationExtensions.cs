@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -68,7 +68,7 @@ namespace SimpleInjector
         /// Registers the ASP.NET Core MVC view component instances that are defined in the application.
         /// </summary>
         /// <param name="container">The container the controllers should be registered in.</param>
-        /// <param name="applicationBuilder">The ASP.NET object that holds the 
+        /// <param name="applicationBuilder">The ASP.NET object that holds the
         /// <see cref="IViewComponentDescriptorProvider"/> that allows retrieving the application's controller types.
         /// </param>
         [Obsolete(
@@ -107,7 +107,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Registers the ASP.NET view component types using the supplied 
+        /// Registers the ASP.NET view component types using the supplied
         /// <paramref name="viewComponentDescriptorProvider"/>.
         /// </summary>
         /// <param name="container">The container the controllers should be registered in.</param>

@@ -22,7 +22,7 @@
             // In v2, Verify() locks the container. This means that when GetCurrentRegistrations when the
             // container is not locked, there are no auto registered instances and we won't have to build
             // any expressions and we therefore don't need to lock.
-            // Still, the container has to be locked when BuildExpression is called on a returned 
+            // Still, the container has to be locked when BuildExpression is called on a returned
             // InstanceProducer.
             container.GetCurrentRegistrations();
 

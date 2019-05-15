@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Advanced
@@ -8,8 +8,8 @@ namespace SimpleInjector.Advanced
 
     /// <summary>
     /// Defines the container's behavior for selecting properties to inject during the creation of a type.
-    /// Set the <see cref="ContainerOptions.PropertySelectionBehavior">PropertySelectionBehavior</see> 
-    /// property of the container's <see cref="Container.Options"/> property to change the default behavior 
+    /// Set the <see cref="ContainerOptions.PropertySelectionBehavior">PropertySelectionBehavior</see>
+    /// property of the container's <see cref="Container.Options"/> property to change the default behavior
     /// of the container. By default, no properties will be injected by the container.
     /// </summary>
     public interface IPropertySelectionBehavior

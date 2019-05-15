@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Diagnostics
@@ -15,7 +15,7 @@ namespace SimpleInjector.Diagnostics
     /// The following example shows the usage of the <b>Analyzer</b> class:
     /// <code lang="cs"><![CDATA[
     /// DiagnosticResult[] results = Analyzer.Analyze(container);
-    /// 
+    ///
     /// var typesWithAShortedLifetimeThanTheirDependencies =
     ///     from result in results
     ///     where result.DiagnosticType == DiagnosticType.LifestyleMismatch

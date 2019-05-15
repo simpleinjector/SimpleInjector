@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -19,11 +19,11 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given set of
-        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>
         /// with container's default lifestyle (which is transient by default).
         /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
         /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
-        /// will be excluded from registration, while 
+        /// will be excluded from registration, while
         /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
         /// </summary>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
@@ -32,8 +32,8 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the given set of 
-        /// <paramref name="assemblies"/> contain multiple types that implement the same 
+        /// <exception cref="InvalidOperationException">Thrown when the given set of
+        /// <paramref name="assemblies"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public void Register(Type openGenericServiceType, params Assembly[] assemblies)
         {
@@ -42,11 +42,11 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given set of
-        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>
         /// with container's default lifestyle (which is transient by default).
         /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
         /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
-        /// will be excluded from registration, while 
+        /// will be excluded from registration, while
         /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
         /// </summary>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
@@ -55,8 +55,8 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the given set of 
-        /// <paramref name="assemblies"/> contain multiple types that implement the same 
+        /// <exception cref="InvalidOperationException">Thrown when the given set of
+        /// <paramref name="assemblies"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public void Register(Type openGenericServiceType, IEnumerable<Assembly> assemblies)
         {
@@ -65,11 +65,11 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given
-        /// <paramref name="assembly"/> that implement the given <paramref name="openGenericServiceType"/> 
+        /// <paramref name="assembly"/> that implement the given <paramref name="openGenericServiceType"/>
         /// with the supplied <paramref name="lifestyle"/>.
         /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
         /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
-        /// will be excluded from registration, while 
+        /// will be excluded from registration, while
         /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
         /// </summary>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
@@ -79,8 +79,8 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the given 
-        /// <paramref name="assembly"/> contain multiple types that implement the same 
+        /// <exception cref="InvalidOperationException">Thrown when the given
+        /// <paramref name="assembly"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public void Register(Type openGenericServiceType, Assembly assembly, Lifestyle lifestyle)
         {
@@ -91,11 +91,11 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given set of
-        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>
         /// with the supplied <paramref name="lifestyle"/>.
         /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
         /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
-        /// will be excluded from registration, while 
+        /// will be excluded from registration, while
         /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
         /// </summary>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
@@ -105,8 +105,8 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the given set of 
-        /// <paramref name="assemblies"/> contain multiple types that implement the same 
+        /// <exception cref="InvalidOperationException">Thrown when the given set of
+        /// <paramref name="assemblies"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public void Register(
             Type openGenericServiceType, IEnumerable<Assembly> assemblies, Lifestyle lifestyle)
@@ -144,11 +144,11 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
-        /// an open generic type or when one of the supplied types from the 
-        /// <paramref name="implementationTypes"/> collection does not derive from 
+        /// an open generic type or when one of the supplied types from the
+        /// <paramref name="implementationTypes"/> collection does not derive from
         /// <paramref name="openGenericServiceType"/>.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the given set of 
-        /// <paramref name="implementationTypes"/> contain multiple types that implement the same 
+        /// <exception cref="InvalidOperationException">Thrown when the given set of
+        /// <paramref name="implementationTypes"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public void Register(Type openGenericServiceType, IEnumerable<Type> implementationTypes)
         {
@@ -165,11 +165,11 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
-        /// an open generic type or when one of the supplied types from the 
-        /// <paramref name="implementationTypes"/> collection does not derive from 
+        /// an open generic type or when one of the supplied types from the
+        /// <paramref name="implementationTypes"/> collection does not derive from
         /// <paramref name="openGenericServiceType"/>.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the given set of 
-        /// <paramref name="implementationTypes"/> contain multiple types that implement the same 
+        /// <exception cref="InvalidOperationException">Thrown when the given set of
+        /// <paramref name="implementationTypes"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public void Register(
             Type openGenericServiceType, IEnumerable<Type> implementationTypes, Lifestyle lifestyle)
@@ -216,11 +216,11 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given set of
-        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>
         /// with <see cref="Lifestyle.Singleton" /> lifestyle.
         /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
         /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
-        /// will be excluded from registration, while 
+        /// will be excluded from registration, while
         /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
         /// </summary>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
@@ -229,8 +229,8 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the given set of 
-        /// <paramref name="assemblies"/> contain multiple types that implement the same 
+        /// <exception cref="InvalidOperationException">Thrown when the given set of
+        /// <paramref name="assemblies"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public void RegisterSingleton(Type openGenericServiceType, params Assembly[] assemblies)
         {
@@ -239,11 +239,11 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given set of
-        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/> 
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>
         /// with <see cref="Lifestyle.Singleton" /> lifestyle.
         /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
         /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
-        /// will be excluded from registration, while 
+        /// will be excluded from registration, while
         /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
         /// </summary>
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
@@ -252,8 +252,8 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the given set of 
-        /// <paramref name="assemblies"/> contain multiple types that implement the same 
+        /// <exception cref="InvalidOperationException">Thrown when the given set of
+        /// <paramref name="assemblies"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public void RegisterSingleton(Type openGenericServiceType, IEnumerable<Assembly> assemblies)
         {
@@ -264,7 +264,7 @@ namespace SimpleInjector
         /// Registers all concrete, non-generic types (both public and internal) that are defined in the given
         /// set of <paramref name="assemblies"/> and that implement the given <typeparamref name="TService"/>
         /// with a default lifestyle and register them as a collection of <typeparamref name="TService"/>.
-        /// Unless overridden using a custom 
+        /// Unless overridden using a custom
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
         /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// </summary>
@@ -285,11 +285,11 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers all concrete, non-generic types (both public and internal) that are defined in the given
-        /// set of <paramref name="assemblies"/> and that implement the given <paramref name="serviceType"/> 
+        /// set of <paramref name="assemblies"/> and that implement the given <paramref name="serviceType"/>
         /// with a default lifestyle and register them as a collection of <paramref name="serviceType"/>.
-        /// Unless overridden using a custom 
+        /// Unless overridden using a custom
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
-        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>. 
+        /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// <see cref="TypesToRegisterOptions.IncludeComposites">Composites</see>,
         /// <see cref="TypesToRegisterOptions.IncludeDecorators">decorators</see> and
         /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
@@ -312,9 +312,9 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers all concrete, non-generic types (both public and internal) that are defined in the given
-        /// set of <paramref name="assemblies"/> and that implement the given <paramref name="serviceType"/> 
+        /// set of <paramref name="assemblies"/> and that implement the given <paramref name="serviceType"/>
         /// with a default lifestyle and register them as a collection of <paramref name="serviceType"/>.
-        /// Unless overridden using a custom 
+        /// Unless overridden using a custom
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
         /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// <see cref="TypesToRegisterOptions.IncludeComposites">Composites</see>,
@@ -338,23 +338,23 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Returns all concrete non-generic types that are located in the supplied <paramref name="assemblies"/> 
-        /// and implement or inherit from the supplied <typeparamref name="TService"/>. 
+        /// Returns all concrete non-generic types that are located in the supplied <paramref name="assemblies"/>
+        /// and implement or inherit from the supplied <typeparamref name="TService"/>.
         /// </summary>
         /// <remarks>
-        /// Use this method when you need influence the types that are registered using 
-        /// <see cref="ContainerCollectionRegistrator.Register(Type, Assembly[])">Container.Collections.Register</see>. 
-        /// The <b>Collections.Register</b> overloads that take a collection of <see cref="Assembly"/> 
+        /// Use this method when you need influence the types that are registered using
+        /// <see cref="ContainerCollectionRegistrator.Register(Type, Assembly[])">Container.Collections.Register</see>.
+        /// The <b>Collections.Register</b> overloads that take a collection of <see cref="Assembly"/>
         /// objects use this method internally to get the list of types that need to be registered. Instead of
-        /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
+        /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects
         /// and pass in a filtered result from this <b>GetTypesToRegister</b> method.
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
-        /// 
+        ///
         /// IEnumerable<Assembly> assemblies = new[] { typeof(ILogger).Assembly };
         /// var types = container.GetTypesToRegister<ILogger>(assemblies)
         ///     .Where(type => type.IsPublic);
-        /// 
+        ///
         /// container.Collections.Register<ILogger>(types);
         /// ]]></code>
         /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
@@ -366,7 +366,7 @@ namespace SimpleInjector
         /// <typeparam name="TService">The base type or interface to find derived types for.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <returns>A collection of types.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference 
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference
         /// (Nothing in VB).</exception>
         /// <returns>A collection of types.</returns>
         public IEnumerable<Type> GetTypesToRegister<TService>(IEnumerable<Assembly> assemblies)
@@ -375,24 +375,24 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Returns all concrete non-generic types that are located in the supplied <paramref name="assemblies"/> 
-        /// and implement or inherit from the supplied <typeparamref name="TService"/>. 
+        /// Returns all concrete non-generic types that are located in the supplied <paramref name="assemblies"/>
+        /// and implement or inherit from the supplied <typeparamref name="TService"/>.
         /// </summary>
         /// <remarks>
         /// Use this method when you need influence the types that are registered using
-        /// <see cref="ContainerCollectionRegistrator.Register(Type, Assembly[])">Container.Collections.Register</see>. 
-        /// The <b>Collections.Register</b> overloads that take a collection of <see cref="Assembly"/> 
+        /// <see cref="ContainerCollectionRegistrator.Register(Type, Assembly[])">Container.Collections.Register</see>.
+        /// The <b>Collections.Register</b> overloads that take a collection of <see cref="Assembly"/>
         /// objects use this method internally to get the list of types that need to be registered. Instead of
-        /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
+        /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects
         /// and pass in a filtered result from this <b>GetTypesToRegister</b> method.
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
-        /// 
+        ///
         /// var types = container.GetTypesToRegister<ILogger>(
         ///     typeof(ILogger).Assembly,
         ///     typeof(FileLogger).Assembly)
         ///     .Where(type => type.IsPublic);
-        /// 
+        ///
         /// container.Collections.Register<ILogger>(types);
         /// ]]></code>
         /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
@@ -404,7 +404,7 @@ namespace SimpleInjector
         /// <typeparam name="TService">The base type or interface to find derived types for.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <returns>A collection of types.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference 
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference
         /// (Nothing in VB).</exception>
         /// <returns>A collection of types.</returns>
         public IEnumerable<Type> GetTypesToRegister<TService>(params Assembly[] assemblies)
@@ -413,25 +413,25 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Returns all concrete non-generic types that are located in the supplied <paramref name="assemblies"/> 
-        /// and implement or inherit from the supplied <paramref name="serviceType"/>. 
+        /// Returns all concrete non-generic types that are located in the supplied <paramref name="assemblies"/>
+        /// and implement or inherit from the supplied <paramref name="serviceType"/>.
         /// <paramref name="serviceType"/> can be an open-generic type.
         /// </summary>
         /// <remarks>
-        /// Use this method when you need influence the types that are registered using 
+        /// Use this method when you need influence the types that are registered using
         /// <see cref="Register(System.Type, IEnumerable{System.Reflection.Assembly})">Register</see> or
-        /// <see cref="ContainerCollectionRegistrator.Register(Type, Assembly[])">Collections.Register</see>. 
-        /// The <b>Register</b> overloads that take a collection of <see cref="Assembly"/> 
+        /// <see cref="ContainerCollectionRegistrator.Register(Type, Assembly[])">Collections.Register</see>.
+        /// The <b>Register</b> overloads that take a collection of <see cref="Assembly"/>
         /// objects use this method internally to get the list of types that need to be registered. Instead of
-        /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
+        /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects
         /// and pass in a filtered result from this <b>GetTypesToRegister</b> method.
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
-        /// 
+        ///
         /// var assemblies = new[] { typeof(ICommandHandler<>).Assembly };
         /// var types = container.GetTypesToRegister(typeof(ICommandHandler<>), assemblies)
         ///     .Where(type => type.IsPublic);
-        /// 
+        ///
         /// container.Register(typeof(ICommandHandler<>), types);
         /// ]]></code>
         /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
@@ -444,7 +444,7 @@ namespace SimpleInjector
         /// a non-generic and open-generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <returns>A collection of types.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference 
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference
         /// (Nothing in VB).</exception>
         public IEnumerable<Type> GetTypesToRegister(Type serviceType, params Assembly[] assemblies)
         {
@@ -452,25 +452,25 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Returns all concrete non-generic types that are located in the supplied <paramref name="assemblies"/> 
-        /// and implement or inherit from the supplied <paramref name="serviceType"/>. 
+        /// Returns all concrete non-generic types that are located in the supplied <paramref name="assemblies"/>
+        /// and implement or inherit from the supplied <paramref name="serviceType"/>.
         /// <paramref name="serviceType"/> can be an open-generic type.
         /// </summary>
         /// <remarks>
-        /// Use this method when you need influence the types that are registered using 
+        /// Use this method when you need influence the types that are registered using
         /// <see cref="Register(System.Type, IEnumerable{System.Reflection.Assembly})">Register</see> or
-        /// <see cref="ContainerCollectionRegistrator.Register(Type, Assembly[])">Collections.Register</see>. 
-        /// The <b>Register</b> overloads that take a collection of <see cref="Assembly"/> 
+        /// <see cref="ContainerCollectionRegistrator.Register(Type, Assembly[])">Collections.Register</see>.
+        /// The <b>Register</b> overloads that take a collection of <see cref="Assembly"/>
         /// objects use this method internally to get the list of types that need to be registered. Instead of
-        /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
+        /// calling such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects
         /// and pass in a filtered result from this <b>GetTypesToRegister</b> method.
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
-        /// 
+        ///
         /// var assemblies = new[] { typeof(ICommandHandler<>).Assembly };
         /// var types = container.GetTypesToRegister(typeof(ICommandHandler<>), assemblies)
         ///     .Where(type => type.IsPublic);
-        /// 
+        ///
         /// container.Register(typeof(ICommandHandler<>), types);
         /// ]]></code>
         /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
@@ -483,7 +483,7 @@ namespace SimpleInjector
         /// a non-generic and open-generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <returns>A collection of types.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference 
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference
         /// (Nothing in VB).</exception>
         public IEnumerable<Type> GetTypesToRegister(Type serviceType, IEnumerable<Assembly> assemblies)
         {
@@ -491,25 +491,25 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Returns all concrete types that are located in the supplied <paramref name="assemblies"/> 
+        /// Returns all concrete types that are located in the supplied <paramref name="assemblies"/>
         /// and implement or inherit from the supplied <paramref name="serviceType"/> and match the specified
         /// <paramref name="options."/>. <paramref name="serviceType"/> can be an open-generic type.
         /// </summary>
         /// <remarks>
-        /// Use this method when you need influence the types that are registered using 
-        /// <see cref="Register(System.Type, IEnumerable{System.Reflection.Assembly})">Register</see>. 
-        /// The <b>Register</b> overloads that take a collection of <see cref="Assembly"/> 
+        /// Use this method when you need influence the types that are registered using
+        /// <see cref="Register(System.Type, IEnumerable{System.Reflection.Assembly})">Register</see>.
+        /// The <b>Register</b> overloads that take a collection of <see cref="Assembly"/>
         /// objects use this method internally to get the list of types that need to be registered. Instead of
-        /// calling  such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects 
+        /// calling  such overload, you can call an overload that takes a list of <see cref="System.Type"/> objects
         /// and pass  in a filtered result from this <b>GetTypesToRegister</b> method.
         /// <code lang="cs"><![CDATA[
         /// var container = new Container();
-        /// 
+        ///
         /// var assemblies = new[] { typeof(ICommandHandler<>).Assembly };
         /// var options = new TypesToRegisterOptions { IncludeGenericTypeDefinitions: true };
         /// var types = container.GetTypesToRegister(typeof(ICommandHandler<>), assemblies, options)
         ///     .Where(type => type.IsPublic);
-        /// 
+        ///
         /// container.Register(typeof(ICommandHandler<>), types);
         /// ]]></code>
         /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
@@ -523,7 +523,7 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <param name="options">The options.</param>
         /// <returns>A collection of types.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference 
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference
         /// (Nothing in VB).</exception>
         public IEnumerable<Type> GetTypesToRegister(
             Type serviceType, IEnumerable<Assembly> assemblies, TypesToRegisterOptions options)

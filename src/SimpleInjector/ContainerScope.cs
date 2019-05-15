@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -25,9 +25,9 @@ namespace SimpleInjector
         /// <remarks>
         /// During the call to <see cref="Container.Dispose()"/> all registered <see cref="Action"/> delegates are
         /// processed in the order of registration. Do note that registered actions <b>are not guaranteed
-        /// to run</b>. In case an exception is thrown during the call to 
-        /// <see cref="Container.Dispose()">Dispose</see>, the 
-        /// <see cref="ContainerScope"/> will stop running any actions that might not have been invoked at that point. 
+        /// to run</b>. In case an exception is thrown during the call to
+        /// <see cref="Container.Dispose()">Dispose</see>, the
+        /// <see cref="ContainerScope"/> will stop running any actions that might not have been invoked at that point.
         /// Instances that are registered for disposal using <see cref="RegisterForDisposal"/> on the other
         /// hand, are guaranteed to be disposed. Note that registered actions won't be invoked during a call
         /// to <see cref="Container.Verify()" />.
@@ -44,7 +44,7 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// Instances that are registered for disposal, will be disposed in opposite order of registration and
-        /// they are guaranteed to be disposed when <see cref="Container.Dispose()"/> is called (even when 
+        /// they are guaranteed to be disposed when <see cref="Container.Dispose()"/> is called (even when
         /// exceptions are thrown). This mimics the behavior of the C# and VB <code>using</code> statements,
         /// where the <see cref="IDisposable.Dispose"/> method is called inside the <code>finally</code> block.
         /// </remarks>
@@ -76,7 +76,7 @@ namespace SimpleInjector
         /// </remarks>
         /// <param name="key">The key of the item to insert or override.</param>
         /// <param name="item">The actual item. May be null.</param>
-        /// <exception cref="ArgumentNullException">Thrown when paramref name="key"/> is a null reference 
+        /// <exception cref="ArgumentNullException">Thrown when paramref name="key"/> is a null reference
         /// (Nothing in VB).</exception>
         public void SetItem(object key, object item) => this.scope.SetItem(key, item);
 
@@ -99,12 +99,12 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Returns the list of <see cref="IDisposable"/> instances that will be disposed of when this 
-        /// instance is being disposed. The list contains scoped instances that are cached in this instance, 
+        /// Returns the list of <see cref="IDisposable"/> instances that will be disposed of when this
+        /// instance is being disposed. The list contains scoped instances that are cached in this instance,
         /// and instances explicitly registered for disposal using <see cref="RegisterForDisposal"/>. The instances
-        /// are returned in order of creation/registration. When 
-        /// <see cref="Container.Dispose()">Container.Dispose</see> is called, the scope will ensure 
-        /// <see cref="IDisposable.Dispose"/> is called on each instance in this list. The instance will be 
+        /// are returned in order of creation/registration. When
+        /// <see cref="Container.Dispose()">Container.Dispose</see> is called, the scope will ensure
+        /// <see cref="IDisposable.Dispose"/> is called on each instance in this list. The instance will be
         /// disposed in opposite order as they appear in the list.
         /// </summary>
         /// <returns>The list of <see cref="IDisposable"/> instances that will be disposed of when this <see cref="SimpleInjector.Scope"/>

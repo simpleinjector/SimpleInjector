@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -15,14 +15,14 @@ namespace SimpleInjector
 
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="Predicate{T}"/>
-    /// delegate that is that is supplied to the 
+    /// delegate that is that is supplied to the
     /// <see cref="Container.RegisterDecorator(Type, Type, Predicate{DecoratorPredicateContext})">RegisterDecorator</see>
     /// overload that takes this delegate. This type contains information about the decoration that is about
     /// to be applied and it allows users to examine the given instance to see whether the decorator should
     /// be applied or not.
     /// </summary>
     /// <remarks>
-    /// Please see the 
+    /// Please see the
     /// <see cref="Container.RegisterDecorator(Type, Type, Predicate{DecoratorPredicateContext})">RegisterDecorator</see>
     /// method for more information.
     /// </remarks>

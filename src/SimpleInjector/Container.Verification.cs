@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -51,7 +51,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Verifies and diagnoses this <b>Container</b> instance. This method will call all registered 
+        /// Verifies and diagnoses this <b>Container</b> instance. This method will call all registered
         /// delegates, iterate registered collections and throws an exception if there was an error.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown when the registration of instances was
@@ -62,7 +62,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Verifies the <b>Container</b>. This method will call all registered delegates, 
+        /// Verifies the <b>Container</b>. This method will call all registered delegates,
         /// iterate registered collections and throws an exception if there was an error.
         /// </summary>
         /// <param name="option">Specifies how the container should verify its configuration.</param>
@@ -146,10 +146,10 @@ namespace SimpleInjector
 
             InstanceProducer[] producersToVerify;
 
-            // The process of building expressions can trigger the creation/registration of new instance 
-            // producers. Those new producers need to be checked as well. That's why we have a loop here. But 
-            // since a user could accidentally trigger the creation of new registrations during verify, we 
-            // must set a sensible limit to the number of iterations, to prevent the process from never 
+            // The process of building expressions can trigger the creation/registration of new instance
+            // producers. Those new producers need to be checked as well. That's why we have a loop here. But
+            // since a user could accidentally trigger the creation of new registrations during verify, we
+            // must set a sensible limit to the number of iterations, to prevent the process from never
             // stopping.
             do
             {

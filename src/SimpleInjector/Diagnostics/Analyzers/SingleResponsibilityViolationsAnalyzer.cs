@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Diagnostics.Analyzers
@@ -45,7 +45,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         private static bool IsAnalyzable(InstanceProducer producer)
         {
             // We can't analyze collections, because this would lead to false positives when decorators are
-            // applied to the collection. For a decorator, each collection element it decorates is a 
+            // applied to the collection. For a decorator, each collection element it decorates is a
             // dependency, which will make it look as if the decorator has too many dependencies. Since the
             // container will delegate the creation of those elements back to the container, those elements
             // would by them selves still get analyzed, so the only thing we'd miss here is the decorator.

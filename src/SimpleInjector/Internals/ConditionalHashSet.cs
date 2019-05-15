@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Internals
@@ -13,7 +13,7 @@ namespace SimpleInjector.Internals
 
         private static readonly Predicate<WeakReference> IsDead = reference => !reference.IsAlive;
 
-        private readonly Dictionary<int, List<WeakReference>> dictionary = 
+        private readonly Dictionary<int, List<WeakReference>> dictionary =
             new Dictionary<int, List<WeakReference>>();
 
         private int shrinkCount = 0;

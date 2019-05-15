@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Internals
@@ -44,7 +44,7 @@ namespace SimpleInjector.Internals
             collection.AppendAll(registrations.Select(ContainerControlledItem.CreateFromRegistration));
         }
 
-        internal static void AppendAll(this IContainerControlledCollection collection, 
+        internal static void AppendAll(this IContainerControlledCollection collection,
             IEnumerable<Type> types)
         {
             collection.AppendAll(types.Select(ContainerControlledItem.CreateFromType));

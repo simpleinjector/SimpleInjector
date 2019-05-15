@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Diagnostics.Debugger
@@ -30,8 +30,8 @@ namespace SimpleInjector.Diagnostics.Debugger
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = @"
-                We must catch all exceptions here, because this constructor is called by the Visual Studio 
-                debugger and it won't hide any failure in case of an exception. We catch and show the 
+                We must catch all exceptions here, because this constructor is called by the Visual Studio
+                debugger and it won't hide any failure in case of an exception. We catch and show the
                 exception in the debug view instead.")]
         private void Initialize()
         {

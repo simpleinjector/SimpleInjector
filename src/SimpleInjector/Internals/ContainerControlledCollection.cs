@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Internals
@@ -192,8 +192,8 @@ namespace SimpleInjector.Internals
         // container.Collections.Register<ILogger>(typeof(ILogger));
         private InstanceProducer GetOrCreateInstanceProducer(Type implementationType)
         {
-            // If the implementationType is explicitly registered (using a Register call) we select this 
-            // producer (but we skip any implicit registrations or anything that is assignable, since 
+            // If the implementationType is explicitly registered (using a Register call) we select this
+            // producer (but we skip any implicit registrations or anything that is assignable, since
             // there could be more than one and it would be unclear which one to pick).
             InstanceProducer producer = this.GetExplicitRegisteredInstanceProducer(implementationType);
 

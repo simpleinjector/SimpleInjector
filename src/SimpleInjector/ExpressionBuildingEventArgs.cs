@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -13,10 +13,10 @@ namespace SimpleInjector
     using SimpleInjector.Advanced;
 
     /// <summary>
-    /// Provides data for and interaction with the 
-    /// <see cref="Container.ExpressionBuilding">ExpressionBuilding</see> event of 
-    /// the <see cref="Container"/>. An observer can change the 
-    /// <see cref="Expression"/> property to change the component that is 
+    /// Provides data for and interaction with the
+    /// <see cref="Container.ExpressionBuilding">ExpressionBuilding</see> event of
+    /// the <see cref="Container"/>. An observer can change the
+    /// <see cref="Expression"/> property to change the component that is
     /// currently being built.
     /// </summary>
     [DebuggerDisplay(nameof(ExpressionBuildingEventArgs) +
@@ -52,12 +52,12 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Gets the type that is known to be returned by the 
+        /// Gets the type that is known to be returned by the
         /// <see cref="Expression">Expression</see> (most often the implementation
         /// type used in the <b>Register</b> call). This type will be a derivative of
         /// <see cref="RegisteredServiceType">RegisteredServiceType</see> (or
-        /// or <b>RegisteredServiceType</b> itself). If the <b>Expression</b> is changed, the new expression 
-        /// must also return an instance of type <b>KnownImplementationType</b> or a sub type. 
+        /// or <b>RegisteredServiceType</b> itself). If the <b>Expression</b> is changed, the new expression
+        /// must also return an instance of type <b>KnownImplementationType</b> or a sub type.
         /// This information must be described in the new Expression.
         /// </summary>
         /// <value>A <see cref="Type"/>.</value>
@@ -67,7 +67,7 @@ namespace SimpleInjector
         /// <value>The <see cref="Lifestyle"/>.</value>
         public Lifestyle Lifestyle { get; }
 
-        /// <summary>Gets or sets the currently registered 
+        /// <summary>Gets or sets the currently registered
         /// <see cref="System.Linq.Expressions.Expression">Expression</see>.</summary>
         /// <value>The current registration.</value>
         /// <exception cref="ArgumentNullException">Thrown when the supplied value is a null reference.</exception>
@@ -95,7 +95,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Gets the collection of currently known relationships. This information is used by the Diagnostics 
+        /// Gets the collection of currently known relationships. This information is used by the Diagnostics
         /// Debug View. Change the contents of this collection to represent the changes made to the
         /// <see cref="Expression">Expression</see> property (if any). This allows
         /// the Diagnostics Debug View to analyze those new relationships as well.

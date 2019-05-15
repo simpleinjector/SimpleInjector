@@ -392,7 +392,7 @@
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Transient);
 
-            // Register the same decorator twice. 
+            // Register the same decorator twice.
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
                 typeof(TransactionHandlerDecorator<>),

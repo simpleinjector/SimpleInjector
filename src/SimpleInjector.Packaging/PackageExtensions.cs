@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 // This class is placed in the root namespace to allow users to start using these extension methods after
@@ -20,8 +20,8 @@ namespace SimpleInjector
         // For more information about why this method was obsoleted, see: #372.
 #if NET40
         /// <summary>
-        /// Loads all <see cref="IPackage"/> implementations from assemblies that are currently loaded in the 
-        /// current AppDomain, and calls their <see cref="IPackage.RegisterServices">Register</see> method. 
+        /// Loads all <see cref="IPackage"/> implementations from assemblies that are currently loaded in the
+        /// current AppDomain, and calls their <see cref="IPackage.RegisterServices">Register</see> method.
         /// Note that only publicly exposed classes that contain a public default constructor will be loaded.
         /// Note that this method will only pick up assemblies that are loaded at that moment in time. A
         /// more reliable way of registering packages is by explicitly supplying the list of assemblies using
@@ -45,9 +45,9 @@ namespace SimpleInjector
 #endif
 
         /// <summary>
-        /// Loads all <see cref="IPackage"/> implementations from the given set of 
-        /// <paramref name="assemblies"/> and calls their <see cref="IPackage.RegisterServices">Register</see> method. 
-        /// Note that only publicly exposed classes that contain a public default constructor will be loaded. 
+        /// Loads all <see cref="IPackage"/> implementations from the given set of
+        /// <paramref name="assemblies"/> and calls their <see cref="IPackage.RegisterServices">Register</see> method.
+        /// Note that only publicly exposed classes that contain a public default constructor will be loaded.
         /// </summary>
         /// <param name="container">The container to which the packages will be applied to.</param>
         /// <param name="assemblies">The assemblies that will be searched for packages.</param>
@@ -72,7 +72,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Loads all <see cref="IPackage"/> implementations from the given set of 
+        /// Loads all <see cref="IPackage"/> implementations from the given set of
         /// <paramref name="assemblies"/> and returns a list of created package instances.
         /// </summary>
         /// <param name="container">The container.</param>
@@ -106,7 +106,7 @@ namespace SimpleInjector
             }
             catch (NotSupportedException)
             {
-                // A type load exception would typically happen on an Anonymously Hosted DynamicMethods 
+                // A type load exception would typically happen on an Anonymously Hosted DynamicMethods
                 // Assembly and it would be safe to skip this exception.
                 return Enumerable.Empty<Type>();
             }

@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -122,7 +122,7 @@ namespace SimpleInjector
 
         internal static IEnumerable CastCollection(IEnumerable collection, Type resultType)
         {
-            // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a 
+            // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a
             // CastEnumerator<[ServiceType]> to be able to supply it to the Collections.Register<T> method.
             var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(resultType);
 

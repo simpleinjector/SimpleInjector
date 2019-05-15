@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Decorators
@@ -84,8 +84,8 @@ namespace SimpleInjector.Decorators
             originalRegistration = originalRegistration ?? e.ReplacedRegistration;
             registeredServiceType = registeredServiceType ?? e.RegisteredServiceType;
 
-            // registeredProducer.ServiceType and registeredServiceType are different when called by 
-            // container uncontrolled decorator. producer.ServiceType will be IEnumerable<T> and 
+            // registeredProducer.ServiceType and registeredServiceType are different when called by
+            // container uncontrolled decorator. producer.ServiceType will be IEnumerable<T> and
             // registeredServiceType will be T.
             if (e.DecoratorInfo == null)
             {
@@ -179,7 +179,7 @@ namespace SimpleInjector.Decorators
         private static void AddVerifierForDecorateeFactoryDependency(
             Expression decorateeExpression, InstanceProducer producer)
         {
-            // Func<T> dependencies for the decoratee must be explicitly added to the InstanceProducer as 
+            // Func<T> dependencies for the decoratee must be explicitly added to the InstanceProducer as
             // verifier. This allows those dependencies to be verified when calling Container.Verify().
             Action<Scope> verifier = GetVerifierFromDecorateeExpression(decorateeExpression);
 

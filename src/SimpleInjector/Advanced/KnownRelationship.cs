@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Advanced
@@ -10,7 +10,7 @@ namespace SimpleInjector.Advanced
 
     /// <summary>
     /// A known relationship defines a relationship between two types. The Diagnostics Debug View uses this
-    /// information to spot possible misconfigurations. 
+    /// information to spot possible misconfigurations.
     /// </summary>
     [DebuggerDisplay("{" + nameof(KnownRelationship.DebuggerDisplay) + ",nq}")]
     public sealed class KnownRelationship : IEquatable<KnownRelationship>

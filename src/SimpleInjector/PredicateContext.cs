@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector
@@ -11,14 +11,14 @@ namespace SimpleInjector
 
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="Predicate{T}"/>
-    /// delegate that is that is supplied to the 
+    /// delegate that is that is supplied to the
     /// <see cref="Container.RegisterConditional(System.Type, System.Type, Lifestyle, Predicate{PredicateContext})">RegisterConditional</see>
-    /// overload that takes this delegate. This type contains information about the open generic service that 
-    /// is about to be created and it allows the user to examine the given instance to decide whether this 
+    /// overload that takes this delegate. This type contains information about the open generic service that
+    /// is about to be created and it allows the user to examine the given instance to decide whether this
     /// implementation should be created or not.
     /// </summary>
     /// <remarks>
-    /// Please see the 
+    /// Please see the
     /// <see cref="Container.RegisterConditional(System.Type, System.Type, Lifestyle, Predicate{PredicateContext})">Register</see>
     /// method for more information.
     /// </remarks>

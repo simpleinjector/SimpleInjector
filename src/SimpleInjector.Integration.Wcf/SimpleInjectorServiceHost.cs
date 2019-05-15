@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Integration.Wcf
@@ -10,7 +10,7 @@ namespace SimpleInjector.Integration.Wcf
     using System.ServiceModel.Description;
 
     /// <summary>
-    /// This service host is used to set up the service behavior that replaces the instance provider to use 
+    /// This service host is used to set up the service behavior that replaces the instance provider to use
     /// dependency injection.
     /// </summary>
     public class SimpleInjectorServiceHost : ServiceHost

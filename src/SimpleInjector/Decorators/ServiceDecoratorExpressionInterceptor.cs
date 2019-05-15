@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Decorators
@@ -112,7 +112,7 @@ namespace SimpleInjector.Decorators
         {
             var info = this.GetServiceTypeInfo(this.e);
 
-            // Add the decorator to the list of applied decorators. This way users can use this information in 
+            // Add the decorator to the list of applied decorators. This way users can use this information in
             // the predicate of the next decorator they add.
             info.AddAppliedDecorator(
                 this.e.RegisteredServiceType,

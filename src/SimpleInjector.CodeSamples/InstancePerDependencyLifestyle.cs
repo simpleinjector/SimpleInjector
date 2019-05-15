@@ -4,15 +4,15 @@
     using System.Linq.Expressions;
 
     /// <summary>
-    /// Injects a new instance for each dependency. Behaves the same as Transient but 
-    /// prevents any lifestyle mismatches from being reported. Instances will not be disposed! 
+    /// Injects a new instance for each dependency. Behaves the same as Transient but
+    /// prevents any lifestyle mismatches from being reported. Instances will not be disposed!
     /// Use with care -or rather- don't use AT ALL!!!
     /// </summary>
     public class InstancePerDependencyLifestyle : Lifestyle
     {
         public InstancePerDependencyLifestyle() : base("Instance Per Dependency") { }
 
-        // Returning Singleton.Length prevents lifestyle mismatches when injected into a 
+        // Returning Singleton.Length prevents lifestyle mismatches when injected into a
         // component, while allowing instances to depend on singletons.
         public override int Length => Singleton.Length;
 

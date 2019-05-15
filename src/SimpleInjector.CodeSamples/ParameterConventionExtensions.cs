@@ -119,7 +119,7 @@
             if (connectionString == null)
             {
                 throw new ActivationException(
-                    "No connection string with name '" + name + "' could be found in the " + 
+                    "No connection string with name '" + name + "' could be found in the " +
                     "application's configuration file.");
             }
 
@@ -182,7 +182,7 @@
 
             if (configurationValue != null)
             {
-                System.ComponentModel.TypeConverter converter = 
+                System.ComponentModel.TypeConverter converter =
                     System.ComponentModel.TypeDescriptor.GetConverter(target.TargetType);
 
                 return converter.ConvertFromString(null,
@@ -195,7 +195,7 @@
         }
     }
     
-    // Using optional parameters in constructor arguments is highly discouraged. 
+    // Using optional parameters in constructor arguments is highly discouraged.
     // This code is merely an example.
     public class OptionalParameterConvention : IParameterConvention
     {

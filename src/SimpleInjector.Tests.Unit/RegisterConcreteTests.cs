@@ -148,7 +148,7 @@
             container.Register<UserServiceBase>(() => container.GetInstance<RealUserService>());
 
             // Act
-            // UserController is dependant on UserServiceBase. 
+            // UserController is dependant on UserServiceBase.
             // Registration should succeed even though IUserRepository is not registered yet.
             container.Register<UserController>();
         }

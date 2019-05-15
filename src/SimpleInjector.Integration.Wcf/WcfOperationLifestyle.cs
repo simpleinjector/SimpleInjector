@@ -1,4 +1,4 @@
-// Copyright (c) Simple Injector Contributors. All rights reserved.
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
 namespace SimpleInjector.Integration.Wcf
@@ -9,7 +9,7 @@ namespace SimpleInjector.Integration.Wcf
 
     /// <summary>
     /// Defines a lifestyle that caches instances for the lifetime of a WCF service class. WCF allows service
-    /// classes to be (both implicitly and explicitly) configured to have a lifetime of <b>PerCall</b>, 
+    /// classes to be (both implicitly and explicitly) configured to have a lifetime of <b>PerCall</b>,
     /// <b>PerSession</b> or <b>Single</b> using the <see cref="InstanceContextMode"/> enumeration. The
     /// lifetime of WCF service classes is controlled by WCF and this lifestyle allows registrations to be
     /// scoped according to the containing WCF service class.
@@ -37,7 +37,7 @@ namespace SimpleInjector.Integration.Wcf
         /// <summary>Initializes a new instance of the <see cref="WcfOperationLifestyle"/> class.</summary>
         /// <param name="disposeInstanceWhenOperationEnds">
         /// Specifies whether the created and cached instance will be disposed after the execution of the WCF
-        /// operation ended and when the created object implements <see cref="IDisposable"/>. 
+        /// operation ended and when the created object implements <see cref="IDisposable"/>.
         /// </param>
         [Obsolete("Please use WcfOperationLifestyle() instead. " +
             "Will be removed in version 5.0.",
