@@ -78,8 +78,28 @@ namespace SimpleInjector
         /// <param name="container">The container.</param>
         /// <param name="assemblies">The assemblies that will be searched for packages.</param>
         /// <returns>Returns a list of created packages.</returns>
-        public static IPackage[] GetPackagesToRegister(this Container container, IEnumerable<Assembly> assemblies)
+        public static IPackage[] GetPackagesToRegister(
+            this Container container, IEnumerable<Assembly> assemblies)
         {
+            if (container == null)
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
+
+            if (assemblies == null)
+            {
+                throw new ArgumentNullException(nameof(assemblies));
+            }
+
+            assemblies = assemblies.ToArray();
+
+            if (assemblies.Any(a => a is null))
+            {
+                throw new ArgumentNullException(
+                    "The elements of the supplied collection should not be null.",
+                    nameof(assemblies));
+            }
+
             var packageTypes = (
                 from assembly in assemblies
                 from type in GetExportedTypesFrom(assembly)
