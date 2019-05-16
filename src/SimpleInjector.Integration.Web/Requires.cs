@@ -7,9 +7,9 @@ namespace SimpleInjector.Integration.Web
 
     internal static class Requires
     {
-        internal static void IsNotNull(object instance, string paramName)
+        internal static void IsNotNull(object? instance, string paramName)
         {
-            if (instance == null)
+            if (instance is null)
             {
                 ThrowArgumentNullException(paramName);
             }
