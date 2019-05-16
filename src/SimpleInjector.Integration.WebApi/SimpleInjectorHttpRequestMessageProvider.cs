@@ -11,13 +11,13 @@ namespace SimpleInjector.Integration.WebApi
     {
         private static readonly string Key = Guid.NewGuid().ToString("N").Substring(0, 12);
 
-        internal static HttpRequestMessage CurrentMessage
+        internal static HttpRequestMessage? CurrentMessage
         {
             get
             {
-                var wrapper = (HttpRequestMessageWrapper)CallContext.LogicalGetData(Key);
+                var wrapper = (HttpRequestMessageWrapper?)CallContext.LogicalGetData(Key);
 
-                return wrapper != null ? wrapper.Message : null;
+                return wrapper?.Message;
             }
 
             set
@@ -31,7 +31,7 @@ namespace SimpleInjector.Integration.WebApi
         [Serializable]
         internal sealed class HttpRequestMessageWrapper : MarshalByRefObject
         {
-            [NonSerializedAttribute]
+            [NonSerialized]
             internal readonly HttpRequestMessage Message;
 
             internal HttpRequestMessageWrapper(HttpRequestMessage message)

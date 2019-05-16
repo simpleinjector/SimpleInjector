@@ -77,7 +77,7 @@ namespace SimpleInjector.Integration.WebApi
         private readonly AsyncScopedLifestyle scopedLifestyle = new AsyncScopedLifestyle();
         private readonly Container container;
         private readonly DependencyResolverScopeOption scopeOption;
-        private readonly Scope scope;
+        private readonly Scope? scope;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleInjectorWebApiDependencyResolver"/> class with
@@ -134,7 +134,7 @@ namespace SimpleInjector.Integration.WebApi
         IDependencyScope IDependencyResolver.BeginScope()
         {
             bool beginScope = this.scopeOption == DependencyResolverScopeOption.RequiresNew ||
-                this.scopedLifestyle.GetCurrentScope(this.container) == null;
+                this.scopedLifestyle.GetCurrentScope(this.container) is null;
 
             return new SimpleInjectorWebApiDependencyResolver(this.container, beginScope);
         }
@@ -144,6 +144,8 @@ namespace SimpleInjector.Integration.WebApi
         /// <returns>The retrieved service.</returns>
         object IDependencyScope.GetService(Type serviceType)
         {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+
             // By calling GetInstance instead of GetService when resolving a controller, we prevent the
             // container from returning null when the controller isn't registered explicitly and can't be
             // created because of an configuration error. GetInstance will throw a descriptive exception
@@ -162,8 +164,12 @@ namespace SimpleInjector.Integration.WebApi
         /// <returns>The retrieved collection of services.</returns>
         IEnumerable<object> IDependencyScope.GetServices(Type serviceType)
         {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+
             Type collectionType = typeof(IEnumerable<>).MakeGenericType(serviceType);
 
+            // The IDependencyResolver doesn't state what is expected from the returned enumerable. We,
+            // therefore, simply assume it is correct to return a stream.
             var services = (IEnumerable<object>)this.ServiceProvider.GetService(collectionType);
 
             // NOTE: The contract of IDependencyScope isn't very clear, but Web API will break when null
@@ -179,10 +185,7 @@ namespace SimpleInjector.Integration.WebApi
         {
             // NOTE: Dispose is called by Web API outside the context of the CallContext in which it was
             // created (which is fucking awful btw and should be considered a design flaw).
-            if (this.scope != null)
-            {
-                this.scope.Dispose();
-            }
+            this.scope?.Dispose();
         }
     }
 }
