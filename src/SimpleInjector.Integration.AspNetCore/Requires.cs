@@ -17,9 +17,9 @@ namespace SimpleInjector
 
         internal static void IsOfType<ShouldBeType>(Type type,string paramName)
         {
-            if ( !(type.IsSubclassOf(typeof(ShouldBeType) ) ))
+            if (!(typeof(ShouldBeType).IsAssignableFrom(type)))
             {
-                throw new ArgumentException($"{paramName} should be of type {nameof(ShouldBeType)}");
+                throw new ArgumentException($"{paramName} should be of type {typeof(ShouldBeType).Name}");
             }
         }
     }
