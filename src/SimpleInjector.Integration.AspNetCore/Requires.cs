@@ -14,5 +14,13 @@ namespace SimpleInjector
                 throw new ArgumentNullException(paramName);
             }
         }
+
+        internal static void IsOfType<ShouldBeType>(Type type,string paramName)
+        {
+            if ( !(type.IsSubclassOf(typeof(ShouldBeType) ) ))
+            {
+                throw new ArgumentException($"{paramName} should be of type {nameof(ShouldBeType)}");
+            }
+        }
     }
 }

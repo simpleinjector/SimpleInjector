@@ -67,5 +67,35 @@ namespace SimpleInjector
                 return middleware.InvokeAsync(c, _ => next());
             });
         }
+
+        /// <summary>
+        /// Adds a middleware type to the application's request pipeline. The middleware will be resolved
+        /// from Simple Injector. The middleware will be added to the container for verification.
+        /// </summary>
+        /// <param name="options">The <see cref="SimpleInjectorUseOptions"/>.</param>
+        /// <param name="middleWareType">The middleware type.</param>
+        /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
+        public static void UseMiddleware(
+            this SimpleInjectorUseOptions options, Type middleWareType, IApplicationBuilder app)
+        {
+            Requires.IsNotNull(options, nameof(options));
+            Requires.IsNotNull(app, nameof(app));
+            Requires.IsOfType<IMiddleware>(middleWareType, nameof(app));
+
+            var container = options.Container;
+
+            var lifestyle = container.Options.LifestyleSelectionBehavior.SelectLifestyle(middleWareType);
+
+            // By creating an InstanceProducer up front, it will be known to the container, and will be part
+            // of the verification process of the container.
+            InstanceProducer<IMiddleware> producer =
+                lifestyle.CreateProducer<IMiddleware>(middleWareType,container);
+
+            app.Use((c, next) =>
+            {
+                IMiddleware middleware = producer.GetInstance();
+                return middleware.InvokeAsync(c, _ => next());
+            });
+        }
     }
 }
