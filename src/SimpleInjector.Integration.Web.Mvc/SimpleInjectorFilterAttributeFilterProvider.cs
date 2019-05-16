@@ -29,8 +29,8 @@ namespace SimpleInjector.Integration.Web.Mvc
 
         internal Container Container { get; }
 
-        public override IEnumerable<Filter> GetFilters(ControllerContext controllerContext,
-            ActionDescriptor actionDescriptor)
+        public override IEnumerable<Filter> GetFilters(
+            ControllerContext controllerContext, ActionDescriptor actionDescriptor)
         {
             Filter[] filters = this.GetBaseFilters(controllerContext, actionDescriptor);
 
@@ -42,7 +42,8 @@ namespace SimpleInjector.Integration.Web.Mvc
             return filters;
         }
 
-        private Filter[] GetBaseFilters(ControllerContext controllerContext, ActionDescriptor actionDescriptor)
+        private Filter[] GetBaseFilters(
+            ControllerContext controllerContext, ActionDescriptor actionDescriptor)
         {
             IEnumerable<Filter> filters = base.GetFilters(controllerContext, actionDescriptor);
 
