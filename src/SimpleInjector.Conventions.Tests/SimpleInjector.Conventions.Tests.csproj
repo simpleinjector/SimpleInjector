@@ -4,7 +4,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>SimpleInjector.Tests.Unit</AssemblyName>
+    <AssemblyName>SimpleInjector.Conventions.Tests</AssemblyName>
     <AssemblyOriginatorKeyFile>../fake.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
@@ -14,7 +14,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <RootNamespace>SimpleInjector.Tests.Unit</RootNamespace>
+    <RootNamespace>SimpleInjector.Conventions.Tests</RootNamespace>
   </PropertyGroup>
 
 

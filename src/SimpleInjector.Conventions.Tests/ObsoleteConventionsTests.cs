@@ -7,8 +7,6 @@
     using System.Reflection;
     using Microsoft.CodeAnalysis;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Integration.AspNetCore.Mvc;
-    using SimpleInjector.Integration.Web;
 
     [TestClass]
     [TestCategory("Conventions")]
@@ -21,30 +19,8 @@
 
         static ObsoleteConventionsTests()
         {
-            // Ensure all assemblies are loaded
-            var types = new[]
-            {
-                typeof(Container), // SimpleInjector.dll
-                typeof(SimpleInjectorAspNetCoreIntegrationExtensions), // SI.Integration.AspNetCore
-                typeof(SimpleInjectorTagHelperActivator), // SI.Integration.AspNetCore.Mvc
-                typeof(SimpleInjectorViewComponentActivator), // SI.Integration.AspNetCore.Mvc.Core
-                typeof(SimpleInjectorWcfExtensions), // SI.Integration.Wcf
-                typeof(SimpleInjectorHttpModule), // SI.Integration.Web
-                typeof(SimpleInjectorMvcExtensions), // SI.Integration.Web.Mvc
-                typeof(SimpleInjectorWebApiExtensions), // SI.Integration.WebApi
-                typeof(PackageExtensions) // SI.Packaging
-            };
-
-            var assemblies = (
-                from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                let fileName = Path.GetFileName(assembly.Location)
-                where fileName.Contains("SimpleInjector")
-                where !fileName.Contains("Test")
-                select assembly)
-                .ToArray();
-
             var exportedSimpleInjectorTypes = (
-                from assembly in assemblies
+                from assembly in ConventionValues.AssembliesUnderConvention
                 from type in assembly.GetExportedTypes()
                 orderby type.FullName
                 select type)
