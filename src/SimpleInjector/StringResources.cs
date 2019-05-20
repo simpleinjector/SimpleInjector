@@ -636,15 +636,25 @@ namespace SimpleInjector
                 property.PropertyType.TypeName(),
                 property.Name);
 
-        internal static string ThisOverloadDoesNotAllowOpenGenerics(IEnumerable<Type> openGenericTypes) =>
+        internal static string ThisOverloadDoesNotAllowOpenGenerics(
+            IEnumerable<Type> openGenericTypes, Type exampleAbstraction, Type exampleImplementation) =>
             Format(
-                "The supplied list of types contains one or multiple open-generic types, but this method " +
-                "is unable to handle open-generic types because it can only map closed-generic service " +
-                "types to a single implementation. " +
-                "You must register the open-generic types separately using the Register(Type, Type) " +
-                "overload. Alternatively, try using {0} instead, if you expect to have multiple " +
-                "implementations per closed-generic abstraction. Invalid types: {1}.",
+                "The supplied list of types contains {0}, but this method is unable to handle open-generic " +
+                "types—it can only map closed-generic service types to a single implementation. {1}" +
+                "You must register the open-generic {3} separately using the Register(Type, Type) " +
+                "overload. Alternatively, try using {2} instead, if you expect to have multiple " +
+                "implementations per closed-generic service type and want to inject a collection into " +
+                "consumers. Invalid {3}: {4}.",
+                openGenericTypes.Count() > 1 ? "multiple open-generic types" : "an open-generic type",
+                exampleAbstraction is null || exampleImplementation is null
+                    ? string.Empty
+                    : Format(
+                        "As an example, the supplied {0} can be used as implementation for the closed-" +
+                        "generic service type {1}, because {0} does not contain any generic type arguments. ",
+                        exampleImplementation.TypeName(),
+                        exampleAbstraction.TypeName()),
                 CollectionsRegisterMethodName,
+                openGenericTypes.Count() > 1 ? "types" : "type",
                 openGenericTypes.Select(TypeName).ToCommaSeparatedText());
 
         internal static string AppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(

@@ -424,10 +424,39 @@
             // Assert
             AssertThat.ThrowsWithParamName("implementationTypes", action);
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The supplied list of types contains one or multiple open-generic types, but this method
-                is unable to handle open-generic types because it can only map closed-generic service
-                types to a single implementation. You must register the open-generic types separately
-                using the Register(Type, Type) overload."
+                The supplied list of types contains an open-generic type, but this method is unable to handle 
+                open-generic types—it can only map closed-generic service types to a single implementation. 
+                You must register the open-generic type separately using the Register(Type, Type) overload."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterTypes_SuppliedWithOpenGenericTypeAndValidNonGeneric_FailsWithExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            Type[] types = new[]
+            {
+                // An open-generic type
+                typeof(GenericHandler<>),
+
+                // A valid non-generic type
+                typeof(FloatHandler),
+            };
+
+            // Act
+            Action action = () => container.Register(typeof(IBatchCommandHandler<>), types);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>($@"
+                The supplied list of types contains an open-generic type, but this method is unable to handle
+                open-generic types—it can only map closed-generic service types to a single implementation.
+                As an example, the supplied {typeof(FloatHandler).ToFriendlyName()} can be used as 
+                implementation for the closed-generic service type 
+                {typeof(IBatchCommandHandler<float>).ToFriendlyName()}, because
+                {typeof(FloatHandler).ToFriendlyName()} does not contain any generic type arguments."
                 .TrimInside(),
                 action);
         }

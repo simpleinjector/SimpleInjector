@@ -193,8 +193,8 @@ namespace SimpleInjector
             implementationTypes = implementationTypes.Distinct().ToArray();
 
             Requires.DoesNotContainNullValues(implementationTypes, nameof(implementationTypes));
-            Requires.CollectionDoesNotContainOpenGenericTypes(
-                implementationTypes, nameof(implementationTypes));
+            CollectionDoesNotContainOpenGenericTypes(
+                openGenericServiceType, implementationTypes, nameof(implementationTypes));
 
             Requires.ServiceIsAssignableFromImplementations(
                 openGenericServiceType,
@@ -688,6 +688,31 @@ namespace SimpleInjector
                         StringResources.MultipleTypesThatRepresentClosedGenericType(
                             invalidRegistration.service, invalidRegistration.implementations));
                 }
+            }
+        }
+
+        private static void CollectionDoesNotContainOpenGenericTypes(
+            Type openGenericServiceType, IEnumerable<Type> typesToRegister, string paramName)
+        {
+            Type[] openGenericTypes = (
+                from type in typesToRegister
+                where type.ContainsGenericParameters()
+                select type)
+                .ToArray();
+
+            if (openGenericTypes.Length > 0)
+            {
+                var closedGenericMapping = (
+                    from type in typesToRegister
+                    where !type.ContainsGenericParameters()
+                    from service in type.GetBaseTypesAndInterfacesFor(openGenericServiceType)
+                    select new { service, type })
+                    .FirstOrDefault();
+
+                string message = StringResources.ThisOverloadDoesNotAllowOpenGenerics(
+                    openGenericTypes, closedGenericMapping?.service, closedGenericMapping?.type);
+
+                throw new ArgumentException(message, paramName);
             }
         }
 
