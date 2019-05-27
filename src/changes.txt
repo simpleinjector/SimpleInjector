@@ -1,5 +1,6 @@
 ﻿Version [Version Number] ([Friendly Version Number]) [Release Date]
 
+This text file is no longer maintained. See https://simpleinjector.org/download for the release notes.
 
 Version 4.0.0 (v4.0 RTM)
 
