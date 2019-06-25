@@ -31,7 +31,7 @@ namespace SimpleInjector
         [Obsolete(
             "Please use " + nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions) + "." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddControllerActivation) + " instead" +
-            "—e.g. 'services.AddSimpleInjector(container, options => options." +
+            "—e.g. 'services.AddSimpleInjector(container, options => options.AddAspNetCore()." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddControllerActivation) + "());'. " +
             "Please see https://simpleinjector.org/aspnetcore for more details. " +
             "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
@@ -74,7 +74,7 @@ namespace SimpleInjector
         [Obsolete(
             "Please use " + nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions) + "." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddViewComponentActivation) + " instead" +
-            "—e.g. 'services.AddSimpleInjector(container, options => options." +
+            "—e.g. 'services.AddSimpleInjector(container, options => options.AddAspNetCore()." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddViewComponentActivation) + "());'. " +
             "Please see https://simpleinjector.org/aspnetcore for more details. " +
             "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
@@ -116,7 +116,7 @@ namespace SimpleInjector
         [Obsolete(
             "Please use " + nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions) + "." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddViewComponentActivation) + " instead" +
-            "—e.g. 'services.AddSimpleInjector(container, options => options." +
+            "—e.g. 'services.AddSimpleInjector(container, options => options.AddAspNetCore()." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddViewComponentActivation) + "());'. " +
             "Please see https://simpleinjector.org/aspnetcore for more details. " +
             "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
