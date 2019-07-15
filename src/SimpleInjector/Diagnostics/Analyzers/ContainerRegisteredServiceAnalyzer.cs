@@ -83,7 +83,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 .ToArray();
 
             return unregisteredTypes.Length == 1
-                ? $"container-registered type {unregisteredTypes[0].ToFriendlyName()}"
+                ? $"container-registered type {unregisteredTypes[0].FriendlyName()}"
                 : $"{unregisteredTypes.Length} container-registered types";
         }
 
