@@ -9,6 +9,7 @@ assignees: ''
 
 Describe your problem, question, or feature in a clear and concise way. Please make sure you:
 
+* Do **not post a duplicate** question on StackOverflow. If you [raised a question](https://stackoverflow.com/questions/ask?tags=simple-injector%20ioc-container%20dependency-injection%20.net%20c%23) with the `simple-injector` tag on StackOverflow, rest assured that we already read your question. Posting a duplicate won't make you get an answer faster.
 * Provide a **[Minimal, Complete, and Verifiable example](https://stackoverflow.com/help/mcve)** that reproduces the problem, illustrates your question, or shows the feature you are missing.
 * Show **what you've tried**.
 * Show a **simplified, but realistic, representation of your application**. We are not interested to see a large amount of source code, but DI-related questions are typically design questions and it is impossible to feedback on your design when you reduce your interfaces and classes to e.g. `IFoo`, `Flux` and `Baz`.
