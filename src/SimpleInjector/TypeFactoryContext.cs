@@ -39,10 +39,12 @@ namespace SimpleInjector
     [DebuggerDisplay(nameof(TypeFactoryContext) + " ({" + nameof(TypeFactoryContext.DebuggerDisplay) + ", nq})")]
     public sealed class TypeFactoryContext : ApiObject
     {
+        private readonly InjectionConsumerInfo consumer;
+
         internal TypeFactoryContext(Type serviceType, InjectionConsumerInfo consumer)
         {
             this.ServiceType = serviceType;
-            this.Consumer = consumer;
+            this.consumer = consumer;
         }
 
         /// <summary>Gets the closed generic service type that is to be created.</summary>
@@ -54,7 +56,8 @@ namespace SimpleInjector
         /// service. This property will return null in case the service is resolved directly from the container.
         /// </summary>
         /// <value>The <see cref="InjectionConsumerInfo"/> or null.</value>
-        public InjectionConsumerInfo Consumer { get; }
+        public InjectionConsumerInfo Consumer =>
+            this.consumer != InjectionConsumerInfo.Root ? this.consumer : null;
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
