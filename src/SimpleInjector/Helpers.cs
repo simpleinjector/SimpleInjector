@@ -12,14 +12,15 @@ namespace SimpleInjector
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading;
+    using SimpleInjector.Internals;
 
     /// <summary>
     /// Helper methods for the container.
     /// </summary>
     internal static class Helpers
     {
-        internal static Lazy<T> ToLazy<T>(T value) =>
-            new Lazy<T>(() => value, LazyThreadSafetyMode.PublicationOnly);
+        internal static LazyEx<T> ToLazy<T>(T value) where T : class =>
+            new LazyEx<T>(value);
 
         internal static T AddReturn<T>(this HashSet<T> set, T value)
         {
