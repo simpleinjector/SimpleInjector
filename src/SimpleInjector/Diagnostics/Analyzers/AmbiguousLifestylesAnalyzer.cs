@@ -113,16 +113,16 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 "The registration for {0} ({1}) maps to the same implementation ({2}) as the {3} for {4} " +
                 "{5}, but the {3} {6} to a different lifestyle. This will cause each registration to " +
                 "resolve to a different instance.",
-                diagnosedProducer.ServiceType.ToFriendlyName(),
+                diagnosedProducer.ServiceType.FriendlyName(),
                 diagnosedProducer.Registration.Lifestyle.Name,
-                diagnosedProducer.Registration.ImplementationType.ToFriendlyName(),
+                diagnosedProducer.Registration.ImplementationType.FriendlyName(),
                 conflictingProducers.Length == 1 ? "registration" : "registrations",
                 conflictingProducers.Select(ToFriendlyNameWithLifestyle).ToCommaSeparatedText(),
                 conflictingProducers.Length == 1 ? "does" : "do",
                 conflictingProducers.Length == 1 ? "maps" : "map");
 
         private static string ToFriendlyNameWithLifestyle(InstanceProducer producer) =>
-            producer.ServiceType.ToFriendlyName() + " (" + producer.Registration.Lifestyle.Name + ")";
+            producer.ServiceType.FriendlyName() + " (" + producer.Registration.Lifestyle.Name + ")";
 
         private static string RegistrationsPlural(int number) => number == 1 ? "registration" : "registrations";
         private static string LifestylesPlural(int number) => number == 1 ? "lifestyle" : "lifestyles";
