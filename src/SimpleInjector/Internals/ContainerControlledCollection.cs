@@ -21,7 +21,7 @@ namespace SimpleInjector.Internals
     {
         private readonly Container container;
 
-        private readonly List<Lazy<InstanceProducer>> producers = new List<Lazy<InstanceProducer>>();
+        private readonly List<LazyEx<InstanceProducer>> producers = new List<LazyEx<InstanceProducer>>();
 
         // This constructor needs to be public. It is called using reflection.
         public ContainerControlledCollection(Container container)
@@ -160,7 +160,7 @@ namespace SimpleInjector.Internals
             return service;
         }
 
-        private static object VerifyCreatingProducer(Lazy<InstanceProducer> lazy)
+        private static object VerifyCreatingProducer(LazyEx<InstanceProducer> lazy)
         {
             try
             {
@@ -176,16 +176,16 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private Lazy<InstanceProducer> ToLazyInstanceProducer(ContainerControlledItem registration) =>
+        private LazyEx<InstanceProducer> ToLazyInstanceProducer(ContainerControlledItem registration) =>
             registration.Registration != null
                 ? ToLazyInstanceProducer(registration.Registration)
                 : this.ToLazyInstanceProducer(registration.ImplementationType);
 
-        private static Lazy<InstanceProducer> ToLazyInstanceProducer(Registration registration) =>
+        private static LazyEx<InstanceProducer> ToLazyInstanceProducer(Registration registration) =>
             Helpers.ToLazy(new InstanceProducer(typeof(TService), registration));
 
-        private Lazy<InstanceProducer> ToLazyInstanceProducer(Type implementationType) =>
-            new Lazy<InstanceProducer>(() => this.GetOrCreateInstanceProducer(implementationType));
+        private LazyEx<InstanceProducer> ToLazyInstanceProducer(Type implementationType) =>
+            new LazyEx<InstanceProducer>(() => this.GetOrCreateInstanceProducer(implementationType));
 
         // Note that the 'implementationType' could in fact be a service type as well and it is allowed
         // for the implementationType to equal TService. This will happen when someone does the following:
