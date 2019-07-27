@@ -72,7 +72,7 @@ namespace SimpleInjector
         private static readonly Predicate<PredicateContext> Always = context => true;
 
         private readonly object locker = new object();
-        private readonly Lazy<Expression> lazyExpression;
+        private readonly LazyEx<Expression> lazyExpression;
 
         private CyclicDependencyValidator validator;
         private Func<object> instanceCreator;
@@ -109,7 +109,7 @@ namespace SimpleInjector
             this.Registration = registration;
             this.validator = new CyclicDependencyValidator(this);
 
-            this.lazyExpression = new Lazy<Expression>(this.BuildExpressionInternal);
+            this.lazyExpression = new LazyEx<Expression>(this.BuildExpressionInternal);
 
             if (registerExternalProducer)
             {

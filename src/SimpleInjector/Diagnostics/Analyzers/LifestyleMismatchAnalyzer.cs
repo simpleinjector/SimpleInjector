@@ -46,11 +46,11 @@ namespace SimpleInjector.Diagnostics.Analyzers
             string.Format(
                 CultureInfo.InvariantCulture,
                 "{0} ({1}) depends on {2}{3} ({4}).{5}{6}",
-                relationship.ImplementationType.ToFriendlyName(),
+                relationship.ImplementationType.FriendlyName(),
                 relationship.Lifestyle.Name,
-                relationship.Dependency.ServiceType.ToFriendlyName(),
+                relationship.Dependency.ServiceType.FriendlyName(),
                 relationship.Dependency.ServiceType != relationship.Dependency.ImplementationType
-                    ? " implemented by " + relationship.Dependency.ImplementationType.ToFriendlyName()
+                    ? " implemented by " + relationship.Dependency.ImplementationType.FriendlyName()
                     : string.Empty,
                 relationship.Dependency.Lifestyle.Name,
                 relationship.AdditionalInformation == string.Empty ? string.Empty : " ",

@@ -7,6 +7,7 @@ namespace SimpleInjector
     using System.Diagnostics;
     using System.Reflection;
     using System.Reflection.Emit;
+    using SimpleInjector.Internals;
 
 #if !PUBLISH && (NET40 || NET45)
     /// <summary>Common Container methods specific for the full .NET version of Simple Injector.</summary>
@@ -14,7 +15,7 @@ namespace SimpleInjector
 #if NET40 || NET45
     public partial class Container
     {
-        private static readonly Lazy<ModuleBuilder> LazyBuilder = new Lazy<ModuleBuilder>(() =>
+        private static readonly LazyEx<ModuleBuilder> LazyBuilder = new LazyEx<ModuleBuilder>(() =>
             AppDomain.CurrentDomain.DefineDynamicAssembly(
                 new AssemblyName("SimpleInjector.Compiled"),
                 AssemblyBuilderAccess.Run)

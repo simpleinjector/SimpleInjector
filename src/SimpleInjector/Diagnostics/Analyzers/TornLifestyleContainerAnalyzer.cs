@@ -90,12 +90,12 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 "The registration for {0} maps to the same implementation and lifestyle as the {1} " +
                 "for {2} {3}. They {4} map to {5} ({6}). This will cause each registration to resolve to " +
                 "a different instance: each registration will have its own instance{7}.",
-                diagnosedProducer.ServiceType.ToFriendlyName(),
+                diagnosedProducer.ServiceType.FriendlyName(),
                 tornProducers.Length == 1 ? "registration" : "registrations",
-                tornProducers.Select(producer => producer.ServiceType.ToFriendlyName()).ToCommaSeparatedText(),
+                tornProducers.Select(producer => producer.ServiceType.FriendlyName()).ToCommaSeparatedText(),
                 tornProducers.Length == 1 ? "does" : "do",
                 tornProducers.Length == 1 ? "both" : "all",
-                diagnosedProducer.Registration.ImplementationType.ToFriendlyName(),
+                diagnosedProducer.Registration.ImplementationType.FriendlyName(),
                 lifestyle.Name,
                 lifestyle == Lifestyle.Singleton ? string.Empty : " during a single " + lifestyle.Name);
         }

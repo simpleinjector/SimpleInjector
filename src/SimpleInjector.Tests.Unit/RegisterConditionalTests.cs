@@ -1727,6 +1727,31 @@
                 "When requesint a root type, the Consumer property should be null.");
         }
 
+        // Regression in v4.5.2. See #734
+        [TestMethod]
+        public void GetInstance_ResolvingConditionalRootObject_SuppliesImplementationTypeFactoryWithNullConsumer()
+        {
+            // Arrange
+            var container = new Container();
+
+            TypeFactoryContext context = null;
+
+            Func<TypeFactoryContext, Type> implementationTypeFactory =
+                c => { context = c; return typeof(NullLogger); };
+
+            container.RegisterConditional(
+                typeof(ILogger),
+                implementationTypeFactory,
+                Lifestyle.Singleton,
+                _ => true);
+
+            // Act
+            container.GetInstance<ILogger>();
+
+            // Assert
+            Assert.IsNull(context.Consumer, message: $"Actual: {context.Consumer}");
+        }
+
         private static void RegisterConditionalConstant<T>(Container container, T constant,
             Predicate<PredicateContext> predicate)
         {

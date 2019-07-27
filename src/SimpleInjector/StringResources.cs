@@ -637,25 +637,38 @@ namespace SimpleInjector
                 property.Name);
 
         internal static string ThisOverloadDoesNotAllowOpenGenerics(
-            IEnumerable<Type> openGenericTypes, Type exampleAbstraction, Type exampleImplementation) =>
+            Type openGenericServiceType, Type[] openGenericTypes, Type[] closedAndNonGenericTypes) =>
             Format(
-                "The supplied list of types contains {0}, but this method is unable to handle open-generic " +
-                "types—it can only map closed-generic service types to a single implementation. {1}" +
-                "You must register the open-generic {3} separately using the Register(Type, Type) " +
-                "overload. Alternatively, try using {2} instead, if you expect to have multiple " +
-                "implementations per closed-generic service type and want to inject a collection into " +
-                "consumers. Invalid {3}: {4}.",
-                openGenericTypes.Count() > 1 ? "multiple open-generic types" : "an open-generic type",
-                exampleAbstraction is null || exampleImplementation is null
-                    ? string.Empty
-                    : Format(
-                        "As an example, the supplied {0} can be used as implementation for the closed-" +
-                        "generic service type {1}, because {0} does not contain any generic type arguments. ",
-                        exampleImplementation.TypeName(),
-                        exampleAbstraction.TypeName()),
+                "The supplied list of types contains {0} open-generic {1}, but this method is unable to " +
+                "handle open-generic implementations—it can only map a single implementation to " +
+                "closed-generic service types. {2}You must register {3} open-generic {1} separately using " +
+                "the Register(Type, Type) overload. Alternatively, try using {4} " +
+                "instead, if you expect to have multiple implementations per closed-generic service type " +
+                "and want to inject a collection of them into consumers. Invalid {1}: {5}.",
+                openGenericTypes.Length == 1 ? "an" : "multiple",
+                openGenericTypes.Length == 1 ? "type" : "types",
+                ThisOverloadDoesNotAllowOpenGenericsExample(
+                    openGenericServiceType: openGenericServiceType,
+                    openGenericTypes: openGenericTypes,
+                    firstClosedAndNonGenericType: closedAndNonGenericTypes.FirstOrDefault()),
+                openGenericTypes.Length == 1 ? "this" : "these",
                 CollectionsRegisterMethodName,
                 openGenericTypes.Count() > 1 ? "types" : "type",
                 openGenericTypes.Select(TypeName).ToCommaSeparatedText());
+
+        internal static string ThisOverloadDoesNotAllowOpenGenericsExample(
+            Type openGenericServiceType, Type[] openGenericTypes, Type firstClosedAndNonGenericType) =>
+            firstClosedAndNonGenericType != null
+                ? Format(
+                    "As an example, the supplied type {0} can be used as implementation, because it " +
+                    "implements the closed-generic service type {1}. The supplied open-generic {2}, " +
+                    "however, can't be mapped to a closed-generic service because of its generic type {3}. ",
+                    firstClosedAndNonGenericType.TypeName(),
+                    firstClosedAndNonGenericType.GetBaseTypesAndInterfacesFor(openGenericServiceType)
+                        .First().TypeName(),
+                    openGenericTypes.First().TypeName(),
+                    openGenericTypes.First().GetGenericArguments().Length == 1 ? "argument" : "arguments")
+                : string.Empty;
 
         internal static string AppendingRegistrationsToContainerUncontrolledCollectionsIsNotSupported(
             Type serviceType) =>

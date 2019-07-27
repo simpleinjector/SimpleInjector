@@ -193,14 +193,17 @@ namespace SimpleInjector
             implementationTypes = implementationTypes.Distinct().ToArray();
 
             Requires.DoesNotContainNullValues(implementationTypes, nameof(implementationTypes));
-            CollectionDoesNotContainOpenGenericTypes(
-                openGenericServiceType, implementationTypes, nameof(implementationTypes));
 
             Requires.ServiceIsAssignableFromImplementations(
                 openGenericServiceType,
                 implementationTypes,
                 paramName: nameof(implementationTypes),
                 typeCanBeServiceType: false);
+
+            CollectionDoesNotContainOpenGenericTypes(
+                openGenericServiceType,
+                implementationTypes,
+                nameof(implementationTypes));
 
             var mappings =
                 from mapping in BatchMapping.Build(openGenericServiceType, implementationTypes)
@@ -636,6 +639,25 @@ namespace SimpleInjector
             return Helpers.Array<Type>.Empty;
         }
 
+        private static void CollectionDoesNotContainOpenGenericTypes(
+            Type openGenericServiceType, IEnumerable<Type> typesToRegister, string paramName)
+        {
+            var openGenericTypes = typesToRegister.Where(type => type.ContainsGenericParameters());
+
+            if (openGenericTypes.Any())
+            {
+                var closedAndNonGenericTypes =
+                    typesToRegister.Where(type => !type.ContainsGenericParameters());
+
+                string message = StringResources.ThisOverloadDoesNotAllowOpenGenerics(
+                    openGenericServiceType: openGenericServiceType,
+                    openGenericTypes: openGenericTypes.ToArray(),
+                    closedAndNonGenericTypes: closedAndNonGenericTypes.ToArray());
+
+                throw new ArgumentException(message, paramName);
+            }
+        }
+
         private sealed class BatchMapping
         {
             internal Type ImplementationType { get; private set; }
@@ -688,31 +710,6 @@ namespace SimpleInjector
                         StringResources.MultipleTypesThatRepresentClosedGenericType(
                             invalidRegistration.service, invalidRegistration.implementations));
                 }
-            }
-        }
-
-        private static void CollectionDoesNotContainOpenGenericTypes(
-            Type openGenericServiceType, IEnumerable<Type> typesToRegister, string paramName)
-        {
-            Type[] openGenericTypes = (
-                from type in typesToRegister
-                where type.ContainsGenericParameters()
-                select type)
-                .ToArray();
-
-            if (openGenericTypes.Length > 0)
-            {
-                var closedGenericMapping = (
-                    from type in typesToRegister
-                    where !type.ContainsGenericParameters()
-                    from service in type.GetBaseTypesAndInterfacesFor(openGenericServiceType)
-                    select new { service, type })
-                    .FirstOrDefault();
-
-                string message = StringResources.ThisOverloadDoesNotAllowOpenGenerics(
-                    openGenericTypes, closedGenericMapping?.service, closedGenericMapping?.type);
-
-                throw new ArgumentException(message, paramName);
             }
         }
 
