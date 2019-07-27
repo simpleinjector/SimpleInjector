@@ -424,10 +424,40 @@
             // Assert
             AssertThat.ThrowsWithParamName("implementationTypes", action);
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The supplied list of types contains one or multiple open-generic types, but this method
-                is unable to handle open-generic types because it can only map closed-generic service
-                types to a single implementation. You must register the open-generic types separately
-                using the Register(Type, Type) overload."
+                The supplied list of types contains an open-generic type, but this method is unable to 
+                handle open-generic implementations—it can only map a single implementation to
+                closed-generic service types. You must register this open-generic type separately using
+                the Register(Type, Type) overload. Alternatively, try using Container.Collection.Register
+                instead, if you expect to have multiple implementations per closed-generic service type
+                and want to inject a collection of them into consumers."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterTypes_SuppliedWithCorrectTypesAndOpenGenericType_FailsWithExpectedExceptionContainingAnExample()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            Type[] types = new[]
+            {
+                typeof(GenericHandler<>),
+                typeof(ObjectHandler),
+                typeof(DecimalHandler),
+            };
+
+            // Act
+            Action action = () => container.Register(typeof(IBatchCommandHandler<>), types);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
+                As an example, the supplied type RegisterBatchTests.ObjectHandler can be used as 
+                implementation, because it implements the closed-generic service type
+                RegisterBatchTests.IBatchCommandHandler<Object>.
+                The supplied open-generic RegisterBatchTests.GenericHandler<T>, however, can't be
+                mapped to a closed-generic service because of its generic type argument.
+                You must register this open-generic type separately"
                 .TrimInside(),
                 action);
         }
