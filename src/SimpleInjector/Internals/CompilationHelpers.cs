@@ -198,10 +198,10 @@ namespace SimpleInjector.Internals
             {
                 reducedNodes = reducedNodes ?? new Dictionary<Expression, InvocationExpression>(16);
 
-                Expression mostReductiveNode = FindMostReductiveNodeOrNull(results,
+                Expression? mostReductiveNode = FindMostReductiveNodeOrNull(results,
                     container.Options.MaximumNumberOfNodesPerDelegate);
 
-                if (mostReductiveNode == null)
+                if (mostReductiveNode is null)
                 {
                     // In case mostReductiveNode is null, there's no good candidate to reduce the object
                     // graph. In that case we break out.
@@ -238,7 +238,7 @@ namespace SimpleInjector.Internals
             return Expression.Invoke(Expression.Constant(compiledDelegate));
         }
 
-        private static Expression FindMostReductiveNodeOrNull(
+        private static Expression? FindMostReductiveNodeOrNull(
             NodeSizes results, int maximumNumberOfNodesPerDelegate)
         {
             // By setting a maximum size, we prevent that the one of the root nodes will be selected as most
@@ -465,7 +465,7 @@ namespace SimpleInjector.Internals
                 return new NodeSizes(totalSize: calculator.size, nodes: calculator.nodes.Values);
             }
 
-            public override Expression Visit(Expression node)
+            public override Expression? Visit(Expression node)
             {
                 // Weird: node can be null: CallExpression.Object can be null.
                 if (node != null)

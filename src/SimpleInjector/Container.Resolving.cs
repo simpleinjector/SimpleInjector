@@ -33,8 +33,8 @@ namespace SimpleInjector
         // Cache for producers that are resolved as root type
         // PERF: The rootProducerCache uses a special equality comparer that does a quicker lookup of types.
         // PERF: This collection is updated by replacing the complete collection.
-        private Dictionary<Type, InstanceProducer> rootProducerCache =
-            new Dictionary<Type, InstanceProducer>(ReferenceEqualityComparer<Type>.Instance);
+        private Dictionary<Type, InstanceProducer?> rootProducerCache =
+            new Dictionary<Type, InstanceProducer?>(ReferenceEqualityComparer<Type>.Instance);
 
         private enum MutableCollectionType { Array, List }
 
@@ -53,12 +53,12 @@ namespace SimpleInjector
                 return (TService)this.GetInstanceForRootType<TService>();
             }
 
-            if (instanceProducer == null)
+            if (instanceProducer is null)
             {
                 this.ThrowMissingInstanceProducerException(typeof(TService));
             }
 
-            return (TService)instanceProducer.GetInstance();
+            return (TService)instanceProducer!.GetInstance();
         }
 
         /// <summary>Gets an instance of the given <paramref name="serviceType"/>.</summary>
@@ -75,12 +75,12 @@ namespace SimpleInjector
                 return this.GetInstanceForRootType(serviceType);
             }
 
-            if (instanceProducer == null)
+            if (instanceProducer is null)
             {
                 this.ThrowMissingInstanceProducerException(serviceType);
             }
 
-            return instanceProducer.GetInstance();
+            return instanceProducer!.GetInstance();
         }
 
         /// <summary>
@@ -701,7 +701,8 @@ namespace SimpleInjector
         {
             if (producer != null)
             {
-                throw producer.Exception;
+                // Exception is never null in this context.
+                throw producer.Exception!;
             }
             else
             {

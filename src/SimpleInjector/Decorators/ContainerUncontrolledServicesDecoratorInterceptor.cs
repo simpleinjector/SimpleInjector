@@ -254,10 +254,11 @@ namespace SimpleInjector.Decorators
 
             if (decorateeFactoryType != null)
             {
+                // decoratorType is never null at this point
                 string message = StringResources.CantGenerateFuncForDecorator(
                     this.registeredServiceType,
                     decorateeFactoryType,
-                    decoratorTypeDefinition ?? this.decoratorType);
+                    decoratorTypeDefinition ?? this.decoratorType!);
 
                 throw new ActivationException(message);
             }
@@ -282,9 +283,10 @@ namespace SimpleInjector.Decorators
             // the past, we don't want to introduce (yet another) breaking change.
             if (this.Lifestyle != Lifestyle.Transient && this.Lifestyle != Lifestyle.Singleton)
             {
+                // At this point, decoratorType is never null.
                 throw new NotSupportedException(
                     StringResources.CanNotDecorateContainerUncontrolledCollectionWithThisLifestyle(
-                        decoratorTypeDefinition ?? this.decoratorType,
+                        decoratorTypeDefinition ?? this.decoratorType!,
                         this.Lifestyle,
                         this.registeredServiceType));
             }
