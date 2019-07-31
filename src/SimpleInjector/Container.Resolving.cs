@@ -127,7 +127,7 @@ namespace SimpleInjector
                 instanceProducer = this.GetRegistration(serviceType);
             }
 
-            return instanceProducer != null && instanceProducer.IsValid
+            return instanceProducer?.IsValid == true
                 ? instanceProducer.GetInstance()
                 : null;
         }
@@ -306,7 +306,7 @@ namespace SimpleInjector
 
         private object GetInstanceFromProducer(InstanceProducer? instanceProducer, Type serviceType)
         {
-            if (instanceProducer == null)
+            if (instanceProducer is null)
             {
                 this.ThrowMissingInstanceProducerException(serviceType);
             }
@@ -499,7 +499,7 @@ namespace SimpleInjector
         private InstanceProducer BuildMutableCollectionProducerFromUncontrolledCollection(
             Type serviceType, Type elementType)
         {
-            var enumerableProducer = this.GetRegistration(
+            InstanceProducer? enumerableProducer = this.GetRegistration(
                 typeof(IEnumerable<>).MakeGenericType(elementType), throwOnFailure: true);
             Expression enumerableExpression = enumerableProducer!.BuildExpression();
 

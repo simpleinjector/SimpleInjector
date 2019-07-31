@@ -210,7 +210,7 @@ namespace SimpleInjector
 
             foreach (var mapping in mappings)
             {
-                this.AddRegistration(mapping.serviceType!, mapping.registration!);
+                this.AddRegistration(mapping.serviceType, mapping.registration);
             }
         }
 
@@ -687,7 +687,7 @@ namespace SimpleInjector
                 {
                     throw new InvalidOperationException(
                         StringResources.MultipleTypesThatRepresentClosedGenericType(
-                            invalidRegistration.service!, invalidRegistration.implementations!));
+                            invalidRegistration.service, invalidRegistration.implementations));
                 }
             }
         }
