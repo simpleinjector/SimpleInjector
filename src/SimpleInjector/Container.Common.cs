@@ -627,10 +627,10 @@ namespace SimpleInjector
             // starts depending on them.
             var scopeLifestyle = new ScopedScopeLifestyle();
 
-            this.resolveUnregisteredTypeRegistrations[typeof(Scope)] = new Lazy<InstanceProducer>(
+            this.resolveUnregisteredTypeRegistrations[typeof(Scope)] = new LazyEx<InstanceProducer>(
                 () => scopeLifestyle.CreateProducer(() => scopeLifestyle.GetCurrentScope(this), this));
 
-            this.resolveUnregisteredTypeRegistrations[typeof(Container)] = new Lazy<InstanceProducer>(
+            this.resolveUnregisteredTypeRegistrations[typeof(Container)] = new LazyEx<InstanceProducer>(
                 () => Lifestyle.Singleton.CreateProducer(() => this, this));
         }
 

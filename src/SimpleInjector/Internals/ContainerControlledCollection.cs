@@ -21,7 +21,7 @@ namespace SimpleInjector.Internals
     {
         private readonly Container container;
 
-        private readonly List<Lazy<InstanceProducer>> producers = new List<Lazy<InstanceProducer>>();
+        private readonly List<LazyEx<InstanceProducer>> producers = new List<LazyEx<InstanceProducer>>();
 
         // This constructor needs to be public. It is called using reflection.
         public ContainerControlledCollection(Container container)
@@ -160,7 +160,7 @@ namespace SimpleInjector.Internals
             return service;
         }
 
-        private static object VerifyCreatingProducer(Lazy<InstanceProducer> lazy)
+        private static object VerifyCreatingProducer(LazyEx<InstanceProducer> lazy)
         {
             try
             {
@@ -176,12 +176,12 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private Lazy<InstanceProducer> ToLazyInstanceProducer(ContainerControlledItem item) =>
+        private LazyEx<InstanceProducer> ToLazyInstanceProducer(ContainerControlledItem item) =>
             item.Registration != null
                 ? ToLazyInstanceProducer(item.Registration)
-                : new Lazy<InstanceProducer>(() => this.GetOrCreateInstanceProducer(item));
+                : new LazyEx<InstanceProducer>(() => this.GetOrCreateInstanceProducer(item));
 
-        private static Lazy<InstanceProducer> ToLazyInstanceProducer(Registration registration) =>
+        private static LazyEx<InstanceProducer> ToLazyInstanceProducer(Registration registration) =>
             Helpers.ToLazy(new InstanceProducer(typeof(TService), registration));
 
         // Note that the 'implementationType' could in fact be a service type as well and it is allowed

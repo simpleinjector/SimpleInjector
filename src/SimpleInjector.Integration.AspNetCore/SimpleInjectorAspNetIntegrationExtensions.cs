@@ -152,6 +152,7 @@ namespace SimpleInjector
         // WARNING: Although most of the extension methods in this class can become obsolete, because of the
         // new fluent API, this method should not be obsoleted, as there is no alternative for the following
         // call: app.Map("/api/queries", builder => builder.UseMiddleware<QueryHandlerMiddleware>(container));
+
         /// <summary>
         /// Adds a middleware type to the application's request pipeline. The middleware will be resolved from
         /// the supplied the Simple Injector <paramref name="container"/>. The middleware will be added to the

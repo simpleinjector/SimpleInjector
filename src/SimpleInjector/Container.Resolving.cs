@@ -24,8 +24,8 @@ namespace SimpleInjector
         private static readonly MethodInfo EnumerableToListMethod =
             typeof(Enumerable).GetMethod(nameof(Enumerable.ToList));
 
-        private readonly Dictionary<Type, Lazy<InstanceProducer>> resolveUnregisteredTypeRegistrations =
-            new Dictionary<Type, Lazy<InstanceProducer>>();
+        private readonly Dictionary<Type, LazyEx<InstanceProducer>> resolveUnregisteredTypeRegistrations =
+            new Dictionary<Type, LazyEx<InstanceProducer>>();
 
         private readonly Dictionary<Type, InstanceProducer?> emptyAndRedirectedCollectionRegistrationCache =
             new Dictionary<Type, InstanceProducer?>();

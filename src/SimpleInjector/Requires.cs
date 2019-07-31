@@ -335,22 +335,6 @@ namespace SimpleInjector
             }
         }
 
-        internal static void CollectionDoesNotContainOpenGenericTypes(IEnumerable<Type> typesToRegister,
-            string paramName)
-        {
-            var openGenericTypes =
-                from type in typesToRegister
-                where type.ContainsGenericParameters()
-                select type;
-
-            if (openGenericTypes.Any())
-            {
-                string message = StringResources.ThisOverloadDoesNotAllowOpenGenerics(openGenericTypes);
-
-                throw new ArgumentException(message, paramName);
-            }
-        }
-
         [DebuggerStepThrough]
         internal static void IsValidEnum<TEnum>(TEnum value, string paramName) where TEnum : struct
         {

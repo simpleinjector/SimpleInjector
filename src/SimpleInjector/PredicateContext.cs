@@ -8,6 +8,7 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Internals;
 
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="Predicate{T}"/>
@@ -26,7 +27,7 @@ namespace SimpleInjector
     public sealed class PredicateContext : ApiObject
     {
         private readonly InjectionConsumerInfo consumer;
-        private readonly Lazy<Type?> implementationType;
+        private readonly LazyEx<Type> implementationType;
 
         internal PredicateContext(InstanceProducer producer, InjectionConsumerInfo consumer, bool handled)
             : this(producer.ServiceType, producer.Registration.ImplementationType, consumer, handled)
@@ -41,7 +42,7 @@ namespace SimpleInjector
             Requires.IsNotNull(consumer, nameof(consumer));
 
             this.ServiceType = serviceType;
-            this.implementationType = Helpers.ToLazy<Type?>(implementationType);
+            this.implementationType = new LazyEx<Type>(implementationType);
             this.consumer = consumer;
             this.Handled = handled;
         }
@@ -57,7 +58,11 @@ namespace SimpleInjector
             Requires.IsNotNull(consumer, nameof(consumer));
 
             this.ServiceType = serviceType;
-            this.implementationType = new Lazy<Type?>(implementationTypeProvider);
+
+            // HACK: LazyEx does not support null (as a simplification and memory optimization). This is why
+            // the dummy type is returned when the provider returns null.
+            this.implementationType =
+                new LazyEx<Type>(() => implementationTypeProvider() ?? typeof(NullMarkerDummy));
             this.consumer = consumer;
             this.Handled = handled;
         }
@@ -70,7 +75,15 @@ namespace SimpleInjector
         /// Gets the closed generic implementation type that will be created by the container.
         /// </summary>
         /// <value>The implementation type.</value>
-        public Type? ImplementationType => this.implementationType.Value;
+        public Type? ImplementationType
+        {
+            get
+            {
+                Type type = this.implementationType.Value;
+
+                return type == typeof(NullMarkerDummy) ? null : type;
+            }
+        }
 
         /// <summary>Gets a value indicating whether a previous <b>Register</b> registration has already
         /// been applied for the given <see cref="ServiceType"/>.</summary>
@@ -99,5 +112,7 @@ namespace SimpleInjector
             this.Handled,
             nameof(this.Consumer),
             this.Consumer);
+
+        private sealed class NullMarkerDummy { }
     }
 }

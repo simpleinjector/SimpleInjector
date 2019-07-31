@@ -90,7 +90,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
             var possibleSkippedRegistrationsDescription = string.Join(" or ",
                 from possibleSkippedRegistration in possibleSkippedRegistrations
-                let name = possibleSkippedRegistration.ServiceType.ToFriendlyName()
+                let name = possibleSkippedRegistration.ServiceType.FriendlyName()
                 orderby name
                 select string.Format(
                     CultureInfo.InvariantCulture,
@@ -101,8 +101,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return string.Format(
                 CultureInfo.InvariantCulture,
                 "{0} might incorrectly depend on unregistered type {1} ({2}) instead of {3}.",
-                relationship.ImplementationType.ToFriendlyName(),
-                relationship.Dependency.ServiceType.ToFriendlyName(),
+                relationship.ImplementationType.FriendlyName(),
+                relationship.Dependency.ServiceType.FriendlyName(),
                 relationship.Dependency.Lifestyle.Name,
                 possibleSkippedRegistrationsDescription);
         }
