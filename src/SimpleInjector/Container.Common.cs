@@ -625,11 +625,10 @@ namespace SimpleInjector
         {
             // Add the default registrations. This adds them as registration, but only in case some component
             // starts depending on them.
-            // HACK: ScopedScopeLifestyle.GetCurrentScopeCore will never return null.
             var scopeLifestyle = new ScopedScopeLifestyle();
 
             this.resolveUnregisteredTypeRegistrations[typeof(Scope)] = new Lazy<InstanceProducer>(
-                () => scopeLifestyle.CreateProducer(() => scopeLifestyle.GetCurrentScope(this)!, this));
+                () => scopeLifestyle.CreateProducer(() => scopeLifestyle.GetCurrentScope(this), this));
 
             this.resolveUnregisteredTypeRegistrations[typeof(Container)] = new Lazy<InstanceProducer>(
                 () => Lifestyle.Singleton.CreateProducer(() => this, this));
