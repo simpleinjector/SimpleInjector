@@ -17,7 +17,6 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <LangVersion>preview</LangVersion>
-    <NullableReferenceTypes>true</NullableReferenceTypes>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

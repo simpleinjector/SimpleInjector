@@ -19,7 +19,6 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
     <LangVersion>preview</LangVersion>
-    <NullableReferenceTypes>true</NullableReferenceTypes>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

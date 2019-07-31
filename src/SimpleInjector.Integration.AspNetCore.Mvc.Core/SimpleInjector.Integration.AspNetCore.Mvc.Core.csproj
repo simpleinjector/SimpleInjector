@@ -21,7 +21,6 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <LangVersion>preview</LangVersion>
-    <NullableReferenceTypes>true</NullableReferenceTypes>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
