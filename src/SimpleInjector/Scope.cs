@@ -15,7 +15,7 @@ namespace SimpleInjector
     /// <see cref="Scope"/> is thread-safe can be used over multiple threads concurrently, but note that the
     /// cached instances might not be thread-safe.
     /// </remarks>
-    public class Scope : ApiObject, IDisposable
+    public class Scope : ApiObject, IDisposable, IServiceProvider
     {
         private const int MaximumDisposeRecursion = 100;
 
@@ -249,6 +249,36 @@ namespace SimpleInjector
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>Gets the service object of the specified type.</summary>
+        /// <param name="serviceType">An object that specifies the type of service object to get.</param>
+        /// <returns>A service object of type serviceType -or- null if there is no service object of type
+        /// <paramref name="serviceType"/>.</returns>
+        object IServiceProvider.GetService(Type serviceType)
+        {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+
+            IServiceProvider provider = this.Container;
+
+            if (provider is null)
+            {
+                throw new InvalidOperationException(
+                    "This method can only be called on Scope instances that are related to a Container. " +
+                    "Please use the overloaded constructor of Scope create an instance with a Container.");
+            }
+
+            Scope originalScope = this.Container.CurrentThreadResolveScope;
+
+            try
+            {
+                this.Container.CurrentThreadResolveScope = this;
+                return provider.GetService(serviceType);
+            }
+            finally
+            {
+                this.Container.CurrentThreadResolveScope = originalScope;
+            }
         }
 
         internal static TImplementation GetInstance<TImplementation>(
