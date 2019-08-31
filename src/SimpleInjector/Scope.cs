@@ -255,11 +255,11 @@ namespace SimpleInjector
         /// <param name="serviceType">An object that specifies the type of service object to get.</param>
         /// <returns>A service object of type serviceType -or- null if there is no service object of type
         /// <paramref name="serviceType"/>.</returns>
-        object IServiceProvider.GetService(Type serviceType)
+        object? IServiceProvider.GetService(Type serviceType)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
 
-            IServiceProvider provider = this.Container;
+            IServiceProvider? provider = this.Container;
 
             if (provider is null)
             {
@@ -268,7 +268,7 @@ namespace SimpleInjector
                     "Please use the overloaded constructor of Scope create an instance with a Container.");
             }
 
-            Scope originalScope = this.Container.CurrentThreadResolveScope;
+            Scope? originalScope = this.Container!.CurrentThreadResolveScope;
 
             try
             {
