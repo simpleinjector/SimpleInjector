@@ -35,7 +35,7 @@ namespace SimpleInjector.Advanced
             "Will be removed in version 5.0.",
             error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public InstanceProducer Producer { get; }
+        public InstanceProducer? Producer { get; }
 
         /// <summary>
         /// Gets the <see cref="Registration"/> that is responsible for the initialization of the created

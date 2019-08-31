@@ -23,7 +23,7 @@ namespace SimpleInjector.Internals
         {
             IEnumerable<InstanceProducer> CurrentProducers { get; }
 
-            InstanceProducer TryGetProducer(InjectionConsumerInfo consumer, bool handled);
+            InstanceProducer? TryGetProducer(InjectionConsumerInfo consumer, bool handled);
         }
 
         public IEnumerable<InstanceProducer> CurrentProducers =>
@@ -59,7 +59,7 @@ namespace SimpleInjector.Internals
             Type serviceType,
             Func<TypeFactoryContext, Type> implementationTypeFactory,
             Lifestyle lifestyle,
-            Predicate<PredicateContext> predicate)
+            Predicate<PredicateContext>? predicate)
         {
             Requires.IsNotNull(predicate, "only support conditional for now");
 
@@ -76,11 +76,11 @@ namespace SimpleInjector.Internals
                     serviceType,
                     implementationTypeFactory,
                     lifestyle,
-                    predicate,
+                    predicate!,
                     this.container));
         }
 
-        public InstanceProducer TryGetInstanceProducer(Type serviceType, InjectionConsumerInfo consumer)
+        public InstanceProducer? TryGetInstanceProducer(Type serviceType, InjectionConsumerInfo consumer)
         {
             var instanceProducers = this.GetInstanceProducers(consumer).ToArray();
 
@@ -96,7 +96,7 @@ namespace SimpleInjector.Internals
             Type serviceType,
             Type implementationType,
             Lifestyle lifestyle,
-            Predicate<PredicateContext> predicate)
+            Predicate<PredicateContext>? predicate)
         {
             throw new NotSupportedException();
         }
@@ -107,7 +107,7 @@ namespace SimpleInjector.Internals
 
             foreach (var provider in this.providers)
             {
-                InstanceProducer producer = provider.TryGetProducer(consumer, handled);
+                InstanceProducer? producer = provider.TryGetProducer(consumer, handled);
 
                 if (producer != null)
                 {
@@ -223,7 +223,7 @@ namespace SimpleInjector.Internals
 
             public IEnumerable<InstanceProducer> CurrentProducers => Enumerable.Repeat(this.producer, 1);
 
-            public InstanceProducer TryGetProducer(InjectionConsumerInfo consumer, bool handled) =>
+            public InstanceProducer? TryGetProducer(InjectionConsumerInfo consumer, bool handled) =>
                 this.producer.Predicate(new PredicateContext(this.producer, consumer, handled))
                     ? this.producer
                     : null;
@@ -265,7 +265,7 @@ namespace SimpleInjector.Internals
                 }
             }
 
-            public InstanceProducer TryGetProducer(InjectionConsumerInfo consumer, bool handled)
+            public InstanceProducer? TryGetProducer(InjectionConsumerInfo consumer, bool handled)
             {
                 Func<Type> implementationTypeProvider =
                     () => this.GetImplementationTypeThroughFactory(consumer);
@@ -311,21 +311,24 @@ namespace SimpleInjector.Internals
                 // Never build a producer twice. This could cause components with a torn lifestyle.
                 lock (this.cache)
                 {
+                    // ImplementationType will never be null at this point.
+                    Type implementationType = context.ImplementationType!;
+
                     // We need to cache on implementation, because service type is always the same.
-                    if (!this.cache.TryGetValue(context.ImplementationType, out producer))
+                    if (!this.cache.TryGetValue(implementationType, out producer))
                     {
-                        this.cache[context.ImplementationType] =
-                            producer = this.CreateNewProducerFor(context);
+                        this.cache[implementationType] =
+                            producer = this.CreateNewProducerFor(implementationType);
                     }
                 }
 
                 return producer;
             }
 
-            private InstanceProducer CreateNewProducerFor(PredicateContext context) =>
+            private InstanceProducer CreateNewProducerFor(Type concreteType) =>
                 new InstanceProducer(
                     this.serviceType,
-                    this.lifestyle.CreateRegistration(context.ImplementationType, this.container),
+                    this.lifestyle.CreateRegistration(concreteType, this.container),
                     this.predicate);
         }
     }

@@ -32,7 +32,8 @@ namespace SimpleInjector
         /// types to register.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null
         /// reference (Nothing in VB).</exception>
-        public static void RegisterWebApiControllers(this Container container, HttpConfiguration configuration)
+        public static void RegisterWebApiControllers(
+            this Container container, HttpConfiguration configuration)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(configuration, nameof(configuration));
@@ -56,6 +57,10 @@ namespace SimpleInjector
         public static void RegisterWebApiControllers(
             this Container container, HttpConfiguration configuration, params Assembly[] assemblies)
         {
+            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(configuration, nameof(configuration));
+            Requires.IsNotNull(assemblies, nameof(assemblies));
+
             container.RegisterWebApiControllers(configuration, (IEnumerable<Assembly>)assemblies);
         }
 
@@ -108,8 +113,8 @@ namespace SimpleInjector
         /// <param name="configuration">The application's configuration.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
         /// (Nothing in VB).</exception>
-        public static void EnableHttpRequestMessageTracking(this Container container,
-            HttpConfiguration configuration)
+        public static void EnableHttpRequestMessageTracking(
+            this Container container, HttpConfiguration configuration)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(configuration, nameof(configuration));
@@ -131,7 +136,7 @@ namespace SimpleInjector
         /// <see cref="EnableHttpRequestMessageTracking"/> is called.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> argument
         /// is a null reference (Nothing in VB).</exception>
-        public static HttpRequestMessage GetCurrentHttpRequestMessage(this Container container)
+        public static HttpRequestMessage? GetCurrentHttpRequestMessage(this Container container)
         {
             Requires.IsNotNull(container, nameof(container));
 
@@ -202,11 +207,15 @@ namespace SimpleInjector
             }
         }
 
-        private static IHttpControllerTypeResolver GetHttpControllerTypeResolver(HttpConfiguration configuration)
+        private static IHttpControllerTypeResolver GetHttpControllerTypeResolver(
+            HttpConfiguration configuration)
         {
             try
             {
-                return configuration.Services.GetHttpControllerTypeResolver();
+                return configuration.Services.GetHttpControllerTypeResolver()
+                    ?? throw new InvalidOperationException(
+                        "An IHttpControllerTypeResolver instance is missing from the HttpConfiguration" +
+                        ".Services.");
             }
             catch (Exception ex)
             {

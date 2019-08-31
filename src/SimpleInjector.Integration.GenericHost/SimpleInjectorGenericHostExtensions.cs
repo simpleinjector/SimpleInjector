@@ -57,7 +57,7 @@ namespace SimpleInjector
         public static IHost UseSimpleInjector(
             this IHost host,
             Container container,
-            Action<SimpleInjectorUseOptions> setupAction = null)
+            Action<SimpleInjectorUseOptions>? setupAction = null)
         {
             if (host is null)
             {

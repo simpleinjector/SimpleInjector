@@ -10,15 +10,15 @@ namespace SimpleInjector.Decorators
         public DecoratorExpressionInterceptorData(
             Container container,
             Type serviceType,
-            Type decoratorType,
-            Predicate<DecoratorPredicateContext> predicate,
+            Type? decoratorType,
+            Predicate<DecoratorPredicateContext>? predicate,
             Lifestyle lifestyle,
-            Func<DecoratorPredicateContext, Type> decoratorTypeFactory = null)
+            Func<DecoratorPredicateContext, Type>? factory = null)
         {
             this.Container = container;
             this.ServiceType = serviceType;
             this.DecoratorType = decoratorType;
-            this.DecoratorTypeFactory = this.WrapInNullProtector(decoratorTypeFactory);
+            this.DecoratorTypeFactory = factory == null ? null : this.WrapInNullProtector(factory);
             this.Predicate = predicate;
             this.Lifestyle = lifestyle;
         }
@@ -27,22 +27,17 @@ namespace SimpleInjector.Decorators
 
         internal Type ServiceType { get; }
 
-        internal Type DecoratorType { get; }
+        internal Type? DecoratorType { get; }
 
-        internal Func<DecoratorPredicateContext, Type> DecoratorTypeFactory { get; }
+        internal Func<DecoratorPredicateContext, Type>? DecoratorTypeFactory { get; }
 
-        internal Predicate<DecoratorPredicateContext> Predicate { get; }
+        internal Predicate<DecoratorPredicateContext>? Predicate { get; }
 
         internal Lifestyle Lifestyle { get; }
 
         private Func<DecoratorPredicateContext, Type> WrapInNullProtector(
             Func<DecoratorPredicateContext, Type> decoratorTypeFactory)
         {
-            if (decoratorTypeFactory == null)
-            {
-                return null;
-            }
-
             return context =>
             {
                 Type type = decoratorTypeFactory(context);

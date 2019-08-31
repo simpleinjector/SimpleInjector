@@ -569,11 +569,9 @@ namespace SimpleInjector
             var partitions =
                 typesIncludingDecorators.Partition(type => !this.IsDecorator(openGenericServiceType, type));
 
-            return new NonGenericTypesToRegisterForOneToOneMappingResults
-            {
-                ImplementationTypes = partitions.Item1,
-                SkippedDecorators = partitions.Item2
-            };
+            return new NonGenericTypesToRegisterForOneToOneMappingResults(
+                implementationTypes: partitions.Item1,
+                skippedDecorators: partitions.Item2);
         }
 
         private bool IsDecorator(Type openGenericServiceType, Type implemenationType)
@@ -582,7 +580,7 @@ namespace SimpleInjector
             return ctor != null && Types.IsDecorator(openGenericServiceType, ctor);
         }
 
-        private ConstructorInfo SelectImplementationTypeConstructorOrNull(Type implementationType)
+        private ConstructorInfo? SelectImplementationTypeConstructorOrNull(Type implementationType)
         {
             try
             {
@@ -660,9 +658,14 @@ namespace SimpleInjector
 
         private sealed class BatchMapping
         {
-            internal Type ImplementationType { get; private set; }
+            private BatchMapping(Type implementationType, IEnumerable<Type> closedServiceTypes)
+            {
+                this.ImplementationType = implementationType;
+                this.ClosedServiceTypes = closedServiceTypes;
+            }
 
-            internal IEnumerable<Type> ClosedServiceTypes { get; private set; }
+            internal Type ImplementationType { get; }
+            internal IEnumerable<Type> ClosedServiceTypes { get; }
 
             public static BatchMapping[] Build(Type openServiceType, IEnumerable<Type> implementationTypes)
             {
@@ -678,11 +681,9 @@ namespace SimpleInjector
 
             public static BatchMapping Build(Type openServiceType, Type implementationType)
             {
-                return new BatchMapping()
-                {
-                    ImplementationType = implementationType,
-                    ClosedServiceTypes = implementationType.GetBaseTypesAndInterfacesFor(openServiceType)
-                };
+                return new BatchMapping(
+                    implementationType: implementationType,
+                    closedServiceTypes: implementationType.GetBaseTypesAndInterfacesFor(openServiceType));
             }
 
             private static void RequiresNoDuplicateRegistrations(BatchMapping[] mappings)
@@ -715,8 +716,15 @@ namespace SimpleInjector
 
         private class NonGenericTypesToRegisterForOneToOneMappingResults
         {
-            public List<Type> SkippedDecorators { get; set; }
-            public List<Type> ImplementationTypes { get; set; }
+            public NonGenericTypesToRegisterForOneToOneMappingResults(
+                List<Type> skippedDecorators, List<Type> implementationTypes)
+            {
+                this.SkippedDecorators = skippedDecorators;
+                this.ImplementationTypes = implementationTypes;
+            }
+
+            public List<Type> SkippedDecorators { get; }
+            public List<Type> ImplementationTypes { get; }
         }
     }
 }

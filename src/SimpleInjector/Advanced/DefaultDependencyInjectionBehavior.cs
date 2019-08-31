@@ -27,13 +27,13 @@ namespace SimpleInjector.Advanced
             }
         }
 
-        public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure)
+        public InstanceProducer? GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure)
         {
             Requires.IsNotNull(consumer, nameof(consumer));
 
             InjectionTargetInfo target = consumer.Target;
 
-            InstanceProducer producer =
+            InstanceProducer? producer =
                 this.container.GetRegistrationEvenIfInvalid(target.TargetType, consumer);
 
             if (producer == null && throwOnFailure)

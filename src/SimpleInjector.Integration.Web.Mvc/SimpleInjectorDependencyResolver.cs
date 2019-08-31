@@ -54,7 +54,7 @@ namespace SimpleInjector.Integration.Web.Mvc
         /// reference.</exception>
         public SimpleInjectorDependencyResolver(Container container)
         {
-            if (container == null)
+            if (container is null)
             {
                 throw new ArgumentNullException(nameof(container));
             }
@@ -73,6 +73,11 @@ namespace SimpleInjector.Integration.Web.Mvc
         /// <returns>The requested service or object.</returns>
         public object GetService(Type serviceType)
         {
+            if (serviceType is null)
+            {
+                throw new ArgumentNullException(nameof(serviceType));
+            }
+
             // By calling GetInstance instead of GetService when resolving a controller, we prevent the
             // container from returning null when the controller isn't registered explicitly and can't be
             // created because of an configuration error. GetInstance will throw a descriptive exception
@@ -91,8 +96,15 @@ namespace SimpleInjector.Integration.Web.Mvc
         /// <returns>The requested services.</returns>
         public IEnumerable<object> GetServices(Type serviceType)
         {
+            if (serviceType is null)
+            {
+                throw new ArgumentNullException(nameof(serviceType));
+            }
+
             Type collectionType = typeof(IEnumerable<>).MakeGenericType(serviceType);
 
+            // The IDependencyResolver doesn't state what is expected from the returned enumerable. We,
+            // therefore, simply assume it is correct to return a stream.
             var services = (IEnumerable<object>)this.ServiceProvider.GetService(collectionType);
 
             // NOTE: The contract of IDependencyResolver isn't very clear, but MVC will break when null

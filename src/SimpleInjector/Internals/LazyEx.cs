@@ -26,30 +26,31 @@ namespace SimpleInjector.Internals
     [DebuggerDisplay("IsValueCreated={IsValueCreated}, Value={ValueForDebugDisplay}")]
     internal sealed class LazyEx<T> where T : class
     {
-        private Func<T> valueFactory;
-        private T value;
+        private object valueOrFactory;
 
         public LazyEx(Func<T> valueFactory)
         {
             Requires.IsNotNull(valueFactory, nameof(valueFactory));
 
-            this.valueFactory = valueFactory;
+            this.valueOrFactory = valueFactory;
         }
 
         public LazyEx(T value)
         {
             Requires.IsNotNull(value, nameof(value));
 
-            this.value = value;
+            this.valueOrFactory = value;
         }
 
-        public bool IsValueCreated => !(this.value is null);
+        public bool IsValueCreated => this.valueOrFactory is T;
 
         public T Value
         {
             get
             {
-                if (this.value is null)
+                T? value = this.valueOrFactory as T;
+
+                if (value is null)
                 {
                     // NOTE: Locking on 'this' is typically not adviced, but this type is internal, which
                     // means the risk is minimal. Locking on 'this' allows us to safe some bytes for the extra
@@ -59,26 +60,29 @@ namespace SimpleInjector.Internals
                     // readable (for user's and maintainers).
                     lock (this)
                     {
-                        if (this.value is null)
-                        {
-                            this.value = this.valueFactory();
+                        value = this.valueOrFactory as T;
 
-                            if (this.value is null)
+                        if (value is null)
+                        {
+                            var factory = (Func<T>)this.valueOrFactory;
+
+                            value = factory.Invoke();
+
+                            if (value is null)
                             {
                                 throw new InvalidOperationException("The valueFactory produced null.");
                             }
 
-                            // Clear the reference to the factory. We don't need it any longer.
-                            this.valueFactory = null;
+                            this.valueOrFactory = value;
                         }
                     }
                 }
 
-                return this.value;
+                return value;
             }
         }
 
-        internal T ValueForDebugDisplay => !this.IsValueCreated ? default(T) : this.Value;
+        internal T? ValueForDebugDisplay => this.valueOrFactory as T;
 
         public override string ToString() =>
             !this.IsValueCreated ? "Value is not created." : this.Value.ToString();

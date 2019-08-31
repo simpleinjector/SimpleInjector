@@ -8,6 +8,7 @@ namespace SimpleInjector
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Internals;
 
     /// <summary>
     /// An instance of this type will be supplied to the <see cref="Predicate{T}"/>
@@ -26,8 +27,7 @@ namespace SimpleInjector
     public sealed class PredicateContext : ApiObject
     {
         private readonly InjectionConsumerInfo consumer;
-        private readonly Func<Type> implementationTypeProvider;
-        private Type implementationType;
+        private readonly LazyEx<Type> implementationType;
 
         internal PredicateContext(InstanceProducer producer, InjectionConsumerInfo consumer, bool handled)
             : this(producer.ServiceType, producer.Registration.ImplementationType, consumer, handled)
@@ -42,14 +42,14 @@ namespace SimpleInjector
             Requires.IsNotNull(consumer, nameof(consumer));
 
             this.ServiceType = serviceType;
-            this.implementationType = implementationType;
+            this.implementationType = new LazyEx<Type>(implementationType);
             this.consumer = consumer;
             this.Handled = handled;
         }
 
         internal PredicateContext(
             Type serviceType,
-            Func<Type> implementationTypeProvider,
+            Func<Type?> implementationTypeProvider,
             InjectionConsumerInfo consumer,
             bool handled)
         {
@@ -58,7 +58,11 @@ namespace SimpleInjector
             Requires.IsNotNull(consumer, nameof(consumer));
 
             this.ServiceType = serviceType;
-            this.implementationTypeProvider = implementationTypeProvider;
+
+            // HACK: LazyEx does not support null (as a simplification and memory optimization). This is why
+            // the dummy type is returned when the provider returns null.
+            this.implementationType =
+                new LazyEx<Type>(() => implementationTypeProvider() ?? typeof(NullMarkerDummy));
             this.consumer = consumer;
             this.Handled = handled;
         }
@@ -71,8 +75,15 @@ namespace SimpleInjector
         /// Gets the closed generic implementation type that will be created by the container.
         /// </summary>
         /// <value>The implementation type.</value>
-        public Type ImplementationType =>
-            this.implementationType ?? (this.implementationType = this.implementationTypeProvider());
+        public Type? ImplementationType
+        {
+            get
+            {
+                Type type = this.implementationType.Value;
+
+                return type == typeof(NullMarkerDummy) ? null : type;
+            }
+        }
 
         /// <summary>Gets a value indicating whether a previous <b>Register</b> registration has already
         /// been applied for the given <see cref="ServiceType"/>.</summary>
@@ -84,7 +95,7 @@ namespace SimpleInjector
         /// service. This property will return null in case the service is resolved directly from the container.
         /// </summary>
         /// <value>The <see cref="InjectionConsumerInfo"/> or null.</value>
-        public InjectionConsumerInfo Consumer =>
+        public InjectionConsumerInfo? Consumer =>
             this.consumer != InjectionConsumerInfo.Root ? this.consumer : null;
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
@@ -96,10 +107,12 @@ namespace SimpleInjector
             nameof(this.ServiceType),
             this.ServiceType.ToFriendlyName(),
             nameof(this.ImplementationType),
-            this.ImplementationType.ToFriendlyName(),
+            this.ImplementationType?.ToFriendlyName(),
             nameof(this.Handled),
             this.Handled,
             nameof(this.Consumer),
             this.Consumer);
+
+        private sealed class NullMarkerDummy { }
     }
 }

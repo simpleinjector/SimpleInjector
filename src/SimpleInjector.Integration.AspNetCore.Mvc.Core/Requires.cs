@@ -7,9 +7,9 @@ namespace SimpleInjector
 
     internal static class Requires
     {
-        internal static void IsNotNull(object instance, string paramName)
+        internal static void IsNotNull(object? instance, string paramName)
         {
-            if (object.ReferenceEquals(instance, null))
+            if (instance is null)
             {
                 throw new ArgumentNullException(paramName);
             }

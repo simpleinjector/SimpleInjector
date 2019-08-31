@@ -28,7 +28,7 @@ namespace SimpleInjector
         public static IApplicationBuilder UseSimpleInjector(
             this IApplicationBuilder app,
             Container container,
-            Action<SimpleInjectorUseOptions> setupAction = null)
+            Action<SimpleInjectorUseOptions>? setupAction = null)
         {
             Requires.IsNotNull(app, nameof(app));
             Requires.IsNotNull(container, nameof(container));

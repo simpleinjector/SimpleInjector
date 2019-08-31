@@ -33,9 +33,9 @@ namespace SimpleInjector
         /// <value>The indication whether the event has been handled.</value>
         public bool Handled => this.Expression != null || this.Registration != null;
 
-        internal Expression Expression { get; private set; }
+        internal Expression? Expression { get; private set; }
 
-        internal Registration Registration { get; private set; }
+        internal Registration? Registration { get; private set; }
 
         /// <summary>
         /// Registers a <see cref="Func{T}"/> delegate that allows creation of instances of the type

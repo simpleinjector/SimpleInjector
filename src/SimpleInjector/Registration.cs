@@ -34,9 +34,9 @@ namespace SimpleInjector
 
         private readonly HashSet<KnownRelationship> knownRelationships = new HashSet<KnownRelationship>();
 
-        private HashSet<DiagnosticType> suppressions;
-        private ParameterDictionary<OverriddenParameter> overriddenParameters;
-        private Action<object> instanceInitializer;
+        private HashSet<DiagnosticType>? suppressions;
+        private ParameterDictionary<OverriddenParameter>? overriddenParameters;
+        private Action<object>? instanceInitializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Registration"/> class.
@@ -415,7 +415,7 @@ namespace SimpleInjector
             {
                 var consumer = new InjectionConsumerInfo(parameter);
                 Expression expression = this.GetPlaceHolderFor(parameter);
-                InstanceProducer producer = null;
+                InstanceProducer? producer = null;
 
                 if (expression == null)
                 {
@@ -451,8 +451,8 @@ namespace SimpleInjector
                     select new KnownRelationship(
                         implementationType: implementationType,
                         lifestyle: this.Lifestyle,
-                        consumer: new InjectionConsumerInfo(implementationType, pair.prop),
-                        dependency: pair.prod);
+                        consumer: new InjectionConsumerInfo(implementationType, pair.prop!),
+                        dependency: pair.prod!);
 
                 foreach (var knownRelationship in knownRelationships)
                 {
@@ -575,10 +575,10 @@ namespace SimpleInjector
         private struct DependencyData
         {
             public readonly ParameterInfo Parameter;
-            public readonly InstanceProducer Producer;
+            public readonly InstanceProducer? Producer;
             public readonly Expression Expression;
 
-            public DependencyData(ParameterInfo parameter, Expression expression, InstanceProducer producer)
+            public DependencyData(ParameterInfo parameter, Expression expression, InstanceProducer? producer)
             {
                 this.Parameter = parameter;
                 this.Expression = expression;

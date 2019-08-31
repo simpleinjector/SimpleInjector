@@ -12,6 +12,7 @@ namespace SimpleInjector.Internals
     internal abstract class CollectionResolver
     {
         private readonly List<RegistrationGroup> registrationGroups = new List<RegistrationGroup>();
+
         private readonly Dictionary<Type, InstanceProducer> producerCache =
             new Dictionary<Type, InstanceProducer>();
 
@@ -32,11 +33,11 @@ namespace SimpleInjector.Internals
         protected Container Container { get; }
 
         internal abstract void AddControlledRegistrations(
-            Type serviceType, ContainerControlledItem[] registrations, bool append);
+            Type serviceType, ContainerControlledItem[] items, bool append);
 
         internal abstract void RegisterUncontrolledCollection(Type serviceType, InstanceProducer producer);
 
-        internal InstanceProducer TryGetInstanceProducer(Type elementType) =>
+        internal InstanceProducer? TryGetInstanceProducer(Type elementType) =>
             this.ServiceType == elementType || this.ServiceType.IsGenericTypeDefinitionOf(elementType)
                 ? this.GetInstanceProducerFromCache(elementType)
                 : null;
@@ -149,29 +150,32 @@ namespace SimpleInjector.Internals
 
         protected sealed class RegistrationGroup
         {
-            internal Type ServiceType { get; private set; }
+            private RegistrationGroup(Type serviceType, bool appended)
+            {
+                this.ServiceType = serviceType;
+                this.Appended = appended;
+            }
 
-            internal IEnumerable<ContainerControlledItem> ControlledItems { get; private set; }
+            internal Type ServiceType { get; }
 
-            internal InstanceProducer UncontrolledProducer { get; private set; }
+            internal IEnumerable<ContainerControlledItem>? ControlledItems { get; private set; }
 
-            internal bool Appended { get; private set; }
+            internal InstanceProducer? UncontrolledProducer { get; private set; }
+
+            internal bool Appended { get; }
 
             internal static RegistrationGroup CreateForUncontrolledProducer(Type serviceType,
                 InstanceProducer producer) =>
-                new RegistrationGroup
+                new RegistrationGroup(serviceType, appended: false)
                 {
-                    ServiceType = serviceType,
                     UncontrolledProducer = producer
                 };
 
             internal static RegistrationGroup CreateForControlledItems(
-                Type serviceType, ContainerControlledItem[] registrations, bool appended) =>
-                new RegistrationGroup
+                Type serviceType, ContainerControlledItem[] items, bool appended) =>
+                new RegistrationGroup(serviceType, appended)
                 {
-                    ServiceType = serviceType,
-                    ControlledItems = registrations,
-                    Appended = appended
+                    ControlledItems = items,
                 };
         }
     }

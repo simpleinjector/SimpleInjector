@@ -15,10 +15,10 @@ namespace SimpleInjector.Decorators
     internal static class DecoratorHelpers
     {
         private static readonly MethodInfo EnumerableSelectMethod =
-            Helpers.GetGenericMethodDefinition(() => Enumerable.Select(null, (Func<int, int>)null));
+            Helpers.GetGenericMethodDefinition(() => Enumerable.Select(null, (Func<int, int>?)null));
 
         private static readonly MethodInfo DecoratorHelpersReadOnlyCollectionMethod =
-            Helpers.GetGenericMethodDefinition(() => ReadOnlyCollection<int>(null));
+            Helpers.GetGenericMethodDefinition(() => ReadOnlyCollection<int>(null!));
 
         // This method name does not describe what it does, but since the C# compiler will create an iterator
         // type named after this method, it allows us to return a type that has a nice name that will show up

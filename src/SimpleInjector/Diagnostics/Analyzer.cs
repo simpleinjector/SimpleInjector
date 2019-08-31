@@ -47,7 +47,7 @@ namespace SimpleInjector.Diagnostics
 
             foreach (var analyzerResults in analyzerResultsCollection)
             {
-                DiagnosticResultGrouper.Group(analyzerResults.Analyzer, analyzerResults.Results);
+                DiagnosticResultGrouper.Group(analyzerResults.Analyzer!, analyzerResults.Results!);
             }
 
             return (

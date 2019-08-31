@@ -74,13 +74,13 @@ namespace SimpleInjector
         private readonly object locker = new object();
         private readonly LazyEx<Expression> lazyExpression;
 
-        private CyclicDependencyValidator validator;
+        private CyclicDependencyValidator? validator;
         private Func<object> instanceCreator;
         private bool? isValid = true;
-        private Lifestyle overriddenLifestyle;
-        private ReadOnlyCollection<KnownRelationship> knownRelationships;
-        private List<Action<Scope>> verifiers;
-        private List<InstanceProducer> wrappedProducers;
+        private Lifestyle? overriddenLifestyle;
+        private ReadOnlyCollection<KnownRelationship>? knownRelationships;
+        private List<Action<Scope>>? verifiers;
+        private List<InstanceProducer>? wrappedProducers;
 
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
         /// <param name="serviceType">The service type for which this instance is created.</param>
@@ -93,7 +93,7 @@ namespace SimpleInjector
         }
 
         internal InstanceProducer(
-            Type serviceType, Registration registration, Predicate<PredicateContext> predicate)
+            Type serviceType, Registration registration, Predicate<PredicateContext>? predicate)
             : this(serviceType, registration)
         {
             this.Predicate = predicate ?? Always;
@@ -174,7 +174,7 @@ namespace SimpleInjector
 
         // Gets set by the IsValid and indicates the reason why this producer is invalid. Will be null
         // when the producer is valid.
-        internal Exception Exception { get; private set; }
+        internal Exception? Exception { get; private set; }
 
         // Will never return null.
         internal Predicate<PredicateContext> Predicate { get; } = Always;
@@ -535,22 +535,31 @@ namespace SimpleInjector
                     this.Registration));
             }
 
-            var e = new ExpressionBuiltEventArgs(this.ServiceType, expression, this, this.Registration);
+            ExpressionBuiltEventArgs? e = this.Container.OnExpressionBuilt(this, expression);
 
-            this.Container.OnExpressionBuilt(e, this);
-
-            if (!object.ReferenceEquals(this.Registration, e.ReplacedRegistration))
+            if (e != null)
             {
-                this.Registration = e.ReplacedRegistration;
+                if (!object.ReferenceEquals(this.Registration, e.ReplacedRegistration))
+                {
+                    this.Registration = e.ReplacedRegistration;
+                }
+                else
+                {
+                    this.overriddenLifestyle = e.Lifestyle;
+                }
+
+                this.Analyze();
+
+                return e.Expression;
             }
             else
             {
-                this.overriddenLifestyle = e.Lifestyle;
+                this.overriddenLifestyle = this.Lifestyle;
+
+                this.Analyze();
+
+                return expression;
             }
-
-            this.Analyze();
-
-            return e.Expression;
         }
 
         private bool MustWrapThrownException(Exception ex)
@@ -627,7 +636,7 @@ namespace SimpleInjector
             this.validator?.Reset();
         }
 
-        private Exception GetExceptionIfInvalid()
+        private Exception? GetExceptionIfInvalid()
         {
             try
             {

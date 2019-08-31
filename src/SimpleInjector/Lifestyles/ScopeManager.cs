@@ -8,10 +8,10 @@ namespace SimpleInjector.Lifestyles
     internal sealed class ScopeManager
     {
         private readonly Container container;
-        private readonly Func<Scope> scopeRetriever;
-        private readonly Action<Scope> scopeReplacer;
+        private readonly Func<Scope?> scopeRetriever;
+        private readonly Action<Scope?> scopeReplacer;
 
-        internal ScopeManager(Container container, Func<Scope> scopeRetriever, Action<Scope> scopeReplacer)
+        internal ScopeManager(Container container, Func<Scope?> scopeRetriever, Action<Scope?> scopeReplacer)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(scopeRetriever, nameof(scopeRetriever));
@@ -22,9 +22,9 @@ namespace SimpleInjector.Lifestyles
             this.scopeReplacer = scopeReplacer;
         }
 
-        internal Scope CurrentScope => this.GetCurrentScopeWithAutoCleanup();
+        internal Scope? CurrentScope => this.GetCurrentScopeWithAutoCleanup();
 
-        private Scope CurrentScopeInternal
+        private Scope? CurrentScopeInternal
         {
             get { return this.scopeRetriever(); }
             set { this.scopeReplacer(value); }
@@ -49,7 +49,7 @@ namespace SimpleInjector.Lifestyles
         // Determines whether this instance is the currently registered lifetime scope or an ancestor of it.
         private bool IsScopeInLocalChain(Scope scope)
         {
-            Scope localScope = this.CurrentScopeInternal;
+            Scope? localScope = this.CurrentScopeInternal;
 
             while (localScope != null)
             {
@@ -64,12 +64,12 @@ namespace SimpleInjector.Lifestyles
             return false;
         }
 
-        private Scope GetCurrentScopeWithAutoCleanup()
+        private Scope? GetCurrentScopeWithAutoCleanup()
         {
-            Scope scope = this.CurrentScopeInternal;
+            Scope? scope = this.CurrentScopeInternal;
 
             // When the current scope is disposed, make the parent scope the current.
-            while (scope?.Disposed == true)
+            while (scope != null && scope.Disposed)
             {
                 this.CurrentScopeInternal = scope = scope.ParentScope;
             }

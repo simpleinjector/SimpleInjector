@@ -9,19 +9,14 @@ namespace SimpleInjector.Internals
     using System.Linq;
     using SimpleInjector.Advanced;
 
-    /// <summary>This interface is not meant for public use.</summary>
     internal interface IContainerControlledCollection : IEnumerable
     {
         bool AllProducersVerified { get; }
 
-        /// <summary>Please do not use.</summary>
-        /// <returns>Do not use.</returns>
         KnownRelationship[] GetRelationships();
 
-        /// <summary>PLease do not use.</summary>
-        /// <param name="registration">Do not use.</param>
-        void Append(ContainerControlledItem registration);
-        
+        void Append(ContainerControlledItem item);
+
         void Clear();
 
         void VerifyCreatingProducers();
@@ -29,23 +24,23 @@ namespace SimpleInjector.Internals
 
     internal static class ContainerControlledCollectionExtensions
     {
-        internal static void AppendAll(this IContainerControlledCollection collection,
-            IEnumerable<ContainerControlledItem> registrations)
+        internal static void AppendAll(
+            this IContainerControlledCollection collection, IEnumerable<ContainerControlledItem> items)
         {
-            foreach (ContainerControlledItem registration in registrations)
+            foreach (ContainerControlledItem item in items)
             {
-                collection.Append(registration);
+                collection.Append(item);
             }
         }
 
-        internal static void AppendAll(this IContainerControlledCollection collection,
-            IEnumerable<Registration> registrations)
+        internal static void AppendAll(
+            this IContainerControlledCollection collection, IEnumerable<Registration> registrations)
         {
             collection.AppendAll(registrations.Select(ContainerControlledItem.CreateFromRegistration));
         }
 
-        internal static void AppendAll(this IContainerControlledCollection collection,
-            IEnumerable<Type> types)
+        internal static void AppendAll(
+            this IContainerControlledCollection collection, IEnumerable<Type> types)
         {
             collection.AppendAll(types.Select(ContainerControlledItem.CreateFromType));
         }

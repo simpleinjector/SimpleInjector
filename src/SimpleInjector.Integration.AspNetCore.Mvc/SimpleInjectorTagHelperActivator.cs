@@ -12,8 +12,8 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
     public class SimpleInjectorTagHelperActivator : ITagHelperActivator
     {
         private readonly Container container;
-        private readonly Predicate<Type> tagHelperSelector;
-        private readonly ITagHelperActivator frameworkTagHelperActivator;
+        private readonly Predicate<Type>? tagHelperSelector;
+        private readonly ITagHelperActivator? frameworkTagHelperActivator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleInjectorTagHelperActivator"/> class.
@@ -74,6 +74,6 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         public TTagHelper Create<TTagHelper>(ViewContext context) where TTagHelper : ITagHelper =>
             this.tagHelperSelector?.Invoke(typeof(TTagHelper)) ?? true
                 ? (TTagHelper)this.container.GetInstance(typeof(TTagHelper))
-                : this.frameworkTagHelperActivator.Create<TTagHelper>(context);
+                : this.frameworkTagHelperActivator!.Create<TTagHelper>(context);
     }
 }

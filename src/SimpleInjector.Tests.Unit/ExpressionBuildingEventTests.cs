@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -501,7 +502,8 @@
             var eventArgs = new ExpressionBuildingEventArgs(
                 typeof(PluginImpl),
                 Expression.Constant(new PluginImpl()),
-                Lifestyle.Transient);
+                Lifestyle.Transient,
+                new Collection<KnownRelationship>());
 
             // Act
             Action action = () => eventArgs.Expression = null;

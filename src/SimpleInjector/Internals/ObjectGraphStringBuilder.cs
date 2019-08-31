@@ -16,7 +16,7 @@ namespace SimpleInjector.Internals
         private readonly Stack<ProducerEntry> producers = new Stack<ProducerEntry>();
         private readonly VisualizationOptions visualizationOptions;
 
-        private ProducerEntry stillToWriteLifestyleEntry;
+        private ProducerEntry? stillToWriteLifestyleEntry;
         private int indentingDepth;
 
         public ObjectGraphStringBuilder(VisualizationOptions visualizationOptions)
@@ -76,7 +76,7 @@ namespace SimpleInjector.Internals
 
             if (!this.producers.Any())
             {
-                this.AppendLifestyle(this.stillToWriteLifestyleEntry);
+                this.AppendLifestyle(this.stillToWriteLifestyleEntry!);
             }
         }
 

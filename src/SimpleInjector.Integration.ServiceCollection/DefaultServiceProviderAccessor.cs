@@ -9,7 +9,7 @@ namespace SimpleInjector.Integration.ServiceCollection
     internal class DefaultServiceProviderAccessor : IServiceProviderAccessor
     {
         private readonly Container container;
-        private InstanceProducer serviceScopeProducer;
+        private InstanceProducer? serviceScopeProducer;
 
         internal DefaultServiceProviderAccessor(Container container)
         {
@@ -22,9 +22,9 @@ namespace SimpleInjector.Integration.ServiceCollection
         {
             get
             {
-                if (this.serviceScopeProducer == null)
+                if (this.serviceScopeProducer is null)
                 {
-                    this.serviceScopeProducer = this.container.GetRegistration(typeof(IServiceScope), true);
+                    this.serviceScopeProducer = this.container.GetRegistration(typeof(IServiceScope), true)!;
                 }
 
                 try
@@ -44,7 +44,7 @@ namespace SimpleInjector.Integration.ServiceCollection
                     {
                         throw new ActivationException(
                              "You are trying to resolve a cross-wired service, but are doing so outside " +
-                             $"the context of an active ({lifestyle.Name}) scope. To be able to resolve " +
+                             $"the context of an active ({lifestyle?.Name}) scope. To be able to resolve " +
                              "this service the operation must run in the context of such scope. " +
                              "Please see https://simpleinjector.org/scoped for more information about how " +
                              "to manage scopes.");

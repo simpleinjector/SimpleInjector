@@ -24,7 +24,7 @@ namespace SimpleInjector.Internals
 
         [DebuggerDisplay("{(" + nameof(partialOpenGenericImplementation) + " == null ? \"null\" : " +
             TypesExtensions.FriendlyName + "(" + nameof(partialOpenGenericImplementation) + ")),nq}")]
-        private readonly Type partialOpenGenericImplementation;
+        private readonly Type? partialOpenGenericImplementation;
 
         private readonly bool isPartialOpenGenericImplementation;
 
@@ -33,17 +33,18 @@ namespace SimpleInjector.Internals
             this.closedServiceType = closedServiceType;
             this.implementation = implementation;
 
-            if (implementation.IsGenericType() && !implementation.IsGenericTypeDefinition())
+            this.isPartialOpenGenericImplementation =
+                implementation.IsGenericType() && !implementation.IsGenericTypeDefinition();
+
+            if (this.isPartialOpenGenericImplementation)
             {
                 this.openGenericImplementation = implementation.GetGenericTypeDefinition();
                 this.partialOpenGenericImplementation = implementation;
-                this.isPartialOpenGenericImplementation = true;
             }
             else
             {
                 this.openGenericImplementation = implementation;
                 this.partialOpenGenericImplementation = null;
-                this.isPartialOpenGenericImplementation = false;
             }
         }
 
@@ -63,7 +64,7 @@ namespace SimpleInjector.Internals
             }
         }
 
-        internal static Type MakeClosedImplementation(Type closedAbstraction, Type openImplementation)
+        internal static Type? MakeClosedImplementation(Type closedAbstraction, Type openImplementation)
         {
             var builder = new GenericTypeBuilder(closedAbstraction, openImplementation);
             var results = builder.BuildClosedGenericImplementation();
@@ -112,7 +113,7 @@ namespace SimpleInjector.Internals
 
                 if (serviceType != null && this.SafisfiesPartialTypeArguments(serviceType))
                 {
-                    Type closedGenericImplementation =
+                    Type? closedGenericImplementation =
                         this.BuildClosedGenericImplementationBasedOnMatchingServiceType(serviceType);
 
                     // closedGenericImplementation will be null when there was a mismatch on type constraints.
@@ -138,7 +139,7 @@ namespace SimpleInjector.Internals
                 .FirstOrDefault();
         }
 
-        private Type BuildClosedGenericImplementationBasedOnMatchingServiceType(
+        private Type? BuildClosedGenericImplementationBasedOnMatchingServiceType(
             CandicateServiceType candicateServiceType)
         {
             if (this.openGenericImplementation.IsGenericType())
@@ -226,7 +227,7 @@ namespace SimpleInjector.Internals
         {
             // Map the partial open generic type arguments to the concrete arguments.
             var mappings =
-                this.partialOpenGenericImplementation.GetGenericArguments()
+                this.partialOpenGenericImplementation!.GetGenericArguments()
                 .Zip(arguments, ArgumentMapping.Create);
 
             return mappings.All(mapping => mapping.ConcreteTypeMatchesPartialArgument());
@@ -279,24 +280,20 @@ namespace SimpleInjector.Internals
         /// <summary>Result of the GenericTypeBuilder.</summary>
         internal sealed class BuildResult
         {
-            internal static readonly BuildResult Invalid =
-                new BuildResult { ClosedServiceTypeSatisfiesAllTypeConstraints = false };
+            internal static readonly BuildResult Invalid = new BuildResult(null);
 
-            private BuildResult()
+            private BuildResult(Type? closedGenericImplementation)
             {
+                this.ClosedGenericImplementation = closedGenericImplementation;
             }
 
-            internal bool ClosedServiceTypeSatisfiesAllTypeConstraints { get; private set; }
+            internal bool ClosedServiceTypeSatisfiesAllTypeConstraints => this.ClosedGenericImplementation != null;
 
-            internal Type ClosedGenericImplementation { get; private set; }
+            internal Type? ClosedGenericImplementation { get; }
 
             internal static BuildResult Valid(Type closedGenericImplementation)
             {
-                return new BuildResult
-                {
-                    ClosedServiceTypeSatisfiesAllTypeConstraints = true,
-                    ClosedGenericImplementation = closedGenericImplementation,
-                };
+                return new BuildResult(closedGenericImplementation);
             }
         }
 

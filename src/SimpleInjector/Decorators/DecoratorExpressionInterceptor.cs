@@ -29,16 +29,16 @@ namespace SimpleInjector.Decorators
         }
 
         // Must be set after construction.
-        internal DecoratorPredicateContext Context { get; set; }
+        internal DecoratorPredicateContext? Context { get; set; }
 
         protected Container Container => this.data.Container;
 
         protected Lifestyle Lifestyle { get; set; }
 
         // The decorator type definition (possibly open generic).
-        protected Type DecoratorTypeDefinition => this.data.DecoratorType;
+        protected Type? DecoratorTypeDefinition => this.data.DecoratorType;
 
-        protected Predicate<DecoratorPredicateContext> Predicate => this.data.Predicate;
+        protected Predicate<DecoratorPredicateContext>? Predicate => this.data.Predicate;
 
         // NOTE: This method must be public for it to be callable through reflection when running in a sandbox.
         public static TService ResolveWithinThreadResolveScope<TService>(
@@ -58,7 +58,7 @@ namespace SimpleInjector.Decorators
                 }
             }
 
-            Scope originalScope = container.CurrentThreadResolveScope;
+            Scope? originalScope = container.CurrentThreadResolveScope;
 
             try
             {
@@ -76,9 +76,9 @@ namespace SimpleInjector.Decorators
 
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(
             ExpressionBuiltEventArgs e,
-            Expression originalExpression = null,
-            Registration originalRegistration = null,
-            Type registeredServiceType = null)
+            Expression? originalExpression = null,
+            Registration? originalRegistration = null,
+            Type? registeredServiceType = null)
         {
             originalExpression = originalExpression ?? e.Expression;
             originalRegistration = originalRegistration ?? e.ReplacedRegistration;
@@ -135,7 +135,7 @@ namespace SimpleInjector.Decorators
             return DecoratorPredicateContext.CreateFromInfo(registeredServiceType, expression, info);
         }
 
-        protected Expression GetExpressionForDecorateeDependencyParameterOrNull(
+        protected Expression? GetExpressionForDecorateeDependencyParameterOrNull(
             ParameterInfo param, Type serviceType, Expression expr)
         {
             return
@@ -196,7 +196,7 @@ namespace SimpleInjector.Decorators
             ParameterInfo decorateeParameter = GetDecorateeParameter(serviceType, decoratorConstructor);
 
             decorateeExpression = this.GetExpressionForDecorateeDependencyParameterOrNull(
-                decorateeParameter, serviceType, decorateeExpression);
+                decorateeParameter, serviceType, decorateeExpression)!;
 
             var currentProducer = info.GetCurrentInstanceProducer();
 
@@ -230,7 +230,7 @@ namespace SimpleInjector.Decorators
             return
                 from parameter in decoratorConstructor.GetParameters()
                 where parameter.ParameterType == typeof(DecoratorContext)
-                let contextExpression = Expression.Constant(new DecoratorContext(this.Context))
+                let contextExpression = Expression.Constant(new DecoratorContext(this.Context!))
                 select new OverriddenParameter(parameter, contextExpression, currentProducer);
         }
 
@@ -251,7 +251,7 @@ namespace SimpleInjector.Decorators
         }
 
         // The constructor parameter in which the decorated instance should be injected.
-        private static Expression BuildExpressionForDecorateeDependencyParameter(
+        private static Expression? BuildExpressionForDecorateeDependencyParameter(
             ParameterInfo parameter, Type serviceType, Expression expression)
         {
             return IsDecorateeDependencyParameter(parameter, serviceType) ? expression : null;
@@ -263,7 +263,7 @@ namespace SimpleInjector.Decorators
         }
 
         // The constructor parameter in which the factory for creating decorated instances should be injected.
-        private Expression BuildExpressionForDecorateeFactoryDependencyParameter(
+        private Expression? BuildExpressionForDecorateeFactoryDependencyParameter(
             ParameterInfo param, Type serviceType, Expression expr)
         {
             if (DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(param.ParameterType, serviceType))
@@ -283,7 +283,7 @@ namespace SimpleInjector.Decorators
         }
 
         // The constructor parameter in which the factory for creating decorated instances should be injected.
-        private Expression BuildExpressionForScopedDecorateeFactoryDependencyParameter(
+        private Expression? BuildExpressionForScopedDecorateeFactoryDependencyParameter(
             ParameterInfo param, Type serviceType, Expression expr)
         {
             if (DecoratorHelpers.IsScopeDecorateeFactoryDependencyParameter(param.ParameterType, serviceType))
@@ -295,7 +295,8 @@ namespace SimpleInjector.Decorators
 
                 var scopeParameter = Expression.Parameter(typeof(Scope), "scope");
 
-                // Create an Func<Scope, [ServiceType>
+                // Build a Func<Scope, ServiceType>:
+                // scope => ResolveWithinThreadResolveScope<TService>(scope, instanceCreator)
                 var scopedInstanceCreator = Expression.Lambda(
                     Expression.Call(
                         ResolveWithinThreadResolveScopeMethod.MakeGenericMethod(serviceType),

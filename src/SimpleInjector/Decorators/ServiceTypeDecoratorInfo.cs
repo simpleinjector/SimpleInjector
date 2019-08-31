@@ -38,7 +38,7 @@ namespace SimpleInjector.Decorators
             Container container,
             Lifestyle lifestyle,
             Expression decoratedExpression,
-            IEnumerable<KnownRelationship> decoratorRelationships = null)
+            IEnumerable<KnownRelationship>? decoratorRelationships = null)
         {
             var registration = new ExpressionRegistration(
                 decoratedExpression, decoratorType, lifestyle, container);

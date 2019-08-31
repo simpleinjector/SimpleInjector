@@ -18,7 +18,7 @@ namespace SimpleInjector
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         [DebuggerStepThrough]
-        internal static void IsNotNull(object instance, string paramName)
+        internal static void IsNotNull(object? instance, string paramName)
         {
             if (instance is null)
             {
@@ -99,7 +99,7 @@ namespace SimpleInjector
         }
 
         [DebuggerStepThrough]
-        internal static void IsGenericType(Type type, string paramName, Func<Type, string> guidance = null)
+        internal static void IsGenericType(Type type, string paramName, Func<Type, string>? guidance = null)
         {
             if (!type.IsGenericType())
             {
@@ -111,7 +111,7 @@ namespace SimpleInjector
         }
 
         [DebuggerStepThrough]
-        internal static void IsOpenGenericType(Type type, string paramName, Func<Type, string> guidance = null)
+        internal static void IsOpenGenericType(Type type, string paramName, Func<Type, string>? guidance = null)
         {
             // We don't check for ContainsGenericParameters, because we can't handle types that don't have
             // a direct parameter (such as Lazy<Func<TResult>>). This is a limitation in the current
@@ -125,7 +125,7 @@ namespace SimpleInjector
             }
         }
 
-        internal static void DoesNotContainNullValues<T>(IEnumerable<T> collection, string paramName)
+        internal static void DoesNotContainNullValues<T>(IEnumerable<T?> collection, string paramName)
             where T : class
         {
             if (collection != null && collection.Contains(null))
@@ -214,9 +214,9 @@ namespace SimpleInjector
         internal static void ImplementationHasSelectableConstructor(
             Container container, Type implementationType, string paramName)
         {
-            if (!container.Options.IsConstructableType(implementationType, out string message))
+            if (!container.Options.IsConstructableType(implementationType, out string? message))
             {
-                throw new ArgumentException(message, paramName);
+                throw new ArgumentException(message!, paramName);
             }
         }
 
@@ -256,7 +256,7 @@ namespace SimpleInjector
         }
 
         internal static void OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
-            Type serviceType, Type implementationType, string parameterName)
+            Type serviceType, Type implementationType, string? parameterName)
         {
             if (serviceType.ContainsGenericParameters() && implementationType.ContainsGenericParameters())
             {
@@ -308,7 +308,7 @@ namespace SimpleInjector
         }
 
         internal static void IsDecorator(
-            Container container, Type serviceType, Type decoratorType, string paramName)
+            Container container, Type serviceType, Type decoratorType, string? paramName)
         {
             ConstructorInfo decoratorConstructor = container.Options.SelectConstructor(decoratorType);
 
@@ -368,7 +368,7 @@ namespace SimpleInjector
         }
 
         private static void DecoratesServiceType(
-            Type serviceType, ConstructorInfo decoratorConstructor, string paramName)
+            Type serviceType, ConstructorInfo decoratorConstructor, string? paramName)
         {
             bool decoratesServiceType =
                 DecoratorHelpers.DecoratesServiceType(serviceType, decoratorConstructor);
@@ -380,7 +380,7 @@ namespace SimpleInjector
         }
 
         private static void ThrowMustDecorateServiceType(
-            Type serviceType, ConstructorInfo constructor, string paramName)
+            Type serviceType, ConstructorInfo constructor, string? paramName)
         {
             int numberOfServiceTypeDependencies =
                 DecoratorHelpers.GetNumberOfServiceTypeDependencies(serviceType, constructor);
@@ -402,7 +402,7 @@ namespace SimpleInjector
         }
 
         private static void ThrowMustContainTheServiceTypeAsArgument(
-            Type serviceType, ConstructorInfo decoratorConstructor, string paramName)
+            Type serviceType, ConstructorInfo decoratorConstructor, string? paramName)
         {
             string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
                 decoratorConstructor.DeclaringType, serviceType);
@@ -411,7 +411,7 @@ namespace SimpleInjector
         }
 
         private static void ThrowMustContainASingleInstanceOfTheServiceTypeAsArgument(
-            Type serviceType, ConstructorInfo decoratorConstructor, string paramName)
+            Type serviceType, ConstructorInfo decoratorConstructor, string? paramName)
         {
             string message =
                 StringResources.TheConstructorOfTypeMustContainASingleInstanceOfTheServiceTypeAsArgument(

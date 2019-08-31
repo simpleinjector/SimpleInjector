@@ -20,12 +20,12 @@ namespace SimpleInjector
         private const int MaximumDisposeRecursion = 100;
 
         private readonly object syncRoot = new object();
-        private readonly ScopeManager manager;
+        private readonly ScopeManager? manager;
 
-        private IDictionary items;
-        private Dictionary<Registration, object> cachedInstances;
-        private List<Action> scopeEndActions;
-        private List<IDisposable> disposables;
+        private IDictionary? items;
+        private Dictionary<Registration, object>? cachedInstances;
+        private List<Action>? scopeEndActions;
+        private List<IDisposable>? disposables;
         private DisposeState state;
         private int recursionDuringDisposalCounter;
 
@@ -46,7 +46,7 @@ namespace SimpleInjector
             this.Container = container;
         }
 
-        internal Scope(Container container, ScopeManager manager, Scope parentScope) : this(container)
+        internal Scope(Container container, ScopeManager manager, Scope? parentScope) : this(container)
         {
             Requires.IsNotNull(manager, nameof(manager));
 
@@ -63,11 +63,11 @@ namespace SimpleInjector
 
         /// <summary>Gets the container instance that this scope belongs to.</summary>
         /// <value>The <see cref="Container"/> instance.</value>
-        public Container Container { get; }
+        public Container? Container { get; }
 
         internal bool Disposed => this.state == DisposeState.Disposed;
 
-        internal Scope ParentScope { get; }
+        internal Scope? ParentScope { get; }
 
         /// <summary>Gets an instance of the given <typeparamref name="TService"/> for the current scope.</summary>
         /// <typeparam name="TService">The type of the service to resolve.</typeparam>
@@ -91,7 +91,7 @@ namespace SimpleInjector
                     "Please use the overloaded constructor of Scope create an instance with a Container.");
             }
 
-            Scope originalScope = this.Container.CurrentThreadResolveScope;
+            Scope? originalScope = this.Container.CurrentThreadResolveScope;
 
             try
             {
@@ -178,7 +178,7 @@ namespace SimpleInjector
         /// <returns>The stored item or null (Nothing in VB).</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference (Nothing in VB).</exception>
-        public object GetItem(object key)
+        public object? GetItem(object key)
         {
             Requires.IsNotNull(key, nameof(key));
 
@@ -197,7 +197,7 @@ namespace SimpleInjector
         /// <param name="item">The actual item. May be null.</param>
         /// <exception cref="ArgumentNullException">Thrown when paramref name="key"/> is a null reference
         /// (Nothing in VB).</exception>
-        public void SetItem(object key, object item)
+        public void SetItem(object key, object? item)
         {
             Requires.IsNotNull(key, nameof(key));
 
@@ -205,7 +205,7 @@ namespace SimpleInjector
             {
                 if (this.items is null)
                 {
-                    this.items = new Dictionary<object, object>(capacity: 1);
+                    this.items = new Dictionary<object, object?>(capacity: 1);
                 }
 
                 if (item is null)
@@ -252,7 +252,7 @@ namespace SimpleInjector
         }
 
         internal static TImplementation GetInstance<TImplementation>(
-            ScopedRegistration<TImplementation> registration, Scope scope)
+            ScopedRegistration<TImplementation> registration, Scope? scope)
             where TImplementation : class
         {
             if (scope == null)
@@ -272,14 +272,14 @@ namespace SimpleInjector
                     this.items = new Dictionary<object, object>(capacity: 1);
                 }
 
-                object item = this.items[key];
+                object? item = this.items[key];
 
                 if (item is null)
                 {
-                    this.items[key] = item = valueFactory(this.Container, key);
+                    this.items[key] = item = valueFactory(this.Container!, key);
                 }
 
-                return (T)item;
+                return (T)item!;
             }
         }
 
@@ -398,7 +398,7 @@ namespace SimpleInjector
         {
             if (registration.Container.IsVerifying)
             {
-                return registration.Container.VerificationScope.GetInstanceInternal(registration);
+                return registration.Container.VerificationScope!.GetInstanceInternal(registration);
             }
 
             throw new ActivationException(
@@ -423,19 +423,22 @@ namespace SimpleInjector
                         new Dictionary<Registration, object>(ReferenceEqualityComparer<Registration>.Instance);
                 }
 
-                return !cacheIsEmpty && this.cachedInstances.TryGetValue(registration, out object instance)
+                return !cacheIsEmpty && this.cachedInstances.TryGetValue(registration, out object? instance)
                     ? (TImplementation)instance
-                    : this.CreateAndCacheInstance(registration);
+                    : this.CreateAndCacheInstance(registration, this.cachedInstances);
             }
         }
 
         private TImplementation CreateAndCacheInstance<TImplementation>(
-            ScopedRegistration<TImplementation> registration)
+            ScopedRegistration<TImplementation> registration, Dictionary<Registration, object> cache)
             where TImplementation : class
         {
-            TImplementation instance = registration.InstanceCreator.Invoke();
+            // registration.BuildExpression has been called, and InstanceCreate thus been initialized.
+            Func<TImplementation> instanceCreator = registration.InstanceCreator!;
 
-            this.cachedInstances[registration] = instance;
+            TImplementation instance = instanceCreator.Invoke();
+
+            cache[registration] = instance;
 
             if (instance is IDisposable disposable && !registration.SuppressDisposal)
             {

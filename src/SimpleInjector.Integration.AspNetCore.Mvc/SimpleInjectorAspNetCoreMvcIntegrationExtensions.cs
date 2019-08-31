@@ -46,7 +46,7 @@ namespace SimpleInjector
         public static void AddSimpleInjectorTagHelperActivation(
             this IServiceCollection services,
             Container container,
-            Predicate<Type> applicationTypeSelector = null)
+            Predicate<Type>? applicationTypeSelector = null)
         {
             if (services == null)
             {
@@ -61,12 +61,12 @@ namespace SimpleInjector
             // There are tag helpers OOTB in MVC. Letting the application container try to create them will fail
             // because of the dependencies these tag helpers have. This means that OOTB tag helpers need to remain
             // created by the framework's DefaultTagHelperActivator, hence the selector predicate.
-            applicationTypeSelector =
+            Predicate<Type> selector =
                 applicationTypeSelector ?? (type => !type.GetTypeInfo().Namespace.StartsWith("Microsoft"));
 
             services.AddSingleton<ITagHelperActivator>(p => new SimpleInjectorTagHelperActivator(
                 container,
-                applicationTypeSelector,
+                selector,
                 new DefaultTagHelperActivator(p.GetRequiredService<ITypeActivatorCache>())));
         }
 

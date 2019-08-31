@@ -36,7 +36,7 @@ namespace SimpleInjector.Internals
 
         internal bool TypeConstraintsAreSatisfied => this.Validator.AreTypeConstraintsSatisfied();
 
-        private TypeConstraintValidator Validator => new TypeConstraintValidator { Mapping = this };
+        private TypeConstraintValidator Validator => new TypeConstraintValidator(this);
 
         /// <summary>Implements equality. Needed for doing LINQ distinct operations.</summary>
         /// <param name="other">The other to compare to.</param>

@@ -32,10 +32,10 @@ namespace SimpleInjector
         public static Guid GetGuid(this Type type) => type.GUID;
 #endif
 #if NETSTANDARD1_0 || NETSTANDARD1_3 || NETSTANDARD2_0
-        public static MethodInfo GetSetMethod(this PropertyInfo property, bool nonPublic = true) =>
+        public static MethodInfo? GetSetMethod(this PropertyInfo property, bool nonPublic = true) =>
             nonPublic || property.SetMethod?.IsPublic == true ? property.SetMethod : null;
 
-        public static MethodInfo GetGetMethod(this PropertyInfo property, bool nonPublic = true) =>
+        public static MethodInfo? GetGetMethod(this PropertyInfo property, bool nonPublic = true) =>
             nonPublic || property.GetMethod?.IsPublic == true ? property.GetMethod : null;
 
         public static Type[] GetGenericArguments(this Type type) => type.GetTypeInfo().IsGenericTypeDefinition
@@ -51,7 +51,7 @@ namespace SimpleInjector
         public static bool IsAbstract(this Type type) => type.GetTypeInfo().IsAbstract;
         public static bool IsAssignableFrom(this Type type, Type other) => type.GetTypeInfo().IsAssignableFrom(other.GetTypeInfo());
         public static bool ContainsGenericParameters(this Type type) => type.GetTypeInfo().ContainsGenericParameters;
-        public static Type BaseType(this Type type) => type.GetTypeInfo().BaseType;
+        public static Type? BaseType(this Type type) => type.GetTypeInfo().BaseType;
         public static bool IsGenericTypeDefinition(this Type type) => type.GetTypeInfo().IsGenericTypeDefinition;
         public static bool IsPrimitive(this Type type) => type.GetTypeInfo().IsPrimitive;
         public static bool IsNestedPublic(this Type type) => type.GetTypeInfo().IsNestedPublic;
@@ -68,7 +68,7 @@ namespace SimpleInjector
         public static ConstructorInfo[] GetConstructors(this Type type) =>
             type.GetTypeInfo().DeclaredConstructors.Where(ctor => !ctor.IsStatic && ctor.IsPublic).ToArray();
 
-        public static ConstructorInfo GetConstructor(this Type type, Type[] types) => (
+        public static ConstructorInfo? GetConstructor(this Type type, Type[] types) => (
             from constructor in type.GetTypeInfo().DeclaredConstructors
             where types.SequenceEqual(constructor.GetParameters().Select(p => p.ParameterType))
             select constructor)

@@ -37,7 +37,7 @@ namespace SimpleInjector
         public static IServiceCollection AddSimpleInjector(
             this IServiceCollection services,
             Container container,
-            Action<SimpleInjectorAddOptions> setupAction = null)
+            Action<SimpleInjectorAddOptions>? setupAction = null)
         {
             if (services is null)
             {
@@ -81,7 +81,7 @@ namespace SimpleInjector
         public static IServiceProvider UseSimpleInjector(
             this IServiceProvider provider,
             Container container,
-            Action<SimpleInjectorUseOptions> setupAction = null)
+            Action<SimpleInjectorUseOptions>? setupAction = null)
         {
             if (provider is null)
             {
@@ -225,8 +225,8 @@ namespace SimpleInjector
 
         private static SimpleInjectorAddOptions GetOptions(Container container)
         {
-            SimpleInjectorAddOptions options =
-                (SimpleInjectorAddOptions)container.ContainerScope.GetItem(SimpleInjectorAddOptionsKey);
+            var options =
+                (SimpleInjectorAddOptions?)container.ContainerScope.GetItem(SimpleInjectorAddOptionsKey);
 
             if (options is null)
             {

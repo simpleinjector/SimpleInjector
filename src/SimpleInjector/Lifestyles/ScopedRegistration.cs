@@ -9,9 +9,9 @@ namespace SimpleInjector.Lifestyles
     internal sealed class ScopedRegistration<TImplementation> : Registration
         where TImplementation : class
     {
-        private readonly Func<TImplementation> userSuppliedInstanceCreator;
+        private readonly Func<TImplementation>? userSuppliedInstanceCreator;
 
-        private Func<Scope> scopeFactory;
+        private Func<Scope?>? scopeFactory;
 
         internal ScopedRegistration(
             ScopedLifestyle lifestyle, Container container, Func<TImplementation> instanceCreator)
@@ -28,7 +28,8 @@ namespace SimpleInjector.Lifestyles
         public override Type ImplementationType => typeof(TImplementation);
         public new ScopedLifestyle Lifestyle => (ScopedLifestyle)base.Lifestyle;
 
-        internal Func<TImplementation> InstanceCreator { get; private set; }
+        // Initialized when BuildExpression is called
+        internal Func<TImplementation>? InstanceCreator { get; private set; }
 
         public override Expression BuildExpression()
         {
@@ -51,7 +52,7 @@ namespace SimpleInjector.Lifestyles
         // is most cases not be called. It will however be called when the expression that is built by
         // this instance will get compiled by someone else than the core library. That's why this method
         // is still important.
-        public TImplementation GetInstance() => Scope.GetInstance(this, this.scopeFactory());
+        public TImplementation GetInstance() => Scope.GetInstance(this, this.scopeFactory!());
 
         private Func<TImplementation> BuildInstanceCreator() =>
             this.userSuppliedInstanceCreator != null

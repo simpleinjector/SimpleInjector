@@ -36,19 +36,26 @@ namespace SimpleInjector
             this.RegisteredServiceType = registeredServiceType;
 
             this.expression = expression;
+
+            this.lifestyle = null!;
+            this.InstanceProducer = null!;
+            this.ReplacedRegistration = null!;
+            this.KnownRelationships = null!;
         }
 
         internal ExpressionBuiltEventArgs(
             Type registeredServiceType,
             Expression expression,
             InstanceProducer producer,
-            Registration replacedRegistration)
+            Registration replacedRegistration,
+            Collection<KnownRelationship> knownRelationships)
         {
             this.RegisteredServiceType = registeredServiceType;
             this.expression = expression;
             this.InstanceProducer = producer;
             this.lifestyle = producer.Lifestyle;
             this.ReplacedRegistration = replacedRegistration;
+            this.KnownRelationships = knownRelationships;
         }
 
         /// <summary>Gets the registered service type that is currently requested.</summary>
@@ -116,7 +123,7 @@ namespace SimpleInjector
         // creation of a new Dictionary object for every InstanceProducer that gets a one or multiple decorators
         // applied can cause quite a lot of memory overhead (an empty Dictionary takes roughly 60 bytes of
         // memory in a 32bit process).
-        internal Decorators.ServiceTypeDecoratorInfo DecoratorInfo { get; set; }
+        internal Decorators.ServiceTypeDecoratorInfo? DecoratorInfo { get; set; }
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]

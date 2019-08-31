@@ -616,8 +616,8 @@ namespace SimpleInjector
         private void RegisterDecoratorCore(
             Type serviceType,
             Type decoratorType,
-            Predicate<DecoratorPredicateContext> predicate = null,
-            Lifestyle lifestyle = null)
+            Predicate<DecoratorPredicateContext>? predicate = null,
+            Lifestyle? lifestyle = null)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(decoratorType, nameof(decoratorType));

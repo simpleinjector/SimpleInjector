@@ -7,6 +7,10 @@
     {
     }
 
+    public abstract class PluginBase : IPlugin
+    {
+    }
+
     public class PluginImpl : IPlugin
     {
     }
