@@ -29,8 +29,8 @@ namespace SimpleInjector
         /// <param name="registeredServiceType">Type of the registered service.</param>
         /// <param name="expression">The registered expression.</param>
         [Obsolete("Don't create instances. Instances of this type are created by Simple Injector. " +
-            "Will be treated as an error from version 4.7. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         public ExpressionBuiltEventArgs(Type registeredServiceType, Expression expression)
         {
             this.RegisteredServiceType = registeredServiceType;
