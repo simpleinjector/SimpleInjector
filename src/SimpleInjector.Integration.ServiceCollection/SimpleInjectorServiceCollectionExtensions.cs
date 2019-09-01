@@ -152,7 +152,7 @@ namespace SimpleInjector
                 typeof(ILogger),
                 c => c.Consumer is null
                     ? typeof(RootLogger)
-                    : typeof(Logger<>).MakeGenericType(c.Consumer.ImplementationType),
+                    : typeof(Integration.ServiceCollection.Logger<>).MakeGenericType(c.Consumer.ImplementationType),
                 Lifestyle.Singleton,
                 _ => true);
 
@@ -422,37 +422,6 @@ namespace SimpleInjector
             if (container.Options.DefaultScopedLifestyle is null)
             {
                 container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
-            }
-        }
-
-        private sealed class RootLogger : ILogger
-        {
-            private readonly ILogger logger;
-
-            // This constructor needs to be public for Simple Injector to create this type.
-            public RootLogger(ILoggerFactory factory) => this.logger = factory.CreateLogger(string.Empty);
-
-            public IDisposable BeginScope<TState>(TState state) => this.logger.BeginScope(state);
-
-            public bool IsEnabled(LogLevel logLevel) => this.logger.IsEnabled(logLevel);
-
-            public void Log<TState>(
-                LogLevel logLevel,
-                EventId eventId,
-                TState state,
-                Exception exception,
-                Func<TState, Exception, string> formatter) =>
-                this.logger.Log(logLevel, eventId, state, exception, formatter);
-        }
-
-        // This class wouldn't strictly be required, but since Microsoft could decide to add an extra ctor
-        // to the Microsoft.Extensions.Logging.Logger<T> class, this sub type prevents this integration
-        // package to break when this happens.
-        private sealed class Logger<T> : Microsoft.Extensions.Logging.Logger<T>
-        {
-            // This constructor needs to be public for Simple Injector to create this type.
-            public Logger(ILoggerFactory factory) : base(factory)
-            {
             }
         }
     }
