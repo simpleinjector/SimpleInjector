@@ -7,6 +7,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Reflection;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Localization;
     using Microsoft.Extensions.Logging;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Integration.ServiceCollection;
@@ -158,6 +159,57 @@ namespace SimpleInjector
             return options;
         }
 
+        /// <summary>
+        /// Allows components that are built by Simple Injector to depend on the (non-generic)
+        /// <see cref="IStringLocalizer">Microsoft.Extensions.Localization.IStringLocalizer</see> abstraction. Components are
+        /// injected with an contextual implementation. Using this method, application components can simply
+        /// depend on <b>IStringLocalizer</b> instead of its generic counter part, <b>IStringLocalizer&lt;T&gt;</b>, which
+        /// simplifies development.
+        /// </summary>
+        /// <param name="options">The options.</param>
+        /// <returns>The supplied <paramref name="options"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="options"/> is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when no <see cref="IStringLocalizerFactory"/> entry
+        /// can be found in the framework's list of services defined by <see cref="IServiceCollection"/>.
+        /// </exception>
+        /// <exception cref="ActivationException">Thrown when an <see cref="IStringLocalizer"/> is directly resolved from the 
+        /// container. Instead use <see cref="IStringLocalizer"/> within a constructor dependency.</exception>
+        public static SimpleInjectorUseOptions UseLocalization(this SimpleInjectorUseOptions options)
+        {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            var localizerFactory = options.ApplicationServices.GetService<IStringLocalizerFactory>();
+
+            if (localizerFactory is null)
+            {
+                throw new InvalidOperationException(
+                    $"The IServiceCollection is missing an entry for {typeof(IStringLocalizerFactory).FullName}. " +
+                    "This is most likely caused by a missing call to .AddLocalization(). Make sure that the " +
+                    "AddLocalization() extension method is called on the IServiceCollection. This method is " +
+                    "part of the LocalizationServiceCollectionExtensions class of the Microsoft.Extensions" +
+                    ".Localization assembly.");
+            }
+
+            // Register localizer factory explicitly. This allows the IStringLocalizer<T> conditional registration to work
+            // even when auto cross wiring is disabled.
+            options.Container.RegisterInstance(localizerFactory);
+
+            options.Container.RegisterConditional(
+                typeof(IStringLocalizer),
+                c => c.Consumer is null
+                    ? throw new ActivationException("IStringLocalizer is being resolved directly from the container, " +
+                    "but this is not supported as string localizers need to be related to a consuming type. " +
+                    "Instead, make IStringLocalizer a constructor dependency of the type it is used in.")
+                    : typeof(Integration.ServiceCollection.StringLocalizer<>).MakeGenericType(c.Consumer.ImplementationType),
+                Lifestyle.Singleton,
+                _ => true);
+
+            return options;
+        }
         /// <summary>
         /// Cross wires an ASP.NET Core or third-party service to the container, to allow the service to be
         /// injected into components that are built by Simple Injector.
