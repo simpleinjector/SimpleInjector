@@ -38,10 +38,15 @@ namespace SimpleInjector.Internals
             // actually spits out types with null parameter names), so we have to guard against this. Since
             // it is valid for all parameter names of the same member to be null, we have to have use the
             // ParameterType as well to compare two ParameterInfo objects.
-            public int GetHashCode(ParameterInfo obj) =>
-                (obj?.Name ?? string.Empty).GetHashCode()
-                ^ obj.ParameterType.GetHashCode()
-                ^ GetHashCode(obj.Member);
+            public int GetHashCode(ParameterInfo obj)
+            {
+                Requires.IsNotNull(obj, nameof(obj));
+
+                return
+                    (obj.Name ?? string.Empty).GetHashCode()
+                    ^ obj.ParameterType.GetHashCode()
+                    ^ GetHashCode(obj.Member);
+            }
 
             // Although there is a lock around the creation of MemberInfo's in the System.Type for the
             // full framework version, there is no guarantee that this holds for all versions (and I

@@ -16,7 +16,7 @@ namespace SimpleInjector.Integration.Wcf
     public class SimpleInjectorServiceHost : ServiceHost
     {
         private readonly Container container;
-        private readonly Type serviceAbstraction;
+        private readonly Type? serviceAbstraction;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleInjectorServiceHost"/> class.

@@ -89,7 +89,7 @@ namespace SimpleInjector.Integration.Web
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        protected override Scope GetCurrentScopeCore(Container container) => GetOrCreateScope(container);
+        protected override Scope? GetCurrentScopeCore(Container container) => GetOrCreateScope(container);
 
         /// <summary>
         /// Creates a delegate that upon invocation return the current <see cref="Scope"/> for this
@@ -98,14 +98,14 @@ namespace SimpleInjector.Integration.Web
         /// </summary>
         /// <param name="container">The container for which the delegate gets created.</param>
         /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
-        protected override Func<Scope> CreateCurrentScopeProvider(Container container)
+        protected override Func<Scope?> CreateCurrentScopeProvider(Container container)
         {
             Requires.IsNotNull(container, nameof(container));
 
             return () => GetOrCreateScope(container);
         }
 
-        private static Scope GetOrCreateScope(Container container)
+        private static Scope? GetOrCreateScope(Container container)
         {
             HttpContext context = HttpContext.Current;
 
@@ -134,7 +134,7 @@ namespace SimpleInjector.Integration.Web
             return scope;
         }
 
-        private static Scope FindScopeForContainer(List<Scope> scopes, Container container)
+        private static Scope? FindScopeForContainer(List<Scope> scopes, Container container)
         {
             foreach (var scope in scopes)
             {
@@ -165,7 +165,7 @@ namespace SimpleInjector.Integration.Web
             // Here we use a 'master' scope that will hold the real scopes. This allows all scopes
             // to be disposed, even if a scope's Dispose method throws an exception. Scopes will
             // also be disposed in opposite order of creation.
-            using (var masterScope = new Scope(scopes[0].Container))
+            using (var masterScope = new Scope(scopes[0].Container!))
             {
                 foreach (var scope in scopes)
                 {

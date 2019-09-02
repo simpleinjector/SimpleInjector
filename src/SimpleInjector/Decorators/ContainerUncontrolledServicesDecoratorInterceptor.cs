@@ -24,8 +24,8 @@ namespace SimpleInjector.Decorators
         private readonly ExpressionBuiltEventArgs e;
         private readonly Type registeredServiceType;
 
-        private ConstructorInfo decoratorConstructor;
-        private Type decoratorType;
+        private ConstructorInfo? decoratorConstructor;
+        private Type? decoratorType;
 
         public ContainerUncontrolledServicesDecoratorInterceptor(
             DecoratorExpressionInterceptorData data,
@@ -95,7 +95,7 @@ namespace SimpleInjector.Decorators
             // information in the predicate of the next decorator they add.
             serviceTypeInfo.AddAppliedDecorator(
                 this.registeredServiceType,
-                this.decoratorType,
+                this.decoratorType!,
                 this.Container,
                 this.Lifestyle,
                 decoratedExpression);
@@ -107,8 +107,10 @@ namespace SimpleInjector.Decorators
             Justification = "This is not a performance critical path.")]
         private Expression BuildDecoratorExpression(out Registration decoratorRegistration)
         {
-            this.ThrowWhenDecoratorNeedsAFunc();
-            this.ThrownWhenLifestyleIsNotSupported();
+            Type decoratorTypeDefinition = this.DecoratorTypeDefinition!;
+
+            this.ThrowWhenDecoratorNeedsAFunc(decoratorTypeDefinition);
+            this.ThrownWhenLifestyleIsNotSupported(decoratorTypeDefinition);
 
             ParameterExpression parameter = Expression.Parameter(this.registeredServiceType, "decoratee");
 
@@ -128,7 +130,7 @@ namespace SimpleInjector.Decorators
                 var collection = ((ConstantExpression)originalEnumerableExpression).Value as IEnumerable;
 
                 return this.BuildDecoratorEnumerableExpressionForConstantEnumerable(wrapInstanceWithDecorator,
-                    collection);
+                    collection!);
             }
             else
             {
@@ -143,17 +145,17 @@ namespace SimpleInjector.Decorators
 
             // Create the decorator as transient. Caching is applied later on.
             return Lifestyle.Transient.CreateDecoratorRegistration(
-                this.decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
+                this.decoratorConstructor!.DeclaringType, this.Container, overriddenParameters);
         }
 
         private OverriddenParameter[] CreateOverriddenParameters(Expression decorateeExpression)
         {
             ParameterInfo decorateeParameter =
-                GetDecorateeParameter(this.registeredServiceType, this.decoratorConstructor);
+                GetDecorateeParameter(this.registeredServiceType, this.decoratorConstructor!);
 
             decorateeExpression =
                 this.GetExpressionForDecorateeDependencyParameterOrNull(
-                    decorateeParameter, this.registeredServiceType, decorateeExpression);
+                    decorateeParameter, this.registeredServiceType, decorateeExpression)!;
 
             var currentProducer = this.GetServiceTypeInfo(this.e).GetCurrentInstanceProducer();
 
@@ -173,9 +175,9 @@ namespace SimpleInjector.Decorators
             InstanceProducer currentProducer)
         {
             return
-                from parameter in this.decoratorConstructor.GetParameters()
+                from parameter in this.decoratorConstructor!.GetParameters()
                 where parameter.ParameterType == typeof(DecoratorContext)
-                let contextExpression = Expression.Constant(new DecoratorContext(this.Context))
+                let contextExpression = Expression.Constant(new DecoratorContext(this.Context!))
                 select new OverriddenParameter(parameter, contextExpression, currentProducer);
         }
 
@@ -246,23 +248,24 @@ namespace SimpleInjector.Decorators
             return callExpression;
         }
 
-        private void ThrowWhenDecoratorNeedsAFunc()
+        private void ThrowWhenDecoratorNeedsAFunc(Type decoratorTypeDefinition)
         {
             Type decorateeFactoryType = this.GetDecorateeFactoryTypeOrNull();
 
             if (decorateeFactoryType != null)
             {
+                // decoratorType is never null at this point
                 string message = StringResources.CantGenerateFuncForDecorator(
                     this.registeredServiceType,
                     decorateeFactoryType,
-                    this.DecoratorTypeDefinition ?? this.decoratorType);
+                    decoratorTypeDefinition ?? this.decoratorType!);
 
                 throw new ActivationException(message);
             }
         }
 
         private Type GetDecorateeFactoryTypeOrNull() => (
-            from parameter in this.decoratorConstructor.GetParameters()
+            from parameter in this.decoratorConstructor!.GetParameters()
             where DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(
                 parameter.ParameterType, this.registeredServiceType)
                 || DecoratorHelpers.IsScopeDecorateeFactoryDependencyParameter(
@@ -270,7 +273,7 @@ namespace SimpleInjector.Decorators
             select parameter.ParameterType)
             .FirstOrDefault();
 
-        private void ThrownWhenLifestyleIsNotSupported()
+        private void ThrownWhenLifestyleIsNotSupported(Type decoratorTypeDefinition)
         {
             // Because the user registered an IEnumerable<TService>, this collection can be dynamic in nature,
             // and the number of elements could change on each enumeration. It's impossible to detect if a
@@ -280,9 +283,10 @@ namespace SimpleInjector.Decorators
             // the past, we don't want to introduce (yet another) breaking change.
             if (this.Lifestyle != Lifestyle.Transient && this.Lifestyle != Lifestyle.Singleton)
             {
+                // At this point, decoratorType is never null.
                 throw new NotSupportedException(
                     StringResources.CanNotDecorateContainerUncontrolledCollectionWithThisLifestyle(
-                        this.DecoratorTypeDefinition ?? this.decoratorType,
+                        decoratorTypeDefinition ?? this.decoratorType!,
                         this.Lifestyle,
                         this.registeredServiceType));
             }

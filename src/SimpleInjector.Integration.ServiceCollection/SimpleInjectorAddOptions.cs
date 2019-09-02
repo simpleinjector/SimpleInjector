@@ -19,7 +19,7 @@ namespace SimpleInjector.Integration.ServiceCollection
         {
             this.Services = services;
             this.Container = container;
-            this.ServiceProviderAccessor = accessor;
+            this.serviceProviderAccessor = accessor;
         }
 
         /// <summary>

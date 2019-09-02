@@ -99,7 +99,7 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="container">The container instance that is related to the scope to return.</param>
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        public Scope GetCurrentScope(Container container)
+        public Scope? GetCurrentScope(Container container)
         {
             Requires.IsNotNull(container, nameof(container));
 
@@ -113,7 +113,7 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="container">The container for which the delegate gets created.</param>
         /// <returns>A <see cref="Func{T}"/> delegate. This method should never return null.</returns>
-        protected internal abstract Func<Scope> CreateCurrentScopeProvider(Container container);
+        protected internal abstract Func<Scope?> CreateCurrentScopeProvider(Container container);
 
         /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
@@ -161,11 +161,11 @@ namespace SimpleInjector
         /// </remarks>
         /// <param name="container">The container instance that is related to the scope to return.</param>
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        protected virtual Scope GetCurrentScopeCore(Container container)
+        protected virtual Scope? GetCurrentScopeCore(Container container)
         {
             Requires.IsNotNull(container, nameof(container));
 
-            Func<Scope> currentScopeProvider = this.CreateCurrentScopeProvider(container);
+            Func<Scope?> currentScopeProvider = this.CreateCurrentScopeProvider(container);
 
             return currentScopeProvider.Invoke();
         }
@@ -175,20 +175,20 @@ namespace SimpleInjector
 #endif
         private Scope GetCurrentScopeOrThrow(Container container)
         {
-            Scope scope = this.GetCurrentScopeInternal(container);
+            Scope? scope = this.GetCurrentScopeInternal(container);
 
             if (scope == null)
             {
                 this.ThrowThisMethodCanOnlyBeCalledWithinTheContextOfAnActiveScope();
             }
 
-            return scope;
+            return scope!;
         }
 
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        private Scope GetCurrentScopeInternal(Container container)
+        private Scope? GetCurrentScopeInternal(Container container)
         {
             // If we are running verification in the current thread, we prefer returning a verification scope
             // over a real active scope (issue #95).

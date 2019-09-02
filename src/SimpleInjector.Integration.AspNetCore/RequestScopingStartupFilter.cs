@@ -21,7 +21,7 @@ namespace SimpleInjector.Integration.AspNetCore
         {
             return builder =>
             {
-                ConfigureRequestScoping(builder);
+                this.ConfigureRequestScoping(builder);
 
                 next(builder);
             };
@@ -31,7 +31,7 @@ namespace SimpleInjector.Integration.AspNetCore
         {
             builder.Use(async (context, next) =>
             {
-                using (AsyncScopedLifestyle.BeginScope(container))
+                using (AsyncScopedLifestyle.BeginScope(this.container))
                 {
                     await next();
                 }

@@ -54,7 +54,7 @@ namespace SimpleInjector.Integration.Wcf
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
 
-            if (container == null)
+            if (container is null)
             {
                 throw new InvalidOperationException("The operation failed. Please call the " +
                     typeof(SimpleInjectorServiceHostFactory).FullName + ".SetContainer(Container) method " +
@@ -65,7 +65,7 @@ namespace SimpleInjector.Integration.Wcf
                     "documentation: https://simpleinjector.org/wcf.");
             }
 
-            InstanceProducer producer = container.GetRegistration(serviceType, true);
+            InstanceProducer producer = container.GetRegistration(serviceType, true)!;
 
             // Force building the expression tree. Decorators and interceptors might be applied at this point,
             // causing the lifestyle and registration properties to change.

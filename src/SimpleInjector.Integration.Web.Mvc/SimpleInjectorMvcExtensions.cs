@@ -43,7 +43,7 @@ namespace SimpleInjector
                             "grouped together.")]
         public static void RegisterMvcIntegratedFilterProvider(this Container container)
         {
-            if (container == null)
+            if (container is null)
             {
                 throw new ArgumentNullException(nameof(container));
             }
@@ -100,12 +100,18 @@ namespace SimpleInjector
         /// <returns>A list of types.</returns>
         public static Type[] GetControllerTypesToRegister(Container container, params Assembly[] assemblies)
         {
-            if (container == null)
+            if (container is null)
             {
                 throw new ArgumentNullException(nameof(container));
             }
 
-            if (assemblies == null || assemblies.Length == 0)
+            if (assemblies == null || !Array.TrueForAll(assemblies, a => a != null))
+            {
+                throw new ArgumentNullException(
+                    "The supplied elements in the array can't be null.", nameof(assemblies));
+            }
+
+            if (assemblies is null || assemblies.Length == 0)
             {
                 assemblies = BuildManager.GetReferencedAssemblies().OfType<Assembly>().ToArray();
             }

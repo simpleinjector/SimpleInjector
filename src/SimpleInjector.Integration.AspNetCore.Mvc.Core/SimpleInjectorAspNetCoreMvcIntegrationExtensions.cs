@@ -44,7 +44,7 @@ namespace SimpleInjector
 
             var manager = applicationBuilder.ApplicationServices.GetService<ApplicationPartManager>();
 
-            if (manager == null)
+            if (manager is null)
             {
                 throw new InvalidOperationException(
                     string.Format(
@@ -88,7 +88,7 @@ namespace SimpleInjector
             IServiceProvider serviceProvider = applicationBuilder.ApplicationServices;
             var componentProvider = serviceProvider.GetService<IViewComponentDescriptorProvider>();
 
-            if (componentProvider == null)
+            if (componentProvider is null)
             {
                 throw new InvalidOperationException(
                     string.Format(
@@ -133,7 +133,7 @@ namespace SimpleInjector
 
             RegisterViewComponentTypes(container, componentTypes);
         }
-        
+
         private static void RegisterControllerTypes(this Container container, IEnumerable<Type> types)
         {
             foreach (Type type in types.ToArray())
@@ -173,13 +173,13 @@ namespace SimpleInjector
         // and otherwise only if he has overridden Controller.Dispose(bool).
         private static bool ShouldSuppressDisposableTransientComponent(Type controllerType) =>
             TypeInheritsFromController(controllerType)
-                ? GetProtectedDisposeMethod(controllerType).DeclaringType == typeof(Controller)
+                ? GetProtectedDisposeMethod(controllerType)?.DeclaringType == typeof(Controller)
                 : false;
 
         private static bool TypeInheritsFromController(Type controllerType) =>
             typeof(Controller).GetTypeInfo().IsAssignableFrom(controllerType);
 
-        private static MethodInfo GetProtectedDisposeMethod(Type controllerType)
+        private static MethodInfo? GetProtectedDisposeMethod(Type controllerType)
         {
             foreach (var method in controllerType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
             {

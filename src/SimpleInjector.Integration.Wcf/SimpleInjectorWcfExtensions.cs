@@ -32,7 +32,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, nameof(container));
 
-            if (assemblies == null || assemblies.Length == 0)
+            if (assemblies is null || assemblies.Length == 0)
             {
                 assemblies = AppDomain.CurrentDomain.GetAssemblies();
             }
@@ -103,8 +103,8 @@ namespace SimpleInjector
             return attribute != null && attribute.ConcurrencyMode == ConcurrencyMode.Multiple;
         }
 
-        private static Lifestyle GetAppropriateLifestyle(Type wcfServiceType,
-            ILifestyleSelectionBehavior behavior)
+        private static Lifestyle GetAppropriateLifestyle(
+            Type wcfServiceType, ILifestyleSelectionBehavior behavior)
         {
             var attribute = GetServiceBehaviorAttribute(wcfServiceType);
 

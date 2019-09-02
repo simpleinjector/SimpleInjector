@@ -1299,7 +1299,7 @@ namespace SimpleInjector
         private void ThrowArgumentExceptionWhenTypeIsNotConstructable(
             Type implementationType, string parameterName)
         {
-            bool constructable = this.Options.IsConstructableType(implementationType, out string message);
+            bool constructable = this.Options.IsConstructableType(implementationType, out string? message);
 
             if (!constructable)
             {

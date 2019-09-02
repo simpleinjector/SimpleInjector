@@ -442,20 +442,22 @@
 
             Type[] types = new[]
             {
+                // An open-generic type
                 typeof(GenericHandler<>),
-                typeof(ObjectHandler),
-                typeof(DecimalHandler),
+
+                // A valid non-generic type
+                typeof(FloatHandler),
             };
 
             // Act
             Action action = () => container.Register(typeof(IBatchCommandHandler<>), types);
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                As an example, the supplied type RegisterBatchTests.ObjectHandler can be used as 
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>($@"
+                As an example, the supplied type {typeof(FloatHandler).ToFriendlyName()} can be used as 
                 implementation, because it implements the closed-generic service type
-                RegisterBatchTests.IBatchCommandHandler<Object>.
-                The supplied open-generic RegisterBatchTests.GenericHandler<T>, however, can't be
+                {typeof(IBatchCommandHandler<float>).ToFriendlyName()}.
+                The supplied open-generic {typeof(GenericHandler<>).ToFriendlyName()}, however, can't be
                 mapped to a closed-generic service because of its generic type argument.
                 You must register this open-generic type separately"
                 .TrimInside(),

@@ -30,7 +30,7 @@ namespace SimpleInjector.Integration.Wcf
             this.container = container;
         }
 
-        internal Type ServiceType { get; set; }
+        internal Type? ServiceType { get; set; }
 
         /// <summary>
         /// Provides the ability to pass custom data to binding elements to support the contract implementation.

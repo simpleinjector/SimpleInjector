@@ -139,12 +139,12 @@ namespace SimpleInjector
         // and otherwise only if he has overridden Controller.Dispose(bool).
         private static bool ShouldSuppressDisposingControllers(Type controllerType) =>
             TypeInheritsFromController(controllerType)
-                && GetProtectedDisposeMethod(controllerType).DeclaringType == typeof(Controller);
+                && GetProtectedDisposeMethod(controllerType)?.DeclaringType == typeof(Controller);
 
         private static bool TypeInheritsFromController(Type controllerType) =>
             typeof(Controller).GetTypeInfo().IsAssignableFrom(controllerType);
 
-        private static MethodInfo GetProtectedDisposeMethod(Type controllerType)
+        private static MethodInfo? GetProtectedDisposeMethod(Type controllerType)
         {
             foreach (var method in controllerType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
             {

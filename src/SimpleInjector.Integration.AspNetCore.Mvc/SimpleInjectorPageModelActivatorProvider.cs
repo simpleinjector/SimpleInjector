@@ -14,8 +14,8 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
     /// </summary>
     public class SimpleInjectorPageModelActivatorProvider : IPageModelActivatorProvider
     {
-        private readonly ConcurrentDictionary<Type, InstanceProducer> pageModelProducers =
-            new ConcurrentDictionary<Type, InstanceProducer>();
+        private readonly ConcurrentDictionary<Type, InstanceProducer?> pageModelProducers =
+            new ConcurrentDictionary<Type, InstanceProducer?>();
 
         private readonly Container container;
 
@@ -26,12 +26,7 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is null.</exception>
         public SimpleInjectorPageModelActivatorProvider(Container container)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException(nameof(container));
-            }
-
-            this.container = container;
+            this.container = container ?? throw new ArgumentNullException(nameof(container));
         }
 
         /// <summary>
@@ -41,12 +36,12 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// <returns>The delegate used to activate the page model.</returns>
         public Func<PageContext, object> CreateActivator(CompiledPageActionDescriptor descriptor)
         {
-            if (descriptor == null)
+            if (descriptor is null)
             {
                 throw new ArgumentNullException(nameof(descriptor));
             }
 
-            if (descriptor.ModelTypeInfo == null)
+            if (descriptor.ModelTypeInfo is null)
             {
                 throw new ArgumentNullException(
                     nameof(descriptor.ModelTypeInfo) + " property cannot be null.",
@@ -55,9 +50,10 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
 
             Type pageModelType = descriptor.ModelTypeInfo.AsType();
 
-            var producer = this.pageModelProducers.GetOrAdd(pageModelType, this.GetPageModelProducer);
+            InstanceProducer? producer =
+                this.pageModelProducers.GetOrAdd(pageModelType, this.GetPageModelProducer);
 
-            if (producer == null)
+            if (producer is null)
             {
                 throw new InvalidOperationException(
                     string.Format(
@@ -82,11 +78,11 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// </summary>
         /// <param name="descriptor">The <see cref="CompiledPageActionDescriptor"/>.</param>
         /// <returns>The delegate used to dispose the activated Razor Page model or null.</returns>
-        public Action<PageContext, object> CreateReleaser(CompiledPageActionDescriptor descriptor) => null;
+        public Action<PageContext, object>? CreateReleaser(CompiledPageActionDescriptor descriptor) => null;
 
         // By searching through the current registrations, we ensure that the page model is not auto-registered,
         // because that might cause it to be resolved from ASP.NET Core, in case auto cross-wiring is enabled.
-        private InstanceProducer GetPageModelProducer(Type pageModelType) =>
+        private InstanceProducer? GetPageModelProducer(Type pageModelType) =>
             this.container.GetCurrentRegistrations().SingleOrDefault(r => r.ServiceType == pageModelType);
     }
 }

@@ -124,5 +124,22 @@
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
         }
+
+        [TestMethod]
+        public void GetService_OnRegisteredInstance_ReturnsThatInstance()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<ILogger, NullLogger>();
+
+            IServiceProvider activeScope = new Scope(container);
+
+            // Act
+            var logger = activeScope.GetService(typeof(ILogger));
+
+            // Assert
+            Assert.IsNotNull(logger);
+        }
     }
 }

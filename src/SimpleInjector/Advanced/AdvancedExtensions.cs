@@ -61,7 +61,7 @@ namespace SimpleInjector.Advanced
             "Will be removed in version 6.0.",
             error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public static object GetItem(this Container container, object key)
+        public static object? GetItem(this Container container, object key)
         {
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotNull(key, nameof(key));

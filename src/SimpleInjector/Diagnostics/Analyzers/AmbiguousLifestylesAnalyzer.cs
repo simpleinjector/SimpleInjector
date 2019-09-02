@@ -70,7 +70,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
             var ambiguousComponents =
                 from component in components
-                where component.componentLifestylePairs.Length > 1
+                where component.componentLifestylePairs!.Length > 1
                 select component;
 
             return

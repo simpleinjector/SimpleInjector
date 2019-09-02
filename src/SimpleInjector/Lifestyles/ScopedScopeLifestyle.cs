@@ -14,15 +14,21 @@ namespace SimpleInjector.Lifestyles
         {
         }
 
-        protected internal override Func<Scope> CreateCurrentScopeProvider(Container container) =>
+        internal new Scope GetCurrentScope(Container container)
+        {
+            // ScopedScopeLifestyle.GetCurrentScopeCore will never return null.
+            return base.GetCurrentScope(container)!;
+        }
+
+        protected internal override Func<Scope?> CreateCurrentScopeProvider(Container container) =>
             () => this.GetScopeFromDefaultScopedLifestyle(container);
 
-        protected override Scope GetCurrentScopeCore(Container container) =>
+        protected override Scope? GetCurrentScopeCore(Container container) =>
             this.GetScopeFromDefaultScopedLifestyle(container);
 
         private Scope GetScopeFromDefaultScopedLifestyle(Container container)
         {
-            ScopedLifestyle lifestyle = container.Options.DefaultScopedLifestyle;
+            ScopedLifestyle? lifestyle = container.Options.DefaultScopedLifestyle;
 
             if (lifestyle != null)
             {

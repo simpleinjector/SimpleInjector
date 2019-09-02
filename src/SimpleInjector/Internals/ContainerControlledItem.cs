@@ -13,11 +13,9 @@ namespace SimpleInjector.Internals
     [DebuggerDisplay(nameof(ContainerControlledItem) + " ({" + nameof(ContainerControlledItem.DebuggerDisplay) + ", nq})")]
     internal sealed class ContainerControlledItem
     {
-        /// <summary>Will never be null. Can be open-generic.</summary>
         public readonly Type ImplementationType;
 
-        /// <summary>Can be null.</summary>
-        public readonly Registration Registration;
+        public readonly Registration? Registration;
 
         private ContainerControlledItem(Registration registration)
         {
@@ -25,6 +23,7 @@ namespace SimpleInjector.Internals
 
             this.Registration = registration;
             this.ImplementationType = registration.ImplementationType;
+            this.RegisteredImplementationType = registration.ImplementationType;
         }
 
         private ContainerControlledItem(Type implementationType)
@@ -32,8 +31,11 @@ namespace SimpleInjector.Internals
             Requires.IsNotNull(implementationType, nameof(implementationType));
 
             this.ImplementationType = implementationType;
+            this.RegisteredImplementationType = implementationType;
         }
 
+        internal Type RegisteredImplementationType { get; private set; }
+        
         internal string DebuggerDisplay =>
             $"ImplementationType: {this.ImplementationType.ToFriendlyName()}, " + (
             this.Registration != null
@@ -45,5 +47,12 @@ namespace SimpleInjector.Internals
 
         public static ContainerControlledItem CreateFromType(Type implementationType) =>
             new ContainerControlledItem(implementationType);
+
+        public static ContainerControlledItem CreateFromType(
+            Type registeredImplementationType, Type closedImplementationType) =>
+            new ContainerControlledItem(closedImplementationType)
+            {
+                RegisteredImplementationType = registeredImplementationType
+            };
     }
 }

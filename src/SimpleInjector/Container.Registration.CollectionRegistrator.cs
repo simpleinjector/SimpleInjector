@@ -282,7 +282,7 @@ namespace SimpleInjector
         {
             // This might seem backwards, but CreateInternal<T> also creates a Producer/Registration pair to
             // ensure the collection is correctly verified, and we can make use of this existing pair.
-            return this.CreateInternal<TService>(serviceTypes).ParentProducer.Registration;
+            return this.CreateInternal<TService>(serviceTypes).ParentProducer!.Registration;
         }
 
         /// <summary>
@@ -334,7 +334,7 @@ namespace SimpleInjector
         public Registration CreateRegistration<TService>(IEnumerable<Registration> registrations)
             where TService : class
         {
-            return this.CreateInternal<TService>(registrations).ParentProducer.Registration;
+            return this.CreateInternal<TService>(registrations).ParentProducer!.Registration;
         }
 
         /// <summary>

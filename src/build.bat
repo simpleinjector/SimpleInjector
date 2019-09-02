@@ -161,6 +161,11 @@ IF %step%==2 (
 	echo %testRunner% %testDll%
 	%testRunner% %testDll%
 	
+	set testDll2=SimpleInjector.Conventions.Tests\bin\Release\net472\SimpleInjector.Conventions.Tests.dll
+
+	echo %testRunner% %testDll2%
+	%testRunner% %testDll2%
+
     echo If tests were green, please run step 3
     goto :EOF	
 )

@@ -9,8 +9,8 @@ namespace SimpleInjector.Integration.WebApi
 
     internal sealed class SimpleInjectorHttpRequestMessageHandler : DelegatingHandler
     {
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
-            CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken)
         {
             SimpleInjectorHttpRequestMessageProvider.CurrentMessage = request;
 

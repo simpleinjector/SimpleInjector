@@ -36,9 +36,9 @@ namespace SimpleInjector.Diagnostics.Analyzers
             where numberOfUniqueDependencies > MaximumValidNumberOfDependencies
             let dependencies = g.Select(r => r.Dependency).ToArray()
             select new SingleResponsibilityViolationDiagnosticResult(
-                serviceType: g.Key.producer.ServiceType,
-                description: BuildRelationshipDescription(g.Key.ImplementationType, dependencies.Length),
-                implementationType: g.Key.ImplementationType,
+                serviceType: g.Key.producer!.ServiceType,
+                description: BuildRelationshipDescription(g.Key.ImplementationType!, dependencies.Length),
+                implementationType: g.Key.ImplementationType!,
                 dependencies: dependencies))
             .ToArray();
 

@@ -37,7 +37,7 @@ namespace SimpleInjector
         /// service. This property will return null in case the service is resolved directly from the container.
         /// </summary>
         /// <value>The <see cref="InjectionConsumerInfo"/> or null.</value>
-        public InjectionConsumerInfo Consumer =>
+        public InjectionConsumerInfo? Consumer =>
             this.consumer != InjectionConsumerInfo.Root ? this.consumer : null;
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",

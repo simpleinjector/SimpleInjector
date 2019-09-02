@@ -16,10 +16,10 @@ namespace SimpleInjector.Internals
     internal static partial class CompilationHelpers
     {
         private static readonly ConstructorInfo LazyScopeConstructor =
-            Helpers.GetConstructor(() => new LazyScope(null, null));
+            Helpers.GetConstructor(() => new LazyScope(null!, null!));
 
         private static readonly MethodInfo CreateConstantValueDelegateMethod =
-            Helpers.GetGenericMethodDefinition(() => CreateConstantValueDelegate<object>(null));
+            Helpers.GetGenericMethodDefinition(() => CreateConstantValueDelegate<object>(null!));
 
         // NOTE: This method should be public. It is called using reflection.
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -52,7 +52,7 @@ namespace SimpleInjector.Internals
             Type resultType,
             Container container,
             Expression expression,
-            Dictionary<Expression, InvocationExpression> reducedNodes = null)
+            Dictionary<Expression, InvocationExpression>? reducedNodes = null)
         {
             if (expression is ConstantExpression)
             {
@@ -67,7 +67,7 @@ namespace SimpleInjector.Internals
 
             container.Options.ExpressionCompiling(expression);
 
-            Delegate compiledLambda = null;
+            Delegate? compiledLambda = null;
 
             // In the common case, the developer will/should only create a single container during the
             // lifetime of the application (this is the recommended approach). In this case, we can optimize
@@ -108,7 +108,7 @@ namespace SimpleInjector.Internals
         }
 
         static partial void TryCompileInDynamicAssembly(
-            Type resultType, Expression expression, ref Delegate compiledLambda);
+            Type resultType, Expression expression, ref Delegate? compiledLambda);
 
         // OptimizeExpression will implement caching of the scopes of ScopedLifestyles which will optimize
         // performance in case multiple scoped registrations are used within a single delegate. Here's an
@@ -139,7 +139,7 @@ namespace SimpleInjector.Internals
             var lifestyleAssigmentExpressions = (
                 from lifestyleInfo in lifestyleInfos
                 let scopeFactory = lifestyleInfo.Lifestyle.CreateCurrentScopeProvider(container)
-                let newExpression = CreateNewLazyScopeExpression(scopeFactory, container)
+                let newExpression = CreateNewLazyScopeExpression(scopeFactory!, container)
                 select Expression.Assign(lifestyleInfo.Variable, newExpression))
                 .ToArray();
 
@@ -190,7 +190,7 @@ namespace SimpleInjector.Internals
         private static Expression ReduceObjectGraphSize(
             Expression expression,
             Container container,
-            Dictionary<Expression, InvocationExpression> reducedNodes = null)
+            Dictionary<Expression, InvocationExpression>? reducedNodes = null)
         {
             var results = NodeSizeCalculator.Calculate(expression);
 
@@ -198,10 +198,10 @@ namespace SimpleInjector.Internals
             {
                 reducedNodes = reducedNodes ?? new Dictionary<Expression, InvocationExpression>(16);
 
-                Expression mostReductiveNode = FindMostReductiveNodeOrNull(results,
+                Expression? mostReductiveNode = FindMostReductiveNodeOrNull(results,
                     container.Options.MaximumNumberOfNodesPerDelegate);
 
-                if (mostReductiveNode == null)
+                if (mostReductiveNode is null)
                 {
                     // In case mostReductiveNode is null, there's no good candidate to reduce the object
                     // graph. In that case we break out.
@@ -238,7 +238,7 @@ namespace SimpleInjector.Internals
             return Expression.Invoke(Expression.Constant(compiledDelegate));
         }
 
-        private static Expression FindMostReductiveNodeOrNull(
+        private static Expression? FindMostReductiveNodeOrNull(
             NodeSizes results, int maximumNumberOfNodesPerDelegate)
         {
             // By setting a maximum size, we prevent that the one of the root nodes will be selected as most
@@ -276,11 +276,16 @@ namespace SimpleInjector.Internals
             private readonly List<OptimizableRegistrationInfo> perObjectGraphRegistrations =
                 new List<OptimizableRegistrationInfo>();
 
-            private Container container;
+            private readonly Container container;
+
+            private PerObjectGraphOptimizableRegistrationFinder(Container container)
+            {
+                this.container = container;
+            }
 
             public static OptimizableLifestyleInfo[] Find(Expression expression, Container container)
             {
-                var finder = new PerObjectGraphOptimizableRegistrationFinder { container = container };
+                var finder = new PerObjectGraphOptimizableRegistrationFinder(container);
 
                 finder.Visit(expression);
 
@@ -299,7 +304,7 @@ namespace SimpleInjector.Internals
 
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
-                Registration registration = this.GetScopedRegistration(node);
+                Registration? registration = this.GetScopedRegistration(node);
 
                 if (registration != null)
                 {
@@ -309,13 +314,13 @@ namespace SimpleInjector.Internals
                 return base.VisitMethodCall(node);
             }
 
-            private Registration GetScopedRegistration(MethodCallExpression node)
+            private Registration? GetScopedRegistration(MethodCallExpression node)
             {
                 var registration = node.Object is ConstantExpression instance
                     ? instance.Value as Registration
                     : null;
 
-                if (object.ReferenceEquals(registration?.Container, this.container)
+                if (registration != null && object.ReferenceEquals(registration.Container, this.container)
                     && typeof(ScopedRegistration<>).IsGenericTypeDefinitionOf(registration.GetType()))
                 {
                     return registration;
@@ -329,13 +334,16 @@ namespace SimpleInjector.Internals
         {
             private OptimizableRegistrationInfo[] registrationsToOptimize;
 
+            private ObjectGraphOptimizerExpressionVisitor(
+                OptimizableRegistrationInfo[] registrationsToOptimize)
+            {
+                this.registrationsToOptimize = registrationsToOptimize;
+            }
+
             public static Expression Optimize(Expression expression,
                 OptimizableRegistrationInfo[] registrationsToOptimize)
             {
-                var optimizer = new ObjectGraphOptimizerExpressionVisitor();
-
-                optimizer.registrationsToOptimize = registrationsToOptimize;
-
+                var optimizer = new ObjectGraphOptimizerExpressionVisitor(registrationsToOptimize);
                 return optimizer.Visit(expression);
             }
 
@@ -382,7 +390,7 @@ namespace SimpleInjector.Internals
 
             private readonly Type lazyScopeRegistrationType;
 
-            private ParameterExpression variable;
+            private ParameterExpression? variable;
 
             internal OptimizableRegistrationInfo(Registration registration,
                 MethodCallExpression originalExpression)
@@ -407,13 +415,13 @@ namespace SimpleInjector.Internals
                 }
             }
 
-            internal OptimizableLifestyleInfo LifestyleInfo { get; set; }
+            internal OptimizableLifestyleInfo? LifestyleInfo { get; set; }
 
             internal Expression LazyScopeRegistrationGetInstanceExpression =>
                 Expression.Call(
                     this.Variable,
                     this.lazyScopeRegistrationType.GetMethod("GetInstance"),
-                    Expression.Property(this.LifestyleInfo.Variable, "Value"));
+                    Expression.Property(this.LifestyleInfo!.Variable, "Value"));
         }
 
         [DebuggerDisplay(
@@ -423,7 +431,9 @@ namespace SimpleInjector.Internals
             nameof(ExpressionInfo.Node) + ": {" + nameof(ExpressionInfo.Node) + "}")]
         private sealed class ExpressionInfo
         {
-            public Expression Node { get; set; }
+            public ExpressionInfo(Expression node) => this.Node = node;
+
+            public Expression Node { get; }
             public int Count { get; set; }
             public int TreeSize { get; set; }
             public int TotalCost => this.Count * this.TreeSize;
@@ -431,8 +441,14 @@ namespace SimpleInjector.Internals
 
         private sealed class NodeSizes
         {
-            public int TotalSize { get; set; }
-            public ICollection<ExpressionInfo> Nodes { get; set; }
+            public readonly int TotalSize;
+            public readonly ICollection<ExpressionInfo> Nodes;
+
+            public NodeSizes(int totalSize, ICollection<ExpressionInfo> nodes)
+            {
+                this.TotalSize = totalSize;
+                this.Nodes = nodes;
+            }
         }
 
         private sealed class NodeSizeCalculator : ExpressionVisitor
@@ -446,10 +462,10 @@ namespace SimpleInjector.Internals
             {
                 var calculator = new NodeSizeCalculator();
                 calculator.Visit(node);
-                return new NodeSizes { TotalSize = calculator.size, Nodes = calculator.nodes.Values };
+                return new NodeSizes(totalSize: calculator.size, nodes: calculator.nodes.Values);
             }
 
-            public override Expression Visit(Expression node)
+            public override Expression? Visit(Expression node)
             {
                 // Weird: node can be null: CallExpression.Object can be null.
                 if (node != null)
@@ -486,7 +502,7 @@ namespace SimpleInjector.Internals
                 }
                 else
                 {
-                    info = new ExpressionInfo { Node = node };
+                    info = new ExpressionInfo(node);
                     this.nodes[node] = info;
                     return info;
                 }
@@ -495,11 +511,17 @@ namespace SimpleInjector.Internals
 
         private sealed class NodeReplacer : ExpressionVisitor
         {
-            private Expression oldNode;
-            private Expression newNode;
+            private readonly Expression oldNode;
+            private readonly Expression newNode;
+
+            private NodeReplacer(Expression oldNode, Expression newNode)
+            {
+                this.oldNode = oldNode;
+                this.newNode = newNode;
+            }
 
             public static Expression Replace(Expression expression, Expression oldNode, Expression newNode) =>
-                new NodeReplacer { oldNode = oldNode, newNode = newNode }
+                new NodeReplacer(oldNode: oldNode, newNode: newNode)
                     .Visit(expression);
 
             public override Expression Visit(Expression node) =>

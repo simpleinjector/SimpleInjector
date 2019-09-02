@@ -14,7 +14,6 @@ namespace SimpleInjector.Decorators
         private readonly Dictionary<InstanceProducer, Registration> registrations;
         private readonly ExpressionBuiltEventArgs e;
         private readonly Type registeredServiceType;
-        private ConstructorInfo decoratorConstructor;
 
         public ServiceDecoratorExpressionInterceptor(
             DecoratorExpressionInterceptorData data,
@@ -36,7 +35,7 @@ namespace SimpleInjector.Decorators
 
         internal void ApplyDecorator(Type closedDecoratorType)
         {
-            this.decoratorConstructor = this.Container.Options.SelectConstructor(closedDecoratorType);
+            var decoratorConstructor = this.Container.Options.SelectConstructor(closedDecoratorType);
 
             if (object.ReferenceEquals(this.Lifestyle, this.Container.SelectionBasedLifestyle))
             {
@@ -46,11 +45,12 @@ namespace SimpleInjector.Decorators
             // By creating the decorator using a Lifestyle Registration the decorator can be completely
             // incorporated into the pipeline. This means that the ExpressionBuilding can be applied,
             // properties can be injected, and it can be wrapped with an initializer.
-            Registration decoratorRegistration = this.CreateRegistrationForDecorator();
+            Registration decoratorRegistration = this.CreateRegistrationForDecorator(decoratorConstructor);
 
             this.ReplaceOriginalExpression(decoratorRegistration);
 
-            this.AddAppliedDecoratorToPredicateContext(decoratorRegistration.GetRelationships());
+            this.AddAppliedDecoratorToPredicateContext(
+                decoratorRegistration.GetRelationships(), decoratorConstructor);
         }
 
         private void ReplaceOriginalExpression(Registration decoratorRegistration)
@@ -82,7 +82,7 @@ namespace SimpleInjector.Decorators
                 relationship.Dependency.ServiceType, this.e.RegisteredServiceType)
             select relationship.Dependency.Registration;
 
-        private Registration CreateRegistrationForDecorator()
+        private Registration CreateRegistrationForDecorator(ConstructorInfo decoratorConstructor)
         {
             Registration registration;
 
@@ -95,7 +95,7 @@ namespace SimpleInjector.Decorators
                 {
                     registration = this.CreateRegistration(
                         this.registeredServiceType,
-                        this.decoratorConstructor,
+                        decoratorConstructor,
                         this.e.Expression,
                         this.e.InstanceProducer,
                         this.GetServiceTypeInfo(this.e));
@@ -108,7 +108,7 @@ namespace SimpleInjector.Decorators
         }
 
         private void AddAppliedDecoratorToPredicateContext(
-            IEnumerable<KnownRelationship> decoratorRelationships)
+            IEnumerable<KnownRelationship> decoratorRelationships, ConstructorInfo decoratorConstructor)
         {
             var info = this.GetServiceTypeInfo(this.e);
 
@@ -116,7 +116,7 @@ namespace SimpleInjector.Decorators
             // the predicate of the next decorator they add.
             info.AddAppliedDecorator(
                 this.e.RegisteredServiceType,
-                this.decoratorConstructor.DeclaringType,
+                decoratorConstructor.DeclaringType,
                 this.Container,
                 this.Lifestyle,
                 this.e.Expression,

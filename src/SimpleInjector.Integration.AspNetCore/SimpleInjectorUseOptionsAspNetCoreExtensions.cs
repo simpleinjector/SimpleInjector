@@ -28,7 +28,7 @@ namespace SimpleInjector
         public static IApplicationBuilder UseSimpleInjector(
             this IApplicationBuilder app,
             Container container,
-            Action<SimpleInjectorUseOptions> setupAction = null)
+            Action<SimpleInjectorUseOptions>? setupAction = null)
         {
             Requires.IsNotNull(app, nameof(app));
             Requires.IsNotNull(container, nameof(container));
@@ -52,14 +52,35 @@ namespace SimpleInjector
             Requires.IsNotNull(options, nameof(options));
             Requires.IsNotNull(app, nameof(app));
 
+            options.UseMiddleware(typeof(TMiddleware), app);
+        }
+
+        /// <summary>
+        /// Adds a middleware type to the application's request pipeline. The middleware will be resolved
+        /// from Simple Injector. The middleware will be added to the container for verification.
+        /// </summary>
+        /// <param name="options">The <see cref="SimpleInjectorUseOptions"/>.</param>
+        /// <param name="middlewareType">The middleware type.</param>
+        /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
+        public static void UseMiddleware(
+            this SimpleInjectorUseOptions options, Type middlewareType, IApplicationBuilder app)
+        {
+            Requires.IsNotNull(options, nameof(options));
+            Requires.IsNotNull(middlewareType, nameof(middlewareType));
+            Requires.IsNotNull(app, nameof(app));
+
+            Requires.ServiceIsAssignableFromImplementation(
+                typeof(IMiddleware), middlewareType, nameof(middlewareType));
+            Requires.IsNotOpenGenericType(middlewareType, nameof(middlewareType));
+
             var container = options.Container;
 
-            var lifestyle = container.Options.LifestyleSelectionBehavior.SelectLifestyle(typeof(TMiddleware));
+            var lifestyle = container.Options.LifestyleSelectionBehavior.SelectLifestyle(middlewareType);
 
             // By creating an InstanceProducer up front, it will be known to the container, and will be part
             // of the verification process of the container.
             InstanceProducer<IMiddleware> producer =
-                lifestyle.CreateProducer<IMiddleware, TMiddleware>(container);
+                lifestyle.CreateProducer<IMiddleware>(middlewareType, container);
 
             app.Use((c, next) =>
             {

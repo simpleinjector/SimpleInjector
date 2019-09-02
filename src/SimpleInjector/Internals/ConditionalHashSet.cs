@@ -46,7 +46,7 @@ namespace SimpleInjector.Internals
 
             lock (this.dictionary)
             {
-                WeakReference reference = this.GetWeakReferenceOrNull(item);
+                WeakReference? reference = this.GetWeakReferenceOrNull(item);
 
                 if (reference != null)
                 {
@@ -75,7 +75,7 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private WeakReference GetWeakReferenceOrNull(T item)
+        private WeakReference? GetWeakReferenceOrNull(T item)
         {
             if (this.dictionary.TryGetValue(item.GetHashCode(), out List<WeakReference> bucket))
             {
