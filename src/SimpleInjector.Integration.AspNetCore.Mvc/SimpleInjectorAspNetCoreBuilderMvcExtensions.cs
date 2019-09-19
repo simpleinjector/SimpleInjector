@@ -9,9 +9,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Reflection;
     using Microsoft.AspNetCore.Mvc.ApplicationParts;
-    using Microsoft.AspNetCore.Mvc.Internal;
     using Microsoft.AspNetCore.Mvc.Razor;
-    using Microsoft.AspNetCore.Mvc.Razor.Internal;
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.AspNetCore.Razor.TagHelpers;
     using Microsoft.Extensions.DependencyInjection;
@@ -76,14 +74,48 @@ namespace SimpleInjector
 
             var manager = GetApplicationPartManager(builder.Services, nameof(AddTagHelperActivation));
 
+            ServiceDescriptor tagHelperDescriptor = GetTagHelperActivatorDescriptor(builder.Services);
+
             builder.Container.RegisterTagHelpers(manager, selector);
 
             builder.Services.AddSingleton<ITagHelperActivator>(p => new SimpleInjectorTagHelperActivator(
                 builder.Container,
                 selector,
-                new DefaultTagHelperActivator(p.GetRequiredService<ITypeActivatorCache>())));
+                (ITagHelperActivator)p.GetInstance(tagHelperDescriptor)));
 
             return builder;
+        }
+
+        private static ServiceDescriptor GetTagHelperActivatorDescriptor(IServiceCollection services)
+        {
+            var descriptor = FindServiceDescriptor(services, typeof(ITagHelperActivator));
+
+            if (descriptor is null)
+            {
+                throw new InvalidOperationException(
+                    $"A registration for the {typeof(ITagHelperActivator).FullName} is missing from the " +
+                    "ASP.NET Core configuration system. This is most likely caused by a missing call to " +
+                    "either services.AddRazorPages(), services.AddControllersWithViews(), " +
+                    "services.AddViewLocalization(), or services.AddRazorViewEngine() as part of the " +
+                    "ConfigureServices(IServiceCollection) method of the Startup class. A call to one of " +
+                    "those methods will ensure the registration of the ITagHelperActivator. The default " +
+                    "ITagHelperActivator registration is used as a fallback.");
+            }
+            else if (descriptor.Lifetime != ServiceLifetime.Singleton)
+            {
+                throw new InvalidOperationException(
+                    $"Although a registration for {typeof(ITagHelperActivator).FullName} exists in the " +
+                    "ASP.NET Core configuration system, the registration is not added as Singleton. " +
+                    $"Instead the registration exists as {descriptor.Lifetime}. This makes it impossible " +
+                    $"Simple Injector's {nameof(AddTagHelperActivation)} method requires the default " +
+                    "ITagHelperActivator to be a Singleton. This is most likely because " +
+                    "ITagHelperActivator was overridden by you or a third-party library. Make sure that " +
+                    "you use one of the AddSingleton overloads to register the default ITagHelperActivator.");
+            }
+            else
+            {
+                return descriptor;
+            }
         }
 
         private static ApplicationPartManager GetApplicationPartManager(
@@ -170,5 +202,29 @@ namespace SimpleInjector
 
             return lifestyle.CreateRegistration(concreteType, container);
         }
+
+        private static ServiceDescriptor? FindServiceDescriptor(IServiceCollection services, Type serviceType)
+        {
+            // In case there are multiple descriptors for a given type, .NET Core will use the last
+            // descriptor when one instance is resolved. We will have to get this last one as well.
+            ServiceDescriptor? descriptor = services.LastOrDefault(d => d.ServiceType == serviceType);
+
+            if (descriptor == null && serviceType.GetTypeInfo().IsGenericType)
+            {
+                // In case the registration is made as open-generic type, the previous query will return
+                // null, and we need to go find the last open generic registration for the service type.
+                var serviceTypeDefinition = serviceType.GetTypeInfo().GetGenericTypeDefinition();
+                descriptor = services.LastOrDefault(d => d.ServiceType == serviceTypeDefinition);
+            }
+
+            return descriptor;
+        }
+
+        private static object GetInstance(this IServiceProvider provider, ServiceDescriptor descriptor) =>
+            descriptor.ImplementationInstance != null
+                ? descriptor.ImplementationInstance
+                : descriptor.ImplementationType != null
+                    ? ActivatorUtilities.GetServiceOrCreateInstance(provider, descriptor.ImplementationType)
+                    : descriptor.ImplementationFactory(provider);
     }
 }
