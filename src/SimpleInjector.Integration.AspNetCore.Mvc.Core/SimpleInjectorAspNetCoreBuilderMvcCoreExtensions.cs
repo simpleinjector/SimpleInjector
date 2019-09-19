@@ -68,7 +68,7 @@ namespace SimpleInjector
         private static ApplicationPartManager GetApplicationPartManager(
             this IServiceCollection services, string methodName)
         {
-            ServiceDescriptor descriptor = services
+            ServiceDescriptor? descriptor = services
                 .LastOrDefault(d => d.ServiceType == typeof(ApplicationPartManager));
 
             if (descriptor is null)

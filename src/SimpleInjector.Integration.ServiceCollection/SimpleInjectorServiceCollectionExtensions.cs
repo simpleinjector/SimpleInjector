@@ -152,7 +152,8 @@ namespace SimpleInjector
                 typeof(ILogger),
                 c => c.Consumer is null
                     ? typeof(RootLogger)
-                    : typeof(Integration.ServiceCollection.Logger<>).MakeGenericType(c.Consumer.ImplementationType),
+                    : typeof(Integration.ServiceCollection.Logger<>)
+                        .MakeGenericType(c.Consumer.ImplementationType),
                 Lifestyle.Singleton,
                 _ => true);
 
@@ -161,20 +162,21 @@ namespace SimpleInjector
 
         /// <summary>
         /// Allows components that are built by Simple Injector to depend on the (non-generic)
-        /// <see cref="IStringLocalizer">Microsoft.Extensions.Localization.IStringLocalizer</see> abstraction. Components are
-        /// injected with an contextual implementation. Using this method, application components can simply
-        /// depend on <b>IStringLocalizer</b> instead of its generic counter part, <b>IStringLocalizer&lt;T&gt;</b>, which
-        /// simplifies development.
+        /// <see cref="IStringLocalizer">Microsoft.Extensions.Localization.IStringLocalizer</see> abstraction.
+        /// Components are injected with an contextual implementation. Using this method, application 
+        /// components can simply depend on <b>IStringLocalizer</b> instead of its generic counter part,
+        /// <b>IStringLocalizer&lt;T&gt;</b>, which simplifies development.
         /// </summary>
         /// <param name="options">The options.</param>
         /// <returns>The supplied <paramref name="options"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="options"/> is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when no <see cref="IStringLocalizerFactory"/> entry
-        /// can be found in the framework's list of services defined by <see cref="IServiceCollection"/>.
+        /// <exception cref="InvalidOperationException">Thrown when no <see cref="IStringLocalizerFactory"/>
+        /// entry can be found in the framework's list of services defined by <see cref="IServiceCollection"/>.
         /// </exception>
-        /// <exception cref="ActivationException">Thrown when an <see cref="IStringLocalizer"/> is directly resolved from the 
-        /// container. Instead use <see cref="IStringLocalizer"/> within a constructor dependency.</exception>
+        /// <exception cref="ActivationException">Thrown when an <see cref="IStringLocalizer"/> is directly 
+        /// resolved from the container. Instead use <see cref="IStringLocalizer"/> within a constructor 
+        /// dependency.</exception>
         public static SimpleInjectorUseOptions UseLocalization(this SimpleInjectorUseOptions options)
         {
             if (options is null)
@@ -187,24 +189,27 @@ namespace SimpleInjector
             if (localizerFactory is null)
             {
                 throw new InvalidOperationException(
-                    $"The IServiceCollection is missing an entry for {typeof(IStringLocalizerFactory).FullName}. " +
-                    "This is most likely caused by a missing call to .AddLocalization(). Make sure that the " +
-                    "AddLocalization() extension method is called on the IServiceCollection. This method is " +
-                    "part of the LocalizationServiceCollectionExtensions class of the Microsoft.Extensions" +
-                    ".Localization assembly.");
+                    $"The IServiceCollection is missing an entry for " +
+                    $"{typeof(IStringLocalizerFactory).FullName}. This is most likely caused by a missing " +
+                    $"call to .AddLocalization(). Make sure that the AddLocalization() extension method is " +
+                    $"called on the IServiceCollection. This method is part of the " +
+                    $"LocalizationServiceCollectionExtensions class of the " +
+                    $"Microsoft.Extensions.Localization assembly.");
             }
 
-            // Register localizer factory explicitly. This allows the IStringLocalizer<T> conditional registration to work
-            // even when auto cross wiring is disabled.
+            // Register localizer factory explicitly. This allows the IStringLocalizer<T> conditional
+            // registration to work even when auto cross wiring is disabled.
             options.Container.RegisterInstance(localizerFactory);
 
             options.Container.RegisterConditional(
                 typeof(IStringLocalizer),
                 c => c.Consumer is null
-                    ? throw new ActivationException("IStringLocalizer is being resolved directly from the container, " +
-                    "but this is not supported as string localizers need to be related to a consuming type. " +
-                    "Instead, make IStringLocalizer a constructor dependency of the type it is used in.")
-                    : typeof(Integration.ServiceCollection.StringLocalizer<>).MakeGenericType(c.Consumer.ImplementationType),
+                    ? throw new ActivationException(
+                        "IStringLocalizer is being resolved directly from the container, but this is not " +
+                        "supported as string localizers need to be related to a consuming type. Instead, " +
+                        "make IStringLocalizer a constructor dependency of the type it is used in.")
+                    : typeof(Integration.ServiceCollection.StringLocalizer<>)
+                    .MakeGenericType(c.Consumer.ImplementationType),
                 Lifestyle.Singleton,
                 _ => true);
 
@@ -306,7 +311,7 @@ namespace SimpleInjector
 
                 Type serviceType = e.UnregisteredServiceType;
 
-                ServiceDescriptor descriptor = FindServiceDescriptor(services, serviceType);
+                ServiceDescriptor? descriptor = FindServiceDescriptor(services, serviceType);
 
                 if (descriptor != null)
                 {
@@ -375,11 +380,11 @@ namespace SimpleInjector
             return () => accessor.Current.GetRequiredService(serviceType);
         }
 
-        private static ServiceDescriptor FindServiceDescriptor(IServiceCollection services, Type serviceType)
+        private static ServiceDescriptor? FindServiceDescriptor(IServiceCollection services, Type serviceType)
         {
             // In case there are multiple descriptors for a given type, .NET Core will use the last
             // descriptor when one instance is resolved. We will have to get this last one as well.
-            ServiceDescriptor descriptor = services.LastOrDefault(d => d.ServiceType == serviceType);
+            ServiceDescriptor? descriptor = services.LastOrDefault(d => d.ServiceType == serviceType);
 
             if (descriptor == null && serviceType.GetTypeInfo().IsGenericType)
             {
