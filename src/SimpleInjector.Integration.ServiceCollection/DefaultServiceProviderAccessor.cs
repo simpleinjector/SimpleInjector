@@ -33,7 +33,7 @@ namespace SimpleInjector.Integration.ServiceCollection
                     // disposed of when the scope is disposed of.
                     return (IServiceScope)this.serviceScopeProducer.GetInstance();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     var lifestyle = this.container.Options.DefaultScopedLifestyle;
 
@@ -47,7 +47,7 @@ namespace SimpleInjector.Integration.ServiceCollection
                              $"the context of an active ({lifestyle?.Name}) scope. To be able to resolve " +
                              "this service the operation must run in the context of such scope. " +
                              "Please see https://simpleinjector.org/scoped for more information about how " +
-                             "to manage scopes.");
+                             "to manage scopes.", ex);
                     }
                     else
                     {

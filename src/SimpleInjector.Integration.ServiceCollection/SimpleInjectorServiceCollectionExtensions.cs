@@ -377,7 +377,26 @@ namespace SimpleInjector
             // container—resolving them from the root container will cause memory leaks. Specific
             // framework integration (such as Simple Injector's ASP.NET Core integration) can override
             // this accessor with one that allows retrieving the IServiceProvider from a web request.
-            return () => accessor.Current.GetRequiredService(serviceType);
+            return () =>
+            {
+                IServiceProvider current;
+
+                try
+                {
+                    current = accessor.Current;
+                }
+                catch (ActivationException ex)
+                {
+                    // The DefaultServiceProviderAccessor will throw an ActivationException in case the
+                    // IServiceProvider (or in fact the underlying IServiceScope) is requested outside the
+                    // context of an active scope. Here we enrich that exception message with information
+                    // of the actual requested cross-wired service.
+                    throw new ActivationException(
+                        $"Error resolving the cross-wired {serviceType.ToFriendlyName()}. {ex.Message}", ex);
+                }
+
+                return current.GetRequiredService(serviceType);
+            };
         }
 
         private static ServiceDescriptor? FindServiceDescriptor(IServiceCollection services, Type serviceType)
