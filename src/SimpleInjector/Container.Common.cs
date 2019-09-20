@@ -398,15 +398,18 @@ namespace SimpleInjector
 
         internal void ThrowParameterTypeMustBeRegistered(InjectionTargetInfo target)
         {
+            var type = target.TargetType;
+
             throw new ActivationException(
                 StringResources.ParameterTypeMustBeRegistered(
-                    this,
-                    target,
-                    this.GetNumberOfConditionalRegistrationsFor(target.TargetType),
-                    this.ContainsOneToOneRegistrationForCollectionType(target.TargetType),
-                    this.ContainsCollectionRegistrationFor(target.TargetType),
-                    this.GetNonGenericDecoratorsThatWereSkippedDuringBatchRegistration(target.TargetType),
-                    this.GetLookalikesForMissingType(target.TargetType)));
+                    container: this,
+                    target: target,
+                    numberOfConditionals: this.GetNumberOfConditionalRegistrationsFor(type),
+                    hasRelatedOneToOneMapping: this.ContainsOneToOneRegistrationForCollection(type),
+                    noCollectionRegistrationExists: this.IsCollectionButNoOneToToOneRegistrationExists(type),
+                    hasRelatedCollectionMapping: this.ContainsCollectionRegistrationFor(type),
+                    skippedDecorators: this.GetNonGenericDecoratorsSkippedDuringAutoRegistration(type),
+                    lookalikes: this.GetLookalikesForMissingType(type)));
         }
 
         internal CollectionResolver GetContainerUncontrolledResolver(Type itemType) =>
