@@ -20,7 +20,10 @@ namespace SimpleInjector
 
         private const string EnableAutoVerificationPropertyName =
             nameof(Container) + "." + nameof(Container.Options) + "." + nameof(ContainerOptions.EnableAutoVerification);
-        
+
+        private const string CollectionsAppendMethodName =
+            nameof(Container) + "." + nameof(Container.Collection) + "." + nameof(ContainerCollectionRegistrator.Append);
+
         // Assembly.Location only exists in .NETStandard1.5 and up, .NET4.0 and PCL, but we only compile
         // against .NETStandard1.0 and .NETStandard1.3. We don't want to add an extra build directly, solely
         // for the Location property.
@@ -93,18 +96,22 @@ namespace SimpleInjector
         internal static string NoRegistrationForTypeFound(
             Type serviceType,
             bool containerHasRegistrations,
+            bool noCollectionRegistrationExists,
             bool containerHasRelatedOneToOneMapping,
             bool containerHasRelatedCollectionMapping,
             Type[] skippedDecorators,
             Type[] lookalikes) =>
             Format(
-                "No registration for type {0} could be found.{1}{2}{3}{4}{5}",
+                "No registration for type {0} could be found.{1}{2}{3}{4}{5}{6}",
                 serviceType.TypeName(),
                 ContainerHasNoRegistrationsAddition(containerHasRegistrations),
+
                 DidYouMeanToCallGetInstanceInstead(containerHasRelatedOneToOneMapping, serviceType),
+                NoCollectionRegistrationExists(noCollectionRegistrationExists, serviceType),
                 DidYouMeanToCallGetAllInstancesInstead(containerHasRelatedCollectionMapping, serviceType),
                 NoteThatSkippedDecoratorsWereFound(serviceType, skippedDecorators),
-                NoteThatTypeLookalikesAreFound(serviceType, lookalikes));
+                NoteThatTypeLookalikesAreFound(serviceType, lookalikes),
+                NoCollectionRegistrationExists(false, serviceType));
 
         internal static string KnownImplementationTypeShouldBeAssignableFromExpressionType(
             Type knownImplementationType, Type currentExpressionType) =>
@@ -284,6 +291,7 @@ namespace SimpleInjector
             InjectionTargetInfo target,
             int numberOfConditionals,
             bool hasRelatedOneToOneMapping,
+            bool noCollectionRegistrationExists,
             bool hasRelatedCollectionMapping,
             Type[] skippedDecorators,
             Type[] lookalikes)
@@ -298,6 +306,7 @@ namespace SimpleInjector
             string extraInfo = string.Concat(
                 GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals),
                 DidYouMeanToDependOnNonCollectionInstead(hasRelatedOneToOneMapping, target.TargetType),
+                NoCollectionRegistrationExists(noCollectionRegistrationExists, target.TargetType),
                 DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType),
                 NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators),
                 NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(container, target.TargetType),
@@ -1014,6 +1023,21 @@ namespace SimpleInjector
                     "about registering and resolving collections.",
                     collectionServiceType.GetGenericArguments()[0].TypeName(),
                     CollectionsRegisterMethodName)
+                : string.Empty;
+
+        private static object NoCollectionRegistrationExists(
+            bool shouldDisplayMessage, Type collectionServiceType) =>
+            shouldDisplayMessage
+                ? Format(
+                    " You can use one of the {0} overloads to register a collection of {1} types, or one " +
+                    "of the {2} overloads to append a single registration to a collection. In case you " +
+                    "intend to resolve an empty collection of {1} elements, make sure you register an " +
+                    "empty collection; Simple Injector requires a call to {0} to be made, even in the " +
+                    "absence of any instances. Please see https://simpleinjector.org/collections for more " +
+                    "information about registering and resolving collections.",
+                    CollectionsRegisterMethodName,
+                    collectionServiceType.GetGenericArguments()[0].TypeName(),
+                    CollectionsAppendMethodName)
                 : string.Empty;
 
         private static string DidYouMeanToDependOnNonCollectionInstead(

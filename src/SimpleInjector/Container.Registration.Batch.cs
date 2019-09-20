@@ -620,7 +620,7 @@ namespace SimpleInjector
             this.skippedNonGenericDecorators[openGenericServiceType].AddRange(nonGenericDecorators);
         }
 
-        private Type[] GetNonGenericDecoratorsThatWereSkippedDuringBatchRegistration(Type serviceType)
+        private Type[] GetNonGenericDecoratorsSkippedDuringAutoRegistration(Type serviceType)
         {
             if (serviceType.IsGenericType())
             {
