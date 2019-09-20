@@ -2516,6 +2516,54 @@
                 actualTypes: bases.Select(d => d.GetType()).ToArray());
         }
 
+        // Test for #441
+        [TestMethod]
+        public void GetAllInstances_OnUnregisteredCollection_ThrowsExceptionThatDescribesHowCollectionsMustBeRegistered()
+        {
+            // Arrange
+            var container = new Container();
+
+            // to ensure the container isn't empty
+            container.RegisterInstance(new object());
+
+            // Act
+            // resolve an unregistered collection
+            Action action = () => container.GetAllInstances<IPlugin>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                No registration for type IEnumerable<IPlugin> could be found. You can use one of the
+                Container.Collection.Register overloads to register a collection of IPlugin types, or one of
+                the Container.Collection.Append overloads to append a single registration to a collection.
+                In case you intend to resolve an empty collection of IPlugin elements, make sure you register
+                an empty collection; Simple Injector requires a call to Container.Collection.Register to be
+                made, even in the absence of any instances.
+                Please see https://simpleinjector.org/collections for more information about registering and
+                resolving collections."
+                .TrimInside(),
+                action);
+        }
+
+        // Test for #441
+        [TestMethod]
+        public void GetInstance_OnTypeDependingOnUnregisteredCollection_ThrowsExceptionThatDescribesHowCollectionsMustBeRegistered()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ServiceDependingOn<ICollection<IPlugin>>>();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceDependingOn<ICollection<IPlugin>>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                In case you intend to resolve an empty collection of IPlugin elements, make sure you register
+                an empty collection"
+                .TrimInside(),
+                action);
+        }
+
         private static void Assert_IsNotAMutableCollection<T>(IEnumerable<T> collection)
         {
             string assertMessage = "The container should wrap mutable types to make it impossible for " +
