@@ -70,7 +70,8 @@ namespace SimpleInjector
             // fail because of the dependencies these tag helpers have. This means that OOTB tag helpers need
             // to remain created by the framework's DefaultTagHelperActivator, hence the selector predicate.
             Predicate<Type> selector = applicationTypeSelector ??
-                (type => !type.GetTypeInfo().Namespace.StartsWith("Microsoft"));
+                (type => !type.GetTypeInfo().Namespace.StartsWith("Microsoft")
+                    && !type.GetTypeInfo().Name.Contains("__Generated__"));
 
             var manager = GetApplicationPartManager(builder.Services, nameof(AddTagHelperActivation));
 
