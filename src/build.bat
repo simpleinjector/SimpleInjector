@@ -57,27 +57,11 @@ set version_Integration_AspNetCore=%version_Core%
 set version_Integration_AspNetCore_Mvc_Core=%version_Core%
 set version_Integration_AspNetCore_Mvc=%version_Core%
 
-set vsFolder=%programfiles(x86)%\Microsoft Visual Studio\2019
-
-if not exist %vsFolder% goto :vs_missing
-
-set vsEdition=""
-
-if exist "%vsFolder%\Community" (
-    set vsEdition="Community"
-) else if exist "%vsFolder%\Professional" (
-    set vsEdition="Professional"
-) else (
-    goto :vs_edition_missing
-)
-
-set vsEditionFolder=%vsFolder%\%vsEdition%
-
-set vsvars32_bat=%vsEditionFolder%\Common7\Tools\VsMSBuildCmd.bat
+set vsvars32_bat="%programfiles(x86)%\Microsoft Visual Studio\2019\Community\Common7\Tools\VsMSBuildCmd.bat"
 if not exist %vsvars32_bat% goto :vsvars32_bat_missing
 @call %vsvars32_bat%
 
-set msbuild=%vsEditionFolder%\MSBuild\Current\Bin\MSBuild.exe
+set msbuild="%programfiles(x86)%\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
 if not exist %msbuild% goto :msbuild_exe_missing
 
 set attrib=%systemroot%\System32\attrib.exe
@@ -390,12 +374,4 @@ GOTO :EOF
 
 :xcopy_missing
 echo Couldn't locate xcopy. Expected it to be here: %xcopy%
-GOTO :EOF
-
-:vs_missing
-echo Couldn't locate Visual Studio. Expected it to be here: %vsFolder%
-GOTO :EOF
-
-:vs_edition_missing
-echo Couldn't locate Visual Studio edition in %vsFolder%. Expected a %vsFolder%\Community or %vsFolder%\Professional.
 GOTO :EOF
