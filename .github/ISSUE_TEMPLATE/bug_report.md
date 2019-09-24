@@ -7,6 +7,16 @@ assignees: ''
 
 ---
 
+**Write a great title**
+Write a title that summarizes the specific problem, question, or feature request. Your title should be specific. Examples:
+
+* **Bad**: Simple Injector Confusion
+* **Good**: How to prevent Simple Injector from resolving generated ASP.NET Core TagHelper classes?
+* **Bad**: How to get container instance
+* **Good**: Singletons are caching ThreadAbortExceptions, requiring the application to be restarted
+* **Bad**: sitecore upgrade issue with Simple Injector
+* **Good**: Can the ASP.NET Core integration cross-wiring feature work the other way around?
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 

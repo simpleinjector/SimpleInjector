@@ -7,6 +7,15 @@ assignees: ''
 
 ---
 
+Write a title that summarizes the specific problem, question, or feature request. Your title should be specific. Examples:
+
+* **Bad**: Simple Injector Confusion
+* **Good**: How to prevent Simple Injector from resolving generated ASP.NET Core TagHelper classes?
+* **Bad**: How to get container instance
+* **Good**: Singletons are caching ThreadAbortExceptions, requiring the application to be restarted
+* **Bad**: sitecore upgrade issue with Simple Injector
+* **Good**: Can the ASP.NET Core integration cross-wiring feature work the other way around?
+
 Describe your problem, question, or feature in a clear and concise way. Please make sure you:
 
 * Do **not post a duplicate** question on StackOverflow. If you [raised a question](https://stackoverflow.com/questions/ask?tags=simple-injector%20ioc-container%20dependency-injection%20.net%20c%23) with the `simple-injector` tag on StackOverflow, rest assured that we already read your question. Posting a duplicate won't make you get an answer faster.
