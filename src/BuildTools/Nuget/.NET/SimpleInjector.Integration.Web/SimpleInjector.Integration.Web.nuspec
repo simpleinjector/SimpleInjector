@@ -7,7 +7,7 @@
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
     <license type="expression">MIT</license>
     <projectUrl>https://simpleinjector.org</projectUrl>
-    <iconUrl>https://simpleinjector.org/simpleinjector.ico</iconUrl>
+	<icon>simpleinjector.ico</icon>
     <dependencies>
       <dependency id="SimpleInjector" version="[{versionCore},5)" />
       <dependency id="Microsoft.Web.Infrastructure" version="1.0.0" />
@@ -21,4 +21,7 @@
     <language>en-US</language>
     <tags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC per-web-request web integration</tags>
   </metadata>
+  <files>
+    <file src="simpleinjector.ico" target="" />
+  </files>  
 </package>
