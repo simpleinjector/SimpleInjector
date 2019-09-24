@@ -16,7 +16,7 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>SimpleInjector.Integration.GenericHost</PackageId>
     <PackageTags>simpleinjector;dependency-injection;DI;.NET;ASP.NET Core;Generic Host;GenericHost;IHost;HostBuilder</PackageTags>
-    <PackageIconUrl>https://simpleinjector.org/simpleinjector.ico</PackageIconUrl>
+    <PackageIcon>simpleinjector.ico</PackageIcon>
     <PackageProjectUrl>https://simpleinjector.org/generichost</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -41,6 +41,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\Graphics\simpleinjector.ico" Pack="true" PackagePath=""/>
+  </ItemGroup>
+  
   <Target Name="PostcompileScript" AfterTargets="Build" Condition=" '$(IsCrossTargetingBuild)' != 'true' ">
     <Exec Command="dotnet pack --no-build --configuration $(Configuration)" />
   </Target>
