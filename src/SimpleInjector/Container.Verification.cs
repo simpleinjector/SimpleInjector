@@ -110,9 +110,13 @@ namespace SimpleInjector
             // the first thread could dispose the verification scope, while the other thread is still using it.
             lock (this.isVerifying)
             {
+                // Flag verifying before locking the container, because LockContainer otherwise triggers
+                // verification again causing a stack overflow.
+                this.IsVerifying = true;
+
                 this.LockContainer();
                 bool original = this.Options.SuppressLifestyleMismatchVerification;
-                this.IsVerifying = true;
+                
                 this.VerificationScope = new ContainerVerificationScope(this);
 
                 try

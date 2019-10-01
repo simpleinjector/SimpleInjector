@@ -18,6 +18,9 @@ namespace SimpleInjector
         private const string CollectionsRegisterMethodName =
             nameof(Container) + "." + nameof(Container.Collection) + "." + nameof(ContainerCollectionRegistrator.Register);
 
+        private const string EnableAutoVerificationPropertyName =
+            nameof(Container) + "." + nameof(Container.Options) + "." + nameof(ContainerOptions.EnableAutoVerification);
+        
         // Assembly.Location only exists in .NETStandard1.5 and up, .NET4.0 and PCL, but we only compile
         // against .NETStandard1.0 and .NETStandard1.3. We don't want to add an extra build directly, solely
         // for the Location property.
@@ -164,6 +167,11 @@ namespace SimpleInjector
                 string.Join(Environment.NewLine, descriptions.Distinct()),
                 Environment.NewLine);
         }
+
+        internal static string EnableAutoVerificationIsEnabled(string innerMessage) =>
+            innerMessage + $" Verification was triggered because {EnableAutoVerificationPropertyName} was " +
+            "enabled. To prevent the container from being verified on first resolve, set " +
+            $"{EnableAutoVerificationPropertyName} to false.";
 
         internal static string ConfigurationInvalidCreatingInstanceFailed(
             Type serviceType, Exception exception) =>

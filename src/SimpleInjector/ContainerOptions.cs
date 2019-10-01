@@ -88,12 +88,21 @@ namespace SimpleInjector
         /// <summary>
         /// Gets or sets a value indicating whether the container should suppress checking for lifestyle
         /// mismatches (see: https://simpleinjector.org/dialm) when a component is resolved. The default
-        /// is false.
+        /// is false. This setting will have no effect when <see cref="EnableAutoVerification"/> is true.
         /// </summary>
         /// <value>The value indicating whether the container should suppress checking for lifestyle
         /// mismatches.</value>
         public bool SuppressLifestyleMismatchVerification { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the container should automatically trigger verification
+        /// and diagnostics of its configuration when the first service is resolved (e.g. the first call to
+        /// GetInstance). The behavior is identical to calling <see cref="Container.Verify()">Verify()</see>
+        /// manually. The default is false.
+        /// </summary>
+        /// <value>The value indicating whether the container should automatically trigger verification.</value>
+        public bool EnableAutoVerification { get; set; }
+        
         /// <summary>Gets or sets a value indicating whether.
         /// This method is deprecated. Changing its value will have no effect.</summary>
         /// <value>The value indicating whether the container will return an empty collection.</value>

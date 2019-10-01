@@ -477,6 +477,28 @@ namespace SimpleInjector
 
                 this.locked = true;
             }
+
+            if (this.Options.EnableAutoVerification && !this.IsVerifying && !this.SuccesfullyVerified)
+            {
+                try
+                {
+                    this.Verify();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // Verify throws an invalid operation exception. Here, we instead want to throw an
+                    // ActivationException, as that would allow the same exception type to be thrown in that
+                    // case, which is often what the user would expect.
+                    throw new ActivationException(
+                        StringResources.EnableAutoVerificationIsEnabled(ex.Message), ex);
+                }
+                catch (DiagnosticVerificationException ex)
+                {
+                    // Same for DiagnosticVerificationExceptions.
+                    throw new ActivationException(
+                        StringResources.EnableAutoVerificationIsEnabled(ex.Message), ex);
+                }
+            }
         }
 
         private void ThrowContainerDisposedException()
