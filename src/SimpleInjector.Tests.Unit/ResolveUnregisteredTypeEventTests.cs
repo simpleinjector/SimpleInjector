@@ -638,7 +638,7 @@ namespace SimpleInjector.Tests.Unit
         public void ResolveUnregisteredConcreteTypes_SetToFalse_DoesNotAllowUnregisteredConcreteDependenciesToBeResolved()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Options.ResolveUnregisteredConcreteTypes = false;
 
             container.Register<ServiceDependingOn<ConcreteCommand>>();

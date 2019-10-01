@@ -19,6 +19,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             container.Options.EnableAutomaticParameterizedFactories();
 

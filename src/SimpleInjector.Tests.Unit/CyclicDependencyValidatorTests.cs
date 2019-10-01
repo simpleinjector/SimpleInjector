@@ -227,7 +227,7 @@
         public void GetInstance_DelegateRegistrationDependingIndirectlyOnItselfThroughRootType_Throws()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // One depends on ITwo
             container.Register<One>();
@@ -545,11 +545,20 @@
         public void GetInstance_OnCyclicGraphWithCycleInDecorator_ShowsTheDecoratorInTheGraph()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
+            // The registrations below result in the following cyclic graph
+            // ServiceDependingOn<A>(
+            //     dependency: new A(
+            //         b: new B(
+            //             x: CyclicXDecorator3(
+            //                 x: new NonCyclicX(),
+            //                 a: new A(...)))))
+            container.Register<ServiceDependingOn<A>>();
+            container.Register<A>();
+            container.Register<B>();
             container.Register<IX, NonCyclicX>();
             container.RegisterDecorator(typeof(IX), typeof(CyclicXDecorator3));
-            container.Register<B>();
 
             // Act
             Action action = () => container.GetInstance<ServiceDependingOn<A>>();
@@ -559,7 +568,7 @@
                 "The cyclic graph contains the following types: A -> B -> CyclicXDecorator3 -> A.",
                 action);
         }
-
+        
         private static void Assert_FinishedWithoutExceptions(ThreadWrapper thread)
         {
             thread.Join();
@@ -722,12 +731,12 @@
     }
 
     public class A { public A(B b) { } }
-    public class B { public B(IX c) { } }
+    public class B { public B(IX x) { } }
     public class NonCyclicX : IX { }
-    public class CyclicX : IX { public CyclicX(IX c) { } } // Depending on itself
-    public class XDecorator1 : IX { public XDecorator1(IX d) { } }
-    public class XDecorator2 : IX { public XDecorator2(IX d) { } }
-    public class CyclicXDecorator3 : IX { public CyclicXDecorator3(IX d, A a) { } }
+    public class CyclicX : IX { public CyclicX(IX x) { } } // Depending on itself
+    public class XDecorator1 : IX { public XDecorator1(IX x) { } }
+    public class XDecorator2 : IX { public XDecorator2(IX x) { } }
+    public class CyclicXDecorator3 : IX { public CyclicXDecorator3(IX x, A a) { } }
 
     public class ServiceDependingOn<TDependency>
     {

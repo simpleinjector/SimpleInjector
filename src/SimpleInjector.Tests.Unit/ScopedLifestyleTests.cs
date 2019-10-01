@@ -242,7 +242,7 @@
 
             var scope = new Scope(new Container());
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<DisposableObject>(() => disposable, new FakeScopedLifestyle(scope));
 
@@ -415,7 +415,7 @@
             // Arrange
             bool newlyResolvedInstanceDisposed = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var scope = new Scope(container);
 
@@ -737,6 +737,7 @@
             DisposablePlugin plugin = null;
 
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             var scopedLifestyle = new FakeScopedLifestyle(new Scope(container));
 

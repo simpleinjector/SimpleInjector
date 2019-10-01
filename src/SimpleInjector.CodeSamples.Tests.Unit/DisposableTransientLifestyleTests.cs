@@ -74,7 +74,7 @@
             // Arrange
             DisposableUserRepository instanceToDispose;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var lifestyle = new DisposableTransientLifestyle(new ThreadScopedLifestyle());
 

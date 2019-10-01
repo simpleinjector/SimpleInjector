@@ -1593,10 +1593,11 @@
         }
 
         [TestMethod]
-        public void Verify_ClosedTypeWithUnregisteredDependencyResolvedBeforeCallingVerift_StillThrowsException()
+        public void Verify_ClosedTypeWithUnregisteredDependencyResolvedBeforeCallingVerify_StillThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
+            container.Options.EnableAutoVerification = false;
 
             container.Collection.Register(typeof(IEventHandler<>), new[]
             {

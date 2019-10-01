@@ -329,6 +329,10 @@
             // Arrange
             var container = ContainerFactory.New();
 
+            // Behavior is different with auto verification enabled, because the real user service is not
+            // resolved, but the complete container verified.
+            container.Options.EnableAutoVerification = false;
+
             container.Register<IUserRepository>(() => { throw new InvalidOperationException("Bla."); });
 
             try
