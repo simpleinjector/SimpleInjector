@@ -106,6 +106,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
             container.Collection.Register<IStrategy>(typeof(A), typeof(B));

@@ -11,7 +11,7 @@
         public void GetInstance_ResolvingConditionallyDecoratedInstanceWithPredicateTrue_AppliesTheDecorator()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Options.EnableContextualDecoratorSupport();
 
@@ -31,7 +31,7 @@
         public void GetInstance_ResolvingConditionallyDecoratedInstanceWithPredicateFalse_DoesNotApplyTheDecorator()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Options.EnableContextualDecoratorSupport();
 
@@ -51,7 +51,7 @@
         public void GetInstance_ResolvingConditionallyDecoratedInstanceWithConditionalPredicate_AppliesDecoratorsBasedOnPredicate()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Options.EnableContextualDecoratorSupport();
 
@@ -76,7 +76,7 @@
         public void GetInstance_ResolvingInstanceWithTwoConditionallyDecoratorsRegistered_AppliesBothDecorators()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Options.EnableContextualDecoratorSupport();
 
@@ -107,7 +107,7 @@
         public void GetInstance_ResolvingConditionallyDecoratedInstanceWithTwoDecoratorsAndConditionalPredicate_AppliesDecoratorsBasedOnPredicate()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Options.EnableContextualDecoratorSupport();
 
@@ -141,7 +141,7 @@
         public void GetInstance_ResolvingConditionallyDecoratedInstanceWrappedWithOtherNonTransientDecorator_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Options.EnableContextualDecoratorSupport();
 
@@ -173,7 +173,7 @@
         public void GetInstance_ResolvingInstanceWithTwoConditionalDecoratorsWhereInnerDecoratorIsWrappedWithNonTransientDecorator_ThrowsExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Options.EnableContextualDecoratorSupport();
 
@@ -218,7 +218,7 @@
         public void RegisterContextualDecorator_CalledBeforeEnableContextualDecoratorSupport_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             try
             {

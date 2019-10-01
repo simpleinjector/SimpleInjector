@@ -1528,6 +1528,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
+            container.Options.EnableAutoVerification = false;
             container.Options.SuppressLifestyleMismatchVerification = true;
 
             container.Register<ICommandHandler<RealCommand>, StubCommandHandler>(Lifestyle.Transient);
@@ -1853,7 +1854,7 @@
             bool predicateCalled = false;
             bool decoratorTypeFactoryCalled = false;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register(typeof(ICommandHandler<RealCommand>), typeof(RealCommandHandler));
 

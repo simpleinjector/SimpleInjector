@@ -258,6 +258,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             // Transient
             container.Register<ICommand, DisposableCommand>();
@@ -281,6 +282,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             var lifestyle = new ThreadScopedLifestyle();
 
@@ -370,8 +372,6 @@
             var container = new Container();
 
             container.Register<DisposableCommand>(Lifestyle.Singleton);
-
-            container.Register<ICommand, DisposableCommand>(new ThreadScopedLifestyle());
 
             DisposableCommand singleton;
 
@@ -670,7 +670,7 @@
 
             var actualOrderOfDisposal = new List<Type>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             // Outer, Middle and Inner all depend on Func<object> and call it when disposed.
@@ -721,7 +721,7 @@
 
             var actualOrderOfDisposal = new List<Type>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             // Allow PropertyDependency to be injected as property on Inner

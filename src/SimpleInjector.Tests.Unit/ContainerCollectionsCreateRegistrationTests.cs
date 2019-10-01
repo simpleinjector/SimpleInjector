@@ -31,7 +31,7 @@
             // Arrange
             var expectedTypes = new[] { typeof(NullLogger), typeof(ConsoleLogger) };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var reg1 = container.Collection.CreateRegistration<ILogger>(typeof(NullLogger));

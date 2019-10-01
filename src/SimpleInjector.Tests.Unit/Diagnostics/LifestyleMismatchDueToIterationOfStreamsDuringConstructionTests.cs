@@ -91,7 +91,7 @@
             // Arrange
             Type dependencyType = typeof(ILogger[]);
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Collection.Append<ILogger, ConsoleLogger>(Lifestyle.Transient);
 
@@ -121,6 +121,7 @@
             Type dependencyType = typeof(List<ILogger>);
 
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             container.Collection.Append<ILogger, ConsoleLogger>(Lifestyle.Transient);
 
@@ -148,6 +149,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             container.Collection.Append<ILogger, ConsoleLogger>(Lifestyle.Singleton);
             container.Collection.Append<ILogger, NullLogger>(Lifestyle.Transient);
@@ -159,7 +161,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "lifestyle mismatch",
+                "A lifestyle mismatch has been detected.",
                 action);
         }
 
@@ -168,6 +170,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
             container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
 
             container.Collection.Append<ILogger, NullLogger>(Lifestyle.Scoped);
@@ -187,7 +190,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "lifestyle mismatch",
+                "A lifestyle mismatch has been detected.",
                 action);
         }
 
