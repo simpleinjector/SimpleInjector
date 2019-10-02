@@ -7,7 +7,9 @@ assignees: ''
 
 ---
 
-Write a title that summarizes the specific problem, question, or feature request. Your title should be specific. If you have trouble coming up with a title, consider writing the title last. Here are some examples of good and bad titles:
+This template aims to help you writing high-quality questions. Raising a high-quality question gives you the best bang for your buck, because it typically takes far less time before you get a satisfactory answer.
+
+You should start with writing a title that summarizes the specific problem, question, or feature request. Your title should be specific. If you have trouble coming up with a title, consider writing the title last. Here are some examples of good and bad titles:
 
 Bad titles:
 * Simple Injector Confusion
@@ -32,3 +34,13 @@ Describe your problem, question, or feature in a clear and concise way. Please m
 * Make sure that code and exception details are formatted correctly and ideally include the programming language (typically `c#`). This way GitHub will highlight the code automatically. (see: https://help.github.com/en/articles/creating-and-highlighting-code-blocks)
 * Follow the guidelines given by Stack Overflow and https://idownvotedbecau.se/ about asking good questions.
 * If you think a feature is missing, consider providing an example of a possible API.
+
+TIP: If your question is related to the registration of multiple related classes, consider showing a manually constructed object graph in plain C#. This not only is useful as a mental model for yourself, it is a useful way of communicating to others what it is you are trying to achieve. This is often much harder to comprehend when just showing DI registrations. Here's an example of a "manually constructed object graph in plain C#:"
+
+    new HomeController(
+        new MySpecialDecorator(
+            new SomeService(),
+        new SomeOtherDecorator(
+            new OtherService())))
+
+Thank you for your time in writing a high-quality question. This is much appreciated.
