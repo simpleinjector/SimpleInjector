@@ -13,7 +13,7 @@ namespace SimpleInjector.Integration.Wcf
     /// </summary>
     public class SimpleInjectorServiceHostFactory : ServiceHostFactory
     {
-        private static Container container;
+        private static Container? container;
 
         /// <summary>Sets the container.</summary>
         /// <param name="container">The container.</param>
