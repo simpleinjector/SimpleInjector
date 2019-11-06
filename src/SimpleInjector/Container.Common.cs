@@ -75,7 +75,6 @@ namespace SimpleInjector
 
         private EventHandler<UnregisteredTypeEventArgs>? resolveUnregisteredType;
         private EventHandler<ExpressionBuildingEventArgs>? expressionBuilding;
-
         private EventHandler<ExpressionBuiltEventArgs>? expressionBuilt;
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
@@ -347,7 +346,7 @@ namespace SimpleInjector
             {
                 // Performance optimization: The real locking is moved to another method to allow this method
                 // to be in-lined.
-                this.FlagContainerAsLocked();
+                this.NotifyAndLock();
             }
         }
 
@@ -467,15 +466,28 @@ namespace SimpleInjector
             return resolver;
         }
 
-        private void FlagContainerAsLocked()
+        private void NotifyAndLock()
         {
             // By using a lock, we have the certainty that all threads will see the new value for 'locked'
             // immediately, since ThrowWhenContainerIsLocked also locks on 'locker'.
             lock (this.locker)
             {
-                this.stackTraceThatLockedTheContainer = GetStackTraceOrNull();
+                if (!this.locked)
+                {
+                    this.stackTraceThatLockedTheContainer = GetStackTraceOrNull();
 
-                this.locked = true;
+                    var locking = this.Options.containerLocking;
+
+                    if (locking != null)
+                    {
+                        // Prevent re-entry.
+                        this.Options.containerLocking = null;
+
+                        locking(this, new ContainerLockingEventArgs());
+                    }
+
+                    this.locked = true;
+                }
             }
         }
 

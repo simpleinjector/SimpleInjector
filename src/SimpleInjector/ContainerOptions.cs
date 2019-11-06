@@ -40,6 +40,9 @@ namespace SimpleInjector
     public class ContainerOptions : ApiObject
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal EventHandler<ContainerLockingEventArgs>? containerLocking;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorResolutionBehavior resolutionBehavior;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -71,6 +74,42 @@ namespace SimpleInjector
             this.lifestyleBehavior = new DefaultLifestyleSelectionBehavior(this);
         }
 
+        /// <summary>
+        /// Occurs just before the container is about to be locked, giving the developer a last change to
+        /// interact and change the unlocked container before it is sealed for further modifications. Locking
+        /// typically occurs by a call to <b>Container.GetInstance</b>, <b>Container.Verify</b>, or any other
+        /// method that causes the construction and resolution of registered instances.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The <b>ContainerLocking</b> event is called exactly once by the container, allowing a developer to
+        /// register types, hook unregistered type resolution events that need to be applied last, or see
+        /// who is responsible for locking the container.
+        /// </para>
+        /// <para>
+        /// A registered event handler delegate is allowed to make a call that locks the container, e.g.
+        /// calling <b>Container.GetInstance</b>; this will not cause any new <b>ContainerLocking</b> event to
+        /// be raised. Doing so, however, is not advised, as that might cause any following executed handlers
+        /// to break, in case they require an unlocked container.
+        /// </para>
+        /// </remarks>
+        public event EventHandler<ContainerLockingEventArgs> ContainerLocking
+        {
+            add
+            {
+                this.Container.ThrowWhenContainerIsLockedOrDisposed();
+
+                this.containerLocking += value;
+            }
+
+            remove
+            {
+                this.Container.ThrowWhenContainerIsLockedOrDisposed();
+
+                this.containerLocking -= value;
+            }
+        }
+        
         /// <summary>
         /// Gets the container to which this <b>ContainerOptions</b> instance belongs to.
         /// </summary>
