@@ -215,6 +215,7 @@ namespace SimpleInjector
 
             return options;
         }
+
         /// <summary>
         /// Cross wires an ASP.NET Core or third-party service to the container, to allow the service to be
         /// injected into components that are built by Simple Injector.
