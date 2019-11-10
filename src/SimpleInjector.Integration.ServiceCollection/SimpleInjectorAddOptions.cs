@@ -13,6 +13,8 @@ namespace SimpleInjector.Integration.ServiceCollection
     public sealed class SimpleInjectorAddOptions : ApiObject
     {
         private IServiceProviderAccessor serviceProviderAccessor;
+        private IServiceScopeFactory? serviceScopeFactory;
+        private IServiceProvider? applicationServices;
 
         internal SimpleInjectorAddOptions(
             IServiceCollection services, Container container, IServiceProviderAccessor accessor)
@@ -55,6 +57,62 @@ namespace SimpleInjector.Integration.ServiceCollection
                 }
 
                 this.serviceProviderAccessor = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether or not Simple Injector should try to load framework
+        /// components from the framework's configuration system or not. The default is <c>true</c>.
+        /// </summary>
+        /// <value>A boolean value.</value>
+        public bool AutoCrossWireFrameworkComponents { get; set; }
+
+        /// <summary>
+        /// Gets the <see cref="IServiceProvider"/> instance that will be used by Simple Injector to resolve
+        /// cross-wired framework components. It's value will be set when
+        /// <see cref="SimpleInjectorServiceCollectionExtensions.UseSimpleInjector(IServiceProvider, Container)">UseSimpleInjector</see>
+        /// is called, or when ASP.NET Core resolves its hosted services (whatever comes first).
+        /// </summary>
+        /// <value>The <see cref="IServiceProvider"/> instance.</value>
+        internal IServiceProvider ApplicationServices
+        { 
+            get
+            {
+                if (this.applicationServices is null)
+                {
+                    // TODO: Awesome exceptions in construction
+                    throw new InvalidOperationException("Great exceptions are king.");
+                }
+
+                return this.applicationServices;
+            }
+        }
+
+        internal IServiceScopeFactory ServiceScopeFactory
+        {
+            get
+            {
+                if (this.serviceScopeFactory is null)
+                {
+                    this.serviceScopeFactory = this.ApplicationServices.GetService<IServiceScopeFactory>();
+
+                    if (this.serviceScopeFactory is null)
+                    {
+                        // TODO: Make good exception message
+                        throw new InvalidOperationException(
+                            "This is extremely weird; your IServiceProvider implementation is broken.");
+                    }
+                }
+
+                return this.serviceScopeFactory;
+            }
+        }
+
+        internal void SetServiceProviderIfNull(IServiceProvider provider)
+        {
+            if (this.applicationServices is null)
+            {
+                this.applicationServices = provider;
             }
         }
     }

@@ -22,7 +22,9 @@ namespace SimpleInjector
         /// additional integration options to be applied. These basic integrations includes wrapping each web
         /// request in an <see cref="AsyncScopedLifestyle"/> scope and making the nessesary changes that make
         /// it possible for enabling the injection of framework components in Simple Injector-constructed
-        /// components when <see cref="SimpleInjectorServiceCollectionExtensions.UseSimpleInjector"/> is called.
+        /// components when 
+        /// <see cref="SimpleInjectorServiceCollectionExtensions.UseSimpleInjector(IServiceProvider, Container)"/>
+        /// is called.
         /// </summary>
         /// <param name="options">The options to which the integration should be applied.</param>
         /// <returns>A new <see cref="SimpleInjectorAspNetCoreBuilder"/> instance that allows additional
