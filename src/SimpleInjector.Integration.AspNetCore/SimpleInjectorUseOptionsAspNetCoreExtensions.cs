@@ -21,19 +21,51 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="app">The application's <see cref="IApplicationBuilder"/>.</param>
         /// <param name="container">The application's <see cref="Container"/> instance.</param>
-        /// <param name="setupAction">An optional setup action.</param>
         /// <returns>The supplied <paramref name="app"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="app"/> or
         /// <paramref name="container"/> are null references.</exception>
-        public static IApplicationBuilder UseSimpleInjector(
-            this IApplicationBuilder app,
-            Container container,
-            Action<SimpleInjectorUseOptions>? setupAction = null)
+        public static IApplicationBuilder UseSimpleInjector(this IApplicationBuilder app, Container container)
         {
             Requires.IsNotNull(app, nameof(app));
             Requires.IsNotNull(container, nameof(container));
 
+            app.ApplicationServices.UseSimpleInjector(container);
+
+            return app;
+        }
+
+        /// <summary>
+        /// Finalizes the configuration of Simple Injector on top of <see cref="IServiceCollection"/>. Will
+        /// ensure framework components can be injected into Simple Injector-resolved components, unless
+        /// <see cref="SimpleInjectorUseOptions.AutoCrossWireFrameworkComponents"/> is set to <c>false</c>
+        /// using the <paramref name="setupAction"/>.
+        /// </summary>
+        /// <param name="app">The application's <see cref="IApplicationBuilder"/>.</param>
+        /// <param name="container">The application's <see cref="Container"/> instance.</param>
+        /// <param name="setupAction">An optional setup action.</param>
+        /// <returns>The supplied <paramref name="app"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="app"/> or
+        /// <paramref name="container"/> are null references.</exception>
+        [Obsolete(
+            "You are supplying a setup action, but due breaking changes in ASP.NET Core 3, the Simple " +
+            "Injector contianer can get locked at an earlier stage, making it impossible to further setup " +
+            "the container at this stage. Please call the UseSimpleInjector(IApplicationBuilder, Container) " +
+            "overload instead. Take a look at the compiler warnings on the individual methods you are " +
+            "calling inside your setupAction delegate to understand how to migrate them. " +
+            " For more information, see: https://simpleinjector.org/aspnetcore. " +
+            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
+            error: false)]
+        public static IApplicationBuilder UseSimpleInjector(
+            this IApplicationBuilder app,
+            Container container,
+            Action<SimpleInjectorUseOptions>? setupAction)
+        {
+            Requires.IsNotNull(app, nameof(app));
+            Requires.IsNotNull(container, nameof(container));
+
+#pragma warning disable CS0618 // Type or member is obsolete
             app.ApplicationServices.UseSimpleInjector(container, setupAction);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             return app;
         }
