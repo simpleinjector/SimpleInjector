@@ -103,6 +103,11 @@ namespace SimpleInjector
         /// <param name="services">The ASP.NET application builder instance that references all
         /// framework components.</param>
         /// <param name="container">The container.</param>
+        [Obsolete("Please call services.AddSimpleInjector() instead. AddSimpleInjector can be called from " +
+            "within the ConfigureServices method of the Startup class. " +
+            "See https://simpleinjector.org/aspnetcore for more information. " +
+            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
+            error: false)]
         public static void EnableSimpleInjectorCrossWiring(
             this IServiceCollection services, Container container)
         {
@@ -122,6 +127,11 @@ namespace SimpleInjector
         /// <typeparam name="TService">The type of service object to cross-wire.</typeparam>
         /// <param name="container">The container.</param>
         /// <param name="builder">The IApplicationBuilder to retrieve the service object from.</param>
+        [Obsolete("Please call services.AddSimpleInjector(options => { options.CrossWire<TService>(); }) " +
+            "instead. AddSimpleInjector can be called from within the ConfigureServices method of the " +
+            "Startup class. See https://simpleinjector.org/aspnetcore for more information. " +
+            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
+            error: false)]
         public static void CrossWire<TService>(this Container container, IApplicationBuilder builder)
             where TService : class
         {
@@ -135,6 +145,11 @@ namespace SimpleInjector
         /// <param name="container">The container.</param>
         /// <param name="serviceType">The type of service object to ross-wire.</param>
         /// <param name="builder">The IApplicationBuilder to retrieve the service object from.</param>
+        [Obsolete("Please call services.AddSimpleInjector(options => { options.CrossWire(typeof(YourType));" +
+            " }) instead. AddSimpleInjector can be called from within the ConfigureServices method of the " +
+            "Startup class. See https://simpleinjector.org/aspnetcore for more information. " +
+            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
+            error: false)]
         public static void CrossWire(this Container container, Type serviceType, IApplicationBuilder builder)
         {
             Requires.IsNotNull(container, nameof(container));
@@ -162,6 +177,7 @@ namespace SimpleInjector
         /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
         /// <param name="container">The container to resolve <typeparamref name="TMiddleware"/> from.</param>
         /// <returns>The supplied <see cref="IApplicationBuilder"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
         public static IApplicationBuilder UseMiddleware<TMiddleware>(
             this IApplicationBuilder app, Container container)
             where TMiddleware : class, IMiddleware
@@ -173,8 +189,56 @@ namespace SimpleInjector
 
             // By creating an InstanceProducer up front, it will be known to the container, and will be part
             // of the verification process of the container.
+            // Note that the middleware can't be registered in the container, because at this point the
+            // container might already be locked (which will happen when the new ASP.NET Core 3 Host class is
+            // used).
             InstanceProducer<IMiddleware> producer =
                 lifestyle.CreateProducer<IMiddleware, TMiddleware>(container);
+
+            app.Use((c, next) =>
+            {
+                IMiddleware middleware = producer.GetInstance();
+                return middleware.InvokeAsync(c, _ => next());
+            });
+
+            return app;
+        }
+
+        /// <summary>
+        /// Adds a middleware type to the application's request pipeline. The middleware will be resolved from
+        /// the supplied the Simple Injector <paramref name="container"/>. The middleware will be added to the
+        /// container for verification.
+        /// </summary>
+        /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
+        /// <param name="middlewareType">The middleware type that needs to be applied. This type must 
+        /// implement <see cref="IMiddleware"/>.</param>
+        /// <param name="container">The container to resolve <paramref name="middlewareType"/> from.</param>
+        /// <returns>The supplied <see cref="IApplicationBuilder"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="middlewareType"/> does not
+        /// derive from <see cref="IMiddleware"/>, is an open-generic type, or not a concrete constructable
+        /// type.</exception>
+        public static IApplicationBuilder UseMiddleware(
+            this IApplicationBuilder app, Type middlewareType, Container container)
+        {
+            Requires.IsNotNull(app, nameof(app));
+            Requires.IsNotNull(middlewareType, nameof(middlewareType));
+            Requires.IsNotNull(container, nameof(container));
+
+            Requires.ServiceIsAssignableFromImplementation(
+                typeof(IMiddleware), middlewareType, nameof(middlewareType));
+
+            Requires.IsNotOpenGenericType(middlewareType, nameof(middlewareType));
+
+            var lifestyle = container.Options.LifestyleSelectionBehavior.SelectLifestyle(middlewareType);
+
+            // By creating an InstanceProducer up front, it will be known to the container, and will be part
+            // of the verification process of the container.
+            // Note that the middleware can't be registered in the container, because at this point the
+            // container might already be locked (which will happen when the new ASP.NET Core 3 Host class is
+            // used).
+            InstanceProducer<IMiddleware> producer =
+                lifestyle.CreateProducer<IMiddleware>(middlewareType, container);
 
             app.Use((c, next) =>
             {
@@ -191,6 +255,11 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="container">The container.</param>
         /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
+        [Obsolete("Please call services.AddSimpleInjector() instead. AddSimpleInjector can be called from " +
+            "within the ConfigureServices method of the Startup class. It ensures auto cross wiring is " +
+            "enabled. See https://simpleinjector.org/aspnetcore for more information. " +
+            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
+            error: false)]
         public static void AutoCrossWireAspNetComponents(this Container container, IApplicationBuilder app)
         {
             Requires.IsNotNull(app, nameof(app));
@@ -206,6 +275,11 @@ namespace SimpleInjector
         /// <param name="container">The container.</param>
         /// <param name="appServices">The <see cref="IServiceProvider"/> instance that provides the set of
         /// singleton services.</param>
+        [Obsolete("Please call services.AddSimpleInjector() instead. AddSimpleInjector can be called from " +
+            "within the ConfigureServices method of the Startup class. It ensures auto cross wiring is " +
+            "enabled. See https://simpleinjector.org/aspnetcore for more information. " +
+            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
+            error: false)]
         public static void AutoCrossWireAspNetComponents(
             this Container container, IServiceProvider appServices)
         {

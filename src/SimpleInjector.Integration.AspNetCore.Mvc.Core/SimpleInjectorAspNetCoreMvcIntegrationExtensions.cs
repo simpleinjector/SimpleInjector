@@ -34,8 +34,9 @@ namespace SimpleInjector
             "—e.g. 'services.AddSimpleInjector(container, options => options." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddControllerActivation) + "());'. " +
             "Please see https://simpleinjector.org/aspnetcore for more details. " +
-            "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
+            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
             error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void RegisterMvcControllers(
             this Container container, IApplicationBuilder applicationBuilder)
         {
@@ -77,8 +78,9 @@ namespace SimpleInjector
             "—e.g. 'services.AddSimpleInjector(container, options => options." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddViewComponentActivation) + "());'. " +
             "Please see https://simpleinjector.org/aspnetcore for more details. " +
-            "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
+            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
             error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void RegisterMvcViewComponents(
             this Container container, IApplicationBuilder applicationBuilder)
         {
@@ -119,8 +121,9 @@ namespace SimpleInjector
             "—e.g. 'services.AddSimpleInjector(container, options => options." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddViewComponentActivation) + "());'. " +
             "Please see https://simpleinjector.org/aspnetcore for more details. " +
-            "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
+            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
             error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void RegisterMvcViewComponents(
             this Container container, IViewComponentDescriptorProvider viewComponentDescriptorProvider)
         {

@@ -16,8 +16,7 @@ namespace SimpleInjector
         /// <summary>
         /// Finalizes the configuration of Simple Injector on top of <see cref="IServiceCollection"/>. Will
         /// ensure framework components can be injected into Simple Injector-resolved components, unless
-        /// <see cref="SimpleInjectorUseOptions.AutoCrossWireFrameworkComponents"/> is set to <c>false</c>
-        /// using the <paramref name="setupAction"/>.
+        /// <see cref="SimpleInjectorUseOptions.AutoCrossWireFrameworkComponents"/> is set to <c>false</c>.
         /// </summary>
         /// <param name="app">The application's <see cref="IApplicationBuilder"/>.</param>
         /// <param name="container">The application's <see cref="Container"/> instance.</param>
@@ -77,6 +76,15 @@ namespace SimpleInjector
         /// <typeparam name="TMiddleware">The middleware type.</typeparam>
         /// <param name="options">The <see cref="SimpleInjectorUseOptions"/>.</param>
         /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
+        [Obsolete("Please call IApplicationBuilder.UseMiddleware<TMiddleware>(Container) instead. This " +
+            "method can cause your middleware to be applied at the wrong stage in the pipeline. This will, " +
+            "for instance, cause your middleware to be executed before the static files middleware (i.e. " +
+            "the .UseStaticFiles() call) or before authorization is applied (i.e. the .UseAuthorization() " +
+            "call). Instead, take care that you call .UseMiddleware<TMiddleware>(Container) at the right " +
+            "stage. This typically means after .UseStaticFiles() and .UseAuthorization(), but before " +
+            ".UseEndpoints(...). See https://simpleinjector.org/aspnetcore for more information. " +
+            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
+            error: false)]
         public static void UseMiddleware<TMiddleware>(
             this SimpleInjectorUseOptions options, IApplicationBuilder app)
             where TMiddleware : class, IMiddleware
@@ -94,6 +102,15 @@ namespace SimpleInjector
         /// <param name="options">The <see cref="SimpleInjectorUseOptions"/>.</param>
         /// <param name="middlewareType">The middleware type.</param>
         /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
+        [Obsolete("Please call IApplicationBuilder.UseMiddleware(Type, Container) instead. This " +
+            "method can cause your middleware to be applied at the wrong stage in the pipeline. This will, " +
+            "for instance, cause your middleware to be executed before the static files middleware (i.e. " +
+            "the .UseStaticFiles() call) or before authorization is applied (i.e. the .UseAuthorization() " +
+            "call). Instead, take care that you call .UseMiddleware<TMiddleware>(Container) at the right " +
+            "stage. This typically means after .UseStaticFiles() and .UseAuthorization(), but before " +
+            ".UseEndpoints(...). See https://simpleinjector.org/aspnetcore for more information. " +
+            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
+            error: false)]
         public static void UseMiddleware(
             this SimpleInjectorUseOptions options, Type middlewareType, IApplicationBuilder app)
         {

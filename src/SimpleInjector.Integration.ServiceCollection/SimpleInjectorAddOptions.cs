@@ -80,33 +80,18 @@ namespace SimpleInjector.Integration.ServiceCollection
             {
                 if (this.applicationServices is null)
                 {
-                    // TODO: Awesome exceptions in construction
-                    throw new InvalidOperationException("Great exceptions are king.");
+                    throw this.GetServiceProviderNotSetException();
                 }
 
                 return this.applicationServices;
             }
         }
 
-        internal IServiceScopeFactory ServiceScopeFactory
-        {
-            get
-            {
-                if (this.serviceScopeFactory is null)
-                {
-                    this.serviceScopeFactory = this.ApplicationServices.GetService<IServiceScopeFactory>();
+        internal IServiceScopeFactory ServiceScopeFactory =>
+            this.serviceScopeFactory
+                ?? (this.serviceScopeFactory = this.GetRequiredFrameworkService<IServiceScopeFactory>());
 
-                    if (this.serviceScopeFactory is null)
-                    {
-                        // TODO: Make good exception message
-                        throw new InvalidOperationException(
-                            "This is extremely weird; your IServiceProvider implementation is broken.");
-                    }
-                }
-
-                return this.serviceScopeFactory;
-            }
-        }
+        internal T GetRequiredFrameworkService<T>() => this.ApplicationServices.GetRequiredService<T>();
 
         internal void SetServiceProviderIfNull(IServiceProvider provider)
         {
@@ -114,6 +99,28 @@ namespace SimpleInjector.Integration.ServiceCollection
             {
                 this.applicationServices = provider;
             }
+        }
+
+        private InvalidOperationException GetServiceProviderNotSetException()
+        {
+            const string ServiceProviderRequiredMessage =
+                "Simple Injector requires an IServiceProvider to ensure a required framework " +
+                "service is aquired, but the IServiceProvider hasn't been set. ";
+
+            const string CommonInformationMessage =
+                "Please make sure 'IServiceProvider.UseSimpleInjector(Container)' is called. " +
+                "For more information, see: https://simpleinjector.org/servicecollection.";
+
+            const string AspNetCoreInformationMessage =
+                "Please make sure 'IApplicationBuilder.UseSimpleInjector(Container)' is called " +
+                "from inside the 'Configure' method of your ASP.NET Core Startup class. " +
+                "For more information, see: https://simpleinjector.org/aspnetcore.";
+
+            return new InvalidOperationException(
+                ServiceProviderRequiredMessage + (
+                    this.ServiceProviderAccessor is DefaultServiceProviderAccessor
+                        ? CommonInformationMessage
+                        : AspNetCoreInformationMessage));
         }
     }
 }
