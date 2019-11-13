@@ -36,8 +36,8 @@ namespace SimpleInjector
                 "Please use SimpleInjectorAddOptions.AutoCrossWireFrameworkComponents instead, e.g. by " +
                 "calling services.AddSimpleInjector(container, options => { " +
                 "options.AutoCrossWireFrameworkComponents = false; }). " +
-                "For more information, see: https://simpleinjector.org/aspnetcore. " +
-                "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
+                "For more information, see: https://simpleinjector.org/servicecollection. " +
+                "Will be removed in version 5.0.",
                 error: true)]
             set
             {
@@ -45,8 +45,8 @@ namespace SimpleInjector
                     "Please use SimpleInjectorAddOptions.AutoCrossWireFrameworkComponents instead, e.g. by " +
                     "calling services.AddSimpleInjector(container, options => { " +
                     "options.AutoCrossWireFrameworkComponents = false; }). " +
-                    "For more information, see: https://simpleinjector.org/aspnetcore. " +
-                    "Will be treated as an error from version 4.9. Will be removed in version 5.0.");
+                    "For more information, see: https://simpleinjector.org/servicecollection. " +
+                    "Will be removed in version 5.0.");
             }
         }
 
