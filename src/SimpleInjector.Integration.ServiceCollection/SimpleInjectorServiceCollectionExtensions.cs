@@ -21,7 +21,9 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorServiceCollectionExtensions
     {
-        private static readonly object SimpleInjectorAddOptionsKey = new object();
+        private static readonly object AddOptionsKey = new object();
+        private static readonly object AddLoggingKey = new object();
+        private static readonly object AddLocalizationKey = new object();
 
         /// <summary>
         /// Sets up the basic configuration that allows Simple Injector to be used in frameworks that require
@@ -82,8 +84,7 @@ namespace SimpleInjector
         /// <summary>
         /// Finalizes the configuration of Simple Injector on top of <see cref="IServiceCollection"/>. Will
         /// ensure framework components can be injected into Simple Injector-resolved components, unless
-        /// <see cref="SimpleInjectorAddOptions.AutoCrossWireFrameworkComponents"/> is set to <c>false</c>
-        /// using the <paramref name="setupAction"/>.
+        /// <see cref="SimpleInjectorAddOptions.AutoCrossWireFrameworkComponents"/> is set to <c>false</c>.
         /// </summary>
         /// <param name="provider">The application's <see cref="IServiceProvider"/>.</param>
         /// <param name="container">The application's <see cref="Container"/> instance.</param>
@@ -147,6 +148,8 @@ namespace SimpleInjector
             }
 
             SimpleInjectorAddOptions addOptions = GetOptions(container);
+
+            addOptions.SetServiceProviderIfNull(provider);
 
             var useOptions = new SimpleInjectorUseOptions(addOptions, provider);
 
@@ -230,12 +233,13 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(options));
             }
 
+            EnsureMethodOnlyCalledOnce(options, nameof(AddLogging), AddLoggingKey);
+
             // Both RootLogger and Logger<T> depend on ILoggerFactory
             VerifyLoggerFactoryAvailable(options.Services);
 
             // Cross-wire ILoggerFactory explicitly, because auto cross-wiring might be disabled by the user.
-            options.Container.RegisterSingleton(
-                () => options.ApplicationServices.GetRequiredService<ILoggerFactory>());
+            options.Container.RegisterSingleton(() => options.GetRequiredFrameworkService<ILoggerFactory>());
 
             options.Container.RegisterConditional(
                 typeof(ILogger),
@@ -277,22 +281,21 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(options));
             }
 
-            // Both RootLogger and Logger<T> depend on ILoggerFactory
-            var loggerFactory = options.ApplicationServices.GetService<ILoggerFactory>();
-
-            if (loggerFactory is null)
+            if (options.Container.ContainerScope.GetItem(AddLoggingKey) != null)
             {
                 throw new InvalidOperationException(
-                    $"The IServiceCollection is missing an entry for {typeof(ILoggerFactory).FullName}. " +
-                    "This is most likely caused by a missing call to .AddLogging(). Make sure that the " +
-                    "AddLogging() extension method is called on the IServiceCollection. This method is " +
-                    "part of the LoggingServiceCollectionExtensions class of the Microsoft.Extensions" +
-                    ".Logging assembly.");
+                    $"You already initialized logging by calling the {nameof(AddLogging)} extension " +
+                    $"method. {nameof(UseLogging)} and {nameof(AddLogging)} are mutually exclusive—" +
+                    $"they can't be used together. Prefer using {nameof(AddLogging)} as " +
+                    "this method is obsolete.");
             }
+
+            // Both RootLogger and Logger<T> depend on ILoggerFactory
+            VerifyLoggerFactoryAvailable(options.Services);
 
             // Register logger factory explicitly. This allows the Logger<T> conditional registration to work
             // even when auto cross wiring is disabled.
-            options.Container.RegisterInstance(loggerFactory);
+            options.Container.RegisterInstance(options.Builder.GetRequiredFrameworkService<ILoggerFactory>());
 
             options.Container.RegisterConditional(
                 typeof(ILogger),
@@ -330,11 +333,13 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(options));
             }
 
+            EnsureMethodOnlyCalledOnce(options, nameof(AddLocalization), AddLocalizationKey);
+
             VerifyStringLocalizerFactoryAvailable(options.Services);
 
             // Cross-wire IStringLocalizerFactory explicitly, because auto cross-wiring might be disabled.
             options.Container.RegisterSingleton(
-                () => options.ApplicationServices.GetRequiredService<IStringLocalizerFactory>());
+                () => options.GetRequiredFrameworkService<IStringLocalizerFactory>());
 
             options.Container.RegisterConditional(
                 typeof(IStringLocalizer),
@@ -382,22 +387,20 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(options));
             }
 
-            var localizerFactory = options.ApplicationServices.GetService<IStringLocalizerFactory>();
-
-            if (localizerFactory is null)
+            if (options.Container.ContainerScope.GetItem(AddLocalizationKey) != null)
             {
                 throw new InvalidOperationException(
-                    $"The IServiceCollection is missing an entry for " +
-                    $"{typeof(IStringLocalizerFactory).FullName}. This is most likely caused by a missing " +
-                    $"call to .AddLocalization(). Make sure that the AddLocalization() extension method is " +
-                    $"called on the IServiceCollection. This method is part of the " +
-                    $"LocalizationServiceCollectionExtensions class of the " +
-                    $"Microsoft.Extensions.Localization assembly.");
+                    $"You already initialized logging by calling the {nameof(AddLocalization)} extension " +
+                    $"method. {nameof(UseLocalization)} and {nameof(AddLocalization)} are mutually " +
+                    $"exclusive—they can't be used together. Prefer using {nameof(AddLocalization)} as " +
+                    "this method is obsolete.");
             }
 
-            // Register localizer factory explicitly. This allows the IStringLocalizer<T> conditional
+            VerifyStringLocalizerFactoryAvailable(options.Services);
+
             // registration to work even when auto cross wiring is disabled.
-            options.Container.RegisterInstance(localizerFactory);
+            options.Container.RegisterInstance(
+                options.Builder.GetRequiredFrameworkService<IStringLocalizerFactory>());
 
             options.Container.RegisterConditional(
                 typeof(IStringLocalizer),
@@ -426,7 +429,7 @@ namespace SimpleInjector
         [Obsolete(
             "Please call services.AddSimpleInjector(options => { options.CrossWire<TService>(); } instead " +
             "on the IServiceCollection instance (typically from inside your Startup.ConfigureServices " +
-            "method). For more information, see: https://simpleinjector.org/aspnetcore. " +
+            "method). For more information, see: https://simpleinjector.org/servicecollection. " +
             "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
             error: false)]
         public static SimpleInjectorUseOptions CrossWire<TService>(this SimpleInjectorUseOptions options)
@@ -447,7 +450,7 @@ namespace SimpleInjector
         [Obsolete(
             "Please call services.AddSimpleInjector(options => { options.CrossWire(Type); } instead " +
             "on the IServiceCollection instance (typically from inside your Startup.ConfigureServices " +
-            "method). For more information, see: https://simpleinjector.org/aspnetcore. " +
+            "method). For more information, see: https://simpleinjector.org/servicecollection. " +
             "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
             error: false)]
         public static SimpleInjectorUseOptions CrossWire(
@@ -540,7 +543,7 @@ namespace SimpleInjector
         private static SimpleInjectorAddOptions GetOptions(Container container)
         {
             var options =
-                (SimpleInjectorAddOptions?)container.ContainerScope.GetItem(SimpleInjectorAddOptionsKey);
+                (SimpleInjectorAddOptions?)container.ContainerScope.GetItem(AddOptionsKey);
 
             if (options is null)
             {
@@ -617,7 +620,7 @@ namespace SimpleInjector
             {
                 registration.SuppressDiagnosticWarning(
                     DiagnosticType.DisposableTransientComponent,
-                    justification: "This is a cross-wired service. It will  be disposed by IServiceScope.");
+                    justification: "This is a cross-wired service. It will be disposed by IServiceScope.");
             }
 
             return registration;
@@ -688,11 +691,11 @@ namespace SimpleInjector
 
         private static void AddSimpleInjectorOptions(Container container, SimpleInjectorAddOptions builder)
         {
-            var current = container.ContainerScope.GetItem(SimpleInjectorAddOptionsKey);
+            var current = container.ContainerScope.GetItem(AddOptionsKey);
 
             if (current is null)
             {
-                container.ContainerScope.SetItem(SimpleInjectorAddOptionsKey, builder);
+                container.ContainerScope.SetItem(AddOptionsKey, builder);
             }
             else
             {
@@ -715,13 +718,27 @@ namespace SimpleInjector
             // ASP.NET Core 3's new Host class resolves hosted services much earlier in the pipeline. This
             // registration ensures that the IServiceProvider is assigned before such resolve takes place,
             // to ensure that that hosted service can be injected with cross-wired dependencies.
-            options.Services.AddSingleton<IHostedService>(p =>
+            options.Services.AddSingleton<IHostedService>(provider =>
             {
-                options.SetServiceProviderIfNull(p);
+                options.SetServiceProviderIfNull(provider);
 
                 // We can't return null here, so we return an empty implementation.
                 return new NullSimpleInjectorHostedService();
             });
+        }
+
+        private static void EnsureMethodOnlyCalledOnce(
+            SimpleInjectorAddOptions options, string methodName, object key)
+        {
+            if (options.Container.ContainerScope.GetItem(key) != null)
+            {
+                throw new InvalidOperationException(
+                    $"The {methodName} extension method can only be called once on a Container instance.");
+            }
+            else
+            {
+                options.Container.ContainerScope.SetItem(key, new object());
+            }
         }
 
         private sealed class NullSimpleInjectorHostedService : IHostedService
