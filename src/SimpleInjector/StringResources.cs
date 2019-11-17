@@ -25,7 +25,7 @@ namespace SimpleInjector
             nameof(Container) + "." + nameof(Container.Collection) + "." + nameof(ContainerCollectionRegistrator.Append);
 
         // Assembly.Location only exists in .NETStandard1.5 and up, .NET4.0 and PCL, but we only compile
-        // against .NETStandard1.0 and .NETStandard1.3. We don't want to add an extra build directly, solely
+        // against .NETStandard1.0 and .NETStandard1.3. We don't want to add an extra build directive solely
         // for the Location property.
         private static readonly PropertyInfo AssemblyLocationProperty =
             typeof(Assembly).GetProperties().SingleOrDefault(p => p.Name == "Location");
