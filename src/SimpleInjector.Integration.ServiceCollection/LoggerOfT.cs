@@ -5,9 +5,9 @@ namespace SimpleInjector.Integration.ServiceCollection
 {
     using Microsoft.Extensions.Logging;
 
-    // This class wouldn't strictly be required, but since Microsoft could decide to add an extra ctor
-    // to the Microsoft.Extensions.Logging.Logger<T> class, this sub type prevents this integration
-    // package to break when this happens.
+    // This class will only be used when a future version of Microsoft.Extensions.Logging.Logger<T> gets a
+    // second constructor. In that case Simple Injector can't resolve Microsoft.Extensions.Logging.Logger<T>
+    // and it falls back to this self-defined class.
     internal sealed class Logger<T> : Microsoft.Extensions.Logging.Logger<T>
     {
         // This constructor needs to be public for Simple Injector to create this type.

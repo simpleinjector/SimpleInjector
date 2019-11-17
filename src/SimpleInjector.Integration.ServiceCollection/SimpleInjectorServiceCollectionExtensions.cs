@@ -110,7 +110,6 @@ namespace SimpleInjector
             return provider;
         }
 
-
         /// <summary>
         /// Finalizes the configuration of Simple Injector on top of <see cref="IServiceCollection"/>. Will
         /// ensure framework components can be injected into Simple Injector-resolved components, unless
@@ -123,15 +122,19 @@ namespace SimpleInjector
         /// <returns>The supplied <paramref name="provider"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="provider"/> or
         /// <paramref name="container"/> are null references.</exception>
-        [Obsolete(
-            "You are supplying a setup action, but due breaking changes in ASP.NET Core 3, the Simple " +
-            "Injector contianer can get locked at an earlier stage, making it impossible to further setup " +
-            "the container at this stage. Please call the UseSimpleInjector(IServiceProvider, Container) " +
-            "overload instead. Take a look at the compiler warnings on the individual methods you are " +
-            "calling inside your setupAction delegate to understand how to migrate them. " +
-            " For more information, see: https://simpleinjector.org/aspnetcore. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+        //// I wanted to add this obsolete message in 4.8, but it was confusing considering the obsolete
+        //// messages for everything on top of SimpleInjectorUseOptions. When those obsolete messages are
+        //// resolved by the user, there is no harm in calling this method any longer. So it will get
+        //// obsoleted in a later release.
+        ////[Obsolete(
+        ////    "You are supplying a setup action, but due breaking changes in ASP.NET Core 3, the Simple " +
+        ////    "Injector container can get locked at an earlier stage, making it impossible to further setup " +
+        ////    "the container at this stage. Please call the UseSimpleInjector(IServiceProvider, Container) " +
+        ////    "overload instead. Take a look at the compiler warnings on the individual methods you are " +
+        ////    "calling inside your setupAction delegate to understand how to migrate them. " +
+        ////    " For more information, see: https://simpleinjector.org/aspnetcore. " +
+        ////    "Will be treated as an error from version 4.10. Will be removed in version 5.0.",
+        ////    error: false)]
         public static IServiceProvider UseSimpleInjector(
             this IServiceProvider provider,
             Container container,
@@ -241,12 +244,13 @@ namespace SimpleInjector
             // Cross-wire ILoggerFactory explicitly, because auto cross-wiring might be disabled by the user.
             options.Container.RegisterSingleton(() => options.GetRequiredFrameworkService<ILoggerFactory>());
 
+            Type genericLoggerType = GetGenericLoggerType();
+
             options.Container.RegisterConditional(
                 typeof(ILogger),
                 c => c.Consumer is null
                     ? typeof(RootLogger)
-                    : typeof(Integration.ServiceCollection.Logger<>)
-                        .MakeGenericType(c.Consumer.ImplementationType),
+                    : genericLoggerType.MakeGenericType(c.Consumer.ImplementationType),
                 Lifestyle.Singleton,
                 _ => true);
 
@@ -269,8 +273,8 @@ namespace SimpleInjector
         /// </exception>
         [Obsolete(
             "Please call services.AddSimpleInjector(options => { options.AddLogging(); } instead on " +
-            "the IServiceCollection instance (typically from inside your Startup.ConfigureServices method)." +
-            " For more information, see: https://simpleinjector.org/aspnetcore. " +
+            "the IServiceCollection instance. For more information, see: " +
+            "https://simpleinjector.org/servicecollection. " +
             "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
             error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -297,12 +301,13 @@ namespace SimpleInjector
             // even when auto cross wiring is disabled.
             options.Container.RegisterInstance(options.Builder.GetRequiredFrameworkService<ILoggerFactory>());
 
+            Type genericLoggerType = GetGenericLoggerType();
+
             options.Container.RegisterConditional(
                 typeof(ILogger),
                 c => c.Consumer is null
                     ? typeof(RootLogger)
-                    : typeof(Integration.ServiceCollection.Logger<>)
-                        .MakeGenericType(c.Consumer.ImplementationType),
+                    : genericLoggerType.MakeGenericType(c.Consumer.ImplementationType),
                 Lifestyle.Singleton,
                 _ => true);
 
@@ -341,6 +346,8 @@ namespace SimpleInjector
             options.Container.RegisterSingleton(
                 () => options.GetRequiredFrameworkService<IStringLocalizerFactory>());
 
+            Type genericLocalizerType = GetGenericLocalizerType();
+
             options.Container.RegisterConditional(
                 typeof(IStringLocalizer),
                 c => c.Consumer is null
@@ -348,8 +355,7 @@ namespace SimpleInjector
                         "IStringLocalizer is being resolved directly from the container, but this is not " +
                         "supported as string localizers need to be related to a consuming type. Instead, " +
                         "make IStringLocalizer a constructor dependency of the type it is used in.")
-                    : typeof(Integration.ServiceCollection.StringLocalizer<>)
-                    .MakeGenericType(c.Consumer.ImplementationType),
+                    : genericLocalizerType.MakeGenericType(c.Consumer.ImplementationType),
                 Lifestyle.Singleton,
                 _ => true);
 
@@ -375,8 +381,8 @@ namespace SimpleInjector
         /// dependency.</exception>
         [Obsolete(
             "Please call services.AddSimpleInjector(options => { options.AddLocalization(); } instead on " +
-            "the IServiceCollection instance (typically from inside your Startup.ConfigureServices method)." +
-            " For more information, see: https://simpleinjector.org/aspnetcore. " +
+            "the IServiceCollection instance. For more information, see: " +
+            "https://simpleinjector.org/servicecollection. " +
             "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
             error: false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -402,6 +408,8 @@ namespace SimpleInjector
             options.Container.RegisterInstance(
                 options.Builder.GetRequiredFrameworkService<IStringLocalizerFactory>());
 
+            Type genericLocalizerType = GetGenericLocalizerType();
+
             options.Container.RegisterConditional(
                 typeof(IStringLocalizer),
                 c => c.Consumer is null
@@ -409,8 +417,7 @@ namespace SimpleInjector
                         "IStringLocalizer is being resolved directly from the container, but this is not " +
                         "supported as string localizers need to be related to a consuming type. Instead, " +
                         "make IStringLocalizer a constructor dependency of the type it is used in.")
-                    : typeof(Integration.ServiceCollection.StringLocalizer<>)
-                    .MakeGenericType(c.Consumer.ImplementationType),
+                    : genericLocalizerType.MakeGenericType(c.Consumer.ImplementationType),
                 Lifestyle.Singleton,
                 _ => true);
 
@@ -740,6 +747,24 @@ namespace SimpleInjector
                 options.Container.ContainerScope.SetItem(key, new object());
             }
         }
+
+        // We prefer using the Microsoft.Logger<T> type directly, but this is only something that can be done
+        // when that type has exactly one public constructor and that constructor only has a single parameter
+        // of type ILoggerFactory. These requirements are met in .NET Core 2 and 3, but MS might choose to add
+        // an extra constructor any time, in which case this integration would fail. To make the library
+        // forward compatible, we check whether the type still has one single constructor. If not, we fall
+        // back to Simple Injector's internally defined Logger<T> derivative. That type is guaranteed to have
+        // a single constructor.
+        private static Type GetGenericLoggerType() =>
+            typeof(Microsoft.Extensions.Logging.Logger<>).GetConstructors().Length == 1
+                ? typeof(Microsoft.Extensions.Logging.Logger<>)
+                : typeof(Integration.ServiceCollection.Logger<>);
+
+        // We do exactly the same thing for StringLocalizer<T>.
+        private static Type GetGenericLocalizerType() =>
+            typeof(Microsoft.Extensions.Localization.StringLocalizer<>).GetConstructors().Length == 1
+                ? typeof(Microsoft.Extensions.Localization.StringLocalizer<>)
+                : typeof(Integration.ServiceCollection.StringLocalizer<>);
 
         private sealed class NullSimpleInjectorHostedService : IHostedService
         {

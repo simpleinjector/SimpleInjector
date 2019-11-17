@@ -45,15 +45,19 @@ namespace SimpleInjector
         /// <returns>The supplied <paramref name="app"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="app"/> or
         /// <paramref name="container"/> are null references.</exception>
-        [Obsolete(
-            "You are supplying a setup action, but due breaking changes in ASP.NET Core 3, the Simple " +
-            "Injector contianer can get locked at an earlier stage, making it impossible to further setup " +
-            "the container at this stage. Please call the UseSimpleInjector(IApplicationBuilder, Container) " +
-            "overload instead. Take a look at the compiler warnings on the individual methods you are " +
-            "calling inside your setupAction delegate to understand how to migrate them. " +
-            " For more information, see: https://simpleinjector.org/aspnetcore. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+        //// I wanted to add this obsolete message in 4.8, but it was confusing considering the obsolete
+        //// messages for everything on top of SimpleInjectorUseOptions. When those obsolete messages are
+        //// resolved by the user, there is no harm in calling this method any longer. So it will get
+        //// obsoleted in a later release.
+        ////[Obsolete(
+        ////    "You are supplying a setup action, but due breaking changes in ASP.NET Core 3, the Simple " +
+        ////    "Injector container can get locked at an earlier stage, making it impossible to further setup " +
+        ////    "the container at this stage. Please call the UseSimpleInjector(IApplicationBuilder, Container) " +
+        ////    "overload instead. Take a look at the compiler warnings on the individual methods you are " +
+        ////    "calling inside your setupAction delegate to understand how to migrate them. " +
+        ////    " For more information, see: https://simpleinjector.org/aspnetcore. " +
+        ////    "Will be treated as an error from version 4.10. Will be removed in version 5.0.",
+        ////    error: false)]
         public static IApplicationBuilder UseSimpleInjector(
             this IApplicationBuilder app,
             Container container,
@@ -62,9 +66,7 @@ namespace SimpleInjector
             Requires.IsNotNull(app, nameof(app));
             Requires.IsNotNull(container, nameof(container));
 
-#pragma warning disable CS0618 // Type or member is obsolete
             app.ApplicationServices.UseSimpleInjector(container, setupAction);
-#pragma warning restore CS0618 // Type or member is obsolete
 
             return app;
         }
