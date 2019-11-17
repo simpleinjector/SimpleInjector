@@ -36,8 +36,29 @@ namespace SimpleInjector
 
             options.Container.AddRegistration<THostedService>(registration);
 
-            options.Services.AddSingleton<IHostedService>(
-                _ => options.Container.GetInstance<THostedService>());
+            options.Services.AddSingleton<IHostedService>(_ =>
+            {
+                try
+                {
+                    return options.Container.GetInstance<THostedService>();
+                }
+                catch (ActivationException ex) when (ex.Message.Contains("is not registered"))
+                {
+                    throw new ActivationException(ex.Message + " " +
+                        "ASP.NET Core is trying to resolve your " +
+                        $"{typeof(THostedService).ToFriendlyName()} hosted service that you registered by " +
+                        "calling the AddHostedService<THostedService>() extension method, but it can't be " +
+                        "resolved due to a missing registration. In ASP.NET Core 3 and up, hosted " +
+                        "services are resolved much earlier in the pipeline, before the 'Configure' " +
+                        "method of your Startup class is invoked. If you are registering the missing " +
+                        "service inside the 'Configure' method, that would be the likely cause of the " +
+                        "issue. To fix the problem, you should ensure that all registration to the " +
+                        "container are done during the 'ConfigureServices' method of the Startup class. " +
+                        "For more information, see: https://simpleinjector.org/generichost or " +
+                        "https://simpleinjector.org/aspnetcore.",
+                        ex);
+                }
+            });
 
             return options;
         }
@@ -81,15 +102,19 @@ namespace SimpleInjector
         /// <returns>The supplied <paramref name="host"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="host"/> or
         /// <paramref name="container"/> are null references.</exception>
-        [Obsolete(
-            "You are supplying a setup action, but due breaking changes in ASP.NET Core 3, the Simple " +
-            "Injector contianer can get locked at an earlier stage, making it impossible to further setup " +
-            "the container at this stage. Please call the UseSimpleInjector(IHost, Container) " +
-            "overload instead. Take a look at the compiler warnings on the individual methods you are " +
-            "calling inside your setupAction delegate to understand how to migrate them. " +
-            " For more information, see: https://simpleinjector.org/aspnetcore. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+        //// I wanted to add this obsolete message in 4.8, but it was confusing considering the obsolete
+        //// messages for everything on top of SimpleInjectorUseOptions. When those obsolete messages are
+        //// resolved by the user, there is no harm in calling this method any longer. So it will get
+        //// obsoleted in a later release.
+        ////[Obsolete(
+        ////    "You are supplying a setup action, but due breaking changes in ASP.NET Core 3, the Simple " +
+        ////    "Injector container can get locked at an earlier stage, making it impossible to further setup " +
+        ////    "the container at this stage. Please call the UseSimpleInjector(IHost, Container) " +
+        ////    "overload instead. Take a look at the compiler warnings on the individual methods you are " +
+        ////    "calling inside your setupAction delegate to understand how to migrate them. " +
+        ////    " For more information, see: https://simpleinjector.org/generichost. " +
+        ////    "Will be treated as an error from version 4.10. Will be removed in version 5.0.",
+        ////    error: false)]
         public static IHost UseSimpleInjector(
             this IHost host,
             Container container,
@@ -105,9 +130,7 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(container));
             }
 
-#pragma warning disable CS0618 // Type or member is obsolete
             host.Services.UseSimpleInjector(container, setupAction);
-#pragma warning restore CS0618 // Type or member is obsolete
 
             return host;
         }
