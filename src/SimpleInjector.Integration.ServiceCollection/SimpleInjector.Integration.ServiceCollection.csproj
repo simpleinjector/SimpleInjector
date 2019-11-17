@@ -16,7 +16,7 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>SimpleInjector.Integration.ServiceCollection</PackageId>
     <PackageTags>simpleinjector;dependency-injection;DI;ASP.NET Core;IServiceCollection</PackageTags>
-    <PackageIcon>simpleinjector.ico</PackageIcon>
+    <PackageIcon>simpleinjector.png</PackageIcon>
     <PackageProjectUrl>https://simpleinjector.org/servicecollection</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\Graphics\simpleinjector.ico" Pack="true" PackagePath=""/>
+    <None Include="..\Graphics\simpleinjector.png" Pack="true" PackagePath=""/>
   </ItemGroup>
 
   <Target Name="PostcompileScript" AfterTargets="Build" Condition=" '$(IsCrossTargetingBuild)' != 'true' ">
