@@ -163,7 +163,11 @@ namespace SimpleInjector
         private static void RegisterTagHelpers(
             this Container container, ApplicationPartManager manager, Predicate<Type> applicationTypeSelector)
         {
-            var pageModelTypes =
+            // TagHelpers should always have a transient lifestyle, because a single chtml can have the same
+            // tag applied many times, but all should be a seperate instance. See #761.
+            var tagHelperLifestyle = Lifestyle.Transient;
+
+            var tagHelperTypes =
                 from part in manager.ApplicationParts.OfType<IApplicationPartTypeProvider>()
                 from type in part.Types
                 where typeof(ITagHelper).IsAssignableFrom(type)
@@ -172,7 +176,7 @@ namespace SimpleInjector
                 where applicationTypeSelector(type)
                 select type;
 
-            RegisterConcreteTypes(container, pageModelTypes);
+            RegisterConcreteTypes(container, tagHelperTypes, tagHelperLifestyle);
         }
 
         private static void RegisterPageModels(Container container, ApplicationPartManager manager)
@@ -189,20 +193,19 @@ namespace SimpleInjector
             RegisterConcreteTypes(container, pageModelTypes);
         }
 
-        private static void RegisterConcreteTypes(this Container container, IEnumerable<Type> types)
+        private static void RegisterConcreteTypes(
+            this Container container, IEnumerable<Type> types, Lifestyle? lifestyle = null)
         {
             foreach (Type type in types.ToArray())
             {
-                container.AddRegistration(type, CreateConcreteRegistration(container, type));
+                container.AddRegistration(type, CreateConcreteRegistration(container, type, lifestyle));
             }
         }
 
-        private static Registration CreateConcreteRegistration(Container container, Type concreteType)
-        {
-            var lifestyle = container.Options.LifestyleSelectionBehavior.SelectLifestyle(concreteType);
-
-            return lifestyle.CreateRegistration(concreteType, container);
-        }
+        private static Registration CreateConcreteRegistration(
+            Container container, Type concreteType, Lifestyle? lifestyle) =>
+            (lifestyle ?? container.Options.LifestyleSelectionBehavior.SelectLifestyle(concreteType))
+                .CreateRegistration(concreteType, container);
 
         private static ServiceDescriptor? FindServiceDescriptor(IServiceCollection services, Type serviceType)
         {
