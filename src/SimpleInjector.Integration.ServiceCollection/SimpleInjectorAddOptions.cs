@@ -65,7 +65,7 @@ namespace SimpleInjector.Integration.ServiceCollection
         /// components from the framework's configuration system or not. The default is <c>true</c>.
         /// </summary>
         /// <value>A boolean value.</value>
-        public bool AutoCrossWireFrameworkComponents { get; set; }
+        public bool AutoCrossWireFrameworkComponents { get; set; } = true;
 
         /// <summary>
         /// Gets the <see cref="IServiceProvider"/> instance that will be used by Simple Injector to resolve
@@ -75,7 +75,7 @@ namespace SimpleInjector.Integration.ServiceCollection
         /// </summary>
         /// <value>The <see cref="IServiceProvider"/> instance.</value>
         internal IServiceProvider ApplicationServices
-        { 
+        {
             get
             {
                 if (this.applicationServices is null)
@@ -104,14 +104,13 @@ namespace SimpleInjector.Integration.ServiceCollection
         private InvalidOperationException GetServiceProviderNotSetException()
         {
             const string ServiceProviderRequiredMessage =
-                "Simple Injector requires an IServiceProvider to ensure a required framework " +
-                "service is aquired, but the IServiceProvider hasn't been set. ";
+                "The Simple Injector integration hasn't been fully initialized. ";
 
-            const string CommonInformationMessage =
+            const string ServiceCollectionMessage =
                 "Please make sure 'IServiceProvider.UseSimpleInjector(Container)' is called. " +
                 "For more information, see: https://simpleinjector.org/servicecollection.";
 
-            const string AspNetCoreInformationMessage =
+            const string AspNetCoreMessage =
                 "Please make sure 'IApplicationBuilder.UseSimpleInjector(Container)' is called " +
                 "from inside the 'Configure' method of your ASP.NET Core Startup class. " +
                 "For more information, see: https://simpleinjector.org/aspnetcore.";
@@ -119,8 +118,8 @@ namespace SimpleInjector.Integration.ServiceCollection
             return new InvalidOperationException(
                 ServiceProviderRequiredMessage + (
                     this.ServiceProviderAccessor is DefaultServiceProviderAccessor
-                        ? CommonInformationMessage
-                        : AspNetCoreInformationMessage));
+                        ? ServiceCollectionMessage
+                        : AspNetCoreMessage));
         }
     }
 }
