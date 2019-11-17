@@ -7,7 +7,7 @@
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
     <license type="expression">MIT</license>
     <projectUrl>https://simpleinjector.org</projectUrl>
-	<icon>simpleinjector.ico</icon>
+    <icon>simpleinjector.png</icon>
     <dependencies>
       <dependency id="SimpleInjector" version="[{versionCore},5)" />
       <dependency id="Microsoft.Web.Infrastructure" version="1.0.0" />
