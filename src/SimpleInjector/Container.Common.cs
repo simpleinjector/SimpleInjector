@@ -479,9 +479,14 @@ namespace SimpleInjector
                 {
                     this.stackTraceThatLockedTheContainer = GetStackTraceOrNull();
 
-                    this.Options.RaiseContainerLockingAndReset();
-                    
-                    this.locked = true;
+                    try
+                    {
+                        this.Options.RaiseContainerLockingAndReset();
+                    }
+                    finally
+                    {
+                        this.locked = true;
+                    }
                 }
             }
 
