@@ -96,7 +96,7 @@ namespace SimpleInjector
         internal static string NoRegistrationForTypeFound(
             Type serviceType,
             bool containerHasRegistrations,
-            bool noCollectionRegistrationExists,
+            bool collectionRegistrationDoesNotExists,
             bool containerHasRelatedOneToOneMapping,
             bool containerHasRelatedCollectionMapping,
             Type[] skippedDecorators,
@@ -105,9 +105,8 @@ namespace SimpleInjector
                 "No registration for type {0} could be found.{1}{2}{3}{4}{5}{6}",
                 serviceType.TypeName(),
                 ContainerHasNoRegistrationsAddition(containerHasRegistrations),
-
                 DidYouMeanToCallGetInstanceInstead(containerHasRelatedOneToOneMapping, serviceType),
-                NoCollectionRegistrationExists(noCollectionRegistrationExists, serviceType),
+                NoCollectionRegistrationExists(collectionRegistrationDoesNotExists, serviceType),
                 DidYouMeanToCallGetAllInstancesInstead(containerHasRelatedCollectionMapping, serviceType),
                 NoteThatSkippedDecoratorsWereFound(serviceType, skippedDecorators),
                 NoteThatTypeLookalikesAreFound(serviceType, lookalikes),
@@ -291,7 +290,7 @@ namespace SimpleInjector
             InjectionTargetInfo target,
             int numberOfConditionals,
             bool hasRelatedOneToOneMapping,
-            bool noCollectionRegistrationExists,
+            bool collectionRegistrationDoesNotExists,
             bool hasRelatedCollectionMapping,
             Type[] skippedDecorators,
             Type[] lookalikes)
@@ -306,7 +305,7 @@ namespace SimpleInjector
             string extraInfo = string.Concat(
                 GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals),
                 DidYouMeanToDependOnNonCollectionInstead(hasRelatedOneToOneMapping, target.TargetType),
-                NoCollectionRegistrationExists(noCollectionRegistrationExists, target.TargetType),
+                NoCollectionRegistrationExists(collectionRegistrationDoesNotExists, target.TargetType),
                 DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType),
                 NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators),
                 NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(container, target.TargetType),
@@ -732,12 +731,12 @@ namespace SimpleInjector
                 nameof(UnregisteredTypeEventArgs),
                 nameof(UnregisteredTypeEventArgs.Register));
 
-        internal static string TheServiceIsRequestedOutsideTheContextOfAScopedLifestyle(Type serviceType,
-            ScopedLifestyle lifestyle) =>
+        internal static string TheServiceIsRequestedOutsideTheContextOfAScopedLifestyle(
+            Type serviceType, ScopedLifestyle lifestyle) =>
             Format(
-                "{0} is registered as '{1}' lifestyle, but the instance is requested outside the " +
+                "{0} is registered using the '{1}' lifestyle, but the instance is requested outside the " +
                 "context of an active ({1}) scope. Please see https://simpleinjector.org/scoped " +
-                "for more information about how to manage scopes.",
+                "for more information about how apply lifestyles and manage scopes.",
                 serviceType.TypeName(),
                 lifestyle.Name);
 

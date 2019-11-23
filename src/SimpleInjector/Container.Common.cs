@@ -320,7 +320,7 @@ namespace SimpleInjector
                     instanceProducer,
                     replacedRegistration: instanceProducer.Registration,
                     knownRelationships: relationships);
-                
+
                 this.expressionBuilt(this, e);
 
                 if (relationships.HasChanged)
@@ -405,7 +405,7 @@ namespace SimpleInjector
                     target: target,
                     numberOfConditionals: this.GetNumberOfConditionalRegistrationsFor(type),
                     hasRelatedOneToOneMapping: this.ContainsOneToOneRegistrationForCollection(type),
-                    noCollectionRegistrationExists: this.IsCollectionButNoOneToToOneRegistrationExists(type),
+                    collectionRegistrationDoesNotExists: this.IsCollectionButNoOneToToOneRegistrationExists(type),
                     hasRelatedCollectionMapping: this.ContainsCollectionRegistrationFor(type),
                     skippedDecorators: this.GetNonGenericDecoratorsSkippedDuringAutoRegistration(type),
                     lookalikes: this.GetLookalikesForMissingType(type)));
@@ -479,16 +479,8 @@ namespace SimpleInjector
                 {
                     this.stackTraceThatLockedTheContainer = GetStackTraceOrNull();
 
-                    var locking = this.Options.containerLocking;
-
-                    if (locking != null)
-                    {
-                        // Prevent re-entry.
-                        this.Options.containerLocking = null;
-
-                        locking(this, new ContainerLockingEventArgs());
-                    }
-
+                    this.Options.RaiseContainerLockingAndReset();
+                    
                     this.locked = true;
                 }
             }

@@ -162,7 +162,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.ExceptionMessageContains(@"
-                    ConcreteCommand is registered as 'Async Scoped' lifestyle, but the instance is
+                    ConcreteCommand is registered using the 'Async Scoped' lifestyle, but the instance is
                     requested outside the context of an active (Async Scoped) scope."
                     .TrimInside(),
                     ex);
@@ -1092,7 +1092,6 @@
             // The cyclic graph contains the following types: ConcreteCommand. 
             // Verification was triggered because Container.Options.EnableAutoVerification was enabled. 
             // To prevent the container from being verified on first resolve, set the value to false. 
-
             InstanceProducer producer = container.GetRegistration(typeof(ICommand));
             Expression expression = producer.BuildExpression();
             var factory = Expression.Lambda<Func<ICommand>>(expression).Compile();
