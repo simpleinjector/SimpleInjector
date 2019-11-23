@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
+    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -183,6 +184,53 @@
             // Act
             // ITimeProvider can now be resolved.
             container.GetInstance<ITimeProvider>();
+        }
+
+        [TestMethod]
+        public void GetInstance_CalledAfterContainerLockingIsRaisedWhileThrowingAnException_StillLocksTheContainer()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<ILogger, NullLogger>();
+
+            container.Options.ContainerLocking += (s, e) =>
+            {
+                throw new Exception();
+            };
+
+            // Act
+            // GetInstance should lock the container, even though ContainerLocking throws an exception
+            AssertThat.Throws<Exception>(() => container.GetInstance<ILogger>());
+
+            // Assert
+            Assert.IsTrue(container.IsLocked,
+                "Container is expected to get locked; even when ContainerLocking throws an exception.");
+        }
+
+        [TestMethod]
+        public void GetInstance_CalledAfterContainerLockingIsRaisedWhileThrowingAnException_StillDisallowsMakingNewRegistrations()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<ILogger, NullLogger>();
+
+            container.Options.ContainerLocking += (s, e) =>
+            {
+                throw new Exception();
+            };
+
+            // GetInstance should lock the container, even though ContainerLocking throws an exception
+            AssertThat.Throws<Exception>(() => container.GetInstance<ILogger>(), "Setup");
+
+            // Act
+            Action action = () => container.Register<ITimeProvider, RealTimeProvider>();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(
+                action,
+                "Container is expected to get locked; even when ContainerLocking throws an exception.");
         }
     }
 }
