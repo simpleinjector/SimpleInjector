@@ -40,7 +40,7 @@ namespace SimpleInjector
     public class ContainerOptions : ApiObject
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal EventHandler<ContainerLockingEventArgs>? containerLocking;
+        private EventHandler<ContainerLockingEventArgs>? containerLocking;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorResolutionBehavior resolutionBehavior;
@@ -530,6 +530,19 @@ namespace SimpleInjector
             }
 
             return lifestyle;
+        }
+
+        internal void RaiseContainerLockingAndReset()
+        {
+            var locking = this.containerLocking;
+
+            if (locking != null)
+            {
+                // Prevent re-entry.
+                this.containerLocking = null;
+
+                locking(this.Container, new ContainerLockingEventArgs());
+            }
         }
 
         private void ThrowWhenContainerHasRegistrations(string propertyName)

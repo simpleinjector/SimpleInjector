@@ -141,7 +141,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.ExceptionMessageContains(@"
-                    ConcreteCommand is registered as 'Thread Scoped' lifestyle, but the instance is
+                    ConcreteCommand is registered using the 'Thread Scoped' lifestyle, but the instance is
                     requested outside the context of an active (Thread Scoped) scope."
                     .TrimInside(),
                     ex);

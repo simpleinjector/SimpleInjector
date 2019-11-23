@@ -721,7 +721,7 @@ namespace SimpleInjector
                 type,
                 containerHasRegistrations: this.HasRegistrations,
                 containerHasRelatedOneToOneMapping: this.ContainsOneToOneRegistrationForCollection(type),
-                noCollectionRegistrationExists: this.IsCollectionButNoOneToToOneRegistrationExists(type),
+                collectionRegistrationDoesNotExists: this.IsCollectionButNoOneToToOneRegistrationExists(type),
                 containerHasRelatedCollectionMapping: this.ContainsCollectionRegistrationFor(type),
                 skippedDecorators: this.GetNonGenericDecoratorsSkippedDuringAutoRegistration(type),
                 lookalikes: this.GetLookalikesForMissingType(type)));
