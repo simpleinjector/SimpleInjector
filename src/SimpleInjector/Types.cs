@@ -110,7 +110,8 @@ namespace SimpleInjector
                 serviceTypeDefinition == typeof(IEnumerable<>) ||
                 serviceTypeDefinition == typeof(IList<>) ||
                 serviceTypeDefinition == typeof(ICollection<>) ||
-                serviceTypeDefinition == typeof(Collection<>);
+                serviceTypeDefinition == typeof(Collection<>) ||
+                serviceTypeDefinition == typeof(ReadOnlyCollection<>);
         }
 
         // Return a list of all base types T inherits, all interfaces T implements and T itself.

@@ -572,19 +572,6 @@ namespace SimpleInjector
             };
         }
 
-        private InstanceProducer BuildEmptyCollectionInstanceProducerForEnumerable(Type enumerableType)
-        {
-            Type elementType = enumerableType.GetGenericArguments()[0];
-
-            var collection = ControlledCollectionHelper.CreateContainerControlledCollection(elementType, this);
-
-            var registration = new ExpressionRegistration(Expression.Constant(collection, enumerableType), this);
-
-            // Producers for ExpressionRegistration are normally ignored as external producer, but in this
-            // case the empty collection producer should pop up in the list of GetCurrentRegistrations().
-            return new InstanceProducer(enumerableType, registration, registerExternalProducer: true);
-        }
-
         private InstanceProducer? TryBuildInstanceProducerForConcreteUnregisteredType<TConcrete>(
             InjectionConsumerInfo context)
             where TConcrete : class
