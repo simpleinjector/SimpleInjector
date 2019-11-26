@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Threading;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -568,7 +569,36 @@
                 "The cyclic graph contains the following types: A -> B -> CyclicXDecorator3 -> A.",
                 action);
         }
-        
+
+        // #756
+        [TestMethod]
+        public void Verify_OnCyclicGraphWithCycleInDecorator_ShowsTheDecoratorInTheGraph()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // The registrations below result in the following cyclic graph
+            // ServiceDependingOn<A>(
+            //     dependency: new A(
+            //         b: new B(
+            //             x: CyclicXDecorator3(
+            //                 x: new NonCyclicX(),
+            //                 a: new A(...)))))
+            container.Register<ServiceDependingOn<A>>();
+            container.Register<A>();
+            container.Register<B>();
+            container.Register<IX, NonCyclicX>();
+            container.RegisterDecorator(typeof(IX), typeof(CyclicXDecorator3));
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "The cyclic graph contains the following types: A -> B -> CyclicXDecorator3 -> A.",
+                action);
+        }
+
         private static void Assert_FinishedWithoutExceptions(ThreadWrapper thread)
         {
             thread.Join();
