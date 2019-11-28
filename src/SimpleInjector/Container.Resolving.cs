@@ -710,30 +710,36 @@ namespace SimpleInjector
             }
         }
 
-        private void ThrowMissingInstanceProducerException(Type serviceType)
+        private void ThrowMissingInstanceProducerException(Type type)
         {
-            if (Types.IsConcreteConstructableType(serviceType))
+            if (Types.IsConcreteConstructableType(type))
             {
-                this.ThrowNotConstructableException(serviceType);
+                this.ThrowNotConstructableException(type);
             }
 
             throw new ActivationException(StringResources.NoRegistrationForTypeFound(
-                serviceType,
-                this.HasRegistrations,
-                this.ContainsOneToOneRegistrationForCollectionType(serviceType),
-                this.ContainsCollectionRegistrationFor(serviceType),
-                this.GetNonGenericDecoratorsThatWereSkippedDuringBatchRegistration(serviceType),
-                this.GetLookalikesForMissingType(serviceType)));
+                type,
+                containerHasRegistrations: this.HasRegistrations,
+                containerHasRelatedOneToOneMapping: this.ContainsOneToOneRegistrationForCollection(type),
+                collectionRegistrationDoesNotExists: this.IsCollectionButNoOneToToOneRegistrationExists(type),
+                containerHasRelatedCollectionMapping: this.ContainsCollectionRegistrationFor(type),
+                skippedDecorators: this.GetNonGenericDecoratorsSkippedDuringAutoRegistration(type),
+                lookalikes: this.GetLookalikesForMissingType(type)));
         }
 
-        private bool ContainsOneToOneRegistrationForCollectionType(Type collectionServiceType) =>
-            Types.IsGenericCollectionType(collectionServiceType) &&
-                this.ContainsExplicitRegistrationFor(collectionServiceType.GetGenericArguments()[0]);
+        private bool IsCollectionButNoOneToToOneRegistrationExists(Type collectionServiceType) =>
+            Types.IsGenericCollectionType(collectionServiceType)
+            && !this.ContainsOneToOneRegistrationForCollection(collectionServiceType);
+
+        private bool ContainsOneToOneRegistrationForCollection(Type collectionServiceType) =>
+            Types.IsGenericCollectionType(collectionServiceType)
+            && this.ContainsExplicitRegistrationFor(collectionServiceType.GetGenericArguments()[0]);
 
         // NOTE: MakeGenericType will fail for IEnumerable<T> when T is a pointer.
         private bool ContainsCollectionRegistrationFor(Type serviceType) =>
-            !Types.IsGenericCollectionType(serviceType) && !serviceType.IsPointer &&
-                this.ContainsExplicitRegistrationFor(typeof(IEnumerable<>).MakeGenericType(serviceType));
+            !Types.IsGenericCollectionType(serviceType)
+            && !serviceType.IsPointer
+            && this.ContainsExplicitRegistrationFor(typeof(IEnumerable<>).MakeGenericType(serviceType));
 
         private bool ContainsExplicitRegistrationFor(Type serviceType) =>
             this.GetRegistrationEvenIfInvalid(serviceType, InjectionConsumerInfo.Root, false) != null;

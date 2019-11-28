@@ -25,7 +25,30 @@ namespace SimpleInjector
         /// components from the framework's configuration system or not. The default is <c>true</c>.
         /// </summary>
         /// <value>A boolean value.</value>
-        public bool AutoCrossWireFrameworkComponents { get; set; } = true;
+        public bool AutoCrossWireFrameworkComponents
+        {
+            get
+            {
+                return this.Builder.AutoCrossWireFrameworkComponents;
+            }
+
+            [Obsolete(
+                "Please use SimpleInjectorAddOptions.AutoCrossWireFrameworkComponents instead, e.g. by " +
+                "calling services.AddSimpleInjector(container, options => { " +
+                "options.AutoCrossWireFrameworkComponents = false; }). " +
+                "For more information, see: https://simpleinjector.org/servicecollection. " +
+                "Will be removed in version 5.0.",
+                error: true)]
+            set
+            {
+                throw new NotSupportedException(
+                    "Please use SimpleInjectorAddOptions.AutoCrossWireFrameworkComponents instead, e.g. by " +
+                    "calling services.AddSimpleInjector(container, options => { " +
+                    "options.AutoCrossWireFrameworkComponents = false; }). " +
+                    "For more information, see: https://simpleinjector.org/servicecollection. " +
+                    "Will be removed in version 5.0.");
+            }
+        }
 
         /// <summary>
         /// Gets the <see cref="IServiceProvider"/> that provides access to the framework's singleton

@@ -75,7 +75,6 @@ namespace SimpleInjector
 
         private EventHandler<UnregisteredTypeEventArgs>? resolveUnregisteredType;
         private EventHandler<ExpressionBuildingEventArgs>? expressionBuilding;
-
         private EventHandler<ExpressionBuiltEventArgs>? expressionBuilt;
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
@@ -321,7 +320,7 @@ namespace SimpleInjector
                     instanceProducer,
                     replacedRegistration: instanceProducer.Registration,
                     knownRelationships: relationships);
-                
+
                 this.expressionBuilt(this, e);
 
                 if (relationships.HasChanged)
@@ -347,7 +346,7 @@ namespace SimpleInjector
             {
                 // Performance optimization: The real locking is moved to another method to allow this method
                 // to be in-lined.
-                this.FlagContainerAsLocked();
+                this.NotifyAndLock();
             }
         }
 
@@ -398,15 +397,18 @@ namespace SimpleInjector
 
         internal void ThrowParameterTypeMustBeRegistered(InjectionTargetInfo target)
         {
+            var type = target.TargetType;
+
             throw new ActivationException(
                 StringResources.ParameterTypeMustBeRegistered(
-                    this,
-                    target,
-                    this.GetNumberOfConditionalRegistrationsFor(target.TargetType),
-                    this.ContainsOneToOneRegistrationForCollectionType(target.TargetType),
-                    this.ContainsCollectionRegistrationFor(target.TargetType),
-                    this.GetNonGenericDecoratorsThatWereSkippedDuringBatchRegistration(target.TargetType),
-                    this.GetLookalikesForMissingType(target.TargetType)));
+                    container: this,
+                    target: target,
+                    numberOfConditionals: this.GetNumberOfConditionalRegistrationsFor(type),
+                    hasRelatedOneToOneMapping: this.ContainsOneToOneRegistrationForCollection(type),
+                    collectionRegistrationDoesNotExists: this.IsCollectionButNoOneToToOneRegistrationExists(type),
+                    hasRelatedCollectionMapping: this.ContainsCollectionRegistrationFor(type),
+                    skippedDecorators: this.GetNonGenericDecoratorsSkippedDuringAutoRegistration(type),
+                    lookalikes: this.GetLookalikesForMissingType(type)));
         }
 
         internal CollectionResolver GetContainerUncontrolledResolver(Type itemType) =>
@@ -467,15 +469,47 @@ namespace SimpleInjector
             return resolver;
         }
 
-        private void FlagContainerAsLocked()
+        private void NotifyAndLock()
         {
             // By using a lock, we have the certainty that all threads will see the new value for 'locked'
             // immediately, since ThrowWhenContainerIsLocked also locks on 'locker'.
             lock (this.locker)
             {
-                this.stackTraceThatLockedTheContainer = GetStackTraceOrNull();
+                if (!this.locked)
+                {
+                    this.stackTraceThatLockedTheContainer = GetStackTraceOrNull();
 
-                this.locked = true;
+                    try
+                    {
+                        this.Options.RaiseContainerLockingAndReset();
+                    }
+                    finally
+                    {
+                        this.locked = true;
+                    }
+                }
+            }
+
+            if (this.Options.EnableAutoVerification && !this.IsVerifying && !this.SuccesfullyVerified)
+            {
+                try
+                {
+                    this.Verify();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // Verify throws an invalid operation exception. Here, we instead want to throw an
+                    // ActivationException, as that would allow the same exception type to be thrown in that
+                    // case, which is often what the user would expect.
+                    throw new ActivationException(
+                        StringResources.EnableAutoVerificationIsEnabled(ex.Message), ex);
+                }
+                catch (DiagnosticVerificationException ex)
+                {
+                    // Same for DiagnosticVerificationExceptions.
+                    throw new ActivationException(
+                        StringResources.EnableAutoVerificationIsEnabled(ex.Message), ex);
+                }
             }
         }
 

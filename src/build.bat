@@ -2,6 +2,8 @@
 
 for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /format:list') do set datetime=%%I
 
+set nextMajorVersion=5
+
 set buildNumber=0 
 set copyrightYear=%datetime:~0,4%
 set version=%1
@@ -71,7 +73,13 @@ if not exist %xcopy% goto :xcopy_missing
 
 set buildToolsPath=BuildTools
 set nugetTemplatePath=%buildToolsPath%\NuGet
+
+rem replace.exe can replace one text for another in a given file
 set replace=%buildToolsPath%\replace.exe
+
+rem zipreplace.exe does what replace.exe does, but now inside a .zip file.
+set zipreplace=%buildToolsPath%\zipreplace.exe
+
 set compress=%systemroot%\System32\CScript.exe %buildToolsPath%\zip.vbs
 set configuration=Release
 set defineConstantsNet=PUBLISH
@@ -107,8 +115,10 @@ set numeric_version_Packaging=%version_Packaging%.%buildNumber%
 
 if not exist SimpleInjector.snk goto :strong_name_key_missing
 
+echo Initialization complete
+
 IF %step%==1 (
-	echo Running step 1
+	echo Running step 1: Cleaning solution and setting version numbers
 	if exist Releases\v%named_version% goto :release_directory_already_exists
 
 	echo BUILDING
@@ -153,7 +163,7 @@ IF %step%==1 (
 )
 
 IF %step%==2 (
-	echo RUNNING TESTS IN PARTIAL TRUST
+	echo Running step 2: RUNNING TESTS IN PARTIAL TRUST
 
 	set testDll=SimpleInjector.Tests.Unit\bin\Release\net451\SimpleInjector.Tests.Unit.dll
 	set testRunner=SimpleInjector.Tests.Unit\bin\Release\net451\PartialTrustTestRunner.exe
@@ -171,7 +181,7 @@ IF %step%==2 (
 )
 
 IF %step%==3 (
-	echo BUILD DOCUMENTATION
+	echo Running step 3: BUILDING DOCUMENTATION
 
 	%msbuild% "SimpleInjector.Documentation\SimpleInjector.Documentation.shfbproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
 
@@ -196,8 +206,9 @@ IF %step%==3 (
 )
 
 IF %step%==4 (
-	echo CREATING NUGET PACKAGES
-	rmdir Releases\temp /s /q
+	echo Running step 4: CREATING NUGET PACKAGES
+	
+    rmdir Releases\temp /s /q
 	
 	mkdir Releases\temp
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector Releases\temp /E /H
@@ -325,18 +336,32 @@ IF %step%==4 (
 
 	ren "%CD%\Releases\v%named_version%\*.zip" "*.nupkg"
 
+	rem We need to reaplce the version number of the core library from 'named_version_Core >= version' to 'named_version_Core >= version < 5'
+	rem from the following .nupkg files, because ReferenceGenerator does not allow setting a version range of a dependency.
+	set coreLibraryNupkgDependencySearch="<dependency id=""SimpleInjector"" version=""%named_version_Core%"""
+	set coreLibraryNupkgDependencyReplace="<dependency id=""SimpleInjector"" version=""[%named_version_Core%,%nextMajorVersion%)"""
+
 	copy "SimpleInjector.Integration.ServiceCollection\bin\Release\SimpleInjector.Integration.ServiceCollection.%named_version_Integration_ServiceCollection%.nupkg" Releases\v%named_version%\
+	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.ServiceCollection.%named_version_Integration_ServiceCollection%.nupkg /sourceFile:SimpleInjector.Integration.ServiceCollection.nuspec %coreLibraryNupkgDependencySearch% %coreLibraryNupkgDependencyReplace% /force
+	
 	copy "SimpleInjector.Integration.GenericHost\bin\Release\SimpleInjector.Integration.GenericHost.%named_version_Integration_GenericHost%.nupkg" Releases\v%named_version%\
+	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.GenericHost.%named_version_Integration_GenericHost%.nupkg /sourceFile:SimpleInjector.Integration.GenericHost.nuspec %coreLibraryNupkgDependencySearch% %coreLibraryNupkgDependencyReplace% /force
+	
 	copy "SimpleInjector.Integration.AspNetCore\bin\Release\SimpleInjector.Integration.AspNetCore.%named_version_Integration_AspNetCore%.nupkg" Releases\v%named_version%\
+	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.AspNetCore.%named_version_Integration_AspNetCore%.nupkg /sourceFile:SimpleInjector.Integration.AspNetCore.nuspec %coreLibraryNupkgDependencySearch% %coreLibraryNupkgDependencyReplace% /force
+	
 	copy "SimpleInjector.Integration.AspNetCore.Mvc.Core\bin\Release\SimpleInjector.Integration.AspNetCore.Mvc.Core.%named_version_Integration_AspNetCore_Mvc_Core%.nupkg" Releases\v%named_version%\
+	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.AspNetCore.Mvc.Core.%named_version_Integration_AspNetCore_Mvc_Core%.nupkg /sourceFile:SimpleInjector.Integration.AspNetCore.Mvc.Core.nuspec %coreLibraryNupkgDependencySearch% %coreLibraryNupkgDependencyReplace%
+	
 	copy "SimpleInjector.Integration.AspNetCore.Mvc\bin\Release\SimpleInjector.Integration.AspNetCore.Mvc.%named_version_Integration_AspNetCore_Mvc%.nupkg" Releases\v%named_version%\
+	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.AspNetCore.Mvc.%named_version_Integration_AspNetCore_Mvc%.nupkg /sourceFile:SimpleInjector.Integration.AspNetCore.Mvc.nuspec %coreLibraryNupkgDependencySearch% %coreLibraryNupkgDependencyReplace%
 
     echo Please run step 5
     goto :EOF	
 )
 
 IF %step%==5 (
-	echo RESTORE VERSION NUMBERS
+	echo Running step 5: RESTORING VERSION NUMBERS
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj

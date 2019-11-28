@@ -162,7 +162,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.ExceptionMessageContains(@"
-                    ConcreteCommand is registered as 'Async Scoped' lifestyle, but the instance is
+                    ConcreteCommand is registered using the 'Async Scoped' lifestyle, but the instance is
                     requested outside the context of an active (Async Scoped) scope."
                     .TrimInside(),
                     ex);
@@ -290,7 +290,7 @@
         public void AsyncScopedLifestyleDispose_TransientDisposableObject_DoesNotDisposeInstanceAfterAsyncScopedLifestyleEnds()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Transient
             container.Register<ICommand, DisposableCommand>();
@@ -313,7 +313,8 @@
         public void AsyncScopedLifestyleDispose_WithInstanceExplicitlyRegisteredForDisposal_DisposesThatInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
+
             var scopedLifestyle = new AsyncScopedLifestyle();
 
             // Transient
@@ -563,7 +564,7 @@
             // Arrange
             int initializerCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
 
@@ -586,7 +587,7 @@
             // Arrange
             int initializerCallCount = 0;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommand>(() => new ConcreteCommand(), new AsyncScopedLifestyle());
 
@@ -870,7 +871,7 @@
 
             var actualOrderOfDisposal = new List<Type>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Outer, Middle and Inner all depend on Func<object> and call it when disposed.
             // This way we can check in which order the instances are disposed.
@@ -922,7 +923,7 @@
 
             var actualOrderOfDisposal = new List<Type>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Allow PropertyDependency to be injected as property on Inner
             container.Options.PropertySelectionBehavior = new InjectProperties<ImportAttribute>();
@@ -1082,13 +1083,18 @@
         public void BuildExpression_ManuallyCompiledToDelegate_CanBeExecutedSuccessfully()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ICommand, ConcreteCommand>(new AsyncScopedLifestyle());
 
-            var factory = Expression.Lambda<Func<ICommand>>(
-                container.GetRegistration(typeof(ICommand)).BuildExpression())
-                .Compile();
+            // Creating the instance for type ICommand failed. The configuration is invalid. 
+            // The type ConcreteCommand is directly or indirectly depending on itself. 
+            // The cyclic graph contains the following types: ConcreteCommand. 
+            // Verification was triggered because Container.Options.EnableAutoVerification was enabled. 
+            // To prevent the container from being verified on first resolve, set the value to false. 
+            InstanceProducer producer = container.GetRegistration(typeof(ICommand));
+            Expression expression = producer.BuildExpression();
+            var factory = Expression.Lambda<Func<ICommand>>(expression).Compile();
 
             using (AsyncScopedLifestyle.BeginScope(container))
             {

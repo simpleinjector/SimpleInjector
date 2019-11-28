@@ -173,7 +173,7 @@
             // Registration
             var actualContexts = new List<InstanceInitializationData>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<RealTimeProvider>();
 
@@ -195,7 +195,7 @@
             // Arrange
             var actualContexts = new List<InstanceInitializationData>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<RealTimeProvider>();
 
@@ -223,7 +223,7 @@
             // Arrange
             var actualContexts = new List<InstanceInitializationData>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<RealTimeProvider>();
 
@@ -262,7 +262,7 @@
             // Arrange
             var actualContexts = new List<InstanceInitializationData>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Collection.Register<ICommandHandler<RealCommand>>(new[] { typeof(StubCommandHandler) });
 
@@ -288,7 +288,7 @@
             // Arrange
             var actualContexts = new List<InstanceInitializationData>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Container uncontrolled collection
             IEnumerable<ICommandHandler<RealCommand>> handlers = new ICommandHandler<RealCommand>[]
@@ -328,7 +328,7 @@
             // Arrange
             var actualContexts = new List<InstanceInitializationData>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
 
@@ -358,7 +358,7 @@
             // Arrange
             var actualContexts = new List<InstanceInitializationData>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var custom =
                 Lifestyle.CreateCustom("Custom", transientInstanceCreator => transientInstanceCreator);

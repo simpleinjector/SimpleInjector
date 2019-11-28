@@ -483,7 +483,8 @@ namespace SimpleInjector.Tests.Unit
         public void Verify_DecoratorWithFuncDecorateeWithFailingConstructor_ThrowsTheExpectedException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
+            container.Options.EnableAutoVerification = false;
 
             container.Register<IPlugin, FailingPlugin>();
             container.RegisterDecorator(typeof(IPlugin), typeof(PluginProxy), Lifestyle.Singleton);
@@ -618,6 +619,7 @@ namespace SimpleInjector.Tests.Unit
         {
             // Arrange
             var container = ContainerFactory.New();
+            container.Options.EnableAutoVerification = false;
             container.Options.SuppressLifestyleMismatchVerification = false;
 
             // Lifestyle Mismatch

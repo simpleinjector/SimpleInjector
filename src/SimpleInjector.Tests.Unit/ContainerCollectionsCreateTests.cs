@@ -38,7 +38,7 @@
             var expectedTypes1 = new[] { typeof(NullLogger), typeof(ConsoleLogger) };
             var expectedTypes2 = new[] { typeof(Logger<int>), typeof(Logger<bool>) };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var stream1 = container.Collection.Create<ILogger>(expectedTypes1);
@@ -127,7 +127,7 @@
             var expectedTypes1 = new[] { typeof(NullLogger), typeof(ConsoleLogger) };
             var expectedTypes2 = new[] { typeof(Logger<int>), typeof(NullLogger) };
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<NullLogger>(Lifestyle.Singleton);
 

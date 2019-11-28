@@ -141,7 +141,7 @@
             catch (ActivationException ex)
             {
                 AssertThat.ExceptionMessageContains(@"
-                    ConcreteCommand is registered as 'Thread Scoped' lifestyle, but the instance is
+                    ConcreteCommand is registered using the 'Thread Scoped' lifestyle, but the instance is
                     requested outside the context of an active (Thread Scoped) scope."
                     .TrimInside(),
                     ex);
@@ -258,6 +258,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             // Transient
             container.Register<ICommand, DisposableCommand>();
@@ -281,6 +282,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             var lifestyle = new ThreadScopedLifestyle();
 
@@ -370,8 +372,6 @@
             var container = new Container();
 
             container.Register<DisposableCommand>(Lifestyle.Singleton);
-
-            container.Register<ICommand, DisposableCommand>(new ThreadScopedLifestyle());
 
             DisposableCommand singleton;
 
@@ -670,7 +670,7 @@
 
             var actualOrderOfDisposal = new List<Type>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             // Outer, Middle and Inner all depend on Func<object> and call it when disposed.
@@ -721,7 +721,7 @@
 
             var actualOrderOfDisposal = new List<Type>();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             // Allow PropertyDependency to be injected as property on Inner

@@ -7,7 +7,7 @@
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
     <license type="expression">MIT</license>
     <projectUrl>https://simpleinjector.org/</projectUrl>
-    <iconUrl>https://simpleinjector.org/simpleinjector.ico</iconUrl>
+    <icon>simpleinjector.png</icon>
     <id>SimpleInjector</id>
     <title>Simple Injector</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -32,4 +32,7 @@
       </group>
     </dependencies>
   </metadata>
+  <files>
+    <file src="simpleinjector.ico" target="" />
+  </files>  
 </package>

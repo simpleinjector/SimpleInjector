@@ -17,7 +17,7 @@
             Container container = CreateContainerWithMostResolvableParametersConstructorResolutionBehavior();
 
             // Act
-            container.Register<IDisposable, MultipleConstructorsType>();
+            container.Register<object, MultipleConstructorsType>();
         }
 
         [TestMethod]
@@ -296,7 +296,7 @@
             return container;
         }
 
-        public sealed class MultipleConstructorsType : IDisposable
+        public sealed class MultipleConstructorsType
         {
             public readonly ILogger Logger;
             public readonly ICommand Command;
@@ -315,10 +315,6 @@
             {
                 this.Logger = logger;
                 this.Command = command;
-            }
-
-            public void Dispose()
-            {
             }
         }
 

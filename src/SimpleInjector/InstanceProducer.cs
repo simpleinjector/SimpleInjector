@@ -234,6 +234,9 @@ namespace SimpleInjector
             "A property is not appropriate, because get instance could possibly be a heavy operation.")]
         public object GetInstance()
         {
+            // We must lock the container, because not locking could lead to race conditions.
+            this.Container.LockContainer();
+
             this.CheckForCyclicDependencies();
 
             object instance;
@@ -275,6 +278,9 @@ namespace SimpleInjector
         /// <returns>An Expression.</returns>
         public Expression BuildExpression()
         {
+            // We must lock the container, because not locking could lead to race conditions.
+            this.Container.LockContainer();
+
             this.CheckForCyclicDependencies();
 
             try
@@ -524,9 +530,6 @@ namespace SimpleInjector
 
         private Expression BuildExpressionInternal()
         {
-            // We must lock the container, because not locking could lead to race conditions.
-            this.Container.LockContainer();
-
             var expression = this.Registration.BuildExpression();
 
             if (expression == null)

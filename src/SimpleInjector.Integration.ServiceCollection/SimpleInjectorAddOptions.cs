@@ -13,6 +13,8 @@ namespace SimpleInjector.Integration.ServiceCollection
     public sealed class SimpleInjectorAddOptions : ApiObject
     {
         private IServiceProviderAccessor serviceProviderAccessor;
+        private IServiceScopeFactory? serviceScopeFactory;
+        private IServiceProvider? applicationServices;
 
         internal SimpleInjectorAddOptions(
             IServiceCollection services, Container container, IServiceProviderAccessor accessor)
@@ -56,6 +58,68 @@ namespace SimpleInjector.Integration.ServiceCollection
 
                 this.serviceProviderAccessor = value;
             }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether or not Simple Injector should try to load framework
+        /// components from the framework's configuration system or not. The default is <c>true</c>.
+        /// </summary>
+        /// <value>A boolean value.</value>
+        public bool AutoCrossWireFrameworkComponents { get; set; } = true;
+
+        /// <summary>
+        /// Gets the <see cref="IServiceProvider"/> instance that will be used by Simple Injector to resolve
+        /// cross-wired framework components. It's value will be set when
+        /// <see cref="SimpleInjectorServiceCollectionExtensions.UseSimpleInjector(IServiceProvider, Container)">UseSimpleInjector</see>
+        /// is called, or when ASP.NET Core resolves its hosted services (whatever comes first).
+        /// </summary>
+        /// <value>The <see cref="IServiceProvider"/> instance.</value>
+        internal IServiceProvider ApplicationServices
+        {
+            get
+            {
+                if (this.applicationServices is null)
+                {
+                    throw this.GetServiceProviderNotSetException();
+                }
+
+                return this.applicationServices;
+            }
+        }
+
+        internal IServiceScopeFactory ServiceScopeFactory =>
+            this.serviceScopeFactory
+                ?? (this.serviceScopeFactory = this.GetRequiredFrameworkService<IServiceScopeFactory>());
+
+        internal T GetRequiredFrameworkService<T>() => this.ApplicationServices.GetRequiredService<T>();
+
+        internal void SetServiceProviderIfNull(IServiceProvider provider)
+        {
+            if (this.applicationServices is null)
+            {
+                this.applicationServices = provider;
+            }
+        }
+
+        private InvalidOperationException GetServiceProviderNotSetException()
+        {
+            const string ServiceProviderRequiredMessage =
+                "The Simple Injector integration hasn't been fully initialized. ";
+
+            const string ServiceCollectionMessage =
+                "Please make sure 'IServiceProvider.UseSimpleInjector(Container)' is called. " +
+                "For more information, see: https://simpleinjector.org/servicecollection.";
+
+            const string AspNetCoreMessage =
+                "Please make sure 'IApplicationBuilder.UseSimpleInjector(Container)' is called " +
+                "from inside the 'Configure' method of your ASP.NET Core Startup class. " +
+                "For more information, see: https://simpleinjector.org/aspnetcore.";
+
+            return new InvalidOperationException(
+                ServiceProviderRequiredMessage + (
+                    this.ServiceProviderAccessor is DefaultServiceProviderAccessor
+                        ? ServiceCollectionMessage
+                        : AspNetCoreMessage));
         }
     }
 }

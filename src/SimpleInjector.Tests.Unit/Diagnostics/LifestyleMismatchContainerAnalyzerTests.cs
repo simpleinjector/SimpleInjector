@@ -289,7 +289,7 @@
         {
             // Arrange
             var container = new Container();
-
+            container.Options.EnableAutoVerification = false;
             container.Options.SuppressLifestyleMismatchVerification = true;
 
             container.Register(typeof(ICommandHandler<int>), typeof(NullCommandHandler<int>), Lifestyle.Transient);
@@ -306,7 +306,7 @@
         public void GetInstance_ResolvingcTypeWithLifestyleMismatchInGraph_ThrowsException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<ServiceWithDependency<ServiceDependingOn<ILogger>>>(Lifestyle.Transient);
             container.Register<ServiceDependingOn<ILogger>>(Lifestyle.Singleton);

@@ -36,10 +36,58 @@ namespace SimpleInjector
 
             options.Container.AddRegistration<THostedService>(registration);
 
-            options.Services.AddSingleton<IHostedService>(
-                _ => options.Container.GetInstance<THostedService>());
+            options.Services.AddSingleton<IHostedService>(_ =>
+            {
+                try
+                {
+                    return options.Container.GetInstance<THostedService>();
+                }
+                catch (ActivationException ex) when (ex.Message.Contains("is not registered"))
+                {
+                    throw new ActivationException(ex.Message + " " +
+                        "ASP.NET Core is trying to resolve your " +
+                        $"{typeof(THostedService).ToFriendlyName()} hosted service that you registered by " +
+                        "calling the AddHostedService<THostedService>() extension method, but it can't be " +
+                        "resolved due to a missing registration. In ASP.NET Core 3 and up, hosted " +
+                        "services are resolved much earlier in the pipeline, before the 'Configure' " +
+                        "method of your Startup class is invoked. If you are registering the missing " +
+                        "service inside the 'Configure' method, that would be the likely cause of the " +
+                        "issue. To fix the problem, you should ensure that all registration to the " +
+                        "container are done during the 'ConfigureServices' method of the Startup class. " +
+                        "For more information, see: https://simpleinjector.org/generichost or " +
+                        "https://simpleinjector.org/aspnetcore.",
+                        ex);
+                }
+            });
 
             return options;
+        }
+
+        /// <summary>
+        /// Finalizes the configuration of Simple Injector on top of <see cref="IHost"/>.
+        /// Ensures framework components can be injected into Simple Injector-resolved components, unless
+        /// <see cref="SimpleInjectorAddOptions.AutoCrossWireFrameworkComponents"/> is set to <c>false</c>.
+        /// </summary>
+        /// <param name="host">The application's <see cref="IHost"/>.</param>
+        /// <param name="container">The application's <see cref="Container"/> instance.</param>
+        /// <returns>The supplied <paramref name="host"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="host"/> or
+        /// <paramref name="container"/> are null references.</exception>
+        public static IHost UseSimpleInjector(this IHost host, Container container)
+        {
+            if (host is null)
+            {
+                throw new ArgumentNullException(nameof(host));
+            }
+
+            if (container is null)
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
+
+            host.Services.UseSimpleInjector(container);
+
+            return host;
         }
 
         /// <summary>
@@ -54,6 +102,19 @@ namespace SimpleInjector
         /// <returns>The supplied <paramref name="host"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="host"/> or
         /// <paramref name="container"/> are null references.</exception>
+        //// I wanted to add this obsolete message in 4.8, but it was confusing considering the obsolete
+        //// messages for everything on top of SimpleInjectorUseOptions. When those obsolete messages are
+        //// resolved by the user, there is no harm in calling this method any longer. So it will get
+        //// obsoleted in a later release.
+        ////[Obsolete(
+        ////    "You are supplying a setup action, but due breaking changes in ASP.NET Core 3, the Simple " +
+        ////    "Injector container can get locked at an earlier stage, making it impossible to further setup " +
+        ////    "the container at this stage. Please call the UseSimpleInjector(IHost, Container) " +
+        ////    "overload instead. Take a look at the compiler warnings on the individual methods you are " +
+        ////    "calling inside your setupAction delegate to understand how to migrate them. " +
+        ////    " For more information, see: https://simpleinjector.org/generichost. " +
+        ////    "Will be treated as an error from version 4.10. Will be removed in version 5.0.",
+        ////    error: false)]
         public static IHost UseSimpleInjector(
             this IHost host,
             Container container,

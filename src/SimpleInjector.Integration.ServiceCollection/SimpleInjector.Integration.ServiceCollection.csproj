@@ -16,7 +16,7 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>SimpleInjector.Integration.ServiceCollection</PackageId>
     <PackageTags>simpleinjector;dependency-injection;DI;ASP.NET Core;IServiceCollection</PackageTags>
-    <PackageIconUrl>https://simpleinjector.org/simpleinjector.ico</PackageIconUrl>
+    <PackageIcon>simpleinjector.png</PackageIcon>
     <PackageProjectUrl>https://simpleinjector.org/servicecollection</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
   </ItemGroup>
@@ -39,6 +40,10 @@
     <PackageReference Include="NuSpec.ReferenceGenerator" Version="2.0.0-beta-bld14">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Graphics\simpleinjector.png" Pack="true" PackagePath=""/>
   </ItemGroup>
 
   <Target Name="PostcompileScript" AfterTargets="Build" Condition=" '$(IsCrossTargetingBuild)' != 'true' ">

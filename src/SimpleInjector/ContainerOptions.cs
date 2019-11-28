@@ -40,6 +40,9 @@ namespace SimpleInjector
     public class ContainerOptions : ApiObject
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private EventHandler<ContainerLockingEventArgs>? containerLocking;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IConstructorResolutionBehavior resolutionBehavior;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -72,6 +75,42 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// Occurs just before the container is about to be locked, giving the developer a last change to
+        /// interact and change the unlocked container before it is sealed for further modifications. Locking
+        /// typically occurs by a call to <b>Container.GetInstance</b>, <b>Container.Verify</b>, or any other
+        /// method that causes the construction and resolution of registered instances.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The <b>ContainerLocking</b> event is called exactly once by the container, allowing a developer to
+        /// register types, hook unregistered type resolution events that need to be applied last, or see
+        /// who is responsible for locking the container.
+        /// </para>
+        /// <para>
+        /// A registered event handler delegate is allowed to make a call that locks the container, e.g.
+        /// calling <b>Container.GetInstance</b>; this will not cause any new <b>ContainerLocking</b> event to
+        /// be raised. Doing so, however, is not advised, as that might cause any following executed handlers
+        /// to break, in case they require an unlocked container.
+        /// </para>
+        /// </remarks>
+        public event EventHandler<ContainerLockingEventArgs> ContainerLocking
+        {
+            add
+            {
+                this.Container.ThrowWhenContainerIsLockedOrDisposed();
+
+                this.containerLocking += value;
+            }
+
+            remove
+            {
+                this.Container.ThrowWhenContainerIsLockedOrDisposed();
+
+                this.containerLocking -= value;
+            }
+        }
+        
+        /// <summary>
         /// Gets the container to which this <b>ContainerOptions</b> instance belongs to.
         /// </summary>
         /// <value>The current <see cref="SimpleInjector.Container">Container</see>.</value>
@@ -88,12 +127,21 @@ namespace SimpleInjector
         /// <summary>
         /// Gets or sets a value indicating whether the container should suppress checking for lifestyle
         /// mismatches (see: https://simpleinjector.org/dialm) when a component is resolved. The default
-        /// is false.
+        /// is false. This setting will have no effect when <see cref="EnableAutoVerification"/> is true.
         /// </summary>
         /// <value>The value indicating whether the container should suppress checking for lifestyle
         /// mismatches.</value>
         public bool SuppressLifestyleMismatchVerification { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the container should automatically trigger verification
+        /// and diagnostics of its configuration when the first service is resolved (e.g. the first call to
+        /// GetInstance). The behavior is identical to calling <see cref="Container.Verify()">Verify()</see>
+        /// manually. The default is false.
+        /// </summary>
+        /// <value>The value indicating whether the container should automatically trigger verification.</value>
+        public bool EnableAutoVerification { get; set; }
+        
         /// <summary>Gets or sets a value indicating whether.
         /// This method is deprecated. Changing its value will have no effect.</summary>
         /// <value>The value indicating whether the container will return an empty collection.</value>
@@ -482,6 +530,19 @@ namespace SimpleInjector
             }
 
             return lifestyle;
+        }
+
+        internal void RaiseContainerLockingAndReset()
+        {
+            var locking = this.containerLocking;
+
+            if (locking != null)
+            {
+                // Prevent re-entry.
+                this.containerLocking = null;
+
+                locking(this.Container, new ContainerLockingEventArgs());
+            }
         }
 
         private void ThrowWhenContainerHasRegistrations(string propertyName)
