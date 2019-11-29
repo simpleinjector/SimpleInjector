@@ -54,9 +54,19 @@ namespace SimpleInjector.Diagnostics.Analyzers
             let lifestyle = registration.Lifestyle.IdentificationKey
             let key = new { registration.ImplementationType, lifestyle }
             group registrationGroup by key into registrationLifestyleGroup
+            let possibleConflictingProducers = registrationLifestyleGroup.SelectMany(p => p).ToArray()
             let hasConflict = registrationLifestyleGroup.Count() > 1
+
+                // HACK: Fixes #769. In case all producers in the group are Singleton and produce the same
+                // instance, it will not result in a torn registration, as a torn registration produces
+                // multiple instances. This is kind-of a hack, because the source of the problem lies within
+                // the ContainerControlledCollection.GetOrCreateInstanceProducer method, as it creates a new
+                // ExpressionRegistration instead of reusing the same. Changing that code, however, causes
+                // other bugs (and failing tests). Because of that, we filter the problem out at this stage.
+                && (possibleConflictingProducers.Any(p => p.Lifestyle != Lifestyle.Singleton)
+                    || possibleConflictingProducers.Select(p => p.GetInstance()).Distinct().Count() > 1)
             where hasConflict
-            select registrationLifestyleGroup.SelectMany(p => p).ToArray();
+            select possibleConflictingProducers;
 
         private static TornLifestyleDiagnosticResult CreateDiagnosticResult(
             InstanceProducer diagnosedProducer,
