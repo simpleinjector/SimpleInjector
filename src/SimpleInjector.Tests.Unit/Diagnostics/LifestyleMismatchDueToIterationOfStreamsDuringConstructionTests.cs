@@ -393,37 +393,6 @@ $@"{typeof(CaptivatingCompositeLogger<IEnumerable<ILogger>>).ToFriendlyName()}(
             container.Verify();
         }
 
-        private static void GetInstance_SingletonThatIteratesStreamInCtorInjectedWithStreamWithTransient_Throws(
-            Type dependencyType)
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Collection.Append<ILogger, ConsoleLogger>(Lifestyle.Transient);
-
-            Type captivatingComposite =
-                typeof(CaptivatingCompositeLogger<>).MakeGenericType(dependencyType);
-
-            container.RegisterSingleton(typeof(ILogger), captivatingComposite);
-
-            // Act
-            Action action = () => container.GetInstance<ILogger>();
-
-            // Assert
-            string name = captivatingComposite.ToFriendlyName();
-            string collectionName = dependencyType.ToFriendlyName();
-
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                $@"ConsoleLogger is part of the {collectionName} that is injected into {name}.
-                The problem in {name} is that instead of storing the injected {collectionName}
-                in a private field and iterating over it at the point its instances are
-                required, ConsoleLogger is being resolved (from the collection) during object
-                construction. Resolving services from an injected collection during object
-                construction (e.g. by calling loggers.ToList() in the constructor) is not advised."
-                .TrimInside(),
-                action);
-        }
-
         [TestMethod]
         public void Verify_SingletonThatIteratesStreamInCtorInjectedWithStreamWithAppendedSingleton_Succeeds()
         {
@@ -459,7 +428,38 @@ $@"{typeof(CaptivatingCompositeLogger<IEnumerable<ILogger>>).ToFriendlyName()}(
             // Act
             container.Verify();
         }
-        
+
+        private static void GetInstance_SingletonThatIteratesStreamInCtorInjectedWithStreamWithTransient_Throws(
+            Type dependencyType)
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Collection.Append<ILogger, ConsoleLogger>(Lifestyle.Transient);
+
+            Type captivatingComposite =
+                typeof(CaptivatingCompositeLogger<>).MakeGenericType(dependencyType);
+
+            container.RegisterSingleton(typeof(ILogger), captivatingComposite);
+
+            // Act
+            Action action = () => container.GetInstance<ILogger>();
+
+            // Assert
+            string name = captivatingComposite.ToFriendlyName();
+            string collectionName = dependencyType.ToFriendlyName();
+
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                $@"ConsoleLogger is part of the {collectionName} that is injected into {name}.
+                The problem in {name} is that instead of storing the injected {collectionName}
+                in a private field and iterating over it at the point its instances are
+                required, ConsoleLogger is being resolved (from the collection) during object
+                construction. Resolving services from an injected collection during object
+                construction (e.g. by calling loggers.ToList() in the constructor) is not advised."
+                .TrimInside(),
+                action);
+        }
+
         private static string Actual(IEnumerable<DiagnosticResult> results) =>
             "actual: " + string.Join(" - ", results.Select(r => r.Description));
 

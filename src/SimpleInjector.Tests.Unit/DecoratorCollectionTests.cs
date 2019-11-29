@@ -1662,7 +1662,7 @@
             //     new BaseDecorator(
             //         new DeriveDecorator(
             //             new DeriveImplementation()))
-            //}
+            // }
             container.Register<IDerive, DeriveImplementation>();
             container.RegisterDecorator(typeof(IDerive), typeof(DeriveDecorator));
             container.Collection.Register<IBase>(new[] { typeof(IDerive) });
