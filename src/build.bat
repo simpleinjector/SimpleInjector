@@ -342,19 +342,19 @@ IF %step%==4 (
 	set coreLibraryNupkgDependencyReplace="<dependency id=""SimpleInjector"" version=""[%named_version_Core%,%nextMajorVersion%)"""
 
 	copy "SimpleInjector.Integration.ServiceCollection\bin\Release\SimpleInjector.Integration.ServiceCollection.%named_version_Integration_ServiceCollection%.nupkg" Releases\v%named_version%\
-	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.ServiceCollection.%named_version_Integration_ServiceCollection%.nupkg /sourceFile:SimpleInjector.Integration.ServiceCollection.nuspec %coreLibraryNupkgDependencySearch% %coreLibraryNupkgDependencyReplace% /force
+	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.ServiceCollection.%named_version_Integration_ServiceCollection%.nupkg /sourceFile:SimpleInjector.Integration.ServiceCollection.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace% /force
 	
 	copy "SimpleInjector.Integration.GenericHost\bin\Release\SimpleInjector.Integration.GenericHost.%named_version_Integration_GenericHost%.nupkg" Releases\v%named_version%\
-	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.GenericHost.%named_version_Integration_GenericHost%.nupkg /sourceFile:SimpleInjector.Integration.GenericHost.nuspec %coreLibraryNupkgDependencySearch% %coreLibraryNupkgDependencyReplace% /force
+	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.GenericHost.%named_version_Integration_GenericHost%.nupkg /sourceFile:SimpleInjector.Integration.GenericHost.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace% /force
 	
 	copy "SimpleInjector.Integration.AspNetCore\bin\Release\SimpleInjector.Integration.AspNetCore.%named_version_Integration_AspNetCore%.nupkg" Releases\v%named_version%\
-	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.AspNetCore.%named_version_Integration_AspNetCore%.nupkg /sourceFile:SimpleInjector.Integration.AspNetCore.nuspec %coreLibraryNupkgDependencySearch% %coreLibraryNupkgDependencyReplace% /force
+	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.AspNetCore.%named_version_Integration_AspNetCore%.nupkg /sourceFile:SimpleInjector.Integration.AspNetCore.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace% /force
 	
 	copy "SimpleInjector.Integration.AspNetCore.Mvc.Core\bin\Release\SimpleInjector.Integration.AspNetCore.Mvc.Core.%named_version_Integration_AspNetCore_Mvc_Core%.nupkg" Releases\v%named_version%\
-	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.AspNetCore.Mvc.Core.%named_version_Integration_AspNetCore_Mvc_Core%.nupkg /sourceFile:SimpleInjector.Integration.AspNetCore.Mvc.Core.nuspec %coreLibraryNupkgDependencySearch% %coreLibraryNupkgDependencyReplace%
+	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.AspNetCore.Mvc.Core.%named_version_Integration_AspNetCore_Mvc_Core%.nupkg /sourceFile:SimpleInjector.Integration.AspNetCore.Mvc.Core.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace%
 	
 	copy "SimpleInjector.Integration.AspNetCore.Mvc\bin\Release\SimpleInjector.Integration.AspNetCore.Mvc.%named_version_Integration_AspNetCore_Mvc%.nupkg" Releases\v%named_version%\
-	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.AspNetCore.Mvc.%named_version_Integration_AspNetCore_Mvc%.nupkg /sourceFile:SimpleInjector.Integration.AspNetCore.Mvc.nuspec %coreLibraryNupkgDependencySearch% %coreLibraryNupkgDependencyReplace%
+	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.AspNetCore.Mvc.%named_version_Integration_AspNetCore_Mvc%.nupkg /sourceFile:SimpleInjector.Integration.AspNetCore.Mvc.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace%
 
     echo Please run step 5
     goto :EOF	

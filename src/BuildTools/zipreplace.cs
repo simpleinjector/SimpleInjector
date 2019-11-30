@@ -20,8 +20,8 @@ namespace zipreplace
                         "[/zipTarget:target.zip] " +
                         "/source:source.txt " +
                         "[/target:target.txt] " +
-                        "\"search text\" " +
-                        "\"replacement text\" " +
+                        "\"/search:search text\" " +
+                        "\"/replace:replacement text\" " +
                         "[/force] " +
                         "[/line]");
                 return;
@@ -33,6 +33,9 @@ namespace zipreplace
 
             if (arguments.InvalidArguments.Any())
                 ExitWithMessage("Invalid arguments found.", arguments);
+
+            if (string.IsNullOrEmpty(arguments.SearchText))
+                ExitWithMessage("No search text supplied.", arguments);
 
             if (string.IsNullOrWhiteSpace(arguments.ZipSource))
                 ExitWithMessage("/zipSource not supplied.", arguments);
@@ -149,32 +152,21 @@ namespace zipreplace
 
         private static Arguments GetArguments(string[] args)
         {
-            string zipSource = args.SingleOrDefault(a => a.StartsWith("/zipSource:"))
-                ?.Substring("/zipSource:".Length);
-
-            string zipTarget = args.SingleOrDefault(a => a.StartsWith("/zipTarget:"))
-                ?.Substring("/zipTarget:".Length) ?? zipSource;
-
-            string sourceFile = args.SingleOrDefault(a => a.StartsWith("/sourceFile:"))
-                ?.Substring("/sourceFile:".Length);
-
-            string targetFile = args.SingleOrDefault(a => a.StartsWith("/targetFile:"))
-                ?.Substring("/targetFile:".Length) ?? sourceFile;
-
             return new Arguments
             {
-                ZipSource = zipSource,
-                ZipTarget = zipTarget,
-                SourceFile = sourceFile,
-                TargetFile = targetFile,
-                SearchText = args.First(a => !a.StartsWith("/")),
-                ReplaceText = args.Last(a => !a.StartsWith("/")),
+                ZipSource = GetValue("zipSource", args),
+                ZipTarget = GetValue("zipTarget", args) ?? GetValue("zipSource", args),
+                SourceFile = GetValue("sourceFile", args),
+                TargetFile = GetValue("targetFile", args) ?? GetValue("sourceFile", args),
+                SearchText = GetValue("search", args),
+                ReplaceText = GetValue("replace", args),
                 ReplaceCompleteLine = args.Any(a => a == "/line"),
                 ForceReplace = args.Any(a => a == "/force"),
                 IncludeStackTrace = args.Any(a => a == "/stackTrace"),
                 InvalidArguments = (
                     from arg in args
-                    where arg.StartsWith("/")
+                    where !arg.StartsWith("/search:")
+                    where !arg.StartsWith("/replace:")
                     where !arg.StartsWith("/zipSource:")
                     where !arg.StartsWith("/zipTarget:")
                     where !arg.StartsWith("/sourceFile:")
@@ -184,6 +176,9 @@ namespace zipreplace
                     .ToArray()
             };
         }
+
+        private static string GetValue(string tag, string[] args) =>
+            args.SingleOrDefault(a => a.StartsWith($"/{tag}:"))?.Substring($"/{tag}:".Length);
 
         class Arguments
         {
