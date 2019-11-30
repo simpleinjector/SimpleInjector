@@ -154,10 +154,13 @@ namespace SimpleInjector
 
         internal static string LifestyleMismatchesReported(LifestyleMismatchDiagnosticResult error) =>
             Format(
-                "A lifestyle mismatch has been detected. {0} Lifestyle mismatches can cause concurrency " +
-                "bugs in your application. Please see https://simpleinjector.org/dialm to understand this " +
-                "problem and how to solve it.",
-                error.Description);
+                "A lifestyle mismatch has been detected. {0} {1} " +
+                "Please see https://simpleinjector.org/dialm to understand this problem and how to solve it.",
+                error.Description,
+                LifestyleMismatchesCanCauseConcurrencyBugs());
+
+        internal static string LifestyleMismatchesCanCauseConcurrencyBugs() =>
+            "Lifestyle mismatches can cause concurrency bugs in your application.";
 
         internal static string DiagnosticWarningsReported(IList<DiagnosticResult> errors)
         {
@@ -235,23 +238,9 @@ namespace SimpleInjector
 
         internal static string CollectionUsedDuringConstruction(
             Type consumer, InstanceProducer producer, KnownRelationship? relationship = null) =>
-            Format(
-                "{0} is part of the {3} that is injected into {2}. The problem in {2} is that instead " +
-                "of storing the injected {3} in a private field and iterating over it at the point " +
-                "its instances are required, {0} is being resolved (from the collection) during " +
-                "object construction. Resolving services from an injected collection during object " +
-                "construction (e.g. by calling {4}.ToList() in the constructor) is not advised.",
-                producer.ImplementationType.ToFriendlyName(),
-                producer.ServiceType.ToFriendlyName(),
-                consumer.ToFriendlyName(),
-                relationship != null
-                    ? relationship.Dependency.ServiceType.ToFriendlyName()
-                    : Format(
-                        "collection of {0} services",
-                        producer.ServiceType.ToFriendlyName()),
-                relationship != null && !relationship.Consumer.IsRoot
-                    ? relationship.Consumer.Target.Name
-                    : "collection");
+            relationship != null && IsListOrArrayRelationship(relationship)
+                ? CollectionUsedDuringConstructionByInjectingMutableCollection(consumer, producer, relationship!)
+                : CollectionUsedDuringConstructionByIteratingAStream(consumer, producer, relationship);
 
         internal static string UnregisteredAbstractionFoundInCollection(
             Type serviceType, Type registeredType, Type foundAbstractType) =>
@@ -916,6 +905,43 @@ namespace SimpleInjector
                 "Unable to load types from assembly {0}. {1}",
                 assembly.FullName,
                 innerException.Message);
+
+        private static bool IsListOrArrayRelationship(KnownRelationship relationship) =>
+            typeof(List<>).IsGenericTypeDefinitionOf(relationship.Consumer.Target.TargetType)
+            || relationship.Consumer.Target.TargetType.IsArray;
+
+        private static string CollectionUsedDuringConstructionByInjectingMutableCollection(
+            Type consumer, InstanceProducer producer, KnownRelationship relationship) =>
+            Format(
+                "{0} is part of the {3} that is injected into {2}. The problem in {2} is that instead " +
+                "of depending on one of the collection types that stream services (e.g. IEnumerable<{1}>, " +
+                "ICollection<{1}>, etc), it depends on the mutable collection type {4}. This causes " +
+                "{0} to be resolved during object construction, which is not advised.",
+                producer.ImplementationType.ToFriendlyName(),
+                producer.ServiceType.ToFriendlyName(),
+                consumer.ToFriendlyName(),
+                relationship.Dependency.ServiceType.ToFriendlyName(),
+                relationship.Consumer.Target.TargetType.ToFriendlyName());
+
+        private static string CollectionUsedDuringConstructionByIteratingAStream(
+            Type consumer, InstanceProducer producer, KnownRelationship? relationship = null) =>
+            Format(
+                "{0} is part of the {3} that is injected into {2}. The problem in {2} is that instead " +
+                "of storing the injected {3} in a private field and iterating over it at the point " +
+                "its instances are required, {0} is being resolved (from the collection) during " +
+                "object construction. Resolving services from an injected collection during object " +
+                "construction (e.g. by calling {4}.ToList() in the constructor) is not advised.",
+                producer.ImplementationType.ToFriendlyName(),
+                producer.ServiceType.ToFriendlyName(),
+                consumer.ToFriendlyName(),
+                relationship != null
+                    ? relationship.Dependency.ServiceType.ToFriendlyName()
+                    : Format(
+                        "collection of {0} services",
+                        producer.ServiceType.ToFriendlyName()),
+                relationship?.Consumer.IsRoot == false
+                    ? relationship.Consumer.Target.Name
+                    : "collection");
 
         private static string BuildRegistrationName(
             Tuple<Type, Type, InstanceProducer> registration, int index)

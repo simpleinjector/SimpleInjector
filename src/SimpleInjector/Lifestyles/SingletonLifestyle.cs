@@ -6,6 +6,7 @@ namespace SimpleInjector.Lifestyles
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading;
@@ -224,7 +225,25 @@ namespace SimpleInjector.Lifestyles
                 var isCurrentThread = new ThreadLocal<bool> { Value = true };
 
                 // Create a listener that can spot when an injected stream is iterated during construction.
-                Action<ServiceCreatedListenerArgs> listener = args =>
+                var listener = this.CreateCollectionUsedDuringConstructionListener(isCurrentThread);
+
+                try
+                {
+                    ControlledCollectionHelper.AddServiceCreatedListener(listener);
+
+                    return instanceCreator();
+                }
+                finally
+                {
+                    ControlledCollectionHelper.RemoveServiceCreatedListener(listener);
+                    isCurrentThread.Dispose();
+                }
+            }
+
+            private Action<ServiceCreatedListenerArgs> CreateCollectionUsedDuringConstructionListener(
+                ThreadLocal<bool> isCurrentThread)
+            {
+                return args =>
                 {
                     // Only handle when an inner registration hasn't handled this yet.
                     if (!args.Handled)
@@ -256,21 +275,14 @@ namespace SimpleInjector.Lifestyles
                         }
                     }
                 };
-
-                try
-                {
-                    ControlledCollectionHelper.AddServiceCreatedListener(listener);
-
-                    return instanceCreator();
-                }
-                finally
-                {
-                    ControlledCollectionHelper.RemoveServiceCreatedListener(listener);
-                    isCurrentThread.Dispose();
-                }
             }
 
             private KnownRelationship FindMatchingCollectionRelationship(
+                InstanceProducer collectionItemProducer) =>
+                this.FindMatchingControlledCollectionRelationship(collectionItemProducer)
+                ?? this.FindMatchingMutableCollectionRelationship(collectionItemProducer);
+
+            private KnownRelationship FindMatchingControlledCollectionRelationship(
                 InstanceProducer collectionItemProducer)
             {
                 return (
@@ -279,6 +291,23 @@ namespace SimpleInjector.Lifestyles
                     where producer.IsContainerControlledCollection()
                     let controlledElementType = producer.GetContainerControlledCollectionElementType()
                     where controlledElementType == collectionItemProducer.ServiceType
+                    select relationship)
+                    .FirstOrDefault();
+            }
+
+            private KnownRelationship FindMatchingMutableCollectionRelationship(
+                InstanceProducer collectionItemProducer)
+            {
+                return (
+                    from relationship in this.GetRelationships()
+                    let producer = relationship.Dependency
+                    let dependencyType = producer.ServiceType
+                    where typeof(List<>).IsGenericTypeDefinitionOf(dependencyType)
+                        || typeof(Collection<>).IsGenericTypeDefinitionOf(dependencyType)
+                        || dependencyType.IsArray
+                    let elementType = dependencyType.GetGenericArguments().FirstOrDefault()
+                        ?? dependencyType.GetElementType()
+                    where elementType == collectionItemProducer.ServiceType
                     select relationship)
                     .FirstOrDefault();
             }

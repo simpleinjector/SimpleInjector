@@ -13,6 +13,9 @@
     [TestClass]
     public class LifestyleMismatchDueToIterationOfStreamsDuringConstructionTests
     {
+        private const string ResolvingServicesFromAnInjectedCollectionMessage =
+            "Resolving services from an injected collection during object construction";
+
         [TestMethod]
         public void GetInstance_SingletonThatNotIteratesStreamInCtorInjectedWithStreamWithTransient_Succeeds()
         {
@@ -86,18 +89,13 @@
             GetInstance_SingletonThatIteratesStreamInCtorInjectedWithStreamWithTransient_Throws(typeof(Collection<ILogger>));
 
         [TestMethod]
-        public void GetInstance_SingletonThatIteratesArrayInCtorInjectedWithArrayWithTransient_ThrowsMismatchDetected()
+        public void GetInstance_SingletonThatGetsInjectedWithArrayWithTransients_ThrowsMismatchDetected()
         {
             // Arrange
-            Type dependencyType = typeof(ILogger[]);
-
             var container = ContainerFactory.New();
 
             container.Collection.Append<ILogger, ConsoleLogger>(Lifestyle.Transient);
-
-            container.RegisterSingleton(
-                typeof(ILogger),
-                typeof(CaptivatingCompositeLogger<>).MakeGenericType(dependencyType));
+            container.RegisterSingleton<ILogger, NoncaptivatingCompositeLogger<ILogger[]>>();
 
             // Act
             Action action = () => container.GetInstance<ILogger>();
@@ -106,7 +104,7 @@
             // No special communication about iterating during the collection: this can't be
             // detected as array is not a stream and can't be intercepted.
             AssertThat.ThrowsWithExceptionMessageDoesNotContain<ActivationException>(
-                "Resolving services from an injected collection during object construction",
+                ResolvingServicesFromAnInjectedCollectionMessage,
                 action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
@@ -114,33 +112,84 @@
                 action);
         }
 
+        // #755
         [TestMethod]
-        public void GetInstance_SingletonThatIteratesListInCtorInjectedWithListWithTransient_ThrowsMismatchDetected()
+        public void Verify_SingletonThatGetsInjectedWithArrayWithTransients_ThrowsMismatchDetected()
         {
             // Arrange
-            Type dependencyType = typeof(List<ILogger>);
-
-            var container = new Container();
-            container.Options.EnableAutoVerification = false;
+            var container = ContainerFactory.New();
 
             container.Collection.Append<ILogger, ConsoleLogger>(Lifestyle.Transient);
+            container.RegisterSingleton<ILogger, NoncaptivatingCompositeLogger<ILogger[]>>();
 
-            container.RegisterSingleton(
-                typeof(ILogger),
-                typeof(CaptivatingCompositeLogger<>).MakeGenericType(dependencyType));
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(
+                "it depends on the mutable collection type ILogger[]. " +
+                "This causes ConsoleLogger to be resolved during object construction",
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_SingletonThatGetsInjectedWithListWithTransients_ThrowsMismatchDetected()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Append<ILogger, ConsoleLogger>(Lifestyle.Transient);
+            container.RegisterSingleton<ILogger, NoncaptivatingCompositeLogger<List<ILogger>>>();
 
             // Act
             Action action = () => container.GetInstance<ILogger>();
 
             // Assert
-            // No special communication about iterating during the collection: this can't be
-            // detected as List<T> is not a stream and can't be intercepted.
             AssertThat.ThrowsWithExceptionMessageDoesNotContain<ActivationException>(
-                "Resolving services from an injected collection during object construction",
+                ResolvingServicesFromAnInjectedCollectionMessage,
                 action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
                 "lifestyle mismatch has been detected",
+                action);
+        }
+
+        // #755
+        [TestMethod]
+        public void Verify_SingletonThatGetsInjectedInjectedWithListWithTransients_ThrowsMismatchDetected()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Append<ILogger, ConsoleLogger>(Lifestyle.Transient);
+            container.RegisterSingleton<ILogger, NoncaptivatingCompositeLogger<List<ILogger>>>();
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(
+                "it depends on the mutable collection type List<ILogger>. " +
+                "This causes ConsoleLogger to be resolved during object construction",
+                action);
+        }
+
+        // #755
+        [TestMethod]
+        public void Verify_SingletonThatIteratesCollectionInCtorWithCollectionWithTransients_ThrowsMismatchDetected()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Append<ILogger, ConsoleLogger>(Lifestyle.Transient);
+            container.RegisterSingleton<ILogger, CaptivatingCompositeLogger<Collection<ILogger>>>();
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(
+                "instead of storing the injected Collection<ILogger> in a private field",
                 action);
         }
 
@@ -454,8 +503,8 @@ $@"{typeof(CaptivatingCompositeLogger<IEnumerable<ILogger>>).ToFriendlyName()}(
                 The problem in {name} is that instead of storing the injected {collectionName}
                 in a private field and iterating over it at the point its instances are
                 required, ConsoleLogger is being resolved (from the collection) during object
-                construction. Resolving services from an injected collection during object
-                construction (e.g. by calling loggers.ToList() in the constructor) is not advised."
+                construction. {ResolvingServicesFromAnInjectedCollectionMessage}
+                (e.g. by calling loggers.ToList() in the constructor) is not advised."
                 .TrimInside(),
                 action);
         }
