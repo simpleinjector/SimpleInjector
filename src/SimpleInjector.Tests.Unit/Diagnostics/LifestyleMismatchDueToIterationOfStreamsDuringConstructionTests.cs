@@ -393,6 +393,42 @@ $@"{typeof(CaptivatingCompositeLogger<IEnumerable<ILogger>>).ToFriendlyName()}(
             container.Verify();
         }
 
+        [TestMethod]
+        public void Verify_SingletonThatIteratesStreamInCtorInjectedWithStreamWithAppendedSingleton_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Collection.Append<ILogger, ConsoleLogger>(Lifestyle.Singleton);
+
+            Type captivatingComposite = typeof(CaptivatingCompositeLogger<IEnumerable<ILogger>>);
+
+            container.RegisterSingleton(typeof(ILogger), captivatingComposite);
+
+            // Act
+            container.Verify();
+        }
+
+        // #769
+        [TestMethod]
+        public void Verify_SingletonThatIteratesStreamInCtorInjectedWithStreamWithForwaredSingleton_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Here the collection's ConsoleLogger registration is forwarded to the single registration.
+            // This should have the same effect as calling Append<S, I>(Lifestyle.Singleton)
+            container.Collection.Register<ILogger>(typeof(ConsoleLogger));
+            container.RegisterSingleton<ConsoleLogger>();
+
+            Type captivatingComposite = typeof(CaptivatingCompositeLogger<IEnumerable<ILogger>>);
+
+            container.RegisterSingleton(typeof(ILogger), captivatingComposite);
+
+            // Act
+            container.Verify();
+        }
+
         private static void GetInstance_SingletonThatIteratesStreamInCtorInjectedWithStreamWithTransient_Throws(
             Type dependencyType)
         {

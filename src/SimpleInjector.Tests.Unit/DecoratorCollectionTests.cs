@@ -1656,6 +1656,13 @@
             // Arrange
             var container = ContainerFactory.New();
 
+            // The following four registrations should result in the following object graph:
+            // new IBase[]
+            // {
+            //     new BaseDecorator(
+            //         new DeriveDecorator(
+            //             new DeriveImplementation()))
+            // }
             container.Register<IDerive, DeriveImplementation>();
             container.RegisterDecorator(typeof(IDerive), typeof(DeriveDecorator));
             container.Collection.Register<IBase>(new[] { typeof(IDerive) });
@@ -1665,7 +1672,8 @@
             var decorator = (BaseDecorator)container.GetAllInstances<IBase>().Single();
 
             // Assert
-            AssertThat.IsInstanceOfType(typeof(DeriveDecorator), decorator.Decoratee, "Since the collection element points back into a container's registration, we would expect " +
+            AssertThat.IsInstanceOfType(typeof(DeriveDecorator), decorator.Decoratee,
+                "Since the collection element points back into a container's registration, we would expect " +
                 "the type to be decorated with that decorator as well.");
         }
 
