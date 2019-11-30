@@ -36,13 +36,10 @@
   <ItemGroup>
     <ProjectReference Include="..\SimpleInjector\SimpleInjector.csproj" />
     <ProjectReference Include="..\SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj" />
-    <PackageReference Include="NuSpec.ReferenceGenerator" Version="2.0.0-beta-bld14">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\Graphics\simpleinjector.png" Pack="true" PackagePath=""/>
+    <None Include="..\Graphics\simpleinjector.png" Pack="true" PackagePath="" />
   </ItemGroup>
   
   <Target Name="PostcompileScript" AfterTargets="Build" Condition=" '$(IsCrossTargetingBuild)' != 'true' ">
