@@ -44,7 +44,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
                 "ServiceDependingOn<ILogger> contains the parameter with name 'dependency' and type " +
-                "ILogger that is not registered",
+                "ILogger, but ILogger is not registered",
                 action);
         }
 

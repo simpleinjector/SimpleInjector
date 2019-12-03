@@ -1561,7 +1561,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Please ensure ILogger is registered",
+                "For ILogger to be resolved, it must be registered in the container.",
                 action);
         }
 
@@ -1588,7 +1588,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Please ensure ILogger is registered",
+                "For ILogger to be resolved, it must be registered in the container",
                 action);
         }
 
@@ -1613,7 +1613,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Please ensure ILogger is registered",
+                "For ILogger to be resolved, it must be registered in the container.",
                 action);
         }
 
@@ -1640,7 +1640,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "Please ensure IUserRepository is registered",
+                "For IUserRepository to be resolved, it must be registered in the container",
                 action);
         }
 

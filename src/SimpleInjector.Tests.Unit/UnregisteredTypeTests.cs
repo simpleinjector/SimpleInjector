@@ -191,12 +191,11 @@
                     "The exception message should contain the missing constructor argument.");
 
                 AssertThat.ExceptionMessageContains(
-                    "Please ensure IUserRepository is registered",
+                    "For IUserRepository to be resolved, it must be registered in the container",
                     ex, "(1) The exception message should give a solution to solve the problem.");
 
                 AssertThat.ExceptionMessageContains(@"
-                    Please ensure IUserRepository is registered,
-                    or change the constructor of RealUserService"
+                    For IUserRepository to be resolved, it must be registered in the container"
                     .TrimInside(),
                     ex,
                     "(2) The exception message should give a solution to solve the problem.");
@@ -229,12 +228,11 @@
                     "The exception message should contain the missing constructor argument.");
 
                 AssertThat.ExceptionMessageContains(
-                    "Please ensure IUserRepository is registered",
+                    "For IUserRepository to be resolved, it must be registered in the container",
                     ex, "(1) The exception message should give a solution to solve the problem.");
 
                 AssertThat.ExceptionMessageContains(@"
-                    Please ensure IUserRepository is registered,
-                    or change the constructor of RealUserService"
+                    For IUserRepository to be resolved, it must be registered in the container"
                     .TrimInside(),
                     ex,
                     "(2) The exception message should give a solution to solve the problem.");

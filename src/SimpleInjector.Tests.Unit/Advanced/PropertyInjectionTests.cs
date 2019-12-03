@@ -56,8 +56,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                property with name 'Dependency' and type ITimeProvider that is not registered.
-                Please ensure ITimeProvider is registered"
+                property with name 'Dependency' and type ITimeProvider, but ITimeProvider is not registered.
+                For ITimeProvider to be resolved, it must be registered in the container"
                 .TrimInside(),
                 action);
         }

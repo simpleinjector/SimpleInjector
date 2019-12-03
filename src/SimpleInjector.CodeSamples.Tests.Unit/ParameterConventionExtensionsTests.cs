@@ -240,10 +240,10 @@
             }
             catch (ActivationException ex)
             {
-                AssertThat.StringContains("The constructor of type " +
-                    "ParameterConventionExtensionsTests.TypeWithAppSettingConstructorArgumentOfReferenceType " +
-                    "contains the parameter with name 'as1AppSetting' and type IDisposable that is not " +
-                    "registered.", ex.Message);
+                AssertThat.StringContains("The constructor of type ParameterConventionExtensionsTests" +
+                    ".TypeWithAppSettingConstructorArgumentOfReferenceType contains the parameter with " +
+                    "name 'as1AppSetting' and type IDisposable, but IDisposable is not registered.",
+                    ex.Message);
             }
         }
 

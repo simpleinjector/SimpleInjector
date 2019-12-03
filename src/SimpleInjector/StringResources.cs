@@ -285,11 +285,12 @@ namespace SimpleInjector
             Type[] lookalikes)
         {
             var formatString = target.Parameter != null
-                ? "The constructor of type {0} contains the parameter with name '{1}' and type {2} that " +
-                    "is not registered. Please ensure {2} is registered, or change the constructor of {0}." +
-                    "{3}"
-                : "Type {0} contains the property with name '{1}' and type {2} that is not registered. " +
-                    "Please ensure {2} is registered, or change {0}.{3}";
+                ? "The constructor of type {0} contains the parameter "
+                : "Type {0} contains the property ";
+
+            formatString +=
+                "with name '{1}' and type {2}, but {2} is not registered. " +
+                "For {2} to be resolved, it must be registered in the container.{3}";
 
             string extraInfo = string.Concat(
                 GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals),
@@ -381,9 +382,11 @@ namespace SimpleInjector
         internal static string ImplicitRegistrationCouldNotBeMadeForType(
             Container container, Type serviceType, bool containerHasRegistrations) =>
             Format(
-                "No registration for type {0} could be found and an implicit registration could not be " +
-                "made.{1}{2}",
+                "No registration for type {0} could be found. Make sure {0} is registered, for instance by " +
+                "calling '{1}'.{2}{3}",
                 serviceType.TypeName(),
+                nameof(Container) + "." + nameof(Container.Register) +
+                    "<" + serviceType.ToFriendlyName(fullyQualifiedName: false) + ">();",
                 NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(container, serviceType),
                 ContainerHasNoRegistrationsAddition(containerHasRegistrations));
 
@@ -1087,14 +1090,15 @@ namespace SimpleInjector
         private static string DidYouMeanToDependOnCollectionInstead(bool hasCollection, Type serviceType) =>
             hasCollection
                 ? Format(
-                    " There is, however, a registration for {0}; Did you mean to depend on {0}? If you " +
-                    "meant to depend on {1}, you should use one of the {3} overloads instead of using {2}." +
+                    " There is, however, a registration for a collection of {0} instances; Did you mean to " +
+                    "depend on {1} instead? If you meant to depend on {0}, you should use one of the {3} " +
+                    "overloads instead of using {2}. " +
                     "Please see https://simpleinjector.org/collections for more information about " +
                     "registering and resolving collections.",
-                    typeof(IEnumerable<>).MakeGenericType(serviceType).TypeName(),
                     serviceType.TypeName(),
+                    typeof(IEnumerable<>).MakeGenericType(serviceType).TypeName(),
                     CollectionsRegisterMethodName,
-                    nameof(Container.Register))
+                    nameof(Container) + "." + nameof(Container.Register))
                 : string.Empty;
 
         private static string NoteThatSkippedDecoratorsWereFound(Type serviceType, Type[] decorators) =>
@@ -1102,12 +1106,12 @@ namespace SimpleInjector
                 ? Format(
                     " Note that {0} {1} found as implementation of {2}, but {1} skipped during auto-" +
                     "registration by the container because {3} considered to be a decorator (because {4} " +
-                    "a cyclic reference to {5}).",
+                    "{2}).",
                     decorators.Select(TypeName).ToCommaSeparatedText(),
                     decorators.Length == 1 ? "was" : "were",
                     serviceType.GetGenericTypeDefinition().TypeName(),
-                    decorators.Length == 1 ? "it is" : "there are",
-                    decorators.Length == 1 ? "it contains" : "they contain",
+                    decorators.Length == 1 ? "it is" : "they are",
+                    decorators.Length == 1 ? "it references" : "they reference",
                     decorators.Length == 1 ? "itself" : "themselves")
                 : string.Empty;
 
@@ -1151,8 +1155,9 @@ namespace SimpleInjector
             Container container, Type serviceType) =>
             container.IsConcreteConstructableType(serviceType)
                 && !container.Options.ResolveUnregisteredConcreteTypes
-                ? " Note that the container's Options.ResolveUnregisteredConcreteTypes option is set " +
-                  "to 'false'. This disallows the container to construct this unregistered concrete type."
+                ? " An implicit registration could not be made because the container's " +
+                    "Options.ResolveUnregisteredConcreteTypes option is set to 'false'. " +
+                    "This disallows the container to construct this unregistered concrete type."
                 : string.Empty;
 
         private static string BuildAssemblyLocationMessage(Type serviceType, Type duplicateAssemblyLookalike)

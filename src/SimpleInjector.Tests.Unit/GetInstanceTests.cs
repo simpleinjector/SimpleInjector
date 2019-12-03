@@ -34,7 +34,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 The constructor of type ServiceWithUnregisteredDependencies contains the parameter with name
-                'a' and type IDisposable that is not registered."
+                'a' and type IDisposable, but IDisposable is not registered."
                 .TrimInside(),
                 action);
         }
@@ -51,7 +51,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 The constructor of type ServiceWithUnregisteredDependencies contains the parameter
-                with name 'a' and type IDisposable that is not registered."
+                with name 'a' and type IDisposable, but IDisposable is not registered."
                 .TrimInside(),
                 action);
         }
@@ -68,7 +68,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 The constructor of type ServiceWithUnregisteredDependencies contains the parameter
-                with name 'a' and type IDisposable that is not registered."
+                with name 'a' and type IDisposable, but IDisposable is not registered."
                 .TrimInside(),
                 action);
         }
@@ -366,10 +366,11 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                There is, however, a registration for IEnumerable<ILogger>;
-                Did you mean to depend on IEnumerable<ILogger>?
+                There is, however, a registration for a collection of ILogger instances;
+                Did you mean to depend on IEnumerable<ILogger> instead?
                 If you meant to depend on ILogger,
-                you should use one of the Register overloads instead of using Container.Collection.Register"
+                you should use one of the Container.Register overloads instead of using 
+                Container.Collection.Register"
                 .TrimInside(),
                 action);
         }

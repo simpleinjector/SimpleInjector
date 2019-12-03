@@ -626,10 +626,11 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                No registration for type ConcreteCommand could be found and an implicit registration
-                could not be made. Note that the container's Options.ResolveUnregisteredConcreteTypes
-                option is set to 'false'. This disallows the container to construct this unregistered
-                concrete type."
+                No registration for type ConcreteCommand could be found. Make sure ConcreteCommand is 
+                registered, for instance by calling 'Container.Register<ConcreteCommand>();'.
+                An implicit registration could not be made because the container's 
+                Options.ResolveUnregisteredConcreteTypes option is set to 'false'.
+                This disallows the container to construct this unregistered concrete type."
                 .TrimInside(),
                 action);
         }
@@ -649,9 +650,9 @@ namespace SimpleInjector.Tests.Unit
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 The constructor of type ServiceDependingOn<ConcreteCommand> contains
-                the parameter with name 'dependency' and type ConcreteCommand that is not
-                registered. Please ensure ConcreteCommand is registered, or change the constructor of
-                ServiceDependingOn<ConcreteCommand>. Note that the container's
+                the parameter with name 'dependency' and type ConcreteCommand, but ConcreteCommand is not
+                registered. For ConcreteCommand to be resolved, it must be registered in the container.
+                An implicit registration could not be made because the container's
                 Options.ResolveUnregisteredConcreteTypes option is set to 'false'. This disallows the
                 container to construct this unregistered concrete type."
                 .TrimInside(),
@@ -707,7 +708,7 @@ namespace SimpleInjector.Tests.Unit
             // Act
             container.GetInstance<ServiceDependingOn<ConcreteCommand>>();
         }
-        
+
         [TestMethod]
         public void ResolveUnregisteredConcreteTypes_SetToFalseWithUnregisteredTypeHandlingType_DoesAllowUnregisteredConcreteDependenciesToBeResolved()
         {
@@ -729,7 +730,7 @@ namespace SimpleInjector.Tests.Unit
             // Act
             container.GetInstance<ServiceDependingOn<ConcreteCommand>>();
         }
-        
+
         public class CompositeService<T> where T : struct
         {
             public CompositeService(Nullable<T>[] dependencies)

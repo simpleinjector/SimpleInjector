@@ -690,7 +690,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 The constructor of type DefaultStuffDoer<Boolean> contains the parameter with name 'service'
-                and type IService<Boolean, Int32> that is not registered."
+                and type IService<Boolean, Int32>, but IService<Boolean, Int32> is not registered."
                 .TrimInside(),
                 action);
         }
@@ -716,7 +716,8 @@
             {
                 AssertThat.StringContains(@"
                     The constructor of type DefaultStuffDoer<Boolean> contains the parameter
-                    with name 'service' and type IService<Boolean, Int32> that is not registered."
+                    with name 'service' and type IService<Boolean, Int32>, but IService<Boolean, Int32> is 
+                    not registered."
                     .TrimInside(),
                     ex.Message);
             }

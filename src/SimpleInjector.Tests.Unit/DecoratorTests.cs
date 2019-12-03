@@ -1154,8 +1154,8 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 The constructor of type LoggingHandlerDecorator1<RealCommand>
-                contains the parameter with name 'logger' and type ILogger that is
-                not registered.".TrimInside(),
+                contains the parameter with name 'logger' and type ILogger, but ILogger is not registered."
+                .TrimInside(),
                 action);
         }
 

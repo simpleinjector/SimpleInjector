@@ -125,7 +125,7 @@
                 action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "ILogger that is not registered",
+                "ILogger is not registered",
                 action);
         }
 

@@ -579,10 +579,10 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 The constructor of type ServiceWithDependency<ILogger> contains the parameter with name
-                'dependency' and type ILogger that is not registered. Please ensure ILogger is registered, or
-                change the constructor of ServiceWithDependency<ILogger>. 1 conditional registration for ILogger
-                exists, but its supplied predicate didn't return true when provided with the contextual
-                information for ServiceWithDependency<ILogger>."
+                'dependency' and type ILogger, but ILogger is not registered. For ILogger to be resolved, it
+                must be registered in the container.
+                1 conditional registration for ILogger exists, but its supplied predicate didn't return true 
+                when provided with the contextual information for ServiceWithDependency<ILogger>."
                 .TrimInside(),
                 action);
         }
@@ -603,7 +603,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 The constructor of type ServiceWithDependency<IGeneric<Int32>> contains the parameter with
-                name 'dependency' and type IGeneric<Int32> that is not registered."
+                name 'dependency' and type IGeneric<Int32>, but IGeneric<Int32> is not registered."
                 .TrimInside(),
                 action);
 
@@ -806,7 +806,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 The constructor of type PluginWithDependency<ILogger> contains the parameter with name
-                'dependency' and type ILogger that is not registered."
+                'dependency' and type ILogger, but ILogger is not registered."
                 .TrimInside(),
                 action);
         }
