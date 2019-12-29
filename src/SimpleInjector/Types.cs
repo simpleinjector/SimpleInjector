@@ -189,6 +189,17 @@ namespace SimpleInjector
 
             return false;
         }
+        
+        // Find all 'protected virtual void Dispose(bool)' methods for type and its base types.
+        internal static IEnumerable<MethodInfo> GetProtectedVirtualDisposeMethodsInTypeHierarchy(Type type) =>
+            from t in type.GetTypeAndBaseTypes()
+            from method in t.DeclaredMethods()
+            where !method.IsPrivate && !method.IsPublic
+            where method.IsVirtual
+            where method.ReturnType == typeof(void)
+            where method.Name == nameof(IDisposable.Dispose)
+            where method.GetParameters().Length == 1 && method.GetParameters()[0].ParameterType == typeof(bool)
+            select method;
 
         // Example: when implementation implements IComparable<int> and IComparable<double>, the method will
         // return typeof(IComparable<int>) and typeof(IComparable<double>) when serviceType is
@@ -208,7 +219,13 @@ namespace SimpleInjector
             return thisType.Concat(type.GetBaseTypesAndInterfaces());
         }
 
-        private static IEnumerable<Type> GetBaseTypes(this Type type)
+        internal static IEnumerable<Type> GetTypeAndBaseTypes(this Type type)
+        {
+            var thisType = new[] { type };
+            return thisType.Concat(type.GetBaseTypes());
+        }
+
+        internal static IEnumerable<Type> GetBaseTypes(this Type type)
         {
             Type? baseType = type.BaseType() ?? (type != typeof(object) ? typeof(object) : null);
 

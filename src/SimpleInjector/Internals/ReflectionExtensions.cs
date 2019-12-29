@@ -11,6 +11,8 @@ namespace SimpleInjector
     internal static class ReflectionExtensions
     {
 #if NET40 || NET45
+        public static IEnumerable<MethodInfo> DeclaredMethods(this Type type) =>
+            type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static  | BindingFlags.DeclaredOnly);
         public static bool IsGenericType(this Type type) => type.IsGenericType;
         public static bool IsValueType(this Type type) => type.IsValueType;
         public static bool IsAbstract(this Type type) => type.IsAbstract;
@@ -43,6 +45,7 @@ namespace SimpleInjector
             : type.GetTypeInfo().GenericTypeArguments;
 
         public static MethodInfo GetMethod(this Type type, string name) => type.GetTypeInfo().DeclaredMethods.Single(m => m.Name == name);
+        public static IEnumerable<MethodInfo> DeclaredMethods(this Type type) => type.GetTypeInfo().DeclaredMethods;
         public static Type[] GetTypes(this Assembly assembly) => assembly.DefinedTypes.Select(i => i.AsType()).ToArray();
         public static MemberInfo[] GetMember(this Type type, string name) => type.GetTypeInfo().DeclaredMembers.Where(m => m.Name == name).ToArray();
         public static Type[] GetInterfaces(this Type type) => type.GetTypeInfo().ImplementedInterfaces.ToArray();

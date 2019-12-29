@@ -7,9 +7,11 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics;
 
     /// <summary>
     /// Delegate that allows intercepting calls to <see cref="Container.GetInstance"/> and
@@ -109,7 +111,7 @@ namespace SimpleInjector
                 this.containerLocking -= value;
             }
         }
-        
+
         /// <summary>
         /// Gets the container to which this <b>ContainerOptions</b> instance belongs to.
         /// </summary>
@@ -141,7 +143,7 @@ namespace SimpleInjector
         /// </summary>
         /// <value>The value indicating whether the container should automatically trigger verification.</value>
         public bool EnableAutoVerification { get; set; }
-        
+
         /// <summary>Gets or sets a value indicating whether.
         /// This method is deprecated. Changing its value will have no effect.</summary>
         /// <value>The value indicating whether the container will return an empty collection.</value>
@@ -374,6 +376,8 @@ namespace SimpleInjector
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal Action<Expression> ExpressionCompiling { get; set; } = _ => { };
 
+        internal HashSet<Type> SuppressedDisposableBaseTypes { get; } = new HashSet<Type>();
+
         /// <summary>
         /// Registers an <see cref="ResolveInterceptor"/> delegate that allows intercepting calls to
         /// <see cref="SimpleInjector.Container.GetInstance">GetInstance</see> and
@@ -426,6 +430,101 @@ namespace SimpleInjector
             this.Container.ThrowWhenContainerIsLockedOrDisposed();
 
             this.Container.RegisterResolveInterceptor(interceptor, predicate);
+        }
+
+        /// <summary>
+        /// Suppresses the <see cref="DiagnosticType.DisposableTransientComponent"/> on all types that derive
+        /// from the supplied <paramref name="baseType"/> in case the derived type does not override the
+        /// 'protected virtual void Dispose(bool)' method that is defined on the base type.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Framework base classes sometimes implement <see cref="IDisposable"/> and implement a 'protected
+        /// virtual void Dispose(bool)' method for application developers to override, while leaving the base
+        /// class's default implementation empty. Frameworks such as MVC and SignalR apply this design.
+        /// </para>
+        /// <para>
+        /// This design, however, causes a problem when derivates are registered with Simple Injector, because
+        /// Simple Injector does not disposes of transient components. This causes Simple Injector's
+        /// diagnostics to warn about the registration of this undisposed (see https://simpleinjector.org/diadt)
+        /// transient component. In practice, however, not disposing the component only causes a problem in
+        /// case the application developer overrides Dispose(bool) in the derived type, as the base Dispose
+        /// operation is a no-op.
+        /// </para>
+        /// <para>
+        /// This <see cref="SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom"/> method
+        /// exists to mitigate this problem. It suppresses the warning on derivatives that do not override
+        /// <c>Dispose</c> from the base class.
+        /// </para>
+        /// </remarks>
+        /// <param name="baseType">The base type that defines a 'protected virtual void Dispose' method.</param>
+        /// <example>
+        /// The following example shows the usage of the
+        /// <see cref="SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom" /> method:
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        ///
+        /// container.Options
+        ///     .SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom(
+        ///         typeof(Controller));
+        ///
+        /// container.Register<HomeController>(Lifestyle.Transient);
+        /// container.Register<UserController>(Lifestyle.Transient);
+        ///
+        /// container.Verify();
+        /// ]]></code>
+        /// In this example, <c>HomeController</c> and <c>UserController</c> derive from <c>Controller</c>,
+        /// which is defined as follows:
+        /// <code lang="cs"><![CDATA[
+        /// public abstract class Controller : IDisposable
+        /// {
+        ///     public void Dispose() => this.Dispose(true);
+        ///     protected virtual void Dispose(bool disposing) { } // empty
+        /// }
+        /// ]]></code>
+        /// Because <c>HomeController</c> and <c>UserController</c> implement <c>IDisposable</c> (by inheriting
+        /// from <c>Controller</c>), a call to <see cref="Container.Verify()"/> would typically cause a
+        /// diagnostic warning to be thrown, explaining that "HomeController is registered as transient, but 
+        /// implements IDisposable." Because of the call to 
+        /// <see cref="SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom"/>, however, that
+        /// warning is suppressed.
+        /// </example>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="baseType"/> is a null reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="baseType"/> is not a class,
+        /// does not implement <see cref="IDisposable"/>, or does not have a method named <i>Dispose</i> with
+        /// the following signature: <c>protected virtual void Dispose(bool)</c>.</exception>
+        /// <exception cref="ObjectDisposedException">Thrown when the container is disposed.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
+        public void SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom(Type baseType)
+        {
+            Requires.IsNotNull(baseType, nameof(baseType));
+
+            this.Container.ThrowWhenContainerIsLockedOrDisposed();
+
+            if (!this.SuppressedDisposableBaseTypes.Contains(baseType))
+            {
+                if (!baseType.IsClass())
+                {
+                    throw new ArgumentException("The supplied type must be a class.", nameof(baseType));
+                }
+
+                if (!typeof(IDisposable).IsAssignableFrom(baseType))
+                {
+                    throw new ArgumentException(
+                        "The supplied type must implement IDisposable.", nameof(baseType));
+                }
+
+                if (!Types.GetProtectedVirtualDisposeMethodsInTypeHierarchy(baseType).Any())
+                {
+                    throw new ArgumentException(
+                        "The supplied type must have a method defined with the signature " +
+                        "'protected virtual void Dispose(bool)'.",
+                        nameof(baseType));
+                }
+
+                this.SuppressedDisposableBaseTypes.Add(baseType);
+            }
         }
 
         /// <summary>Returns a string that represents the current object.</summary>

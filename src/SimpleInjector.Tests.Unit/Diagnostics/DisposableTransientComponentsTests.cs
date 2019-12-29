@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
+    using System;
     using System.Linq;
     using Lifestyles;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -130,7 +131,89 @@
             Assert.AreEqual(0, results.Length, Actual(results));
         }
 
+        [TestMethod]
+        public void Analyze_WithBaseTypeSuppressionAndTypesDontOverrideDispose_NoWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom(
+                typeof(DisposableBaseClass));
+
+            container.Register<DerivedClassWithoutOverriddenDispose>();
+            container.Register<DerivedClassWithoutOverriddenDispose2>();
+
+            // Act
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void Analyze_WithBaseTypeSuppressionIndirectBaseTypeAndTypesDontOverrideDispose_NoWarning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom(
+                typeof(DisposableDerivedBaseClass));
+
+            container.Register<DerivedClassWithoutOverriddenDispose2>();
+
+            // Act
+            container.Verify();
+        }
+        
+        [TestMethod]
+        public void Analyze_WithSuppressionButTypesDoOverrideDispose_2Warnings()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom(
+                typeof(DisposableBaseClass));
+
+            container.Register<DerivedClassWithOverriddenDispose>();
+            container.Register<DerivedClassWithOverriddenDispose2>();
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<DisposableTransientComponentDiagnosticResult>()
+                .ToArray();
+
+            // Assert
+            Assert.AreEqual(2, results.Length, Actual(results));
+        }
+
         private static string Actual(DisposableTransientComponentDiagnosticResult[] results) =>
             "actual: " + string.Join(" - ", results.Select(r => r.Description));
+
+        public class DisposableBaseClass : IDisposable
+        {
+            public void Dispose()
+            {
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+            }
+        }
+
+        public class DisposableDerivedBaseClass : DisposableBaseClass { }
+        public class DerivedClassWithoutOverriddenDispose : DisposableBaseClass { }
+        public class DerivedClassWithoutOverriddenDispose2 : DisposableDerivedBaseClass { }
+        
+        public class DerivedClassWithOverriddenDispose : DisposableBaseClass
+        {
+            protected override void Dispose(bool disposing)
+            {
+            }
+        }
+
+        public class DerivedClassWithOverriddenDispose2 : DisposableDerivedBaseClass
+        {
+            protected override void Dispose(bool disposing)
+            {
+            }
+        }
     }
 }

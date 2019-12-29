@@ -31,6 +31,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 where registration.Lifestyle == Lifestyle.Transient
                 where typeof(IDisposable).IsAssignableFrom(registration.ImplementationType)
                 where registration.ShouldNotBeSuppressed(this.DiagnosticType)
+                where !CanSuppressForSuppressionBaseTypes(producer)
                 select producer;
 
             var results =
@@ -39,6 +40,29 @@ namespace SimpleInjector.Diagnostics.Analyzers
                     producer.ServiceType, producer, BuildDescription(producer));
 
             return results.ToArray();
+        }
+
+        private static bool CanSuppressForSuppressionBaseTypes(InstanceProducer producer)
+        {
+            var baseTypes = producer.Container.Options.SuppressedDisposableBaseTypes;
+            var implementationType = producer.Registration.ImplementationType;
+
+            return baseTypes.Any(baseType => CanSuppressForBaseType(implementationType, baseType));
+        }
+
+        private static bool CanSuppressForBaseType(Type implementationType, Type baseType)
+        {
+            if (implementationType.GetBaseTypes().Contains(baseType))
+            {
+                var protectedVirtualDisposeMethodDefinedInDerivedHierarchy =
+                    from method in Types.GetProtectedVirtualDisposeMethodsInTypeHierarchy(implementationType)
+                    where !baseType.GetTypeAndBaseTypes().Contains(method.DeclaringType)
+                    select method;
+
+                return !protectedVirtualDisposeMethodDefinedInDerivedHierarchy.Any();
+            }
+
+            return false;
         }
 
         private static string BuildDescription(InstanceProducer producer) =>

@@ -969,6 +969,102 @@
                 action);
         }
 
+        [TestMethod]
+        public void SuppressDisposable_NullArgument_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            Action action = () => container.Options
+                .SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom(null);
+
+            // Assert
+            AssertThat.Throws<ArgumentNullException>(action);
+        }
+        
+        [TestMethod]
+        public void SuppressDisposable_OnDisposedContainer_ThrowsObjectDisposedException()
+        {
+            // Arrange
+            var container = new Container();
+            container.Dispose();
+
+            // Act
+            Action action = () => container.Options
+                .SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom(
+                    typeof(DisposePatternImplementation));
+
+            // Assert
+            AssertThat.Throws<ObjectDisposedException>(action);
+        }
+
+        [TestMethod]
+        public void SuppressDisposable_OnLockedContainer_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var container = new Container();
+            container.GetInstance<NullLogger>();
+
+            // Act
+            Action action = () => container.Options
+                .SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom(
+                    typeof(DisposePatternImplementation));
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
+        }
+
+        [TestMethod]
+        public void SuppressDisposable_SuppliedWithInterface_ThrowsExpectedMessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            Action action = () => container.Options
+                .SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom(typeof(IDisposable));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type must be a class.",
+                action);
+        }
+
+        [TestMethod]
+        public void SuppressDisposable_SuppliedWithTypeThatNotImplementsIDisposable_ThrowsExpectedMessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            Action action = () => container.Options
+                .SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom(typeof(object));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type must implement IDisposable.",
+                action);
+        }
+
+        [TestMethod]
+        public void SuppressDisposable_SuppliedWithTypeNotImplementingTheDisposePattern_ThrowsExpectedMessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            // Act
+            Action action = () => container.Options
+                .SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom(
+                    typeof(NotImplementingTheDisposePattern));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "The supplied type must have a method defined with the " +
+                "signature 'protected virtual void Dispose(bool)'.",
+                action);
+        }
+
         private static PropertyInfo GetProperty<T>(Expression<Func<T, object>> propertySelector)
         {
             var body = (MemberExpression)propertySelector.Body;
@@ -1024,6 +1120,26 @@
             public Lifestyle SelectLifestyle(Type implementationType)
             {
                 throw new NotImplementedException();
+            }
+        }
+
+        // Does not implement the Disposable pattern
+        public sealed class NotImplementingTheDisposePattern : IDisposable
+        {
+            public void Dispose()
+            {
+            }
+        }
+
+        // Implements the Dispose pattern using the protected virtual void Dispose(bool) method.
+        public abstract class DisposePatternImplementation : IDisposable
+        {
+            public void Dispose()
+            {
+            }
+
+            protected virtual void Dispose(bool disposing) 
+            {
             }
         }
     }
