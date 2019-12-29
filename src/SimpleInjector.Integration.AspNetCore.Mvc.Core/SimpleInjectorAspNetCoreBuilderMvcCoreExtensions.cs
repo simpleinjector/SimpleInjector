@@ -7,13 +7,11 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using System.Reflection;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ApplicationParts;
     using Microsoft.AspNetCore.Mvc.Controllers;
     using Microsoft.AspNetCore.Mvc.ViewComponents;
     using Microsoft.Extensions.DependencyInjection;
-    using SimpleInjector.Diagnostics;
     using SimpleInjector.Integration.AspNetCore;
     using SimpleInjector.Integration.AspNetCore.Mvc;
 
@@ -117,50 +115,13 @@ namespace SimpleInjector
 
         private static void RegisterControllerTypes(this Container container, IEnumerable<Type> types)
         {
+            container.Options
+                .SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom(typeof(Controller));
+
             foreach (Type type in types.ToArray())
             {
-                var registration = CreateConcreteRegistration(container, type);
-
-                // Microsoft.AspNetCore.Mvc.Controller implements IDisposable (which is a design flaw).
-                // This will cause false positives in Simple Injector's diagnostic services, so we suppress
-                // this warning in case the registered type doesn't override Dispose from Controller.
-                if (ShouldSuppressDisposingControllers(type))
-                {
-                    registration.SuppressDiagnosticWarning(
-                        DiagnosticType.DisposableTransientComponent,
-                            "Derived type doesn't override Dispose, so it can be safely ignored.");
-                }
-
-                container.AddRegistration(type, registration);
+                container.Register(type);
             }
-        }
-
-        // The user should be warned when he implements IDisposable on a non-controller derivative,
-        // and otherwise only if he has overridden Controller.Dispose(bool).
-        private static bool ShouldSuppressDisposingControllers(Type controllerType) =>
-            TypeInheritsFromController(controllerType)
-                && GetProtectedDisposeMethod(controllerType)?.DeclaringType == typeof(Controller);
-
-        private static bool TypeInheritsFromController(Type controllerType) =>
-            typeof(Controller).GetTypeInfo().IsAssignableFrom(controllerType);
-
-        private static MethodInfo? GetProtectedDisposeMethod(Type controllerType)
-        {
-            foreach (var method in controllerType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
-            {
-                // if method == 'protected void Dispose(bool)'
-                if (!method.IsPrivate
-                    && !method.IsPublic
-                    && method.ReturnType == typeof(void)
-                    && method.Name == "Dispose"
-                    && method.GetParameters().Length == 1
-                    && method.GetParameters()[0].ParameterType == typeof(bool))
-                {
-                    return method;
-                }
-            }
-
-            return null;
         }
 
         private static void RegisterViewComponentTypes(SimpleInjectorAspNetCoreBuilder builder)
@@ -177,13 +138,8 @@ namespace SimpleInjector
 
             foreach (Type type in viewComponentTypes.ToArray())
             {
-                container.AddRegistration(type, CreateConcreteRegistration(container, type));
+                container.Register(type);
             }
         }
-
-        private static Registration CreateConcreteRegistration(Container container, Type concreteType) =>
-            container.Options.LifestyleSelectionBehavior
-                .SelectLifestyle(concreteType)
-                .CreateRegistration(concreteType, container);
     }
 }

@@ -139,21 +139,12 @@ namespace SimpleInjector
 
         private static void RegisterControllerTypes(this Container container, IEnumerable<Type> types)
         {
+            container.Options
+                .SuppressDisposableTransientVerificationWhenDisposeIsNotOverriddenFrom(typeof(Controller));
+
             foreach (Type type in types.ToArray())
             {
-                var registration = CreateConcreteRegistration(container, type);
-
-                // Microsoft.AspNetCore.Mvc.Controller implements IDisposable (which is a design flaw).
-                // This will cause false positives in Simple Injector's diagnostic services, so we suppress
-                // this warning in case the registered type doesn't override Dispose from Controller.
-                if (ShouldSuppressDisposableTransientComponent(type))
-                {
-                    registration.SuppressDiagnosticWarning(
-                        DiagnosticType.DisposableTransientComponent,
-                            "Derived type doesn't override Dispose, so it can be safely ignored.");
-                }
-
-                container.AddRegistration(type, registration);
+                container.Register(type);
             }
         }
 
@@ -170,35 +161,6 @@ namespace SimpleInjector
             var lifestyle = container.Options.LifestyleSelectionBehavior.SelectLifestyle(concreteType);
 
             return lifestyle.CreateRegistration(concreteType, container);
-        }
-
-        // The user should be warned when he implements IDisposable on a non-controller derivative,
-        // and otherwise only if he has overridden Controller.Dispose(bool).
-        private static bool ShouldSuppressDisposableTransientComponent(Type controllerType) =>
-            TypeInheritsFromController(controllerType)
-                ? GetProtectedDisposeMethod(controllerType)?.DeclaringType == typeof(Controller)
-                : false;
-
-        private static bool TypeInheritsFromController(Type controllerType) =>
-            typeof(Controller).GetTypeInfo().IsAssignableFrom(controllerType);
-
-        private static MethodInfo? GetProtectedDisposeMethod(Type controllerType)
-        {
-            foreach (var method in controllerType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
-            {
-                // if method == 'protected void Dispose(bool)'
-                if (
-                    !method.IsPrivate && !method.IsPublic
-                    && method.ReturnType == typeof(void)
-                    && method.Name == "Dispose"
-                    && method.GetParameters().Length == 1
-                    && method.GetParameters()[0].ParameterType == typeof(bool))
-                {
-                    return method;
-                }
-            }
-
-            return null;
         }
     }
 }
