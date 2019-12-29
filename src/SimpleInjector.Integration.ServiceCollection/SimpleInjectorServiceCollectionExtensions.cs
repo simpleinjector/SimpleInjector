@@ -9,6 +9,7 @@ namespace SimpleInjector
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Localization;
     using Microsoft.Extensions.Logging;
@@ -76,6 +77,11 @@ namespace SimpleInjector
             if (options.AutoCrossWireFrameworkComponents)
             {
                 AddAutoCrossWiring(options);
+            }
+
+            if (options.DisposeContainerWithServiceProvider)
+            {
+                AddContainerDisposalOnShutdown(services, options);
             }
 
             return services;
@@ -597,6 +603,33 @@ namespace SimpleInjector
             };
         }
 
+        // Note about implementation: We could have used the ASP.NET Core IApplicationLifetime or
+        // IHostApplicationLifetime for this as well, but there are a few downsides to this:
+        // * IApplicationLifetime is obsolete
+        // * IHostApplicationLifetime is only available for ASP.NET Core >= 3.0
+        // * This requires ASP.NET Core, so this is less generic and couldn't be implemented in this library.
+        // * It required much more research and testing to get right.
+        private static void AddContainerDisposalOnShutdown(
+            IServiceCollection services, SimpleInjectorAddOptions options)
+        {
+            services.TryAddSingleton(options.Container);
+
+            // This wrapper implements disposable and allows the container to be disposed of when
+            // IServiceProvider is disposed of. Just like Simple Injector, however, MS.DI will only
+            // dispose of instances that are registered using this overload (not using AddSingleton<T>(T)).
+            services.AddSingleton<ContainerDisposeWrapper>();
+
+            options.Container.Options.ContainerLocking += (_, __) =>
+            {
+                // If there's no IServiceProvider, the property will throw, which is something we want to do
+                // at this point, not later on, when an unregistered type is resolved.
+                IServiceProvider provider = options.ApplicationServices;
+
+                // In order for the wrapper to get disposed of, it needs to be resolved once.
+                provider.GetRequiredService<ContainerDisposeWrapper>();
+            };
+        }
+
         private static Lifestyle DetermineLifestyle(Type serviceType, IServiceCollection services)
         {
             var descriptor = FindServiceDescriptor(services, serviceType);
@@ -770,6 +803,15 @@ namespace SimpleInjector
         {
             public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
             public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        }
+
+        private sealed class ContainerDisposeWrapper : IDisposable
+        {
+            private readonly Container container;
+
+            public ContainerDisposeWrapper(Container container) => this.container = container;
+            
+            public void Dispose() => this.container.Dispose();
         }
     }
 }
