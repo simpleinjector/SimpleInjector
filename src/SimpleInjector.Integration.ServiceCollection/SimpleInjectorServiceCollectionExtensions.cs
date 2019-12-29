@@ -9,6 +9,7 @@ namespace SimpleInjector
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Localization;
     using Microsoft.Extensions.Logging;
@@ -59,6 +60,11 @@ namespace SimpleInjector
                 services,
                 container,
                 new DefaultServiceProviderAccessor(container));
+
+            // Add the container; this simplifies registration of types that depend on the container, but need
+            // to be constructed by MS.DI (such as generic activators). Those registrations don't need to add
+            // the container themselves.
+            services.TryAddSingleton(container);
 
             // This stores the options, which includes the IServiceCollection. IServiceCollection is required
             // when calling UseSimpleInjector to enable auto cross wiring.
