@@ -38,7 +38,7 @@ namespace SimpleInjector
         [Obsolete(
             "Please use " + nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions) + "." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions.AddTagHelperActivation) + " instead—e.g. " +
-            "'services.AddSimpleInjector(container, options => options." +
+            "'services.AddSimpleInjector(container, options => options.AddAspNetCore()." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions.AddTagHelperActivation) + "());'. " +
             "Please see https://simpleinjector.org/aspnetcore for more details. " +
             "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
@@ -81,7 +81,7 @@ namespace SimpleInjector
         [Obsolete(
             "Please use " + nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions) + "." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions.AddPageModelActivation) + " instead—e.g. " +
-            "'services.AddSimpleInjector(container, options => options." +
+            "'services.AddSimpleInjector(container, options => options.AddAspNetCore()." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions.AddPageModelActivation) + "());'. " +
             "Please see https://simpleinjector.org/aspnetcore for more details. " +
             "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
