@@ -109,7 +109,7 @@ namespace SimpleInjector
                 this.containerLocking -= value;
             }
         }
-        
+
         /// <summary>
         /// Gets the container to which this <b>ContainerOptions</b> instance belongs to.
         /// </summary>
@@ -134,6 +134,23 @@ namespace SimpleInjector
         public bool SuppressLifestyleMismatchVerification { get; set; }
 
         /// <summary>
+        /// <para>
+        /// Gets or sets a value indicating whether the container should use a loosened (i.e. less strict)
+        /// behavior for detecting lifestyle mismatches (see: https://simpleinjector.org/dialm). In short,
+        /// when <see cref="UseLoosenedLifestyleMismatchBehavior"/> is set to <b>true</b>
+        /// <see cref="Lifestyle.Transient"/> dependencies are allowed to be injected into
+        /// <see cref="Lifestyle.Scoped"/> components. When disabled, a warning would be given in that case.
+        /// </para>
+        /// <para>
+        /// Simple Injector allows custom lifestyles to be created and this loosened behavior works on custom
+        /// lifestyles as well. The loosened behavior will ignore any lifestyle mismatch checks on any
+        /// component with a lifestyle that has a <see cref="Lifestyle.Length"/> that is equal or shorter than
+        /// the length of <see cref="Lifestyle.Scoped"/>.
+        /// </para>
+        /// </summary>
+        public bool UseLoosenedLifestyleMismatchBehavior { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the container should automatically trigger verification
         /// and diagnostics of its configuration when the first service is resolved (e.g. the first call to
         /// GetInstance). The behavior is identical to calling <see cref="Container.Verify()">Verify()</see>
@@ -141,7 +158,7 @@ namespace SimpleInjector
         /// </summary>
         /// <value>The value indicating whether the container should automatically trigger verification.</value>
         public bool EnableAutoVerification { get; set; }
-        
+
         /// <summary>Gets or sets a value indicating whether.
         /// This method is deprecated. Changing its value will have no effect.</summary>
         /// <value>The value indicating whether the container will return an empty collection.</value>

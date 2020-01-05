@@ -3,6 +3,7 @@
     using System;
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Tests.Unit;
@@ -154,7 +155,20 @@
         }
 
         [TestMethod]
-        public void DependencyHasPossibleLifestyleMismatch_WcfOperationeToTransient_ReportsMismatch()
+        public void DependencyHasPossibleLifestyleMismatch_LifetimeScopeToTransientWithLoosenedBehavior_ReportsNoMismatch()
+        {
+            // Arrange
+            var dependency = CreateRelationship(parent: Lifestyles.LifetimeScope, child: Lifestyle.Transient);
+
+            // Act
+            bool result = HasPossibleLifestyleMismatch(dependency, useLoosenedLifestyleMismatchBehavior: true);
+
+            // Assert
+            Assert.IsFalse(result, "UseLoosenedLifestyleMismatchBehavior = true should have suppressed this.");
+        }
+
+        [TestMethod]
+        public void DependencyHasPossibleLifestyleMismatch_WcfOperationToTransient_ReportsMismatch()
         {
             // Arrange
             var dependency = CreateRelationship(parent: Lifestyles.WcfOperation, child: Lifestyle.Transient);
@@ -164,6 +178,19 @@
 
             // Assert
             Assert.IsTrue(result, "Services can not depend on a dependency with a shorter lifestyle.");
+        }
+
+        [TestMethod]
+        public void DependencyHasPossibleLifestyleMismatch_WcfOperationToTransientWithLoosenedMode_ReportsNoMismatch()
+        {
+            // Arrange
+            var dependency = CreateRelationship(parent: Lifestyles.WcfOperation, child: Lifestyle.Transient);
+
+            // Act
+            bool result = HasPossibleLifestyleMismatch(dependency, useLoosenedLifestyleMismatchBehavior: true);
+
+            // Assert
+            Assert.IsFalse(result, "Scoped components can safely depend on anything in loosened mode.");
         }
 
         [TestMethod]
@@ -243,6 +270,33 @@
             // Assert
             Assert.IsTrue(result, "A lifestyle longer than transient can not safely depend on an unknown " +
                 "lifestyle, since this unknown lifestyle could act like a transient.");
+        }
+
+        [TestMethod]
+        public void DependencyHasPossibleLifestyleMismatch_SingletonToUnknownWithLoosenedBehavior_ReportsMismatch()
+        {
+            // Arrange
+            var dependency = CreateRelationship(parent: Lifestyle.Singleton, child: Lifestyle.Unknown);
+
+            // Act
+            bool result = HasPossibleLifestyleMismatch(dependency, useLoosenedLifestyleMismatchBehavior: true);
+
+            // Assert
+            Assert.IsTrue(result, "A singleton can not safely depend on an unknown " +
+                "lifestyle, even in loosened mode, since this unknown lifestyle could act like a transient.");
+        }
+
+        [TestMethod]
+        public void DependencyHasPossibleLifestyleMismatch_LifetimeScopeToUnknownWithLoosenedBehavior_ReportsMismatch()
+        {
+            // Arrange
+            var dependency = CreateRelationship(parent: Lifestyles.LifetimeScope, child: Lifestyle.Unknown);
+
+            // Act
+            bool result = HasPossibleLifestyleMismatch(dependency, useLoosenedLifestyleMismatchBehavior: true);
+
+            // Assert
+            Assert.IsFalse(result, "A scoped lifestyle can safely depend on anything in loosened mode.");
         }
 
         [TestMethod]
@@ -419,8 +473,24 @@
                 dependency:
                     new InstanceProducer(typeof(IDisposable), new DummyRegistration<IDisposable>(child)));
 
-        private static bool HasPossibleLifestyleMismatch(KnownRelationship dependency) =>
-            LifestyleMismatchChecker.HasLifestyleMismatch(new Container(), dependency);
+        private static bool HasPossibleLifestyleMismatch(
+            KnownRelationship dependency, bool? useLoosenedLifestyleMismatchBehavior = null) =>
+            LifestyleMismatchChecker.HasLifestyleMismatch(
+                CreateContainer(useLoosenedLifestyleMismatchBehavior),
+                dependency);
+
+        private static Container CreateContainer(bool? useLoosenedLifestyleMismatchBehavior)
+        {
+            var container = new Container();
+
+            if (useLoosenedLifestyleMismatchBehavior != null)
+            {
+                container.Options.UseLoosenedLifestyleMismatchBehavior =
+                    useLoosenedLifestyleMismatchBehavior.Value;
+            }
+
+            return container;
+        }
 
         private class DummyRegistration<TImplementation> : Registration
         {
