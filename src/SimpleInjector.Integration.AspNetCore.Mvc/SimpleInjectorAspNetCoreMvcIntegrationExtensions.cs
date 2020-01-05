@@ -41,8 +41,8 @@ namespace SimpleInjector
             "'services.AddSimpleInjector(container, options => options.AddAspNetCore()." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions.AddTagHelperActivation) + "());'. " +
             "Please see https://simpleinjector.org/aspnetcore for more details. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void AddSimpleInjectorTagHelperActivation(
             this IServiceCollection services,
@@ -84,8 +84,8 @@ namespace SimpleInjector
             "'services.AddSimpleInjector(container, options => options.AddAspNetCore()." +
             nameof(SimpleInjectorAspNetCoreBuilderMvcExtensions.AddPageModelActivation) + "());'. " +
             "Please see https://simpleinjector.org/aspnetcore for more details. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static void RegisterPageModels(
             this Container container, IApplicationBuilder applicationBuilder)

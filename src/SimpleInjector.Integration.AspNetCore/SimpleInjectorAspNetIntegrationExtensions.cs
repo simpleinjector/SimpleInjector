@@ -106,8 +106,8 @@ namespace SimpleInjector
         [Obsolete("Please call services.AddSimpleInjector() instead. AddSimpleInjector can be called from " +
             "within the ConfigureServices method of the Startup class. " +
             "See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         public static void EnableSimpleInjectorCrossWiring(
             this IServiceCollection services, Container container)
         {
@@ -130,8 +130,8 @@ namespace SimpleInjector
         [Obsolete("Please call services.AddSimpleInjector(options => { options.CrossWire<TService>(); }) " +
             "instead. AddSimpleInjector can be called from within the ConfigureServices method of the " +
             "Startup class. See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         public static void CrossWire<TService>(this Container container, IApplicationBuilder builder)
             where TService : class
         {
@@ -148,8 +148,8 @@ namespace SimpleInjector
         [Obsolete("Please call services.AddSimpleInjector(options => { options.CrossWire(typeof(YourType));" +
             " }) instead. AddSimpleInjector can be called from within the ConfigureServices method of the " +
             "Startup class. See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         public static void CrossWire(this Container container, Type serviceType, IApplicationBuilder builder)
         {
             Requires.IsNotNull(container, nameof(container));
@@ -258,8 +258,8 @@ namespace SimpleInjector
         [Obsolete("Please call services.AddSimpleInjector() instead. AddSimpleInjector can be called from " +
             "within the ConfigureServices method of the Startup class. It ensures auto cross wiring is " +
             "enabled. See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         public static void AutoCrossWireAspNetComponents(this Container container, IApplicationBuilder app)
         {
             Requires.IsNotNull(app, nameof(app));
@@ -278,8 +278,8 @@ namespace SimpleInjector
         [Obsolete("Please call services.AddSimpleInjector() instead. AddSimpleInjector can be called from " +
             "within the ConfigureServices method of the Startup class. It ensures auto cross wiring is " +
             "enabled. See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         public static void AutoCrossWireAspNetComponents(
             this Container container, IServiceProvider appServices)
         {

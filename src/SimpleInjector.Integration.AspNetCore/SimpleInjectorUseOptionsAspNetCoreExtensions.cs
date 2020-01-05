@@ -85,8 +85,8 @@ namespace SimpleInjector
             "call). Instead, take care that you call .UseMiddleware<TMiddleware>(Container) at the right " +
             "stage. This typically means after .UseStaticFiles() and .UseAuthorization(), but before " +
             ".UseEndpoints(...). See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         public static void UseMiddleware<TMiddleware>(
             this SimpleInjectorUseOptions options, IApplicationBuilder app)
             where TMiddleware : class, IMiddleware
@@ -111,8 +111,8 @@ namespace SimpleInjector
             "call). Instead, take care that you call .UseMiddleware<TMiddleware>(Container) at the right " +
             "stage. This typically means after .UseStaticFiles() and .UseAuthorization(), but before " +
             ".UseEndpoints(...). See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         public static void UseMiddleware(
             this SimpleInjectorUseOptions options, Type middlewareType, IApplicationBuilder app)
         {
