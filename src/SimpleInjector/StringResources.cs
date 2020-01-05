@@ -298,7 +298,7 @@ namespace SimpleInjector
                 NoCollectionRegistrationExists(collectionRegistrationDoesNotExists, target.TargetType),
                 DidYouMeanToDependOnCollectionInstead(hasRelatedCollectionMapping, target.TargetType),
                 NoteThatSkippedDecoratorsWereFound(target.TargetType, skippedDecorators),
-                NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(container, target.TargetType),
+                NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(container, target),
                 NoteThatTypeLookalikesAreFound(target.TargetType, lookalikes, numberOfConditionals));
 
             return Format(
@@ -1152,13 +1152,81 @@ namespace SimpleInjector
         }
 
         private static string NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(
-            Container container, Type serviceType) =>
-            container.IsConcreteConstructableType(serviceType)
+            Container container, InjectionTargetInfo target) =>
+            NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(
+                container, target.TargetType, target.Member.DeclaringType);
+
+        private static string NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(
+            Container container, Type resolvedType, Type? consumingType = null) =>
+            container.IsConcreteConstructableType(resolvedType)
                 && !container.Options.ResolveUnregisteredConcreteTypes
-                ? " An implicit registration could not be made because the container's " +
-                    "Options.ResolveUnregisteredConcreteTypes option is set to 'false'. " +
+                ? ThereIsAMappingToImplementationType(container, resolvedType, consumingType) +
+                    " An implicit registration could not be made because " +
+                    "Container.Options.ResolveUnregisteredConcreteTypes is set to 'false'. " +
                     "This disallows the container to construct this unregistered concrete type."
                 : string.Empty;
+
+        private static string ThereIsAMappingToImplementationType(
+            Container container, Type resolvedType, Type? consumingType)
+        {
+            var serviceTypes = GetServiceTypesForMappedImplementation(container, resolvedType).ToArray();
+
+            return ThereIsAMappingToImplementationType(resolvedType, serviceTypes)
+                + DidYouIntendForXToDependOnYInstead(consumingType, serviceTypes);
+        }
+
+        private static string ThereIsAMappingToImplementationType(Type resolvedType, Type[] serviceTypes)
+        {
+            switch (serviceTypes.Length)
+            {
+                case 0:
+                    return string.Empty;
+
+                case 1:
+                    return Format(
+                        " There is a registration for {0} though, which maps to {1}.",
+                        serviceTypes[0].TypeName(),
+                        resolvedType.TypeName());
+
+                default:
+                    return Format(
+                       " There are registrations for {0} though, which {1} map to {2}.",
+                       serviceTypes.Select(TypeName).ToCommaSeparatedText(),
+                       serviceTypes.Length > 2 ? "all" : "both",
+                       resolvedType.TypeName());
+            }
+        }
+
+
+        private static string DidYouIntendForXToDependOnYInstead(Type? consumingType, Type[] serviceTypes)
+        {
+            if (serviceTypes.Length == 0)
+            {
+                return string.Empty;
+            }
+            else
+            {
+                var name = serviceTypes[0].ToFriendlyName(fullyQualifiedName: false);
+
+                return consumingType is null
+                    ? serviceTypes.Length == 1
+                        ? Format(" Did you intend to request {0} instead?", name)
+                        : " Did you intend to request one of those types instead?"
+                    : serviceTypes.Length == 1
+                        ? Format(
+                            " Did you intend for {0} to depend on {1} instead?",
+                            consumingType.TypeName(),
+                            name)
+                        : Format(
+                            " Did you intend for {0} to depend on one of those registrations instead?",
+                            consumingType.TypeName());
+            }
+        }
+
+        private static IEnumerable<Type> GetServiceTypesForMappedImplementation(Container container, Type type) =>
+            from producer in container.GetCurrentRegistrations()
+            where producer.ImplementationType == type && producer.ServiceType != type
+            select producer.ServiceType;
 
         private static string BuildAssemblyLocationMessage(Type serviceType, Type duplicateAssemblyLookalike)
         {

@@ -626,11 +626,114 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                No registration for type ConcreteCommand could be found. Make sure ConcreteCommand is 
+                No registration for type ConcreteCommand could be found. Make sure ConcreteCommand is
                 registered, for instance by calling 'Container.Register<ConcreteCommand>();'.
-                An implicit registration could not be made because the container's 
-                Options.ResolveUnregisteredConcreteTypes option is set to 'false'.
+                An implicit registration could not be made because
+                Container.Options.ResolveUnregisteredConcreteTypes is set to 'false'.
                 This disallows the container to construct this unregistered concrete type."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void ResolveUnregisteredConcreteTypes_SetToFalse_ProvidesAnExpressiveMessageForNotFoundResolveImplemenationThatExistsInMapping()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = false;
+
+            // Mapping with FakeTimeProvider as implementation type
+            container.Register<ITimeProvider, FakeTimeProvider>(Lifestyle.Singleton);
+
+            // Act
+            Action action = () => container.GetInstance<FakeTimeProvider>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                No registration for type FakeTimeProvider could be found.
+                Make sure FakeTimeProvider is registered, for instance by calling 
+                'Container.Register<FakeTimeProvider>();'.
+                There is a registration for ITimeProvider though, which maps to FakeTimeProvider.
+                Did you intend to request ITimeProvider instead?"
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void ResolveUnregisteredConcreteTypes_SetToFalse_ProvidesAnExpressiveMessageForShortCircuitedDependencies()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = false;
+
+            container.Register<ITimeProvider, FakeTimeProvider>(Lifestyle.Singleton);
+
+            // This component short circuits to FakeTimeProvider, while there is an ITimeProvider registration.
+            container.Register<ServiceDependingOn<FakeTimeProvider>>();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceDependingOn<FakeTimeProvider>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                For FakeTimeProvider to be resolved, it must be registered in the container.
+                There is a registration for ITimeProvider though, which maps to FakeTimeProvider.
+                Did you intend for ServiceDependingOn<FakeTimeProvider> to depend on ITimeProvider instead?
+                An implicit registration could not be made because
+                Container.Options.ResolveUnregisteredConcreteTypes is set to 'false'."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void ResolveUnregisteredConcreteTypes_SetToFalse_ProvidesAnExpressiveMessageForShortCircuitedDependenciesWithTwoOptions()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = false;
+
+            container.Register<ITimeProvider, PluginTimeProvider>(Lifestyle.Singleton);
+            container.Register<IPlugin, PluginTimeProvider>(Lifestyle.Singleton);
+
+            // This component short circuits to PluginTimeProvider, while there are ITimeProvider and IPlugin
+            // registrations.
+            container.Register<ServiceDependingOn<PluginTimeProvider>>();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceDependingOn<PluginTimeProvider>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                There are registrations for ITimeProvider and IPlugin though,
+                which both map to PluginTimeProvider.
+                Did you intend for ServiceDependingOn<PluginTimeProvider> to depend on one of
+                those registrations instead?"
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void ResolveUnregisteredConcreteTypes_SetToFalse_ProvidesAnExpressiveMessageForShortCircuitedDependenciesWithThreeOptions()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = false;
+
+            container.Register<ITimeProvider, PluginTimeProvider>(Lifestyle.Singleton);
+            container.Register<IPlugin, PluginTimeProvider>(Lifestyle.Singleton);
+            container.Register<object, PluginTimeProvider>(Lifestyle.Singleton);
+
+            // This component short circuits to PluginTimeProvider, while there are ITimeProvider and IPlugin
+            // registrations.
+            container.Register<ServiceDependingOn<PluginTimeProvider>>();
+
+            // Act
+            Action action = () => container.GetInstance<ServiceDependingOn<PluginTimeProvider>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                There are registrations for ITimeProvider, IPlugin, and Object though,
+                which all map to PluginTimeProvider."
                 .TrimInside(),
                 action);
         }
@@ -652,9 +755,9 @@ namespace SimpleInjector.Tests.Unit
                 The constructor of type ServiceDependingOn<ConcreteCommand> contains
                 the parameter with name 'dependency' and type ConcreteCommand, but ConcreteCommand is not
                 registered. For ConcreteCommand to be resolved, it must be registered in the container.
-                An implicit registration could not be made because the container's
-                Options.ResolveUnregisteredConcreteTypes option is set to 'false'. This disallows the
-                container to construct this unregistered concrete type."
+                An implicit registration could not be made because
+                Container.Options.ResolveUnregisteredConcreteTypes is set to 'false'.
+                This disallows the container to construct this unregistered concrete type."
                 .TrimInside(),
                 action);
         }

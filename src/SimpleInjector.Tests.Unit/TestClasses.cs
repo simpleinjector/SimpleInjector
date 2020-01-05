@@ -99,6 +99,11 @@
         public DateTime Now { get; set; }
     }
 
+    public class PluginTimeProvider : ITimeProvider, IPlugin
+    {
+        public DateTime Now { get; set; }
+    }
+
     public class SqlUserRepository : IUserRepository
     {
     }
