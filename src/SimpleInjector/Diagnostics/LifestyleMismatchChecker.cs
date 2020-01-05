@@ -21,7 +21,17 @@ namespace SimpleInjector.Diagnostics
                 return false;
             }
 
-            return componentLifestyle.ComponentLength(container) > dependencyLifestyle.DependencyLength(container);
+            var componentLength = componentLifestyle.ComponentLength(container);
+
+            if (container.Options.UseLoosenedLifestyleMismatchBehavior
+                && componentLength <= Lifestyle.Scoped.Length)
+            {
+                return false;
+            }
+
+            var dependencyLength = dependencyLifestyle.DependencyLength(container);
+
+            return componentLength > dependencyLength;
         }
     }
 }
