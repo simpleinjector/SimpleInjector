@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -114,6 +115,97 @@
 
             // Assert
             Assert.AreEqual(0, list.Count);
+        }
+        
+        [TestMethod]
+        public void GetInstance_TypeDependingOnReadOnlyCollection_InjectsTheRegisteredCollection()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
+
+            // Act
+            ReadOnlyCollection<IPlugin> collection =
+                container.GetInstance<ClassDependingOn<ReadOnlyCollection<IPlugin>>>().Dependency;
+
+            // Assert
+            Assert.AreEqual(2, collection.Count);
+            AssertThat.IsInstanceOfType(typeof(PluginImpl), collection.First());
+            AssertThat.IsInstanceOfType(typeof(PluginImpl2), collection.Second());
+        }
+
+        [TestMethod]
+        public void GetInstance_TypeDependingOnReadOnlyCollection_InjectsTheRegisteredCollectionOfDecorators()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl), typeof(PluginImpl2) });
+
+            container.RegisterDecorator(typeof(IPlugin), typeof(PluginDecorator));
+
+            // Act
+            ReadOnlyCollection<IPlugin> collection =
+                container.GetInstance<ClassDependingOn<ReadOnlyCollection<IPlugin>>>().Dependency;
+
+            // Assert
+            Assert.AreEqual(2, collection.Count);
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), collection.First());
+            AssertThat.IsInstanceOfType(typeof(PluginDecorator), collection.Second());
+        }
+
+        [TestMethod]
+        public void GetInstance_TypeDependingOnReadOnlyCollection_InjectsEmptyCollectionWhenNoInstancesRegistered()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register<IPlugin>(Type.EmptyTypes);
+
+            // Act
+            ReadOnlyCollection<IPlugin> collection =
+                container.GetInstance<ClassDependingOn<ReadOnlyCollection<IPlugin>>>().Dependency;
+
+            // Assert
+            Assert.AreEqual(0, collection.Count);
+        }
+
+        [TestMethod]
+        public void ReadOnlyCollection_WhenInjected_IsAlwaysASingleton()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl) });
+
+            // Act
+            ReadOnlyCollection<IPlugin> collection1 =
+                container.GetInstance<ClassDependingOn<ReadOnlyCollection<IPlugin>>>().Dependency;
+
+            ReadOnlyCollection<IPlugin> collection2 =
+                container.GetInstance<ClassDependingOn<ReadOnlyCollection<IPlugin>>>().Dependency;
+
+            // Assert
+            Assert.AreSame(collection1, collection2, "ReadOnlyCollection<T> should be a singleton.");
+        }
+
+        [TestMethod]
+        public void ReadOnlyCollection_WhenIterated_ProducesInstancesAccordingToTheirLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Append<IPlugin, PluginImpl>(Lifestyle.Transient);
+            container.Collection.Append<IPlugin, PluginImpl2>(Lifestyle.Singleton);
+
+            // Act
+            ReadOnlyCollection<IPlugin> collection =
+                container.GetInstance<ClassDependingOn<ReadOnlyCollection<IPlugin>>>().Dependency;
+
+            // Assert
+            Assert.AreNotSame(collection.First(), collection.First(), "PluginImpl should be transient.");
+            Assert.AreSame(collection.Last(), collection.Last(), "PluginImpl2 should be singleton.");
         }
     }
 }

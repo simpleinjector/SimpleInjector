@@ -102,11 +102,11 @@ namespace SimpleInjector.Internals
         internal static Registration CreateRegistration(
             this IContainerControlledCollection instance, Type collectionType, Container container)
         {
-            // We need special handling for Collection<T>, because the ContainerControlledCollection does not
-            // (and can't) inherit from Collection<T>. So we have to wrap that stream into a Collection<T>.
-            return collectionType.GetGenericTypeDefinition() == typeof(Collection<>)
-                ? CreateRegistrationForCollectionOfT(instance, collectionType, container)
-                : new ContainerControlledCollectionRegistration(collectionType, instance, container);
+            // We need special handling for Collection<T> (and ReadOnlyCollection<T>), because the 
+            // ContainerControlledCollection does not (and can't) inherit it. So we have to wrap that
+            // stream into a Collection<T> or ReadOnlyCollection<T>.
+            return TryCreateRegistrationForCollectionOfT(collectionType, instance, container)
+                ?? new ContainerControlledCollectionRegistration(collectionType, instance, container);
         }
 
         internal static bool IsContainerControlledCollectionExpression(Expression enumerableExpression)
@@ -125,18 +125,22 @@ namespace SimpleInjector.Internals
         internal static Type GetContainerControlledCollectionElementType(this InstanceProducer producer) =>
             ((ContainerControlledCollectionRegistration)producer.Registration).ElementType;
 
-        private static Registration CreateRegistrationForCollectionOfT(
-            IContainerControlledCollection controlledCollection, Type collectionType, Container container)
+        private static Registration? TryCreateRegistrationForCollectionOfT(
+            Type collectionType, IContainerControlledCollection controlledCollection, Container container)
         {
-            var collection = Activator.CreateInstance(collectionType, controlledCollection);
-
-            return new ContainerControlledCollectionRegistration(
-                collectionType, controlledCollection, container)
+            if (collectionType.GetGenericTypeDefinition() == typeof(Collection<>)
+                || collectionType.GetGenericTypeDefinition() == typeof(ReadOnlyCollection<>))
             {
-                Expression = Expression.Constant(
-                    Activator.CreateInstance(collectionType, controlledCollection),
-                    collectionType),
-            };
+                return new ContainerControlledCollectionRegistration(
+                    collectionType, controlledCollection, container)
+                {
+                    Expression = Expression.Constant(
+                        Activator.CreateInstance(collectionType, controlledCollection),
+                        collectionType),
+                };
+            }
+
+            return null;
         }
 
         private sealed class ContainerControlledCollectionRegistration : Registration
