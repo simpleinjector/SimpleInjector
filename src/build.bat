@@ -1,4 +1,4 @@
-rem @ECHO OFF
+@ECHO OFF
 
 for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /format:list') do set datetime=%%I
 
