@@ -1,4 +1,4 @@
-@ECHO OFF
+rem @ECHO OFF
 
 for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /format:list') do set datetime=%%I
 
@@ -31,9 +31,12 @@ IF "%version%"=="" (
 	set inputOk=false
 )
 
+for /f "tokens=1,2,3 delims=. " %%a in ("%version%") do set version_major=%%a&set version_minor=%%b&set version_patch=%%c
+
 echo step: %step%
-echo version: %version%
+echo version: %version% (major: %version_major%, minor: %version_minor%, patch: %version_patch%)
 echo prereleasePostfix: %prereleasePostfix%
+
 
 IF "%inputOk%"=="false" (
 	rem I would have loved doing this all in one single step, but for some reason, I can't seem to build using MSBuild
@@ -58,6 +61,9 @@ set version_Integration_GenericHost=%version_Core%
 set version_Integration_AspNetCore=%version_Core%
 set version_Integration_AspNetCore_Mvc_Core=%version_Core%
 set version_Integration_AspNetCore_Mvc=%version_Core%
+
+set referenceLibraryPath=..\..\simpleinjector-website.github.io\ReferenceLibrary
+if not exist %referenceLibraryPath% goto :referenceLibraryPath_missing
 
 set vsvars32_bat="%programfiles(x86)%\Microsoft Visual Studio\2019\Community\Common7\Tools\VsMSBuildCmd.bat"
 if not exist %vsvars32_bat% goto :vsvars32_bat_missing
@@ -200,6 +206,13 @@ IF %step%==3 (
 	del Help\index.tmp
 	REM For some strange reason, the following call does not compress the complete help directory, while calling it manually does work
 	REM %compress% "%CD%\Help" "%CD%\Releases\v%named_version%\SimpleInjector Online Documentation v%named_version%.zip"
+
+	IF "%prereleasePostfix%"=="" (
+		echo COPYING ONLINE DOCUMENTATION TO WEBSITE REPOSITORY
+
+		%xcopy% Help %referenceLibraryPath% /E /H /Y /I
+		%xcopy% Help %referenceLibraryPath%\%version_major%.%version_minor% /E /H /Y /I
+	)
 
     echo Please run step 4
     goto :EOF	
@@ -399,4 +412,8 @@ GOTO :EOF
 
 :xcopy_missing
 echo Couldn't locate xcopy. Expected it to be here: %xcopy%
+GOTO :EOF
+
+:referenceLibraryPath_missing
+echo The directory %cd%\%referenceLibraryPath% does not exist.
 GOTO :EOF
