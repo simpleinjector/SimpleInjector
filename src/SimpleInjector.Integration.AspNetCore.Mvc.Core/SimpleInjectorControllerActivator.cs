@@ -41,19 +41,18 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
 
             if (producer is null)
             {
+                const string AddControllerActivationMethod =
+                    nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions.AddControllerActivation);
+
                 throw new InvalidOperationException(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "For the {0} to function properly, it requires all controllers to be registered explicitly " +
-                        "in Simple Injector, but a registration for {1} is missing. To ensure all controllers are " +
-                        "registered properly, call the RegisterMvcControllers extension method on the Container " +
-                        "from within your Startup.Configure method while supplying the IApplicationBuilder " +
-                        "instance, e.g. \"this.container.RegisterMvcControllers(app);\".{2}" +
-                        "Full controller name: {3}.",
-                        typeof(SimpleInjectorControllerActivator).Name,
-                        controllerType.ToFriendlyName(),
-                        Environment.NewLine,
-                        controllerType.FullName));
+                    $"For the {nameof(SimpleInjectorControllerActivator)} to function properly, it " +
+                    $"requires all controllers to be registered explicitly, but a registration for " +
+                    $"{controllerType.ToFriendlyName()} is missing. To ensure all controllers are regis" +
+                    $"tered properly, call the {nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions)}" +
+                    $".{AddControllerActivationMethod} extension method from within your Startup" +
+                    $".ConfigureServices method—e.g. 'services.AddSimpleInjector(container, " +
+                        $"options => options.AddAspNetCore().{AddControllerActivationMethod}());'." +
+                    $"{Environment.NewLine}Full controller name: {controllerType.FullName}.");
             }
 
             return producer.GetInstance();
