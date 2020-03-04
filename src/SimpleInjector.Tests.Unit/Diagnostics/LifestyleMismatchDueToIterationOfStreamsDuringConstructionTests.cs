@@ -342,7 +342,9 @@
             // Arrange
             string expectedGraph =
 $@"{typeof(CaptivatingCompositeLogger<IEnumerable<ILogger>>).ToFriendlyName()}(
-    IEnumerable<ILogger>(),
+    IEnumerable<ILogger>(
+        NullLogger(),
+        ConsoleLogger()),
     NullLogger(),
     ConsoleLogger())";
 

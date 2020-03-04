@@ -43,6 +43,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 from producer in producers
                 where producer.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
                 from actualDependency in producer.GetRelationships()
+                where actualDependency.UseForVerification
                 where autoRegisteredRegistrationsWithLifestyleMismatch.ContainsKey(
                     actualDependency.Dependency.ServiceType)
                 let possibleSkippedRegistrations =

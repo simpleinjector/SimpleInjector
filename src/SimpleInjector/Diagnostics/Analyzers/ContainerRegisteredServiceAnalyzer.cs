@@ -38,6 +38,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return (
                 from producer in producers
                 from relationship in producer.GetRelationships()
+                where relationship.UseForVerification
                 where autoRegisteredServices.Contains(relationship.Dependency.ServiceType)
                 group relationship by producer into relationshipGroup
                 select BuildDiagnosticResult(relationshipGroup.Key, relationshipGroup.ToArray()))

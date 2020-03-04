@@ -31,6 +31,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
             where producer.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
             where IsAnalyzable(producer)
             from relationship in producer.GetRelationships()
+            where relationship.UseForVerification
             group relationship by new { relationship.ImplementationType, producer } into g
             let numberOfUniqueDependencies = g.Select(i => i.Dependency.ServiceType).Distinct().Count()
             where numberOfUniqueDependencies > MaximumValidNumberOfDependencies

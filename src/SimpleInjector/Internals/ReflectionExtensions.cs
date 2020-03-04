@@ -30,6 +30,12 @@ namespace SimpleInjector
                 BindingFlags.NonPublic | BindingFlags.Public);
         public static Assembly GetAssembly(this Type type) => type.Assembly;
         public static Guid GetGuid(this Type type) => type.GUID;
+
+        public static ConstructorInfo[] GetConstructors(this Type type, bool nonPublic) =>
+            type.GetConstructors(
+                BindingFlags.Public
+                | BindingFlags.Instance
+                | (nonPublic ? BindingFlags.NonPublic : BindingFlags.Default));
 #endif
 #if NETSTANDARD1_0 || NETSTANDARD1_3 || NETSTANDARD2_0
         public static MethodInfo? GetSetMethod(this PropertyInfo property, bool nonPublic = true) =>
@@ -65,11 +71,15 @@ namespace SimpleInjector
         public static PropertyInfo[] GetProperties(this Type type) => type.GetTypeInfo().DeclaredProperties.ToArray();
         public static Guid GetGuid(this Type type) => type.GetTypeInfo().GUID;
 
+        public static ConstructorInfo[] GetConstructors(this Type type, bool nonPublic) =>
+            type.GetTypeInfo().DeclaredConstructors
+            .Where(ctor => !ctor.IsStatic && (nonPublic || ctor.IsPublic)).ToArray();
+
         public static ConstructorInfo[] GetConstructors(this Type type) =>
-            type.GetTypeInfo().DeclaredConstructors.Where(ctor => !ctor.IsStatic && ctor.IsPublic).ToArray();
+            type.GetConstructors(nonPublic: false);
 
         public static ConstructorInfo? GetConstructor(this Type type, Type[] types) => (
-            from constructor in type.GetTypeInfo().DeclaredConstructors
+            from constructor in type.GetConstructors()
             where types.SequenceEqual(constructor.GetParameters().Select(p => p.ParameterType))
             select constructor)
             .FirstOrDefault();

@@ -9,6 +9,7 @@ namespace SimpleInjector.Internals
     using System.Linq;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics;
 
     // This class allows an ContainerControlledCollection<T> to notify about the creation of its wrapped items.
     // This is solely used for diagnostic verification.
@@ -170,7 +171,30 @@ namespace SimpleInjector.Internals
                 ?? System.Linq.Expressions.Expression.Constant(this.Collection, this.ImplementationType);
 
             internal override KnownRelationship[] GetRelationshipsCore() =>
-                base.GetRelationshipsCore().Concat(this.Collection.GetRelationships()).ToArray();
+                base.GetRelationshipsCore().Concat(this.GetCollectionRelationships()).ToArray();
+
+            private IEnumerable<KnownRelationship> GetCollectionRelationships()
+            {
+                InjectionConsumerInfo? consumerInfo = null;
+
+                InjectionConsumerInfo GetConsumer() =>
+                    consumerInfo ?? (consumerInfo =
+                        new InjectionConsumerInfo(
+                            this.Collection.GetType().GetConstructors(nonPublic: true)
+                            .Single(ctor => !ctor.IsPublic)
+                            .GetParameters().Single()));
+
+                return
+                    from producer in this.Collection.GetProducers()
+                    select new KnownRelationship(
+                        this.ImplementationType, this.Lifestyle, GetConsumer(), producer)
+                    {
+                        // Since a controlled collection functions as a factory, their relationship should not
+                        // be verified. That would lead to false positives, such as lifestyle mismatches and
+                        // SRP violations.
+                        UseForVerification = false
+                    };
+            }
         }
     }
 }

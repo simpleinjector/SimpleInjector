@@ -302,15 +302,19 @@
 
             container.Register<ILogger, FakeLogger>(Lifestyle.Singleton);
 
-            container.Collection.Register(typeof(IEventHandler<>), new[] { typeof(EventHandlerWithLoggerDependency<>) });
+            container.Collection.Register(typeof(IEventHandler<>), new[]
+            {
+                // Depends on ILogger
+                typeof(EventHandlerWithLoggerDependency<>)
+            });
 
             container.Register<ServiceWithDependency<IEnumerable<IEventHandler<ClassEvent>>>>();
 
             container.Verify();
 
             var expectedRelationship = new KnownRelationship(
-                implementationType: typeof(EventHandlerWithLoggerDependency<ClassEvent>),
-                lifestyle: Lifestyle.Transient,
+                implementationType: typeof(IEnumerable<IEventHandler<ClassEvent>>),
+                lifestyle: Lifestyle.Singleton,
                 dependency: container.GetRegistration(typeof(ILogger)));
 
             // Act
@@ -318,10 +322,8 @@
                 container.GetRegistration(typeof(IEnumerable<IEventHandler<ClassEvent>>)).GetRelationships()
                 .Single();
 
-            // Assert
             Assert.AreEqual(expectedRelationship.ImplementationType, actualRelationship.ImplementationType);
             Assert.AreEqual(expectedRelationship.Lifestyle, actualRelationship.Lifestyle);
-            Assert.AreEqual(expectedRelationship.Dependency, actualRelationship.Dependency);
         }
 
         [TestMethod]

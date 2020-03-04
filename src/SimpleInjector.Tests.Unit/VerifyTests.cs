@@ -396,7 +396,8 @@ namespace SimpleInjector.Tests.Unit
 
             container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl) });
 
-            container.RegisterInitializer<PluginImpl>(plugin => actualNumberOfCreatedPlugins++);
+            container.RegisterInitializer<PluginImpl>(
+                plugin => actualNumberOfCreatedPlugins++);
 
             // Act
             container.Verify();
@@ -406,10 +407,46 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void Verify_CollectionWithDecoratorThatCanNotBeCreatedAtRuntime_ThrowsInvalidOperationException()
+        public void Verify_MixedOneToOneAndCollectionRegistrationForSameComponent_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();
+
+            container.Register<PluginImpl>();
+
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl) });
+
+            // Act
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void Verify_RootTypeCollectionWithDecoratorThatCanNotBeCreatedAtRuntime_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Root type
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl) });
+
+            // FailingConstructorDecorator constructor throws an exception.
+            container.RegisterDecorator(typeof(IPlugin), typeof(FailingConstructorPluginDecorator));
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action);
+        }
+
+        [TestMethod]
+        public void Verify_NonRootTypeCollectionWithDecoratorThatCanNotBeCreatedAtRuntime_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Root type
+            container.Register<ServiceDependingOn<IEnumerable<IPlugin>>>();
 
             container.Collection.Register<IPlugin>(new[] { typeof(PluginImpl) });
 

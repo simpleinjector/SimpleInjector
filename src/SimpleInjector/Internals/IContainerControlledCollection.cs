@@ -7,13 +7,12 @@ namespace SimpleInjector.Internals
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using SimpleInjector.Advanced;
 
     internal interface IContainerControlledCollection : IEnumerable
     {
         bool AllProducersVerified { get; }
 
-        KnownRelationship[] GetRelationships();
+        InstanceProducer[] GetProducers();
 
         void Append(ContainerControlledItem item);
 
