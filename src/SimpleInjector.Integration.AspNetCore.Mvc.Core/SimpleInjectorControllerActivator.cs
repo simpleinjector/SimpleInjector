@@ -5,7 +5,6 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Globalization;
     using System.Linq;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Controllers;
@@ -47,12 +46,14 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
                 throw new InvalidOperationException(
                     $"For the {nameof(SimpleInjectorControllerActivator)} to function properly, it " +
                     $"requires all controllers to be registered explicitly, but a registration for " +
-                    $"{controllerType.ToFriendlyName()} is missing. To ensure all controllers are regis" +
-                    $"tered properly, call the {nameof(SimpleInjectorAspNetCoreBuilderMvcCoreExtensions)}" +
-                    $".{AddControllerActivationMethod} extension method from within your Startup" +
-                    $".ConfigureServices method—e.g. 'services.AddSimpleInjector(container, " +
-                        $"options => options.AddAspNetCore().{AddControllerActivationMethod}());'." +
-                    $"{Environment.NewLine}Full controller name: {controllerType.FullName}.");
+                    $"{controllerType.ToFriendlyName()} is missing. To find the controllers to register, " +
+                    $"Simple Injector's {AddControllerActivationMethod} method makes use of ASP.NET Core's " +
+                    $"Application Parts. The most likely cause of this missing controller is, therefore, " +
+                    $"that {controllerType.ToFriendlyName()}'s assembly, namely " +
+                    $"{controllerType.Assembly.GetName().Name}, is not registered as application part. For " +
+                    $"more information about configuring application parts, please consult the official " +
+                    $"Microsoft documentation at: " +
+                    $"https://docs.microsoft.com/en-us/aspnet/core/mvc/advanced/app-parts.");
             }
 
             return producer.GetInstance();
