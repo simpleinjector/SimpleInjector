@@ -18,6 +18,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Simple Injector ASP.NET MVC Integration.</description>
     <summary>ASP.NET MVC integration for Simple Injector.</summary>
+    <releaseNotes>See: https://github.com/simpleinjector/SimpleInjector/releases/tag/{version}</releaseNotes>
     <copyright>Simple Injector Contributors 2011 - {year}</copyright>
     <language>en-US</language>
     <tags>simpleinjector MVC MVC3 architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC DependencyResolver ControllerFactory</tags>

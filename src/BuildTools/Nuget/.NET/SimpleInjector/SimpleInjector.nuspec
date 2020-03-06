@@ -13,6 +13,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Simple Injector is an easy, flexible and fast dependency injection library that uses best practice to guide your solutions toward the pit of success.</description>
     <summary>Simple Injector is an easy-to-use Dependency Injection (DI) library for .NET 4+ that supports .NET Core, UWP and Mono.</summary>
+    <releaseNotes>See: https://github.com/simpleinjector/SimpleInjector/releases/tag/{version}</releaseNotes>
     <copyright>Simple Injector Contributors 2010 - {year}</copyright>
     <language>en-US</language>
     <tags>simpleinjector architecture dependency-injection DI Inversion-of-Control IOC</tags>
