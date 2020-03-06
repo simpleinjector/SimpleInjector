@@ -8,6 +8,7 @@ set buildNumber=0
 set copyrightYear=%datetime:~0,4%
 set version=%1
 set prereleasePostfix=
+set releaseNotesUrl=https://github.com/simpleinjector/SimpleInjector/releases/tag/v
 
 IF "%2"=="1" ( 
 	set step=%2
@@ -150,6 +151,15 @@ IF %step%==1 (
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_Mvc%</VersionPrefix>" /source:SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_WebApi%</VersionPrefix>" /source:SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Packaging%</VersionPrefix>" /source:SimpleInjector.Packaging\SimpleInjector.Packaging.csproj
+	
+	echo SET PACKAGE RELEASE NOTES
+	
+	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_Integration_ServiceCollection%</PackageReleaseNotes>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
+	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_Integration_GenericHost%</PackageReleaseNotes>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj
+	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_Integration_AspNetCore%</PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
+	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_Integration_AspNetCore_Mvc_Core%</PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj
+	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_Integration_AspNetCore_Mvc%</PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj
+
 	
 	rem echo BUILD SOLUTION
 
@@ -386,6 +396,14 @@ IF %step%==5 (
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Packaging\SimpleInjector.Packaging.csproj
+	
+	echo RESTORING PACKAGE RELEASE NOTES
+	
+	%replace% /line "<PackageReleaseNotes>" "    <PackageReleaseNotes></PackageReleaseNotes>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
+	%replace% /line "<PackageReleaseNotes>" "    <PackageReleaseNotes></PackageReleaseNotes>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj
+	%replace% /line "<PackageReleaseNotes>" "    <PackageReleaseNotes></PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
+	%replace% /line "<PackageReleaseNotes>" "    <PackageReleaseNotes></PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj
+	%replace% /line "<PackageReleaseNotes>" "    <PackageReleaseNotes></PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj
 	
 	echo Done!
 	GOTO :EOF	
