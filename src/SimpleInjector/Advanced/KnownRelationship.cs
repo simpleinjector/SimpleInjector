@@ -66,6 +66,8 @@ namespace SimpleInjector.Advanced
         /// <value>The type that the parent depends on.</value>
         public InstanceProducer Dependency { get; }
 
+        internal bool UseForVerification { get; set; } = true;
+
         internal InjectionConsumerInfo Consumer { get; }
 
         internal string AdditionalInformation { get; } = string.Empty;

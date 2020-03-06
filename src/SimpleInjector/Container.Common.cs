@@ -246,9 +246,13 @@ namespace SimpleInjector
             var currentRegistrations = this.GetCurrentRegistrations(
                 includeInvalidContainerRegisteredTypes: includeInvalidContainerRegisteredTypes);
 
+            // Get the non-root producers. Producers of a controlled collection are considered to be roots.
             var nonRootProducers =
                 from registration in currentRegistrations
-                from relationship in registration.GetRelationships()
+                let relationships = registration.IsContainerControlledCollection()
+                    ? Enumerable.Empty<KnownRelationship>()
+                    : registration.GetRelationships()
+                from relationship in relationships
                 select relationship.Dependency;
 
             return currentRegistrations.Except(nonRootProducers, InstanceProducer.EqualityComparer).ToArray();

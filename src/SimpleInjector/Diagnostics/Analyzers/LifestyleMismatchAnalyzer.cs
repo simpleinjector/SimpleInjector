@@ -33,6 +33,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers) => (
             from producer in producers
             from relationship in producer.GetRelationships()
+            where relationship.UseForVerification
             where relationship.Dependency.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
             let container = producer.Registration.Container
             where LifestyleMismatchChecker.HasLifestyleMismatch(container, relationship)

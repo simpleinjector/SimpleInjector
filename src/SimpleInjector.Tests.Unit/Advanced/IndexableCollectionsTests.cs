@@ -152,7 +152,10 @@
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collection.Register<IPlugin>(new[] { typeof(Plugin0), typeof(Plugin1), typeof(Plugin2) });
+            container.Register<ILogger, NullLogger>(Lifestyle.Transient);
+            container.Collection.Register<IPlugin>(new[] { typeof(PluginX<ILogger>), typeof(Plugin2) });
+
+            container.Verify();
 
             var plugins = container.GetAllInstances<IPlugin>() as IList<IPlugin>;
 
@@ -161,6 +164,14 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(ReadOnlyMessage, action);
+        }
+
+        public class PluginX<TDependency> : IPlugin
+        {
+            public PluginX(TDependency dependency)
+            {
+
+            }
         }
 
         [TestMethod]

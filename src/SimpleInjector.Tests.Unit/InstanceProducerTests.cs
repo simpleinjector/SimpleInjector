@@ -266,8 +266,9 @@
             string expectedGraph =
 @"InstanceProducerTests.NodeFactory( // Transient
     IEnumerable<InstanceProducerTests.INode>( // Singleton
-        InstanceProducerTests.NodeFactory( // Transient
-            IEnumerable<InstanceProducerTests.INode>(/* cyclic dependency graph detected */)))) // Singleton";
+        InstanceProducerTests.NodeOne( // Transient
+            InstanceProducerTests.NodeFactory( // Transient
+                IEnumerable<InstanceProducerTests.INode>(/* cyclic dependency graph detected */))))) // Singleton";
 
             var container = new Container();
 

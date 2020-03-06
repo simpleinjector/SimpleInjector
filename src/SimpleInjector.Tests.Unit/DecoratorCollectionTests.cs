@@ -808,19 +808,14 @@
                 .GetRelationships();
 
             // Assert
-            Assert.AreEqual(2, relationships.Length);
-
-            var real = relationships[0];
-
-            AssertThat.AreEqual(typeof(TransactionalCommandHandlerDecorator<RealCommand>), real.ImplementationType);
-            AssertThat.AreEqual(typeof(ICommandHandler<RealCommand>), real.Dependency.ServiceType);
-            AssertThat.AreEqual(typeof(RealCommandHandler), real.Dependency.ImplementationType);
-
-            var @default = relationships[1];
-
-            AssertThat.AreEqual(typeof(TransactionalCommandHandlerDecorator<RealCommand>), @default.ImplementationType);
-            AssertThat.AreEqual(typeof(ICommandHandler<RealCommand>), @default.Dependency.ServiceType);
-            AssertThat.AreEqual(typeof(DefaultCommandHandler<RealCommand>), @default.Dependency.ImplementationType);
+            AssertThat.SequenceEquals(
+                expectedTypes: new[]
+                {
+                    typeof(TransactionalCommandHandlerDecorator<RealCommand>),
+                    typeof(TransactionalCommandHandlerDecorator<RealCommand>),
+                    typeof(NullCommandHandler<RealCommand>)
+                },
+                actualTypes: relationships.Select(r => r.Dependency.Registration.ImplementationType));
         }
 
         [TestMethod]
@@ -1358,8 +1353,8 @@
             // Arrange
             var expectedRelationship = new RelationshipInfo
             {
-                ImplementationType = typeof(RealCommandHandlerDecorator),
-                Lifestyle = Lifestyle.Transient,
+                ImplementationType = typeof(IEnumerable<ICommandHandler<RealCommand>>),
+                Lifestyle = Lifestyle.Singleton,
                 Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Transient)
             };
 
@@ -1384,42 +1379,6 @@
             // Assert
             Assert.AreEqual(2, relationships.Length);
             Assert.AreEqual(2, relationships.Count(actual => expectedRelationship.Equals(actual)));
-        }
-
-        [TestMethod]
-        public void GetRegistration_ContainerUncontrolledCollectionWithDecorator_ContainsExpectedListOfRelationships()
-        {
-            // Arrange
-            var expectedRelationship = new RelationshipInfo
-            {
-                ImplementationType = typeof(RealCommandHandlerDecorator),
-                Lifestyle = Lifestyle.Transient,
-                Dependency = new DependencyInfo(typeof(ICommandHandler<RealCommand>), Lifestyle.Unknown)
-            };
-
-            var container = ContainerFactory.New();
-
-            IEnumerable<ICommandHandler<RealCommand>> containerUncontrolledCollection =
-                new ICommandHandler<RealCommand>[] { new StubCommandHandler(), new RealCommandHandler() };
-
-            container.Collection.Register<ICommandHandler<RealCommand>>(containerUncontrolledCollection);
-
-            // RealCommandHandlerDecorator only takes a dependency on ICommandHandler<RealCommand>
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator));
-
-            // Verify() ensures that all Relationships are built.
-            container.Verify();
-
-            var r = container.GetCurrentRegistrations();
-
-            // Act
-            var registration = container.GetRegistration(typeof(IEnumerable<ICommandHandler<RealCommand>>));
-            var relationships = registration.GetRelationships();
-
-            // Assert
-            Assert.AreEqual(1, relationships.Length);
-            Assert.IsTrue(expectedRelationship.Equals(relationships[0]),
-                "Actual relationship: " + RelationshipInfo.ToString(relationships[0]));
         }
 
         [TestMethod]
@@ -1626,7 +1585,9 @@
             var commandHandlerCollectionRegistration =
                 container.GetRegistration(typeof(IEnumerable<ICommandHandler<RealCommand>>));
 
-            var relationships = commandHandlerCollectionRegistration.GetRelationships();
+            var relationships = commandHandlerCollectionRegistration.GetRelationships()
+                .Take(1)
+                .SelectMany(r => r.Dependency.GetRelationships());
 
             // Assert
             Assert.AreEqual(1, relationships.Count(relationship => relationship == expectedRelationship),

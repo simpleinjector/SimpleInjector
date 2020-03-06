@@ -6,6 +6,7 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
@@ -27,6 +28,12 @@ namespace SimpleInjector.Internals
         public ContainerControlledCollection(Container container)
         {
             this.container = container;
+        }
+
+        // This constructor is not called; its meta data is used to build valid KnownRelationship types.
+        internal ContainerControlledCollection(TService services)
+        {
+            throw new NotSupportedException("This constructor is not intended to be called.");
         }
 
         public bool AllProducersVerified => this.producers.All(lazy => lazy.IsValueCreated);
@@ -124,12 +131,8 @@ namespace SimpleInjector.Internals
             this.producers.Add(this.ToLazyInstanceProducer(item));
         }
 
-        KnownRelationship[] IContainerControlledCollection.GetRelationships() => (
-            from producer in this.producers.Select(p => p.Value)
-            from relationship in producer.GetRelationships()
-            select relationship)
-            .Distinct()
-            .ToArray();
+        InstanceProducer[] IContainerControlledCollection.GetProducers() =>
+            this.producers.Select(p => p.Value).ToArray();
 
         public IEnumerator<TService> GetEnumerator()
         {
