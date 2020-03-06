@@ -8,6 +8,7 @@ namespace SimpleInjector.Decorators
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
@@ -165,13 +166,24 @@ namespace SimpleInjector.Decorators
             return parameters.Single();
         }
 
-        protected InstanceProducer CreateDecorateeFactoryProducer(ParameterInfo parameter)
+        protected InstanceProducer CreateDecorateeFactoryProducer(
+            ParameterInfo parameter, InstanceProducer decorateeProducer)
         {
             // We create a dummy expression with a null value. Much easier than passing on the real delegate.
             // We won't miss it, since the created InstanceProducer is just a dummy for purposes of analysis.
             var dummyExpression = Expression.Constant(null, parameter.ParameterType);
 
             var registration = new ExpressionRegistration(dummyExpression, this.Container);
+            
+            var relationship = new KnownRelationship(
+                parameter.ParameterType, Lifestyle.Singleton, decorateeProducer)
+            {
+                // Make sure the relationship is not traversed when doing verification, because that leads to
+                // false positivies.
+                UseForVerification = false
+            };
+
+            registration.AddRelationship(relationship);
 
             return new InstanceProducer(parameter.ParameterType, registration);
         }
@@ -209,7 +221,7 @@ namespace SimpleInjector.Decorators
                 // By adding the decoratee producer, we allow that object graph to be diagnosed.
                 realProducer.AddProducerToVerify(currentProducer);
 
-                currentProducer = this.CreateDecorateeFactoryProducer(decorateeParameter);
+                currentProducer = this.CreateDecorateeFactoryProducer(decorateeParameter, currentProducer);
             }
 
             var decorateeOverriddenParameter =

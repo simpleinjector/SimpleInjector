@@ -14,6 +14,9 @@
     [TestClass]
     public class DecoratorTests
     {
+        private static VisualizationOptions ExcludeLifestyleInformation =
+            new VisualizationOptions { IncludeLifestyleInformation = false };
+
         [TestMethod]
         public void GetInstance_OnRegisteredPartialGenericDecoratorType_Succeeds()
         {
@@ -2582,6 +2585,62 @@
                 action);
         }
 
+        // #414.
+        [TestMethod]
+        public void VisualizeObjectGraph_DecoratorWithFuncDecoratee_VisualizesTheDependenciesBelowTheFuncCorrectly()
+        {
+            // Act
+            string expectedGraph =
+@"NonGenericServiceDecoratorWithFunc( // Transient
+    Func<INonGenericService>( // Singleton
+        NonGenericServiceDecorator( // Transient
+            RealNonGenericService()))) // Transient";
+
+            var container = new Container();
+
+            container.Register<INonGenericService, RealNonGenericService>();
+            container.RegisterDecorator<INonGenericService, NonGenericServiceDecorator>();
+            container.RegisterDecorator<INonGenericService, NonGenericServiceDecoratorWithFunc>();
+
+            container.Verify();
+
+            // Act
+            string actualGraph = container.GetRegistration(typeof(INonGenericService)).VisualizeObjectGraph();
+
+            // Assert
+            Assert.AreEqual(expected: "\n" + expectedGraph + "\n", actual: "\n" + actualGraph + "\n");
+        }
+
+        // #414.
+        [TestMethod]
+        public void VisualizeObjectGraph_DecoratorWithScopeFuncDecoratee_VisualizesTheDependenciesBelowTheFuncCorrectly()
+        {
+            // Act
+            string expectedGraph =
+@"NonGenericServiceDecoratorWithScopeFunc( // Transient
+    Container(), // Singleton
+    Func<Scope, INonGenericService>( // Singleton
+        NonGenericServiceDecoratorWithFunc( // Transient
+            Func<INonGenericService>( // Singleton
+                NonGenericServiceDecorator( // Transient
+                    RealNonGenericService()))))) // Transient";
+
+            var container = new Container();
+
+            container.Register<INonGenericService, RealNonGenericService>();
+            container.RegisterDecorator<INonGenericService, NonGenericServiceDecorator>();
+            container.RegisterDecorator<INonGenericService, NonGenericServiceDecoratorWithFunc>();
+            container.RegisterDecorator<INonGenericService, NonGenericServiceDecoratorWithScopeFunc>();
+
+            container.Verify();
+
+            // Act
+            string actualGraph = container.GetRegistration(typeof(INonGenericService)).VisualizeObjectGraph();
+
+            // Assert
+            Assert.AreEqual(expected: "\n" + expectedGraph + "\n", actual: "\n" + actualGraph + "\n");
+        }
+
         public class ScopedPluginProxy : IPlugin
         {
             public readonly Func<Scope, IPlugin> Factory;
@@ -2778,6 +2837,28 @@
         public void DoSomething()
         {
             this.DecoratedServiceCreator().DoSomething();
+        }
+    }
+
+    public class NonGenericServiceDecoratorWithScopeFunc : INonGenericService
+    {
+        private readonly Container container;
+
+        public NonGenericServiceDecoratorWithScopeFunc(
+            Container container, Func<Scope, INonGenericService> decoratedCreator)
+        {
+            this.DecoratedServiceCreator = decoratedCreator;
+            this.container = container;
+        }
+
+        public Func<Scope, INonGenericService> DecoratedServiceCreator { get; }
+
+        public void DoSomething()
+        {
+            using (var scope = new Scope(this.container))
+            {
+                this.DecoratedServiceCreator(scope).DoSomething();
+            }
         }
     }
 
