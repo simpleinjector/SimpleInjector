@@ -85,7 +85,7 @@
     {
     }
 
-    public class Duplicate<T> : IDuplicate<T>
+    public class Duplicate<T> : IDuplicate<T>, IDuplicate
     {
     }
 

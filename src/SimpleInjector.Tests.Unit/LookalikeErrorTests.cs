@@ -138,5 +138,74 @@
                 .TrimInside(),
                 action);
         }
+
+        [TestMethod]
+        public void GetInstance_OnMissingConstructorDependencyWithExistingConditionalNonGenericLookalike_WarnsAboutThisLookalike()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(typeof(IDuplicate), typeof(Duplicate), c => true);
+
+            // Act
+            Action action = () =>
+                container.GetInstance<ServiceDependingOn<SimpleInjector.Tests.Unit.Duplicates.IDuplicate>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                Note that there exists a registration for a different type
+                SimpleInjector.Tests.Unit.IDuplicate"
+                .TrimInside(),
+                action);
+        }
+
+        // #807
+        [TestMethod]
+        public void GetInstance_OnMissingConstructorDependencyWithExistingConditionalFactoryNonGenericLookalike_WarnsAboutThisLookalike()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(
+                typeof(IDuplicate),
+                c => typeof(Duplicate<>).MakeGenericType(c.Consumer.ImplementationType),
+                Lifestyle.Singleton,
+                c => true);
+
+            // Act
+            Action action = () =>
+                container.GetInstance<ServiceDependingOn<SimpleInjector.Tests.Unit.Duplicates.IDuplicate>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                Note that there exists a registration for a different type
+                SimpleInjector.Tests.Unit.IDuplicate"
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_OnMissingConstructorDependencyWithExistingConditionalFactoryGenericLookalike_WarnsAboutThisLookalike()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(
+                typeof(IDuplicate<>),
+                c => typeof(Duplicate<>).MakeGenericType(c.Consumer.ImplementationType),
+                Lifestyle.Singleton,
+                c => true);
+
+            // Act
+            Action action = () =>
+                container.GetInstance<ServiceDependingOn<SimpleInjector.Tests.Unit.Duplicates.IDuplicate<object>>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                Note that there exists a registration for a different type
+                SimpleInjector.Tests.Unit.IDuplicate"
+                .TrimInside(),
+                action);
+        }
     }
 }
