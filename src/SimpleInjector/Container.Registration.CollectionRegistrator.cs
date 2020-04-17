@@ -742,6 +742,13 @@ namespace SimpleInjector
         /// The order in which the types appear in the collection is the exact same order that the items were
         /// supplied to this method, i.e the resolved collection's order is deterministic.
         /// </summary>
+        /// <remarks>
+        /// Note that this overload only allows all registered <paramref name="serviceTypes"/> to have same
+        /// lifestyle. In case you need individual elements to have a different lifestyle, please use
+        /// <see cref="Append(Type, Type, Lifestyle)"/> to register types one-by-one, or use the
+        /// <see cref="Register{TService}(IEnumerable{Registration})"/> overload that accepts a list of
+        /// <see cref="Registration"/> instances.
+        /// </remarks>
         /// <typeparam name="TService">The base type or interface for elements in the collection.</typeparam>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
@@ -827,6 +834,13 @@ namespace SimpleInjector
         /// The order in which the types appear in the collection is the exact same order that the items were
         /// supplied to this method, i.e the resolved collection's order is deterministic.
         /// </summary>
+        /// <remarks>
+        /// Note that this overload only allows all registered <paramref name="serviceTypes"/> to have same
+        /// lifestyle. In case you need individual elements to have a different lifestyle, please use
+        /// <see cref="Append(Type, Type, Lifestyle)"/> to register types one-by-one, or use the
+        /// <see cref="Register(Type, IEnumerable{Registration})"/> overload that accepts a list of
+        /// <see cref="Registration"/> instances.
+        /// </remarks>
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
@@ -975,6 +989,16 @@ namespace SimpleInjector
         /// <see cref="ContainerOptions.LifestyleSelectionBehavior">LifestyleSelectionBehavior</see>, the
         /// default lifestyle is <see cref="Lifestyle.Transient">Transient</see>.
         /// </summary>
+        /// <remarks>
+        /// Note that this overload only allows all registered types to have same
+        /// lifestyle. In case you need individual elements to have a different lifestyle, please use
+        /// <see cref="Container.GetTypesToRegister{TService}(Assembly[])"/> to retrieve the
+        /// <typeparamref name="TService"/> implementations and than either call
+        /// <see cref="Append(Type, Type, Lifestyle)"/> on each individual type, or convert the collection of
+        /// types into a collection of <see cref="Registration"/> instances (by calling
+        /// <see cref="Lifestyle.CreateRegistration(Type, Container)"/>) and register that collection using
+        /// <see cref="Register(Type, IEnumerable{Registration})"/>.
+        /// </remarks>
         /// <typeparam name="TService">The element type of the collections to register. This can be either
         /// a non-generic, closed-generic or open-generic type.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
@@ -1045,6 +1069,16 @@ namespace SimpleInjector
         /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
         /// will be excluded from registration.
         /// </summary>
+        /// <remarks>
+        /// Note that this overload only allows all registered types to have same
+        /// lifestyle. In case you need individual elements to have a different lifestyle, please use
+        /// <see cref="Container.GetTypesToRegister(Type, IEnumerable{Assembly})"/> to retrieve the
+        /// <paramref name="serviceType"/> implementations and than either call
+        /// <see cref="Append(Type, Type, Lifestyle)"/> on each individual type, or convert the collection of
+        /// types into a collection of <see cref="Registration"/> instances (by calling
+        /// <see cref="Lifestyle.CreateRegistration(Type, Container)"/>) and register that collection using
+        /// <see cref="Register(Type, IEnumerable{Registration})"/>.
+        /// </remarks>
         /// <param name="serviceType">The element type of the collections to register. This can be either
         /// a non-generic, closed-generic or open-generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
