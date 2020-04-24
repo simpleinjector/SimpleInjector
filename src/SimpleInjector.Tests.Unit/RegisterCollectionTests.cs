@@ -92,6 +92,23 @@
         }
 
         [TestMethod]
+        public void RegisterCollectionServiceAssemblyEnumerableLifestyle_RegisteringNonGenericServiceAndAssemblyWithMultipleImplementations_RegistersThoseImplementations()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register(
+                typeof(ILogStuf), Enumerable.Repeat(CurrentAssembly, 1), Lifestyle.Singleton);
+
+            // Act
+            var loggers1 = container.GetAllInstances<ILogStuf>().ToArray();
+            var loggers2 = container.GetAllInstances<ILogStuf>().ToArray();
+
+            // Assert
+            Assert.IsTrue(loggers1.SequenceEqual(loggers2));
+        }
+
+        [TestMethod]
         public void RegisterCollection_UnexpectedCSharpOverloadResolution_ThrowsDescriptiveException()
         {
             // Arrange
@@ -108,6 +125,45 @@
                 "a different method for you than you expected to call. The method C# selected for you is: " +
                 "Container.Collection.Register<Type>",
                 action);
+        }
+
+        [TestMethod]
+        public void RegisterCollectionGeneric_WithTypesAndLifestyle_RespectsTheRegisteredLifestyle()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Collection.Register<ILogger>(
+                new[] { typeof(NullLogger), typeof(ConsoleLogger) },
+                Lifestyle.Singleton);
+
+            // Act
+            var loggers1 = container.GetAllInstances<ILogger>().ToArray();
+            var loggers2 = container.GetAllInstances<ILogger>().ToArray();
+
+            // Assert
+            Assert.AreEqual(2, loggers1.Length);
+            Assert.IsTrue(loggers1.SequenceEqual(loggers2));
+        }
+
+        [TestMethod]
+        public void RegisterCollectionNonGeneric_WithTypesAndLifestyle_RespectsTheRegisteredLifestyle()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Collection.Register(
+                typeof(ILogger),
+                new[] { typeof(NullLogger), typeof(ConsoleLogger) },
+                Lifestyle.Singleton);
+
+            // Act
+            var loggers1 = container.GetAllInstances<ILogger>().ToArray();
+            var loggers2 = container.GetAllInstances<ILogger>().ToArray();
+
+            // Assert
+            Assert.AreEqual(2, loggers1.Length);
+            Assert.IsTrue(loggers1.SequenceEqual(loggers2));
         }
 
         [TestMethod]
