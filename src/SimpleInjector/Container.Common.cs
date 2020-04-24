@@ -675,7 +675,7 @@ namespace SimpleInjector
         private Type[] GetLookalikesForMissingType(Type missingServiceType) =>
             this.GetLookalikesForMissingNonGenericType(missingServiceType.ToFriendlyName())
                 .Concat(missingServiceType.IsGenericType()
-                    ? this.GetLookalikesForMissingGeneritTypeDefinitions(
+                    ? this.GetLookalikesForMissingGenericTypeDefinitions(
                         missingServiceType.GetGenericTypeDefinition().ToFriendlyName())
                     : Enumerable.Empty<Type>())
                 .ToArray();
@@ -684,13 +684,26 @@ namespace SimpleInjector
         // and the parent type name of a nested type is included) as the missing type. Nested types are
         // mostly excluded from this list, because it would be quite common for developers to have lots
         // of nested types with the same name.
-        private IEnumerable<Type> GetLookalikesForMissingNonGenericType(string missingServiceTypeName) =>
+        private IEnumerable<Type> GetLookalikesForMissingNonGenericType(string missingServiceTypeName) => (
+            this.GetLookalikesFromCurrentRegistrationsForMissingNonGenericType(missingServiceTypeName))
+            .Concat(
+                this.GetLookalikesFromExplictRegistrationsForMissingNonGenericType(missingServiceTypeName))
+            .Distinct();
+
+        private IEnumerable<Type> GetLookalikesFromCurrentRegistrationsForMissingNonGenericType(string name) =>
             from registration in this.GetCurrentRegistrations(false, includeExternalProducers: false)
             let typeName = registration.ServiceType.ToFriendlyName()
-            where StringComparer.OrdinalIgnoreCase.Equals(typeName, missingServiceTypeName)
+            where StringComparer.OrdinalIgnoreCase.Equals(typeName, name)
             select registration.ServiceType;
 
-        private IEnumerable<Type> GetLookalikesForMissingGeneritTypeDefinitions(string missingTypeDefName) =>
+        private IEnumerable<Type> GetLookalikesFromExplictRegistrationsForMissingNonGenericType(string name) =>
+            from type in this.explicitRegistrations.Keys
+            where !type.IsGenericTypeDefinition()
+            let friendlyName = type.ToFriendlyName()
+            where StringComparer.OrdinalIgnoreCase.Equals(friendlyName, name)
+            select type;
+
+        private IEnumerable<Type> GetLookalikesForMissingGenericTypeDefinitions(string missingTypeDefName) =>
             from type in this.explicitRegistrations.Keys
             where type.IsGenericTypeDefinition()
             let friendlyName = type.GetGenericTypeDefinition().ToFriendlyName()

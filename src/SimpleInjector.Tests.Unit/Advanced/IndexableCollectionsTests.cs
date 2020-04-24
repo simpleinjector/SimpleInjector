@@ -170,7 +170,6 @@
         {
             public PluginX(TDependency dependency)
             {
-
             }
         }
 
