@@ -102,8 +102,9 @@ namespace SimpleInjector.Diagnostics
             if (!container.SuccesfullyVerified)
             {
                 throw new InvalidOperationException(
-                    "Please make sure that Container.Verify() is called on the supplied container instance. " +
-                    "Only successfully verified container instance can be analyzed.");
+                    "Please make sure that Container.Verify(VerificationOption.VerifyOnly) is called on the " +
+                    "supplied container instance. Only successfully verified container instance can be " +
+                    "analyzed.");
             }
         }
     }
