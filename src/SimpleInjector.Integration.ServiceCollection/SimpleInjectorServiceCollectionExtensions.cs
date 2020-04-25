@@ -286,8 +286,8 @@ namespace SimpleInjector
             "Please call services.AddSimpleInjector(options => { options.AddLogging(); } instead on " +
             "the IServiceCollection instance. For more information, see: " +
             "https://simpleinjector.org/servicecollection. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static SimpleInjectorUseOptions UseLogging(this SimpleInjectorUseOptions options)
         {
@@ -394,8 +394,8 @@ namespace SimpleInjector
             "Please call services.AddSimpleInjector(options => { options.AddLocalization(); } instead on " +
             "the IServiceCollection instance. For more information, see: " +
             "https://simpleinjector.org/servicecollection. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static SimpleInjectorUseOptions UseLocalization(this SimpleInjectorUseOptions options)
         {
@@ -448,8 +448,8 @@ namespace SimpleInjector
             "Please call services.AddSimpleInjector(options => { options.CrossWire<TService>(); } instead " +
             "on the IServiceCollection instance (typically from inside your Startup.ConfigureServices " +
             "method). For more information, see: https://simpleinjector.org/servicecollection. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         public static SimpleInjectorUseOptions CrossWire<TService>(this SimpleInjectorUseOptions options)
             where TService : class
         {
@@ -469,8 +469,8 @@ namespace SimpleInjector
             "Please call services.AddSimpleInjector(options => { options.CrossWire(Type); } instead " +
             "on the IServiceCollection instance (typically from inside your Startup.ConfigureServices " +
             "method). For more information, see: https://simpleinjector.org/servicecollection. " +
-            "Will be treated as an error from version 4.9. Will be removed in version 5.0.",
-            error: false)]
+            "Will be removed in version 5.0.",
+            error: true)]
         public static SimpleInjectorUseOptions CrossWire(
             this SimpleInjectorUseOptions options, Type serviceType)
         {
