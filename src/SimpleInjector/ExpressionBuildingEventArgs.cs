@@ -37,29 +37,10 @@ namespace SimpleInjector
             this.expression = expression;
         }
 
-        /// <summary>Gets the registered service type that is currently requested.</summary>
-        /// <value>The registered service type that is currently requested.</value>
-        [Obsolete(
-            "Please use KnownImplementationType instead. See https://simpleinjector.org/depr3. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Type RegisteredServiceType
-        {
-            get
-            {
-                throw new NotSupportedException(
-                    "This property has been removed. Please use KnownImplementationType instead. " +
-                    "See https://simpleinjector.org/depr3.");
-            }
-        }
-
         /// <summary>
         /// Gets the type that is known to be returned by the
         /// <see cref="Expression">Expression</see> (most often the implementation
-        /// type used in the <b>Register</b> call). This type will be a derivative of
-        /// <see cref="RegisteredServiceType">RegisteredServiceType</see> (or
-        /// or <b>RegisteredServiceType</b> itself). If the <b>Expression</b> is changed, the new expression
+        /// type used in the <b>Register</b> call). If the <b>Expression</b> is changed, the new expression
         /// must also return an instance of type <b>KnownImplementationType</b> or a sub type.
         /// This information must be described in the new Expression.
         /// </summary>

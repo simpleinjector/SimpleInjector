@@ -370,14 +370,6 @@ namespace SimpleInjector
         /// <value>The <see cref="ContainerCollectionRegistrator"/> instance for this container.</value>
         public ContainerCollectionRegistrator Collection { get; }
 
-        /// <summary>This property is obsolete. Please use <see cref="Collection"/> instead.</summary>
-        /// <value>The <see cref="ContainerCollectionRegistrator"/> instance for this container.</value>
-        [Obsolete("Please use the " + nameof(Collection) + " property instead. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public ContainerCollectionRegistrator Collections => this.Collection;
-
         /// <summary>
         /// Registers that a new instance of <typeparamref name="TConcrete"/> will be returned every time it
         /// is requested (transient).
@@ -436,8 +428,8 @@ namespace SimpleInjector
         /// type is not a type that can be created by the container.
         /// </exception>
         public void Register<TService, TImplementation>()
-            where TImplementation : class, TService
             where TService : class
+            where TImplementation : class, TService
         {
             this.Register<TService, TImplementation>(this.SelectionBasedLifestyle, "TService", "TImplementation");
         }
@@ -919,7 +911,7 @@ namespace SimpleInjector
         /// Multiple <paramref name="instanceInitializer"/> delegates can be registered per
         /// <typeparamref name="TService"/> and multiple initializers can be applied on a created instance,
         /// before it is returned. For instance, when registering a <paramref name="instanceInitializer"/>
-        /// for type <see cref="System.Object"/>, the delegate will be called for every instance created by
+        /// for type <see cref="object"/>, the delegate will be called for every instance created by
         /// the container, which can be nice for debugging purposes.
         /// </para>
         /// <para>

@@ -31,19 +31,6 @@ namespace SimpleInjector
         {
         }
 
-        /// <summary>Initializes a new instance of the <see cref="ScopedLifestyle"/> class.</summary>
-        /// <param name="name">The user friendly name of this lifestyle.</param>
-        /// <param name="disposeInstances">Signals the lifestyle whether instances should be
-        /// disposed or not.</param>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB)
-        /// or an empty string.</exception>
-        [Obsolete(
-            "This constructor overload is deprecated. The disposal of instances can't be suppressed anymore",
-            error: true)]
-        protected ScopedLifestyle(string name, bool disposeInstances) : base(name)
-        {
-        }
-
         /// <summary>Gets the length of the lifestyle.</summary>
         /// <value>The <see cref="int"/> representing the length of this lifestyle.</value>
         public override int Length => 500;

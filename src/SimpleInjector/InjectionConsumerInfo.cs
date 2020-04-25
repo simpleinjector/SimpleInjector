@@ -4,7 +4,6 @@
 namespace SimpleInjector
 {
     using System;
-    using System.ComponentModel;
     using System.Reflection;
     using SimpleInjector.Advanced;
 
@@ -43,23 +42,6 @@ namespace SimpleInjector
 
             this.target = new InjectionTargetInfo(property);
             this.implementationType = implementationType;
-        }
-
-        /// <summary>Gets the service type of the consumer of the component that should be created.</summary>
-        /// <value>The closed generic service type.</value>
-        [Obsolete(
-            "Please use ImplementationType instead. See https://simpleinjector.org/depr3. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Type ServiceType
-        {
-            get
-            {
-                throw new NotSupportedException(
-                    "This property has been removed. Please use ImplementationType instead. " +
-                    "See https://simpleinjector.org/depr3.");
-            }
         }
 
         /// <summary>Gets the implementation type of the consumer of the component that should be created.</summary>

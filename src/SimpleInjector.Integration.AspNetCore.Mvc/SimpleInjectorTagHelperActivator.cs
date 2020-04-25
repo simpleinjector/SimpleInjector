@@ -13,26 +13,7 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
     {
         private readonly Container container;
         private readonly Predicate<Type>? tagHelperSelector;
-        private readonly ITagHelperActivator? frameworkTagHelperActivator;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleInjectorTagHelperActivator"/> class.
-        /// </summary>
-        /// <param name="container">The container instance.</param>
-        [Obsolete("Please use the other constructor overload or use the " +
-            "SimpleInjectorAspNetCoreMvcIntegrationExtensions.AddSimpleInjectorTagHelperActivation " +
-            "extension method instead. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        public SimpleInjectorTagHelperActivator(Container container)
-        {
-            if (container == null)
-            {
-                throw new ArgumentNullException(nameof(container));
-            }
-
-            this.container = container;
-        }
+        private readonly ITagHelperActivator? activator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleInjectorTagHelperActivator"/> class.
@@ -47,24 +28,9 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
             Predicate<Type> tagHelperSelector,
             ITagHelperActivator frameworkTagHelperActivator)
         {
-            if (container == null)
-            {
-                throw new ArgumentNullException(nameof(container));
-            }
-
-            if (tagHelperSelector == null)
-            {
-                throw new ArgumentNullException(nameof(tagHelperSelector));
-            }
-
-            if (frameworkTagHelperActivator == null)
-            {
-                throw new ArgumentNullException(nameof(frameworkTagHelperActivator));
-            }
-
-            this.container = container;
-            this.tagHelperSelector = tagHelperSelector;
-            this.frameworkTagHelperActivator = frameworkTagHelperActivator;
+            this.container = container ?? throw new ArgumentNullException(nameof(container));
+            this.tagHelperSelector = tagHelperSelector ?? throw new ArgumentNullException(nameof(tagHelperSelector));
+            this.activator = frameworkTagHelperActivator ?? throw new ArgumentNullException(nameof(frameworkTagHelperActivator));
         }
 
         /// <summary>Creates an <see cref="ITagHelper"/>.</summary>
@@ -74,6 +40,6 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         public TTagHelper Create<TTagHelper>(ViewContext context) where TTagHelper : ITagHelper =>
             this.tagHelperSelector?.Invoke(typeof(TTagHelper)) ?? true
                 ? (TTagHelper)this.container.GetInstance(typeof(TTagHelper))
-                : this.frameworkTagHelperActivator!.Create<TTagHelper>(context);
+                : this.activator!.Create<TTagHelper>(context);
     }
 }

@@ -4,14 +4,11 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Linq;
-    using System.Reflection;
     using Integration.AspNetCore;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
-    using SimpleInjector.Diagnostics;
     using SimpleInjector.Lifestyles;
 
     /// <summary>
@@ -19,35 +16,6 @@ namespace SimpleInjector
     /// </summary>
     public static class SimpleInjectorAspNetCoreIntegrationExtensions
     {
-        private static readonly object CrossWireContextKey = new object();
-        private static readonly object ServiceScopeKey = new object();
-
-        /// <summary>Wraps ASP.NET requests in an <see cref="AsyncScopedLifestyle"/>.</summary>
-        /// <param name="applicationBuilder">The ASP.NET application builder instance that references all
-        /// framework components.</param>
-        /// <param name="container">The container.</param>
-        [Obsolete("Please use " +
-            nameof(UseSimpleInjectorAspNetRequestScoping) + "(IServiceCollection, Container) " +
-            "instead. This new overload can be called from within the ConfigureServices method of the " +
-            "Startup class. See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public static void UseSimpleInjectorAspNetRequestScoping(
-            this IApplicationBuilder applicationBuilder, Container container)
-        {
-            Requires.IsNotNull(applicationBuilder, nameof(applicationBuilder));
-            Requires.IsNotNull(container, nameof(container));
-
-            applicationBuilder.Use(async (_, next) =>
-            {
-                using (AsyncScopedLifestyle.BeginScope(container))
-                {
-                    await next();
-                }
-            });
-        }
-
         /// <summary>Wraps ASP.NET requests in an <see cref="AsyncScopedLifestyle"/>.</summary>
         /// <param name="services">The ASP.NET application builder instance that references all
         /// framework components.</param>
@@ -92,76 +60,6 @@ namespace SimpleInjector
 
             return GetRequestServiceProvider(
                 builder.GetApplicationServices(), typeof(T)).GetRequiredService<T>();
-        }
-
-        /// <summary>
-        /// Enables ASP.NET Core services to be cross-wired in the Container. This method should be called
-        /// in the <b>ConfigureServices</b> method of the application's <b>Startup</b> class. When cross-wiring
-        /// is enabled, individual cross-wire registrations can be made by calling
-        /// <see cref="CrossWire{TService}(Container, IApplicationBuilder)"/>.
-        /// </summary>
-        /// <param name="services">The ASP.NET application builder instance that references all
-        /// framework components.</param>
-        /// <param name="container">The container.</param>
-        [Obsolete("Please call services.AddSimpleInjector() instead. AddSimpleInjector can be called from " +
-            "within the ConfigureServices method of the Startup class. " +
-            "See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        public static void EnableSimpleInjectorCrossWiring(
-            this IServiceCollection services, Container container)
-        {
-            Requires.IsNotNull(services, nameof(services));
-            Requires.IsNotNull(container, nameof(container));
-
-            if (container.ContainerScope.GetItem(CrossWireContextKey) is null)
-            {
-                container.ContainerScope.SetItem(CrossWireContextKey, services);
-            }
-        }
-
-        /// <summary>
-        /// Cross-wires an ASP.NET Core or third party service to the container, to allow the service to be
-        /// injected into components that are built by the container.
-        /// </summary>
-        /// <typeparam name="TService">The type of service object to cross-wire.</typeparam>
-        /// <param name="container">The container.</param>
-        /// <param name="builder">The IApplicationBuilder to retrieve the service object from.</param>
-        [Obsolete("Please call services.AddSimpleInjector(options => { options.CrossWire<TService>(); }) " +
-            "instead. AddSimpleInjector can be called from within the ConfigureServices method of the " +
-            "Startup class. See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        public static void CrossWire<TService>(this Container container, IApplicationBuilder builder)
-            where TService : class
-        {
-            CrossWire(container, typeof(TService), builder);
-        }
-
-        /// <summary>
-        /// Cross-wires an ASP.NET Core or third party service to the container, to allow the service to be
-        /// injected into components that are built by the container.
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="serviceType">The type of service object to ross-wire.</param>
-        /// <param name="builder">The IApplicationBuilder to retrieve the service object from.</param>
-        [Obsolete("Please call services.AddSimpleInjector(options => { options.CrossWire(typeof(YourType));" +
-            " }) instead. AddSimpleInjector can be called from within the ConfigureServices method of the " +
-            "Startup class. See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        public static void CrossWire(this Container container, Type serviceType, IApplicationBuilder builder)
-        {
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(builder, nameof(builder));
-
-            CrossWireServiceScope(container, builder.GetApplicationServices());
-
-            Registration registration =
-                CreateCrossWireRegistration(container, serviceType, builder.GetApplicationServices());
-
-            container.AddRegistration(serviceType, registration);
         }
 
         // WARNING: Although most of the extension methods in this class can become obsolete, because of the
@@ -249,91 +147,6 @@ namespace SimpleInjector
             return app;
         }
 
-        /// <summary>
-        /// Allows registrations made using the <see cref="IServiceCollection"/> API to be resolved by Simple
-        /// Injector.
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
-        [Obsolete("Please call services.AddSimpleInjector() instead. AddSimpleInjector can be called from " +
-            "within the ConfigureServices method of the Startup class. It ensures auto cross wiring is " +
-            "enabled. See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        public static void AutoCrossWireAspNetComponents(this Container container, IApplicationBuilder app)
-        {
-            Requires.IsNotNull(app, nameof(app));
-            Requires.IsNotNull(container, nameof(container));
-
-            container.AutoCrossWireAspNetComponents(app.GetApplicationServices());
-        }
-
-        /// <summary>
-        /// Allows registrations made using the <see cref="IServiceCollection"/> API to be resolved by Simple
-        /// Injector.
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="appServices">The <see cref="IServiceProvider"/> instance that provides the set of
-        /// singleton services.</param>
-        [Obsolete("Please call services.AddSimpleInjector() instead. AddSimpleInjector can be called from " +
-            "within the ConfigureServices method of the Startup class. It ensures auto cross wiring is " +
-            "enabled. See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        public static void AutoCrossWireAspNetComponents(
-            this Container container, IServiceProvider appServices)
-        {
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(appServices, nameof(appServices));
-
-            var services = (IServiceCollection?)container.ContainerScope.GetItem(CrossWireContextKey);
-
-            if (services is null)
-            {
-                throw new InvalidOperationException(
-                    "To use this method, please make sure cross-wiring is enabled, by invoking " +
-                    $"the {nameof(EnableSimpleInjectorCrossWiring)} extension method as part of the " +
-                    "ConfigureServices method of the Startup class. " + Environment.NewLine +
-                    "See https://simpleinjector.org/aspnetcore for more information.");
-            }
-
-            if (container.Options.DefaultScopedLifestyle is null)
-            {
-                throw new InvalidOperationException(
-                    "To be able to allow auto cross-wiring, please ensure that the container is configured " +
-                    "with a default scoped lifestyle by setting the Container.Options" +
-                    ".DefaultScopedLifestyle property with the required scoped lifestyle for your type of " +
-                    "application. In ASP.NET Core, the typical lifestyle to use is the " +
-                    $"{nameof(AsyncScopedLifestyle)}. " + Environment.NewLine +
-                    "See: https://simpleinjector.org/lifestyles#scoped");
-            }
-
-            CrossWireServiceScope(container, appServices);
-
-            container.ResolveUnregisteredType += (s, e) =>
-            {
-                if (e.Handled)
-                {
-                    return;
-                }
-
-                Type serviceType = e.UnregisteredServiceType;
-
-                ServiceDescriptor? descriptor = FindServiceDescriptor(services, serviceType);
-
-                if (descriptor != null)
-                {
-                    Lifestyle lifestyle = ToLifestyle(descriptor.Lifetime);
-
-                    Registration registration = lifestyle == Lifestyle.Singleton
-                        ? CreateSingletonRegistration(container, serviceType, appServices)
-                        : CreateNonSingletonRegistration(container, serviceType, appServices, lifestyle);
-
-                    e.Register(registration);
-                }
-            };
-        }
-
         private static IServiceProvider GetApplicationServices(this IApplicationBuilder builder)
         {
             var appServices = builder.ApplicationServices;
@@ -344,179 +157,6 @@ namespace SimpleInjector
             }
 
             return appServices;
-        }
-
-        private static ServiceDescriptor? FindServiceDescriptor(IServiceCollection services, Type serviceType)
-        {
-            // In case there are multiple descriptors for a given type, .NET Core will use the last descriptor
-            // when one instance is resolved. We will have to get this last one as well.
-            ServiceDescriptor? descriptor = services.LastOrDefault(d => d.ServiceType == serviceType);
-
-            if (descriptor == null && serviceType.GetTypeInfo().IsGenericType)
-            {
-                // In case the registration is made as open-generic type, the previous query will return null,
-                // and we need to go find the last open generic registration for the service type.
-                var serviceTypeDefinition = serviceType.GetTypeInfo().GetGenericTypeDefinition();
-                descriptor = services.LastOrDefault(d => d.ServiceType == serviceTypeDefinition);
-            }
-
-            return descriptor;
-        }
-
-        private static void CrossWireServiceScope(Container container, IServiceProvider appServices)
-        {
-            if (container.Options.DefaultScopedLifestyle == null)
-            {
-                throw new InvalidOperationException(
-                    "To be able to cross-wire a service with a transient or scoped lifestyle, " +
-                    "please ensure that the container is configured with a default scoped lifestyle by " +
-                    "setting the Container.Options.DefaultScopedLifestyle property with the required " +
-                    "scoped lifestyle for your type of application. In ASP.NET Core, the typical " +
-                    $"lifestyle to use is the {nameof(AsyncScopedLifestyle)}. " + Environment.NewLine +
-                    "See: https://simpleinjector.org/lifestyles#scoped");
-            }
-
-            if (container.ContainerScope.GetItem(ServiceScopeKey) is null)
-            {
-                var scopeFactory = appServices.GetRequiredService<IServiceScopeFactory>();
-
-                // We use unregistered type resolution, to allow the user to register IServiceScope manually
-                // if he needs.
-                container.ResolveUnregisteredType += (s, e) =>
-                {
-                    if (e.UnregisteredServiceType == typeof(IServiceScope) && !e.Handled)
-                    {
-                        e.Register(Lifestyle.Scoped.CreateRegistration(scopeFactory.CreateScope, container));
-                    }
-                };
-
-                container.ContainerScope.SetItem(ServiceScopeKey, new object());
-            }
-        }
-
-        private static Registration CreateCrossWireRegistration(
-            Container container, Type serviceType, IServiceProvider appServices)
-        {
-            IServiceCollection services = GetServiceCollection(container);
-
-            Lifestyle lifestyle = DetermineLifestyle(serviceType, services);
-
-            return lifestyle == Lifestyle.Singleton
-                ? CreateSingletonRegistration(container, serviceType, appServices)
-                : CreateNonSingletonRegistration(container, serviceType, appServices, lifestyle);
-        }
-
-        private static Registration CreateSingletonRegistration(
-            Container container, Type serviceType, IServiceProvider appServices)
-        {
-            var registration = Lifestyle.Singleton.CreateRegistration(
-                serviceType,
-                () => appServices.GetRequiredService(serviceType),
-                container);
-
-            // This registration is managed and disposed by IServiceProvider and should, therefore, not be
-            // disposed (again) by Simple Injector.
-            registration.SuppressDisposal = true;
-
-            return registration;
-        }
-
-        private static Registration CreateNonSingletonRegistration(
-            Container container, Type serviceType, IServiceProvider appServices, Lifestyle lifestyle)
-        {
-            IHttpContextAccessor accessor = GetHttpContextAccessor(appServices);
-
-            Registration registration = lifestyle.CreateRegistration(
-                serviceType,
-                () => GetServiceProvider(accessor, container, lifestyle).GetRequiredService(serviceType),
-                container);
-
-            // This registration is managed and disposed by IServiceProvider and should, therefore, not be
-            // disposed (again) by Simple Injector.
-            registration.SuppressDisposal = true;
-
-            if (lifestyle == Lifestyle.Transient && typeof(IDisposable).IsAssignableFrom(serviceType))
-            {
-                registration.SuppressDiagnosticWarning(
-                    DiagnosticType.DisposableTransientComponent,
-                    justification:
-                        "This is a cross-wired service. ASP.NET Core will ensure it gets disposed.");
-            }
-
-            return registration;
-        }
-
-        private static IServiceCollection GetServiceCollection(Container container)
-        {
-            var context = (IServiceCollection?)container.ContainerScope.GetItem(CrossWireContextKey);
-
-            if (context == null)
-            {
-                throw new InvalidOperationException(
-                    "Cross-wiring has to be enabled first. Please make sure the " +
-                    $"{nameof(EnableSimpleInjectorCrossWiring)} extension method is called first by " +
-                    "adding it to the ConfigureServices method as follows: " + Environment.NewLine +
-                    $"services.{nameof(EnableSimpleInjectorCrossWiring)}(container);" + Environment.NewLine +
-                    "See: https://simpleinjector.org/aspnetcore");
-            }
-
-            return context;
-        }
-
-        private static IServiceProvider GetServiceProvider(
-            IHttpContextAccessor accessor, Container container, Lifestyle lifestyle)
-        {
-            // Pull the IServiceProvider from the current request. If there is no request, pull it from an
-            // IServiceScope that that will be managed by Simple Injector as scoped registration
-            // (see CrossWireServiceScope).
-            return accessor.HttpContext?.RequestServices
-                ?? GetServiceProviderForBackgroundThread(container, lifestyle);
-        }
-
-        private static IServiceProvider GetServiceProviderForBackgroundThread(
-            Container container, Lifestyle lifestyle) =>
-            Lifestyle.Scoped.GetCurrentScope(container) != null
-                ? container.GetInstance<IServiceScope>().ServiceProvider
-                : throw new ActivationException(
-                    $"You are trying to resolve a {lifestyle.Name} cross-wired service, but are doing so " +
-                    "outside the context of a web request. To be able to resolve this service, the " +
-                    "operation must run in the context of an active " +
-                    $"({container.Options.DefaultScopedLifestyle!.Name}) scope.");
-
-        private static Lifestyle DetermineLifestyle(Type serviceType, IServiceCollection services)
-        {
-            var descriptor = FindDescriptor(serviceType, services);
-
-            // In case the service type is an IEnumerable, a registration can't be found, but collections are
-            // in Core always registered as Transient, so it's safe to fall back to the transient lifestyle.
-            return ToLifestyle(descriptor?.Lifetime ?? ServiceLifetime.Transient);
-        }
-
-        private static ServiceDescriptor? FindDescriptor(Type serviceType, IServiceCollection services)
-        {
-            ServiceDescriptor? descriptor = services.LastOrDefault(d => d.ServiceType == serviceType);
-
-            if (descriptor == null && serviceType.GetTypeInfo().IsGenericType)
-            {
-                var serviceTypeDefinition = serviceType.GetTypeInfo().GetGenericTypeDefinition();
-
-                // In case the type is an IEnumerable<T>, no registration can be found and null is returned.
-                return services.LastOrDefault(d => d.ServiceType == serviceTypeDefinition);
-            }
-            else
-            {
-                return descriptor;
-            }
-        }
-
-        private static Lifestyle ToLifestyle(ServiceLifetime lifetime)
-        {
-            switch (lifetime)
-            {
-                case ServiceLifetime.Singleton: return Lifestyle.Singleton;
-                case ServiceLifetime.Scoped: return Lifestyle.Scoped;
-                default: return Lifestyle.Transient;
-            }
         }
 
         private static IServiceProvider GetRequestServiceProvider(

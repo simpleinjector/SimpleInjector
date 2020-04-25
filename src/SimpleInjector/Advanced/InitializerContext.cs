@@ -4,7 +4,6 @@
 namespace SimpleInjector.Advanced
 {
     using System;
-    using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
@@ -26,16 +25,6 @@ namespace SimpleInjector.Advanced
 
             this.Registration = registration;
         }
-
-        /// <summary>
-        /// Gets a null reference. This property has been deprecated.
-        /// </summary>
-        /// <value>The null (Nothing in VB).</value>
-        [Obsolete("The Producer property has been deprecated. Please use Registration instead. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public InstanceProducer? Producer { get; }
 
         /// <summary>
         /// Gets the <see cref="Registration"/> that is responsible for the initialization of the created

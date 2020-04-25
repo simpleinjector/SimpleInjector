@@ -17,33 +17,6 @@ namespace SimpleInjector
     /// </summary>
     public static class PackageExtensions
     {
-        // For more information about why this method was obsoleted, see: #372.
-#if NET40
-        /// <summary>
-        /// Loads all <see cref="IPackage"/> implementations from assemblies that are currently loaded in the
-        /// current AppDomain, and calls their <see cref="IPackage.RegisterServices">Register</see> method.
-        /// Note that only publicly exposed classes that contain a public default constructor will be loaded.
-        /// Note that this method will only pick up assemblies that are loaded at that moment in time. A
-        /// more reliable way of registering packages is by explicitly supplying the list of assemblies using
-        /// the <see cref="RegisterPackages(Container, IEnumerable{Assembly})"/> overload.
-        /// </summary>
-        /// <param name="container">The container to which the packages will be applied to.</param>
-        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is a null
-        /// reference.</exception>
-        [Obsolete("Please use RegisterPackages(Container, IEnumerable<Assembly>) instead. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public static void RegisterPackages(this Container container)
-        {
-            var assemblies =
-                AppDomain.CurrentDomain.GetAssemblies()
-                .Where(assembly => !assembly.IsDynamic);
-
-            RegisterPackages(container, assemblies);
-        }
-#endif
-
         /// <summary>
         /// Loads all <see cref="IPackage"/> implementations from the given set of
         /// <paramref name="assemblies"/> and calls their <see cref="IPackage.RegisterServices">Register</see> method.

@@ -5,7 +5,6 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
@@ -565,28 +564,6 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// This overload has been deprecated. Please call <see cref="CreateRegistration{TConcrete}(Container)"/>
-        /// instead.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
-        /// <typeparam name="TImplementation">The concrete type that will be created.</typeparam>
-        /// <param name="container">The <see cref="Container"/> instance for which a
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
-        /// reference (Nothing in VB).</exception>
-        [Obsolete("Please use CreateRegistration<TConcrete>(Container) instead. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Registration CreateRegistration<TService, TImplementation>(Container container)
-            where TService : class
-            where TImplementation : class, TService
-        {
-            return this.CreateRegistration<TImplementation>(container);
-        }
-
-        /// <summary>
         /// Creates a new <see cref="Registration"/> instance defining the creation of the
         /// specified <typeparamref name="TService"/> using the supplied <paramref name="instanceCreator"/>
         /// with the caching as specified by this lifestyle.
@@ -636,29 +613,6 @@ namespace SimpleInjector
             Requires.IsNotOpenGenericType(concreteType, nameof(concreteType));
 
             return this.CreateRegistrationInternal(concreteType, container, preventTornLifestyles: true);
-        }
-
-        /// <summary>
-        /// This overload has been deprecated. Please call <see cref="CreateRegistration(Type, Container)"/>
-        /// instead.
-        /// </summary>
-        /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.</param>
-        /// <param name="implementationType">The concrete type that will be registered.</param>
-        /// <param name="container">The <see cref="Container"/> instance for which a
-        /// <see cref="Registration"/> must be created.</param>
-        /// <returns>A new <see cref="Registration"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
-        [Obsolete("Please use CreateRegistration(Type, Container) instead. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Registration CreateRegistration(Type serviceType, Type implementationType, Container container)
-        {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(implementationType, nameof(implementationType));
-
-            return this.CreateRegistration(implementationType, container);
         }
 
         /// <summary>
@@ -802,21 +756,17 @@ namespace SimpleInjector
         {
             var lifestyleCache = container.LifestyleRegistrationCache;
 
-            Dictionary<Type, WeakReference> registrationCache;
-
-            if (!lifestyleCache.TryGetValue(this.IdentificationKey, out registrationCache))
+            if (!lifestyleCache.TryGetValue(this.IdentificationKey, out Dictionary<Type, WeakReference> cache))
             {
-                registrationCache = new Dictionary<Type, WeakReference>(100);
-                lifestyleCache[this.IdentificationKey] = registrationCache;
+                cache = new Dictionary<Type, WeakReference>(100);
+                lifestyleCache[this.IdentificationKey] = cache;
             }
 
             // The created Registration must be wrapped in a WeakReference, because these instances can
             // go out of scope, and holding a reference might cause a memory leak.
-            WeakReference weakRegistration;
-
-            if (!registrationCache.TryGetValue(concreteType, out weakRegistration))
+            if (!cache.TryGetValue(concreteType, out WeakReference weakRegistration))
             {
-                registrationCache[concreteType] = weakRegistration = new WeakReference(null);
+                cache[concreteType] = weakRegistration = new WeakReference(null);
             }
 
             return weakRegistration;

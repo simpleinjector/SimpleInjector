@@ -5,7 +5,6 @@ namespace SimpleInjector
 {
     using System;
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
@@ -69,75 +68,6 @@ namespace SimpleInjector
             app.ApplicationServices.UseSimpleInjector(container, setupAction);
 
             return app;
-        }
-
-        /// <summary>
-        /// Adds a middleware type to the application's request pipeline. The middleware will be resolved
-        /// from Simple Injector. The middleware will be added to the container for verification.
-        /// </summary>
-        /// <typeparam name="TMiddleware">The middleware type.</typeparam>
-        /// <param name="options">The <see cref="SimpleInjectorUseOptions"/>.</param>
-        /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
-        [Obsolete("Please call IApplicationBuilder.UseMiddleware<TMiddleware>(Container) instead. This " +
-            "method can cause your middleware to be applied at the wrong stage in the pipeline. This will, " +
-            "for instance, cause your middleware to be executed before the static files middleware (i.e. " +
-            "the .UseStaticFiles() call) or before authorization is applied (i.e. the .UseAuthorization() " +
-            "call). Instead, take care that you call .UseMiddleware<TMiddleware>(Container) at the right " +
-            "stage. This typically means after .UseStaticFiles() and .UseAuthorization(), but before " +
-            ".UseEndpoints(...). See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        public static void UseMiddleware<TMiddleware>(
-            this SimpleInjectorUseOptions options, IApplicationBuilder app)
-            where TMiddleware : class, IMiddleware
-        {
-            Requires.IsNotNull(options, nameof(options));
-            Requires.IsNotNull(app, nameof(app));
-
-            options.UseMiddleware(typeof(TMiddleware), app);
-        }
-
-        /// <summary>
-        /// Adds a middleware type to the application's request pipeline. The middleware will be resolved
-        /// from Simple Injector. The middleware will be added to the container for verification.
-        /// </summary>
-        /// <param name="options">The <see cref="SimpleInjectorUseOptions"/>.</param>
-        /// <param name="middlewareType">The middleware type.</param>
-        /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
-        [Obsolete("Please call IApplicationBuilder.UseMiddleware(Type, Container) instead. This " +
-            "method can cause your middleware to be applied at the wrong stage in the pipeline. This will, " +
-            "for instance, cause your middleware to be executed before the static files middleware (i.e. " +
-            "the .UseStaticFiles() call) or before authorization is applied (i.e. the .UseAuthorization() " +
-            "call). Instead, take care that you call .UseMiddleware<TMiddleware>(Container) at the right " +
-            "stage. This typically means after .UseStaticFiles() and .UseAuthorization(), but before " +
-            ".UseEndpoints(...). See https://simpleinjector.org/aspnetcore for more information. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        public static void UseMiddleware(
-            this SimpleInjectorUseOptions options, Type middlewareType, IApplicationBuilder app)
-        {
-            Requires.IsNotNull(options, nameof(options));
-            Requires.IsNotNull(middlewareType, nameof(middlewareType));
-            Requires.IsNotNull(app, nameof(app));
-
-            Requires.ServiceIsAssignableFromImplementation(
-                typeof(IMiddleware), middlewareType, nameof(middlewareType));
-            Requires.IsNotOpenGenericType(middlewareType, nameof(middlewareType));
-
-            var container = options.Container;
-
-            var lifestyle = container.Options.LifestyleSelectionBehavior.SelectLifestyle(middlewareType);
-
-            // By creating an InstanceProducer up front, it will be known to the container, and will be part
-            // of the verification process of the container.
-            InstanceProducer<IMiddleware> producer =
-                lifestyle.CreateProducer<IMiddleware>(middlewareType, container);
-
-            app.Use((c, next) =>
-            {
-                IMiddleware middleware = producer.GetInstance();
-                return middleware.InvokeAsync(c, _ => next());
-            });
         }
     }
 }

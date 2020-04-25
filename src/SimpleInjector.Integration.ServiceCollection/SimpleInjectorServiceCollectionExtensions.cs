@@ -270,63 +270,6 @@ namespace SimpleInjector
 
         /// <summary>
         /// Allows components that are built by Simple Injector to depend on the (non-generic)
-        /// <see cref="ILogger">Microsoft.Extensions.Logging.ILogger</see> abstraction. Components are
-        /// injected with an contextual implementation. Using this method, application components can simply
-        /// depend on <b>ILogger</b> instead of its generic counter part, <b>ILogger&lt;T&gt;</b>, which
-        /// simplifies development.
-        /// </summary>
-        /// <param name="options">The options.</param>
-        /// <returns>The supplied <paramref name="options"/>.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="options"/> is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when no <see cref="ILoggerFactory"/> entry
-        /// can be found in the framework's list of services defined by <see cref="IServiceCollection"/>.
-        /// </exception>
-        [Obsolete(
-            "Please call services.AddSimpleInjector(options => { options.AddLogging(); } instead on " +
-            "the IServiceCollection instance. For more information, see: " +
-            "https://simpleinjector.org/servicecollection. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public static SimpleInjectorUseOptions UseLogging(this SimpleInjectorUseOptions options)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            if (options.Container.ContainerScope.GetItem(AddLoggingKey) != null)
-            {
-                throw new InvalidOperationException(
-                    $"You already initialized logging by calling the {nameof(AddLogging)} extension " +
-                    $"method. {nameof(UseLogging)} and {nameof(AddLogging)} are mutually exclusive—" +
-                    $"they can't be used together. Prefer using {nameof(AddLogging)} as " +
-                    "this method is obsolete.");
-            }
-
-            // Both RootLogger and Logger<T> depend on ILoggerFactory
-            VerifyLoggerFactoryAvailable(options.Services);
-
-            // Register logger factory explicitly. This allows the Logger<T> conditional registration to work
-            // even when auto cross wiring is disabled.
-            options.Container.RegisterInstance(options.Builder.GetRequiredFrameworkService<ILoggerFactory>());
-
-            Type genericLoggerType = GetGenericLoggerType();
-
-            options.Container.RegisterConditional(
-                typeof(ILogger),
-                c => c.Consumer is null
-                    ? typeof(RootLogger)
-                    : genericLoggerType.MakeGenericType(c.Consumer.ImplementationType),
-                Lifestyle.Singleton,
-                _ => true);
-
-            return options;
-        }
-
-        /// <summary>
-        /// Allows components that are built by Simple Injector to depend on the (non-generic)
         /// <see cref="IStringLocalizer">Microsoft.Extensions.Localization.IStringLocalizer</see> abstraction.
         /// Components are injected with an contextual implementation. Using this method, application 
         /// components can simply depend on <b>IStringLocalizer</b> instead of its generic counter part,
@@ -369,128 +312,6 @@ namespace SimpleInjector
                     : genericLocalizerType.MakeGenericType(c.Consumer.ImplementationType),
                 Lifestyle.Singleton,
                 _ => true);
-
-            return options;
-        }
-
-        /// <summary>
-        /// Allows components that are built by Simple Injector to depend on the (non-generic)
-        /// <see cref="IStringLocalizer">Microsoft.Extensions.Localization.IStringLocalizer</see> abstraction.
-        /// Components are injected with an contextual implementation. Using this method, application 
-        /// components can simply depend on <b>IStringLocalizer</b> instead of its generic counter part,
-        /// <b>IStringLocalizer&lt;T&gt;</b>, which simplifies development.
-        /// </summary>
-        /// <param name="options">The options.</param>
-        /// <returns>The supplied <paramref name="options"/>.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="options"/> is a null reference.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when no <see cref="IStringLocalizerFactory"/>
-        /// entry can be found in the framework's list of services defined by <see cref="IServiceCollection"/>.
-        /// </exception>
-        /// <exception cref="ActivationException">Thrown when an <see cref="IStringLocalizer"/> is directly 
-        /// resolved from the container. Instead use <see cref="IStringLocalizer"/> within a constructor 
-        /// dependency.</exception>
-        [Obsolete(
-            "Please call services.AddSimpleInjector(options => { options.AddLocalization(); } instead on " +
-            "the IServiceCollection instance. For more information, see: " +
-            "https://simpleinjector.org/servicecollection. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public static SimpleInjectorUseOptions UseLocalization(this SimpleInjectorUseOptions options)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            if (options.Container.ContainerScope.GetItem(AddLocalizationKey) != null)
-            {
-                throw new InvalidOperationException(
-                    $"You already initialized logging by calling the {nameof(AddLocalization)} extension " +
-                    $"method. {nameof(UseLocalization)} and {nameof(AddLocalization)} are mutually " +
-                    $"exclusive—they can't be used together. Prefer using {nameof(AddLocalization)} as " +
-                    "this method is obsolete.");
-            }
-
-            VerifyStringLocalizerFactoryAvailable(options.Services);
-
-            // registration to work even when auto cross wiring is disabled.
-            options.Container.RegisterInstance(
-                options.Builder.GetRequiredFrameworkService<IStringLocalizerFactory>());
-
-            Type genericLocalizerType = GetGenericLocalizerType();
-
-            options.Container.RegisterConditional(
-                typeof(IStringLocalizer),
-                c => c.Consumer is null
-                    ? throw new ActivationException(
-                        "IStringLocalizer is being resolved directly from the container, but this is not " +
-                        "supported as string localizers need to be related to a consuming type. Instead, " +
-                        "make IStringLocalizer a constructor dependency of the type it is used in.")
-                    : genericLocalizerType.MakeGenericType(c.Consumer.ImplementationType),
-                Lifestyle.Singleton,
-                _ => true);
-
-            return options;
-        }
-
-        /// <summary>
-        /// Cross wires an ASP.NET Core or third-party service to the container, to allow the service to be
-        /// injected into components that are built by Simple Injector.
-        /// </summary>
-        /// <typeparam name="TService">The type of service object to cross-wire.</typeparam>
-        /// <param name="options">The options.</param>
-        /// <returns>The supplied <paramref name="options"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when the parameter is a null reference.
-        /// </exception>
-        [Obsolete(
-            "Please call services.AddSimpleInjector(options => { options.CrossWire<TService>(); } instead " +
-            "on the IServiceCollection instance (typically from inside your Startup.ConfigureServices " +
-            "method). For more information, see: https://simpleinjector.org/servicecollection. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        public static SimpleInjectorUseOptions CrossWire<TService>(this SimpleInjectorUseOptions options)
-            where TService : class
-        {
-            return CrossWire(options, typeof(TService));
-        }
-
-        /// <summary>
-        /// Cross wires an ASP.NET Core or third-party service to the container, to allow the service to be
-        /// injected into components that are built by Simple Injector.
-        /// </summary>
-        /// <param name="options">The options.</param>
-        /// <param name="serviceType">The type of service object to ross-wire.</param>
-        /// <returns>The supplied <paramref name="options"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the parameters is a null reference.
-        /// </exception>
-        [Obsolete(
-            "Please call services.AddSimpleInjector(options => { options.CrossWire(Type); } instead " +
-            "on the IServiceCollection instance (typically from inside your Startup.ConfigureServices " +
-            "method). For more information, see: https://simpleinjector.org/servicecollection. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        public static SimpleInjectorUseOptions CrossWire(
-            this SimpleInjectorUseOptions options, Type serviceType)
-        {
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            if (serviceType is null)
-            {
-                throw new ArgumentNullException(nameof(serviceType));
-            }
-
-            Registration registration = CreateCrossWireRegistration(
-                options.Builder,
-                options.ApplicationServices,
-                serviceType,
-                DetermineLifestyle(serviceType, options.Services));
-
-            options.Container.AddRegistration(serviceType, registration);
 
             return options;
         }
@@ -815,7 +636,7 @@ namespace SimpleInjector
             private readonly Container container;
 
             public ContainerDisposeWrapper(Container container) => this.container = container;
-            
+
             public void Dispose() => this.container.Dispose();
         }
     }

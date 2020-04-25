@@ -31,40 +31,6 @@ namespace SimpleInjector.Integration.Web
         {
         }
 
-        /// <summary>Initializes a new instance of the <see cref="WebRequestLifestyle"/> class.</summary>
-        /// <param name="disposeInstanceWhenWebRequestEnds">
-        /// Specifies whether the created and cached instance will be disposed after the execution of the web
-        /// request ended and when the created object implements <see cref="IDisposable"/>.
-        /// </param>
-        [Obsolete("Please use WebRequestLifestyle() instead. Will be removed in version 5.0.", error: true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public WebRequestLifestyle(bool disposeInstanceWhenWebRequestEnds) : this()
-        {
-            throw new NotSupportedException(
-                "This constructor has been deprecated. Please use WebRequestLifestyle() instead.");
-        }
-
-        /// <summary>
-        /// Allows registering an <paramref name="action"/> delegate that will be called when the scope ends,
-        /// but before the scope disposes any instances.
-        /// </summary>
-        /// <param name="container">The <see cref="Container"/> instance.</param>
-        /// <param name="action">The delegate to run when the scope ends.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
-        /// <exception cref="InvalidOperationException">Will be thrown when the current thread isn't running
-        /// in the context of a web request.</exception>
-        [Obsolete("Please use Lifestyle.Scoped.WhenScopeEnds(Container, Action) instead. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public static void WhenCurrentRequestEnds(Container container, Action action)
-        {
-            throw new NotSupportedException(
-                "WhenCurrentRequestEnds has been deprecated. " +
-                "Please use Lifestyle.Scoped.WhenScopeEnds(Container, Action) instead.");
-        }
-
         internal static void CleanUpWebRequest(HttpContext context)
         {
             Requires.IsNotNull(context, nameof(context));

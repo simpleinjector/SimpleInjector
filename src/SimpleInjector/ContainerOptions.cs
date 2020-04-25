@@ -159,16 +159,6 @@ namespace SimpleInjector
         /// <value>The value indicating whether the container should automatically trigger verification.</value>
         public bool EnableAutoVerification { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether.
-        /// This method is deprecated. Changing its value will have no effect.</summary>
-        /// <value>The value indicating whether the container will return an empty collection.</value>
-        [Obsolete("This method is not used any longer. Setting it has no effect. " +
-            "Please register collections explicitly instead. " +
-            "Will be removed in version 5.0.",
-            error: true)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ResolveUnregisteredCollections { get; set; }
-
         /// <summary>
         /// Gets or sets a value indicating whether all the containers in the current AppDomain should throw
         /// exceptions that contain fully qualified type name. The default is <c>false</c> which means
