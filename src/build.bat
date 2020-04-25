@@ -2,8 +2,6 @@
 
 for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /format:list') do set datetime=%%I
 
-set nextMajorVersion=5
-
 set buildNumber=0 
 set copyrightYear=%datetime:~0,4%
 set version=%1
@@ -38,17 +36,18 @@ echo step: %step%
 echo version: %version% (major: %version_major%, minor: %version_minor%, patch: %version_patch%)
 echo prereleasePostfix: %prereleasePostfix%
 
-
 IF "%inputOk%"=="false" (
 	rem I would have loved doing this all in one single step, but for some reason, I can't seem to build using MSBuild
 	rem while running from the command line using MSBuild 2017. See https://stackoverflow.com/questions/47002571/.
 	rem That's why this build file must be called multiple times.
     echo Please provide both the version number and the number of the of the build step. Starting with 1.
 	echo Usage: "%0 [version] {-[prerelease postfix]} [step]
-	echo Example1: "%0 4.0.0 -beta1 1
-	echo Example2: "%0 4.0.0 1
+	echo Example1: "%0 5.0.0 -beta1 1
+	echo Example2: "%0 5.0.0 1
     goto :EOF
 )
+
+set /a nextMajorVersion=%version_major%+1
 
 set version_Core=%version%
 set version_Packaging=%version_Core%
