@@ -62,7 +62,7 @@
 
         public void AddRegistration(Type serviceType, Registration registration, string name)
         {
-            if (this.IsLocked())
+            if (this.IsLocked)
             {
                 throw new InvalidOperationException("The container is locked.");
             }

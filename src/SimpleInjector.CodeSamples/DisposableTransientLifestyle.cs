@@ -50,7 +50,7 @@
 
             if (!alreadyInitialized)
             {
-                if (container.IsLocked())
+                if (container.IsLocked)
                 {
                     throw new InvalidOperationException(
                         "Please make sure DisposableTransientLifestyle.EnableForContainer(Container) is " +

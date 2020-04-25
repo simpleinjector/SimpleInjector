@@ -34,9 +34,8 @@ namespace SimpleInjector
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
-            "Will be treated as an error from version 5.0. " +
             "Will be removed in version 6.0.",
-            error: false)]
+            error: true)]
         public void RegisterCollection<TService>(IEnumerable<TService> containerUncontrolledCollection)
             where TService : class
         {
@@ -60,9 +59,8 @@ namespace SimpleInjector
             Justification = "TService is the name of the generic type argument. So this warning is a false positive.")]
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
-            "Will be treated as an error from version 5.0. " +
             "Will be removed in version 6.0.",
-            error: false)]
+            error: true)]
         public void RegisterCollection<TService>(params TService[] singletons) where TService : class
         {
             this.Collection.Register<TService>(singletons);
@@ -88,9 +86,8 @@ namespace SimpleInjector
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
-            "Will be treated as an error from version 5.0. " +
             "Will be removed in version 6.0.",
-            error: false)]
+            error: true)]
         public void RegisterCollection<TService>(IEnumerable<Type> serviceTypes) where TService : class
         {
             this.RegisterCollection(typeof(TService), serviceTypes);
@@ -116,9 +113,8 @@ namespace SimpleInjector
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
-            "Will be treated as an error from version 5.0. " +
             "Will be removed in version 6.0.",
-            error: false)]
+            error: true)]
         public void RegisterCollection<TService>(IEnumerable<Registration> registrations)
             where TService : class
         {
@@ -145,9 +141,8 @@ namespace SimpleInjector
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
-            "Will be treated as an error from version 5.0. " +
             "Will be removed in version 6.0.",
-            error: false)]
+            error: true)]
         public void RegisterCollection(Type serviceType, IEnumerable<Type> serviceTypes)
         {
             this.Collection.Register(serviceType, serviceTypes);
@@ -174,9 +169,8 @@ namespace SimpleInjector
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
-            "Will be treated as an error from version 5.0. " +
             "Will be removed in version 6.0.",
-            error: false)]
+            error: true)]
         public void RegisterCollection(Type serviceType, IEnumerable<Registration> registrations)
         {
             this.Collection.Register(serviceType, registrations);
@@ -197,9 +191,8 @@ namespace SimpleInjector
         /// open generic type.</exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
-            "Will be treated as an error from version 5.0. " +
             "Will be removed in version 6.0.",
-            error: false)]
+            error: true)]
         public void RegisterCollection(Type serviceType, IEnumerable containerUncontrolledCollection)
         {
             this.Collection.Register(serviceType, containerUncontrolledCollection);

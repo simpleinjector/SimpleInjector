@@ -674,9 +674,8 @@ namespace SimpleInjector
         /// Thrown when <paramref name="instance"/> is a null reference.
         /// </exception>
         [Obsolete("Please use " + nameof(RegisterInstance) + "<TService>(TService) instead. " +
-            "Will be treated as an error from version 5.0. " +
             "Will be removed in version 6.0.",
-            error: false)]
+            error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void RegisterSingleton<TService>(TService instance) where TService : class
         {
@@ -727,9 +726,8 @@ namespace SimpleInjector
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
         [Obsolete("Please use " + nameof(RegisterInstance) + "(Type, object) instead. " +
-            "Will be treated as an error from version 5.0. " +
             "Will be removed in version 6.0.",
-            error: false)]
+            error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void RegisterSingleton(Type serviceType, object instance)
         {

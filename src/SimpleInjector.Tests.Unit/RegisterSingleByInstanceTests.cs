@@ -1,5 +1,4 @@
-﻿#pragma warning disable 0618
-namespace SimpleInjector.Tests.Unit
+﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Collections.Generic;
@@ -11,11 +10,11 @@ namespace SimpleInjector.Tests.Unit
     public class RegisterSingleByInstanceTests
     {
         [TestMethod]
-        public void RegisterSingleByInstance_WithValidType_ContainerAlwaysReturnsSameInstance()
+        public void RegisterInstance_WithValidType_ContainerAlwaysReturnsSameInstance()
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             // Act
             var instance1 = container.GetInstance<IUserRepository>();
@@ -27,64 +26,64 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingleByInstance_WithNullArgument_ThrowsException()
+        public void RegisterInstance_WithNullArgument_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
             IUserRepository invalidInstance = null;
 
             // Act
-            Action action = () => container.RegisterSingleton<IUserRepository>(invalidInstance);
+            Action action = () => container.RegisterInstance<IUserRepository>(invalidInstance);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        public void RegisterSingleByInstance_CalledTwiceOnSameType_ThrowsException()
+        public void RegisterInstance_CalledTwiceOnSameType_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             // Act
-            Action action = () => container.RegisterSingleton<IUserRepository>(new InMemoryUserRepository());
+            Action action = () => container.RegisterInstance<IUserRepository>(new InMemoryUserRepository());
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action, "A certain type can only be registered once.");
         }
 
         [TestMethod]
-        public void RegisterSingleByInstance_CalledAfterRegisterOnSameType_ThrowsException()
+        public void RegisterInstance_CalledAfterRegisterOnSameType_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
             container.Register<UserServiceBase>(() => new RealUserService(null));
 
             // Act
-            Action action = () => container.RegisterSingleton<UserServiceBase>(new FakeUserService(null));
+            Action action = () => container.RegisterInstance<UserServiceBase>(new FakeUserService(null));
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action, "A certain type can only be registered once.");
         }
 
         [TestMethod]
-        public void RegisterSingleByInstance_AfterCallingGetInstance_ThrowsException()
+        public void RegisterInstance_AfterCallingGetInstance_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterSingleton<IUserRepository>(new InMemoryUserRepository());
+            container.RegisterInstance<IUserRepository>(new InMemoryUserRepository());
             container.GetInstance<IUserRepository>();
 
             // Act
-            Action action = () => container.RegisterSingleton<UserServiceBase>(new RealUserService(null));
+            Action action = () => container.RegisterInstance<UserServiceBase>(new RealUserService(null));
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action, "The container should get locked after a call to GetInstance.");
         }
 
         [TestMethod]
-        public void RegisterSingleByInstance_AfterCallingGetAllInstances_ThrowsException()
+        public void RegisterInstance_AfterCallingGetAllInstances_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -96,28 +95,28 @@ namespace SimpleInjector.Tests.Unit
             var count = repositories.Count();
 
             // Act
-            Action action = () => container.RegisterSingleton<UserServiceBase>(new RealUserService(null));
+            Action action = () => container.RegisterInstance<UserServiceBase>(new RealUserService(null));
 
             // Assert
             AssertThat.Throws<InvalidOperationException>(action, "The container should get locked after a call to GetAllInstances.");
         }
 
         [TestMethod]
-        public void GetInstance_ForConcreteUnregisteredTypeWithDependencyRegisteredWithRegisterSingle_Succeeds()
+        public void GetInstance_ForConcreteUnregisteredTypeWithDependencyRegisteredWithRegisterInstance_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // This registration will make the DelegateBuilder call the
             // SingletonInstanceProducer.BuildExpression method.
-            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             // Act
             container.GetInstance<RealUserService>();
         }
 
         [TestMethod]
-        public void RegisterSingleByInstanceNonGeneric_ValidRegistration_GetInstanceReturnsExpectedInstance()
+        public void RegisterInstanceNonGeneric_ValidRegistration_GetInstanceReturnsExpectedInstance()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -125,7 +124,7 @@ namespace SimpleInjector.Tests.Unit
             object impl = new SqlUserRepository();
 
             // Act
-            container.RegisterSingleton(typeof(IUserRepository), impl);
+            container.RegisterInstance(typeof(IUserRepository), impl);
 
             // Assert
             Assert.AreEqual(impl, container.GetInstance<IUserRepository>(),
@@ -133,7 +132,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingleByInstanceNonGeneric_ValidRegistration_GetInstanceAlwaysReturnsSameInstance()
+        public void RegisterInstanceNonGeneric_ValidRegistration_GetInstanceAlwaysReturnsSameInstance()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -141,7 +140,7 @@ namespace SimpleInjector.Tests.Unit
             object impl = new SqlUserRepository();
 
             // Act
-            container.RegisterSingleton(typeof(IUserRepository), impl);
+            container.RegisterInstance(typeof(IUserRepository), impl);
 
             var instance1 = container.GetInstance<IUserRepository>();
             var instance2 = container.GetInstance<IUserRepository>();
@@ -151,7 +150,7 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void RegisterSingleByInstanceNonGeneric_ImplementationNoDescendantOfServiceType_ThrowsException()
+        public void RegisterInstanceNonGeneric_ImplementationNoDescendantOfServiceType_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -159,14 +158,14 @@ namespace SimpleInjector.Tests.Unit
             object impl = new List<int>();
 
             // Act
-            Action action = () => container.RegisterSingleton(typeof(IUserRepository), impl);
+            Action action = () => container.RegisterInstance(typeof(IUserRepository), impl);
 
             // Assert
             AssertThat.Throws<ArgumentException>(action);
         }
 
         [TestMethod]
-        public void RegisterSingleByInstanceNonGeneric_InstanceOfSameTypeAsService_Succeeds()
+        public void RegisterInstanceNonGeneric_InstanceOfSameTypeAsService_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -174,11 +173,11 @@ namespace SimpleInjector.Tests.Unit
             object impl = new List<int>();
 
             // Act
-            container.RegisterSingleton(impl.GetType(), impl);
+            container.RegisterInstance(impl.GetType(), impl);
         }
 
         [TestMethod]
-        public void RegisterSingleByInstanceNonGeneric_NullServiceType_ThrowsException()
+        public void RegisterInstanceNonGeneric_NullServiceType_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -187,14 +186,14 @@ namespace SimpleInjector.Tests.Unit
             object validInstance = new SqlUserRepository();
 
             // Act
-            Action action = () => container.RegisterSingleton(invalidServiceType, validInstance);
+            Action action = () => container.RegisterInstance(invalidServiceType, validInstance);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        public void RegisterSingleByInstanceNonGeneric_NullInstance_ThrowsException()
+        public void RegisterInstanceNonGeneric_NullInstance_ThrowsException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -203,21 +202,21 @@ namespace SimpleInjector.Tests.Unit
             object invalidInstance = null;
 
             // Act
-            Action action = () => container.RegisterSingleton(validServiceType, invalidInstance);
+            Action action = () => container.RegisterInstance(validServiceType, invalidInstance);
 
             // Assert
             AssertThat.Throws<ArgumentNullException>(action);
         }
 
         [TestMethod]
-        public void GetInstance_ServiceRegisteredUsingRegisterSingleInstanceGeneric_CallsExpressionBuildingWithConstantExpression()
+        public void GetInstance_ServiceRegisteredUsingRegisterInstanceGeneric_CallsExpressionBuildingWithConstantExpression()
         {
             // Arrange
             var expressionsBuilding = new List<Expression>();
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             container.ExpressionBuilding += (s, e) =>
             {
@@ -233,14 +232,14 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
-        public void GetInstance_ServiceRegisteredUsingRegisterSingleInstanceNonGeneric_CallsExpressionBuildingWithConstantExpression()
+        public void GetInstance_ServiceRegisteredUsingRegisterInstanceNonGeneric_CallsExpressionBuildingWithConstantExpression()
         {
             // Arrange
             var expressionsBuilding = new List<Expression>();
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton(typeof(IUserRepository), new SqlUserRepository());
+            container.RegisterInstance(typeof(IUserRepository), new SqlUserRepository());
 
             container.ExpressionBuilding += (s, e) =>
             {
@@ -256,4 +255,3 @@ namespace SimpleInjector.Tests.Unit
         }
     }
 }
-#pragma warning restore 0618

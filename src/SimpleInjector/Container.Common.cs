@@ -132,12 +132,14 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Gets the intermediate lifestyle that forwards CreateRegistration calls to the lifestyle that is
-        /// returned from the registered container.Options.LifestyleSelectionBehavior.
+        /// Determines whether the specified container is locked from making any new registrations. The
+        /// container is automatically locked when the first instance is resolved (e.g. by calling
+        /// <see cref="Container.GetInstance">GetInstance</see>).
         /// </summary>
-        internal LifestyleSelectionBehaviorProxyLifestyle SelectionBasedLifestyle { get; }
-
-        internal bool IsLocked
+        /// <returns>
+        ///   <c>true</c> if the specified container is locked; otherwise, <c>false</c>.
+        /// </returns>
+        public bool IsLocked
         {
             get
             {
@@ -154,6 +156,12 @@ namespace SimpleInjector
                 }
             }
         }
+
+        /// <summary>
+        /// Gets the intermediate lifestyle that forwards CreateRegistration calls to the lifestyle that is
+        /// returned from the registered container.Options.LifestyleSelectionBehavior.
+        /// </summary>
+        internal LifestyleSelectionBehaviorProxyLifestyle SelectionBasedLifestyle { get; }
 
         internal bool HasRegistrations =>
             this.explicitRegistrations.Count > 0 || this.collectionResolvers.Count > 0;

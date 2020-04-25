@@ -22,7 +22,7 @@ namespace SimpleInjector.CodeSamples
             this.container = container;
         }
 
-        private bool IsCalledDuringRegistrationPhase => !this.container.IsLocked();
+        private bool IsCalledDuringRegistrationPhase => !this.container.IsLocked;
 
         [DebuggerStepThrough]
         public ConstructorInfo GetConstructor(Type implementationType) {

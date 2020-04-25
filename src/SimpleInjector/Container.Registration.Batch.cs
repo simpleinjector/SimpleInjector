@@ -278,9 +278,8 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
-            "Will be treated as an error from version 5.0. " +
             "Will be removed in version 6.0.",
-            error: false)]
+            error: true)]
         public void RegisterCollection<TService>(IEnumerable<Assembly> assemblies) where TService : class
         {
             this.Collection.Register<TService>(assemblies);
@@ -305,9 +304,8 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
-            "Will be treated as an error from version 5.0. " +
             "Will be removed in version 6.0.",
-            error: false)]
+            error: true)]
         public void RegisterCollection(Type serviceType, params Assembly[] assemblies)
         {
             this.Collection.Register(serviceType, assemblies);
@@ -332,9 +330,8 @@ namespace SimpleInjector
         /// reference (Nothing in VB).</exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
-            "Will be treated as an error from version 5.0. " +
             "Will be removed in version 6.0.",
-            error: false)]
+            error: true)]
         public void RegisterCollection(Type serviceType, IEnumerable<Assembly> assemblies)
         {
             this.Collection.Register(serviceType, assemblies);

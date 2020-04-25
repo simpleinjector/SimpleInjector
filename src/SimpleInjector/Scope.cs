@@ -31,8 +31,9 @@ namespace SimpleInjector
 
         /// <summary>Initializes a new instance of the <see cref="Scope"/> class.</summary>
         [Obsolete("Use the overloaded Scope(Container) constructor instead. " +
-            "Will be treated as an error from version 5.0. Will be removed in version 6.0.",
-            error: false)]
+            "Will be removed in version 6.0.",
+            error: true)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public Scope()
         {
         }

@@ -37,7 +37,7 @@
             registration.GetInstance();
 
             // Assert
-            Assert.IsTrue(container.IsLocked());
+            Assert.IsTrue(container.IsLocked);
         }
 
         [TestMethod]
@@ -52,7 +52,7 @@
             registration.BuildExpression();
 
             // Assert
-            Assert.IsTrue(container.IsLocked());
+            Assert.IsTrue(container.IsLocked);
         }
 
         [TestMethod]

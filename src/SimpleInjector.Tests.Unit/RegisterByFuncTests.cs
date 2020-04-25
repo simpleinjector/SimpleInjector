@@ -29,7 +29,7 @@ namespace SimpleInjector.Tests.Unit
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             // Act
             Action action = () => container.Register<IUserRepository>(() => new InMemoryUserRepository());
@@ -43,7 +43,7 @@ namespace SimpleInjector.Tests.Unit
         {
             // Arrange
             var container = ContainerFactory.New();
-            container.RegisterSingleton<IUserRepository>(new InMemoryUserRepository());
+            container.RegisterInstance<IUserRepository>(new InMemoryUserRepository());
             container.GetInstance<IUserRepository>();
 
             // Act

@@ -95,9 +95,9 @@ namespace SimpleInjector.Tests.Unit
 
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
-            container.ResolveUnregisteredType += (s, e) => { eventCalled = true; };
+            container.ResolveUnregisteredType += (s, e) => eventCalled = true;
 
             // Act
             // RealUserService is a concrete type with IUserRepository as constructor dependency.
@@ -162,7 +162,7 @@ namespace SimpleInjector.Tests.Unit
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             // The first use of the container locks the container.
             container.GetInstance<IUserRepository>();
@@ -181,7 +181,7 @@ namespace SimpleInjector.Tests.Unit
             // Arrange
             var container = ContainerFactory.New();
 
-            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             // The first use of the container locks the container.
             container.GetInstance<IUserRepository>();
@@ -209,7 +209,7 @@ namespace SimpleInjector.Tests.Unit
 
             container.ResolveUnregisteredType += handler;
 
-            container.RegisterSingleton<IUserRepository>(new SqlUserRepository());
+            container.RegisterInstance<IUserRepository>(new SqlUserRepository());
 
             // Act
             container.ResolveUnregisteredType -= handler;

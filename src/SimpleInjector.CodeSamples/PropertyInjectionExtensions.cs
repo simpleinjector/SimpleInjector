@@ -46,7 +46,7 @@
         [DebuggerStepThrough]
         private static PropertyRegistrations GetPropertyRegistrations(this Container container)
         {
-            if (container.IsLocked())
+            if (container.IsLocked)
             {
                 throw new InvalidOperationException(
                     "New registrations can't be made after the container was locked.");
