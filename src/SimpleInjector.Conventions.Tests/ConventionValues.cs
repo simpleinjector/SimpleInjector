@@ -8,6 +8,7 @@
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Integration.AspNetCore.Mvc;
+    using SimpleInjector.Integration.ServiceCollection;
     using SimpleInjector.Integration.Web;
 
     public static class ConventionValues
@@ -21,6 +22,8 @@
             var types = new[]
             {
                 typeof(Container), // SimpleInjector.dll
+                typeof(SimpleInjectorAddOptions), // SI.Integration.ServiceCollection
+                typeof(SimpleInjectorGenericHostExtensions), // SI.Integration.GenericHost
                 typeof(SimpleInjectorAspNetCoreIntegrationExtensions), // SI.Integration.AspNetCore
                 typeof(SimpleInjectorTagHelperActivator), // SI.Integration.AspNetCore.Mvc
                 typeof(SimpleInjectorViewComponentActivator), // SI.Integration.AspNetCore.Mvc.Core
