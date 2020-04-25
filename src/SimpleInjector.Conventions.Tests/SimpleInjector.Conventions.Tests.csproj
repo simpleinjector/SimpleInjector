@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 
   <PropertyGroup>
@@ -22,6 +22,7 @@
     <ProjectReference Include="..\SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj" />
     <ProjectReference Include="..\SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj" />
     <ProjectReference Include="..\SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj" />
+    <ProjectReference Include="..\SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj" />
     <ProjectReference Include="..\SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj" />
     <ProjectReference Include="..\SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj" />
     <ProjectReference Include="..\SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj" />

@@ -8,6 +8,7 @@
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Integration.AspNetCore.Mvc;
+    using SimpleInjector.Integration.ServiceCollection;
     using SimpleInjector.Integration.Web;
 
     public static class ConventionValues
@@ -20,7 +21,11 @@
             // Ensure all assemblies are loaded
             var types = new[]
             {
+                // SimpleInjector.Integration.GenericHost is excluded here, because requires a higher minimum
+                // version of MS.Ext.DI.Abstr than all the other packages do. This would cause the tests to
+                // fail when run from the command line. We skip testing GenericHost (for now).
                 typeof(Container), // SimpleInjector.dll
+                typeof(SimpleInjectorAddOptions), // SI.Integration.ServiceCollection
                 typeof(SimpleInjectorAspNetCoreIntegrationExtensions), // SI.Integration.AspNetCore
                 typeof(SimpleInjectorTagHelperActivator), // SI.Integration.AspNetCore.Mvc
                 typeof(SimpleInjectorViewComponentActivator), // SI.Integration.AspNetCore.Mvc.Core
