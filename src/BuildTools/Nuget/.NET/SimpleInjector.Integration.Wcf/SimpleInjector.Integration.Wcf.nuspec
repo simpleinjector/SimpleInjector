@@ -9,7 +9,7 @@
     <projectUrl>https://simpleinjector.org/wcf</projectUrl>
     <icon>simpleinjector.png</icon>
     <dependencies>
-      <dependency id="SimpleInjector" version="[{versionCore},5)" />
+      <dependency id="SimpleInjector" version="[{versionCore},6)" />
     </dependencies>
     <id>SimpleInjector.Integration.Wcf</id>
     <title>Simple Injector WCF Integration</title>

@@ -10,7 +10,7 @@
     <icon>simpleinjector.png</icon>
     <dependencies>
       <group targetFramework=".NETFramework4.0">
-        <dependency id="SimpleInjector" version="[{versionCore},5)" />
+        <dependency id="SimpleInjector" version="[{versionCore},6)" />
       </group>
       <group targetFramework=".NETStandard1.0">
         <dependency id="NETStandard.Library" version="1.6.0" />
