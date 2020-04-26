@@ -9,10 +9,10 @@ namespace SimpleInjector
     using System.Reflection.Emit;
     using SimpleInjector.Internals;
 
-#if !PUBLISH && (NET40 || NET45)
+#if !PUBLISH && NET45
     /// <summary>Common Container methods specific for the full .NET version of Simple Injector.</summary>
 #endif
-#if NET40 || NET45
+#if NET45
     public partial class Container
     {
         private static readonly LazyEx<ModuleBuilder> LazyBuilder = new LazyEx<ModuleBuilder>(() =>

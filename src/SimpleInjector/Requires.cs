@@ -14,9 +14,7 @@ namespace SimpleInjector
 
     internal static class Requires
     {
-#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         [DebuggerStepThrough]
         internal static void IsNotNull(object? instance, string paramName)
         {

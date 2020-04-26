@@ -30,9 +30,7 @@ namespace SimpleInjector.Lifestyles
         protected override Scope? GetCurrentScopeCore(Container container) =>
             GetDefaultScopedLifestyle(container).GetCurrentScope(container);
 
-#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         private static ScopedLifestyle GetDefaultScopedLifestyle(Container container) =>
             container.Options.DefaultScopedLifestyle ?? ThrowDefaultScopeLifestyleIsNotSet();
 

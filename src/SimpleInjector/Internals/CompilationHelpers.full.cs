@@ -3,7 +3,7 @@
 
 namespace SimpleInjector.Internals
 {
-#if NET40 || NET45
+#if NET45
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;

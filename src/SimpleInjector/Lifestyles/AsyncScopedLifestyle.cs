@@ -103,13 +103,8 @@ namespace SimpleInjector.Lifestyles
     [Obsolete(Error, error: true)]
     public class AsyncScopedLifestyle : ScopedLifestyle
     {
-#if NET40
-        private const string Error = "The AsyncScopedLifestyle is only available under .NET 4.5 " +
-            "and up, but you are referencing the .NET 4.0 version of Simple Injector.";
-#else
         private const string Error = "The AsyncScopedLifestyle is only available under .NETStandard 1.3 " +
             "and up, but you are referencing the .NETStandard 1.0 version of Simple Injector.";
-#endif
 
         /// <summary>Initializes a new instance of the <see cref="AsyncScopedLifestyle"/> class.</summary>
         public AsyncScopedLifestyle() : base("Async Scoped")

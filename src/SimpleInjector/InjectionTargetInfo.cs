@@ -125,15 +125,9 @@ namespace SimpleInjector
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
         /// <returns>A custom attribute that matches T, or null if no such attribute is found.</returns>
         public T GetCustomAttribute<T>(bool inherit) where T : Attribute =>
-#if !NET40
             this.Parameter != null
                 ? this.Parameter.GetCustomAttribute<T>(inherit)
                 : this.Property!.GetCustomAttribute<T>(inherit);
-#else
-            this.Parameter != null
-                ? (T)Attribute.GetCustomAttribute(this.Parameter, typeof(T), inherit)
-                : (T)Attribute.GetCustomAttribute(this.Property!, typeof(T), inherit);
-#endif
 
         /// <summary>
         /// Retrieves a custom attribute of a specified type that is applied to a specified parameter.
@@ -153,15 +147,9 @@ namespace SimpleInjector
         /// <returns>A custom attribute matching attributeType, or null if no such attribute is found.
         /// </returns>
         public Attribute GetCustomAttribute(Type attributeType, bool inherit) =>
-#if !NET40
             this.Parameter != null
                 ? this.Parameter.GetCustomAttribute(attributeType, inherit)
                 : this.Property!.GetCustomAttribute(attributeType, inherit);
-#else
-            this.Parameter != null
-                ? Attribute.GetCustomAttribute(this.Parameter, attributeType, inherit)
-                : Attribute.GetCustomAttribute(this.Property!, attributeType, inherit);
-#endif
 
         /// <summary>
         /// Retrieves a collection of custom attributes of a specified type that are applied to a specified

@@ -18,7 +18,6 @@
     <language>en-US</language>
     <tags>simpleinjector architecture dependency-injection DI Inversion-of-Control IOC</tags>
     <dependencies>
-      <group targetFramework=".NETFramework4.0" />
       <group targetFramework=".NETFramework4.5" />
       <group targetFramework=".NETStandard1.0">
         <dependency id="NETStandard.Library" version="1.6.0" />

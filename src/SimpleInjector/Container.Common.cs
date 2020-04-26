@@ -349,9 +349,7 @@ namespace SimpleInjector
         }
 
         /// <summary>Prevents any new registrations to be made to the container.</summary>
-#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         internal void LockContainer()
         {
             if (!this.locked)
@@ -362,9 +360,7 @@ namespace SimpleInjector
             }
         }
 
-#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         internal void ThrowWhenDisposed()
         {
             if (this.disposed)
@@ -454,7 +450,7 @@ namespace SimpleInjector
         [DebuggerStepThrough]
         private static string? GetStackTraceOrNull()
         {
-#if NET40 || NET45 || NETSTANDARD2_0
+#if NET45 || NETSTANDARD2_0
             return new System.Diagnostics.StackTrace(fNeedFileInfo: true, skipFrames: 2).ToString();
 #else
             return null;

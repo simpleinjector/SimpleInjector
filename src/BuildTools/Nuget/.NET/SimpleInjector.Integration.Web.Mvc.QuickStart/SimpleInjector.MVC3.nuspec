@@ -14,7 +14,7 @@
       <dependency id="SimpleInjector.Integration.Web.Mvc" version="[{version_Integration_Mvc},6)" />
     </dependencies>
     <frameworkAssemblies>
-      <frameworkAssembly assemblyName="Microsoft.Web.Infrastructure" targetFramework=".NETFramework4.0" />
+      <frameworkAssembly assemblyName="Microsoft.Web.Infrastructure" targetFramework=".NETFramework4.5" />
     </frameworkAssemblies>
     <id>SimpleInjector.MVC3</id>
     <title>Simple Injector MVC Integration Quick Start</title>

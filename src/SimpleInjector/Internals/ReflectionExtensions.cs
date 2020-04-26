@@ -10,7 +10,7 @@ namespace SimpleInjector
 
     internal static class ReflectionExtensions
     {
-#if NET40 || NET45
+#if NET45
         public static bool IsGenericType(this Type type) => type.IsGenericType;
         public static bool IsValueType(this Type type) => type.IsValueType;
         public static bool IsAbstract(this Type type) => type.IsAbstract;

@@ -4,14 +4,14 @@
 namespace SimpleInjector
 {
     using System;
-#if NET40 || NET45
+#if NET45
     using System.Runtime.Serialization;
 #endif
 
     /// <summary>
     /// The standard exception thrown when a container has an error in resolving an object.
     /// </summary>
-#if NET40 || NET45
+#if NET45
     [Serializable]
 #endif
     public partial class ActivationException : Exception
@@ -47,7 +47,7 @@ namespace SimpleInjector
         {
         }
 
-#if NET40 || NET45
+#if NET45
         /// <summary>
         /// Initializes a new instance of the <see cref="ActivationException" /> class with serialized data.
         /// </summary>

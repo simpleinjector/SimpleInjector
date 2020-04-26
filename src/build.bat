@@ -236,8 +236,6 @@ IF %step%==4 (
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector Releases\temp /E /H
 	%attrib% -r "%CD%\Releases\temp\*.*" /s /d
 	del Releases\temp\.gitignore /s /q
-	copy SimpleInjector\bin\Release\net40\SimpleInjector.dll Releases\temp\lib\net40\SimpleInjector.dll
-	copy SimpleInjector\bin\Release\net40\SimpleInjector.xml Releases\temp\lib\net40\SimpleInjector.xml
 	copy SimpleInjector\bin\Release\net45\SimpleInjector.dll Releases\temp\lib\net45\SimpleInjector.dll
 	copy SimpleInjector\bin\Release\net45\SimpleInjector.xml Releases\temp\lib\net45\SimpleInjector.xml
 	copy SimpleInjector\bin\Release\netstandard1.0\SimpleInjector.dll "Releases\temp\lib\netstandard1.0\SimpleInjector.dll"
@@ -256,8 +254,8 @@ IF %step%==4 (
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector.Packaging Releases\temp /E /H
 	%attrib% -r "%CD%\Releases\temp\*.*" /s /d
 	del Releases\temp\.gitignore /s /q
-	copy SimpleInjector.Packaging\bin\Release\net40\SimpleInjector.Packaging.dll "Releases\temp\lib\net40\SimpleInjector.Packaging.dll"
-	copy SimpleInjector.Packaging\bin\Release\net40\SimpleInjector.Packaging.xml "Releases\temp\lib\net40\SimpleInjector.Packaging.xml"
+	copy SimpleInjector.Packaging\bin\Release\net45\SimpleInjector.Packaging.dll "Releases\temp\lib\net45\SimpleInjector.Packaging.dll"
+	copy SimpleInjector.Packaging\bin\Release\net45\SimpleInjector.Packaging.xml "Releases\temp\lib\net45\SimpleInjector.Packaging.xml"
 	copy SimpleInjector.Packaging\bin\Release\netstandard1.0\SimpleInjector.Packaging.dll "Releases\temp\lib\netstandard1.0\SimpleInjector.Packaging.dll"
 	copy SimpleInjector.Packaging\bin\Release\netstandard1.0\SimpleInjector.Packaging.xml "Releases\temp\lib\netstandard1.0\SimpleInjector.Packaging.xml"
 	%replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {version} %named_version_Packaging%
@@ -271,8 +269,8 @@ IF %step%==4 (
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web Releases\temp /E /H
 	%attrib% -r "%CD%\Releases\temp\*.*" /s /d
 	del Releases\temp\.gitignore /s /q
-	copy SimpleInjector.Integration.Web\bin\Release\net40\SimpleInjector.Integration.Web.dll Releases\temp\lib\net40\SimpleInjector.Integration.Web.dll
-	copy SimpleInjector.Integration.Web\bin\Release\net40\SimpleInjector.Integration.Web.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.xml
+	copy SimpleInjector.Integration.Web\bin\Release\net45\SimpleInjector.Integration.Web.dll Releases\temp\lib\net45\SimpleInjector.Integration.Web.dll
+	copy SimpleInjector.Integration.Web\bin\Release\net45\SimpleInjector.Integration.Web.xml Releases\temp\lib\net45\SimpleInjector.Integration.Web.xml
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {version} %named_version_Integration_Web%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {versionCore} %named_version_Core%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {year} %copyrightYear%
@@ -284,8 +282,8 @@ IF %step%==4 (
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web.Mvc Releases\temp /E /H
 	%attrib% -r "%CD%\Releases\temp\*.*" /s /d
 	del Releases\temp\.gitignore /s /q
-	copy SimpleInjector.Integration.Web.Mvc\bin\Release\net40\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\lib\net40\SimpleInjector.Integration.Web.Mvc.dll
-	copy SimpleInjector.Integration.Web.Mvc\bin\Release\net40\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\lib\net40\SimpleInjector.Integration.Web.Mvc.xml
+	copy SimpleInjector.Integration.Web.Mvc\bin\Release\net45\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\lib\net45\SimpleInjector.Integration.Web.Mvc.dll
+	copy SimpleInjector.Integration.Web.Mvc\bin\Release\net45\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\lib\net45\SimpleInjector.Integration.Web.Mvc.xml
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {version} %named_version_Integration_Mvc%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {versionCore} %named_version_Core%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {version_Integration_Web} %named_version_Integration_Web%
@@ -384,17 +382,17 @@ IF %step%==4 (
 
 IF %step%==5 (
 	echo Running step 5: RESTORING VERSION NUMBERS
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>4.0.0</VersionPrefix>" /source:SimpleInjector.Packaging\SimpleInjector.Packaging.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Packaging\SimpleInjector.Packaging.csproj
 	
 	echo RESTORING PACKAGE RELEASE NOTES
 	

@@ -14,7 +14,7 @@
       <dependency id="SimpleInjector.Integration.WebApi" version="{version_Integration_WebApi}" />
     </dependencies>
     <frameworkAssemblies>
-      <frameworkAssembly assemblyName="Microsoft.Web.Infrastructure" targetFramework=".NETFramework4.0" />
+      <frameworkAssembly assemblyName="Microsoft.Web.Infrastructure" targetFramework=".NETFramework4.5" />
     </frameworkAssemblies>
     <id>SimpleInjector.Integration.WebApi.WebHost.QuickStart</id>
     <title>Simple Injector ASP.NET Web API Integration Quick Start for IIS-hosted applications</title>

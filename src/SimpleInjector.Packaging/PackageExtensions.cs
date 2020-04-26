@@ -91,11 +91,7 @@ namespace SimpleInjector
         {
             try
             {
-#if NET40
-                return assembly.GetExportedTypes();
-#else
                 return assembly.DefinedTypes.Select(info => info.AsType());
-#endif
             }
             catch (NotSupportedException)
             {
@@ -143,16 +139,8 @@ namespace SimpleInjector
             type.GetConstructors().Any(ctor => !ctor.GetParameters().Any());
 
         private static ConstructorInfo[] GetConstructors(this Type type) =>
-#if NET40
-            type.GetConstructors();
-#else
             type.GetTypeInfo().DeclaredConstructors.ToArray();
-#endif
 
-#if NET40
-        private static Type Info(this Type type) => type;
-#else
         private static TypeInfo Info(this Type type) => type.GetTypeInfo();
-#endif
     }
 }

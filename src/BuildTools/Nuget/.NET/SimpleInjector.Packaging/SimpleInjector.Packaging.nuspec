@@ -9,7 +9,7 @@
     <projectUrl>https://simpleinjector.org/</projectUrl>
     <icon>simpleinjector.png</icon>
     <dependencies>
-      <group targetFramework=".NETFramework4.0">
+      <group targetFramework=".NETFramework4.5">
         <dependency id="SimpleInjector" version="[{versionCore},6)" />
       </group>
       <group targetFramework=".NETStandard1.0">

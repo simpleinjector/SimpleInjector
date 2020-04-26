@@ -87,11 +87,9 @@ namespace SimpleInjector
             }
         }
 
-#if !NET40
         // NOTE: IsVerifying is thread-specific. We return null is the container is verifying on a
         // different thread.
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         internal Scope? GetVerificationOrResolveScopeForCurrentThread() =>
             this.VerificationScope != null && this.IsVerifying
                 ? this.VerificationScope

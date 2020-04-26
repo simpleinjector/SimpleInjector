@@ -12,7 +12,7 @@ namespace SimpleInjector
     /// <summary>
     /// Thrown by the container in case of a diagnostic error.
     /// </summary>
-#if NET40 || NET45
+#if NET45
     [Serializable]
 #endif
     public class DiagnosticVerificationException : Exception
@@ -64,7 +64,7 @@ namespace SimpleInjector
         {
         }
 
-#if NET40 || NET45
+#if NET45
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagnosticVerificationException" /> class with serialized data.
         /// </summary>

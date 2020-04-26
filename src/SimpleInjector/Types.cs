@@ -103,10 +103,8 @@ namespace SimpleInjector
             Type serviceTypeDefinition = serviceType.GetGenericTypeDefinition();
 
             return
-#if !NET40
                 serviceTypeDefinition == typeof(IReadOnlyList<>) ||
                 serviceTypeDefinition == typeof(IReadOnlyCollection<>) ||
-#endif
                 serviceTypeDefinition == typeof(IEnumerable<>) ||
                 serviceTypeDefinition == typeof(IList<>) ||
                 serviceTypeDefinition == typeof(ICollection<>) ||

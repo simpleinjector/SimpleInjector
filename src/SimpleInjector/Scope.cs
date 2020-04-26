@@ -479,9 +479,7 @@ namespace SimpleInjector
             return instance;
         }
 
-#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         private void RegisterForDisposalInternal(IDisposable disposable)
         {
             if (this.disposables == null)
@@ -504,9 +502,7 @@ namespace SimpleInjector
             }
         }
 
-#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         private void RequiresInstanceNotDisposed()
         {
             if (this.state == DisposeState.Disposed)
@@ -520,9 +516,7 @@ namespace SimpleInjector
             throw new ObjectDisposedException(this.GetType().FullName);
         }
 
-#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         private void PreventCyclicDependenciesDuringDisposal()
         {
             if (this.recursionDuringDisposalCounter > MaximumDisposeRecursion)

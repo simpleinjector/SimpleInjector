@@ -157,9 +157,7 @@ namespace SimpleInjector
             return currentScopeProvider.Invoke();
         }
 
-#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         private Scope GetCurrentScopeOrThrow(Container container)
         {
             Scope? scope = this.GetCurrentScopeInternal(container);
@@ -172,9 +170,7 @@ namespace SimpleInjector
             return scope!;
         }
 
-#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         private Scope? GetCurrentScopeInternal(Container container)
         {
             // If we are running verification in the current thread, we prefer returning a verification scope

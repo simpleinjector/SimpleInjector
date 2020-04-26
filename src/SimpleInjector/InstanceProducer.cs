@@ -602,18 +602,14 @@ namespace SimpleInjector
 
         // Prevents any recursive calls from taking place.
         // This method will be inlined by the JIT.
-#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         private void CheckForCyclicDependencies()
         {
             this.validator?.Check();
         }
 
         // This method will be inlined by the JIT.
-#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         private void RemoveCyclicDependencyValidator()
         {
             // No recursive calls detected, we can remove the validator to increase performance.
@@ -631,9 +627,7 @@ namespace SimpleInjector
         // exception, because a new call to that provider would otherwise make the validator think it is a
         // recursive call and throw an exception, and this would hide the exception that would otherwise be
         // thrown by the provider itself.
-#if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         private void ResetCyclicDependencyValidator()
         {
             this.validator?.Reset();

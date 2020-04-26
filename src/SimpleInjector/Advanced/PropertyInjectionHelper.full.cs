@@ -9,7 +9,7 @@ namespace SimpleInjector.Advanced
     using System.Threading;
     using SimpleInjector.Internals;
 
-#if NET40 || NET45
+#if NET45
     internal sealed partial class PropertyInjectionHelper
     {
         private static long injectorClassCounter;
