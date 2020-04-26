@@ -482,33 +482,22 @@ namespace SimpleInjector
                 return false;
             }
 
-            errorMessage = null;
+            var constructor =
+                this.ConstructorResolutionBehavior.TryGetConstructor(implementationType, out errorMessage);
 
-            try
+            if (constructor is null && errorMessage is null)
             {
-                ConstructorInfo constructor = this.SelectConstructor(implementationType);
-
-                this.DependencyInjectionBehavior.Verify(constructor);
+                throw new InvalidOperationException(
+                    StringResources.TypeHasNoInjectableConstructorAccordingToCustomResolutionBehavior(
+                        this.ConstructorResolutionBehavior, implementationType));
             }
-            catch (ActivationException ex)
+
+            if (constructor != null)
             {
-                errorMessage = ex.Message;
+                errorMessage = this.DependencyInjectionBehavior.VerifyConstructor(constructor);
             }
 
             return errorMessage == null;
-        }
-
-        internal ConstructorInfo SelectConstructor(Type implementationType)
-        {
-            var constructor = this.ConstructorResolutionBehavior.GetConstructor(implementationType);
-
-            if (constructor == null)
-            {
-                throw new ActivationException(StringResources.ConstructorResolutionBehaviorReturnedNull(
-                    this.ConstructorResolutionBehavior, implementationType));
-            }
-
-            return constructor;
         }
 
         internal InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer)
@@ -551,6 +540,12 @@ namespace SimpleInjector
                 locking(this.Container, new ContainerLockingEventArgs());
             }
         }
+
+        internal ConstructorInfo? SelectConstructorOrNull(Type implementationType) =>
+            this.ConstructorResolutionBehavior.TryGetConstructor(implementationType, out string? _);
+
+        internal ConstructorInfo SelectConstructor(Type implementatioType) =>
+            this.ConstructorResolutionBehavior.GetConstructor(implementatioType);
 
         private void ThrowWhenContainerHasRegistrations(string propertyName)
         {

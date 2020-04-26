@@ -85,7 +85,7 @@
             {
                 var invalidParameter = invalidParameters.First().Parameter;
 
-                throw new ActivationException(string.Format(CultureInfo.CurrentCulture,
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                     "Parameter with name '{0}' of type {1} is not a parameter of the constructor of type {2}",
                     invalidParameter.Name, invalidParameter.Type.Name, parameter.Member.DeclaringType.Name));
             }
@@ -107,7 +107,7 @@
                 return suitableParameters[0];
             }
 
-            throw new ActivationException(string.Format(CultureInfo.CurrentCulture,
+            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                 "Multiple parameter registrations found for type " +
                 "{0} that match to parameter with name '{1}' of type {2}.",
                 parameter.Member.DeclaringType.Name, parameter.Name, parameter.ParameterType.Name));

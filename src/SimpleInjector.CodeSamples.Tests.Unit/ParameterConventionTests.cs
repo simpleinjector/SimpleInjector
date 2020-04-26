@@ -202,7 +202,7 @@
                 // Assert
                 Assert.Fail("Exception expected.");
             }
-            catch (ArgumentException ex)
+            catch (InvalidOperationException ex)
             {
                 AssertThat.StringContains(
                     "Parameter with name 'notExistingParamName' of type String is not a parameter of " +
@@ -233,7 +233,7 @@
                 // Assert
                 Assert.Fail("Exception expected.");
             }
-            catch (ArgumentException ex)
+            catch (InvalidOperationException ex)
             {
                 AssertThat.StringContains(
                     "Multiple parameter registrations found for type ClassWithOnlyPrimitiveConstructorParams " +

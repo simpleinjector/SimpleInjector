@@ -579,18 +579,11 @@ namespace SimpleInjector
 
         private ConstructorInfo? SelectImplementationTypeConstructorOrNull(Type implementationType)
         {
-            try
-            {
-                return this.Options.SelectConstructor(implementationType);
-            }
-            catch (ActivationException)
-            {
-                // If the constructor resolution behavior fails, we can't determine the type's constructor.
-                // Since this method is used by batch registration, by returning null the type
-                // will be included in batch registration and at that point GetConstructor is called again
-                // -and will fail again- giving the user the required information.
-                return null;
-            }
+            // If the constructor resolution behavior fails, we can't determine the type's constructor.
+            // Since this method is used by batch registration, by returning null, the type
+            // will be included in batch registration and at that point TryGetConstructor is called again
+            // -and will fail- while providing the user the required error information.
+            return this.Options.SelectConstructorOrNull(implementationType);
         }
 
         private static IEnumerable<Type> GetTypesFromAssembly(Assembly assembly)

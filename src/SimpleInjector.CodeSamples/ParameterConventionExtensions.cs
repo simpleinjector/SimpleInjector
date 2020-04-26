@@ -7,6 +7,7 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Runtime.InteropServices;
+    using SimpleInjector;
     using SimpleInjector.Advanced;
 
     public interface IParameterConvention
@@ -41,25 +42,30 @@
             }
 
             [DebuggerStepThrough]
-            public void Verify(InjectionConsumerInfo consumer)
+            public bool VerifyDependency(InjectionConsumerInfo dependency, out string errorMessage)
             {
-                if (!this.convention.CanResolve(consumer.Target))
+                if (this.convention.CanResolve(dependency.Target))
                 {
-                    this.decorated.Verify(consumer);
+                    errorMessage = null;
+                    return true;
+                }
+                else
+                {
+                    return this.decorated.VerifyDependency(dependency, out errorMessage);
                 }
             }
 
             [DebuggerStepThrough]
-            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure)
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo dependency, bool throwOnFailure)
             {
-                if (!this.convention.CanResolve(consumer.Target))
+                if (!this.convention.CanResolve(dependency.Target))
                 {
-                    return this.decorated.GetInstanceProducer(consumer, throwOnFailure);
+                    return this.decorated.GetInstanceProducer(dependency, throwOnFailure);
                 }
 
                 return InstanceProducer.FromExpression(
-                    serviceType: consumer.Target.TargetType,
-                    expression: this.convention.BuildExpression(consumer),
+                    serviceType: dependency.Target.TargetType,
+                    expression: this.convention.BuildExpression(dependency),
                     container: this.container);
             }
         }
@@ -118,7 +124,7 @@
 
             if (connectionString == null)
             {
-                throw new ActivationException(
+                throw new InvalidOperationException(
                     "No connection string with name '" + name + "' could be found in the " +
                     "application's configuration file.");
             }
@@ -189,12 +195,12 @@
                     CultureInfo.InvariantCulture, configurationValue);
             }
 
-            throw new ActivationException(
+            throw new InvalidOperationException(
                 "No application setting with key '" + key + "' could be found in the " +
                 "application's configuration file.");
         }
     }
-    
+
     // Using optional parameters in constructor arguments is highly discouraged.
     // This code is merely an example.
     public class OptionalParameterConvention : IParameterConvention
@@ -211,11 +217,11 @@
             target.Parameter != null && target.GetCustomAttributes(typeof(OptionalAttribute), true).Any();
 
         [DebuggerStepThrough]
-        public Expression BuildExpression(InjectionConsumerInfo consumer) =>
-            this.GetProducer(consumer)?.BuildExpression() ?? GetDefault(consumer.Target.Parameter);
+        public Expression BuildExpression(InjectionConsumerInfo dependency) =>
+            this.GetProducer(dependency)?.BuildExpression() ?? GetDefault(dependency.Target.Parameter);
 
-        private InstanceProducer GetProducer(InjectionConsumerInfo consumer) =>
-            this.injectionBehavior.GetInstanceProducer(consumer, throwOnFailure: false);
+        private InstanceProducer GetProducer(InjectionConsumerInfo dependency) =>
+            this.injectionBehavior.GetInstanceProducer(dependency, throwOnFailure: false);
 
         private static ConstantExpression GetDefault(ParameterInfo parameter) =>
             Expression.Constant(parameter.RawDefaultValue, parameter.ParameterType);

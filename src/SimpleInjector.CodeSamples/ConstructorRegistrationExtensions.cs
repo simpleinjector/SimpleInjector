@@ -63,16 +63,17 @@
             this.constructors = new Dictionary<Type, ConstructorInfo>();
         }
 
-        ConstructorInfo IConstructorResolutionBehavior.GetConstructor(Type implementationType)
+        public ConstructorInfo TryGetConstructor(Type implementationType, out string errorMessage)
         {
             ConstructorInfo constructor;
 
             if (this.constructors.TryGetValue(implementationType, out constructor))
             {
+                errorMessage = null;
                 return constructor;
             }
 
-            return this.baseBehavior.GetConstructor(implementationType);
+            return this.baseBehavior.TryGetConstructor(implementationType, out errorMessage);
         }
 
         public void Register<TConcrete>(IConstructorSelector selector)

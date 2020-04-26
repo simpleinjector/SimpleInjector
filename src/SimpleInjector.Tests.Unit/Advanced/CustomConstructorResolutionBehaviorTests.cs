@@ -9,31 +9,41 @@
     public class CustomConstructorResolutionBehaviorTests
     {
         [TestMethod]
-        public void Register_NullReturningConstructorResolutionBehavior_ThrowsExpressiveErrorMessage()
+        public void Register_ConstructorResolutionBehaviorThatReturnsBothNullCtorAndNullErrorMessage_ThrowsExpressiveErrorMessage()
         {
             // Arrange
             var container = new Container();
 
-            container.Options.ConstructorResolutionBehavior = new NullReturningConstructorResolutionBehavior();
+            container.Options.ConstructorResolutionBehavior = new FakeConstructorResolutionBehavior
+            {
+                ErrorMessage = null,
+                ConstructorToReturn = null
+            };
 
             // Act
             Action action = () => container.Register<RealTimeProvider>();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                The CustomConstructorResolutionBehaviorTests.NullReturningConstructorResolutionBehavior that
-                was registered through Container.Options.ConstructorResolutionBehavior returned a null
-                reference after its GetConstructor method was supplied with implementationType
-                'RealTimeProvider'. IConstructorResolutionBehavior.GetConstructor implementations should
-                never return null, but should throw a SimpleInjector.ActivationException with an expressive
-                message instead."
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>($@"
+                For the container to be able to create {nameof(RealTimeProvider)} it should have a constructor
+                that can be called, but according to the customly configured IConstructorResolutionBehavior of
+                type {typeof(FakeConstructorResolutionBehavior).ToFriendlyName()}, there is no selectable
+                constructor. The {typeof(FakeConstructorResolutionBehavior).ToFriendlyName()}, however, 
+                didn't supply a reason why."
                 .TrimInside(),
                 action);
         }
 
-        private class NullReturningConstructorResolutionBehavior : IConstructorResolutionBehavior
+        private class FakeConstructorResolutionBehavior : IConstructorResolutionBehavior
         {
-            public ConstructorInfo GetConstructor(Type implementationType) => null;
+            public string ErrorMessage { get; set; }
+            public ConstructorInfo ConstructorToReturn { get; set; }
+
+            public ConstructorInfo TryGetConstructor(Type implementationType, out string errorMessage)
+            {
+                errorMessage = this.ErrorMessage;
+                return this.ConstructorToReturn;
+            }
         }
     }
 }

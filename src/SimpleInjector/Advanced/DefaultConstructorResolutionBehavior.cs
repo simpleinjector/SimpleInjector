@@ -5,19 +5,38 @@ namespace SimpleInjector.Advanced
 {
     using System;
     using System.Diagnostics;
-    using System.Linq;
     using System.Reflection;
 
     [DebuggerDisplay(nameof(DefaultConstructorResolutionBehavior))]
     internal sealed class DefaultConstructorResolutionBehavior : IConstructorResolutionBehavior
     {
-        public ConstructorInfo GetConstructor(Type implementationType)
+        public ConstructorInfo? TryGetConstructor(Type implementationType, out string? errorMessage)
         {
             Requires.IsNotNull(implementationType, nameof(implementationType));
 
             VerifyTypeIsConcrete(implementationType);
 
-            return GetSinglePublicConstructor(implementationType);
+            var constructors = implementationType.GetConstructors();
+
+            if (constructors.Length == 0)
+            {
+                errorMessage =
+                    StringResources.TypeMustHaveASinglePublicConstructorButItHasNone(implementationType);
+
+                return null;
+            }
+
+            if (constructors.Length > 1)
+            {
+                errorMessage =
+                    StringResources.TypeMustHaveASinglePublicConstructorButItHas(
+                        implementationType, constructors.Length);
+
+                return null;
+            }
+
+            errorMessage = null;
+            return constructors[0];
         }
 
         private static void VerifyTypeIsConcrete(Type implementationType)
@@ -27,26 +46,6 @@ namespace SimpleInjector.Advanced
                 throw new ActivationException(
                     StringResources.TypeShouldBeConcreteToBeUsedOnThisMethod(implementationType));
             }
-        }
-
-        private static ConstructorInfo GetSinglePublicConstructor(Type implementationType)
-        {
-            var constructors = implementationType.GetConstructors();
-
-            if (constructors.Length == 0)
-            {
-                throw new ActivationException(
-                    StringResources.TypeMustHaveASinglePublicConstructorButItHasNone(implementationType));
-            }
-
-            if (constructors.Length > 1)
-            {
-                throw new ActivationException(
-                    StringResources.TypeMustHaveASinglePublicConstructorButItHas(implementationType,
-                        constructors.Length));
-            }
-
-            return constructors[0];
         }
     }
 }

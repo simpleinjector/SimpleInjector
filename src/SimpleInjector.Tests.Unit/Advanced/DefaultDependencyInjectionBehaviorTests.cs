@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector;
     using SimpleInjector.Advanced;
 
     [TestClass]
@@ -19,7 +20,7 @@
             Action action = () => behavior.GetInstanceProducer(null, false);
 
             // Assert
-            AssertThat.ThrowsWithParamName<ArgumentNullException>("consumer", action);
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("dependency", action);
         }
 
         [TestMethod]
@@ -129,10 +130,13 @@
         {
             public InstanceProducer ProducerToReturn { get; set; }
 
-            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo c, bool f) => this.ProducerToReturn;
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo d, bool t) =>
+                this.ProducerToReturn;
 
-            public void Verify(InjectionConsumerInfo consumer)
+            public bool VerifyDependency(InjectionConsumerInfo dependency, out string errorMessage)
             {
+                errorMessage = null;
+                return true;
             }
         }
     }

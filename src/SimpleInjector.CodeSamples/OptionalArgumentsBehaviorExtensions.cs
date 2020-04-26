@@ -6,7 +6,7 @@
 
     public static class OptionalArgumentsBehaviorExtensions
     {
-        public static void EnableSkippingOptionalConstructorArguments(ContainerOptions options)
+        public static void EnableSkippingOptionalConstructorArguments(this ContainerOptions options)
         {
             options.DependencyInjectionBehavior =
                 new OptionalArgumentsInjectionBehavior(options.Container, options.DependencyInjectionBehavior);
@@ -24,19 +24,24 @@
             this.original = original;
         }
 
-        public void Verify(InjectionConsumerInfo consumer)
+        public bool VerifyDependency(InjectionConsumerInfo dependency, out string errorMessage)
         {
-            if (consumer.Target.Parameter != null && !IsOptional(consumer.Target.Parameter))
+            if (IsOptional(dependency.Target.Parameter))
             {
-                this.original.Verify(consumer);
+                errorMessage = null;
+                return true;
+            }
+            else
+            {
+                return this.original.VerifyDependency(dependency, out errorMessage);
             }
         }
 
-        public InstanceProducer GetInstanceProducer(InjectionConsumerInfo c, bool t) =>
-            this.TryCreateInstanceProducer(c.Target.Parameter) ?? this.original.GetInstanceProducer(c, t);
+        public InstanceProducer GetInstanceProducer(InjectionConsumerInfo d, bool t) =>
+            this.TryCreateInstanceProducer(d.Target.Parameter) ?? this.original.GetInstanceProducer(d, t);
 
         private InstanceProducer TryCreateInstanceProducer(ParameterInfo parameter) =>
-            parameter != null && IsOptional(parameter) && !this.CanBeResolved(parameter)
+            IsOptional(parameter) && !this.CanBeResolved(parameter)
                 ? this.CreateConstantValueProducer(parameter)
                 : null;
 
@@ -47,7 +52,7 @@
                 this.container);
 
         private static bool IsOptional(ParameterInfo parameter) =>
-            (parameter.Attributes & ParameterAttributes.Optional) != 0;
+            parameter != null && (parameter.Attributes & ParameterAttributes.Optional) != 0;
 
         private bool CanBeResolved(ParameterInfo parameter) =>
             this.container.GetRegistration(parameter.ParameterType, false) != null;

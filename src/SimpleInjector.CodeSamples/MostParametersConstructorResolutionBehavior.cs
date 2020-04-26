@@ -13,18 +13,20 @@
     public class MostParametersConstructorResolutionBehavior : IConstructorResolutionBehavior
     {
         [DebuggerStepThrough]
-        public ConstructorInfo GetConstructor(Type implementationType)
+        public ConstructorInfo TryGetConstructor(Type implementationType, out string errorMessage)
         {
             ConstructorInfo[] constructors = GetConstructorsWithMostParameters(implementationType);
 
             if (constructors.Length == 1)
             {
+                errorMessage = null;
                 return constructors[0];
             }
-
-            string exceptionMessage = BuildExceptionMessage(implementationType, constructors);
-
-            throw new ActivationException(exceptionMessage);
+            else
+            {
+                errorMessage = BuildExceptionMessage(implementationType, constructors);
+                return null;
+            }
         }
 
         private static ConstructorInfo[] GetConstructorsWithMostParameters(Type type)

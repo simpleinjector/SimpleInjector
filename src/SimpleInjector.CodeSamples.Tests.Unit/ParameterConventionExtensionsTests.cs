@@ -132,7 +132,7 @@
                 // Assert
                 Assert.Fail("Exception was expected.");
             }
-            catch (ArgumentException ex)
+            catch (InvalidOperationException ex)
             {
                 AssertThat.StringContains(
                     "No connection string with name 'doesNotExist' could be found", ex.Message);
@@ -153,7 +153,7 @@
                 // Assert
                 Assert.Fail("Exception was expected.");
             }
-            catch (ActivationException ex)
+            catch (InvalidOperationException ex)
             {
                 AssertThat.StringContains(
                     "No connection string with name 'doesNotExist' could be found", ex.Message);
@@ -261,7 +261,7 @@
                 // Assert
                 Assert.Fail("Exception was expected.");
             }
-            catch (ArgumentException ex)
+            catch (InvalidOperationException ex)
             {
                 AssertThat.StringContains("No application setting with key 'doesNotExist' could be found", ex.Message);
             }
@@ -281,7 +281,7 @@
                 // Assert
                 Assert.Fail("Exception was expected.");
             }
-            catch (ActivationException ex)
+            catch (InvalidOperationException ex)
             {
                 AssertThat.StringContains("No application setting with key 'doesNotExist' could be found", ex.Message);
             }

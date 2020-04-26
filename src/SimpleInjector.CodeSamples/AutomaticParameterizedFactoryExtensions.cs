@@ -225,36 +225,42 @@
                 this.originalBehavior = options.DependencyInjectionBehavior;
             }
 
-            void IDependencyInjectionBehavior.Verify(InjectionConsumerInfo consumer)
+            bool IDependencyInjectionBehavior.VerifyDependency(
+                InjectionConsumerInfo dependency, out string errorMessage)
             {
-                if (this.FindThreadLocal(consumer.Target) == null)
+                if (this.FindThreadLocal(dependency.Target) == null)
                 {
-                    this.originalBehavior.Verify(consumer);
+                    return this.originalBehavior.VerifyDependency(dependency, out errorMessage);
+                }
+                else
+                {
+                    errorMessage = null;
+                    return true;
                 }
             }
 
             InstanceProducer IDependencyInjectionBehavior.GetInstanceProducer(
-                InjectionConsumerInfo consumer, bool throwOnFailure)
+                InjectionConsumerInfo dependency, bool throwOnFailure)
             {
-                ThreadLocal<object> local = this.FindThreadLocal(consumer.Target);
+                ThreadLocal<object> local = this.FindThreadLocal(dependency.Target);
 
                 if (local != null)
                 {
-                    if (consumer.Target.TargetType.IsValueType && this.container.IsVerifying)
+                    if (dependency.Target.TargetType.IsValueType && this.container.IsVerifying)
                     {
                         throw new InvalidOperationException(
                             "You can't use Verify() if the factory product contains value types.");
                     }
 
                     return InstanceProducer.FromExpression(
-                        consumer.Target.TargetType,
+                        dependency.Target.TargetType,
                         Expression.Convert(
                             Expression.Property(Expression.Constant(local), "Value"),
-                            consumer.Target.TargetType),
+                            dependency.Target.TargetType),
                         this.container);
                 }
 
-                return this.originalBehavior.GetInstanceProducer(consumer, throwOnFailure);
+                return this.originalBehavior.GetInstanceProducer(dependency, throwOnFailure);
             }
 
             // Called by RegisterFactory<TFactory>

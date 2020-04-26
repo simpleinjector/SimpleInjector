@@ -995,17 +995,21 @@
 
         private sealed class AlternativeConstructorResolutionBehavior : IConstructorResolutionBehavior
         {
-            public ConstructorInfo GetConstructor(Type implementationType) => implementationType.GetConstructors()[0];
+            public ConstructorInfo TryGetConstructor(Type implementationType, out string errorMessage)
+            {
+                errorMessage = null;
+                return implementationType.GetConstructors()[0];
+            }
         }
 
         private sealed class AlternativeDependencyInjectionBehavior : IDependencyInjectionBehavior
         {
-            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure)
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo dependency, bool @throw)
             {
                 throw new NotImplementedException();
             }
 
-            public void Verify(InjectionConsumerInfo consumer)
+            public bool VerifyDependency(InjectionConsumerInfo dependency, out string errorMessage)
             {
                 throw new NotImplementedException();
             }

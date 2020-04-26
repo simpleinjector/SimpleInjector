@@ -4,7 +4,6 @@
 namespace SimpleInjector.Advanced
 {
     using System;
-    using System.Reflection;
 
     /// <summary>
     /// Extension methods for enable advanced scenarios.
@@ -173,14 +172,6 @@ namespace SimpleInjector.Advanced
             Requires.IsNotNull(container, nameof(container));
 
             container.Collection.Append(serviceType, implementationType);
-        }
-
-        internal static void Verify(this IDependencyInjectionBehavior behavior, ConstructorInfo constructor)
-        {
-            foreach (ParameterInfo parameter in constructor.GetParameters())
-            {
-                behavior.Verify(new InjectionConsumerInfo(parameter));
-            }
         }
     }
 }

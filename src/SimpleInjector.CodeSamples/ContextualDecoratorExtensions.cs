@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using SimpleInjector;
     using SimpleInjector.Advanced;
 
     public static class ContextualDecoratorExtensions
@@ -72,20 +73,18 @@
                 this.defaultBehavior = container.Options.DependencyInjectionBehavior;
             }
 
-            public void Verify(InjectionConsumerInfo consumer)
-            {
-                this.defaultBehavior.Verify(consumer);
-            }
+            public bool VerifyDependency(InjectionConsumerInfo dependency, out string errorMessage) =>
+                this.defaultBehavior.VerifyDependency(dependency, out errorMessage);
 
-            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure)
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo dependency, bool throwOnFailure)
             {
-                InstanceProducer producer = this.defaultBehavior.GetInstanceProducer(consumer, throwOnFailure);
+                InstanceProducer producer = this.defaultBehavior.GetInstanceProducer(dependency, throwOnFailure);
 
                 List<PredicatePair> pairs;
 
-                if (this.MustApplyContextualDecorator(consumer.Target.TargetType, out pairs))
+                if (this.MustApplyContextualDecorator(dependency.Target.TargetType, out pairs))
                 {
-                    return this.ApplyDecorator(consumer.Target, producer.BuildExpression(), pairs);
+                    return this.ApplyDecorator(dependency.Target, producer.BuildExpression(), pairs);
                 }
 
                 return producer;

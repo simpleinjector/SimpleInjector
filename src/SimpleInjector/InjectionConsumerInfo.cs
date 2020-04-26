@@ -8,8 +8,10 @@ namespace SimpleInjector
     using SimpleInjector.Advanced;
 
     /// <summary>
-    /// Contains contextual information about the direct consumer for which the given dependency is injected
-    /// into.
+    /// Contextual information the a dependency and its direct consumer for which the dependency is injected
+    /// into. The consumer's type is given by the <see cref="ImplementationType"/> property, where the
+    /// <see cref="Target"/> property gives access to the consumer's target element (property or constructor
+    /// argument) in which the dependency will be injected, and the dependency's type information.
     /// </summary>
     public class InjectionConsumerInfo : ApiObject, IEquatable<InjectionConsumerInfo?>
     {

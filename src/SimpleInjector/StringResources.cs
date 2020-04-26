@@ -503,20 +503,6 @@ namespace SimpleInjector
                 nameof(IDependencyInjectionBehavior),
                 typeof(ActivationException).FullName);
 
-        internal static string ConstructorResolutionBehaviorReturnedNull(
-            IConstructorResolutionBehavior selectionBehavior, Type implementationType) =>
-            Format(
-                "The {0} that was registered through Container.{4}.{5} returned a null reference after " +
-                "its {6} method was supplied with implementationType '{1}'. {2}.{6} implementations " +
-                "should never return null, but should throw a {3} with an expressive message instead.",
-                selectionBehavior.GetType().TypeName(),
-                implementationType.TypeName(),
-                nameof(IConstructorResolutionBehavior),
-                typeof(ActivationException).FullName,
-                nameof(Container.Options),
-                nameof(ContainerOptions.ConstructorResolutionBehavior),
-                nameof(IConstructorResolutionBehavior.GetConstructor));
-
         internal static string LifestyleSelectionBehaviorReturnedNull(
             ILifestyleSelectionBehavior selectionBehavior, Type implementationType) =>
             Format(
@@ -529,6 +515,25 @@ namespace SimpleInjector
                 nameof(Container.Options),
                 nameof(ContainerOptions.LifestyleSelectionBehavior),
                 nameof(ILifestyleSelectionBehavior.SelectLifestyle));
+
+        internal static string TypeHasNoInjectableConstructorAccordingToCustomResolutionBehavior(
+            IConstructorResolutionBehavior behavior, Type implementationType) =>
+            Format(
+                "For the container to be able to create {0} it should have a constructor that can be " +
+                "called, but according to the customly configured {1} of type {2}, there is no " +
+                "selectable constructor. The {2}, however, didn't supply a reason why.",
+                implementationType.TypeName(),
+                nameof(IConstructorResolutionBehavior),
+                behavior.GetType().TypeName());
+
+        internal static string DependencyNotValidForInjectionAccordingToCustomInjectionBehavior(
+            IDependencyInjectionBehavior behavior, InjectionConsumerInfo dependency) =>
+            Format(
+                "The conumer-dependency pair {0} is not valid for injection according to the custom {1} of" +
+                "type {2}. The {2}, however, didn't supply a reason why.",
+                dependency,
+                nameof(IDependencyInjectionBehavior),
+                behavior.GetType().TypeName());
 
         internal static string RegistrationReturnedNullFromBuildExpression(
             Registration lifestyleRegistration) =>

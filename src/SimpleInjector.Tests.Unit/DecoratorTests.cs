@@ -14,9 +14,6 @@
     [TestClass]
     public class DecoratorTests
     {
-        private static VisualizationOptions ExcludeLifestyleInformation =
-            new VisualizationOptions { IncludeLifestyleInformation = false };
-
         [TestMethod]
         public void GetInstance_OnRegisteredPartialGenericDecoratorType_Succeeds()
         {

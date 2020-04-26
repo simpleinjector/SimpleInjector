@@ -6,6 +6,7 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector;
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
@@ -1713,7 +1714,7 @@
         {
             // Arrange
             var container = new Container();
-            
+
             PredicateContext context = null;
 
             container.RegisterConditional<ILogger, NullLogger>(c => { context = c; return true; });
@@ -1781,17 +1782,16 @@
         {
             private readonly IDependencyInjectionBehavior real;
 
-            public VerficationlessInjectionBehavior(IDependencyInjectionBehavior real)
-            {
-                this.real = real;
-            }
+            public VerficationlessInjectionBehavior(IDependencyInjectionBehavior real) => this.real = real;
 
-            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure) =>
-                this.real.GetInstanceProducer(consumer, throwOnFailure);
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo dependency, bool @throw) =>
+                this.real.GetInstanceProducer(dependency, @throw);
 
-            public void Verify(InjectionConsumerInfo consumer)
+            // Suppress verification.
+            public bool VerifyDependency(InjectionConsumerInfo dependency, out string errorMessage)
             {
-                // Suppress verification.
+                errorMessage = null;
+                return true;
             }
         }
     }

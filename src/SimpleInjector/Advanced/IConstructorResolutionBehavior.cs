@@ -16,13 +16,13 @@ namespace SimpleInjector.Advanced
     {
         /// <summary>
         /// Gets the given <paramref name="implementationType"/>'s constructor that can be used by the
-        /// container to create that instance.
+        /// container to create that instance. In case no suitable constructor can be found, <b>null</b> is
+        /// returned and the <paramref name="errorMessage"/> will contain the reason why the resolution failed.
         /// </summary>
         /// <param name="implementationType">Type of the implementation to find a suitable constructor for.</param>
-        /// <returns>
-        /// The <see cref="ConstructorInfo"/>. This method never returns null.
-        /// </returns>
-        /// <exception cref="ActivationException">Thrown when no suitable constructor could be found.</exception>
-        ConstructorInfo GetConstructor(Type implementationType);
+        /// <param name="errorMessage">The reason why the resolution failed.</param>
+        /// <returns>The <see cref="ConstructorInfo"/> or null.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="implementationType"/> is null.</exception>
+        ConstructorInfo? TryGetConstructor(Type implementationType, out string? errorMessage);
     }
 }

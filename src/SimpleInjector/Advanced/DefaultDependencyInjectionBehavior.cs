@@ -3,6 +3,7 @@
 
 namespace SimpleInjector.Advanced
 {
+    using System;
     using System.Diagnostics;
 
     [DebuggerDisplay(nameof(DefaultDependencyInjectionBehavior))]
@@ -15,37 +16,40 @@ namespace SimpleInjector.Advanced
             this.container = container;
         }
 
-        public void Verify(InjectionConsumerInfo consumer)
+        public bool VerifyDependency(InjectionConsumerInfo dependency, out string? errorMessage)
         {
-            Requires.IsNotNull(consumer, nameof(consumer));
+            Requires.IsNotNull(dependency, nameof(dependency));
 
-            InjectionTargetInfo target = consumer.Target;
+            var valid = !HasValueTypeSemantics(dependency.Target.TargetType);
 
-            if (target.TargetType.IsValueType() || target.TargetType == typeof(string))
-            {
-                throw new ActivationException(StringResources.TypeMustNotContainInvalidInjectionTarget(target));
-            }
+            errorMessage =
+                valid ? null : StringResources.TypeMustNotContainInvalidInjectionTarget(dependency.Target);
+
+            return valid;
         }
 
-        public InstanceProducer? GetInstanceProducer(InjectionConsumerInfo consumer, bool throwOnFailure)
+        public InstanceProducer? GetInstanceProducer(InjectionConsumerInfo dependency, bool throwOnFailure)
         {
-            Requires.IsNotNull(consumer, nameof(consumer));
+            Requires.IsNotNull(dependency, nameof(dependency));
 
-            InjectionTargetInfo target = consumer.Target;
+            InjectionTargetInfo target = dependency.Target;
 
             InstanceProducer? producer =
-                this.container.GetRegistrationEvenIfInvalid(target.TargetType, consumer);
+                this.container.GetRegistrationEvenIfInvalid(target.TargetType, dependency);
 
             if (producer == null && throwOnFailure)
             {
                 // By redirecting to Verify() we let the verify throw an expressive exception. If it doesn't
                 // we throw the exception ourselves.
-                this.container.Options.DependencyInjectionBehavior.Verify(consumer);
+                this.container.Options.DependencyInjectionBehavior.Verify(dependency);
 
                 this.container.ThrowParameterTypeMustBeRegistered(target);
             }
 
             return producer;
         }
+
+        private static bool HasValueTypeSemantics(Type targetType) =>
+            targetType.IsValueType() || targetType == typeof(string);
     }
 }
