@@ -4,6 +4,8 @@
 namespace SimpleInjector.Integration.AspNetCore.Mvc
 {
     using System;
+    using System.Collections.Concurrent;
+    using System.Linq;
     using Microsoft.AspNetCore.Mvc.Razor;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -11,9 +13,12 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
     /// <summary>Tag Helper Activator for Simple Injector.</summary>
     public class SimpleInjectorTagHelperActivator : ITagHelperActivator
     {
+        private readonly ConcurrentDictionary<Type, InstanceProducer> tagHelperProducers =
+            new ConcurrentDictionary<Type, InstanceProducer>();
+
         private readonly Container container;
-        private readonly Predicate<Type>? tagHelperSelector;
-        private readonly ITagHelperActivator? activator;
+        private readonly Predicate<Type> tagHelperSelector;
+        private readonly ITagHelperActivator activator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleInjectorTagHelperActivator"/> class.
@@ -33,13 +38,21 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
             this.activator = frameworkTagHelperActivator ?? throw new ArgumentNullException(nameof(frameworkTagHelperActivator));
         }
 
-        /// <summary>Creates an <see cref="ITagHelper"/>.</summary>
-        /// <typeparam name="TTagHelper">The <see cref="ITagHelper"/> type.</typeparam>
-        /// <param name="context">The <see cref="ViewContext"/> for the executing view.</param>
-        /// <returns>The tag helper.</returns>
+        /// <inheritdoc />
         public TTagHelper Create<TTagHelper>(ViewContext context) where TTagHelper : ITagHelper =>
-            this.tagHelperSelector?.Invoke(typeof(TTagHelper)) ?? true
-                ? (TTagHelper)this.container.GetInstance(typeof(TTagHelper))
-                : this.activator!.Create<TTagHelper>(context);
+            this.UseSimpleInjector(typeof(TTagHelper))
+                ? (TTagHelper)this.GetInstanceFromSimpleInjector(typeof(TTagHelper))
+                : this.activator.Create<TTagHelper>(context);
+
+        private bool UseSimpleInjector(Type type) => this.tagHelperSelector.Invoke(type);
+
+        private object GetInstanceFromSimpleInjector(Type type) =>
+            this.tagHelperProducers.GetOrAdd(type, this.GetTagHelperProducer).GetInstance();
+
+        private InstanceProducer GetTagHelperProducer(Type type) =>
+            // Find the registration for the tag helper in the container
+            this.container.GetCurrentRegistrations().SingleOrDefault(r => r.ServiceType == type)
+                // and fallback to creating one when no registration exists.
+                ?? Lifestyle.Transient.CreateProducer(type, type, this.container);
     }
 }
