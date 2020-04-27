@@ -32,6 +32,8 @@
             var container = new Container();
 
             container.Options.AutoWirePropertiesWithAttribute<Inject1Attribute>();
+            
+            container.Register<ServiceWithoutAttributedProperties>();
 
             // Act
             var service = container.GetInstance<ServiceWithoutAttributedProperties>();
@@ -51,6 +53,7 @@
             container.Options.AutoWirePropertiesWithAttribute<Inject1Attribute>();
 
             container.RegisterInstance<ILogger>(expectedDependency);
+            container.Register<ServiceWithAttributedProperty>();
 
             // Act
             var service = container.GetInstance<ServiceWithAttributedProperty>();
@@ -70,7 +73,8 @@
             container.Options.AutoWirePropertiesWithAttribute<Inject1Attribute>();
 
             container.RegisterInstance<ILogger>(expectedDependency);
-            
+            container.Register<ServiceWithAttributedProperties>();
+
             // Act
             var service = container.GetInstance<ServiceWithAttributedProperties>();
 
@@ -92,6 +96,7 @@
             container.Options.AutoWirePropertiesWithAttribute<Inject2Attribute>();
 
             container.RegisterInstance<ILogger>(expectedDependency);
+            container.Register<ServiceWithAttributedProperties>();
 
             // Act
             var service = container.GetInstance<ServiceWithAttributedProperties>();
@@ -114,41 +119,16 @@
 
             container.Options.AutoWirePropertiesWithAttribute<Inject1Attribute>();
 
+            container.Register<ServiceWithAttributedProperty>();
+
             // Act
             // ServiceWithAttributedProperty depends on ILogger
             Action action = () => container.GetInstance<ServiceWithAttributedProperty>();
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                typeof(ServiceWithAttributedProperty).Name +
-                " could be found and an implicit registration could not be made.",
-                action);
-
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
                 "ILogger is not registered",
                 action);
-        }
-
-        [TestMethod]
-        public void AutoInjectPropertiesWithAttribute_MixedWithRegisterWithContext_ShouldInjectContextualDependency()
-        {
-            // Arrange
-            var container = new Container();
-
-            // This attribute must be applied before RegisterWithContext gets applied, since the registered
-            // events adds new
-            container.Options.AutoWirePropertiesWithAttribute<Inject2Attribute>();
-
-            container.RegisterWithContext<ILogger>(context => new ContextualLogger(context));
-                        
-            // Act
-            var service = container.GetInstance<ServiceWithAttributedProperties>();
-
-            // Assert
-            AssertThat.IsInstanceOfType(typeof(ContextualLogger), service.Logger1);
-            Assert.AreEqual(
-                typeof(ServiceWithAttributedProperties).Name,
-                ((ContextualLogger)service.Logger1).Context.ImplementationType.Name);
         }
 
         [TestMethod]
@@ -216,16 +196,6 @@
 
         public class Logger : ILogger
         {
-        }
-
-        public class ContextualLogger : ILogger
-        {
-            public ContextualLogger(DependencyContext context)
-            {
-                this.Context = context;
-            }
-
-            public DependencyContext Context { get; }
         }
 
         public class ServiceWithoutAttributedProperties : IService

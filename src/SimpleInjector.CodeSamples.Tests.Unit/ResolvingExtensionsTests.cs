@@ -89,10 +89,11 @@
         }
 
         [TestMethod]
-        public void CanGetInstanceGeneric_OnOnregisteredConcreteType_ReturnsTrue()
+        public void CanGetInstanceGeneric_OnUnregisteredConcreteType_ReturnsTrue()
         {
             // Arrange
             var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
 
             // Act
             bool result = container.CanGetInstance<ConcreteCommand>();
