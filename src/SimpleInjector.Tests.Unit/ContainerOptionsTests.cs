@@ -442,7 +442,7 @@
             // Arrange
             var expectedBehavior = new AlternativeConstructorResolutionBehavior();
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Request a concrete instance that can be created by the container, even without any registrations.
             container.GetInstance<ClassWithContainerAsDependency>();
@@ -943,7 +943,7 @@
             // Arrange
             var expectedValue = true;
 
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Act
             var actualValue = container.Options.ResolveUnregisteredConcreteTypes;
@@ -958,7 +958,7 @@
             // Arrange
             var container = new Container();
 
-            container.GetInstance<ConcreteCommand>();
+            container.GetInstance<Container>();
 
             // Act
             Action action = () => container.Options.ResolveUnregisteredConcreteTypes = false;

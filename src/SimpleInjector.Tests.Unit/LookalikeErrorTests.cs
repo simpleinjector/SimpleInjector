@@ -107,6 +107,7 @@
             var container = new Container();
 
             container.Register<IDuplicate, Duplicate>();
+            container.Register<ServiceDependingOn<SimpleInjector.Tests.Unit.Duplicates.IDuplicate>>();
 
             // Act
             Action action = () => container.GetInstance<ServiceDependingOn<SimpleInjector.Tests.Unit.Duplicates.IDuplicate>>();
@@ -126,6 +127,7 @@
             var container = new Container();
 
             container.Register(typeof(IDuplicate<>), typeof(Duplicate<>));
+            container.Register<ServiceDependingOn<SimpleInjector.Tests.Unit.Duplicates.IDuplicate<object>>>();
 
             // Act
             Action action = () =>
@@ -146,6 +148,8 @@
             var container = new Container();
 
             container.RegisterConditional(typeof(IDuplicate), typeof(Duplicate), c => true);
+
+            container.Register<ServiceDependingOn<SimpleInjector.Tests.Unit.Duplicates.IDuplicate>>();
 
             // Act
             Action action = () =>
@@ -172,6 +176,8 @@
                 Lifestyle.Singleton,
                 c => true);
 
+            container.Register<ServiceDependingOn<SimpleInjector.Tests.Unit.Duplicates.IDuplicate>>();
+
             // Act
             Action action = () =>
                 container.GetInstance<ServiceDependingOn<SimpleInjector.Tests.Unit.Duplicates.IDuplicate>>();
@@ -195,6 +201,8 @@
                 c => typeof(Duplicate<>).MakeGenericType(c.Consumer.ImplementationType),
                 Lifestyle.Singleton,
                 c => true);
+
+            container.Register<ServiceDependingOn<SimpleInjector.Tests.Unit.Duplicates.IDuplicate<object>>>();
 
             // Act
             Action action = () =>

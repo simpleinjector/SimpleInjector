@@ -122,6 +122,8 @@
             container.Options.LifestyleSelectionBehavior =
                 new CustomLifestyleSelectionBehavior(Lifestyle.Singleton);
 
+            container.Register<RealTimeProvider>();
+
             // Act
             var instance1 = container.GetInstance<RealTimeProvider>();
             var instance2 = container.GetInstance<RealTimeProvider>();
@@ -138,6 +140,8 @@
 
             container.Options.LifestyleSelectionBehavior =
                 new CustomLifestyleSelectionBehavior(Lifestyle.Singleton);
+
+            container.Register<RealTimeProvider>();
 
             // Act
             var instance1 = container.GetInstance(typeof(RealTimeProvider));

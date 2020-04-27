@@ -860,7 +860,7 @@
         public void GetInstance_ResolvingDifferentConsumersDependingOnConditionalTypeWithFactory_EachComponentGetsItsSpecificDependency()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterConditional(
                 typeof(ILogger),
@@ -881,7 +881,7 @@
         public void GetInstance_ConditionalTypeFactoryReturnsSameTypeForSingletonRegistration_DependencyIsAlwaysSameInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterConditional(
                 typeof(ILogger),
@@ -901,7 +901,7 @@
         public void GetInstance_ConditionalSingletonWithMutlipleClosedMappingAtSameImplementationThroughFactory_InjectsSameInstanceForDifferentClosedVersions()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // This is a bit nasty: IntAndFloatGeneric implements IGeneric<int> and IGeneric<float>.
             container.RegisterConditional(
@@ -1114,7 +1114,7 @@
         public void GetInstance_RegisterTypeFactoryReturningAPartialOpenGenericType_WorksLikeACharm()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             // Here we make a partial open-generic type by filling in the TUnresolved.
             container.RegisterConditional(typeof(IOpenGenericWithPredicate<>),
@@ -1243,7 +1243,7 @@
         public void GetInstance_ConditionalNonGenericRegistrationWithFactory_InjectsTheExpectedImplementation()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterConditional(typeof(ILogger),
                 c => typeof(Logger<>).MakeGenericType(c.Consumer.ImplementationType),
@@ -1261,7 +1261,7 @@
         public void GetInstance_ConditionalNonGenericRegistrationWithFactoryInjectedIntoMultipleConsumersAsSingleton_AlwaysInjectSameInstance()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterConditional(typeof(ILogger),
                 c => typeof(Logger<int>),
@@ -1662,7 +1662,7 @@
         public void GetInstance_TypeFactoryRegistrationThatDoesNotMatch_ThrowsAnExpressiveException()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.RegisterConditional(
                 typeof(IGeneric<>),
@@ -1685,7 +1685,7 @@
         public void ContainerUncontrolledCollections_RegisteredAsConditional_ResolvesExpectedRegistrations()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             var collection1 = Lifestyle.Singleton.CreateRegistration(() => new[] { "sqrt2", "e", "pi" }, container);
             var collection2 = Lifestyle.Singleton.CreateRegistration(() => new[] { "foo", "bar", "foobar" }, container);

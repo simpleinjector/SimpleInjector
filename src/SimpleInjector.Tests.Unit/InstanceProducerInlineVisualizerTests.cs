@@ -106,6 +106,7 @@
         private static InstanceProducer GetInstanceProducerForConsumer()
         {
             var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
 
             container.Register<Consumer>();
 

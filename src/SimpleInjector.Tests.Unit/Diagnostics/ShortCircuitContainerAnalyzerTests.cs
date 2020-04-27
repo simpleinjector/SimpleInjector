@@ -27,6 +27,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
 
             container.Register<IUnitOfWork, MyUnitOfWork>(Lifestyle.Singleton);
 
@@ -52,6 +53,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
 
             container.Register<IUnitOfWork, MyUnitOfWork>(Lifestyle.Singleton);
 
@@ -72,6 +74,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
 
             // HomeController depends on MyUnitOfWork.
             container.Register<IUnitOfWork, MyUnitOfWork>(Lifestyle.Singleton);
@@ -97,6 +100,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
 
             var registration = Lifestyle.Singleton.CreateRegistration<ImplementsBothInterfaces>(container);
 
@@ -124,6 +128,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
 
             var registration = Lifestyle.Singleton.CreateRegistration<ImplementsBothInterfaces>(container);
 
@@ -152,6 +157,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
 
             container.Register<ILogger, NullLogger>();
             container.Register<ServiceDependingOn<NullLogger>>();
@@ -171,6 +177,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
 
             container.RegisterDecorator<ILogger, LoggerDecorator>();
             container.Register<ILogger, NullLogger>();

@@ -360,6 +360,7 @@
             var container = new Container();
 
             container.Collection.Register(typeof(ILogger), new[] { typeof(NullLogger) });
+            container.Register<ComponentDependingOn<ILogger>>();
 
             // Act
             Action action = () => container.GetInstance<ComponentDependingOn<ILogger>>();
@@ -421,6 +422,7 @@
             var container = new Container();
 
             container.Register<ILogger, NullLogger>();
+            container.Register<ComponentDependingOn<IEnumerable<ILogger>>>();
 
             // Act
             Action action = () => container.GetInstance<ComponentDependingOn<IEnumerable<ILogger>>>();

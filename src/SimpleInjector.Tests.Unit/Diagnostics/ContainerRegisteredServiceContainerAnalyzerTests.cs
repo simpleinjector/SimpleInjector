@@ -3,6 +3,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector.Tests.Unit;
 
     /// <summary>
     /// Normal tests.
@@ -14,7 +15,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         public void Analyze_ComponentDependingOnUnregisteredConcreteType_ReturnsWarning()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<Consumer<ConcreteShizzle>>();
 
@@ -35,7 +36,7 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         public void Analyze_ComponentDependingOnUnregisteredConcreteType_ReturnsSeverityInformation()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
 
             container.Register<Consumer<ConcreteShizzle>>();
 

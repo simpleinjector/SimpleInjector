@@ -20,6 +20,8 @@
             // Registration
             var container = new Container();
 
+            container.Register<RealTimeProvider>();
+
             // Act
             var expression = container.GetRegistration(typeof(RealTimeProvider)).BuildExpression();
 
@@ -38,6 +40,7 @@
 
             var container = new Container();
 
+            container.Register<RealTimeProvider>();
             container.RegisterInitializer(context => actualCallCount++, TruePredicate);
 
             // Act
@@ -58,6 +61,7 @@
 
             var container = new Container();
 
+            container.Register<RealTimeProvider>();
             container.RegisterInitializer(context => actualCallCount++, context =>
             {
                 actualPredicateCallCount++;
@@ -87,6 +91,7 @@
 
             var container = new Container();
 
+            container.Register<RealTimeProvider>();
             container.RegisterInitializer(context => actualCallCount++, context =>
             {
                 actualPredicateCallCount++;
@@ -114,6 +119,7 @@
 
             var container = new Container();
 
+            container.Register<RealTimeProvider>();
             container.RegisterInitializer(context => actualCallCount++, TruePredicate);
 
             // Act
@@ -153,6 +159,7 @@
 
             var container = new Container();
 
+            container.Register<RealTimeProvider>();
             container.RegisterInitializer(actualContexts.Add, TruePredicate);
 
             // Act

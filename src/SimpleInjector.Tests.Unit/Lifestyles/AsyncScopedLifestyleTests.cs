@@ -72,6 +72,8 @@
             // Arrange
             var container = new Container();
 
+            container.Register<ConcreteCommand>();
+
             // Act
             using (var scope = AsyncScopedLifestyle.BeginScope(container))
             {
@@ -293,7 +295,7 @@
             var container = ContainerFactory.New();
 
             // Transient
-            container.Register<ICommand, DisposableCommand>();
+            container.Register<DisposableCommand>();
 
             DisposableCommand command;
 
@@ -318,7 +320,7 @@
             var scopedLifestyle = new AsyncScopedLifestyle();
 
             // Transient
-            container.Register<ICommand, DisposableCommand>();
+            container.Register<DisposableCommand>();
 
             container.RegisterInitializer<DisposableCommand>(instance =>
             {
@@ -531,7 +533,7 @@
             var container = new Container();
 
             // This locks the container.
-            container.GetInstance<ConcreteCommand>();
+            container.GetInstance<Container>();
 
             try
             {
@@ -742,7 +744,7 @@
 
             var lifestyle = new AsyncScopedLifestyle();
 
-            container.Register<DisposableCommand, DisposableCommand>(lifestyle);
+            container.Register<DisposableCommand>(lifestyle);
 
             container.RegisterInitializer<DisposableCommand>(command =>
             {
@@ -780,6 +782,8 @@
             var container = new Container();
 
             var lifestyle = new AsyncScopedLifestyle();
+
+            container.Register<DisposableCommand>();
 
             container.RegisterInitializer<DisposableCommand>(command =>
             {

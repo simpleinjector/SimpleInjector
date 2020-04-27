@@ -125,7 +125,7 @@
         public void Ctor_VerifiedContainerWithoutConfigurationErrors_ContainsALifestyleMismatchesSection()
         {
             // Arrange
-            var container = new Container();
+            var container = ContainerFactory.New();
             container.Options.SuppressLifestyleMismatchVerification = true;
 
             // Forces a lifestyle mismatch

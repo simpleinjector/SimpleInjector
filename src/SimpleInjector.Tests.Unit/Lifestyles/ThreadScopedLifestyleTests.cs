@@ -52,6 +52,8 @@
             // Arrange
             var container = new Container();
 
+            container.Register<ConcreteCommand>();
+
             // Act
             using (var scope = ThreadScopedLifestyle.BeginScope(container))
             {
@@ -261,7 +263,7 @@
             container.Options.EnableAutoVerification = false;
 
             // Transient
-            container.Register<ICommand, DisposableCommand>();
+            container.Register<DisposableCommand>();
 
             DisposableCommand command;
 
@@ -287,7 +289,7 @@
             var lifestyle = new ThreadScopedLifestyle();
 
             // Transient
-            container.Register<ICommand, DisposableCommand>();
+            container.Register<DisposableCommand>();
 
             container.RegisterInitializer<DisposableCommand>(instance =>
             {
@@ -491,7 +493,7 @@
             var container = new Container();
 
             // This locks the container.
-            container.GetInstance<ConcreteCommand>();
+            container.GetInstance<Container>();
 
             try
             {
@@ -586,6 +588,8 @@
             DisposableCommand transientInstanceToDispose = null;
 
             var container = new Container();
+
+            container.Register<DisposableCommand>();
 
             var lifestyle = new ThreadScopedLifestyle();
 

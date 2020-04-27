@@ -2293,6 +2293,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
 
             container.Collection.Register<ITimeProvider>(new[] { typeof(RealTimeProvider) });
 

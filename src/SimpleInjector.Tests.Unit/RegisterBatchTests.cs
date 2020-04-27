@@ -547,6 +547,7 @@
             var container = new Container();
 
             container.Register(typeof(ISkipDecorator<>), Assemblies);
+            container.Register<SkippedDecoratorController>();
 
             // Act
             Action action = () => container.GetInstance<SkippedDecoratorController>();

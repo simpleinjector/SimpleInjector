@@ -532,6 +532,7 @@
             container.Register<IX, CyclicX>();
             container.RegisterDecorator(typeof(IX), typeof(XDecorator1));
             container.Register<B>();
+            container.Register<A>();
 
             // Act
             Action action = () => container.GetInstance<A>();

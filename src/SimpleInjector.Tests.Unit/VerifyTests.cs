@@ -506,6 +506,7 @@ namespace SimpleInjector.Tests.Unit
         {
             // Arrange
             var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
 
             container.Register<IPlugin>(() => container.GetInstance<PluginWithCreationCounter>(), Lifestyle.Singleton);
 

@@ -49,6 +49,7 @@
         {
             // Arrange
             var container = ContainerFactory.New();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
             container.Options.MaximumNumberOfNodesPerDelegate = 10;
 
             // Act

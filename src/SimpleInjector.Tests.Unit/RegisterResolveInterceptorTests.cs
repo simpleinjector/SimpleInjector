@@ -61,6 +61,7 @@
             var resolvedInstances = new InstanceInitializationDataCollection();
 
             var container = new Container();
+            container.Options.ResolveUnregisteredConcreteTypes = true;
 
             container.Options.RegisterResolveInterceptor(resolvedInstances.Intercept, Always);
 
