@@ -200,7 +200,7 @@
 
             container.Register<FakeInterceptor>(Lifestyle.Singleton);
 
-            container.InterceptWith<FakeInterceptor>(IsACommandPredicate);
+            container.InterceptWith<FakeInterceptor>(Lifestyle.Singleton, IsACommandPredicate);
 
             // Act
             var command1 = container.GetInstance<ICommand>();
@@ -219,6 +219,8 @@
             var logger = new FakeLogger();
 
             var container = ContainerFactory.New();
+
+            container.Register<CommandThatLogsOnExecute>();
 
             container.RegisterInstance<ILogger>(logger);
 
@@ -484,8 +486,10 @@
 
             container.Register<ICommand, FakeCommand>();
 
+            container.InterceptWith<InterceptorWithInternalConstructor>(IsACommandPredicate);
+
             // Act
-            Action action = () => container.InterceptWith<InterceptorWithInternalConstructor>(IsACommandPredicate);
+            Action action = () => container.GetInstance<ICommand>();
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
