@@ -61,7 +61,7 @@ namespace SimpleInjector
         private ScopedLifestyle? defaultScopedLifestyle;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private bool resolveUnregisteredConcreteTypes = true;
+        private bool resolveUnregisteredConcreteTypes;
 
         internal ContainerOptions(Container container)
         {

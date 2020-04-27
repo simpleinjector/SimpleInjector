@@ -627,10 +627,9 @@ namespace SimpleInjector.Tests.Unit
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 No registration for type ConcreteCommand could be found. Make sure ConcreteCommand is
-                registered, for instance by calling 'Container.Register<ConcreteCommand>();'.
-                An implicit registration could not be made because
-                Container.Options.ResolveUnregisteredConcreteTypes is set to 'false'.
-                This disallows the container to construct this unregistered concrete type."
+                registered, for instance by calling 'Container.Register<ConcreteCommand>();' during the
+                registration phase. An implicit registration could not be made because
+                Container.Options.ResolveUnregisteredConcreteTypes is set to 'false'"
                 .TrimInside(),
                 action);
         }
@@ -652,7 +651,7 @@ namespace SimpleInjector.Tests.Unit
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
                 No registration for type FakeTimeProvider could be found.
                 Make sure FakeTimeProvider is registered, for instance by calling 
-                'Container.Register<FakeTimeProvider>();'.
+                'Container.Register<FakeTimeProvider>();' during the registration phase.
                 There is a registration for ITimeProvider though, which maps to FakeTimeProvider.
                 Did you intend to request ITimeProvider instead?"
                 .TrimInside(),
@@ -680,7 +679,7 @@ namespace SimpleInjector.Tests.Unit
                 There is a registration for ITimeProvider though, which maps to FakeTimeProvider.
                 Did you intend for ServiceDependingOn<FakeTimeProvider> to depend on ITimeProvider instead?
                 An implicit registration could not be made because
-                Container.Options.ResolveUnregisteredConcreteTypes is set to 'false'."
+                Container.Options.ResolveUnregisteredConcreteTypes is set to 'false'"
                 .TrimInside(),
                 action);
         }
@@ -756,8 +755,10 @@ namespace SimpleInjector.Tests.Unit
                 the parameter with name 'dependency' and type ConcreteCommand, but ConcreteCommand is not
                 registered. For ConcreteCommand to be resolved, it must be registered in the container.
                 An implicit registration could not be made because
-                Container.Options.ResolveUnregisteredConcreteTypes is set to 'false'.
-                This disallows the container to construct this unregistered concrete type."
+                Container.Options.ResolveUnregisteredConcreteTypes is set to 'false', which is now the
+                default setting in v5. This disallows the container to construct this unregistered concrete
+                type. For more information on why resolving unregistered concrete types is now disallowed by
+                default, and what possible fixes you can apply, see https://simpleinjector.org/ructd."
                 .TrimInside(),
                 action);
         }

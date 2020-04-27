@@ -383,7 +383,7 @@ namespace SimpleInjector
             Container container, Type serviceType, bool containerHasRegistrations) =>
             Format(
                 "No registration for type {0} could be found. Make sure {0} is registered, for instance by " +
-                "calling '{1}'.{2}{3}",
+                "calling '{1}' during the registration phase.{2}{3}",
                 serviceType.TypeName(),
                 nameof(Container) + "." + nameof(Container.Register) +
                     "<" + serviceType.ToFriendlyName(fullyQualifiedName: false) + ">();",
@@ -1167,8 +1167,11 @@ namespace SimpleInjector
                 && !container.Options.ResolveUnregisteredConcreteTypes
                 ? ThereIsAMappingToImplementationType(container, resolvedType, consumingType) +
                     " An implicit registration could not be made because " +
-                    "Container.Options.ResolveUnregisteredConcreteTypes is set to 'false'. " +
-                    "This disallows the container to construct this unregistered concrete type."
+                    "Container.Options.ResolveUnregisteredConcreteTypes is set to 'false', which is now " +
+                    "the default setting in v5. This disallows the container to construct this " +
+                    "unregistered concrete type. For more information on why resolving unregistered " +
+                    "concrete types is now disallowed by default, and what possible fixes you can apply, " +
+                    "see https://simpleinjector.org/ructd."
                 : string.Empty;
 
         private static string ThereIsAMappingToImplementationType(
