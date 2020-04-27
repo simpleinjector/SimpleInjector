@@ -77,6 +77,7 @@
         {
             // Arrange
             var container = CreateContainer();
+            container.Register<MultipleDispatchEventHandler<CustomerMovedEvent>>();
 
             var handler = container.GetInstance<MultipleDispatchEventHandler<CustomerMovedEvent>>();
 

@@ -16,6 +16,8 @@
             PerGraphLifestyle.EnableFor(container);
 
             container.Register<C>(new PerGraphLifestyle());
+            container.Register<B>();
+            container.Register<A>();
 
             // Act
             var a = container.GetInstance<A>();
@@ -33,6 +35,8 @@
             PerGraphLifestyle.EnableFor(container);
 
             container.Register<C>(new PerGraphLifestyle());
+            container.Register<B>();
+            container.Register<A>();
 
             // Act
             var a1 = container.GetInstance<A>();
@@ -52,6 +56,7 @@
 
             container.Register<C>(new PerGraphLifestyle());
             container.Register<B>(() => new B(container.GetInstance<C>()));
+            container.Register<A>();
 
             // Act
             var a = container.GetInstance<A>();
@@ -67,6 +72,8 @@
             var container = new Container();
 
             container.Register<C>(new PerGraphLifestyle());
+            container.Register<B>();
+            container.Register<A>();
 
             // Act
             Action action = () => container.GetInstance<A>();

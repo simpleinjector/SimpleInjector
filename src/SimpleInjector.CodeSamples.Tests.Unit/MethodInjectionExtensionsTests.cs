@@ -20,6 +20,7 @@
 
             container.Register<ILogger, NullLogger>(Lifestyle.Singleton);
             container.Register<ICommand, ConcreteCommand>();
+            container.Register<ClassWithInjectionMethod>();
 
             // Act
             var service = container.GetInstance<ClassWithInjectionMethod>();
@@ -38,6 +39,7 @@
             container.Options.EnableMethodInjectionWith<InjectAttribute>();
 
             container.Register<ILogger, NullLogger>(Lifestyle.Singleton);
+            container.Register<ClassWithInjectionMethod>();
 
             try
             {
@@ -61,6 +63,7 @@
             container.Options.EnableMethodInjectionWith<InjectAttribute>();
 
             container.Register<ILogger, NullLogger>(Lifestyle.Singleton);
+            container.Register<ClassWithStaticInjectionMethod>();
 
             try
             {

@@ -45,13 +45,15 @@
 
             var container = CreateContainerWithConventions(new ConnectionStringsConvention(GetConnectionString));
 
+            container.Register<TypeWithConnectionStringConstructorArgument>();
+
             // Act
             var instance = container.GetInstance<TypeWithConnectionStringConstructorArgument>();
 
             // Assert
             Assert.AreEqual(expectedConnectionString, instance.Cs1ConnectionString);
         }
-        
+
         [TestMethod]
         public void ConnectionStringsConvention_ResolvingTypeWithConnectionStringProperty_InjectsExpectedValue()
         {
@@ -71,7 +73,7 @@
             // Assert
             Assert.AreEqual(expectedConnectionString, instance.Cs1ConnectionString);
         }
-        
+
         [TestMethod]
         public void ConnectionStringsConvention_RegisteringTypeWithIntParameterWhichNameEndsWithConnectionString_FailsWithExpectedException()
         {
@@ -179,6 +181,8 @@
 
             var container = CreateContainerWithConventions(new AppSettingsConvention(GetAppSetting));
 
+            container.Register<TypeWithAppSettingsStringConstructorArgument>();
+
             // Act
             var instance = container.GetInstance<TypeWithAppSettingsStringConstructorArgument>();
 
@@ -203,6 +207,8 @@
             Guid expectedAppSetting = Guid.Parse(AppSettings["as2"]);
 
             var container = CreateContainerWithConventions(new AppSettingsConvention(GetAppSetting));
+
+            container.Register<TypeWithAppSettingsGuidConstructorArgument>();
 
             // Act
             var instance = container.GetInstance<TypeWithAppSettingsGuidConstructorArgument>();
@@ -229,6 +235,8 @@
         {
             // Arrange
             var container = CreateContainerWithConventions(new AppSettingsConvention(GetAppSetting));
+
+            container.Register<TypeWithAppSettingConstructorArgumentOfReferenceType>();
 
             try
             {
@@ -310,6 +318,8 @@
                 new ConnectionStringsConvention(GetConnectionString),
                 new AppSettingsConvention(GetAppSetting));
 
+            container.Register<TypeWithBothConnectionStringAndAppSettingsConstructorArguments>();
+
             // Act
             var instance =
                 container.GetInstance<TypeWithBothConnectionStringAndAppSettingsConstructorArguments>();
@@ -327,6 +337,8 @@
 
             AddConventions(container,
                 new OptionalParameterConvention(container.Options.DependencyInjectionBehavior));
+
+            container.Register<TypeWithOptionalDependency<IDisposable>>();
 
             // Act
             var instance = container.GetInstance<TypeWithOptionalDependency<IDisposable>>();
@@ -347,6 +359,7 @@
                 new OptionalParameterConvention(container.Options.DependencyInjectionBehavior));
 
             container.RegisterInstance<ILogger>(dependency);
+            container.Register<TypeWithOptionalDependency<ILogger>>();
 
             // Act
             var instance = container.GetInstance<TypeWithOptionalDependency<ILogger>>();
@@ -379,6 +392,8 @@
 
             AddConventions(container,
                 new OptionalParameterConvention(container.Options.DependencyInjectionBehavior));
+
+            container.Register<TypeWithOptionalIntDependencyWithDefaultValueOfFive>();
 
             // Act
             var instance = container.GetInstance<TypeWithOptionalIntDependencyWithDefaultValueOfFive>();
@@ -420,7 +435,7 @@
         {
             public string Cs1ConnectionString { get; set; }
         }
-        
+
         public class TypeWithConnectionStringIntConstructorArgument
         {
             public TypeWithConnectionStringIntConstructorArgument(int cs1ConnectionString)

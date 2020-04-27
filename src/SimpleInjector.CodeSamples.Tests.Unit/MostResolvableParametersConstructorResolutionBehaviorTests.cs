@@ -38,6 +38,7 @@
 
             container.Register<ILogger, NullLogger>();
             container.Register<ICommand, ConcreteCommand>();
+            container.Register<MultipleConstructorsType>();
 
             // Act
             container.GetInstance<MultipleConstructorsType>();
@@ -66,6 +67,7 @@
 
             container.Register<ILogger, NullLogger>();
             container.Register<ICommand, ConcreteCommand>();
+            container.Register<MultipleConstructorsType>();
 
             // Act
             var instance = container.GetInstance<MultipleConstructorsType>();
@@ -82,6 +84,7 @@
             Container container = CreateContainerWithMostResolvableParametersConstructorResolutionBehavior();
 
             container.Register<ILogger, NullLogger>();
+            container.Register<MultipleConstructorsType>();
 
             // Act
             var instance = container.GetInstance<MultipleConstructorsType>();
@@ -98,6 +101,7 @@
             Container container = CreateContainerWithMostResolvableParametersConstructorResolutionBehavior();
 
             container.Register<ICommand, ConcreteCommand>();
+            container.Register<MultipleConstructorsType>();
 
             // Act
             var instance = container.GetInstance<MultipleConstructorsType>();
@@ -142,6 +146,8 @@
             // The ConnectionStringsConvention overrides the ConstructorInjectionBehavior and allows resolving
             // constructor arguments of type string that are postfixed with 'ConnectionString'.
             container.Options.RegisterParameterConvention(new ConnectionStringsConvention(name => expectedConnectionString));
+
+            container.Register<TypeWithConnectionStringConstructorArgument>();
 
             // Act
             // TypeWithConnectionStringConstructorArgument contains 1 ctor with a 'string cs1ConnectionString'

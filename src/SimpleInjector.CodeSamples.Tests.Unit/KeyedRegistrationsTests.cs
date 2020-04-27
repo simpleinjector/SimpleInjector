@@ -39,6 +39,7 @@
                 context => context.ImplementationType == typeof(Plugin3));
 
             container.RegisterInstance<Func<string, IPlugin>>(key => plugins.GetInstance(key));
+            container.Register<NamedPluginConsumer>();
 
             container.Verify();
 

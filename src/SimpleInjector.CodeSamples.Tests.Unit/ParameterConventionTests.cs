@@ -53,6 +53,8 @@
                 convention.WithParameter("someValue", "foo"),
                 convention.WithParameter(() => DateTime.MinValue),
                 convention.WithParameter("name", () => "bar"));
+            
+            container.Register<ClassWithOnlyPrimitiveConstructorParams>();
 
             container.Verify();
 
@@ -82,7 +84,7 @@
         }
 
         [TestMethod]
-        public void RegisterSingle_WithAllValidParameters_Succeeds()
+        public void RegisterSingleton_WithAllValidParameters_Succeeds()
         {
             // Arrange
             var container = new Container();
@@ -100,7 +102,7 @@
 
             container.Verify();
 
-            container.GetInstance<ClassWithOnlyPrimitiveConstructorParams>();
+            container.GetInstance<IService>();
         }
 
         [TestMethod]

@@ -16,6 +16,7 @@
             container.Options.EnableContextualDecoratorSupport();
 
             container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();
+            container.Register<Consumer<ICommandHandler<RealCommand>>>();
 
             container.RegisterContextualDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>),
                 parameter => true);
@@ -36,6 +37,7 @@
             container.Options.EnableContextualDecoratorSupport();
 
             container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();
+            container.Register<Consumer<ICommandHandler<RealCommand>>>();
 
             container.RegisterContextualDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>),
                 parameter => false);
@@ -56,6 +58,8 @@
             container.Options.EnableContextualDecoratorSupport();
 
             container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();
+            container.Register<Consumer<ICommandHandler<RealCommand>>>();
+            container.Register<CachedConsumer<ICommandHandler<RealCommand>>>();
 
             container.RegisterContextualDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>),
                 parameter => parameter.Name.StartsWith("cached"));
@@ -81,6 +85,7 @@
             container.Options.EnableContextualDecoratorSupport();
 
             container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();
+            container.Register<Consumer<ICommandHandler<RealCommand>>>();
 
             container.RegisterContextualDecorator(
                 typeof(ICommandHandler<>),
@@ -112,6 +117,8 @@
             container.Options.EnableContextualDecoratorSupport();
 
             container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();
+            container.Register<Consumer<ICommandHandler<RealCommand>>>();
+            container.Register<CachedConsumer<ICommandHandler<RealCommand>>>();
 
             container.RegisterContextualDecorator(
                 typeof(ICommandHandler<>),
@@ -146,6 +153,7 @@
             container.Options.EnableContextualDecoratorSupport();
 
             container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();
+            container.Register<Consumer<ICommandHandler<RealCommand>>>();
 
             container.RegisterContextualDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>),
                 parameter => false);
@@ -178,6 +186,7 @@
             container.Options.EnableContextualDecoratorSupport();
 
             container.Register<ICommandHandler<RealCommand>, NullCommandHandler<RealCommand>>();
+            container.Register<Consumer<ICommandHandler<RealCommand>>>();
 
             container.RegisterContextualDecorator(
                 typeof(ICommandHandler<>),
