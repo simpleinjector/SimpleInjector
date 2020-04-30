@@ -1,14 +1,14 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
-    using System.Reflection;
-
     internal static class ContainerFactory
     {
         public static Container New()
         {
             var container = new Container();
 
-            container.Options.EnableDynamicAssemblyCompilation = true;
+            container.Options.ExpressionCompilationBehavior =
+                new DynamicAssemblyExpressionCompilationBehavior();
+
             container.Options.EnableAutoVerification = false;
 
             return container;

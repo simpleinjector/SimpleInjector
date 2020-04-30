@@ -550,8 +550,7 @@ namespace SimpleInjector
         {
             try
             {
-                return CompilationHelpers.CompileExpression(
-                    this.ImplementationType, this.Container, expression);
+                return CompilationHelpers.CompileExpression(this.Container, expression);
             }
             catch (Exception ex)
             {

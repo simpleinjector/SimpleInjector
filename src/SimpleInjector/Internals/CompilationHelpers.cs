@@ -13,7 +13,7 @@ namespace SimpleInjector.Internals
     using SimpleInjector.Advanced.Internal;
     using SimpleInjector.Lifestyles;
 
-    internal static partial class CompilationHelpers
+    internal static class CompilationHelpers
     {
         private static readonly ConstructorInfo LazyScopeConstructor =
             Helpers.GetConstructor(() => new LazyScope(null!, null!));
@@ -45,18 +45,17 @@ namespace SimpleInjector.Internals
                 return CreateConstantValueDelegate<TResult>(expression);
             }
 
-            return (Func<TResult>)CompileExpression(typeof(TResult), container, expression, null);
+            return (Func<TResult>)CompileExpression(container, expression, null);
         }
 
         internal static Delegate CompileExpression(
-            Type resultType,
             Container container,
             Expression expression,
             Dictionary<Expression, InvocationExpression>? reducedNodes = null)
         {
             if (expression is ConstantExpression)
             {
-                return (Delegate)CreateConstantValueDelegateMethod.MakeGenericMethod(resultType)
+                return (Delegate)CreateConstantValueDelegateMethod.MakeGenericMethod(expression.Type)
                     .Invoke(null, new[] { expression });
             }
 
@@ -65,21 +64,7 @@ namespace SimpleInjector.Internals
 
             expression = OptimizeScopedRegistrationsInObjectGraph(container, expression);
 
-            container.Options.ExpressionCompiling(expression);
-
-            Delegate? compiledLambda = null;
-
-            // In the common case, the developer will/should only create a single container during the
-            // lifetime of the application (this is the recommended approach). In this case, we can optimize
-            // the performance by compiling delegates in an dynamic assembly. We can't do this when the
-            // developer creates many containers, because this will create a memory leak (dynamic assemblies
-            // are never unloaded).
-            if (container.Options.EnableDynamicAssemblyCompilation)
-            {
-                TryCompileInDynamicAssembly(resultType, expression, ref compiledLambda);
-            }
-
-            return compiledLambda ?? CompileLambda(resultType, expression);
+            return container.Options.ExpressionCompilationBehavior.Compile(expression);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -88,7 +73,7 @@ namespace SimpleInjector.Internals
         {
             var lifestyleInfos = PerObjectGraphOptimizableRegistrationFinder.Find(expression, container);
 
-            if (lifestyleInfos.Any())
+            if (lifestyleInfos.Length > 0)
             {
                 return OptimizeExpression(container, expression, lifestyleInfos);
             }
@@ -99,16 +84,6 @@ namespace SimpleInjector.Internals
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal static Func<TService> CompileLambda<TService>(Expression expression) =>
             Expression.Lambda<Func<TService>>(expression).Compile();
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        internal static Delegate CompileLambda(Type resultType, Expression expression)
-        {
-            Type delegateType = typeof(Func<>).MakeGenericType(resultType);
-            return Expression.Lambda(delegateType, expression).Compile();
-        }
-
-        static partial void TryCompileInDynamicAssembly(
-            Type resultType, Expression expression, ref Delegate? compiledLambda);
 
         // OptimizeExpression will implement caching of the scopes of ScopedLifestyles which will optimize
         // performance in case multiple scoped registrations are used within a single delegate. Here's an
@@ -232,8 +207,7 @@ namespace SimpleInjector.Internals
         {
             // Here we compile the expression. This will recursively reduce this sub graph again. The already
             // reduced nodes are passed on; hopefully they can be reused while reducing this sub graph.
-            Delegate compiledDelegate =
-                CompileExpression(expression.Type, container, expression, reducedNodes);
+            Delegate compiledDelegate = CompileExpression(container, expression, reducedNodes);
 
             return Expression.Invoke(Expression.Constant(compiledDelegate));
         }

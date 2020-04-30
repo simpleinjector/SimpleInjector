@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
-namespace SimpleInjector.Internals
+namespace SimpleInjector.DynamicAssemblyCompilation
 {
     using System;
     using System.Collections.Generic;
@@ -96,8 +96,8 @@ namespace SimpleInjector.Internals
         private static bool IsPublic(Type type) => GetTypeAndDeclaringTypes(type).All(IsPublicInternal);
 
         private static bool IsPublicInternal(Type type) =>
-            (type.IsNested ? type.IsNestedPublic() : type.IsPublic())
-            && (!type.IsGenericType() || type.GetGenericArguments().All(IsPublic));
+            (type.IsNested ? type.IsNestedPublic : type.IsPublic)
+            && (!type.IsGenericType || type.GetGenericArguments().All(IsPublic));
 
         private static IEnumerable<Type> GetTypeAndDeclaringTypes(Type type)
         {

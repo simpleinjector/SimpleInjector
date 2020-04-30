@@ -10,7 +10,7 @@ namespace SimpleInjector.Advanced
     using System.Linq.Expressions;
     using System.Reflection;
 
-    internal sealed partial class PropertyInjectionHelper
+    internal sealed class PropertyInjectionHelper
     {
         private const int MaximumNumberOfFuncArguments = 16;
         private const int MaximumNumberOfPropertiesPerDelegate = MaximumNumberOfFuncArguments - 1;
@@ -106,7 +106,7 @@ namespace SimpleInjector.Advanced
                 Expression.Block(this.implementationType, propertyInjectionExpressions),
                 parameters);
 
-            return this.CompilePropertyInjectorLambda(lambda);
+            return this.container.Options.ExpressionCompilationBehavior.Compile(lambda);
         }
 
         private List<Expression> BuildPropertyInjectionExpressions(ParameterExpression targetParameter,
@@ -207,17 +207,6 @@ namespace SimpleInjector.Advanced
 
             return openGenericFuncType.MakeGenericType(genericTypeArguments.ToArray());
         }
-
-        private Delegate CompilePropertyInjectorLambda(LambdaExpression expression)
-        {
-            Delegate? compiledDelegate = null;
-
-            this.TryCompileLambdaInDynamicAssembly(expression, ref compiledDelegate);
-
-            return compiledDelegate ?? expression.Compile();
-        }
-
-        partial void TryCompileLambdaInDynamicAssembly(LambdaExpression expression, ref Delegate? compiledDelegate);
 
         internal struct PropertyInjectionData
         {
