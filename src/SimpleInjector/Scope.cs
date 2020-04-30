@@ -15,7 +15,7 @@ namespace SimpleInjector
     /// <see cref="Scope"/> is thread-safe can be used over multiple threads concurrently, but note that the
     /// cached instances might not be thread-safe.
     /// </remarks>
-    public class Scope : ApiObject, IDisposable, IServiceProvider
+    public partial class Scope : ApiObject, IDisposable, IServiceProvider
     {
         private const int MaximumDisposeRecursion = 100;
 
@@ -471,13 +471,20 @@ namespace SimpleInjector
 
             cache[registration] = instance;
 
-            if (instance is IDisposable disposable && !registration.SuppressDisposal)
+            if (!registration.SuppressDisposal)
             {
-                this.RegisterForDisposalInternal(disposable);
+                if (instance is IDisposable disposable)
+                {
+                    this.RegisterForDisposalInternal(disposable);
+                }
+
+                this.TryRegisterForAsyncDisposalInternal(instance);
             }
 
             return instance;
         }
+
+        partial void TryRegisterForAsyncDisposalInternal(object instance);
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private void RegisterForDisposalInternal(IDisposable disposable)

@@ -9,7 +9,7 @@ namespace SimpleInjector
     /// <summary>
     /// The scope that manages the lifetime of singletons and other container-controlled instances.
     /// </summary>
-    public class ContainerScope : ApiObject
+    public partial class ContainerScope : ApiObject
     {
         private readonly Scope scope;
 
