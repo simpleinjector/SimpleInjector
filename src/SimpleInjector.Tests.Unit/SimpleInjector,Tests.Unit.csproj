@@ -19,6 +19,7 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj" />
     <ProjectReference Include="..\SimpleInjector\SimpleInjector.csproj" />
   </ItemGroup>
 

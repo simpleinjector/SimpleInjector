@@ -55,6 +55,9 @@ namespace SimpleInjector
         private ILifestyleSelectionBehavior lifestyleBehavior;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IExpressionCompilationBehavior compilationBehavior;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Lifestyle defaultLifestyle = Lifestyle.Transient;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -72,6 +75,7 @@ namespace SimpleInjector
             this.injectionBehavior = new DefaultDependencyInjectionBehavior(container);
             this.propertyBehavior = new DefaultPropertySelectionBehavior();
             this.lifestyleBehavior = new DefaultLifestyleSelectionBehavior(this);
+            this.compilationBehavior = new DefaultExpressionCompilationBehavior();
         }
 
         /// <summary>
@@ -295,6 +299,32 @@ namespace SimpleInjector
             }
         }
 
+
+        /// <summary>
+        /// Gets or sets the expression compilation behavior. Changing this behavior allows interception of
+        /// the compilation of delegates, for instance debugging purposes.</summary>
+        /// <value>The expression compilation behavior.</value>
+        /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the container already contains registrations.
+        /// </exception>
+        public IExpressionCompilationBehavior ExpressionCompilationBehavior
+        {
+            get
+            {
+                return this.compilationBehavior;
+            }
+
+            set
+            {
+                Requires.IsNotNull(value, nameof(value));
+
+                this.ThrowWhenContainerHasRegistrations(nameof(this.ExpressionCompilationBehavior));
+
+                this.compilationBehavior = value;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the default lifestyle that the container will use when a registration is
         /// made when no lifestyle is supplied.</summary>
@@ -353,18 +383,21 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the container will use dynamic assemblies for compilation.
-        /// By default, this value is <b>true</b> for the first few containers that are created in an AppDomain
-        /// and <b>false</b> for all other containers. You can set this value explicitly to <b>false</b>
-        /// to prevent the use of dynamic assemblies or you can set this value explicitly to <b>true</b> to
-        /// force more container instances to use dynamic assemblies. Note that creating an infinite number
-        /// of <see cref="SimpleInjector.Container">Container</see> instances (for instance one per web request)
-        /// with this property set to <b>true</b> will result in a memory leak; dynamic assemblies take up
-        /// memory and will only be unloaded when the AppDomain is unloaded.
+        /// This property is obsolete and setting it has no effect. To use dynamic assembly compilation, set 
+        /// the <see cref="ContainerOptions.ExpressionCompilationBehavior"/> property with the custom 
+        /// <see cref="IExpressionCompilationBehavior"/> implementation from the 
+        /// SimpleInjector.DynamicAssemblyCompilation package.
         /// </summary>
         /// <value>A boolean indicating whether the container should use a dynamic assembly for compilation.
         /// </value>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Obsolete(
+            "Changing this value to true has no effect. To use dynamic assembly compilation, set the " +
+            nameof(ExpressionCompilationBehavior) + " property with a new " +
+            "DynamicAssemblyExpressionCompilationBehavior instance that is located in the " +
+            "SimpleInjector.DynamicAssemblyCompilation package. " +
+            "Will be treated as an error from version 5.5. Will be removed in version 6.0.",
+            error: false)]
         public bool EnableDynamicAssemblyCompilation { get; set; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -372,14 +405,6 @@ namespace SimpleInjector
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplayDescription => this.ToString();
-
-        // This property enables a hidden hook to allow to get notified just before expression trees get
-        // compiled. It isn't used internally, but enables debugging in case compiling expressions crashes
-        // the process (which has happened in the past). A user can add the hook using reflection to find out
-        // which expression crashes the system. This property is internal, its not part of the official API,
-        // and we might remove it again in the future.
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        internal Action<Expression> ExpressionCompiling { get; set; } = _ => { };
 
         /// <summary>
         /// Registers an <see cref="ResolveInterceptor"/> delegate that allows intercepting calls to

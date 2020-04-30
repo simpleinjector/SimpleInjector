@@ -47,7 +47,7 @@
             Func<Container> buildContainer = () =>
             {
                 var container = new Container();
-                container.Options.EnableDynamicAssemblyCompilation = false;
+                
                 container.Register<INonGenericService, RealNonGenericService>();
 
                 container.RegisterDecorator<INonGenericService, NonGenericServiceDecorator>();

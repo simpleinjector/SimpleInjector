@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj" />
     <ProjectReference Include="..\SimpleInjector.Tests.Unit\SimpleInjector,Tests.Unit.csproj" />
     <ProjectReference Include="..\SimpleInjector\SimpleInjector.csproj" />
     <ProjectReference Include="..\SimpleInjector.CodeSamples\SimpleInjector.CodeSamples.csproj" />
