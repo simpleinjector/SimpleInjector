@@ -37,7 +37,7 @@ namespace SimpleInjector
         /// <summary>
         /// Gets the type of the implementation that is created by the container and for which the decorator
         /// is about to be applied. The original implementation type will be returned, even if other decorators
-        /// have already been applied to this type. Please not that the implementation type can not always be
+        /// have already been applied to this type. Please note that the implementation type can not always be
         /// determined. In that case the closed generic service type will be returned.
         /// </summary>
         /// <value>The implementation type.</value>
