@@ -33,6 +33,16 @@ namespace SimpleInjector.Lifestyles
         {
             Requires.IsNotNull(instance, nameof(instance));
 
+            // Fixes #589
+            // In case of a COM object, we override the implementation type, because otherwise our internal
+            // type checks (that call Type.IsAssignableFrom) would fail.
+#if !NETSTANDARD1_0 && !NETSTANDARD1_3
+            if (implementationType != null && implementationType.IsCOMObject)
+            {
+                implementationType = serviceType;
+            }
+#endif
+
             return new SingletonInstanceLifestyleRegistration(
                 serviceType, implementationType ?? serviceType, instance, container);
         }
@@ -69,6 +79,22 @@ namespace SimpleInjector.Lifestyles
             return new SingletonLifestyleRegistration<TService>(container, instanceCreator);
         }
 
+        private static ConstantExpression BuildConstantExpression(object instance, Type implementationType)
+        {
+            // Fixes #589
+            // Internally, Expression.Constant just does a simple Type.IsAssignableFrom check, which returns
+            // false for COM objects. Unfortunately, the IsCOMObject property is only available in .NET
+            // Standard 2.0 and up.
+#if !NETSTANDARD1_0 && !NETSTANDARD1_3
+            if (instance.GetType().IsCOMObject)
+            {
+                return Expression.Constant(instance);
+            }
+#endif
+
+            return Expression.Constant(instance, implementationType);
+        }
+
         private sealed class SingletonInstanceLifestyleRegistration : Registration
         {
             private readonly object locker = new object();
@@ -88,10 +114,9 @@ namespace SimpleInjector.Lifestyles
             public Type ServiceType { get; }
             public override Type ImplementationType { get; }
 
-            public override Expression BuildExpression()
-            {
-                return Expression.Constant(this.GetInitializedInstance(), this.ImplementationType);
-            }
+            public override Expression BuildExpression() =>
+                SingletonLifestyle.BuildConstantExpression(
+                    this.GetInitializedInstance(), this.ImplementationType);
 
             private object GetInitializedInstance()
             {
@@ -127,7 +152,8 @@ namespace SimpleInjector.Lifestyles
 
             private object GetInjectedInterceptedAndInitializedInstanceInternal()
             {
-                Expression expression = Expression.Constant(this.instance, this.ImplementationType);
+                Expression expression =
+                    SingletonLifestyle.BuildConstantExpression(this.instance, this.ImplementationType);
 
                 // NOTE: We pass on producer.ServiceType as the implementation type for the following three
                 // methods. This will the initialization to be only done based on information of the service
@@ -175,7 +201,8 @@ namespace SimpleInjector.Lifestyles
             public override Type ImplementationType => typeof(TImplementation);
 
             public override Expression BuildExpression() =>
-                Expression.Constant(this.GetInterceptedInstance(), this.ImplementationType);
+                SingletonLifestyle.BuildConstantExpression(
+                    this.GetInterceptedInstance(), this.ImplementationType);
 
             private object GetInterceptedInstance()
             {
