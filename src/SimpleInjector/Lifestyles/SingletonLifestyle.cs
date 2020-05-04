@@ -182,19 +182,32 @@ namespace SimpleInjector.Lifestyles
                 // Even though the InstanceProducer takes a lock before calling Registration.BuildExpression
                 // we need to take a lock here, because multiple InstanceProducer instances could reference
                 // the same Registration and call this code in parallel.
-                if (this.interceptedInstance == null)
+                if (this.interceptedInstance is null)
                 {
                     lock (this.locker)
                     {
-                        if (this.interceptedInstance == null)
+                        if (this.interceptedInstance is null)
                         {
                             this.interceptedInstance = this.CreateInstanceWithNullCheck();
 
-                            var disposable = this.interceptedInstance as IDisposable;
-
-                            if (disposable != null && !this.SuppressDisposal)
+                            if (!this.SuppressDisposal)
                             {
-                                this.Container.ContainerScope.RegisterForDisposal(disposable);
+                                if (this.interceptedInstance is IDisposable disposable)
+                                {
+                                    this.Container.ContainerScope.RegisterForDisposal(disposable);
+                                }
+                                else
+                                {
+                                    // In case an instance implements both IDisposable and IAsyncDisposable,
+                                    // it should only be registered once and RegisterForDisposal(IDisposable)
+                                    // can be used. That will still allows DisposeAsync to be called.
+#if NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
+                                    if (this.interceptedInstance is IAsyncDisposable asyncDisposable)
+                                    {
+                                        this.Container.ContainerScope.RegisterForDisposal(asyncDisposable);
+                                    }
+#endif
+                                }
                             }
                         }
                     }

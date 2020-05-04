@@ -28,9 +28,9 @@ namespace SimpleInjector
         /// to run</b>. In case an exception is thrown during the call to
         /// <see cref="Container.Dispose()">Dispose</see>, the
         /// <see cref="ContainerScope"/> will stop running any actions that might not have been invoked at that point.
-        /// Instances that are registered for disposal using <see cref="RegisterForDisposal"/> on the other
-        /// hand, are guaranteed to be disposed. Note that registered actions won't be invoked during a call
-        /// to <see cref="Container.Verify()" />.
+        /// Instances that are registered for disposal using <see cref="RegisterForDisposal(IDisposable)"/>
+        /// on the other hand, are guaranteed to be disposed. Note that registered actions won't be invoked
+        /// during a call to <see cref="Container.Verify()" />.
         /// </remarks>
         /// <param name="action">The delegate to run when the scope ends.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
@@ -101,13 +101,14 @@ namespace SimpleInjector
         /// <summary>
         /// Returns the list of <see cref="IDisposable"/> instances that will be disposed of when this
         /// instance is being disposed. The list contains scoped instances that are cached in this instance,
-        /// and instances explicitly registered for disposal using <see cref="RegisterForDisposal"/>. The instances
-        /// are returned in order of creation/registration. When
-        /// <see cref="Container.Dispose()">Container.Dispose</see> is called, the scope will ensure
+        /// and instances explicitly registered for disposal using
+        /// <see cref="RegisterForDisposal(IDisposable)"/>. The instances are returned in order of creation.
+        /// When <see cref="Container.Dispose()">Container.Dispose</see> is called, the scope will ensure
         /// <see cref="IDisposable.Dispose"/> is called on each instance in this list. The instance will be
         /// disposed in opposite order as they appear in the list.
         /// </summary>
-        /// <returns>The list of <see cref="IDisposable"/> instances that will be disposed of when this <see cref="SimpleInjector.Scope"/>
+        /// <returns>The list of <see cref="IDisposable"/> instances that will be disposed of when thi
+        /// <see cref="SimpleInjector.Scope"/>
         /// instance is being disposed.</returns>
         public IDisposable[] GetDisposables() => this.scope.GetDisposables();
 

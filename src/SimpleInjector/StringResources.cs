@@ -914,6 +914,12 @@ namespace SimpleInjector
                 assembly.FullName,
                 innerException.Message);
 
+        internal static string TypeOnlyImplementsIAsyncDisposable(object instance) =>
+            Format(
+                "{0} only implements IAsyncDisposable, but not IDisposable. " +
+                "Make sure to call Scope.DisposeAsync() instead of Dispose().",
+                instance.GetType().TypeName());
+
         private static bool IsListOrArrayRelationship(KnownRelationship relationship) =>
             typeof(List<>).IsGenericTypeDefinitionOf(relationship.Consumer.Target.TargetType)
             || relationship.Consumer.Target.TargetType.IsArray;
