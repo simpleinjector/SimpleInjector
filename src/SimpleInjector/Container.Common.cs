@@ -240,13 +240,6 @@ namespace SimpleInjector
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
-
-            if (!this.disposed)
-            {
-                this.disposed = true;
-
-                this.stackTraceThatDisposedTheContainer = GetStackTraceOrNull();
-            }
         }
 
         internal InstanceProducer[] GetRootRegistrations(bool includeInvalidContainerRegisteredTypes)
@@ -436,13 +429,19 @@ namespace SimpleInjector
         {
             if (disposing)
             {
-                try
+                if (!this.disposed)
                 {
-                    this.ContainerScope.Dispose();
-                }
-                finally
-                {
-                    this.isVerifying.Dispose();
+                    this.stackTraceThatDisposedTheContainer = GetStackTraceOrNull();
+
+                    try
+                    {
+                        this.ContainerScope.Dispose();
+                    }
+                    finally
+                    {
+                        this.disposed = true;
+                        this.isVerifying.Dispose();
+                    }
                 }
             }
         }
