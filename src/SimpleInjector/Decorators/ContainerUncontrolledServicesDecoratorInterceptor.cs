@@ -279,9 +279,8 @@ namespace SimpleInjector.Decorators
             // and the number of elements could change on each enumeration. It's impossible to detect if a
             // returned element is supposed to be a new element and should get its own new decorator, or if
             // it is supposed to be an existing element, for which an already cached decorator can be used.
-            // In fact we can't really cache elements as Singleton, but since this was already supported in
-            // the past, we don't want to introduce (yet another) breaking change.
-            if (this.Lifestyle != Lifestyle.Transient && this.Lifestyle != Lifestyle.Singleton)
+            // This is why only transient decorators are supported.
+            if (this.Lifestyle != Lifestyle.Transient)
             {
                 // At this point, decoratorType is never null.
                 throw new NotSupportedException(

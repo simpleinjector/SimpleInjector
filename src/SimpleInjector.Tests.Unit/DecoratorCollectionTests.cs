@@ -162,37 +162,6 @@
         }
 
         [TestMethod]
-        public void GetAllInstances_RegistrationThatAlwaysReturnsANewCollectionAndSingletonDecorator_ReturnsSingletons()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            // Use the Register<T>(Func<T>) method. This is a strange (not adviced), but valid way of
-            // registering collections.
-            container.Register<IEnumerable<ICommandHandler<RealCommand>>>(
-                () => new[] { new RealCommandHandler() });
-
-            container.RegisterDecorator(
-                typeof(ICommandHandler<>),
-                typeof(RealCommandHandlerDecorator),
-                Lifestyle.Singleton);
-
-            // Act
-            var handlers1 = container.GetAllInstances<ICommandHandler<RealCommand>>();
-            var handlers2 = container.GetAllInstances<ICommandHandler<RealCommand>>();
-
-            var decorator1 = (RealCommandHandlerDecorator)handlers1.Single();
-            var decorator2 = (RealCommandHandlerDecorator)handlers2.Single();
-
-            // Assert
-            bool isSingleton = object.ReferenceEquals(decorator1, decorator2);
-
-            Assert.IsTrue(isSingleton,
-                "Since the decorator is registered as singleton, is should be returned as singleton, no " +
-                "matter how the collection is registered (as Register<T>(Func<T>) in this case).");
-        }
-
-        [TestMethod]
         public void GetAllInstances_TypeDecoratedWithMultipleDecorators_ReturnsCollectionWithDecorators()
         {
             // Arrange
@@ -679,20 +648,20 @@
         }
 
         [TestMethod]
-        public void GetAllInstances_CollectionDecoratedWithSingletonDecorator3_WillNotReturnAMutableType()
+        public void GetAllInstances_CollectionDecoratedWithTransientDecorator_WillNotReturnAMutableType()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             IEnumerable<ICommandHandler<RealCommand>> handlers = new[] { new RealCommandHandler() };
 
-            // Use the RegisterCollection<T>(IEnumerable<T>) overload.
+            // Use the RegisterCollection<T>(IEnumerable<T>) overload (= container uncontrolled)
             container.Collection.Register<ICommandHandler<RealCommand>>(handlers);
 
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
                 typeof(TransactionalCommandHandlerDecorator<>),
-                Lifestyle.Singleton);
+                Lifestyle.Transient);
 
             // Act
             var actualHandlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
@@ -702,7 +671,7 @@
         }
 
         [TestMethod]
-        public void GetAllInstances_CollectionDecoratedWithSingletonDecorator4_WillNotReturnAMutableType()
+        public void GetAllInstances_CollectionDecoratedWithTransientDecorator2_WillNotReturnAMutableType()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -714,7 +683,7 @@
             container.RegisterDecorator(
                 typeof(ICommandHandler<>),
                 typeof(TransactionalCommandHandlerDecorator<>),
-                Lifestyle.Singleton);
+                Lifestyle.Transient);
 
             // Act
             var handlers = container.GetAllInstances<ICommandHandler<RealCommand>>();
@@ -1278,46 +1247,6 @@
         }
 
         [TestMethod]
-        public void GetAllInstances_DecoratorRegisteredTwiceAsSingleton_WrapsTheDecorateeTwice()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            IEnumerable<ICommandHandler<RealCommand>> dynamicList = new List<ICommandHandler<RealCommand>>
-            {
-                new RealCommandHandler(),
-                new NullCommandHandler<RealCommand>()
-            };
-
-            // Uses the RegisterCollection<T>(IEnumerable<T>) that registers a dynamic list.
-            container.Collection.Register<ICommandHandler<RealCommand>>(dynamicList);
-
-            // Register the same decorator twice.
-            container.RegisterDecorator(
-                typeof(ICommandHandler<>),
-                typeof(TransactionalCommandHandlerDecorator<>),
-                Lifestyle.Singleton);
-
-            container.RegisterDecorator(
-                typeof(ICommandHandler<>),
-                typeof(TransactionalCommandHandlerDecorator<>),
-                Lifestyle.Singleton);
-
-            // Act
-            var decorator1 = (TransactionalCommandHandlerDecorator<RealCommand>)
-                container.GetAllInstances<ICommandHandler<RealCommand>>().First();
-
-            var decorator2 = decorator1.Decorated;
-
-            // Assert
-            AssertThat.IsInstanceOfType(typeof(TransactionalCommandHandlerDecorator<RealCommand>), decorator2, "Since the decorator is registered twice, it should wrap the decoratee twice.");
-
-            var decoratee = ((TransactionalCommandHandlerDecorator<RealCommand>)decorator2).Decorated;
-
-            Assert.AreEqual(typeof(RealCommandHandler).ToFriendlyName(), decoratee.GetType().ToFriendlyName());
-        }
-
-        [TestMethod]
         public void RegisterCollection_ContainerUncontrolledSingletons_InitializesThoseSingletonsOnce()
         {
             // Arrange
@@ -1479,7 +1408,7 @@
         }
 
         [TestMethod]
-        public void GetAllInstances_DecoratingContainerUncontrolledCollectionWithLifestyleOtherThanTransientAndSingleton_ThrowsExpectedException()
+        public void GetAllInstances_DecoratingContainerUncontrolledCollectionWithLifestyleOtherThanTransient_ThrowsExpectedException()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -2009,7 +1938,7 @@
             container.RegisterDecorator(
                 typeof(IPlugin),
                 _ => typeof(PluginDecorator), // using factory
-                Lifestyle.Scoped, // lifestyle other than singleton or transient
+                Lifestyle.Scoped, // lifestyle other than transient
                 _ => true);
 
             // Act
@@ -2018,6 +1947,34 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
                 $"You are trying to apply the {decoratorName} decorator with the 'Scoped' lifestyle to " +
+                "a collection of type IPlugin, but the registered collection is not controlled by the " +
+                "container.",
+                action);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_DecoratorTypeSingletonLifestyleWrappingUncontrolledCollection_ThrowsExpressiveException()
+        {
+            // Act
+            string decoratorName = typeof(PluginDecorator).ToFriendlyName();
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            IEnumerable<IPlugin> collection = new[] { new PluginImpl() };
+
+            container.Collection.Register(containerUncontrolledCollection: collection);
+
+            container.RegisterDecorator(
+                typeof(IPlugin),
+                typeof(PluginDecorator),
+                Lifestyle.Singleton); // lifestyle other than transient
+
+            // Act
+            Action action = () => container.GetAllInstances<IPlugin>().ToArray();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                $"You are trying to apply the {decoratorName} decorator with the 'Singleton' lifestyle to " +
                 "a collection of type IPlugin, but the registered collection is not controlled by the " +
                 "container.",
                 action);
