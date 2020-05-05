@@ -22,12 +22,10 @@ namespace SimpleInjector
     /// </summary>
     public sealed class DynamicAssemblyExpressionCompilationBehavior : IExpressionCompilationBehavior
     {
-        private interface IDelegateBuilder
-        {
-            Delegate BuildDelegate();
-        }
-
-        private static long dynamicClassCounter;
+        // The 5000th delegate and up will not use dynamic assembly compilation to prevent memory leaks when
+        // the user accidentally keeps creating new InstanceProducer instances. This means there can be a
+        // multitude of registrations, since not all registrations will trigger delegate compilation.
+        private const long DynamicAssemblyCompilationThreshold = 5000;
 
         private static readonly ModuleBuilder Builder =
             AppDomain.CurrentDomain.DefineDynamicAssembly(
@@ -35,10 +33,12 @@ namespace SimpleInjector
                 AssemblyBuilderAccess.Run)
                 .DefineDynamicModule("SimpleInjector.DAC.CompiledModule");
 
-        // The 5000th delegate and up will not use dynamic assembly compilation to prevent memory leaks when
-        // the user accidentally keeps creating new InstanceProducer instances. This means there can be a
-        // multitude of registrations, since not all registrations will trigger delegate compilation.
-        private const long DynamicAssemblyCompilationThreshold = 5000;
+        private static long dynamicClassCounter;
+
+        private interface IDelegateBuilder
+        {
+            Delegate BuildDelegate();
+        }
 
         /// <inheritdoc />
         public Delegate Compile(Expression expression)
@@ -185,11 +185,11 @@ namespace SimpleInjector
             return CompileLambdaInDynamicAssembly(lambda);
         }
 
-        private static Expression ReplaceConstantsWithArrayLookup(Expression expression,
-            ConstantExpression[] constants, ParameterExpression constantsParameter)
+        private static Expression ReplaceConstantsWithArrayLookup(
+            Expression expression, ConstantExpression[] constants, ParameterExpression constantsParameter)
         {
-            return ConstantArrayIndexizerVisitor.ReplaceConstantsWithArrayIndexes(expression,
-                constants, constantsParameter);
+            return ConstantArrayIndexizerVisitor.ReplaceConstantsWithArrayIndexes(
+                expression, constants, constantsParameter);
         }
 
         private static List<ConstantExpression> GetConstants(Expression expression) =>

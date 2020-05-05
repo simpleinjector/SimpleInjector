@@ -299,7 +299,6 @@ namespace SimpleInjector
             }
         }
 
-
         /// <summary>
         /// Gets or sets the expression compilation behavior. Changing this behavior allows interception of
         /// the compilation of delegates, for instance debugging purposes.</summary>

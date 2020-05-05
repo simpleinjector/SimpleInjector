@@ -49,10 +49,10 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         private object GetInstanceFromSimpleInjector(Type type) =>
             this.tagHelperProducers.GetOrAdd(type, this.GetTagHelperProducer).GetInstance();
 
+        // Find the registration for the tag helper in the container
+        // and fallback to creating one when no registration exists.
         private InstanceProducer GetTagHelperProducer(Type type) =>
-            // Find the registration for the tag helper in the container
             this.container.GetCurrentRegistrations().SingleOrDefault(r => r.ServiceType == type)
-                // and fallback to creating one when no registration exists.
                 ?? Lifestyle.Transient.CreateProducer(type, type, this.container);
     }
 }
