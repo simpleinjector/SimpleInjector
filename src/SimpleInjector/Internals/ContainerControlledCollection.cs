@@ -16,7 +16,9 @@ namespace SimpleInjector.Internals
     {
         private readonly Container container;
 
-        private readonly List<LazyEx<InstanceProducer>> producers = new List<LazyEx<InstanceProducer>>();
+        // PERF: We use array instead of List<T> for optimal performance, even though this quite complicates
+        // the code in this class.
+        private LazyEx<InstanceProducer>[] producers = Helpers.Array<LazyEx<InstanceProducer>>.Empty;
 
         // This constructor needs to be public. It is called using reflection.
         public ContainerControlledCollection(Container container)
@@ -32,7 +34,7 @@ namespace SimpleInjector.Internals
 
         public bool AllProducersVerified => this.producers.All(lazy => lazy.IsValueCreated);
 
-        public int Count => this.producers.Count;
+        public int Count => this.producers.Length;
 
         bool ICollection<TService>.IsReadOnly => true;
 
@@ -65,12 +67,12 @@ namespace SimpleInjector.Internals
         public int IndexOf(TService item)
         {
             // InstanceProducers never return null, so we can short-circuit the operation and return -1.
-            if (item == null)
+            if (item is null)
             {
                 return -1;
             }
 
-            for (int index = 0; index < this.producers.Count; index++)
+            for (int index = 0; index < this.producers.Length; index++)
             {
                 InstanceProducer producer = this.producers[index].Value;
 
@@ -105,9 +107,9 @@ namespace SimpleInjector.Internals
         {
             Requires.IsNotNull(array, nameof(array));
 
-            foreach (var item in this)
+            foreach (var lazy in this.producers)
             {
-                array[arrayIndex++] = item;
+                array[arrayIndex++] = GetInstance(lazy.Value);
             }
         }
 
@@ -117,12 +119,16 @@ namespace SimpleInjector.Internals
         {
             this.container.ThrowWhenContainerIsLockedOrDisposed();
 
-            this.producers.Clear();
+            this.producers = Helpers.Array<LazyEx<InstanceProducer>>.Empty;
         }
 
         void IContainerControlledCollection.Append(ContainerControlledItem item)
         {
-            this.producers.Add(this.ToLazyInstanceProducer(item));
+            ICollection<LazyEx<InstanceProducer>> array = this.producers;
+            var copy = new LazyEx<InstanceProducer>[array.Count + 1];
+            array.CopyTo(copy, 0);
+            copy[array.Count] = this.ToLazyInstanceProducer(item);
+            this.producers = copy;
         }
 
         InstanceProducer[] IContainerControlledCollection.GetProducers() =>
@@ -138,6 +144,7 @@ namespace SimpleInjector.Internals
 
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static TService GetInstance(InstanceProducer producer)
         {
             var service = (TService)producer.GetInstance();
