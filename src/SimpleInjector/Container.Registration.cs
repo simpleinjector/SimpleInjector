@@ -493,7 +493,7 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <typeparamref name="TService"/> has already been registered.</exception>
         /// <exception cref="ArgumentNullException">
-        /// Thrown when one of the supplied arguments is a null reference (Nothing in VB).</exception>
+        /// Thrown when one of the supplied arguments is a null reference.</exception>
         public void Register<TService>(Func<TService> instanceCreator, Lifestyle lifestyle)
             where TService : class
         {
@@ -519,7 +519,7 @@ namespace SimpleInjector
         /// </remarks>
         /// <param name="concreteType">The concrete type that will be registered. This can be an open-generic type.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="concreteType"/> is a null
-        /// references (Nothing in VB).</exception>
+        /// references.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="concreteType"/> represents
         /// a type that can not be created by the container.
         /// </exception>
@@ -553,7 +553,7 @@ namespace SimpleInjector
         /// <param name="implementationType">The actual type that will be returned when requested.
         /// This can be an open-generic type.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceType"/> or
-        /// <paramref name="implementationType"/> are null references (Nothing in VB).</exception>
+        /// <paramref name="implementationType"/> are null references.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="implementationType"/> is
         /// no sub type from <paramref name="serviceType"/> (or the same type).
         /// </exception>
@@ -582,7 +582,7 @@ namespace SimpleInjector
         /// This can be an open-generic type.</param>
         /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <paramref name="serviceType"/> has already been registered.</exception>
@@ -592,7 +592,7 @@ namespace SimpleInjector
         /// <paramref name="serviceType"/> is not assignable from the <paramref name="implementationType"/>.
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle)
         {
             this.Register(
@@ -615,7 +615,7 @@ namespace SimpleInjector
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="instanceCreator">The delegate that will be used for creating new instances.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or
-        /// <paramref name="instanceCreator"/> are null references (Nothing in VB).</exception>
+        /// <paramref name="instanceCreator"/> are null references.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
         /// <exception cref="InvalidOperationException">
@@ -640,7 +640,7 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when the
         /// <paramref name="serviceType"/> has already been registered.</exception>
         /// <exception cref="ArgumentNullException">
-        /// Thrown when one of the supplied arguments is a null reference (Nothing in VB).</exception>
+        /// Thrown when one of the supplied arguments is a null reference.</exception>
         public void Register(Type serviceType, Func<object> instanceCreator, Lifestyle lifestyle)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
@@ -718,7 +718,7 @@ namespace SimpleInjector
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="instance">The instance to register.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or
-        /// <paramref name="instance"/> are null references (Nothing in VB).</exception>
+        /// <paramref name="instance"/> are null references.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="instance"/> is
         /// no sub type from <paramref name="serviceType"/>.</exception>
         /// <exception cref="InvalidOperationException">
@@ -746,7 +746,7 @@ namespace SimpleInjector
         /// <param name="serviceType">The base type or interface to register.</param>
         /// <param name="instance">The instance to register.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or
-        /// <paramref name="instance"/> are null references (Nothing in VB).</exception>
+        /// <paramref name="instance"/> are null references.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="instance"/> is
         /// no sub type from <paramref name="serviceType"/>.</exception>
         /// <exception cref="InvalidOperationException">
@@ -853,7 +853,7 @@ namespace SimpleInjector
         /// <param name="implementationType">The actual type that will be returned when requested.
         /// This can be an open-generic type.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or
-        /// <paramref name="implementationType"/> are null references (Nothing in VB).</exception>
+        /// <paramref name="implementationType"/> are null references.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="implementationType"/> is
         /// no sub type from <paramref name="serviceType"/>, or when one of them represents an open generic
         /// type.</exception>
@@ -880,8 +880,7 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an open
         /// generic type.</exception>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or
-        /// <paramref name="instanceCreator"/> are null references (Nothing in
-        /// VB).</exception>
+        /// <paramref name="instanceCreator"/> are null references.</exception>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
@@ -1076,7 +1075,7 @@ namespace SimpleInjector
         /// <param name="registration">The registration that should be stored for the given
         /// <paramtyperef name="TService"/>.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramtyperef name="TService"/> is ambiguous,
         /// when it is not assignable from the
         /// <paramref name="registration"/>'s <see cref="Registration.ImplementationType">ImplementationType</see>
@@ -1185,7 +1184,7 @@ namespace SimpleInjector
         /// the decorated <c>IBar</c> is still the same instance as the resolved <c>IFoo</c> instance.
         /// </example>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is not a reference
         /// type, is open generic, is ambiguous, when it is not assignable from the
         /// <paramref name="registration"/>'s <see cref="Registration.ImplementationType">ImplementationType</see>

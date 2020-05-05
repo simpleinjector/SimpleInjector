@@ -25,8 +25,8 @@ namespace SimpleInjector
 
         /// <summary>Initializes a new instance of the <see cref="ScopedLifestyle"/> class.</summary>
         /// <param name="name">The user friendly name of this lifestyle.</param>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB)
-        /// or an empty string.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null or an empty string.
+        /// </exception>
         protected ScopedLifestyle(string name) : base(name)
         {
         }
@@ -50,8 +50,8 @@ namespace SimpleInjector
         /// </remarks>
         /// <param name="container">The <see cref="Container"/> instance.</param>
         /// <param name="action">The delegate to run when the scope ends.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
         /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
         /// scope for the supplied <paramref name="container"/>.</exception>
         public void WhenScopeEnds(Container container, Action action)
@@ -68,8 +68,8 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="container">The <see cref="Container"/> instance.</param>
         /// <param name="disposable">The instance that should be disposed when the scope ends.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
         /// <exception cref="InvalidOperationException">Will be thrown when there is currently no active
         /// scope for the supplied <paramref name="container"/>.</exception>
         public void RegisterForDisposal(Container container, IDisposable disposable)

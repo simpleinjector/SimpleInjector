@@ -119,8 +119,8 @@ namespace SimpleInjector
         /// to <see cref="Container.Verify()" />.
         /// </remarks>
         /// <param name="action">The delegate to run when the scope ends.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
         /// <exception cref="ObjectDisposedException">Thrown when the scope has been disposed.</exception>
         public virtual void WhenScopeEnds(Action action)
         {
@@ -151,8 +151,8 @@ namespace SimpleInjector
         /// where the <see cref="IDisposable.Dispose"/> method is called inside the <code>finally</code> block.
         /// </remarks>
         /// <param name="disposable">The instance that should be disposed when the scope ends.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
         /// <exception cref="ObjectDisposedException">Thrown when the scope has been disposed.</exception>
         public void RegisterForDisposal(IDisposable disposable)
         {
@@ -176,9 +176,9 @@ namespace SimpleInjector
         /// percussions when they call both <b>GetItem</b> and <see cref="SetItem"/>.
         /// </remarks>
         /// <param name="key">The key of the item to retrieve.</param>
-        /// <returns>The stored item or null (Nothing in VB).</returns>
+        /// <returns>The stored item or null.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public object? GetItem(object key)
         {
             Requires.IsNotNull(key, nameof(key));
@@ -196,8 +196,8 @@ namespace SimpleInjector
         /// </remarks>
         /// <param name="key">The key of the item to insert or override.</param>
         /// <param name="item">The actual item. May be null.</param>
-        /// <exception cref="ArgumentNullException">Thrown when paramref name="key"/> is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when paramref name="key"/> is a null reference.
+        /// </exception>
         public void SetItem(object key, object? item)
         {
             Requires.IsNotNull(key, nameof(key));

@@ -44,7 +44,7 @@ namespace SimpleInjector
         /// <param name="lifestyle">The <see cref="Lifestyle"/> this that created this registration.</param>
         /// <param name="container">The <see cref="Container"/> instance for this registration.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         protected Registration(Lifestyle lifestyle, Container container)
         {
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
@@ -110,7 +110,7 @@ namespace SimpleInjector
         /// </remarks>
         /// <param name="instance">The instance to initialize.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when the supplied <paramref name="instance"/> is not
         /// of type <see cref="ImplementationType"/>.</exception>
         public void InitializeInstance(object instance)

@@ -34,7 +34,7 @@ namespace SimpleInjector.Advanced
         /// Gets the <see cref="InstanceProducer"/> that is responsible for the initialization of the created
         /// instance.
         /// </summary>
-        /// <value>The <see cref="InstanceProducer"/> or null (Nothing in VB) when the instance producer is
+        /// <value>The <see cref="InstanceProducer"/> or null when the instance producer is
         /// unknown.</value>
         public InstanceProducer Producer { get; }
 

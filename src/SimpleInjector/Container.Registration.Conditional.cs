@@ -38,7 +38,7 @@ namespace SimpleInjector
         /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        /// Thrown when one of the arguments is a null reference (Nothing in VB).
+        /// Thrown when one of the arguments is a null reference.
         /// </exception>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
@@ -67,7 +67,7 @@ namespace SimpleInjector
         /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
         /// </param>
         /// <exception cref="ArgumentNullException">
-        /// Thrown when one of the arguments is a null reference (Nothing in VB).
+        /// Thrown when one of the arguments is a null reference.
         /// </exception>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
@@ -100,8 +100,8 @@ namespace SimpleInjector
         /// are made. Note that the predicate will be called a finite number of times and its result will be cached
         /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
         /// </param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
@@ -127,8 +127,8 @@ namespace SimpleInjector
         /// are made. Note that the predicate will be called a finite number of times and its result will be cached
         /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
         /// </param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> and
         /// <paramref name="implementationType"/> are not a generic type or when <paramref name="serviceType"/>
         /// is a partially-closed generic type.
@@ -188,8 +188,8 @@ namespace SimpleInjector
         /// Note that the predicate will be called a finite number of times and its result will be cached
         /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
         /// </param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is a
         /// partially-closed generic type.
         /// </exception>
@@ -226,8 +226,8 @@ namespace SimpleInjector
         /// are made. Note that the predicate will be called a finite number of times and its result will be cached
         /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
         /// </param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
@@ -252,8 +252,8 @@ namespace SimpleInjector
         /// are made. Note that the predicate will be called a finite number of times and its result will be cached
         /// for the lifetime of the container. It can't be used for selecting a type based on runtime conditions.
         /// </param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> is open generic or
         /// <paramref name="registration" /> is not assignable to <paramref name="serviceType"/>.</exception>
         /// <exception cref="InvalidOperationException">

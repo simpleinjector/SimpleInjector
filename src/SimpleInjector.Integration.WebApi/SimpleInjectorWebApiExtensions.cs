@@ -31,7 +31,7 @@ namespace SimpleInjector
         /// <param name="configuration">The <see cref="HttpConfiguration"/> to use to get the Controller
         /// types to register.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public static void RegisterWebApiControllers(
             this Container container, HttpConfiguration configuration)
         {
@@ -53,7 +53,7 @@ namespace SimpleInjector
         /// types to register.</param>
         /// <param name="assemblies">The assemblies to search.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public static void RegisterWebApiControllers(
             this Container container, HttpConfiguration configuration, params Assembly[] assemblies)
         {
@@ -73,8 +73,8 @@ namespace SimpleInjector
         /// <param name="configuration">The <see cref="HttpConfiguration"/> to use to get the Controller
         /// types to register.</param>
         /// <param name="assemblies">The assemblies to search.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
         public static void RegisterWebApiControllers(
             this Container container, HttpConfiguration configuration, IEnumerable<Assembly> assemblies)
         {
@@ -111,8 +111,8 @@ namespace SimpleInjector
         /// <param name="container">The container instance for which HttpRequestMessageTracking should be
         /// enabled.</param>
         /// <param name="configuration">The application's configuration.</param>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
         public static void EnableHttpRequestMessageTracking(
             this Container container, HttpConfiguration configuration)
         {
@@ -135,7 +135,7 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when this method is called before
         /// <see cref="EnableHttpRequestMessageTracking"/> is called.</exception>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> argument
-        /// is a null reference (Nothing in VB).</exception>
+        /// is a null reference.</exception>
         public static HttpRequestMessage? GetCurrentHttpRequestMessage(this Container container)
         {
             Requires.IsNotNull(container, nameof(container));

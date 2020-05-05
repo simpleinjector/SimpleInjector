@@ -27,7 +27,7 @@ namespace SimpleInjector
         /// <param name="container">The container the services should be registered in.</param>
         /// <param name="assemblies">The assemblies to search.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> is
-        /// a null reference (Nothing in VB).</exception>
+        /// a null reference.</exception>
         public static void RegisterWcfServices(this Container container, params Assembly[] assemblies)
         {
             Requires.IsNotNull(container, nameof(container));

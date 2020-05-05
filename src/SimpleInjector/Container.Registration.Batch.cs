@@ -29,7 +29,7 @@ namespace SimpleInjector
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the given set of
@@ -52,7 +52,7 @@ namespace SimpleInjector
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the given set of
@@ -76,7 +76,7 @@ namespace SimpleInjector
         /// <param name="assembly">An assembly that will be searched.</param>
         /// <param name="lifestyle">The lifestyle to register instances with.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the given
@@ -102,7 +102,7 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <param name="lifestyle">The lifestyle to register instances with.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the given set of
@@ -142,7 +142,7 @@ namespace SimpleInjector
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="implementationTypes">A list types to be registered.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type or when one of the supplied types from the
         /// <paramref name="implementationTypes"/> collection does not derive from
@@ -163,7 +163,7 @@ namespace SimpleInjector
         /// <param name="implementationTypes">A list types to be registered.</param>
         /// <param name="lifestyle">The lifestyle to register instances with.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type or when one of the supplied types from the
         /// <paramref name="implementationTypes"/> collection does not derive from
@@ -229,7 +229,7 @@ namespace SimpleInjector
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the given set of
@@ -252,7 +252,7 @@ namespace SimpleInjector
         /// <param name="openGenericServiceType">The definition of the open generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
         /// an open generic type.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the given set of
@@ -275,7 +275,7 @@ namespace SimpleInjector
         /// a non-generic, closed-generic or open-generic type.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
@@ -301,7 +301,7 @@ namespace SimpleInjector
         /// a non-generic, closed-generic or open-generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
@@ -327,7 +327,7 @@ namespace SimpleInjector
         /// a non-generic, closed-generic or open-generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
@@ -366,8 +366,8 @@ namespace SimpleInjector
         /// <typeparam name="TService">The base type or interface to find derived types for.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <returns>A collection of types.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference.
+        /// </exception>
         /// <returns>A collection of types.</returns>
         public IEnumerable<Type> GetTypesToRegister<TService>(IEnumerable<Assembly> assemblies)
         {
@@ -404,8 +404,8 @@ namespace SimpleInjector
         /// <typeparam name="TService">The base type or interface to find derived types for.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <returns>A collection of types.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference.
+        /// </exception>
         /// <returns>A collection of types.</returns>
         public IEnumerable<Type> GetTypesToRegister<TService>(params Assembly[] assemblies)
         {
@@ -444,8 +444,8 @@ namespace SimpleInjector
         /// a non-generic and open-generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <returns>A collection of types.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference.
+        /// </exception>
         public IEnumerable<Type> GetTypesToRegister(Type serviceType, params Assembly[] assemblies)
         {
             return this.GetTypesToRegister(serviceType, assemblies, new TypesToRegisterOptions());
@@ -483,8 +483,8 @@ namespace SimpleInjector
         /// a non-generic and open-generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <returns>A collection of types.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference.
+        /// </exception>
         public IEnumerable<Type> GetTypesToRegister(Type serviceType, IEnumerable<Assembly> assemblies)
         {
             return this.GetTypesToRegister(serviceType, assemblies, new TypesToRegisterOptions());
@@ -523,8 +523,8 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <param name="options">The options.</param>
         /// <returns>A collection of types.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference.
+        /// </exception>
         public IEnumerable<Type> GetTypesToRegister(
             Type serviceType, IEnumerable<Assembly> assemblies, TypesToRegisterOptions options)
         {

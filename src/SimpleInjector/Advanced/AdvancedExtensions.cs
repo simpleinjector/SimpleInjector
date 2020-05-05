@@ -56,9 +56,9 @@ namespace SimpleInjector.Advanced
         /// </remarks>
         /// <param name="container">The container.</param>
         /// <param name="key">The key of the item to retrieve.</param>
-        /// <returns>The stored item or null (Nothing in VB).</returns>
+        /// <returns>The stored item or null.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         [Obsolete("Please use Container.ContainerScope.GetItem instead." +
             "Will be removed in version 6.0.",
             error: true)]
@@ -82,7 +82,7 @@ namespace SimpleInjector.Advanced
         /// <param name="key">The key of the item to insert or override.</param>
         /// <param name="item">The actual item. May be null.</param>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/> or
-        /// <paramref name="key"/> is a null reference (Nothing in VB).</exception>
+        /// <paramref name="key"/> is a null reference.</exception>
         [Obsolete("Please use Container.ContainerScope.SetItem instead. " +
             "Will be removed in version 6.0.",
             error: true)]
@@ -106,7 +106,7 @@ namespace SimpleInjector.Advanced
         /// value of <paramref name="key"/> will be supplied to the function when called.</param>
         /// <returns>The stored item or the item from the <paramref name="valueFactory"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="container"/>,
-        /// <paramref name="key"/> or <paramref name="valueFactory"/> is a null reference (Nothing in VB).</exception>
+        /// <paramref name="key"/> or <paramref name="valueFactory"/> is a null reference.</exception>
         [Obsolete("Please use Container.ContainerScope.GetOrSetItem instead. " +
             "Will be removed in version 6.0.",
             error: true)]
@@ -129,7 +129,7 @@ namespace SimpleInjector.Advanced
         /// <param name="serviceType">The service type of the collection.</param>
         /// <param name="registration">The registration to append.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is not a
         /// reference type, is open generic, or ambiguous.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
@@ -156,7 +156,7 @@ namespace SimpleInjector.Advanced
         /// <param name="serviceType">The service type of the collection.</param>
         /// <param name="implementationType">The implementation type to append.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is not a
         /// reference type, or ambiguous.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>

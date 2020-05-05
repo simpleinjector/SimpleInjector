@@ -86,7 +86,7 @@ namespace SimpleInjector.Integration.WebApi
         /// </summary>
         /// <param name="container">The container.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> parameter is
-        /// a null reference (Nothing in VB).</exception>
+        /// a null reference.</exception>
         public SimpleInjectorWebApiDependencyResolver(Container container)
             : this(container, DependencyResolverScopeOption.UseAmbientScope)
         {
@@ -98,7 +98,7 @@ namespace SimpleInjector.Integration.WebApi
         /// <param name="container">The container.</param>
         /// <param name="scopeOption">The scoping option.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="container"/> parameter is
-        /// a null reference (Nothing in VB).</exception>
+        /// a null reference.</exception>
         /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Thrown when the
         /// <paramref name="scopeOption"/> contains an invalid value.</exception>
         public SimpleInjectorWebApiDependencyResolver(Container container,

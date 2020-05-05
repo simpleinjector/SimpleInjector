@@ -137,7 +137,7 @@ namespace SimpleInjector
         /// registration exists, the container will try creating a new producer. A producer can be created
         /// when the type is a concrete reference type, there is an <see cref="ResolveUnregisteredType"/>
         /// event registered that acts on that type, or when the service type is an <see cref="IEnumerable{T}"/>.
-        /// Otherwise <b>null</b> (Nothing in VB) is returned.
+        /// Otherwise <b>null</b> is returned.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -151,7 +151,7 @@ namespace SimpleInjector
         /// </para>
         /// </remarks>
         /// <param name="serviceType">The <see cref="System.Type"/> that the returned instance producer should produce.</param>
-        /// <returns>An <see cref="InstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
+        /// <returns>An <see cref="InstanceProducer"/> or <b>null</b>.</returns>
         public InstanceProducer? GetRegistration(Type serviceType)
         {
             return this.GetRegistration(serviceType, throwOnFailure: false);
@@ -162,7 +162,7 @@ namespace SimpleInjector
         /// registration exists, the container will try creating a new producer. A producer can be created
         /// when the type is a concrete reference type, there is an <see cref="ResolveUnregisteredType"/>
         /// event registered that acts on that type, or when the service type is an <see cref="IEnumerable{T}"/>.
-        /// Otherwise <b>null</b> (Nothing in VB) is returned, or an exception is throw when
+        /// Otherwise <b>null</b> is returned, or an exception is throw when
         /// <paramref name="throwOnFailure"/> is set to <b>true</b>.
         /// </summary>
         /// <remarks>
@@ -179,7 +179,7 @@ namespace SimpleInjector
         /// <param name="serviceType">The <see cref="System.Type"/> that the returned instance producer should produce.</param>
         /// <param name="throwOnFailure">The indication whether the method should return null or throw
         /// an exception when the type is not registered.</param>
-        /// <returns>An <see cref="InstanceProducer"/> or <b>null</b> (Nothing in VB).</returns>
+        /// <returns>An <see cref="InstanceProducer"/> or <b>null</b>.</returns>
         //// Yippie, we broke a framework design guideline rule here :-).
         //// 7.1 DO NOT have public members that can either throw or not based on some option.
         public InstanceProducer? GetRegistration(Type serviceType, bool throwOnFailure)

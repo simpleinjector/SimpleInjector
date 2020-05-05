@@ -78,10 +78,10 @@ namespace SimpleInjector
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
@@ -105,10 +105,10 @@ namespace SimpleInjector
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
         /// will be requested from the container.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
-        /// (Nothing in VB) element or when <typeparamref name="TService"/> is not assignable from any of the
+        /// element or when <typeparamref name="TService"/> is not assignable from any of the
         /// service types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
@@ -133,10 +133,10 @@ namespace SimpleInjector
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <paramref name="serviceType"/> is
+        /// element, a generic type definition, or the <paramref name="serviceType"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
@@ -161,10 +161,10 @@ namespace SimpleInjector
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
         /// will be requested from the container.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
-        /// (Nothing in VB) element or when <paramref name="serviceType"/> is not assignable from any of the
+        /// element or when <paramref name="serviceType"/> is not assignable from any of the
         /// service types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
@@ -186,7 +186,7 @@ namespace SimpleInjector
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
         /// <param name="containerUncontrolledCollection">The collection of items to register.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
         [Obsolete("Please use Container." + nameof(Container.Collection) + "." +

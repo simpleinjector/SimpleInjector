@@ -58,7 +58,7 @@ namespace SimpleInjector.Diagnostics
         /// <value>The <see cref="DiagnosticType"/>.</value>
         public DiagnosticType DiagnosticType { get; }
 
-        /// <summary>Gets the parent <see cref="DiagnosticGroup"/> or null (Nothing in VB) when this is the
+        /// <summary>Gets the parent <see cref="DiagnosticGroup"/> or null when this is the
         /// root group.</summary>
         /// <value>The <see cref="DiagnosticGroup"/>.</value>
         public DiagnosticGroup? Parent { get; private set; }

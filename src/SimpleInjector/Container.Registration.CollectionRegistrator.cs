@@ -42,7 +42,7 @@ namespace SimpleInjector
         /// <typeparam name="TService">The element type of the collections to register.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
         /// every time the collection is enumerated.</returns>
         public IList<TService> Create<TService>(params Assembly[] assemblies) where TService : class
@@ -62,7 +62,7 @@ namespace SimpleInjector
         /// <typeparam name="TService">The element type of the collections to register.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
         /// every time the collection is enumerated.</returns>
         public IList<TService> Create<TService>(IEnumerable<Assembly> assemblies) where TService : class
@@ -89,10 +89,10 @@ namespace SimpleInjector
         /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
         /// every time the collection is enumerated.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         public IList<TService> Create<TService>(params Type[] serviceTypes) where TService : class
@@ -114,10 +114,10 @@ namespace SimpleInjector
         /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
         /// every time the collection is enumerated.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         public IList<TService> Create<TService>(IEnumerable<Type> serviceTypes) where TService : class
@@ -139,10 +139,10 @@ namespace SimpleInjector
         /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
         /// every time the collection is enumerated.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="registrations"/> is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
-        /// (Nothing in VB) element or when <typeparamref name="TService"/> is not assignable from any of the
+        /// element or when <typeparamref name="TService"/> is not assignable from any of the
         /// types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
         public IList<TService> Create<TService>(params Registration[] registrations) where TService : class
@@ -164,10 +164,10 @@ namespace SimpleInjector
         /// <returns>A collection that acts as stream, and calls back into the container to resolve instances
         /// every time the collection is enumerated.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="registrations"/> is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
-        /// (Nothing in VB) element or when <typeparamref name="TService"/> is not assignable from any of the
+        /// element or when <typeparamref name="TService"/> is not assignable from any of the
         /// types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
         public IList<TService> Create<TService>(IEnumerable<Registration> registrations)
@@ -195,7 +195,7 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public Registration CreateRegistration<TService>(params Assembly[] assemblies) where TService : class
         {
             return this.CreateRegistration<TService>((IEnumerable<Assembly>)assemblies);
@@ -220,7 +220,7 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public Registration CreateRegistration<TService>(IEnumerable<Assembly> assemblies)
             where TService : class
         {
@@ -246,10 +246,10 @@ namespace SimpleInjector
         /// will be requested from the container.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         public Registration CreateRegistration<TService>(params Type[] serviceTypes) where TService : class
@@ -271,10 +271,10 @@ namespace SimpleInjector
         /// will be requested from the container.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         public Registration CreateRegistration<TService>(IEnumerable<Type> serviceTypes)
@@ -299,10 +299,10 @@ namespace SimpleInjector
         /// will be requested from the container.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="registrations"/> is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
-        /// (Nothing in VB) element or when <typeparamref name="TService"/> is not assignable from any of the
+        /// element or when <typeparamref name="TService"/> is not assignable from any of the
         /// types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
         public Registration CreateRegistration<TService>(params Registration[] registrations)
@@ -325,10 +325,10 @@ namespace SimpleInjector
         /// will be requested from the container.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="registrations"/> is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
-        /// (Nothing in VB) element or when <typeparamref name="TService"/> is not assignable from any of the
+        /// element or when <typeparamref name="TService"/> is not assignable from any of the
         /// types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
         public Registration CreateRegistration<TService>(IEnumerable<Registration> registrations)
@@ -346,7 +346,7 @@ namespace SimpleInjector
         /// <param name="serviceType">The service type of the collection.</param>
         /// <param name="registration">The registration to append.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is not a
         /// reference type, is open generic, or ambiguous.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
@@ -425,7 +425,7 @@ namespace SimpleInjector
         /// <param name="serviceType">The service type of the collection.</param>
         /// <param name="implementationType">The implementation type to append.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is not a
         /// reference type, or ambiguous.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
@@ -459,7 +459,7 @@ namespace SimpleInjector
         /// <param name="implementationType">The implementation type to append.</param>
         /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="serviceType"/> is not a
         /// reference type, or ambiguous.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
@@ -496,7 +496,7 @@ namespace SimpleInjector
         /// <param name="instanceCreator">The delegate that allows building or creating new instances.</param>
         /// <param name="lifestyle">The lifestyle that specifies how the returned instance will be cached.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TService"/> is not a
         /// reference type, or ambiguous.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the container is locked.</exception>
@@ -652,10 +652,10 @@ namespace SimpleInjector
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         public void Register<TService>(params Type[] serviceTypes) where TService : class
@@ -675,10 +675,10 @@ namespace SimpleInjector
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         public void Register<TService>(IEnumerable<Type> serviceTypes) where TService : class
@@ -706,10 +706,10 @@ namespace SimpleInjector
         /// will be requested from the container.</param>
         /// <param name="lifestyle">The lifestyle to register instances with.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="serviceTypes"/> is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <typeparamref name="TService"/> is
+        /// element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         public void Register<TService>(IEnumerable<Type> serviceTypes, Lifestyle lifestyle) where TService : class
@@ -729,10 +729,10 @@ namespace SimpleInjector
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
         /// will be requested from the container.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
-        /// (Nothing in VB) element or when <typeparamref name="TService"/> is not assignable from any of the
+        /// element or when <typeparamref name="TService"/> is not assignable from any of the
         /// service types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
         public void Register<TService>(IEnumerable<Registration> registrations)
@@ -753,10 +753,10 @@ namespace SimpleInjector
         /// <param name="serviceTypes">The collection of <see cref="Type"/> objects whose instances
         /// will be requested from the container.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <paramref name="serviceType"/> is
+        /// element, a generic type definition, or the <paramref name="serviceType"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         public void Register(Type serviceType, IEnumerable<Type> serviceTypes)
@@ -798,10 +798,10 @@ namespace SimpleInjector
         /// will be requested from the container.</param>
         /// <param name="lifestyle">The lifestyle to register instances with.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceTypes"/> contains a null
-        /// (Nothing in VB) element, a generic type definition, or the <paramref name="serviceType"/> is
+        /// element, a generic type definition, or the <paramref name="serviceType"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         public void Register(Type serviceType, IEnumerable<Type> serviceTypes, Lifestyle lifestyle)
@@ -838,11 +838,11 @@ namespace SimpleInjector
         /// <param name="registrations">The collection of <see cref="Registration"/> objects whose instances
         /// will be requested from the container.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).
+        /// reference.
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="registrations"/> contains a null
-        /// (Nothing in VB) element or when <paramref name="serviceType"/> is not assignable from any of the
-        /// service types supplied by the given <paramref name="registrations"/> instances.
+        /// element or when <paramref name="serviceType"/> is not assignable from any of the service types
+        /// supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
         public void Register(Type serviceType, IEnumerable<Registration> registrations)
         {
@@ -872,7 +872,7 @@ namespace SimpleInjector
         /// <param name="serviceType">The base type or interface for elements in the collection.</param>
         /// <param name="containerUncontrolledCollection">The collection of items to register.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
         public void Register(Type serviceType, IEnumerable containerUncontrolledCollection)
@@ -909,7 +909,7 @@ namespace SimpleInjector
         /// a non-generic, closed-generic or open-generic type.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public void Register<TService>(params Assembly[] assemblies) where TService : class
         {
             this.Register(typeof(TService), assemblies);
@@ -927,7 +927,7 @@ namespace SimpleInjector
         /// a non-generic, closed-generic or open-generic type.</typeparam>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public void Register<TService>(IEnumerable<Assembly> assemblies) where TService : class
         {
             this.Register(typeof(TService), assemblies);
@@ -956,7 +956,7 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <param name="lifestyle">The lifestyle to register instances with.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public void Register<TService>(IEnumerable<Assembly> assemblies, Lifestyle lifestyle)
             where TService : class
         {
@@ -979,7 +979,7 @@ namespace SimpleInjector
         /// a non-generic, closed-generic or open-generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public void Register(Type serviceType, params Assembly[] assemblies)
         {
             this.Register(serviceType, (IEnumerable<Assembly>)assemblies);
@@ -1001,7 +1001,7 @@ namespace SimpleInjector
         /// a non-generic, closed-generic or open-generic type.</param>
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public void Register(Type serviceType, IEnumerable<Assembly> assemblies)
         {
             var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };
@@ -1036,7 +1036,7 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <param name="lifestyle">The lifestyle to register instances with.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public void Register(Type serviceType, IEnumerable<Assembly> assemblies, Lifestyle lifestyle)
         {
             var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };

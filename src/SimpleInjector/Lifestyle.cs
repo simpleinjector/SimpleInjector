@@ -132,8 +132,8 @@ namespace SimpleInjector
 
         /// <summary>Initializes a new instance of the <see cref="Lifestyle"/> class.</summary>
         /// <param name="name">The user friendly name of this lifestyle.</param>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null (Nothing in VB)
-        /// or an empty string.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null or an empty string.
+        /// </exception>
         protected Lifestyle(string name)
         {
             Requires.IsNotNullOrEmpty(name, nameof(name));
@@ -173,7 +173,7 @@ namespace SimpleInjector
         /// <paramref name="defaultLifestyle"/> argument returns <b>null</b>.</param>
         /// <returns>A new hybrid lifestyle that wraps the supplied lifestyles.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <example>
         /// <para>
         /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an
@@ -233,7 +233,7 @@ namespace SimpleInjector
         /// <paramref name="defaultLifestyle"/> argument returns <b>null</b>.</param>
         /// <returns>A new hybrid lifestyle that wraps the supplied lifestyles.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <example>
         /// <para>
         /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an
@@ -291,7 +291,7 @@ namespace SimpleInjector
         /// returns <b>false</b>.</param>
         /// <returns>A new hybrid lifestyle that wraps the supplied lifestyles.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <example>
         /// <para>
         /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an
@@ -355,7 +355,7 @@ namespace SimpleInjector
         /// returns <b>false</b>.</param>
         /// <returns>A new scoped hybrid lifestyle that wraps the supplied lifestyles.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         /// <example>
         /// <para>
         /// The following example shows the creation of a <b>HybridLifestyle</b> that mixes an
@@ -407,8 +407,8 @@ namespace SimpleInjector
         /// <param name="lifestyleApplierFactory">A factory delegate that takes a <b>Func&lt;object&gt;</b> delegate
         /// that will produce a transient instance and returns a delegate that returns cached instances.</param>
         /// <returns>A new <see cref="Lifestyle"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
-        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is an empty string.</exception>
         /// <example>
         /// The following example shows the creation of a lifestyle that caches registered instances for 10
@@ -465,7 +465,7 @@ namespace SimpleInjector
         /// <see cref="InstanceProducer"/> must be created.</param>
         /// <returns>A new <see cref="InstanceProducer"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public InstanceProducer<TService> CreateProducer<TService, TImplementation>(Container container)
             where TImplementation : class, TService
             where TService : class
@@ -484,7 +484,7 @@ namespace SimpleInjector
         /// <see cref="InstanceProducer"/> must be created.</param>
         /// <returns>A new <see cref="InstanceProducer"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="implementationType"/> or
-        /// <paramref name="container"/> are null references (Nothing in VB).</exception>
+        /// <paramref name="container"/> are null references.</exception>
         public InstanceProducer<TService> CreateProducer<TService>(
             Type implementationType, Container container)
             where TService : class
@@ -511,7 +511,7 @@ namespace SimpleInjector
         /// <see cref="InstanceProducer"/> must be created.</param>
         /// <returns>A new <see cref="InstanceProducer"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="instanceCreator"/> or
-        /// <paramref name="container"/> are null references (Nothing in VB).</exception>
+        /// <paramref name="container"/> are null references.</exception>
         public InstanceProducer<TService> CreateProducer<TService>(Func<TService> instanceCreator,
             Container container) where TService : class
         {
@@ -532,7 +532,7 @@ namespace SimpleInjector
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="InstanceProducer"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public InstanceProducer CreateProducer(Type serviceType, Type implementationType, Container container)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
@@ -554,7 +554,7 @@ namespace SimpleInjector
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new or cached <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public Registration CreateRegistration<TConcrete>(Container container)
             where TConcrete : class
         {
@@ -575,7 +575,7 @@ namespace SimpleInjector
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="instanceCreator"/> or
-        /// <paramref name="container"/> are null references (Nothing in VB).</exception>
+        /// <paramref name="container"/> are null references.</exception>
         public Registration CreateRegistration<TService>(Func<TService> instanceCreator, Container container)
             where TService : class
         {
@@ -602,7 +602,7 @@ namespace SimpleInjector
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public Registration CreateRegistration(Type concreteType, Container container)
         {
             Requires.IsNotNull(concreteType, nameof(concreteType));
@@ -626,7 +626,7 @@ namespace SimpleInjector
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
         /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null
-        /// reference (Nothing in VB).</exception>
+        /// reference.</exception>
         public Registration CreateRegistration(
             Type serviceType, Func<object> instanceCreator, Container container)
         {
