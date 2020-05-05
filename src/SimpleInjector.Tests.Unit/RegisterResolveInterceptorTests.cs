@@ -217,6 +217,8 @@
         public void GetInstance_IEnumerable_InterceptsThatEnumerable()
         {
             // Arrange
+            var expectedInterceptedTypes = new[] { typeof(IEnumerable<ITimeProvider>) };
+
             var container = new Container();
 
             var contexts = new List<InitializationContext>();
@@ -234,15 +236,24 @@
             container.GetInstance<IEnumerable<ITimeProvider>>();
 
             // Assert
-            AssertThat.AreEqual(
-                expectedType: typeof(IEnumerable<ITimeProvider>),
-                actualType: contexts.Single().Producer.ServiceType);
+            var actualInterceptedTypes =
+                from context in contexts
+                select context.Registration.ImplementationType;
+
+            // Assert
+            AssertThat.SequenceEquals(expectedInterceptedTypes, actualInterceptedTypes);
         }
 
         [TestMethod]
         public void GetInstance_ICollection_InterceptsThatCollection()
         {
             // Arrange
+            var expectedInterceptedTypes = new[]
+            {
+                typeof(IEnumerable<ITimeProvider>),
+                typeof(ICollection<ITimeProvider>)
+            };
+
             var container = new Container();
 
             var contexts = new List<InitializationContext>();
@@ -250,7 +261,8 @@
             container.Options.RegisterResolveInterceptor((c, p) =>
                 {
                     contexts.Add(c);
-                    return p();
+                    var i = p();
+                    return i;
                 },
                 c => true);
 
@@ -260,9 +272,11 @@
             container.GetInstance<ICollection<ITimeProvider>>();
 
             // Assert
-            AssertThat.AreEqual(
-                expectedType: typeof(ICollection<ITimeProvider>),
-                actualType: contexts.Single().Producer.ServiceType);
+            var actualInterceptedTypes =
+                from context in contexts
+                select context.Registration.ImplementationType;
+
+            AssertThat.SequenceEquals(expectedInterceptedTypes, actualInterceptedTypes);
         }
 
         private sealed class InstanceInitializationDataCollection : List<InstanceInitializationPair>

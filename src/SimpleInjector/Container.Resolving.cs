@@ -568,7 +568,7 @@ namespace SimpleInjector
 
             return new InstanceProducer(collectionType, registration)
             {
-                IsContainerAutoRegistered = !((IEnumerable<object>)stream).Any()
+                IsContainerAutoRegistered = stream.Count == 0
             };
         }
 

@@ -12,6 +12,8 @@ namespace SimpleInjector.Internals
     {
         bool AllProducersVerified { get; }
 
+        int Count { get; }
+
         InstanceProducer[] GetProducers();
 
         void Append(ContainerControlledItem item);
