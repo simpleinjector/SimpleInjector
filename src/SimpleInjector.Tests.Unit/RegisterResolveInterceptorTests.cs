@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.Remoting.Contexts;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
 
@@ -210,6 +211,58 @@
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
                 "delegate that was registered using 'RegisterResolveInterceptor' returned null",
                 action);
+        }
+
+        [TestMethod]
+        public void GetInstance_IEnumerable_InterceptsThatEnumerable()
+        {
+            // Arrange
+            var container = new Container();
+
+            var contexts = new List<InitializationContext>();
+
+            container.Options.RegisterResolveInterceptor((c, p) =>
+                {
+                    contexts.Add(c);
+                    return p();
+                },
+                c => true);
+
+            container.Collection.Append<ITimeProvider, RealTimeProvider>();
+
+            // Act
+            container.GetInstance<IEnumerable<ITimeProvider>>();
+
+            // Assert
+            AssertThat.AreEqual(
+                expectedType: typeof(IEnumerable<ITimeProvider>),
+                actualType: contexts.Single().Producer.ServiceType);
+        }
+
+        [TestMethod]
+        public void GetInstance_ICollection_InterceptsThatCollection()
+        {
+            // Arrange
+            var container = new Container();
+
+            var contexts = new List<InitializationContext>();
+
+            container.Options.RegisterResolveInterceptor((c, p) =>
+                {
+                    contexts.Add(c);
+                    return p();
+                },
+                c => true);
+
+            container.Collection.Append<ITimeProvider, RealTimeProvider>();
+
+            // Act
+            container.GetInstance<ICollection<ITimeProvider>>();
+
+            // Assert
+            AssertThat.AreEqual(
+                expectedType: typeof(ICollection<ITimeProvider>),
+                actualType: contexts.Single().Producer.ServiceType);
         }
 
         private sealed class InstanceInitializationDataCollection : List<InstanceInitializationPair>
