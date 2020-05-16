@@ -158,6 +158,56 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// Gets the <see cref="InstanceProducer"/> for the given <typeparamref name="TService"/>. When no
+        /// registration exists, the container will try creating a new producer. A producer can be created
+        /// when the type is a concrete reference type, there is an <see cref="ResolveUnregisteredType"/>
+        /// event registered that acts on that type, or when the service type is an <see cref="IEnumerable{T}"/>.
+        /// Otherwise <b>null</b> is returned.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// A call to this method locks the container. New registrations can't be made after a call to this
+        /// method.
+        /// </para>
+        /// <para>
+        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same
+        /// <see cref="InstanceProducer"/> instance for a given <see cref="System.Type"/>. It will however either
+        /// always return <b>null</b> or always return a producer that is able to return the expected instance.
+        /// </para>
+        /// </remarks>
+        /// <returns>An <see cref="InstanceProducer"/> or <b>null</b>.</returns>
+        public InstanceProducer<TService>? GetRegistration<TService>() where TService : class
+        {
+            return this.GetRegistration<TService>(throwOnFailure: false);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="InstanceProducer{TService}"/> for the given <typeparamref name="TService"/>.When no
+        /// registration exists, the container will try creating a new producer. A producer can be created
+        /// when the type is a concrete reference type, there is an <see cref="ResolveUnregisteredType"/>
+        /// event registered that acts on that type, or when the service type is an <see cref="IEnumerable{T}"/>.
+        /// Otherwise <b>null</b> is returned, or an exception is throw when
+        /// <paramref name="throwOnFailure"/> is set to <b>true</b>.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// A call to this method might lock the container.
+        /// </para>
+        /// <para>
+        /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same
+        /// <see cref="InstanceProducer"/> instance for a given <see cref="System.Type"/>. It will however either
+        /// always return <b>null</b> or always return a producer that is able to return the expected instance.
+        /// </para>
+        /// </remarks>
+        /// <param name="throwOnFailure">The indication whether the method should return null or throw
+        /// an exception when the type is not registered.</param>
+        /// <returns>An <see cref="InstanceProducer"/> or <b>null</b>.</returns>
+        public InstanceProducer<TService>? GetRegistration<TService>(bool throwOnFailure)
+        {
+            return (InstanceProducer<TService>?)this.GetRegistration(typeof(TService), throwOnFailure);
+        }
+
+        /// <summary>
         /// Gets the <see cref="InstanceProducer"/> for the given <paramref name="serviceType"/>. When no
         /// registration exists, the container will try creating a new producer. A producer can be created
         /// when the type is a concrete reference type, there is an <see cref="ResolveUnregisteredType"/>
@@ -167,8 +217,7 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// <para>
-        /// A call to this method locks the container. New registrations can't be made after a call to this
-        /// method.
+        /// A call to this method might lock the container.
         /// </para>
         /// <para>
         /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same
@@ -338,9 +387,73 @@ namespace SimpleInjector
             Type serviceType, Func<InstanceProducer?> tryBuildInstanceProducerForConcreteType)
         {
             return
+                this.TryBuildInstanceProducerForInstanceProducer(serviceType) ??
                 this.TryBuildInstanceProducerThroughUnregisteredTypeResolution(serviceType) ??
                 this.TryBuildInstanceProducerForCollectionType(serviceType) ??
                 tryBuildInstanceProducerForConcreteType();
+        }
+
+        private InstanceProducer? TryBuildInstanceProducerForInstanceProducer(Type type)
+        {
+            // Check for InstanceProducer<T>, but prevent sub types of InstanceProducer<T>.
+            if (typeof(InstanceProducer<>).IsGenericTypeDefinitionOf(type))
+            {
+                return this.BuildInstanceProducerForInstanceProducer(type);
+            }
+            else if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(type)
+                && typeof(InstanceProducer<>).IsGenericTypeDefinitionOf(type.GetGenericArguments()[0]))
+            {
+                return this.BuildInstanceProducerForEnumerableOfInstanceProducers(type);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private InstanceProducer BuildInstanceProducerForInstanceProducer(Type producerType)
+        {
+            Type serviceType = producerType.GetGenericArguments()[0];
+
+            var instanceProducer = this.GetInstanceProducerForType(serviceType, InjectionConsumerInfo.Root);
+
+            if (instanceProducer is null)
+            {
+                this.ThrowMissingInstanceProducerException(serviceType);
+            }
+
+            return InstanceProducer.Create(
+                producerType,
+                SingletonLifestyle.CreateSingleInstanceRegistration(producerType, instanceProducer!, this));
+        }
+
+        private InstanceProducer BuildInstanceProducerForEnumerableOfInstanceProducers(
+            Type enumerableOfProducersType)
+        {
+            Type producerType = enumerableOfProducersType.GetGenericArguments()[0];
+            Type serviceType = producerType.GetGenericArguments()[0];
+
+            var collection = this.GetAllInstances(serviceType) as IContainerControlledCollection;
+
+            if (collection is null)
+            {
+                // This exception might not be expressive enough. If GetAllInstances succeeds, but the
+                // returned type is not an IContainerControlledCollection, it likely means the collection is
+                // container uncontrolled.
+                this.ThrowMissingInstanceProducerException(serviceType);
+            }
+
+            IContainerControlledCollection producerCollection =
+                ControlledCollectionHelper.CreateContainerControlledCollection(producerType, this);
+
+            producerCollection.AppendAll(
+                from producer in collection!.GetProducers()
+                let reg = SingletonLifestyle.CreateSingleInstanceRegistration(producerType, producer, this)
+                select ContainerControlledItem.CreateFromRegistration(reg));
+
+            return InstanceProducer.Create(
+                serviceType: enumerableOfProducersType,
+                registration: producerCollection.CreateRegistration(enumerableOfProducersType, this));
         }
 
         private InstanceProducer? TryBuildInstanceProducerForCollectionType(Type serviceType)
@@ -399,7 +512,7 @@ namespace SimpleInjector
                 // By creating the InstanceProducer after checking the dictionary, we prevent the producer
                 // from being created twice when multiple threads are running. Having the same duplicate
                 // producer can cause a torn lifestyle warning in the container.
-                var producer = new InstanceProducer(e.UnregisteredServiceType, registration);
+                var producer = InstanceProducer.Create(e.UnregisteredServiceType, registration);
 
                 this.resolveUnregisteredTypeRegistrations[e.UnregisteredServiceType] =
                     Helpers.ToLazy(producer);
@@ -466,10 +579,9 @@ namespace SimpleInjector
             Registration registration =
                 new ExpressionRegistration(expression, serviceType, Lifestyle.Transient, this);
 
-            return new InstanceProducer(serviceType, registration)
-            {
-                IsContainerAutoRegistered = !this.GetAllInstances(elementType).Any()
-            };
+            var producer = InstanceProducer.Create(serviceType, registration);
+            producer.IsContainerAutoRegistered = !this.GetAllInstances(elementType).Any();
+            return producer;
         }
 
         private Expression BuildMutableCollectionExpressionFromControlledCollection(
@@ -512,10 +624,9 @@ namespace SimpleInjector
             Registration registration =
                 new ExpressionRegistration(expression, serviceType, Lifestyle.Transient, this);
 
-            return new InstanceProducer(serviceType, registration)
-            {
-                IsContainerAutoRegistered = true
-            };
+            var producer = InstanceProducer.Create(serviceType, registration);
+            producer.IsContainerAutoRegistered = true;
+            return producer;
         }
 
         private InstanceProducer? TryBuildInstanceProducerForStream(Type serviceType)
@@ -552,6 +663,7 @@ namespace SimpleInjector
         {
             if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(collectionType))
             {
+                // Building up enumerables is done inside TryGetInstanceProducerForRegisteredCollection.
                 return null;
             }
 
@@ -566,10 +678,9 @@ namespace SimpleInjector
 
             Registration registration = stream.CreateRegistration(collectionType, this);
 
-            return new InstanceProducer(collectionType, registration)
-            {
-                IsContainerAutoRegistered = stream.Count == 0
-            };
+            var producer = InstanceProducer.Create(collectionType, registration);
+            producer.IsContainerAutoRegistered = stream.Count == 0;
+            return producer;
         }
 
         private InstanceProducer? TryBuildInstanceProducerForConcreteUnregisteredType<TConcrete>(
@@ -642,7 +753,7 @@ namespace SimpleInjector
         private static InstanceProducer BuildInstanceProducerForConcreteUnregisteredType(Type concreteType,
             Registration registration)
         {
-            var producer = new InstanceProducer(concreteType, registration);
+            var producer = InstanceProducer.Create(concreteType, registration);
 
             producer.EnsureTypeWillBeExplicitlyVerified();
 

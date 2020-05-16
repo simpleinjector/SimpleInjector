@@ -471,7 +471,7 @@
                 implementationType: typeof(RealTimeProvider),
                 lifestyle: parent,
                 dependency:
-                    new InstanceProducer(typeof(IDisposable), new DummyRegistration<IDisposable>(child)));
+                    InstanceProducer.Create(typeof(IDisposable), new DummyRegistration<IDisposable>(child)));
 
         private static bool HasPossibleLifestyleMismatch(
             KnownRelationship dependency, bool? useLoosenedLifestyleMismatchBehavior = null) =>

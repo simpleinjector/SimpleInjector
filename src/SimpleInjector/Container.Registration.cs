@@ -1282,7 +1282,7 @@ namespace SimpleInjector
 
             this.ThrowWhenContainerIsLockedOrDisposed();
 
-            this.AddInstanceProducer(new InstanceProducer(serviceType, registration));
+            this.AddInstanceProducer(InstanceProducer.Create(serviceType, registration));
         }
 
         private void ThrowArgumentExceptionWhenTypeIsNotConstructable(

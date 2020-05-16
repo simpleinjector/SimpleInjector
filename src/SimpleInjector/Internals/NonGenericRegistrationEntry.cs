@@ -326,7 +326,7 @@ namespace SimpleInjector.Internals
             }
 
             private InstanceProducer CreateNewProducerFor(Type concreteType) =>
-                new InstanceProducer(
+                InstanceProducer.Create(
                     this.serviceType,
                     this.lifestyle.CreateRegistration(concreteType, this.container),
                     this.predicate);
