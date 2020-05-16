@@ -61,8 +61,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
         private static Dictionary<Type, IEnumerable<InstanceProducer>> GetRegisteredImplementationTypes(
             IEnumerable<InstanceProducer> producers) => (
             from producer in producers
-            where producer.ServiceType != producer.ImplementationType
-            group producer by producer.ImplementationType into registrationGroup
+            where producer.ServiceType != producer.FinalImplementationType
+            group producer by producer.FinalImplementationType into registrationGroup
             select registrationGroup)
             .ToDictionary(g => g.Key, g => (IEnumerable<InstanceProducer>)g);
 

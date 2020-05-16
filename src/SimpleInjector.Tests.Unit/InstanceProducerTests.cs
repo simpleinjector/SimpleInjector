@@ -320,6 +320,23 @@
             Assert.AreEqual(expectedObjectGraph, actualObjectGraph);
         }
 
+        // This code sample is a copy of the example in the XML comments of InstanceProducer.ImplementationType.
+        [TestMethod]
+        public void InstanceProducerWithDecoratorApplied_ChangesRegistration_AfterTypeIsResolvedForTheFirstTime()
+        {
+            var container = new Container();
+
+            container.Register<ILogger, ConsoleLogger>();
+            container.RegisterDecorator<ILogger, LoggerDecorator>();
+
+            var producer = container.GetRegistration(typeof(ILogger));
+
+            Assert.AreEqual(typeof(ConsoleLogger), producer.ImplementationType);
+            Assert.AreEqual(typeof(ConsoleLogger), producer.Registration.ImplementationType, "Before GetInstance");
+            Assert.AreEqual(typeof(LoggerDecorator), producer.GetInstance().GetType());
+            Assert.AreEqual(typeof(LoggerDecorator), producer.Registration.ImplementationType, "After GetInstance");
+        }
+
         public class OneAndTwo : IOne, ITwo
         {
         }

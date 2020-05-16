@@ -50,8 +50,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 relationship.ImplementationType.FriendlyName(),
                 relationship.Lifestyle.Name,
                 relationship.Dependency.ServiceType.FriendlyName(),
-                relationship.Dependency.ServiceType != relationship.Dependency.ImplementationType
-                    ? " implemented by " + relationship.Dependency.ImplementationType.FriendlyName()
+                relationship.Dependency.ServiceType != relationship.Dependency.FinalImplementationType
+                    ? " implemented by " + relationship.Dependency.FinalImplementationType.FriendlyName()
                     : string.Empty,
                 relationship.Dependency.Lifestyle.Name,
                 relationship.AdditionalInformation == string.Empty ? string.Empty : " ",

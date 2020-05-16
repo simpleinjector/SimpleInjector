@@ -931,7 +931,7 @@ namespace SimpleInjector
                 "of depending on one of the collection types that stream services (e.g. IEnumerable<{1}>, " +
                 "ICollection<{1}>, etc), it depends on the mutable collection type {4}. This causes " +
                 "{0} to be resolved during object construction, which is not advised.",
-                producer.ImplementationType.ToFriendlyName(),
+                producer.FinalImplementationType.ToFriendlyName(),
                 producer.ServiceType.ToFriendlyName(),
                 consumer.ToFriendlyName(),
                 relationship.Dependency.ServiceType.ToFriendlyName(),
@@ -945,7 +945,7 @@ namespace SimpleInjector
                 "its instances are required, {0} is being resolved (from the collection) during " +
                 "object construction. Resolving services from an injected collection during object " +
                 "construction (e.g. by calling {4}.ToList() in the constructor) is not advised.",
-                producer.ImplementationType.ToFriendlyName(),
+                producer.FinalImplementationType.ToFriendlyName(),
                 producer.ServiceType.ToFriendlyName(),
                 consumer.ToFriendlyName(),
                 relationship != null
@@ -1239,7 +1239,7 @@ namespace SimpleInjector
 
         private static IEnumerable<Type> GetServiceTypesForMappedImplementation(Container container, Type type) =>
             from producer in container.GetCurrentRegistrations()
-            where producer.ImplementationType == type && producer.ServiceType != type
+            where producer.FinalImplementationType == type && producer.ServiceType != type
             select producer.ServiceType;
 
         private static string BuildAssemblyLocationMessage(Type serviceType, Type duplicateAssemblyLookalike)

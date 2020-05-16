@@ -82,14 +82,6 @@ namespace SimpleInjector
         private List<Action<Scope>>? verifiers;
         private List<InstanceProducer>? wrappedProducers;
 
-        // NOTE: Creating non-generic InstanceProducer instances directly, disallows Simple Injector from
-        // injecting InstanceProducer<T> instances.
-        // As far as I can see, these are mutually exclusive features. Simple Injector will (now) internally
-        // always create an InstanceProducer<T>, but when a user creates a (non-generic) InstanceProducer, it
-        // is not part of injection list, and the producer can only be used as root type. Still, I want to
-        // guide users away from this constructor. This allows us to make InstanceProducer abstract in the
-        // future, which simplifies the API and prevents other problems if in the future we require
-        // InstanceProducer<T> in more scenarios.
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
         /// <param name="serviceType">The service type for which this instance is created.</param>
         /// <param name="registration">The <see cref="Registration"/>.</param>
@@ -100,6 +92,14 @@ namespace SimpleInjector
             error: false)]
         public InstanceProducer(Type serviceType, Registration registration)
         {
+            // NOTE: Creating non-generic InstanceProducer instances directly, disallows Simple Injector from
+            // injecting InstanceProducer<T> instances.
+            // As far as I can see, these are mutually exclusive features. Simple Injector will (now)
+            // internally always create an InstanceProducer<T>, but when a user creates a (non-generic)
+            // InstanceProducer, it is not part of injection list, and the producer can only be used as root
+            // type. Still, I want to guide users away from this constructor. This allows us to make
+            // InstanceProducer abstract in the future, which simplifies the API and prevents other problems
+            // if in the future we require InstanceProducer<T> in more scenarios.
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(registration, nameof(registration));
             Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
@@ -118,6 +118,7 @@ namespace SimpleInjector
             }
 
             this.instanceCreator = this.BuildAndReplaceInstanceCreatorAndCreateFirstInstance;
+            this.ImplementationType = registration.ImplementationType;
         }
 
         /// <summary>
@@ -133,11 +134,39 @@ namespace SimpleInjector
         /// <value>A <see cref="Type"/> instance.</value>
         public Type ServiceType { get; }
 
-        /// <summary>Gets the <see cref="Registration"/> instance for this instance.</summary>
+        /// <summary>Gets the <see cref="Registration"/> instance for this instance.
+        /// Please note that, when decorators are applied, this instance is replaces and will become the
+        /// registration for the outermost decorator.</summary>
         /// <value>The <see cref="Registration"/>.</value>
         public Registration Registration { get; private set; }
 
-        internal Type ImplementationType => this.Registration.ImplementationType ?? this.ServiceType;
+        /// <summary>
+        /// Gets the originally registered implementation type. Note that the actual type, returned by
+        /// <see cref="GetInstance"/>, will be different from <see cref="ImplementationType"/> when
+        /// decorators or interceptors are applied. This property will always return the originally registered
+        /// implementation type. In case the implementation type is unknown, which happens for instance when
+        /// registering <see cref="Func{TResult}"/> delegates, the service type is returned.
+        /// </summary>
+        /// <example>
+        /// Given the configuration below, the Assert calls will succeed.
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        ///
+        /// container.Register<ILogger, ConsoleLogger>();
+        /// container.RegisterDecorator<ILogger, LoggerDecorator>();
+        ///
+        /// var producer = container.GetRegistration(typeof(ILogger));
+        ///
+        /// Assert.AreEqual(typeof(ConsoleLogger), producer.ImplementationType);
+        /// Assert.AreEqual(typeof(ConsoleLogger), producer.Registration.ImplementationType, "Before GetInstance");
+        /// Assert.AreEqual(typeof(LoggerDecorator), producer.GetInstance().GetType());
+        /// Assert.AreEqual(typeof(LoggerDecorator), producer.Registration.ImplementationType, "After GetInstance");
+        /// ]]></code>
+        /// </example>
+        /// <value>The originally registered implementation type.</value>
+        public Type ImplementationType { get; }
+
+        internal Type FinalImplementationType => this.Registration.ImplementationType;
 
         internal Container Container => this.Registration.Container;
 
@@ -742,7 +771,7 @@ namespace SimpleInjector
             public Type ServiceType => this.producer.ServiceType;
 
             [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(" + nameof(ImplementationType) + "), nq}")]
-            public Type ImplementationType => this.producer.ImplementationType;
+            public Type ImplementationType => this.producer.FinalImplementationType;
 
             public KnownRelationship[] Relationships => this.producer.GetRelationships();
 

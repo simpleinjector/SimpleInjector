@@ -36,7 +36,7 @@ namespace SimpleInjector.Internals
 
             this.producers.Push(new ProducerEntry(producer));
 
-            this.Append(producer.ImplementationType.ToFriendlyName(this.visualizationOptions.UseFullyQualifiedTypeNames));
+            this.Append(producer.FinalImplementationType.ToFriendlyName(this.visualizationOptions.UseFullyQualifiedTypeNames));
             this.Append("(");
 
             this.indentingDepth++;

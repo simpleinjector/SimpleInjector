@@ -253,7 +253,7 @@ namespace SimpleInjector.Internals
                 {
                     yield return Tuple.Create(
                         item1: provider.ServiceType,
-                        item2: provider.ImplementationType ?? producer.ImplementationType,
+                        item2: provider.ImplementationType ?? producer.FinalImplementationType,
                         item3: producer);
 
                     handled = true;
