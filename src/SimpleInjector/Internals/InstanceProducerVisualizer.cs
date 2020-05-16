@@ -37,7 +37,7 @@ namespace SimpleInjector.Internals
                 return ExpressionNotCreatedYetMessage;
             }
 
-            string implementationName = producer.ImplementationType.ToFriendlyName();
+            string implementationName = producer.Registration.ImplementationType.ToFriendlyName();
 
             var visualizedDependencies =
                 producer.VisualizeInlinedDependencies(maxLength - implementationName.Length - 2);

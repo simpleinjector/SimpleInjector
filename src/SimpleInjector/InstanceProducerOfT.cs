@@ -3,13 +3,13 @@
 
 namespace SimpleInjector
 {
+    // NOTE: In v5, InstanceProducer<TService>'s type constraint has been removed, making it possible to
+    // create instance producers for value types as well. There were some use cases that require the creation
+    // of InstanceProducers on value types, but that required the creation of non-generic InstanceProducer
+    // instances, which is now not possible any longer.
     using System;
     using System.Diagnostics.CodeAnalysis;
 
-    // NOTE: In v5, the type constraint has been removed, making it possible to create instance producers for
-    // value types as well. There were some use cases that require the creation of InstanceProducers on value
-    // types, but that required the creation of non-generic InstanceProducer instances, which is now not
-    // possible any longer.
     /// <summary>
     /// Produces instances for a given registration. Instances of this type are generally created by the
     /// container when calling one of the <b>Register</b> overloads. Instances can be retrieved by calling

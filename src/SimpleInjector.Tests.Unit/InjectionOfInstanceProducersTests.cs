@@ -1,9 +1,12 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SimpleInjector;
 
+    // Tests for #393.
     [TestClass]
     public class InjectionOfInstanceProducersTests
     {
@@ -106,7 +109,28 @@
             // Assert
             AssertThat.AreEqual(
                 expectedType: typeof(RealCommandHandler),
-                actualType: producer.Registration.ImplementationType);
+                actualType: producer.ImplementationType);
+        }
+
+        [TestMethod]
+        public void InjectingAnInstanceProducerAfterVerifying_ForADecoratedInstance_AllowsRetrievingTheImplementationType()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<ICommandHandler<RealCommand>, RealCommandHandler>(Lifestyle.Singleton);
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Transient);
+
+            // Act
+            var service = container.GetInstance<ServiceDependingOn<InstanceProducer<ICommandHandler<RealCommand>>>>();
+            container.Verify();
+
+            InstanceProducer<ICommandHandler<RealCommand>> producer = service.Dependency;
+
+            // Assert
+            AssertThat.AreEqual(
+                expectedType: typeof(RealCommandHandler),
+                actualType: producer.ImplementationType);
         }
 
         [TestMethod]
@@ -124,7 +148,27 @@
             // Assert
             AssertThat.AreEqual(
                 expectedType: typeof(RealCommandHandler),
-                actualType: producer.Registration.ImplementationType);
+                actualType: producer.ImplementationType);
+        }
+
+        [TestMethod]
+        public void ResolvingInstanceProducerAfterVerification_ForADecoratedInstance_AllowsRetrievingTheImplementationType()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<ICommandHandler<RealCommand>, RealCommandHandler>(Lifestyle.Singleton);
+            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(CommandHandlerDecorator<>), Lifestyle.Transient);
+
+            container.Verify();
+
+            // Act
+            var producer = container.GetInstance<InstanceProducer<ICommandHandler<RealCommand>>>();
+
+            // Assert
+            AssertThat.AreEqual(
+                expectedType: typeof(RealCommandHandler),
+                actualType: producer.ImplementationType);
         }
 
         [TestMethod]
@@ -141,6 +185,8 @@
             // Act
             var service =
                 container.GetInstance<ServiceDependingOn<IReadOnlyList<InstanceProducer<IEventHandler<OrderShipped>>>>>();
+
+            container.Verify();
 
             var producers = service.Dependency;
             var notifyHandler1 = (EventHandlerDecorator<OrderShipped>)producers[0].GetInstance();
@@ -171,12 +217,38 @@
             var service =
                 container.GetInstance<ServiceDependingOn<IEnumerable<InstanceProducer<IEventHandler<OrderShipped>>>>>();
 
+            container.Verify();
+
             var producers = service.Dependency;
             var notifyHandler = (EventHandlerDecorator<OrderShipped>)producers.First().GetInstance();
             var determineHandler = (EventHandlerDecorator<OrderShipped>)producers.Last().GetInstance();
 
             // Assert
             Assert.AreEqual(2, producers.Count());
+        }
+
+        // The following test shows the most likely use case for the InstanceProducer-injection feature (#393).
+        // Where a collection of decorated (generic) instances are registered, but they must be filtered based
+        // on their implementation type. InstanceProducer<T> provides access to this implementation type.
+        [TestMethod]
+        public void ConsumerDependingOnListOfInstanceProducers_CanIterateThatCollectionInItsConstructor_WithoutCausingVerificationErrors()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Append(typeof(IEventHandler<>), typeof(NotifyCustomer));
+            container.Collection.Append(typeof(IEventHandler<>), typeof(DetermineNewWarehouseInventory));
+            container.RegisterDecorator(typeof(IEventHandler<>), typeof(EventHandlerDecorator<>));
+
+            container.RegisterSingleton<MessageProcessor<OrderShipped>>();
+
+            container.Verify();
+
+            var processor = container.GetInstance<MessageProcessor<OrderShipped>>();
+
+            // Act
+            processor.Process(new OrderShipped(), typeof(NotifyCustomer));
+            processor.Process(new OrderShipped(), typeof(DetermineNewWarehouseInventory));
         }
 
         // Events
@@ -201,6 +273,22 @@
             }
 
             public IEventHandler<TEvent> Decoratee { get; }
+        }
+
+        internal class MessageProcessor<T>
+        {
+            private readonly Dictionary<Type, InstanceProducer<IEventHandler<T>>> producers;
+
+            public MessageProcessor(ICollection<InstanceProducer<IEventHandler<T>>> handlerProducers)
+            {
+                this.producers = handlerProducers.ToDictionary(p => p.ImplementationType);
+            }
+
+            public void Process(T message, Type handlerType)
+            {
+                // we would normally call .Handle(message) here.
+                this.producers[handlerType].GetInstance();
+            }
         }
     }
 }

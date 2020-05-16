@@ -145,9 +145,9 @@ namespace SimpleInjector.Internals
                 throw new InvalidOperationException(
                     StringResources.AnOverlappingRegistrationExists(
                         producerToRegister.ServiceType,
-                        overlappingProducer.ImplementationType,
+                        overlappingProducer.FinalImplementationType,
                         overlappingProducer.IsConditional,
-                        producerToRegister.ImplementationType,
+                        producerToRegister.FinalImplementationType,
                         producerToRegister.IsConditional));
             }
         }
@@ -156,10 +156,10 @@ namespace SimpleInjector.Internals
         {
             return
                 from producer in this.CurrentProducers
-                where producer.ImplementationType != null
+                where producer.FinalImplementationType != null
                 where !producer.Registration.WrapsInstanceCreationDelegate
                 where !producerToRegister.Registration.WrapsInstanceCreationDelegate
-                where producer.ImplementationType == producerToRegister.ImplementationType
+                where producer.FinalImplementationType == producerToRegister.FinalImplementationType
                 select producer;
         }
 
