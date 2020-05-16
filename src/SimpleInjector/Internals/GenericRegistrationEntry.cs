@@ -446,7 +446,7 @@ namespace SimpleInjector.Internals
             }
 
             private InstanceProducer CreateNewProducerFor(PredicateContext context) =>
-                new InstanceProducer(context.ServiceType, this.GetRegistration(context), this.Predicate);
+                InstanceProducer.Create(context.ServiceType, this.GetRegistration(context), this.Predicate);
 
             private Registration GetRegistration(PredicateContext context)
             {

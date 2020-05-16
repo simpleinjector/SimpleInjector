@@ -48,8 +48,8 @@ namespace SimpleInjector
     /// // ServiceImpl implements both Interface1 and Interface2.
     /// var registration = Lifestyle.Singleton.CreateRegistration<ServiceImpl, ServiceImpl>(container);
     ///
-    /// var producer1 = new InstanceProducer(typeof(Interface1), registration);
-    /// var producer2 = new InstanceProducer(typeof(Interface2), registration);
+    /// var producer1 = InstanceProducer.Create(typeof(Interface1), registration);
+    /// var producer2 = InstanceProducer.Create(typeof(Interface2), registration);
     ///
     /// container.RegisterDecorator(typeof(Interface1), typeof(Interface1Decorator));
     ///
@@ -64,7 +64,7 @@ namespace SimpleInjector
     /// </example>
     [DebuggerTypeProxy(typeof(InstanceProducerDebugView))]
     [DebuggerDisplay("{" + nameof(InstanceProducer.DebuggerDisplay) + ", nq}")]
-    public class InstanceProducer
+    public abstract class InstanceProducer
     {
         internal static readonly IEqualityComparer<InstanceProducer> EqualityComparer =
             ReferenceEqualityComparer<InstanceProducer>.Instance;
@@ -72,7 +72,7 @@ namespace SimpleInjector
         private static readonly Predicate<PredicateContext> Always = context => true;
 
         private readonly object locker = new object();
-        private readonly LazyEx<Expression> lazyExpression;
+        private LazyEx<Expression> lazyExpression;
 
         private CyclicDependencyValidator? validator;
         private Func<object> instanceCreator;
@@ -85,25 +85,13 @@ namespace SimpleInjector
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
         /// <param name="serviceType">The service type for which this instance is created.</param>
         /// <param name="registration">The <see cref="Registration"/>.</param>
-        public InstanceProducer(Type serviceType, Registration registration)
-            : this(serviceType, registration, ShouldBeRegisteredAsAnExternalProducer(registration))
-        {
-            Requires.ServiceIsAssignableFromImplementation(
-                serviceType, registration.ImplementationType, nameof(serviceType));
-        }
-
-        internal InstanceProducer(
-            Type serviceType, Registration registration, Predicate<PredicateContext>? predicate)
-            : this(serviceType, registration)
-        {
-            this.Predicate = predicate ?? Always;
-        }
-
-        internal InstanceProducer(Type serviceType, Registration registration, bool registerExternalProducer)
+        protected InstanceProducer(Type serviceType, Registration registration)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(registration, nameof(registration));
             Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
+            Requires.ServiceIsAssignableFromImplementation(
+                serviceType, registration.ImplementationType, nameof(serviceType));
 
             this.ServiceType = serviceType;
             this.Registration = registration;
@@ -111,21 +99,12 @@ namespace SimpleInjector
 
             this.lazyExpression = new LazyEx<Expression>(this.BuildExpressionInternal);
 
-            if (registerExternalProducer)
+            if (ShouldBeRegisteredAsAnExternalProducer(registration))
             {
                 registration.Container.RegisterExternalProducer(this);
             }
 
             this.instanceCreator = this.BuildAndReplaceInstanceCreatorAndCreateFirstInstance;
-        }
-
-        // Flagging the registration with WrapsInstanceCreationDelegate prevents false diagnostic warnings.
-        private InstanceProducer(Type serviceType, Expression expression, Container container)
-            : this(serviceType,
-                  new ExpressionRegistration(expression, container) { WrapsInstanceCreationDelegate = true })
-        {
-            // Overrides earlier set value. This prevents ExpressionBuilt from being applied.
-            this.lazyExpression = Helpers.ToLazy(expression);
         }
 
         /// <summary>
@@ -177,7 +156,7 @@ namespace SimpleInjector
         internal Exception? Exception { get; private set; }
 
         // Will never return null.
-        internal Predicate<PredicateContext> Predicate { get; } = Always;
+        internal Predicate<PredicateContext> Predicate { get; set; } = Always;
 
         internal bool IsDecorated { get; set; }
 
@@ -223,7 +202,7 @@ namespace SimpleInjector
             Requires.IsNotNull(expression, nameof(expression));
             Requires.IsNotNull(container, nameof(container));
 
-            return new InstanceProducer(serviceType, expression, container);
+            return InstanceProducer.Create(serviceType, expression, container);
         }
 
         /// <summary>Produces an instance.</summary>
@@ -382,6 +361,81 @@ namespace SimpleInjector
             }
 
             return InstanceProducerVisualizer.VisualizeIndentedObjectGraph(this, options);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="InstanceProducer{TService}"/> for the supplied
+        /// <paramref name="registration"/> where the <b>TService</b> generic type argument will become the
+        /// supplied <paramref name="serviceType"/>.
+        /// </summary>
+        /// <param name="serviceType">The service type.</param>
+        /// <param name="registration">The registration.</param>
+        /// <returns>A new <see cref="InstanceProducer{TService}"/>.</returns>
+        public static InstanceProducer Create(Type serviceType, Registration registration)
+        {
+            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(registration, nameof(registration));
+            Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
+
+            return (InstanceProducer)Activator.CreateInstance(
+                typeof(InstanceProducer<>).MakeGenericType(serviceType),
+                registration);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="InstanceProducer{TService}"/> for the supplied
+        /// <paramref name="registration"/> where the <b>TService</b> generic type argument will become the
+        /// supplied <typeparamref name="TService"/>.
+        /// </summary>
+        /// <typeparam name="TService">The service type.</typeparam>
+        /// <param name="registration">The registration.</param>
+        /// <returns>A new <see cref="InstanceProducer{TService}"/>.</returns>
+        public static InstanceProducer<TService> Create<TService>(Registration registration)
+            where TService : class
+        {
+            // This method seems completely redundant (because users can simply new the InstanceProducer<T>
+            // themselves. The addition of this method, however, does make the API more discoverable and
+            // consistent.
+            Requires.IsNotNull(registration, nameof(registration));
+
+            return new InstanceProducer<TService>(registration);
+        }
+
+        internal static InstanceProducer Create(
+            Type serviceType, Registration registration, Predicate<PredicateContext>? predicate)
+        {
+            var producer = Create(serviceType, registration);
+            producer.Predicate = predicate ?? Always;
+            return producer;
+        }
+
+        internal static InstanceProducer Create(
+            Type serviceType, Registration registration, bool registerExternalProducer)
+        {
+            var producer = Create(serviceType, registration);
+
+            // We have to remove it, because the InstanceProducer ctor automatically adds it.
+            registration.Container.RemoveExternalProducer(producer);
+
+            if (registerExternalProducer)
+            {
+                registration.Container.RegisterExternalProducer(producer);
+            }
+
+            return producer;
+        }
+
+        // Flagging the registration with WrapsInstanceCreationDelegate prevents false diagnostic warnings.
+        internal static InstanceProducer Create(Type serviceType, Expression expression, Container container)
+        {
+            var p = Create(
+                serviceType,
+                new ExpressionRegistration(expression, container) { WrapsInstanceCreationDelegate = true });
+
+            // Overrides earlier set value. This prevents ExpressionBuilt from being applied.
+            p.lazyExpression = Helpers.ToLazy(expression);
+
+            return p;
         }
 
         // Throws an InvalidOperationException on failure.

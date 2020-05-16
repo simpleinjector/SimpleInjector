@@ -3,8 +3,6 @@
     using System;
     using System.Collections.Generic;
 
-    using SimpleInjector.Advanced;
-
     public class NamedContainer : Container
     {
         private readonly Dictionary<Type, Dictionary<string, InstanceProducer>> namedProducers =
@@ -22,15 +20,15 @@
         }
 
         public void Register<TService, TImplementation>(string name)
-            where TImplementation : class, TService
             where TService : class
+            where TImplementation : class, TService
         {
             this.Register<TService, TImplementation>(this.SelectLifestyle<TImplementation>(), name);
         }
 
         public void Register<TService, TImplementation>(Lifestyle lifestyle, string name)
-            where TImplementation : class, TService
             where TService : class
+            where TImplementation : class, TService
         {
             var reg = lifestyle.CreateRegistration<TImplementation>(this);
             this.AddRegistration(typeof(TService), reg, name);
@@ -40,7 +38,7 @@
         {
             this.Register(serviceType, implementationType, this.SelectLifestyle(implementationType), name);
         }
-        
+
         public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle, string name)
         {
             var reg = lifestyle.CreateRegistration(implementationType, this);
@@ -67,9 +65,7 @@
                 throw new InvalidOperationException("The container is locked.");
             }
 
-            Dictionary<string, InstanceProducer> dict;
-
-            if (!this.namedProducers.TryGetValue(serviceType, out dict))
+            if (!this.namedProducers.TryGetValue(serviceType, out Dictionary<string, InstanceProducer> dict))
             {
                 dict = new Dictionary<string, InstanceProducer>();
                 this.namedProducers[serviceType] = dict;
@@ -77,11 +73,11 @@
 
             if (this.Options.AllowOverridingRegistrations)
             {
-                dict[name] = new InstanceProducer(serviceType, registration);
+                dict[name] = InstanceProducer.Create(serviceType, registration);
             }
             else
             {
-                dict.Add(name, new InstanceProducer(serviceType, registration));
+                dict.Add(name, InstanceProducer.Create(serviceType, registration));
             }
         }
 

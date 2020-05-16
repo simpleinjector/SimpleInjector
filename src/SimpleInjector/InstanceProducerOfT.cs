@@ -6,13 +6,15 @@ namespace SimpleInjector
     using System;
     using System.Diagnostics.CodeAnalysis;
 
+    // NOTE: In v5, the type constraint has been removed, making it possible to create instance producers for
+    // value types as well.
     /// <summary>
     /// Produces instances for a given registration. Instances of this type are generally created by the
     /// container when calling one of the <b>Register</b> overloads. Instances can be retrieved by calling
     /// <see cref="Container.GetCurrentRegistrations()"/> or <see cref="Container.GetRegistration(Type, bool)"/>.
     /// </summary>
     /// <typeparam name="TService">The service type.</typeparam>
-    public class InstanceProducer<TService> : InstanceProducer where TService : class
+    public class InstanceProducer<TService> : InstanceProducer
     {
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer{TService}"/> class.</summary>
         /// <param name="registration">The <see cref="Registration"/>.</param>

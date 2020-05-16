@@ -70,7 +70,7 @@
 
         private void Register(Registration registration, TKey key)
         {
-            var producer = new InstanceProducer(typeof(TService), registration);
+            var producer = InstanceProducer.Create(typeof(TService), registration);
 
             this.keyedProducers.Add(key, producer);
             this.producers.Add(producer);

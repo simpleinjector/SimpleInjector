@@ -540,7 +540,7 @@ namespace SimpleInjector
             Requires.IsNotNull(container, nameof(container));
             Requires.IsNotOpenGenericType(implementationType, nameof(implementationType));
 
-            return new InstanceProducer(serviceType, this.CreateRegistration(implementationType, container));
+            return InstanceProducer.Create(serviceType, this.CreateRegistration(implementationType, container));
         }
 
         /// <summary>
