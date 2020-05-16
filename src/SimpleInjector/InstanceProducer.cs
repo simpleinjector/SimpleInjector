@@ -64,7 +64,7 @@ namespace SimpleInjector
     /// </example>
     [DebuggerTypeProxy(typeof(InstanceProducerDebugView))]
     [DebuggerDisplay("{" + nameof(InstanceProducer.DebuggerDisplay) + ", nq}")]
-    public abstract class InstanceProducer
+    public class InstanceProducer
     {
         internal static readonly IEqualityComparer<InstanceProducer> EqualityComparer =
             ReferenceEqualityComparer<InstanceProducer>.Instance;
@@ -82,10 +82,23 @@ namespace SimpleInjector
         private List<Action<Scope>>? verifiers;
         private List<InstanceProducer>? wrappedProducers;
 
+        // NOTE: Creating non-generic InstanceProducer instances directly, disallows Simple Injector from
+        // injecting InstanceProducer<T> instances.
+        // As far as I can see, these are mutually exclusive features. Simple Injector will (now) internally
+        // always create an InstanceProducer<T>, but when a user creates a (non-generic) InstanceProducer, it
+        // is not part of injection list, and the producer can only be used as root type. Still, I want to
+        // guide users away from this constructor. This allows us to make InstanceProducer abstract in the
+        // future, which simplifies the API and prevents other problems if in the future we require
+        // InstanceProducer<T> in more scenarios.
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
         /// <param name="serviceType">The service type for which this instance is created.</param>
         /// <param name="registration">The <see cref="Registration"/>.</param>
-        protected InstanceProducer(Type serviceType, Registration registration)
+        [Obsolete("To create a new InstanceProducer instance, please call InstanceProducer.Create, create " +
+            "a generic InstanceProducer<TService>, or call the CreateProducer method on Lifestyle (e.g. " +
+            "Lifestyle.Transient.CreateProducer). InstanceProducer will become abstract in a future release" +
+            ". Will be treated as an error from version 5.5. Will be removed in version 6.0.",
+            error: false)]
+        public InstanceProducer(Type serviceType, Registration registration)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(registration, nameof(registration));

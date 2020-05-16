@@ -393,6 +393,7 @@ namespace SimpleInjector
                 tryBuildInstanceProducerForConcreteType();
         }
 
+        // This method allows using InstanceProducer<T> as dependency.
         private InstanceProducer? TryBuildInstanceProducerForInstanceProducer(Type type)
         {
             // Check for InstanceProducer<T>, but prevent sub types of InstanceProducer<T>.
