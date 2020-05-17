@@ -6,16 +6,20 @@ namespace SimpleInjector
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
     /// <summary>Implements a cache for <see cref="ScopedLifestyle"/> implementations.</summary>
     /// <remarks>
-    /// <see cref="Scope"/> is thread-safe can be used over multiple threads concurrently, but note that the
-    /// cached instances might not be thread-safe.
+    /// <see cref="Scope"/> is thread safe can be used over multiple threads concurrently, but methods that
+    /// are related to the disposal of the Scope (e.g. <see cref="GetDisposables"/>, <see cref="Dispose()"/>,
+    /// and <b>DisposeAsync()</b> are <b>not</b> thread safe and can't be used in combination with the
+    /// thread-safe methods. This means that once the Scope is ready for disposal, only a single thread should
+    /// access it. Also note that although the scope is thread safe, cached instances might not be.
     /// </remarks>
-    public class Scope : ApiObject, IDisposable, IServiceProvider
+    public partial class Scope : ApiObject, IDisposable, IServiceProvider
     {
         private const int MaximumDisposeRecursion = 100;
 
@@ -25,7 +29,7 @@ namespace SimpleInjector
         private IDictionary? items;
         private Dictionary<Registration, object>? cachedInstances;
         private List<Action>? scopeEndActions;
-        private List<IDisposable>? disposables;
+        private List<object>? disposables;
         private DisposeState state;
         private int recursionDuringDisposalCounter;
 
@@ -72,6 +76,7 @@ namespace SimpleInjector
 
         /// <summary>Gets an instance of the given <typeparamref name="TService"/> for the current scope.</summary>
         /// <typeparam name="TService">The type of the service to resolve.</typeparam>
+        /// <remarks><b>Thread safety:</b> Calls to this method are thread safe.</remarks>
         /// <returns>An instance of the given service type.</returns>
         public TService GetInstance<TService>() where TService : class
         {
@@ -79,6 +84,7 @@ namespace SimpleInjector
         }
 
         /// <summary>Gets an instance of the given <paramref name="serviceType" /> for the current scope.</summary>
+        /// <remarks><b>Thread safety:</b> Calls to this method are thread safe.</remarks>
         /// <param name="serviceType">The type of the service to resolve.</param>
         /// <returns>An instance of the given service type.</returns>
         public object GetInstance(Type serviceType)
@@ -110,13 +116,18 @@ namespace SimpleInjector
         /// but before the scope disposes any instances.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// During the call to <see cref="Scope.Dispose()"/> all registered <see cref="Action"/> delegates are
         /// processed in the order of registration. Do note that registered actions <b>are not guaranteed
         /// to run</b>. In case an exception is thrown during the call to <see cref="Dispose()"/>, the
         /// <see cref="Scope"/> will stop running any actions that might not have been invoked at that point.
-        /// Instances that are registered for disposal using <see cref="RegisterForDisposal"/> on the other
-        /// hand, are guaranteed to be disposed. Note that registered actions won't be invoked during a call
-        /// to <see cref="Container.Verify()" />.
+        /// Instances that are registered for disposal using <see cref="RegisterForDisposal(IDisposable)"/>
+        /// on the other hand, are guaranteed to be disposed. Note that registered actions won't be invoked
+        /// during a call to <see cref="Container.Verify()" />.
+        /// </para>
+        /// <para>
+        /// <b>Thread safety:</b> Calls to this method are thread safe.
+        /// </para>
         /// </remarks>
         /// <param name="action">The delegate to run when the scope ends.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
@@ -131,7 +142,7 @@ namespace SimpleInjector
                 this.RequiresInstanceNotDisposed();
                 this.PreventCyclicDependenciesDuringDisposal();
 
-                if (this.scopeEndActions == null)
+                if (this.scopeEndActions is null)
                 {
                     this.scopeEndActions = new List<Action>();
                 }
@@ -145,10 +156,15 @@ namespace SimpleInjector
         /// scope ends.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Instances that are registered for disposal, will be disposed in opposite order of registration and
         /// they are guaranteed to be disposed when <see cref="Scope.Dispose()"/> is called (even when
         /// exceptions are thrown). This mimics the behavior of the C# and VB <code>using</code> statements,
         /// where the <see cref="IDisposable.Dispose"/> method is called inside the <code>finally</code> block.
+        /// </para>
+        /// <para>
+        /// <b>Thread safety:</b> Calls to this method are thread safe.
+        /// </para>
         /// </remarks>
         /// <param name="disposable">The instance that should be disposed when the scope ends.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
@@ -172,7 +188,7 @@ namespace SimpleInjector
         /// item is stored by that key.
         /// </summary>
         /// <remarks>
-        /// <b>Thread-safety:</b> Calls to this method are thread-safe, but users should take proper
+        /// <b>Thread safety:</b> Calls to this method are thread safe, but users should take proper
         /// percussions when they call both <b>GetItem</b> and <see cref="SetItem"/>.
         /// </remarks>
         /// <param name="key">The key of the item to retrieve.</param>
@@ -191,7 +207,7 @@ namespace SimpleInjector
 
         /// <summary>Stores an item by the given <paramref name="key"/> in the scope.</summary>
         /// <remarks>
-        /// <b>Thread-safety:</b> Calls to this method are thread-safe, but users should take proper
+        /// <b>Thread safety:</b> Calls to this method are thread safe, but users should take proper
         /// percussions when they call both <see cref="GetItem"/> and <b>SetItem</b>.
         /// </remarks>
         /// <param name="key">The key of the item to insert or override.</param>
@@ -221,28 +237,42 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Returns the list of <see cref="IDisposable"/> instances that will be disposed of when this <see cref="Scope"/>
-        /// instance is being disposed. The list contains scoped instances that are cached in this <see cref="Scope"/> instance,
-        /// and instances explicitly registered for disposal using <see cref="RegisterForDisposal"/>. The instances are returned
-        /// in order of creation/registration. When <see cref="Dispose()">Scope.Dispose</see> is called, the scope will ensure
-        /// <see cref="IDisposable.Dispose"/> is called on each instance in this list. The instance will be disposed in opposite
-        /// order as they appear in the list.
+        /// Returns the list of <see cref="IDisposable"/> instances that will be disposed of when this
+        /// <see cref="Scope"/> instance is being disposed. The list contains scoped instances that are cached
+        /// in this <see cref="Scope"/> instance, and instances explicitly registered for disposal using
+        /// <see cref="RegisterForDisposal(IDisposable)"/>. The instances are returned in order of creation.
+        /// When <see cref="Dispose()">Scope.Dispose</see> is called, the scope will ensure
+        /// <see cref="IDisposable.Dispose"/> is called on each instance in this list. The instance will be
+        /// disposed in opposite order as they appear in the list.
         /// </summary>
-        /// <returns>The list of <see cref="IDisposable"/> instances that will be disposed of when this <see cref="Scope"/>
-        /// instance is being disposed.</returns>
+        /// <remarks>
+        /// <b>Thread safety:</b> This method is <b>not</b> thread safe and should not be used in combination
+        /// with any of the thread-safe methods.
+        /// </remarks>
+        /// <returns>The list of <see cref="IDisposable"/> instances that will be disposed of when this
+        /// <see cref="Scope"/> instance is being disposed.</returns>
         public IDisposable[] GetDisposables()
         {
-            lock (this.syncRoot)
+            this.RequiresInstanceNotDisposed();
+
+            if (this.disposables is null)
             {
-                this.RequiresInstanceNotDisposed();
-
-                if (this.disposables == null)
-                {
-                    return Helpers.Array<IDisposable>.Empty;
-                }
-
-                return this.disposables.ToArray();
+                return Helpers.Array<IDisposable>.Empty;
             }
+
+            this.disposables.OfType<IDisposable>().ToArray();
+
+            var list = new List<IDisposable>(this.disposables.Count);
+
+            foreach (var instance in this.disposables)
+            {
+                if (instance is IDisposable disposable)
+                {
+                    list.Add(disposable);
+                }
+            }
+
+            return list.ToArray();
         }
 
         /// <summary>Releases all instances that are cached by the <see cref="Scope"/> object.</summary>
@@ -286,7 +316,7 @@ namespace SimpleInjector
             ScopedRegistration<TImplementation> registration, Scope? scope)
             where TImplementation : class
         {
-            if (scope == null)
+            if (scope is null)
             {
                 return Scope.GetScopelessInstance(registration);
             }
@@ -320,47 +350,46 @@ namespace SimpleInjector
         /// <param name="disposing">False when only unmanaged resources should be released.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if (disposing && this.state == DisposeState.Alive)
             {
-                // We completely block the Dispose method from running in parallel, because there's all kinds
-                // of state that needs to be read/written, such as this.state, this.disposables, and
-                // this.scopeEndActions. Making this thread-safe with smaller granular locks will be much
-                // harder and simply not necessarily, since Dispose should normally only be called from one thread.
-                lock (this.syncRoot)
+                if (this.state != DisposeState.Alive)
                 {
-                    if (this.state != DisposeState.Alive)
-                    {
-                        // Either this instance is already disposed, or a different thread is currently
-                        // disposing it. We can break out immediately.
-                        return;
-                    }
+                    // Either this instance is already disposed, or a different thread is currently
+                    // disposing it. We can break out immediately.
+                    return;
+                }
 
-                    this.state = DisposeState.Disposing;
+                this.state = DisposeState.Disposing;
 
-                    try
-                    {
-                        this.DisposeRecursively();
-                    }
-                    finally
-                    {
-                        this.state = DisposeState.Disposed;
+                try
+                {
+                    this.DisposeRecursively();
+                }
+                finally
+                {
+                    this.state = DisposeState.Disposed;
 
-                        // Remove all references, so we won't hold on to created instances even if the
-                        // scope accidentally keeps referenced. This prevents leaking memory.
-                        this.cachedInstances = null;
-                        this.scopeEndActions = null;
-                        this.disposables = null;
-                        this.items = null;
+                    this.manager?.RemoveScope(this);
 
-                        this.manager?.RemoveScope(this);
-                    }
+                    // Remove all references, so we won't hold on to created instances even if the
+                    // scope accidentally keeps referenced. This prevents leaking memory.
+                    this.ClearState();
                 }
             }
         }
 
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private void ClearState()
+        {
+            this.cachedInstances = null;
+            this.scopeEndActions = null;
+            this.disposables = null;
+            this.items = null;
+        }
+
         private void DisposeRecursively(bool operatingInException = false)
         {
-            if (this.disposables == null && (operatingInException || this.scopeEndActions == null))
+            if (this.disposables is null && (operatingInException || this.scopeEndActions is null))
             {
                 return;
             }
@@ -471,20 +500,27 @@ namespace SimpleInjector
 
             cache[registration] = instance;
 
-            if (instance is IDisposable disposable && !registration.SuppressDisposal)
+            if (!registration.SuppressDisposal)
             {
-                this.RegisterForDisposalInternal(disposable);
+#if NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
+                if (instance is IDisposable || instance is IAsyncDisposable)
+#else
+                if (instance is IDisposable)
+#endif
+                {
+                    this.RegisterForDisposalInternal(instance);
+                }
             }
 
             return instance;
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private void RegisterForDisposalInternal(IDisposable disposable)
+        private void RegisterForDisposalInternal(object disposable)
         {
-            if (this.disposables == null)
+            if (this.disposables is null)
             {
-                this.disposables = new List<IDisposable>(capacity: 4);
+                this.disposables = new List<object>(capacity: 4);
             }
 
             this.disposables.Add(disposable);
@@ -531,7 +567,7 @@ namespace SimpleInjector
         // This method simulates the behavior of a set of nested 'using' statements: It ensures that dispose
         // is called on each element, even if a previous instance threw an exception.
         private static void DisposeInstancesInReverseOrder(
-            List<IDisposable> disposables, int startingAsIndex = int.MinValue)
+            List<object> disposables, int startingAsIndex = int.MinValue)
         {
             if (startingAsIndex == int.MinValue)
             {
@@ -542,7 +578,17 @@ namespace SimpleInjector
             {
                 while (startingAsIndex >= 0)
                 {
-                    disposables[startingAsIndex].Dispose();
+                    object instance = disposables[startingAsIndex];
+
+                    if (instance is IDisposable disposable)
+                    {
+                        disposable.Dispose();
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
+                            StringResources.TypeOnlyImplementsIAsyncDisposable(instance));
+                    }
 
                     startingAsIndex--;
                 }

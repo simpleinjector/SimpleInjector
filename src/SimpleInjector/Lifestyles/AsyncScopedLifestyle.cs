@@ -27,7 +27,7 @@ namespace SimpleInjector.Lifestyles
     /// }
     /// ]]></code>
     /// </example>
-#if NETSTANDARD1_3 || NETSTANDARD2_0 || NET45
+#if !NETSTANDARD1_0
     public class AsyncScopedLifestyle : ScopedLifestyle
     {
         private static readonly object managerKey = new object();

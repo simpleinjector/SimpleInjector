@@ -4,7 +4,6 @@
 namespace SimpleInjector.Integration.AspNetCore
 {
     using System;
-    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using SimpleInjector;
@@ -37,24 +36,9 @@ namespace SimpleInjector.Integration.AspNetCore
                 {
                     await next();
 
-                    await DisposeAsync(scope);
+                    await scope.DisposeAsync();
                 }
             });
-        }
-
-        private static async ValueTask DisposeAsync(Scope scope)
-        {
-            IDisposable[] disposables = scope.GetDisposables();
-
-            // Dispose in reverse order
-            for (int index = disposables.Length - 1; index >= 0; index--)
-            {
-                if (disposables[index] is IAsyncDisposable asyncDisposable)
-                {
-                    // We don't need to catch-and-continue; Scope will guarantee everything is disposed.
-                    await asyncDisposable.DisposeAsync();
-                }
-            }
         }
     }
 }

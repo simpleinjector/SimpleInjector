@@ -23,4 +23,3 @@ using System.Security;
 [assembly: Guid("e385281d-9c56-4399-9d6d-83ab1277238b")]
 
 [assembly: NeutralResourcesLanguage("en-US")]
-[assembly: AllowPartiallyTrustedCallers]

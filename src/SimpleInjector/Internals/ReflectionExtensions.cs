@@ -4,40 +4,11 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
 
     internal static class ReflectionExtensions
     {
-#if NET45
-        public static bool IsGenericType(this Type type) => type.IsGenericType;
-        public static bool IsValueType(this Type type) => type.IsValueType;
-        public static bool IsAbstract(this Type type) => type.IsAbstract;
-        public static bool ContainsGenericParameters(this Type type) => type.ContainsGenericParameters;
-        public static Type BaseType(this Type type) => type.BaseType;
-        public static bool IsPrimitive(this Type type) => type.IsPrimitive;
-        public static bool IsGenericTypeDefinition(this Type type) => type.IsGenericTypeDefinition;
-        public static bool IsNestedPublic(this Type type) => type.IsNestedPublic;
-        public static bool IsPublic(this Type type) => type.IsPublic;
-        public static bool IsClass(this Type type) => type.IsClass;
-        public static bool IsInterface(this Type type) => type.IsInterface;
-        public static bool IsGenericParameter(this Type type) => type.IsGenericParameter;
-        public static GenericParameterAttributes GetGenericParameterAttributes(this Type type) => type.GenericParameterAttributes;
-        public static IEnumerable<PropertyInfo> GetRuntimeProperties(this Type type) =>
-            type.GetProperties(BindingFlags.FlattenHierarchy |
-                BindingFlags.Instance | BindingFlags.Static |
-                BindingFlags.NonPublic | BindingFlags.Public);
-        public static Assembly GetAssembly(this Type type) => type.Assembly;
-        public static Guid GetGuid(this Type type) => type.GUID;
-
-        public static ConstructorInfo[] GetConstructors(this Type type, bool nonPublic) =>
-            type.GetConstructors(
-                BindingFlags.Public
-                | BindingFlags.Instance
-                | (nonPublic ? BindingFlags.NonPublic : BindingFlags.Default));
-#endif
-#if NETSTANDARD1_0 || NETSTANDARD1_3 || NETSTANDARD2_0
         public static MethodInfo? GetSetMethod(this PropertyInfo property, bool nonPublic = true) =>
             nonPublic || property.SetMethod?.IsPublic == true ? property.SetMethod : null;
 
@@ -83,6 +54,5 @@ namespace SimpleInjector
             where types.SequenceEqual(constructor.GetParameters().Select(p => p.ParameterType))
             select constructor)
             .FirstOrDefault();
-#endif
     }
 }
