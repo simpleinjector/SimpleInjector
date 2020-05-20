@@ -16,14 +16,20 @@ namespace SimpleInjector.Internals
     {
         private readonly Container container;
 
-        // PERF: We use array instead of List<T> for optimal performance, even though this quite complicates
-        // the code in this class.
-        private LazyEx<InstanceProducer>[] producers = Helpers.Array<LazyEx<InstanceProducer>>.Empty;
+        private readonly List<LazyEx<InstanceProducer>> lazyProducers = new List<LazyEx<InstanceProducer>>();
+
+        // PERF: This is an optimization.
+        // warning: this changes the behavior and makes the loading of producers less lazy, but according to
+        // our specs (test), this seems to be allowed.
+        private readonly LazyEx<InstanceProducer[]> producers;
 
         // This constructor needs to be public. It is called using reflection.
         public ContainerControlledCollection(Container container)
         {
             this.container = container;
+
+            this.producers =
+                new LazyEx<InstanceProducer[]>(() => this.lazyProducers.Select(p => p.Value).ToArray());
         }
 
         // This constructor is not called; its meta data is used to build valid KnownRelationship types.
@@ -32,9 +38,9 @@ namespace SimpleInjector.Internals
             throw new NotSupportedException("This constructor is not intended to be called.");
         }
 
-        public bool AllProducersVerified => this.producers.All(lazy => lazy.IsValueCreated);
+        public bool AllProducersVerified => this.lazyProducers.All(lazy => lazy.IsValueCreated);
 
-        public int Count => this.producers.Length;
+        public int Count => this.lazyProducers.Count;
 
         bool ICollection<TService>.IsReadOnly => true;
 
@@ -44,7 +50,7 @@ namespace SimpleInjector.Internals
         {
             get
             {
-                var producer = this.producers[index].Value;
+                var producer = this.producers.Value[index];
 
                 return GetInstance(producer);
             }
@@ -58,7 +64,8 @@ namespace SimpleInjector.Internals
         // Throws an InvalidOperationException on failure.
         public void VerifyCreatingProducers()
         {
-            foreach (var lazy in this.producers)
+            // We must iterate the list of lazies, because we want to wrap creation of producers in a try-catch.
+            foreach (LazyEx<InstanceProducer> lazy in this.lazyProducers)
             {
                 VerifyCreatingProducer(lazy);
             }
@@ -72,9 +79,11 @@ namespace SimpleInjector.Internals
                 return -1;
             }
 
-            for (int index = 0; index < this.producers.Length; index++)
+            var producers = this.producers.Value;
+
+            for (int index = 0; index < producers.Length; index++)
             {
-                InstanceProducer producer = this.producers[index].Value;
+                InstanceProducer producer = producers[index];
 
                 // NOTE: We call GetInstance directly as we don't want to notify about the creation to the
                 // ContainsServiceCreatedListeners here; created instances will not leak out of this method
@@ -107,9 +116,9 @@ namespace SimpleInjector.Internals
         {
             Requires.IsNotNull(array, nameof(array));
 
-            foreach (var lazy in this.producers)
+            foreach (var producer in this.producers.Value)
             {
-                array[arrayIndex++] = GetInstance(lazy.Value);
+                array[arrayIndex++] = GetInstance(producer);
             }
         }
 
@@ -119,30 +128,23 @@ namespace SimpleInjector.Internals
         {
             this.container.ThrowWhenContainerIsLockedOrDisposed();
 
-            this.producers = Helpers.Array<LazyEx<InstanceProducer>>.Empty;
+            this.ThrowWhenCollectionAlreadyHasBeenIterated();
+
+            this.lazyProducers.Clear();
         }
 
         void IContainerControlledCollection.Append(ContainerControlledItem item)
         {
-            ICollection<LazyEx<InstanceProducer>> array = this.producers;
-            var copy = new LazyEx<InstanceProducer>[array.Count + 1];
-            array.CopyTo(copy, 0);
-            copy[array.Count] = this.ToLazyInstanceProducer(item);
-            this.producers = copy;
+            this.ThrowWhenCollectionAlreadyHasBeenIterated();
+
+            this.lazyProducers.Add(this.ToLazyInstanceProducer(item));
         }
 
-        InstanceProducer[] IContainerControlledCollection.GetProducers() =>
-            this.producers.Select(p => p.Value).ToArray();
+        InstanceProducer[] IContainerControlledCollection.GetProducers() => this.producers.Value;
 
-        public IEnumerator<TService> GetEnumerator()
-        {
-            foreach (var producer in this.producers)
-            {
-                yield return GetInstance(producer.Value);
-            }
-        }
+        public IEnumerator<TService> GetEnumerator() => new Enumerator(this.producers.Value);
 
-        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => new Enumerator(this.producers.Value);
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static TService GetInstance(InstanceProducer producer)
@@ -270,5 +272,57 @@ namespace SimpleInjector.Internals
 
         private static NotSupportedException GetNotSupportedBecauseReadOnlyException() =>
             new NotSupportedException("Collection is read-only.");
+
+        private void ThrowWhenCollectionAlreadyHasBeenIterated()
+        {
+            if (this.producers.IsValueCreated)
+            {
+                throw new InvalidOperationException("Can't append. The collection has already been iterated.");
+            }
+        }
+
+        // PERF: This custom enumerator is slightly faster compared to the one generated by the C# compiler.
+        private sealed class Enumerator : IEnumerator<TService>
+        {
+            private readonly InstanceProducer[] producers;
+            private readonly int length;
+            private int index;
+            private TService current;
+
+            public Enumerator(InstanceProducer[] producers)
+            {
+                this.producers = producers;
+                this.length = producers.Length;
+                this.current = default!;
+            }
+
+            public TService Current => this.current!;
+
+            object IEnumerator.Current => this.current!;
+
+            public void Dispose()
+            {
+            }
+
+            public bool MoveNext()
+            {
+                if (this.index < this.length)
+                {
+                    this.current = GetInstance(this.producers[this.index]);
+                    this.index++;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            public void Reset()
+            {
+                this.current = default!;
+                this.index = 0;
+            }
+        }
     }
 }
