@@ -51,6 +51,8 @@
       <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore\bin\Release\netstandard2.0\SimpleInjector.Integration.AspNetCore.xml" />
       <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore.Mvc.Core\bin\Release\netstandard2.0\SimpleInjector.Integration.AspNetCore.Mvc.Core.dll" />
       <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore.Mvc.Core\bin\Release\netstandard2.0\SimpleInjector.Integration.AspNetCore.Mvc.Core.xml" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore.Mvc.Core\bin\Release\netstandard2.0\SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures.dll" />
+      <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore.Mvc.Core\bin\Release\netstandard2.0\SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures.xml" />
       <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore.Mvc\bin\Release\netstandard2.0\SimpleInjector.Integration.AspNetCore.Mvc.dll" />
       <DocumentationSource sourceFile="..\SimpleInjector.Integration.AspNetCore.Mvc\bin\Release\netstandard2.0\SimpleInjector.Integration.AspNetCore.Mvc.xml" />
       <DocumentationSource sourceFile="..\SimpleInjector.Integration.ServiceCollection\bin\Release\netstandard2.0\SimpleInjector.Integration.ServiceCollection.dll" />

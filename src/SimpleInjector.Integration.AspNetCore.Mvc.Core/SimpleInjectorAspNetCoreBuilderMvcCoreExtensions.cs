@@ -8,10 +8,8 @@ namespace SimpleInjector
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ApplicationParts;
     using Microsoft.AspNetCore.Mvc.Controllers;
-    using Microsoft.AspNetCore.Mvc.ViewComponents;
     using Microsoft.Extensions.DependencyInjection;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Integration.AspNetCore;
@@ -19,7 +17,7 @@ namespace SimpleInjector
 
     /// <summary>
     /// Extension methods for <see cref="SimpleInjectorAspNetCoreBuilder"/> that allow integrating
-    /// Simple Injector with ASP.NET Core MVC controllers and view components.
+    /// Simple Injector with ASP.NET Core MVC controllers.
     /// </summary>
     public static class SimpleInjectorAspNetCoreBuilderMvcCoreExtensions
     {
@@ -42,25 +40,6 @@ namespace SimpleInjector
 
             builder.Services.AddSingleton<IControllerActivator>(
                 new SimpleInjectorControllerActivator(builder.Container));
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Registers all application's view components in Simple Injector and instructs ASP.NET Core to let
-        /// Simple Injector create those view components.
-        /// </summary>
-        /// <param name="builder">The builder instance.</param>
-        /// <returns>The supplied <paramref name="builder"/> instance.</returns>
-        public static SimpleInjectorAspNetCoreBuilder AddViewComponentActivation(
-            this SimpleInjectorAspNetCoreBuilder builder)
-        {
-            Requires.IsNotNull(builder, nameof(builder));
-
-            RegisterViewComponentTypes(builder);
-
-            builder.Services.AddSingleton<IViewComponentActivator>(
-                new SimpleInjectorViewComponentActivator(builder.Container));
 
             return builder;
         }
@@ -137,12 +116,32 @@ namespace SimpleInjector
 
         // The user should be warned when he implements IDisposable on a non-controller derivative,
         // and otherwise only if he has overridden Controller.Dispose(bool).
-        private static bool ShouldSuppressDisposingControllers(Type controllerType) =>
-            TypeInheritsFromController(controllerType)
-                && GetProtectedDisposeMethod(controllerType)?.DeclaringType == typeof(Controller);
+        private static bool ShouldSuppressDisposingControllers(Type type)
+        {
+            Type? controllerType = GetBaseControllerTypeOrNull(type);
 
-        private static bool TypeInheritsFromController(Type controllerType) =>
-            typeof(Controller).GetTypeInfo().IsAssignableFrom(controllerType);
+            return controllerType != null && GetProtectedDisposeMethod(type)?.DeclaringType == controllerType;
+        }
+
+        private static Type? GetBaseControllerTypeOrNull(Type controllerType)
+        {
+            var baseType = controllerType.BaseType;
+
+            // We can't call 'typeof(Controller).GetTypeInfo().IsAssignableFrom(controllerType)' because
+            // Controller lives in ViewFeatures and this project can't have a dependency on that. That's why
+            // we have to iterate through the type hierarchy.
+            while (baseType != null)
+            {
+                if (baseType.FullName == "Microsoft.AspNetCore.Mvc.Controller")
+                {
+                    return baseType;
+                }
+
+                baseType = baseType.BaseType;
+            }
+
+            return null;
+        }
 
         private static MethodInfo? GetProtectedDisposeMethod(Type controllerType)
         {
@@ -161,24 +160,6 @@ namespace SimpleInjector
             }
 
             return null;
-        }
-
-        private static void RegisterViewComponentTypes(SimpleInjectorAspNetCoreBuilder builder)
-        {
-            var container = builder.Container;
-
-            ApplicationPartManager manager = GetApplicationPartManager(
-               builder.Services,
-               nameof(AddViewComponentActivation));
-
-            var feature = new ViewComponentFeature();
-            manager.PopulateFeature(feature);
-            var viewComponentTypes = feature.ViewComponents.Select(info => info.AsType());
-
-            foreach (Type type in viewComponentTypes.ToArray())
-            {
-                container.AddRegistration(type, CreateConcreteRegistration(container, type));
-            }
         }
 
         private static Registration CreateConcreteRegistration(Container container, Type concreteType) =>

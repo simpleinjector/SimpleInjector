@@ -26,9 +26,7 @@ namespace SimpleInjector.Integration.AspNetCore.Mvc
         /// <param name="container">The container instance.</param>
         public SimpleInjectorViewComponentActivator(Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
-
-            this.container = container;
+            this.container = container ?? throw new ArgumentNullException(nameof(container));
         }
 
         /// <summary>Creates a view component.</summary>
