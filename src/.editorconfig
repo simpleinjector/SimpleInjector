@@ -125,3 +125,5 @@ csharp_preserve_single_line_blocks = true
 
 # CA1063: Implement IDisposable Correctly
 dotnet_diagnostic.CA1063.severity = suggestion
+
+file_header_template = Copyright (c) Simple Injector Contributors. All rights reserved.\nLicensed under the MIT License. See LICENSE file in the project root for license information.
