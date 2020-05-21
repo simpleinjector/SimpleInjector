@@ -144,6 +144,7 @@ namespace SimpleInjector
         /// when <see cref="UseLoosenedLifestyleMismatchBehavior"/> is set to <b>true</b>
         /// <see cref="Lifestyle.Transient"/> dependencies are allowed to be injected into
         /// <see cref="Lifestyle.Scoped"/> components. When disabled, a warning would be given in that case.
+        /// The default value is <b>true</b>.
         /// </para>
         /// <para>
         /// Simple Injector allows custom lifestyles to be created and this loosened behavior works on custom
@@ -152,7 +153,11 @@ namespace SimpleInjector
         /// the length of <see cref="Lifestyle.Scoped"/>.
         /// </para>
         /// </summary>
-        public bool UseLoosenedLifestyleMismatchBehavior { get; set; }
+        /// <value>
+        /// The value indicating whether the container uses loosened or strict behavior when validating
+        /// mismatches on  <see cref="Lifestyle.Scoped"/> components.
+        /// </value>
+        public bool UseLoosenedLifestyleMismatchBehavior { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether the container should automatically trigger verification

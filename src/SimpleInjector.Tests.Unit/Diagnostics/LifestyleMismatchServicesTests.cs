@@ -142,13 +142,13 @@
         }
 
         [TestMethod]
-        public void DependencyHasPossibleLifestyleMismatch_LifetimeScopeToTransient_ReportsMismatch()
+        public void DependencyHasPossibleLifestyleMismatch_LifetimeScopeToTransientWithStrictMismatchBehavior_ReportsMismatch()
         {
             // Arrange
             var dependency = CreateRelationship(parent: Lifestyles.LifetimeScope, child: Lifestyle.Transient);
 
             // Act
-            bool result = HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency, useLoosenedLifestyleMismatchBehavior: false);
 
             // Assert
             Assert.IsTrue(result, "Services can not depend on a dependency with a shorter lifestyle.");
@@ -168,16 +168,31 @@
         }
 
         [TestMethod]
-        public void DependencyHasPossibleLifestyleMismatch_WcfOperationToTransient_ReportsMismatch()
+        public void DependencyHasPossibleLifestyleMismatch_WcfOperationToTransientWithStrictMismatchBehavior_ReportsMismatch()
         {
             // Arrange
             var dependency = CreateRelationship(parent: Lifestyles.WcfOperation, child: Lifestyle.Transient);
 
             // Act
-            bool result = HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency, useLoosenedLifestyleMismatchBehavior: false);
 
             // Assert
-            Assert.IsTrue(result, "Services can not depend on a dependency with a shorter lifestyle.");
+            Assert.IsTrue(result, "Scoped services can't depend on transient with strict mismatch behavior.");
+        }
+
+        [TestMethod]
+        public void DependencyHasPossibleLifestyleMismatch_WcfOperationToTransientWithLoosenedBehavior_ReportsMismatch()
+        {
+            // Arrange
+            var dependency = CreateRelationship(parent: Lifestyles.WcfOperation, child: Lifestyle.Transient);
+
+            // Act
+            bool result = HasPossibleLifestyleMismatch(dependency, useLoosenedLifestyleMismatchBehavior: true);
+
+            // Assert
+            Assert.IsFalse(
+                result,
+                "Scoped services are allowed to depend on shorter lifestyles with loosened mismatch behavior.");
         }
 
         [TestMethod]
@@ -194,13 +209,13 @@
         }
 
         [TestMethod]
-        public void DependencyHasPossibleLifestyleMismatch_WebRequestToTransient_ReportsMismatch()
+        public void DependencyHasPossibleLifestyleMismatch_WebRequestToTransientAndStrictMismatchBehavior_ReportsMismatch()
         {
             // Arrange
             var dependency = CreateRelationship(parent: Lifestyles.WebRequest, child: Lifestyle.Transient);
 
             // Act
-            bool result = HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency, useLoosenedLifestyleMismatchBehavior: false);
 
             // Assert
             Assert.IsTrue(result, "Services can not depend on a dependency with a shorter lifestyle.");
@@ -259,13 +274,13 @@
         }
 
         [TestMethod]
-        public void DependencyHasPossibleLifestyleMismatch_LifetimeScopeToUnknown_ReportsMismatch()
+        public void DependencyHasPossibleLifestyleMismatch_LifetimeScopeToUnknownAndStrictMismatchBehavior_ReportsMismatch()
         {
             // Arrange
             var dependency = CreateRelationship(parent: Lifestyles.LifetimeScope, child: Lifestyle.Unknown);
 
             // Act
-            bool result = HasPossibleLifestyleMismatch(dependency);
+            bool result = HasPossibleLifestyleMismatch(dependency, useLoosenedLifestyleMismatchBehavior: false);
 
             // Assert
             Assert.IsTrue(result, "A lifestyle longer than transient can not safely depend on an unknown " +

@@ -86,10 +86,11 @@
         }
 
         [TestMethod]
-        public void ContainerDebugView_LongerThanTransientDependingOnCustomLifestyle_ResultsInWarning()
+        public void ContainerDebugView_LongerThanTransientDependingOnCustomLifestyleWithStrictMismatchBehavior_ResultsInWarning()
         {
             // Arrange
             var container = new Container();
+            container.Options.UseLoosenedLifestyleMismatchBehavior = false;
 
             var longerThanTransientLifestyle = new FakeLifestyle(length: 100);
 
