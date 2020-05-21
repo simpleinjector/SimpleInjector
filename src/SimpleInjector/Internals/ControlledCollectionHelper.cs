@@ -103,7 +103,7 @@ namespace SimpleInjector.Internals
         internal static Registration CreateRegistration(
             this IContainerControlledCollection instance, Type collectionType, Container container)
         {
-            // We need special handling for Collection<T> (and ReadOnlyCollection<T>), because the 
+            // We need special handling for Collection<T> (and ReadOnlyCollection<T>), because the
             // ContainerControlledCollection does not (and can't) inherit it. So we have to wrap that
             // stream into a Collection<T> or ReadOnlyCollection<T>.
             return TryCreateRegistrationForCollectionOfT(collectionType, instance, container)

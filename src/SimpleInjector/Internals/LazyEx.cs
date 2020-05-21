@@ -24,7 +24,8 @@ namespace SimpleInjector.Internals
     // guarantee to be broken, but now the underlying construct needs to make care that the guarantee isn't
     // broken. In the majority of cases, however, this loosening of constraints is perfectly fine.
     [DebuggerDisplay("IsValueCreated={IsValueCreated}, Value={value}")]
-    internal sealed class LazyEx<T> where T : class
+    internal sealed class LazyEx<T>
+        where T : class
     {
         private Func<T>? factory;
         private T? value;
@@ -51,6 +52,9 @@ namespace SimpleInjector.Internals
             get => this.value ?? this.InitializeAndReturn();
         }
 
+        public override string ToString() =>
+            !this.IsValueCreated ? "Value is not created." : this.Value.ToString();
+
         private T InitializeAndReturn()
         {
             // NOTE: Locking on 'this' is typically not adviced, but this type is internal, which
@@ -70,7 +74,7 @@ namespace SimpleInjector.Internals
                         throw new InvalidOperationException("The valueFactory produced null.");
                     }
 
-                    // We don't need the factory any longer. It might now be eligible for garbage 
+                    // We don't need the factory any longer. It might now be eligible for garbage
                     // collection.
                     this.factory = null;
                 }
@@ -78,8 +82,5 @@ namespace SimpleInjector.Internals
                 return this.value;
             }
         }
-
-        public override string ToString() =>
-            !this.IsValueCreated ? "Value is not created." : this.Value.ToString();
     }
 }

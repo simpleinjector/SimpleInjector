@@ -35,7 +35,9 @@ namespace SimpleInjector
     /// <see cref="AddRegistration"/> or anything related to registering from multiple threads concurrently.
     /// </para>
     /// </remarks>
-    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling",
+    [SuppressMessage(
+        "Microsoft.Maintainability",
+        "CA1506:AvoidExcessiveClassCoupling",
         Justification = "Not much we can do about this. Container is the facade where users work with.")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public partial class Container : ApiObject, IDisposable
@@ -132,7 +134,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Determines whether the specified container is locked from making any new registrations. The
+        /// Gets a value indicating whether the container is locked from making any new registrations. The
         /// container is automatically locked when the first instance is resolved (e.g. by calling
         /// <see cref="Container.GetInstance">GetInstance</see>).
         /// </summary>
@@ -259,8 +261,8 @@ namespace SimpleInjector
             return currentRegistrations.Except(nonRootProducers, InstanceProducer.EqualityComparer).ToArray();
         }
 
-        internal InstanceProducer[] GetCurrentRegistrations(bool includeInvalidContainerRegisteredTypes,
-            bool includeExternalProducers = true)
+        internal InstanceProducer[] GetCurrentRegistrations(
+            bool includeInvalidContainerRegisteredTypes, bool includeExternalProducers = true)
         {
             var producers =
                 from entry in this.explicitRegistrations.Values
@@ -524,8 +526,8 @@ namespace SimpleInjector
         {
             throw new ObjectDisposedException(
                 objectName: null,
-                message: StringResources.ContainerCanNotBeUsedAfterDisposal(this.GetType(),
-                    this.stackTraceThatDisposedTheContainer));
+                message: StringResources.ContainerCanNotBeUsedAfterDisposal(
+                    this.GetType(), this.stackTraceThatDisposedTheContainer));
         }
 
         private static object ThrowWhenResolveInterceptorReturnsNull(object? instance)
@@ -687,8 +689,8 @@ namespace SimpleInjector
         // and the parent type name of a nested type is included) as the missing type. Nested types are
         // mostly excluded from this list, because it would be quite common for developers to have lots
         // of nested types with the same name.
-        private IEnumerable<Type> GetLookalikesForMissingNonGenericType(string missingServiceTypeName) => (
-            this.GetLookalikesFromCurrentRegistrationsForMissingNonGenericType(missingServiceTypeName))
+        private IEnumerable<Type> GetLookalikesForMissingNonGenericType(string missingServiceTypeName) =>
+            this.GetLookalikesFromCurrentRegistrationsForMissingNonGenericType(missingServiceTypeName)
             .Concat(
                 this.GetLookalikesFromExplictRegistrationsForMissingNonGenericType(missingServiceTypeName))
             .Distinct();
@@ -718,8 +720,8 @@ namespace SimpleInjector
             public readonly ResolveInterceptor Interceptor;
             public readonly Predicate<InitializationContext> Predicate;
 
-            public ContextualResolveInterceptor(ResolveInterceptor interceptor,
-                Predicate<InitializationContext> predicate)
+            public ContextualResolveInterceptor(
+                ResolveInterceptor interceptor, Predicate<InitializationContext> predicate)
             {
                 this.Interceptor = interceptor;
                 this.Predicate = predicate;

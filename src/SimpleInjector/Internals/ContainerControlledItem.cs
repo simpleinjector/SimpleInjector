@@ -35,7 +35,7 @@ namespace SimpleInjector.Internals
         }
 
         internal Type RegisteredImplementationType { get; private set; }
-        
+
         internal string DebuggerDisplay =>
             $"ImplementationType: {this.ImplementationType.ToFriendlyName()}, " + (
             this.Registration != null

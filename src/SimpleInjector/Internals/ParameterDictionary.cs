@@ -18,7 +18,8 @@ namespace SimpleInjector.Internals
             }
         }
 
-        public ParameterDictionary() : base(ParameterInfoComparer.Instance)
+        public ParameterDictionary()
+            : base(ParameterInfoComparer.Instance)
         {
         }
 

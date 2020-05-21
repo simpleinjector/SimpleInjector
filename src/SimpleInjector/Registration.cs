@@ -174,8 +174,8 @@ namespace SimpleInjector
             }
         }
 
-        internal Expression InterceptInstanceCreation(Type implementationType,
-            Expression instanceCreatorExpression)
+        internal Expression InterceptInstanceCreation(
+            Type implementationType, Expression instanceCreatorExpression)
         {
             return this.Container.OnExpressionBuilding(this, implementationType, instanceCreatorExpression);
         }
@@ -432,8 +432,8 @@ namespace SimpleInjector
         private ConstantExpression GetPlaceHolderFor(ParameterInfo parameter) =>
             this.GetOverriddenParameterFor(parameter).PlaceHolder;
 
-        private Expression WrapWithPropertyInjectorInternal(Type implementationType,
-            Expression expressionToWrap)
+        private Expression WrapWithPropertyInjectorInternal(
+            Type implementationType, Expression expressionToWrap)
         {
             PropertyInfo[] properties = this.GetPropertiesToInject(implementationType);
 
@@ -503,7 +503,7 @@ namespace SimpleInjector
                 }
             }
 
-            return new OverriddenParameter();
+            return default(OverriddenParameter);
         }
 
         private void AddRelationships(
@@ -525,7 +525,8 @@ namespace SimpleInjector
             }
         }
 
-        private static Expression WrapWithNullChecker<TService>(Expression expression) where TService : class
+        private static Expression WrapWithNullChecker<TService>(Expression expression)
+            where TService : class
         {
             Func<TService, TService> nullChecker = ThrowWhenNull<TService>;
 
@@ -561,7 +562,8 @@ namespace SimpleInjector
             }
         }
 
-        private static TService ThrowWhenNull<TService>(TService instance) where TService : class
+        private static TService ThrowWhenNull<TService>(TService instance)
+            where TService : class
         {
             if (instance == null)
             {

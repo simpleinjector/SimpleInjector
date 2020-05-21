@@ -414,16 +414,16 @@ namespace SimpleInjector
                 innerException.Message,
                 nameof(Container.Register));
 
-        internal static string UnableToInjectPropertiesDueToSecurityConfiguration(Type serviceType,
-            Exception innerException) =>
+        internal static string UnableToInjectPropertiesDueToSecurityConfiguration(
+            Type serviceType, Exception innerException) =>
             Format(
                 "Unable to inject properties into type {0}. The security restrictions of your application's " +
                 "sandbox do not permit the injection of one of its properties. Consider making it public. {1}",
                 serviceType.TypeName(),
                 innerException.Message);
 
-        internal static string UnableToInjectImplicitPropertiesDueToSecurityConfiguration(Type injectee,
-            Exception innerException) =>
+        internal static string UnableToInjectImplicitPropertiesDueToSecurityConfiguration(
+            Type injectee, Exception innerException) =>
             Format(
                 "Unable to inject properties into type {0}. The security restrictions of your application's " +
                 "sandbox do not permit the creation of one of its dependencies. Explicitly register that " +
@@ -680,7 +680,7 @@ namespace SimpleInjector
                     firstClosedAndNonGenericType: closedAndNonGenericTypes.FirstOrDefault()),
                 openGenericTypes.Length == 1 ? "this" : "these",
                 CollectionsRegisterMethodName,
-                openGenericTypes.Count() > 1 ? "types" : "type",
+                openGenericTypes.Length > 1 ? "types" : "type",
                 openGenericTypes.Select(TypeName).ToCommaSeparatedText());
 
         internal static string ThisOverloadDoesNotAllowOpenGenericsExample(
@@ -1032,9 +1032,9 @@ namespace SimpleInjector
                 CollectionsRegisterMethodName);
 
         private static string ToTypeOCfSharpFriendlyList(IEnumerable<Type> types) =>
-            string.Join(", ",
-                from type in types
-                select Format("typeof({0})", CSharpFriendlyName(type)));
+            string.Join(
+                ", ",
+                types.Select(type => Format("typeof({0})", CSharpFriendlyName(type))));
 
         private static string SuppliedTypeIsNotGenericExplainingAlternatives(
             Type type, string registeringElement) =>
@@ -1210,7 +1210,6 @@ namespace SimpleInjector
                        resolvedType.TypeName());
             }
         }
-
 
         private static string DidYouIntendForXToDependOnYInstead(Type? consumingType, Type[] serviceTypes)
         {

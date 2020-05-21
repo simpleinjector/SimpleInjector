@@ -165,8 +165,8 @@ namespace SimpleInjector.Decorators
             IEnumerable<OverriddenParameter> predicateContextOverriddenParameters =
                 this.CreateOverriddenDecoratorContextParameters(currentProducer);
 
-            var overriddenParameters = (new[] { decorateeOverriddenParameter })
-                .Concat(predicateContextOverriddenParameters);
+            var overriddenParameters =
+                new[] { decorateeOverriddenParameter }.Concat(predicateContextOverriddenParameters);
 
             return overriddenParameters.ToArray();
         }

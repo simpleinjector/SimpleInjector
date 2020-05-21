@@ -36,7 +36,7 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>
         /// Gets the base <see cref="DiagnosticType"/> that describes the service types of its
-        /// <see cref="Results"/>. The value often be either <see cref="System.Object"/> (in case this is a
+        /// <see cref="Results"/>. The value often be either <see cref="object"/> (in case this is a
         /// root group) or a partial generic type to allow hierarchical grouping of a large number of related
         /// generic types.
         /// </summary>

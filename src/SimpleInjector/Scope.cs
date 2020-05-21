@@ -78,7 +78,8 @@ namespace SimpleInjector
         /// <typeparam name="TService">The type of the service to resolve.</typeparam>
         /// <remarks><b>Thread safety:</b> Calls to this method are thread safe.</remarks>
         /// <returns>An instance of the given service type.</returns>
-        public TService GetInstance<TService>() where TService : class
+        public TService GetInstance<TService>()
+            where TService : class
         {
             return (TService)this.GetInstance(typeof(TService));
         }

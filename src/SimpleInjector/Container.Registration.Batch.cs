@@ -276,11 +276,13 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference.</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
+        [Obsolete(
+            "Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
             error: true)]
-        public void RegisterCollection<TService>(IEnumerable<Assembly> assemblies) where TService : class
+        public void RegisterCollection<TService>(IEnumerable<Assembly> assemblies)
+            where TService : class
         {
             this.Collection.Register<TService>(assemblies);
         }
@@ -302,7 +304,8 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference.</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
+        [Obsolete(
+            "Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
             error: true)]
@@ -328,7 +331,8 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference.</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
+        [Obsolete(
+            "Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
             error: true)]
@@ -368,7 +372,6 @@ namespace SimpleInjector
         /// <returns>A collection of types.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference.
         /// </exception>
-        /// <returns>A collection of types.</returns>
         public IEnumerable<Type> GetTypesToRegister<TService>(IEnumerable<Assembly> assemblies)
         {
             return this.GetTypesToRegister(typeof(TService), assemblies, new TypesToRegisterOptions());

@@ -673,7 +673,8 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="instance"/> is a null reference.
         /// </exception>
-        [Obsolete("Please use " + nameof(RegisterInstance) + "<TService>(TService) instead. " +
+        [Obsolete(
+            "Please use " + nameof(RegisterInstance) + "<TService>(TService) instead. " +
             "Will be removed in version 6.0.",
             error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -725,7 +726,8 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
-        [Obsolete("Please use " + nameof(RegisterInstance) + "(Type, object) instead. " +
+        [Obsolete(
+            "Please use " + nameof(RegisterInstance) + "(Type, object) instead. " +
             "Will be removed in version 6.0.",
             error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -1054,7 +1056,8 @@ namespace SimpleInjector
         /// a predicate that is thread-safe.
         /// </para>
         /// </remarks>
-        public void RegisterInitializer(Action<InstanceInitializationData> instanceInitializer,
+        public void RegisterInitializer(
+            Action<InstanceInitializationData> instanceInitializer,
             Predicate<InitializerContext> predicate)
         {
             Requires.IsNotNull(instanceInitializer, nameof(instanceInitializer));

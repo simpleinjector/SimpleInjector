@@ -21,12 +21,14 @@ namespace SimpleInjector.Internals
             this.ConcreteType = concreteType;
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
+        [SuppressMessage(
+            "Microsoft.Performance",
+            "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay =>
-            $"{nameof(Argument)}: {this.Argument.ToFriendlyName()}, " +
-            $"{nameof(ConcreteType)}: {this.ConcreteType.ToFriendlyName()}";
+            $"Argument: {this.Argument.ToFriendlyName()}, " +
+            $"ConcreteType: {this.ConcreteType.ToFriendlyName()}";
 
         [DebuggerDisplay("{Argument, nq}")]
         internal Type Argument { get; }
@@ -44,10 +46,13 @@ namespace SimpleInjector.Internals
         bool IEquatable<ArgumentMapping>.Equals(ArgumentMapping other) =>
             this.Argument == other.Argument && this.ConcreteType == other.ConcreteType;
 
-        /// <summary>Overrides the default hash code. Needed for doing LINQ distinct operations.</summary>
-        /// <returns>An 32 bit integer.</returns>
+        /// <inheritdoc />
         public override int GetHashCode() =>
             this.Argument.GetHashCode() ^ this.ConcreteType.GetHashCode();
+
+        /// <inheritdoc />
+        public override bool Equals(object obj) =>
+            obj is ArgumentMapping other && ((IEquatable<ArgumentMapping>)this).Equals(other);
 
         internal static ArgumentMapping Create(Type argument, Type concreteType) =>
             new ArgumentMapping(argument, concreteType);

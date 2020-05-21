@@ -6,6 +6,7 @@ namespace SimpleInjector
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -334,7 +335,8 @@ namespace SimpleInjector
         }
 
         [DebuggerStepThrough]
-        internal static void IsValidEnum<TEnum>(TEnum value, string paramName) where TEnum : struct
+        internal static void IsValidEnum<TEnum>(TEnum value, string paramName)
+            where TEnum : struct
         {
             if (!Enum.GetValues(typeof(TEnum)).Cast<TEnum>().Contains(value))
             {

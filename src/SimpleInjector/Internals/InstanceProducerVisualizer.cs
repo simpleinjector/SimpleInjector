@@ -6,7 +6,7 @@ namespace SimpleInjector.Internals
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using Advanced;
+    using SimpleInjector.Advanced;
 
     internal static class InstanceProducerVisualizer
     {

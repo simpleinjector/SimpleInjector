@@ -37,7 +37,8 @@ namespace SimpleInjector.Lifestyles
         /// <see cref="Scope"/> instance gets disposed and when the created object implements
         /// <see cref="IDisposable"/>.
         /// </summary>
-        public AsyncScopedLifestyle() : base("Async Scoped")
+        public AsyncScopedLifestyle()
+            : base("Async Scoped")
         {
         }
 
@@ -68,15 +69,6 @@ namespace SimpleInjector.Lifestyles
         }
         
         /// <summary>
-        /// Returns the current <see cref="Scope"/> for this lifestyle and the given
-        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
-        /// </summary>
-        /// <param name="container">The container instance that is related to the scope to return.</param>
-        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
-        protected override Scope? GetCurrentScopeCore(Container container) =>
-            GetScopeManager(container).CurrentScope;
-
-        /// <summary>
         /// Creates a delegate that upon invocation return the current <see cref="Scope"/> for this
         /// lifestyle and the given <paramref name="container"/>, or null when the delegate is executed outside
         /// the context of such scope.
@@ -89,6 +81,15 @@ namespace SimpleInjector.Lifestyles
 
             return () => manager.CurrentScope;
         }
+
+        /// <summary>
+        /// Returns the current <see cref="Scope"/> for this lifestyle and the given
+        /// <paramref name="container"/>, or null when this method is executed outside the context of a scope.
+        /// </summary>
+        /// <param name="container">The container instance that is related to the scope to return.</param>
+        /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
+        protected override Scope? GetCurrentScopeCore(Container container) =>
+            GetScopeManager(container).CurrentScope;
 
         private static ScopeManager GetScopeManager(Container c) => c.ContainerScope.GetOrSetItem(managerKey, CreateManager);
 
@@ -103,11 +104,13 @@ namespace SimpleInjector.Lifestyles
     [Obsolete(Error, error: true)]
     public class AsyncScopedLifestyle : ScopedLifestyle
     {
-        private const string Error = "The AsyncScopedLifestyle is only available under .NETStandard 1.3 " +
-            "and up, but you are referencing the .NETStandard 1.0 version of Simple Injector.";
+        private const string Error =
+            "The AsyncScopedLifestyle is only available under .NETStandard 1.3 and up, but you are " +
+            "referencing the .NETStandard 1.0 version of Simple Injector.";
 
         /// <summary>Initializes a new instance of the <see cref="AsyncScopedLifestyle"/> class.</summary>
-        public AsyncScopedLifestyle() : base("Async Scoped")
+        public AsyncScopedLifestyle()
+            : base("Async Scoped")
         {
             throw new NotSupportedException(Error);
         }

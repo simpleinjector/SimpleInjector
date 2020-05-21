@@ -4,9 +4,9 @@
 namespace System.Threading
 {
 #if NET45
+    using System.Runtime.Remoting.Messaging;
     using System.Security;
     using System.Threading;
-    using System.Runtime.Remoting.Messaging;
 
     internal sealed class AsyncLocal<T>
     {
@@ -21,13 +21,13 @@ namespace System.Threading
 
                 return wrapper != null ? wrapper.Value : default(T)!;
             }
+
             [SecuritySafeCritical]
             set
             {
                 var wrapper = value == null ? null : new AsyncScopeWrapper(value);
 
                 CallContext.LogicalSetData(this.key, wrapper);
-
             }
         }
 

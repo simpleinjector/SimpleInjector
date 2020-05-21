@@ -16,7 +16,7 @@ namespace SimpleInjector.Internals
         // The place holder to temporarily inject into the constructor instead so the complete expression can
         // go through the interception pipeline.
         internal readonly ConstantExpression PlaceHolder;
-        
+
         // The final expression that will replace the place holder after the expression went through the
         // interception pipeline.
         internal readonly Expression Expression;

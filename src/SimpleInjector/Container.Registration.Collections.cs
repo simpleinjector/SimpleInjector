@@ -84,7 +84,8 @@ namespace SimpleInjector
         /// element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
+        [Obsolete(
+            "Please use Container." + nameof(Container.Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
             error: true)]

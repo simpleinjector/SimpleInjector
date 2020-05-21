@@ -174,7 +174,7 @@ namespace SimpleInjector.Decorators
             var dummyExpression = Expression.Constant(null, parameter.ParameterType);
 
             var registration = new ExpressionRegistration(dummyExpression, this.Container);
-            
+
             var relationship = new KnownRelationship(
                 parameter.ParameterType, Lifestyle.Singleton, decorateeProducer)
             {

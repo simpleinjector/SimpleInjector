@@ -8,7 +8,7 @@ namespace SimpleInjector
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Reflection;
-    using Decorators;
+    using SimpleInjector.Decorators;
     using SimpleInjector.Internals;
 
     // Internal helper methods on System.Type.

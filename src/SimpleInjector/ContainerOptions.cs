@@ -182,7 +182,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Gets or sets a value indicating whether the container should resolve unregistered concrete types.
-        /// The default value is <code>true</code>. Consider changing the value to <code>false</code> to prevent
+        /// The default value is <c>true</c>. Consider changing the value to <c>false</c> to prevent
         /// accidental creation of types you haven't registered explicitly.
         /// </summary>
         /// <value>The value indicating whether the container should resolve unregistered concrete types.</value>
@@ -387,9 +387,9 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// This property is obsolete and setting it has no effect. To use dynamic assembly compilation, set 
-        /// the <see cref="ContainerOptions.ExpressionCompilationBehavior"/> property with the custom 
-        /// <see cref="IExpressionCompilationBehavior"/> implementation from the 
+        /// This property is obsolete and setting it has no effect. To use dynamic assembly compilation, set
+        /// the <see cref="ContainerOptions.ExpressionCompilationBehavior"/> property with the custom
+        /// <see cref="IExpressionCompilationBehavior"/> implementation from the
         /// SimpleInjector.DynamicAssemblyCompilation package.
         /// </summary>
         /// <value>A boolean indicating whether the container should use a dynamic assembly for compilation.

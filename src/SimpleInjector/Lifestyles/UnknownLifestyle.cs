@@ -7,7 +7,8 @@ namespace SimpleInjector.Lifestyles
 
     internal sealed class UnknownLifestyle : Lifestyle
     {
-        internal UnknownLifestyle() : base("Unknown")
+        internal UnknownLifestyle()
+            : base("Unknown")
         {
         }
 

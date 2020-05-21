@@ -60,7 +60,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 select new
                 {
                     g.Key.ImplementationType,
-                    Producers = g.SelectMany(registration => registration.Producers)
+                    Producers = g.SelectMany(registration => registration.Producers),
                 };
 
             var components =
@@ -107,9 +107,10 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 conflictingProducers);
         }
 
-        private static string BuildDescription(InstanceProducer diagnosedProducer,
-            InstanceProducer[] conflictingProducers) =>
-            string.Format(CultureInfo.InvariantCulture,
+        private static string BuildDescription(
+            InstanceProducer diagnosedProducer, InstanceProducer[] conflictingProducers) =>
+            string.Format(
+                CultureInfo.InvariantCulture,
                 "The registration for {0} ({1}) maps to the same implementation ({2}) as the {3} for {4} " +
                 "{5}, but the {3} {6} to a different lifestyle. This will cause each registration to " +
                 "resolve to a different instance.",

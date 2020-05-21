@@ -163,7 +163,7 @@ AppPackages/
 # Others
 *.[Cc]ache
 ClientBin/
-[Ss]tyle[Cc]op.*
+[Ss]tyle[Cc]op.Cache
 ~$*
 *~
 *.dbmdl

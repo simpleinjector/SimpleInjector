@@ -229,11 +229,11 @@ namespace SimpleInjector.Internals
 
         private static InvalidOperationException GetAnOverlappingGenericRegistrationExistsException(
             IProducerProvider providerToRegister, IProducerProvider overlappingProvider) =>
-            // ImplementationType will never be null, because providers can never be overlapping when they
-            // have a factory instead of an implementation type.
             new InvalidOperationException(
                 StringResources.AnOverlappingRegistrationExists(
                     providerToRegister.ServiceType,
+                    // ImplementationType will never be null, because providers can never be overlapping when they
+                    // have a factory instead of an implementation type.
                     overlappingProvider.ImplementationType!,
                     overlappingProvider.IsConditional,
                     providerToRegister.ImplementationType!,

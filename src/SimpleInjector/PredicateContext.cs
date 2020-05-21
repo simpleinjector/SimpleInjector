@@ -113,6 +113,8 @@ namespace SimpleInjector
             nameof(this.Consumer),
             this.Consumer);
 
-        private sealed class NullMarkerDummy { }
+        private sealed class NullMarkerDummy
+        {
+        }
     }
 }

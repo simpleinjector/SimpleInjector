@@ -114,7 +114,7 @@ namespace SimpleInjector
 
                 this.LockContainer();
                 bool original = this.Options.SuppressLifestyleMismatchVerification;
-                
+
                 this.VerificationScope = new ContainerVerificationScope(this);
 
                 try

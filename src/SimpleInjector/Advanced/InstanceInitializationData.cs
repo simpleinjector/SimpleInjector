@@ -37,7 +37,9 @@ namespace SimpleInjector.Advanced
         /// <value>The created instance.</value>
         public object Instance { get; }
 
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
+        [SuppressMessage(
+            "Microsoft.Performance",
+            "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay => this.Context.DebuggerDisplay;

@@ -4,11 +4,18 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using SimpleInjector.Advanced;
 
     /// <summary>
     /// The scope that manages the lifetime of singletons and other container-controlled instances.
     /// </summary>
+    [SuppressMessage(
+        "Microsoft.Design",
+        "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
+        Justification =
+            "This type has an internal Dispose method, which is called by Container.Dispose. " +
+            "Users should not be able to dispose this class directly bu do so by calling Container.Dispose.")]
     public partial class ContainerScope : ApiObject
     {
         private readonly Scope scope;
@@ -45,8 +52,8 @@ namespace SimpleInjector
         /// <remarks>
         /// Instances that are registered for disposal, will be disposed in opposite order of registration and
         /// they are guaranteed to be disposed when <see cref="Container.Dispose()"/> is called (even when
-        /// exceptions are thrown). This mimics the behavior of the C# and VB <code>using</code> statements,
-        /// where the <see cref="IDisposable.Dispose"/> method is called inside the <code>finally</code> block.
+        /// exceptions are thrown). This mimics the behavior of the C# and VB <c>using</c> statements,
+        /// where the <see cref="IDisposable.Dispose"/> method is called inside the <c>finally</c> block.
         /// </remarks>
         /// <param name="disposable">The instance that should be disposed when the scope ends.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.

@@ -36,13 +36,18 @@ namespace SimpleInjector
         private Dictionary<Type, InstanceProducer?> rootProducerCache =
             new Dictionary<Type, InstanceProducer?>(ReferenceEqualityComparer<Type>.Instance);
 
-        private enum MutableCollectionType { Array, List }
+        private enum MutableCollectionType
+        {
+            Array,
+            List,
+        }
 
         /// <summary>Gets an instance of the given <typeparamref name="TService"/>.</summary>
         /// <typeparam name="TService">Type of object requested.</typeparam>
         /// <returns>The requested service instance.</returns>
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
-        public TService GetInstance<TService>() where TService : class
+        public TService GetInstance<TService>()
+            where TService : class
         {
             this.ThrowWhenDisposed();
             this.LockContainer();
@@ -176,7 +181,8 @@ namespace SimpleInjector
         /// </para>
         /// </remarks>
         /// <returns>An <see cref="InstanceProducer"/> or <b>null</b>.</returns>
-        public InstanceProducer<TService>? GetRegistration<TService>() where TService : class
+        public InstanceProducer<TService>? GetRegistration<TService>()
+            where TService : class
         {
             return this.GetRegistration<TService>(throwOnFailure: false);
         }
@@ -189,6 +195,7 @@ namespace SimpleInjector
         /// Otherwise <b>null</b> is returned, or an exception is throw when
         /// <paramref name="throwOnFailure"/> is set to <b>true</b>.
         /// </summary>
+        /// <typeparam name="TService">The service type.</typeparam>
         /// <remarks>
         /// <para>
         /// A call to this method might lock the container.
@@ -333,7 +340,8 @@ namespace SimpleInjector
                 serviceType, context, () => this.BuildInstanceProducerForType(serviceType, context));
         }
 
-        private object GetInstanceForRootType<TService>() where TService : class
+        private object GetInstanceForRootType<TService>()
+            where TService : class
         {
             InstanceProducer? producer = this.GetInstanceProducerForType<TService>(InjectionConsumerInfo.Root);
             this.AppendRootInstanceProducer(typeof(TService), producer);
@@ -344,8 +352,8 @@ namespace SimpleInjector
         {
             if (serviceType.ContainsGenericParameters())
             {
-                throw new ArgumentException(StringResources.OpenGenericTypesCanNotBeResolved(serviceType),
-                    nameof(serviceType));
+                throw new ArgumentException(
+                    StringResources.OpenGenericTypesCanNotBeResolved(serviceType), nameof(serviceType));
             }
 
             InstanceProducer? producer = this.GetInstanceProducerForType(serviceType, InjectionConsumerInfo.Root);
@@ -369,7 +377,8 @@ namespace SimpleInjector
         private InstanceProducer? BuildInstanceProducerForType<TService>(InjectionConsumerInfo context)
             where TService : class
         {
-            return this.BuildInstanceProducerForType(typeof(TService),
+            return this.BuildInstanceProducerForType(
+                typeof(TService),
                 () => this.TryBuildInstanceProducerForConcreteUnregisteredType<TService>(context));
         }
 
@@ -727,8 +736,8 @@ namespace SimpleInjector
             return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(type, instanceProducerBuilder);
         }
 
-        private InstanceProducer GetOrBuildInstanceProducerForConcreteUnregisteredType(Type concreteType,
-            Func<InstanceProducer> instanceProducerBuilder)
+        private InstanceProducer GetOrBuildInstanceProducerForConcreteUnregisteredType(
+            Type concreteType, Func<InstanceProducer> instanceProducerBuilder)
         {
             // We need to take a lock here to make sure that we never create multiple InstanceProducer
             // instances for the same concrete type, which is a problem when the LifestyleSelectionBehavior
@@ -751,8 +760,8 @@ namespace SimpleInjector
             }
         }
 
-        private static InstanceProducer BuildInstanceProducerForConcreteUnregisteredType(Type concreteType,
-            Registration registration)
+        private static InstanceProducer BuildInstanceProducerForConcreteUnregisteredType(
+            Type concreteType, Registration registration)
         {
             var producer = InstanceProducer.Create(concreteType, registration);
 
