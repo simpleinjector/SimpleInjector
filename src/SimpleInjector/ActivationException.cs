@@ -4,14 +4,14 @@
 namespace SimpleInjector
 {
     using System;
-#if NET45
+#if NET45 || NET461
     using System.Runtime.Serialization;
 #endif
 
     /// <summary>
     /// The standard exception thrown when a container has an error in resolving an object.
     /// </summary>
-#if NET45
+#if NET45 || NET461
     [Serializable]
 #endif
     public partial class ActivationException : Exception
@@ -40,7 +40,7 @@ namespace SimpleInjector
         /// The error message that explains the reason for the exception.
         /// </param>
         /// <param name="innerException">
-        /// The exception that is the cause of the current exception, or a null reference if no inner 
+        /// The exception that is the cause of the current exception, or a null reference if no inner
         /// exception is specified.
         /// </param>
         public ActivationException(string message, Exception innerException) : base(message, innerException)

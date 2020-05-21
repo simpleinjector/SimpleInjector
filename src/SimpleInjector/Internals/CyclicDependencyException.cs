@@ -6,7 +6,7 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
 
-#if NET45
+#if NET45 || NET461
     using System.Runtime.Serialization;
 
     [Serializable]

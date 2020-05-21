@@ -12,7 +12,7 @@ namespace SimpleInjector
     /// <summary>
     /// Thrown by the container in case of a diagnostic error.
     /// </summary>
-#if NET45
+#if NET45 || NET461
     [Serializable]
 #endif
     public class DiagnosticVerificationException : Exception
