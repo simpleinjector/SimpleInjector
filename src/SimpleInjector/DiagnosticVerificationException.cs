@@ -64,7 +64,13 @@ namespace SimpleInjector
         {
         }
 
-#if NET45
+        internal DiagnosticVerificationException(string message, DiagnosticResult error)
+            : base(message)
+        {
+            this.Errors = new ReadOnlyCollection<DiagnosticResult>(new[] { error });
+        }
+
+#if NET45 || NET461
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagnosticVerificationException" /> class with serialized data.
         /// </summary>
@@ -88,12 +94,6 @@ namespace SimpleInjector
         {
         }
 #endif
-
-        internal DiagnosticVerificationException(string message, DiagnosticResult error)
-            : base(message)
-        {
-            this.Errors = new ReadOnlyCollection<DiagnosticResult>(new[] { error });
-        }
 
         /// <summary>Gets the list of <see cref="DiagnosticResult"/> instances.</summary>
         /// <value>A list of <see cref="DiagnosticResult"/> instances.</value>

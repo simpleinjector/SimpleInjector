@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
+#pragma warning disable RCS1194 // Implement exception constructors.
 namespace SimpleInjector.Internals
 {
     using System;
@@ -15,6 +16,11 @@ namespace SimpleInjector.Internals
     {
         private readonly List<Type> types = new List<Type>(1);
 
+        public CyclicDependencyException()
+        {
+            this.OriginatingProducer = null!;
+        }
+
         public CyclicDependencyException(InstanceProducer originatingProducer, Type typeToValidate)
             : base(StringResources.TypeDependsOnItself(typeToValidate))
         {
@@ -22,7 +28,7 @@ namespace SimpleInjector.Internals
             this.types.Add(typeToValidate);
         }
 
-#if NET45
+#if NET45 || NET461
         protected CyclicDependencyException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -30,12 +36,6 @@ namespace SimpleInjector.Internals
         }
 #endif
 
-        /// <summary>
-        /// Gets a message that describes the current exception.
-        /// </summary>
-        /// <value>T
-        /// he error message that explains the reason for the exception, or an empty string("").
-        /// </value>
         public override string Message =>
             base.Message + " " + StringResources.CyclicDependencyGraphMessage(this.types);
 
