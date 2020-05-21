@@ -11,6 +11,7 @@ namespace SimpleInjector
     using System.Reflection;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Diagnostics.Analyzers;
 
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
@@ -111,6 +112,30 @@ namespace SimpleInjector
                 NoteThatSkippedDecoratorsWereFound(serviceType, skippedDecorators),
                 NoteThatTypeLookalikesAreFound(serviceType, lookalikes),
                 NoCollectionRegistrationExists(false, serviceType));
+
+        internal static string CallingPredicateContextConsumerOnDirectResolveIsNotSupported(
+            PredicateContext context) =>
+            Format(
+                "Calling the {0} property for a conditional registration that is requested directly from " +
+                "the container is not supported. {1} is requested directly from the container opposed to it " +
+                "being injected into another class, which causes this exception. If {1} needs to be " +
+                "requested directly (e.g. by calling container.GetInstance<{2}>()), check the {3} property " +
+                "inside the predicate to determine whether {0} can be called{4}. Only call {0} when {3} " +
+                "returns true.",
+                nameof(PredicateContext) + "." + nameof(PredicateContext.Consumer),
+                context.ServiceType.TypeName(),
+                context.ServiceType.CSharpFriendlyName(),
+                nameof(PredicateContext) + "." + nameof(PredicateContext.HasConsumer),
+                CallingPredicateContextConsumerOnDirectResolveExample(context));
+
+        private static string CallingPredicateContextConsumerOnDirectResolveExample(PredicateContext context) =>
+            context.ImplementationType == null
+                ? string.Empty
+                : Format(
+                    ", e.g. container.RegisterConditional(typeof({0}), typeof({1}), " +
+                    "c => c.HasConsumer ? c.Consumer.ImplementationType == typeof(MyConsumer) : true)",
+                    context.ServiceType.CSharpFriendlyName(),
+                    context.ImplementationType.CSharpFriendlyName());
 
         internal static string KnownImplementationTypeShouldBeAssignableFromExpressionType(
             Type knownImplementationType, Type currentExpressionType) =>
@@ -1279,7 +1304,7 @@ namespace SimpleInjector
 
         private static string TypeName(this Type type) => type.ToFriendlyName(UseFullyQualifiedTypeNames);
 
-        private static string CSharpFriendlyName(Type type) =>
+        private static string CSharpFriendlyName(this Type type) =>
             Types.ToCSharpFriendlyName(type, UseFullyQualifiedTypeNames);
 
         private static string Format(string format, params object?[] args) =>

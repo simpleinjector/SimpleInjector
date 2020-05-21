@@ -21,7 +21,7 @@
             var container = ContainerFactory.New();
 
             container.Options.AllowOverridingRegistrations = true;
-            
+
             // Act
             Action action = () => container.RegisterConditional(typeof(ILogger), typeof(NullLogger),
                 Lifestyle.Singleton, c => true);
@@ -1708,9 +1708,40 @@
             Assert.AreEqual(expected: "4, 5, 6", actual: string.Join(", ", intService.Dependency));
         }
 
-        // See #698
         [TestMethod]
-        public void GetInstance_ConditionalRegistrationAsRootType_PredicateContextConsumerPropertyIsNull()
+        public void GetInstance_ConditionalRegistrationAsRootTypeUsingConsumerProperty_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            PredicateContext context = null;
+            InjectionConsumerInfo consumer = null;
+
+            container.RegisterConditional<ILogger, NullLogger>(c => { context = c; return true; });
+
+            container.GetInstance<ILogger>();
+
+            // Act
+            Action action = () => consumer = context.Consumer;
+
+            // Assert
+            Assert.IsNotNull(context, "PredicateContext should not be null.");
+
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                Calling the PredicateContext.Consumer property for a conditional registration that is
+                requested directly from the container is not supported. ILogger is requested directly from the
+                container opposed to it being injected into another class, which causes this exception. If
+                ILogger needs to be requested directly (e.g. by calling container.GetInstance<ILogger>()),
+                check the PredicateContext.HasConsumer property inside the predicate to determine whether
+                PredicateContext.Consumer can be called, e.g. container.RegisterConditional(typeof(ILogger),
+                typeof(NullLogger), c => c.HasConsumer ? c.Consumer.ImplementationType == typeof(MyConsumer)
+                : true). Only call PredicateContext.Consumer when PredicateContext.HasConsumer returns true."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ConditionalRegistrationAsRootType_HasConsumerReturnsFalse()
         {
             // Arrange
             var container = new Container();
@@ -1723,9 +1754,24 @@
             container.GetInstance<ILogger>();
 
             // Assert
-            Assert.IsNotNull(context, "PredicateContext should not be null.");
-            Assert.IsNull(context.Consumer,
-                "When requesint a root type, the Consumer property should be null.");
+            Assert.IsFalse(context.HasConsumer, "PredicateContext.HasConsumer should be false.");
+        }
+
+        [TestMethod]
+        public void GetInstance_ConditionalRegistrationInjected_HasConsumerReturnsTrue()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            PredicateContext context = null;
+
+            container.RegisterConditional<ILogger, NullLogger>(c => { context = c; return true; });
+
+            // Act
+            container.GetInstance<ServiceDependingOn<ILogger>>();
+
+            // Assert
+            Assert.IsTrue(context.HasConsumer, "PredicateContext.HasConsumer should be true.");
         }
 
         // Regression in v4.5.2. See #734
