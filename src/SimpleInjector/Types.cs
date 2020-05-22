@@ -9,11 +9,29 @@ namespace SimpleInjector
     using System.Linq;
     using System.Reflection;
     using SimpleInjector.Decorators;
-    using SimpleInjector.Internals;
 
     // Internal helper methods on System.Type.
     internal static class Types
     {
+        private static readonly Dictionary<Type, string> CSharpKeywordTypes = new Dictionary<Type, string>
+        {
+            { typeof(bool), "bool" },
+            { typeof(byte), "byte" },
+            { typeof(char), "char" },
+            { typeof(decimal), "decimal" },
+            { typeof(double), "double" },
+            { typeof(float), "float" },
+            { typeof(int), "int" },
+            { typeof(long), "long" },
+            { typeof(object), "object" },
+            { typeof(sbyte), "sbyte" },
+            { typeof(short), "short" },
+            { typeof(string), "string" },
+            { typeof(uint), "uint" },
+            { typeof(ulong), "ulong" },
+            { typeof(ushort), "ushort" } ,
+        };
+
         private static readonly Type[] AmbiguousTypes =
             new[] { typeof(Type), typeof(string), typeof(Scope), typeof(Container) };
 
@@ -243,6 +261,11 @@ namespace SimpleInjector
             if (type.IsArray)
             {
                 return type.GetElementType().ToFriendlyName(fullyQualifiedName, argumentsFormatter) + "[]";
+            }
+
+            if (!fullyQualifiedName && CSharpKeywordTypes.ContainsKey(type))
+            {
+                return CSharpKeywordTypes[type];
             }
 
             string name = fullyQualifiedName ? (type.FullName ?? type.Name) : type.Name;
