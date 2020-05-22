@@ -1741,6 +1741,40 @@
         }
 
         [TestMethod]
+        public void PredicateContextConsumer_CalledOnADirectResolve_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            PredicateContext context = null;
+            InjectionConsumerInfo consumer = null;
+
+            container.RegisterConditional(
+                typeof(IGeneric<>),
+                typeof(DefaultGenericType<>),
+                c => { context = c; return true; });
+
+            container.GetInstance<IGeneric<int>>();
+
+            // Act
+            Action action = () => consumer = context.Consumer;
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                Calling the PredicateContext.Consumer property for a conditional registration that is
+                requested directly from the container is not supported. IGeneric<Int32> is requested directly
+                from the container opposed to it being injected into another class, which causes this
+                exception. If IGeneric<Int32> needs to be requested directly (e.g. by calling
+                container.GetInstance<IGeneric<Int32>>()), check the PredicateContext.HasConsumer property
+                inside the predicate to determine whether PredicateContext.Consumer can be called, e.g.
+                    container.RegisterConditional(typeof(IGeneric<>), typeof(DefaultGenericType<>),
+                        c => c.HasConsumer ? c.Consumer.ImplementationType == typeof(MyConsumer) : true).
+                Only call PredicateContext.Consumer when PredicateContext.HasConsumer returns true."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
         public void GetInstance_ConditionalRegistrationAsRootType_HasConsumerReturnsFalse()
         {
             // Arrange
@@ -1772,6 +1806,74 @@
 
             // Assert
             Assert.IsTrue(context.HasConsumer, "PredicateContext.HasConsumer should be true.");
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingConditionalRootObjectWithPredicateReturningFalse_ThrowsTheExpectedMessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional<ILogger, NullLogger>(c => false);
+
+            // Act
+            Action action = () => container.GetInstance<ILogger>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                No registration for type ILogger could be found.
+                1 conditional registration for ILogger exists, but its supplied predicate didn't return true
+                when provided with the contextual information for ILogger."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingTypeForConditionalClosedGenericWithPredicateReturningFalse_ThrowsTheExpectedMessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(
+                typeof(IGeneric<int>),
+                typeof(DefaultGenericType<int>),
+                c => false);
+
+            // Act
+            Action action = () => container.GetInstance<IGeneric<int>>();
+
+            // Assert 
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                No registration for type IGeneric<Int32> could be found.
+                1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<Int32>,
+                but its supplied predicate didn't return true when provided with the contextual information
+                for IGeneric<Int32>."
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void GetInstance_ResolvingTypeForConditionalOpenGenericWithPredicateReturningFalse_ThrowsTheExpectedMessage()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional(
+                typeof(IGeneric<>),
+                typeof(DefaultGenericType<>),
+                c => false);
+
+            // Act
+            Action action = () => container.GetInstance<IGeneric<int>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                No registration for type IGeneric<Int32> could be found.
+                1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<Int32>,
+                but its supplied predicate didn't return true when provided with the contextual information
+                for IGeneric<Int32>."
+                .TrimInside(),
+                action);
         }
 
         // Regression in v4.5.2. See #734
