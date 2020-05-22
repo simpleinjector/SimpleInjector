@@ -96,6 +96,7 @@ namespace SimpleInjector
 
         internal static string NoRegistrationForTypeFound(
             Type serviceType,
+            int numberOfConditionals,
             bool containerHasRegistrations,
             bool collectionRegistrationDoesNotExists,
             bool containerHasRelatedOneToOneMapping,
@@ -103,8 +104,12 @@ namespace SimpleInjector
             Type[] skippedDecorators,
             Type[] lookalikes) =>
             Format(
-                "No registration for type {0} could be found.{1}{2}{3}{4}{5}{6}",
+                "No registration for type {0} could be found.{1}{2}{3}{4}{5}{6}{7}",
                 serviceType.TypeName(),
+                GetAdditionalInformationAboutExistingConditionalRegistrations(
+                    serviceType: serviceType,
+                    consumerImplementationType: serviceType,
+                    numberOfConditionalRegistrations: numberOfConditionals),
                 ContainerHasNoRegistrationsAddition(containerHasRegistrations),
                 DidYouMeanToCallGetInstanceInstead(containerHasRelatedOneToOneMapping, serviceType),
                 NoCollectionRegistrationExists(collectionRegistrationDoesNotExists, serviceType),
@@ -117,14 +122,14 @@ namespace SimpleInjector
             PredicateContext context) =>
             Format(
                 "Calling the {0} property for a conditional registration that is requested directly from " +
-                "the container is not supported. {1} is requested directly from the container opposed to it " +
-                "being injected into another class, which causes this exception. If {1} needs to be " +
+                "the container is not supported. {1} is requested directly from the container opposed to " +
+                "it being injected into another class, which causes this exception. If {1} needs to be " +
                 "requested directly (e.g. by calling container.GetInstance<{2}>()), check the {3} property " +
                 "inside the predicate to determine whether {0} can be called{4}. Only call {0} when {3} " +
                 "returns true.",
                 nameof(PredicateContext) + "." + nameof(PredicateContext.Consumer),
                 context.ServiceType.TypeName(),
-                context.ServiceType.CSharpFriendlyName(),
+                context.ServiceType.ToFriendlyName(fullyQualifiedName: false),
                 nameof(PredicateContext) + "." + nameof(PredicateContext.HasConsumer),
                 CallingPredicateContextConsumerOnDirectResolveExample(context));
 
@@ -1011,15 +1016,20 @@ namespace SimpleInjector
         }
 
         private static string GetAdditionalInformationAboutExistingConditionalRegistrations(
-            InjectionTargetInfo target, int numberOfConditionalRegistrations)
-        {
-            string serviceTypeName = target.TargetType.TypeName();
+            InjectionTargetInfo target, int numberOfConditionalRegistrations) =>
+            GetAdditionalInformationAboutExistingConditionalRegistrations(
+                target.TargetType, target.Member.DeclaringType, numberOfConditionalRegistrations);
 
-            bool isGenericType = target.TargetType.IsGenericType();
+        private static string GetAdditionalInformationAboutExistingConditionalRegistrations(
+            Type serviceType, Type consumerImplementationType, int numberOfConditionalRegistrations)
+        {
+            string serviceTypeName = serviceType.TypeName();
+
+            bool isGenericType = serviceType.IsGenericType();
 
             string openServiceTypeName = isGenericType
-                ? target.TargetType.GetGenericTypeDefinition().TypeName()
-                : target.TargetType.TypeName();
+                ? serviceType.GetGenericTypeDefinition().TypeName()
+                : serviceType.TypeName();
 
             if (numberOfConditionalRegistrations > 1)
             {
@@ -1029,7 +1039,7 @@ namespace SimpleInjector
                     numberOfConditionalRegistrations,
                     openServiceTypeName,
                     isGenericType ? (" that are applicable to " + serviceTypeName) : string.Empty,
-                    target.Member.DeclaringType.TypeName());
+                    consumerImplementationType.TypeName());
             }
             else if (numberOfConditionalRegistrations == 1)
             {
@@ -1038,7 +1048,7 @@ namespace SimpleInjector
                     "return true when provided with the contextual information for {2}.",
                     openServiceTypeName,
                     isGenericType ? (" that is applicable to " + serviceTypeName) : string.Empty,
-                    target.Member.DeclaringType.TypeName());
+                    consumerImplementationType.TypeName());
             }
             else
             {

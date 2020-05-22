@@ -827,6 +827,7 @@ namespace SimpleInjector
 
             throw new ActivationException(StringResources.NoRegistrationForTypeFound(
                 type,
+                numberOfConditionals: this.GetNumberOfConditionalRegistrationsFor(type),
                 containerHasRegistrations: this.HasRegistrations,
                 containerHasRelatedOneToOneMapping: this.ContainsOneToOneRegistrationForCollection(type),
                 collectionRegistrationDoesNotExists: this.IsCollectionButNoOneToToOneRegistrationExists(type),
