@@ -106,7 +106,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 Your request is ambiguous. There are multiple closed version of TypesExtensionsTests.IX<T>
                 that are assignable from TypesExtensionsTests.IntFloatX, namely:
-                TypesExtensionsTests.IX<Int32> and TypesExtensionsTests.IX<Single>. Use GetClosedTypesOf
+                TypesExtensionsTests.IX<int> and TypesExtensionsTests.IX<float>. Use GetClosedTypesOf
                 instead to get this list of closed types to select the proper type."
                 .TrimInside(),
                 action);

@@ -248,7 +248,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "No registration for type Func<Object> could be found.",
+                "No registration for type Func<object> could be found.",
                 action);
         }
 

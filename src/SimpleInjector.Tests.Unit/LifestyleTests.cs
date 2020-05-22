@@ -255,7 +255,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The supplied type Int32 is not a reference type. Only reference types are supported.",
+                "The supplied type int is not a reference type. Only reference types are supported.",
                 action);
         }
 

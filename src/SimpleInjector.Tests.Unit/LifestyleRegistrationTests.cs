@@ -75,7 +75,7 @@
             // Assert
             AssertThat.ThrowsWithParamName<ArgumentException>("instance", action);
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The supplied type Object does not inherit from Container.",
+                "The supplied type object does not inherit from Container.",
                 action);
         }
 

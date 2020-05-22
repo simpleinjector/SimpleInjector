@@ -552,7 +552,7 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                contains parameter 'isInUserContext' of type Boolean, which can not be used for constructor
+                contains parameter 'isInUserContext' of type bool, which can not be used for constructor
                 injection because it is a value type."
                 .TrimInside(),
                 action);

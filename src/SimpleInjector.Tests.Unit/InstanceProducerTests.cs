@@ -113,7 +113,7 @@
 @"PluginDecorator( // Transient
     PluginDecoratorWithDependencyOfType<FakeTimeProvider>( // Transient
         FakeTimeProvider(), // Transient
-        PluginDecorator<Int32>( // Transient
+        PluginDecorator<int>( // Transient
             PluginWithDependencyOfType<RealTimeProvider>( // Transient
                 RealTimeProvider())))) // Transient";
 
@@ -144,7 +144,7 @@
 @"PluginDecorator( // Transient
     PluginDecoratorWithDependencyOfType<FakeTimeProvider>( // Transient
         FakeTimeProvider(), // Transient
-        PluginDecorator<Int32>( // Transient
+        PluginDecorator<int>( // Transient
             PluginWithDependencyOfType<RealTimeProvider>( // Transient
                 RealTimeProvider())))) // Transient";
 
@@ -178,7 +178,7 @@
 @"PluginDecorator(
     PluginDecoratorWithDependencyOfType<FakeTimeProvider>(
         FakeTimeProvider(),
-        PluginDecorator<Int32>(
+        PluginDecorator<int>(
             PluginWithDependencyOfType<RealTimeProvider>(
                 RealTimeProvider()))))";
 

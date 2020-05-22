@@ -211,7 +211,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The given type Func<Object> is not a concrete type. " +
+                "The given type Func<object> is not a concrete type. " +
                 "Please use one of the other overloads to register this type.", action);
         }
         

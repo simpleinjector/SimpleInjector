@@ -92,7 +92,7 @@
             {
                 AssertThat.StringContains("The constructor of type " +
                     "ParameterConventionExtensionsTests.TypeWithConnectionStringIntConstructorArgument contains " +
-                    "parameter 'cs1ConnectionString' of type Int32, which can not be used for constructor " +
+                    "parameter 'cs1ConnectionString' of type int, which can not be used for constructor " +
                     "injection because it is a value type.", ex.Message);
             }
         }
@@ -115,7 +115,7 @@
             {
                 AssertThat.StringContains("The constructor of type " +
                     "ParameterConventionExtensionsTests.TypeWithConnectionStringIntConstructorArgument contains " +
-                    "parameter 'cs1ConnectionString' of type Int32, which can not be used for constructor " +
+                    "parameter 'cs1ConnectionString' of type int, which can not be used for constructor " +
                     "injection because it is a value type.", ex.Message);
             }
         }

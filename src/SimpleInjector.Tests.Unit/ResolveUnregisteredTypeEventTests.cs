@@ -344,7 +344,7 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The supplied expression of type Boolean does not implement IUserRepository",
+                "The supplied expression of type bool does not implement IUserRepository",
                 action);
         }
 
@@ -578,7 +578,7 @@ namespace SimpleInjector.Tests.Unit
             Action action = () => container.GetInstance<CompositeService<int>>();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>("Nullable<Int32>[]", action);
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>("Nullable<int>[]", action);
         }
 
         [TestMethod]
@@ -731,7 +731,7 @@ namespace SimpleInjector.Tests.Unit
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                There are registrations for ITimeProvider, IPlugin, and Object though,
+                There are registrations for ITimeProvider, IPlugin, and object though,
                 which all map to PluginTimeProvider."
                 .TrimInside(),
                 action);

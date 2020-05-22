@@ -91,7 +91,7 @@
             Type type = typeof(GenericNastyness1<int>.Dictionary<object, string>.GenericKeyCollection<byte>);
 
             string expectedName =
-                "GenericNastyness1<TBla>.Dictionary<TKey, TValue>.GenericKeyCollection<Byte>";
+                "GenericNastyness1<TBla>.Dictionary<TKey, TValue>.GenericKeyCollection<byte>";
 
             // Act
             string actualName = type.ToFriendlyName();

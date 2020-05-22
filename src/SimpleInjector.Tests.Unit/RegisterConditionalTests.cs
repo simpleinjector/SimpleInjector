@@ -192,7 +192,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "Multiple applicable registrations found for IOpenGenericWithPredicate<Int64>",
+                "Multiple applicable registrations found for IOpenGenericWithPredicate<long>",
                 action,
                 "GetInstance should fail because the framework should detect that more than one " +
                 "implementation of the requested service.");
@@ -216,7 +216,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "Multiple applicable registrations found for IOpenGenericWithPredicate<Int32>",
+                "Multiple applicable registrations found for IOpenGenericWithPredicate<int>",
                 action,
                 "GetInstance should fail because the framework should detect that more than one " +
                 "implementation of the requested service.");
@@ -305,8 +305,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                There is already a conditional registration for IGeneric<Int32> (with implementation
-                IntGenericType) that overlaps with the registration for GenericType<Int32> that
+                There is already a conditional registration for IGeneric<int> (with implementation
+                IntGenericType) that overlaps with the registration for GenericType<int> that
                 you are trying to make. This new registration causes ambiguity, because both
                 registrations would be used for the same closed service types. Either remove one of the
                 registrations or make them both conditional."
@@ -328,8 +328,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
-                There is already a registration for IGeneric<Int32> (with implementation
-                GenericType<Int32>) that overlaps with the conditional registration for IntGenericType that
+                There is already a registration for IGeneric<int> (with implementation
+                GenericType<int>) that overlaps with the conditional registration for IntGenericType that
                 you are trying to make. This new registration causes ambiguity, because both
                 registrations would be used for the same closed service types. Either remove one of the
                 registrations or make them both conditional."
@@ -603,15 +603,15 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                The constructor of type ServiceWithDependency<IGeneric<Int32>> contains the parameter with
-                name 'dependency' and type IGeneric<Int32>, but IGeneric<Int32> is not registered."
+                The constructor of type ServiceWithDependency<IGeneric<int>> contains the parameter with
+                name 'dependency' and type IGeneric<int>, but IGeneric<int> is not registered."
                 .TrimInside(),
                 action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<Int32>,
+                1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<int>,
                 but its supplied predicate didn't return true when provided with the contextual information
-                for ServiceWithDependency<IGeneric<Int32>>."
+                for ServiceWithDependency<IGeneric<int>>."
                 .TrimInside(),
                 action);
         }
@@ -630,9 +630,9 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                2 conditional registrations for IGeneric<T> exist that are applicable to IGeneric<String>, but
+                2 conditional registrations for IGeneric<T> exist that are applicable to IGeneric<string>, but
                 none of the supplied predicates returned true when provided with the contextual information for
-                ServiceWithDependency<IGeneric<String>>."
+                ServiceWithDependency<IGeneric<string>>."
                 .TrimInside(),
                 action);
         }
@@ -710,8 +710,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                Multiple applicable registrations found for IGeneric<Int32>. The applicable registrations are
-                (1) the unconditional closed-generic registration for IGeneric<Int32> using IntGenericType and
+                Multiple applicable registrations found for IGeneric<int>. The applicable registrations are
+                (1) the unconditional closed-generic registration for IGeneric<int> using IntGenericType and
                 (2) the conditional open-generic registration for IGeneric<T> using GenericType<T>.
                 If your goal is to make one registration a fallback in case another registration is not
                 applicable, make the fallback registration last using RegisterConditional and make sure
@@ -754,7 +754,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "Multiple applicable registrations found for IGeneric<Int32>",
+                "Multiple applicable registrations found for IGeneric<int>",
                 action);
 
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
@@ -1104,7 +1104,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "Multiple applicable registrations found for IOpenGenericWithPredicate<Int32>",
+                "Multiple applicable registrations found for IOpenGenericWithPredicate<int>",
                 action,
                 "GetInstance should fail because the framework should detect that more than one " +
                 "implementation of the requested service.");
@@ -1149,8 +1149,8 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                The registered type factory returned type OpenGenericWithPredicate1<String> which
-                does not implement IOpenGenericWithPredicate<Object>"
+                The registered type factory returned type OpenGenericWithPredicate1<string> which
+                does not implement IOpenGenericWithPredicate<object>"
                 .TrimInside(),
                 action);
         }
@@ -1674,7 +1674,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                @"1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<Int32>,
+                @"1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<int>,
                 but its supplied predicate didn't return true"
                 .TrimInside(),
                 action);
@@ -1762,10 +1762,10 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 Calling the PredicateContext.Consumer property for a conditional registration that is
-                requested directly from the container is not supported. IGeneric<Int32> is requested directly
+                requested directly from the container is not supported. IGeneric<int> is requested directly
                 from the container opposed to it being injected into another class, which causes this
-                exception. If IGeneric<Int32> needs to be requested directly (e.g. by calling
-                container.GetInstance<IGeneric<Int32>>()), check the PredicateContext.HasConsumer property
+                exception. If IGeneric<int> needs to be requested directly (e.g. by calling
+                container.GetInstance<IGeneric<int>>()), check the PredicateContext.HasConsumer property
                 inside the predicate to determine whether PredicateContext.Consumer can be called, e.g.
                     container.RegisterConditional(typeof(IGeneric<>), typeof(DefaultGenericType<>),
                         c => c.HasConsumer ? c.Consumer.ImplementationType == typeof(MyConsumer) : true).
@@ -1844,10 +1844,10 @@
 
             // Assert 
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                No registration for type IGeneric<Int32> could be found.
-                1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<Int32>,
+                No registration for type IGeneric<int> could be found.
+                1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<int>,
                 but its supplied predicate didn't return true when provided with the contextual information
-                for IGeneric<Int32>."
+                for IGeneric<int>."
                 .TrimInside(),
                 action);
         }
@@ -1868,10 +1868,10 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
-                No registration for type IGeneric<Int32> could be found.
-                1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<Int32>,
+                No registration for type IGeneric<int> could be found.
+                1 conditional registration for IGeneric<T> exists that is applicable to IGeneric<int>,
                 but its supplied predicate didn't return true when provided with the contextual information
-                for IGeneric<Int32>."
+                for IGeneric<int>."
                 .TrimInside(),
                 action);
         }

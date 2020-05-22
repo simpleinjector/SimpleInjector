@@ -208,8 +208,8 @@
             Assert.AreEqual(1, results.Length, Actual(results));
 
             Assert.AreEqual(
-                "CommandHandlerDecorator<Int32> (Singleton) depends on ICommandHandler<Int32> implemented " +
-                "by NullCommandHandler<Int32> (Transient).",
+                "CommandHandlerDecorator<int> (Singleton) depends on ICommandHandler<int> implemented " +
+                "by NullCommandHandler<int> (Transient).",
                 results.Single().Description);
         }
 
@@ -239,8 +239,8 @@
             Assert.AreEqual(1, results.Length, Actual(results));
 
             Assert.AreEqual(
-                "CommandHandlerDecorator<Int32> (Singleton) depends on ICommandHandler<Int32> implemented " +
-                "by NullCommandHandler<Int32> (Transient).",
+                "CommandHandlerDecorator<int> (Singleton) depends on ICommandHandler<int> implemented " +
+                "by NullCommandHandler<int> (Transient).",
                 results.Single().Description);
         }
 
@@ -260,7 +260,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(
-                "CommandHandlerDecorator<Int32> (Singleton) depends on ICommandHandler<Int32>",
+                "CommandHandlerDecorator<int> (Singleton) depends on ICommandHandler<int>",
                 action);
         }
 
@@ -280,7 +280,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "CommandHandlerDecorator<Int32> (Singleton) depends on ICommandHandler<Int32>",
+                "CommandHandlerDecorator<int> (Singleton) depends on ICommandHandler<int>",
                 action);
         }
 

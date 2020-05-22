@@ -13,7 +13,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            Assert_RegistrationFailsWithExpectedAmbiguousMessage("String", () =>
+            Assert_RegistrationFailsWithExpectedAmbiguousMessage("string", () =>
             {
                 container.Register<string>(() => "some value");
             });
@@ -39,7 +39,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            Assert_RegistrationFailsWithExpectedAmbiguousMessage("String", () =>
+            Assert_RegistrationFailsWithExpectedAmbiguousMessage("string", () =>
             {
                 container.Register<string>(() => "some value", Lifestyle.Singleton);
             });
@@ -52,7 +52,7 @@
             var container = ContainerFactory.New();
 
             // Act
-            Assert_RegistrationFailsWithExpectedAmbiguousMessage("String", () =>
+            Assert_RegistrationFailsWithExpectedAmbiguousMessage("string", () =>
             {
                 container.RegisterInstance<string>("some value");
             });

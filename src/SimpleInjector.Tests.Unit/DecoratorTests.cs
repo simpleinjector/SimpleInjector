@@ -305,7 +305,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
-                "The supplied type RealCommandHandlerDecorator does not implement ICommandHandler<Int32>",
+                "The supplied type RealCommandHandlerDecorator does not implement ICommandHandler<int>",
                 action);
         }
 
@@ -1066,7 +1066,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(@"
-                must include a single parameter of type ICommandHandler<Int32> (or Func<ICommandHandler<Int32>>)"
+                must include a single parameter of type ICommandHandler<int> (or Func<ICommandHandler<int>>)"
                 .TrimInside(),
                 action);
         }
@@ -2040,7 +2040,7 @@
         {
             // Arrange
             string expectedMessage = @"
-                The registered type factory returned type TransactionHandlerDecorator<Int32> which
+                The registered type factory returned type TransactionHandlerDecorator<int> which
                 does not implement ICommandHandler<RealCommand>"
                 .TrimInside();
 

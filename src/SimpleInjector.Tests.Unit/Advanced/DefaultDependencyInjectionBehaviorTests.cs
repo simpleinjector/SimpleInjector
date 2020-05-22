@@ -51,7 +51,7 @@
         {
             // Arrange
             string expectedString = string.Format(@"
-                The constructor of type {0}.{1} contains parameter 'intArgument' of type Int32, which can not
+                The constructor of type {0}.{1} contains parameter 'intArgument' of type int, which can not
                 be used for constructor injection because it is a value type.",
                 this.GetType().Name,
                 typeof(TypeWithSinglePublicConstructorWithValueTypeParameter).Name)
@@ -83,7 +83,7 @@
         {
             // Arrange
             string expectedString = string.Format(@"
-                The constructor of type {0}.{1} contains parameter 'stringArgument' of type String, which can
+                The constructor of type {0}.{1} contains parameter 'stringArgument' of type string, which can
                 not be used for constructor injection.",
                 this.GetType().Name,
                 typeof(TypeWithSinglePublicConstructorWithStringTypeParameter).Name)

@@ -118,7 +118,7 @@
             Assert.AreEqual(1, results.Length);
             Assert.AreEqual(typeof(Controller<int>).ToFriendlyName(), results[0].Name);
             Assert.AreEqual(
-                "Controller<Int32> might incorrectly depend on unregistered type ImplementsBothInterfaces " +
+                "Controller<int> might incorrectly depend on unregistered type ImplementsBothInterfaces " +
                 "(Transient) instead of IService1 (Singleton) or IService2 (Singleton).",
                 results[0].Description);
         }

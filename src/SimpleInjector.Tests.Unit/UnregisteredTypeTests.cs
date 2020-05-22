@@ -278,7 +278,7 @@
         {
             // Arrange
             string expectedMessage = typeof(ConcreteTypeWithValueTypeConstructorArgument).Name + " contains" +
-                " parameter 'intParam' of type Int32, which can not be used for constructor " +
+                " parameter 'intParam' of type int, which can not be used for constructor " +
                 "injection because it is a value type.";
 
             var container = ContainerFactory.New();
@@ -303,7 +303,7 @@
         {
             // Arrange
             string expectedMessage = typeof(ConcreteTypeWithStringConstructorArgument).Name + " contains pa" +
-                "rameter 'stringParam' of type String, which can not be used for constructor injection.";
+                "rameter 'stringParam' of type string, which can not be used for constructor injection.";
 
             var container = ContainerFactory.New();
 
