@@ -47,8 +47,7 @@ namespace SimpleInjector.Internals
             this.Argument == other.Argument && this.ConcreteType == other.ConcreteType;
 
         /// <inheritdoc />
-        public override int GetHashCode() =>
-            this.Argument.GetHashCode() ^ this.ConcreteType.GetHashCode();
+        public override int GetHashCode() => Helpers.Hash(this.Argument, this.ConcreteType);
 
         /// <inheritdoc />
         public override bool Equals(object obj) =>

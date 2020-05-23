@@ -92,10 +92,7 @@ namespace SimpleInjector.Advanced
 
         /// <inheritdoc />
         public override int GetHashCode() =>
-            this.ImplementationType.GetHashCode()
-            ^ this.Lifestyle.GetHashCode()
-            ^ this.Consumer.GetHashCode()
-            ^ this.Dependency.GetHashCode();
+            Helpers.Hash(this.ImplementationType, this.Lifestyle, this.Consumer, this.Dependency);
 
         /// <inheritdoc />
         public override bool Equals(object obj) => this.Equals(obj as KnownRelationship);

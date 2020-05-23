@@ -88,8 +88,7 @@ namespace SimpleInjector
         internal bool IsRoot => object.ReferenceEquals(this, InjectionConsumerInfo.Root);
 
         /// <inheritdoc />
-        public override int GetHashCode() =>
-            this.implementationType.GetHashCode() ^ this.target.GetHashCode();
+        public override int GetHashCode() => Helpers.Hash(this.implementationType, this.target);
 
         /// <inheritdoc />
         public override bool Equals(object obj) => this.Equals(obj as InjectionConsumerInfo);

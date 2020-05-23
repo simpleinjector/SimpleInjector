@@ -175,7 +175,7 @@ namespace SimpleInjector
                 : this.Property!.GetCustomAttributes(typeof(T), inherit).Cast<T>();
 
         /// <inheritdoc />
-        public override int GetHashCode() => this.Target.GetHashCode();
+        public override int GetHashCode() => Helpers.Hash(this.Target);
 
         /// <inheritdoc />
         public override bool Equals(object obj) => obj is InjectionConsumerInfo info && this.Equals(info);

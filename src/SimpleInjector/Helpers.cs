@@ -19,6 +19,21 @@ namespace SimpleInjector
     /// </summary>
     internal static class Helpers
     {
+        // Use System.Numerics.Hashing.HashHelpers.Combine instead, when all targets can take a dependency on
+        // System.Numerics.Hashing. The uses hashing algorithm here, is identical to that in HashHelpers.
+        internal static int CombineHashes(int a, int b)
+        {
+            uint num = (uint)((a << 5) | (int)((uint)a >> 27));
+            return ((int)num + a) ^ b;
+        }
+
+        internal static int Hash(object? a) => a?.GetHashCode() ?? 0;
+
+        internal static int Hash(object? a, object? b) => CombineHashes(a?.GetHashCode() ?? 0, b?.GetHashCode() ?? 0);
+
+        internal static int Hash(object? a, object? b, object? c, object? d) =>
+            Hash(Hash(Hash(a, b), c), d);
+
         internal static LazyEx<T> ToLazy<T>(T value) where T : class =>
             new LazyEx<T>(value);
 

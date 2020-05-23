@@ -45,13 +45,10 @@ namespace SimpleInjector.Advanced
         internal string DebuggerDisplay => this.Context.DebuggerDisplay;
 
         /// <inheritdoc />
-        public override int GetHashCode() =>
-            (this.Context == null ? 0 : this.Context.GetHashCode()) ^
-            (this.Instance == null ? 0 : this.Instance.GetHashCode());
+        public override int GetHashCode() => Helpers.Hash(this.Context, this.Instance);
 
         /// <inheritdoc />
-        public override bool Equals(object obj) =>
-            obj is InstanceInitializationData && this.Equals((InstanceInitializationData)obj);
+        public override bool Equals(object obj) => obj is InstanceInitializationData other && this.Equals(other);
 
         /// <inheritdoc />
         public bool Equals(InstanceInitializationData other) => this == other;
