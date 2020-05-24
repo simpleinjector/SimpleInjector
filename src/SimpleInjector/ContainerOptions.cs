@@ -5,9 +5,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Diagnostics;
-    using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
 
@@ -65,6 +63,9 @@ namespace SimpleInjector
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool resolveUnregisteredConcreteTypes;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool useStrictLifestyleMismatchBehavior;
 
         internal ContainerOptions(Container container)
         {
@@ -157,7 +158,57 @@ namespace SimpleInjector
         /// The value indicating whether the container uses loosened or strict behavior when validating
         /// mismatches on  <see cref="Lifestyle.Scoped"/> components.
         /// </value>
-        public bool UseLoosenedLifestyleMismatchBehavior { get; set; } = true;
+        [Obsolete(
+            "Please use the UseStrictLifestyleMismatchBehavior property instead. Note that " +
+            "UseStrictLifestyleMismatchBehavior's behavior is negated. This means that if you're currently " +
+            "supplying 'false' to UseLoosenedLifestyleMismatchBehavior, you will have to supply 'true' to " +
+            "UseStrictLifestyleMismatchBehavior instead, and vise versa. Also note that 'loosend' behavior " +
+            "became the default in 5.0 — In case you are assinging UseLoosenedLifestyleMismatchBehavior to " +
+            "'true', the call can be removed safely. " +
+            "Will be treated as an error from version 5.5. " +
+            "Will be removed in version 6.0.",
+            error: false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public bool UseLoosenedLifestyleMismatchBehavior
+        {
+            get => !this.UseStrictLifestyleMismatchBehavior;
+            set => this.UseStrictLifestyleMismatchBehavior = !value;
+        }
+
+        /// <summary>
+        /// <para>
+        /// Gets or sets a value indicating whether the container should use a strict behavior for detecting
+        /// lifestyle mismatches (see: https://simpleinjector.org/dialm). In short, when
+        /// <see cref="UseStrictLifestyleMismatchBehavior"/> is set to <b>false</b>
+        /// <see cref="Lifestyle.Transient"/> dependencies are allowed to be injected into
+        /// <see cref="Lifestyle.Scoped"/> components. When enabled, a warning would be given in that case.
+        /// The default value is <b>false</b>.
+        /// </para>
+        /// <para>
+        /// Simple Injector allows custom lifestyles to be created and this strict behavior works on custom
+        /// lifestyles as well. When set to <b>false</b>. Simple Injector ignores any lifestyle mismatch
+        /// checks on any component with a lifestyle that has a <see cref="Lifestyle.Length"/> that is equal
+        /// or shorter than the length of <see cref="Lifestyle.Scoped"/>.
+        /// </para>
+        /// </summary>
+        /// <value>
+        /// The value indicating whether the container uses strict behavior when validating mismatches on
+        /// <see cref="Lifestyle.Scoped"/> components.
+        /// </value>
+        public bool UseStrictLifestyleMismatchBehavior
+        {
+            get
+            {
+                return this.useStrictLifestyleMismatchBehavior;
+            }
+
+            set
+            {
+                this.Container.ThrowWhenContainerIsLockedOrDisposed();
+
+                this.useStrictLifestyleMismatchBehavior = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the container should automatically trigger verification

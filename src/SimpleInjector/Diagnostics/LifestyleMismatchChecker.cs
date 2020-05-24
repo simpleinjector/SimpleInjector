@@ -23,7 +23,7 @@ namespace SimpleInjector.Diagnostics
 
             var componentLength = componentLifestyle.ComponentLength(container);
 
-            if (container.Options.UseLoosenedLifestyleMismatchBehavior
+            if (!container.Options.UseStrictLifestyleMismatchBehavior
                 && componentLength <= Lifestyle.Scoped.Length)
             {
                 return false;

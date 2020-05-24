@@ -12,8 +12,8 @@
     [TestCategory("Conventions")]
     public class ObsoleteConventionsTests
     {
-        private const string WillBeRemovedInVersionMessage = "Will be removed in version ";
-        private const string TreatedAsErrorFromVersionMessage = "Will be treated as an error from version ";
+        private const string WillBeRemovedInVersionMessage = " Will be removed in version ";
+        private const string TreatedAsErrorFromVersionMessage = " Will be treated as an error from version ";
 
         private static readonly IEnumerable<Tuple<MemberInfo, ObsoleteAttribute>> ObsoletedTypesAndTypeMembers;
 

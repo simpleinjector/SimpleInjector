@@ -90,7 +90,7 @@
         {
             // Arrange
             var container = new Container();
-            container.Options.UseLoosenedLifestyleMismatchBehavior = false;
+            container.Options.UseStrictLifestyleMismatchBehavior = true;
 
             var longerThanTransientLifestyle = new FakeLifestyle(length: 100);
 
