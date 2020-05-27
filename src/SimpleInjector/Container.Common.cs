@@ -193,10 +193,8 @@ namespace SimpleInjector
         /// </para>
         /// </remarks>
         /// <returns>An array of <see cref="InstanceProducer"/> instances.</returns>
-        public InstanceProducer[] GetCurrentRegistrations()
-        {
-            return this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: false);
-        }
+        public InstanceProducer[] GetCurrentRegistrations() =>
+            this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: false);
 
         /// <summary>
         /// Returns an array with the current registrations for root objects. Root objects are registrations
@@ -451,7 +449,7 @@ namespace SimpleInjector
         [DebuggerStepThrough]
         private static string? GetStackTraceOrNull()
         {
-#if NET45 || NETSTANDARD2_0
+#if !NETSTANDARD1_0 && !NETSTANDARD1_3
             return new System.Diagnostics.StackTrace(fNeedFileInfo: true, skipFrames: 2).ToString();
 #else
             return null;
@@ -532,7 +530,7 @@ namespace SimpleInjector
 
         private static object ThrowWhenResolveInterceptorReturnsNull(object? instance)
         {
-            if (instance == null)
+            if (instance is null)
             {
                 throw new ActivationException(StringResources.ResolveInterceptorDelegateReturnedNull());
             }
@@ -646,7 +644,7 @@ namespace SimpleInjector
 
             var entry = this.explicitRegistrations.GetValueOrDefault(key);
 
-            if (entry == null)
+            if (entry is null)
             {
                 this.explicitRegistrations[key] = entry = RegistrationEntry.Create(serviceType, this);
             }
