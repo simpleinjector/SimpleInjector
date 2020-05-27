@@ -97,10 +97,7 @@ namespace SimpleInjector
                     ? this.resolveScope.Value
                     : null;
 
-        internal void UseCurrentThreadResolveScope()
-        {
-            this.usingCurrentThreadResolveScope = true;
-        }
+        internal void UseCurrentThreadResolveScope() => this.usingCurrentThreadResolveScope = true;
 
         private void VerifyInternal(bool suppressLifestyleMismatchVerification)
         {

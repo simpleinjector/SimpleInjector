@@ -10,7 +10,7 @@ namespace SimpleInjector.Internals
     /// Container controlled collections can be supplied with both Type objects or direct Registration
     /// instances.
     /// </summary>
-    [DebuggerDisplay(nameof(ContainerControlledItem) + " ({" + nameof(ContainerControlledItem.DebuggerDisplay) + ", nq})")]
+    [DebuggerDisplay(nameof(ContainerControlledItem) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
     internal sealed class ContainerControlledItem
     {
         public readonly Type ImplementationType;

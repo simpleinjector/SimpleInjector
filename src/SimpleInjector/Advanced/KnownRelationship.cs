@@ -21,8 +21,7 @@ namespace SimpleInjector.Advanced
         /// <param name="implementationType">The implementation type of the parent type.</param>
         /// <param name="lifestyle">The lifestyle of the parent type.</param>
         /// <param name="dependency">The type that the parent depends on (it is injected into the parent).</param>
-        public KnownRelationship(
-            Type implementationType, Lifestyle lifestyle, InstanceProducer dependency)
+        public KnownRelationship(Type implementationType, Lifestyle lifestyle, InstanceProducer dependency)
         {
             Requires.IsNotNull(implementationType, nameof(implementationType));
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
@@ -100,7 +99,7 @@ namespace SimpleInjector.Advanced
         /// <inheritdoc />
         public bool Equals(KnownRelationship? other)
         {
-            if (other == null)
+            if (other is null)
             {
                 return false;
             }

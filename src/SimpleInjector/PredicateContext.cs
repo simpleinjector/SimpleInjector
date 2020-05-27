@@ -23,7 +23,7 @@ namespace SimpleInjector
     /// <see cref="Container.RegisterConditional(Type, Type, Lifestyle, Predicate{PredicateContext})">Register</see>
     /// method for more information.
     /// </remarks>
-    [DebuggerDisplay(nameof(PredicateContext) + " ({" + nameof(PredicateContext.DebuggerDisplay) + ", nq})")]
+    [DebuggerDisplay(nameof(PredicateContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
     public sealed class PredicateContext : ApiObject
     {
         private readonly InjectionConsumerInfo consumer;

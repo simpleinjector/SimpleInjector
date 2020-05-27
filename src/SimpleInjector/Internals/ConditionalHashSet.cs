@@ -16,7 +16,7 @@ namespace SimpleInjector.Internals
         private readonly Dictionary<int, List<WeakReference>> dictionary =
             new Dictionary<int, List<WeakReference>>();
 
-        private int shrinkCount = 0;
+        private int shrinkCount;
 
         internal void Add(T item)
         {
@@ -24,7 +24,7 @@ namespace SimpleInjector.Internals
 
             lock (this.dictionary)
             {
-                if (this.GetWeakReferenceOrNull(item) == null)
+                if (this.GetWeakReferenceOrNull(item) is null)
                 {
                     var weakReference = new WeakReference(item);
 

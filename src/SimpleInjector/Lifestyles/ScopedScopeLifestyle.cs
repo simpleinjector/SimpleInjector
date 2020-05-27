@@ -14,11 +14,8 @@ namespace SimpleInjector.Lifestyles
         {
         }
 
-        internal new Scope GetCurrentScope(Container container)
-        {
-            // ScopedScopeLifestyle.GetCurrentScopeCore will never return null.
-            return base.GetCurrentScope(container)!;
-        }
+        // ScopedScopeLifestyle.GetCurrentScopeCore will never return null.
+        internal new Scope GetCurrentScope(Container container) => base.GetCurrentScope(container)!;
 
         protected internal override Func<Scope?> CreateCurrentScopeProvider(Container container) =>
             () => this.GetScopeFromDefaultScopedLifestyle(container);
@@ -32,8 +29,7 @@ namespace SimpleInjector.Lifestyles
 
             if (lifestyle != null)
             {
-                return lifestyle.GetCurrentScope(container)
-                    ?? ThrowThereIsNoActiveScopeException();
+                return lifestyle.GetCurrentScope(container) ?? ThrowThereIsNoActiveScopeException();
             }
 
             return container.GetVerificationOrResolveScopeForCurrentThread()

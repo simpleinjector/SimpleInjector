@@ -360,7 +360,7 @@
             var uninjectedProperties =
                 from property in instance.GetType().GetProperties()
                 let value = property.GetValue(instance, null)
-                where value == null
+                where value is null
                 select property.Name;
 
             Assert.IsFalse(uninjectedProperties.Any(),

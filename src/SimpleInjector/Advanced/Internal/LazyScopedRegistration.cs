@@ -46,7 +46,7 @@ namespace SimpleInjector.Advanced.Internal
             //  there will be multiple copies of the LazyScope defeating the purpose of the LazyScope.
             // -LazyScope can't be a class, since that would force extra pressure on the GC which must be
             //  prevented.
-            if (this.instance == null)
+            if (this.instance is null)
             {
                 this.instance =
                     Scope.GetInstance((ScopedRegistration<TImplementation>)this.registration, scope);

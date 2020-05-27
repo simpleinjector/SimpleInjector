@@ -73,7 +73,7 @@ namespace SimpleInjector.Decorators
         }
 
         protected bool SatisfiesPredicate(DecoratorPredicateContext context) =>
-            this.Predicate == null || this.Predicate(context);
+            this.Predicate is null || this.Predicate(context);
 
         protected ServiceTypeDecoratorInfo GetServiceTypeInfo(
             ExpressionBuiltEventArgs e,
@@ -81,14 +81,14 @@ namespace SimpleInjector.Decorators
             Registration? originalRegistration = null,
             Type? registeredServiceType = null)
         {
-            originalExpression = originalExpression ?? e.Expression;
-            originalRegistration = originalRegistration ?? e.ReplacedRegistration;
-            registeredServiceType = registeredServiceType ?? e.RegisteredServiceType;
+            originalExpression ??= e.Expression;
+            originalRegistration ??= e.ReplacedRegistration;
+            registeredServiceType ??= e.RegisteredServiceType;
 
             // registeredProducer.ServiceType and registeredServiceType are different when called by
             // container uncontrolled decorator. producer.ServiceType will be IEnumerable<T> and
             // registeredServiceType will be T.
-            if (e.DecoratorInfo == null)
+            if (e.DecoratorInfo is null)
             {
                 Type implementationType =
                     DecoratorHelpers.DetermineImplementationType(originalExpression, e.InstanceProducer);

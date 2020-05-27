@@ -463,7 +463,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers an <see cref="ResolveInterceptor"/> delegate that allows intercepting calls to
-        /// <see cref="SimpleInjector.Container.GetInstance">GetInstance</see> and
+        /// <see cref="Container.GetInstance">GetInstance</see> and
         /// <see cref="InstanceProducer.GetInstance()"/>.
         /// </summary>
         /// <remarks>
@@ -577,7 +577,7 @@ namespace SimpleInjector
                 errorMessage = this.DependencyInjectionBehavior.VerifyConstructor(constructor);
             }
 
-            return errorMessage == null;
+            return errorMessage is null;
         }
 
         internal InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer)
@@ -586,7 +586,7 @@ namespace SimpleInjector
 
             // Producer will only be null if a user created a custom IConstructorInjectionBehavior that
             // returned null.
-            if (producer == null)
+            if (producer is null)
             {
                 throw new ActivationException(StringResources.DependencyInjectionBehaviorReturnedNull(
                     this.DependencyInjectionBehavior));
@@ -599,7 +599,7 @@ namespace SimpleInjector
         {
             var lifestyle = this.LifestyleSelectionBehavior.SelectLifestyle(implementationType);
 
-            if (lifestyle == null)
+            if (lifestyle is null)
             {
                 throw new ActivationException(StringResources.LifestyleSelectionBehaviorReturnedNull(
                     this.LifestyleSelectionBehavior, implementationType));

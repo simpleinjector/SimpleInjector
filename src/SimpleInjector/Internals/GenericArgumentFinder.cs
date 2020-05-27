@@ -32,15 +32,12 @@ namespace SimpleInjector.Internals
                 (partialOpenGenericImplementation ?? implementationTypeDefinition).GetGenericArguments();
         }
 
-        internal Type[] GetConcreteTypeArgumentsForClosedImplementation()
-        {
+        internal Type[] GetConcreteTypeArgumentsForClosedImplementation() => (
             // The arguments must be in the same order as those of the open implementation.
-            return (
-                from mapping in this.FindArgumentMappings()
-                orderby this.implementationTypeDefinitionArguments.IndexOf(mapping.Argument)
-                select mapping.ConcreteType)
-                .ToArray();
-        }
+            from mapping in this.FindArgumentMappings()
+            orderby this.implementationTypeDefinitionArguments.IndexOf(mapping.Argument)
+            select mapping.ConcreteType)
+            .ToArray();
 
         private ArgumentMapping[] FindArgumentMappings()
         {
@@ -80,8 +77,7 @@ namespace SimpleInjector.Internals
             mappings = mappings.Distinct().ToArray();
         }
 
-        private void RemoveMappingsThatDoNotSatisfyAllTypeConstraints(
-            ref IEnumerable<ArgumentMapping> mappings)
+        private void RemoveMappingsThatDoNotSatisfyAllTypeConstraints(ref IEnumerable<ArgumentMapping> mappings)
         {
             mappings = (
                 from mapping in mappings
@@ -99,9 +95,9 @@ namespace SimpleInjector.Internals
             // using an open-generic type and we can't verify whether a mapping is possible; we will return
             // true. Same holds when we can't find the mapping in the service type definition; we will assume
             // it can be mapped. This will be caught higher up the stack.
-            return index < 0 || mapping.ConcreteType.IsGenericParameter
-                ? true
-                : mapping.ConcreteType == this.serviceTypeToResolveArguments[index];
+            return index < 0
+                || mapping.ConcreteType.IsGenericParameter
+                || mapping.ConcreteType == this.serviceTypeToResolveArguments[index];
         }
 
         private IEnumerable<ArgumentMapping> ConvertToOpenImplementationArgumentMappings(
@@ -117,7 +113,8 @@ namespace SimpleInjector.Internals
                     // The argument is one of the type's generic arguments. We can directly return it.
                     yield return mapping;
 
-                    foreach (var arg in this.GetTypeConstraintArgumentMappingsRecursive(mapping, processedTypes))
+                    foreach (var arg in
+                        this.GetTypeConstraintArgumentMappingsRecursive(mapping, processedTypes))
                     {
                         yield return arg;
                     }
@@ -127,7 +124,8 @@ namespace SimpleInjector.Internals
                     // The argument is not in the type's list, which means that the real type is (or are)
                     // buried in a generic type (i.e. Nullable<KeyValueType<TKey, TValue>>). This can result
                     // in multiple values.
-                    foreach (var arg in this.ConvertToOpenImplementationArgumentMappingsRecursive(mapping, processedTypes))
+                    foreach (var arg in
+                        this.ConvertToOpenImplementationArgumentMappingsRecursive(mapping, processedTypes))
                     {
                         yield return arg;
                     }
@@ -135,7 +133,8 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private ArgumentMapping[] GetTypeConstraintArgumentMappingsRecursive(ArgumentMapping mapping, IList<Type> processedTypes)
+        private ArgumentMapping[] GetTypeConstraintArgumentMappingsRecursive(
+            ArgumentMapping mapping, IList<Type> processedTypes)
         {
             IEnumerable<Type> constraints = Enumerable.Empty<Type>();
 

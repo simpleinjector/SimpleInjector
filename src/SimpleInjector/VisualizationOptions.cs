@@ -12,14 +12,16 @@ namespace SimpleInjector
     {
         /// <summary>
         /// Gets or sets a value indicating whether to include lifestyle information in the visualization.
+        /// The default value is <b>true</b>.
         /// </summary>
         /// <value>The value to include life style information.</value>
         public bool IncludeLifestyleInformation { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether to use fully qualified type names in the visualization.
+        /// The default value is <b>false</b>.
         /// </summary>
         /// <value>The value to use fully qualified type names.</value>
-        public bool UseFullyQualifiedTypeNames { get; set; } = false;
+        public bool UseFullyQualifiedTypeNames { get; set; }
     }
 }

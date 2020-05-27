@@ -11,10 +11,7 @@ namespace SimpleInjector.Advanced
     {
         private readonly ContainerOptions options;
 
-        internal DefaultLifestyleSelectionBehavior(ContainerOptions options)
-        {
-            this.options = options;
-        }
+        internal DefaultLifestyleSelectionBehavior(ContainerOptions options) => this.options = options;
 
         public Lifestyle SelectLifestyle(Type implementationType)
         {

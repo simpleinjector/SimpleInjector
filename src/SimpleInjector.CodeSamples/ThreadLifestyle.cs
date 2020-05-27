@@ -29,7 +29,7 @@
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
             Container container)
         {
-            if (instanceCreator == null)
+            if (instanceCreator is null)
             {
                 throw new ArgumentNullException(nameof(instanceCreator));
             }
@@ -56,7 +56,7 @@
             
             public override Expression BuildExpression()
             {
-                if (this.instanceProducer == null)
+                if (this.instanceProducer is null)
                 {
                     this.instanceProducer = this.BuildTransientInstanceCreator();
                 }
@@ -68,7 +68,7 @@
             {
                 TImplementation value = this.threadSpecificCache.Value;
 
-                if (value == null)
+                if (value is null)
                 {
                     this.threadSpecificCache.Value = value = this.instanceProducer();
                 }
@@ -77,7 +77,7 @@
             }
 
             private Func<TImplementation> BuildTransientInstanceCreator() =>
-                this.instanceCreator == null
+                this.instanceCreator is null
                     ? (Func<TImplementation>)this.BuildTransientDelegate()
                     : this.BuildTransientDelegate(this.instanceCreator);
         }

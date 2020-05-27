@@ -54,7 +54,7 @@
 
             var registrations = (PropertyRegistrations)container.ContainerScope.GetItem(RegistrationsKey);
 
-            if (registrations == null)
+            if (registrations is null)
             {
                 throw new InvalidOperationException(
                     "Please call container.Options.EnablePropertyAutoWiring() first.");

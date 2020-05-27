@@ -6,7 +6,7 @@
         {
             while (true)
             {
-                if (group.Parent == null)
+                if (group.Parent is null)
                 {
                     return group;
                 }

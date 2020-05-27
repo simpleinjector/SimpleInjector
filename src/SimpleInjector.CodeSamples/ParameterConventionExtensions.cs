@@ -122,7 +122,7 @@
 
             var connectionString = this.connectionStringRetriever(name);
 
-            if (connectionString == null)
+            if (connectionString is null)
             {
                 throw new InvalidOperationException(
                     "No connection string with name '" + name + "' could be found in the " +

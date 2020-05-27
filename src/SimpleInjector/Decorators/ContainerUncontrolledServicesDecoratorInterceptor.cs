@@ -125,12 +125,12 @@ namespace SimpleInjector.Decorators
 
             Expression originalEnumerableExpression = this.e.Expression;
 
-            if (originalEnumerableExpression is ConstantExpression)
+            if (originalEnumerableExpression is ConstantExpression constant)
             {
-                var collection = ((ConstantExpression)originalEnumerableExpression).Value as IEnumerable;
+                var collection = constant.Value as IEnumerable;
 
-                return this.BuildDecoratorEnumerableExpressionForConstantEnumerable(wrapInstanceWithDecorator,
-                    collection!);
+                return this.BuildDecoratorEnumerableExpressionForConstantEnumerable(
+                    wrapInstanceWithDecorator, collection!);
             }
             else
             {
@@ -172,19 +172,16 @@ namespace SimpleInjector.Decorators
         }
 
         private IEnumerable<OverriddenParameter> CreateOverriddenDecoratorContextParameters(
-            InstanceProducer currentProducer)
-        {
-            return
-                from parameter in this.decoratorConstructor!.GetParameters()
-                where parameter.ParameterType == typeof(DecoratorContext)
-                let contextExpression = Expression.Constant(new DecoratorContext(this.Context!))
-                select new OverriddenParameter(parameter, contextExpression, currentProducer);
-        }
+            InstanceProducer currentProducer) =>
+            from parameter in this.decoratorConstructor!.GetParameters()
+            where parameter.ParameterType == typeof(DecoratorContext)
+            let contextExpression = Expression.Constant(new DecoratorContext(this.Context!))
+            select new OverriddenParameter(parameter, contextExpression, currentProducer);
 
         // Creates an expression that calls a Func<T, T> delegate that takes in the service and returns
         // that instance, wrapped with the decorator.
-        private LambdaExpression BuildDecoratorWrapper(ParameterExpression parameter,
-            Expression decoratorExpression)
+        private LambdaExpression BuildDecoratorWrapper(
+            ParameterExpression parameter, Expression decoratorExpression)
         {
             Type funcType =
                 typeof(Func<,>).MakeGenericType(this.registeredServiceType, this.registeredServiceType);
@@ -204,13 +201,13 @@ namespace SimpleInjector.Decorators
 
             if (this.Lifestyle == Lifestyle.Singleton)
             {
-                Func<IEnumerable> collectionCreator = () =>
+                IEnumerable CreateCollection()
                 {
                     Array array = ToArray(this.registeredServiceType, decoratedCollection);
                     return DecoratorHelpers.MakeReadOnly(this.registeredServiceType, array);
-                };
+                }
 
-                IEnumerable singleton = this.GetSingletonDecoratedCollection(collectionCreator);
+                IEnumerable singleton = this.GetSingletonDecoratedCollection(CreateCollection);
 
                 return Expression.Constant(singleton, enumerableServiceType);
             }
@@ -230,16 +227,16 @@ namespace SimpleInjector.Decorators
                 Type enumerableServiceType =
                     typeof(IEnumerable<>).MakeGenericType(this.registeredServiceType);
 
-                Func<IEnumerable> collectionCreator = () =>
+                IEnumerable CreateCollection()
                 {
                     Type funcType = typeof(Func<>).MakeGenericType(enumerableServiceType);
                     Delegate lambda = Expression.Lambda(funcType, callExpression).Compile();
                     var decoratedCollection = (IEnumerable)lambda.DynamicInvoke();
                     Array array = ToArray(this.registeredServiceType, decoratedCollection);
                     return DecoratorHelpers.MakeReadOnly(this.registeredServiceType, array);
-                };
+                }
 
-                IEnumerable singleton = this.GetSingletonDecoratedCollection(collectionCreator);
+                IEnumerable singleton = this.GetSingletonDecoratedCollection(CreateCollection);
 
                 // Passing the enumerable type is needed when running in a (Silverlight) sandbox.
                 return Expression.Constant(singleton, enumerableServiceType);
@@ -295,10 +292,8 @@ namespace SimpleInjector.Decorators
         {
             lock (this.singletonDecoratedCollectionsCache)
             {
-                IEnumerable collection;
-
                 if (!this.singletonDecoratedCollectionsCache.TryGetValue(
-                    this.e.InstanceProducer, out collection))
+                    this.e.InstanceProducer, out IEnumerable collection))
                 {
                     collection = collectionCreator();
 

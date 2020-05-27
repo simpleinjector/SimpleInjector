@@ -151,7 +151,7 @@ namespace SimpleInjector
         {
             var appServices = builder.ApplicationServices;
 
-            if (appServices == null)
+            if (appServices is null)
             {
                 throw new ArgumentNullException(nameof(builder) + ".ApplicationServices");
             }
@@ -166,7 +166,7 @@ namespace SimpleInjector
 
             var context = accessor.HttpContext;
 
-            if (context == null)
+            if (context is null)
             {
                 throw new InvalidOperationException(
                     $"Unable to request service '{serviceType.ToFriendlyName()} from ASP.NET Core request " +
@@ -181,7 +181,7 @@ namespace SimpleInjector
         {
             var accessor = appServices.GetService<IHttpContextAccessor>();
 
-            if (accessor == null)
+            if (accessor is null)
             {
                 throw new InvalidOperationException(
                     "Type 'Microsoft.AspNetCore.Http.IHttpContextAccessor' is not available in the " +

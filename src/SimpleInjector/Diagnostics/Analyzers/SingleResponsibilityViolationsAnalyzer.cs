@@ -43,15 +43,13 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 dependencies: dependencies))
             .ToArray();
 
-        private static bool IsAnalyzable(InstanceProducer producer)
-        {
+        private static bool IsAnalyzable(InstanceProducer producer) =>
             // We can't analyze collections, because this would lead to false positives when decorators are
             // applied to the collection. For a decorator, each collection element it decorates is a
             // dependency, which will make it look as if the decorator has too many dependencies. Since the
             // container will delegate the creation of those elements back to the container, those elements
             // would by them selves still get analyzed, so the only thing we'd miss here is the decorator.
-            return !typeof(IEnumerable<>).IsGenericTypeDefinitionOf(producer.ServiceType);
-        }
+            !typeof(IEnumerable<>).IsGenericTypeDefinitionOf(producer.ServiceType);
 
         private static string BuildRelationshipDescription(Type implementationType, int numberOfDependencies) =>
             string.Format(CultureInfo.InvariantCulture,

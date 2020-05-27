@@ -17,7 +17,7 @@ namespace SimpleInjector.Decorators
         {
             Type compositeServiceType = GetCompositeBaseType(serviceType, compositeConstructor);
 
-            if (compositeServiceType == null)
+            if (compositeServiceType is null)
             {
                 return 0;
             }

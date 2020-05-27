@@ -24,17 +24,11 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return $"{count} ambiguous {LifestylesPlural(count)}.";
         }
 
-        public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
-        {
-            var warnings = GetDiagnosticWarnings(producers);
-
-            var results =
-                from warning in warnings
-                where warning.DiagnosedRegistration.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
-                select warning;
-
-            return results.ToArray();
-        }
+        public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers) => (
+            from warning in GetDiagnosticWarnings(producers)
+            where warning.DiagnosedRegistration.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
+            select warning)
+            .ToArray();
 
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification =
             "Reducing cyclomatic complexity of this method would mean breaking it up in smaller methods, " +
@@ -84,8 +78,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         }
 
         private static AmbiguousLifestylesDiagnosticResult CreateDiagnosticResult(
-            InstanceProducer diagnosedProducer,
-            InstanceProducer[] conflictingProducers)
+            InstanceProducer diagnosedProducer, InstanceProducer[] conflictingProducers)
         {
             Type serviceType = diagnosedProducer.ServiceType;
             Type implementationType = diagnosedProducer.Registration.ImplementationType;

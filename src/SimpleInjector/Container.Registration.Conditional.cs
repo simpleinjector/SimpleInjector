@@ -74,8 +74,8 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterConditional<TService, TImplementation>(Lifestyle lifestyle,
             Predicate<PredicateContext> predicate)
-            where TImplementation : class, TService
             where TService : class
+            where TImplementation : class, TService
         {
             this.RegisterConditional(typeof(TService), typeof(TImplementation), lifestyle, predicate);
         }

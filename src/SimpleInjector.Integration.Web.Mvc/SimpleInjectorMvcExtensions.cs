@@ -105,7 +105,7 @@ namespace SimpleInjector
                 throw new ArgumentNullException(nameof(container));
             }
 
-            if (assemblies == null || !Array.TrueForAll(assemblies, a => a != null))
+            if (assemblies is null || !Array.TrueForAll(assemblies, a => a != null))
             {
                 throw new ArgumentNullException(
                     "The supplied elements in the array can't be null.", nameof(assemblies));

@@ -26,7 +26,7 @@
                 => this.creator = creator;
 
             public override Type ImplementationType => typeof(T);
-            public override Expression BuildExpression() => this.creator == null
+            public override Expression BuildExpression() => this.creator is null
                 ? this.BuildTransientExpression()
                 : this.BuildTransientExpression(this.creator);
         }

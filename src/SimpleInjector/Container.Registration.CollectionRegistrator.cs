@@ -630,7 +630,7 @@ namespace SimpleInjector
             Requires.IsNotNull(singletons, nameof(singletons));
             Requires.DoesNotContainNullValues(singletons, nameof(singletons));
 
-            if (typeof(TService) == typeof(Type) && singletons.Any())
+            if (typeof(TService) == typeof(Type) && singletons.Length > 0)
             {
                 throw new ArgumentException(
                     StringResources.CollectionsRegisterCalledWithTypeAsTService(singletons.Cast<Type>()),

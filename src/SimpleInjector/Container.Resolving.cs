@@ -250,7 +250,7 @@ namespace SimpleInjector
             {
                 producer = this.GetExplicitlyRegisteredInstanceProducer(serviceType, InjectionConsumerInfo.Root);
 
-                if (producer == null)
+                if (producer is null)
                 {
                     // The producer is created implicitly. This forces us to lock the container.
                     // Such implicit registration could be done through in numberous ways (such as
@@ -294,15 +294,15 @@ namespace SimpleInjector
                     StringResources.OpenGenericTypesCanNotBeResolved(serviceType), nameof(serviceType));
             }
 
-            // This Func<T> is a bit ugly, but does save us a lot of duplicate code.
-            Func<InstanceProducer?> buildProducer =
-                () => this.BuildInstanceProducerForType(serviceType, consumer, autoCreateConcreteTypes);
+            // This local function is a bit ugly, but does save us a lot of duplicate code.
+            InstanceProducer? BuildProducer() =>
+                this.BuildInstanceProducerForType(serviceType, autoCreateConcreteTypes);
 
-            return this.GetInstanceProducerForType(serviceType, consumer, buildProducer);
+            return this.GetInstanceProducerForType(serviceType, consumer, BuildProducer);
         }
 
         internal bool IsConcreteConstructableType(Type concreteType) =>
-            this.Options.IsConstructableType(concreteType, out string? errorMesssage);
+            this.Options.IsConstructableType(concreteType, out _);
 
         private Action<T> GetInitializer<T>(Type implementationType, Registration context)
         {
@@ -331,13 +331,13 @@ namespace SimpleInjector
             return this.GetInstanceProducerForType(
                 typeof(TService),
                 context,
-                () => this.BuildInstanceProducerForType<TService>(context));
+                () => this.BuildInstanceProducerForType<TService>());
         }
 
         private InstanceProducer? GetInstanceProducerForType(Type serviceType, InjectionConsumerInfo context)
         {
             return this.GetInstanceProducerForType(
-                serviceType, context, () => this.BuildInstanceProducerForType(serviceType, context));
+                serviceType, context, () => this.BuildInstanceProducerForType(serviceType));
         }
 
         private object GetInstanceForRootType<TService>()
@@ -374,19 +374,19 @@ namespace SimpleInjector
             return instanceProducer!.GetInstance();
         }
 
-        private InstanceProducer? BuildInstanceProducerForType<TService>(InjectionConsumerInfo context)
+        private InstanceProducer? BuildInstanceProducerForType<TService>()
             where TService : class
         {
             return this.BuildInstanceProducerForType(
                 typeof(TService),
-                () => this.TryBuildInstanceProducerForConcreteUnregisteredType<TService>(context));
+                () => this.TryBuildInstanceProducerForConcreteUnregisteredType<TService>());
         }
 
         private InstanceProducer? BuildInstanceProducerForType(
-            Type serviceType, InjectionConsumerInfo context, bool autoCreateConcreteTypes = true)
+            Type serviceType, bool autoCreateConcreteTypes = true)
         {
             var tryBuildInstanceProducerForConcrete = autoCreateConcreteTypes && !serviceType.IsAbstract()
-                ? () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType, context)
+                ? () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType)
                 : (Func<InstanceProducer?>)(() => null);
 
             return this.BuildInstanceProducerForType(serviceType, tryBuildInstanceProducerForConcrete);
@@ -466,19 +466,16 @@ namespace SimpleInjector
                 registration: producerCollection.CreateRegistration(enumerableOfProducersType, this));
         }
 
-        private InstanceProducer? TryBuildInstanceProducerForCollectionType(Type serviceType)
-        {
-            return
-                this.TryBuildInstanceProducerForMutableCollection(serviceType) ??
-                this.TryBuildInstanceProducerForStream(serviceType);
-        }
+        private InstanceProducer? TryBuildInstanceProducerForCollectionType(Type serviceType) =>
+            this.TryBuildInstanceProducerForMutableCollection(serviceType) ??
+            this.TryBuildInstanceProducerForStream(serviceType);
 
         // Instead of wrapping the complete method in a lock, we lock inside the individual methods. We
         // don't want to hold a lock while calling back into user code, because who knows what the user
         // is doing there. We don't want a dead lock.
         private InstanceProducer? TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType) =>
-            this.TryGetInstanceProducerForUnregisteredTypeResolutionFromCache(serviceType)
-            ?? this.TryGetInstanceProducerThroughResolveUnregisteredTypeEvent(serviceType);
+            this.TryGetInstanceProducerForUnregisteredTypeResolutionFromCache(serviceType) ??
+            this.TryGetInstanceProducerThroughResolveUnregisteredTypeEvent(serviceType);
 
         private InstanceProducer? TryGetInstanceProducerForUnregisteredTypeResolutionFromCache(Type serviceType)
         {
@@ -492,7 +489,7 @@ namespace SimpleInjector
 
         private InstanceProducer? TryGetInstanceProducerThroughResolveUnregisteredTypeEvent(Type serviceType)
         {
-            if (this.resolveUnregisteredType == null)
+            if (this.resolveUnregisteredType is null)
             {
                 return null;
             }
@@ -537,15 +534,13 @@ namespace SimpleInjector
             {
                 return this.BuildInstanceProducerForMutableCollectionType(
                     serviceType,
-                    serviceType.GetElementType(),
-                    MutableCollectionType.Array);
+                    serviceType.GetElementType());
             }
             else if (typeof(List<>).IsGenericTypeDefinitionOf(serviceType))
             {
                 return this.BuildInstanceProducerForMutableCollectionType(
                     serviceType,
-                    serviceType.GetGenericArguments().FirstOrDefault(),
-                    MutableCollectionType.List);
+                    serviceType.GetGenericArguments().FirstOrDefault());
             }
             else
             {
@@ -554,7 +549,7 @@ namespace SimpleInjector
         }
 
         private InstanceProducer? BuildInstanceProducerForMutableCollectionType(
-            Type serviceType, Type elementType, MutableCollectionType type)
+            Type serviceType, Type elementType)
         {
             // We don't auto-register collections for ambiguous types.
             if (Types.IsAmbiguousOrValueType(elementType))
@@ -565,18 +560,16 @@ namespace SimpleInjector
             // GetAllInstances locks the container
             if (this.GetAllInstances(elementType) is IContainerControlledCollection)
             {
-                return this.BuildMutableCollectionProducerFromControlledCollection(
-                    serviceType, elementType, type);
+                return this.BuildMutableCollectionProducerFromControlledCollection(serviceType, elementType);
             }
             else
             {
-                return this.BuildMutableCollectionProducerFromUncontrolledCollection(
-                    serviceType, elementType);
+                return this.BuildMutableCollectionProducerFromUncontrolledCollection(serviceType, elementType);
             }
         }
 
         private InstanceProducer BuildMutableCollectionProducerFromControlledCollection(
-            Type serviceType, Type elementType, MutableCollectionType collectionType)
+            Type serviceType, Type elementType)
         {
             Expression expression =
                 this.BuildMutableCollectionExpressionFromControlledCollection(serviceType, elementType);
@@ -679,9 +672,7 @@ namespace SimpleInjector
 
             Type elementType = collectionType.GetGenericArguments()[0];
 
-            var stream = this.GetAllInstances(elementType) as IContainerControlledCollection;
-
-            if (stream == null)
+            if (!(this.GetAllInstances(elementType) is IContainerControlledCollection stream))
             {
                 return null;
             }
@@ -693,29 +684,27 @@ namespace SimpleInjector
             return producer;
         }
 
-        private InstanceProducer? TryBuildInstanceProducerForConcreteUnregisteredType<TConcrete>(
-            InjectionConsumerInfo context)
+        private InstanceProducer? TryBuildInstanceProducerForConcreteUnregisteredType<TConcrete>()
             where TConcrete : class
         {
             if (this.Options.ResolveUnregisteredConcreteTypes
                 && this.IsConcreteConstructableType(typeof(TConcrete)))
             {
-                Func<InstanceProducer> instanceProducerBuilder = () =>
+                InstanceProducer BuildInstanceProducer()
                 {
                     var registration = this.SelectionBasedLifestyle.CreateRegistration<TConcrete>(this);
 
                     return BuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), registration);
-                };
+                }
 
                 return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(
-                    typeof(TConcrete), instanceProducerBuilder);
+                    typeof(TConcrete), BuildInstanceProducer);
             }
 
             return null;
         }
 
-        private InstanceProducer? TryBuildInstanceProducerForConcreteUnregisteredType(
-            Type type, InjectionConsumerInfo context)
+        private InstanceProducer? TryBuildInstanceProducerForConcreteUnregisteredType(Type type)
         {
             if (!this.Options.ResolveUnregisteredConcreteTypes
                 || type.IsAbstract()
@@ -726,14 +715,14 @@ namespace SimpleInjector
                 return null;
             }
 
-            Func<InstanceProducer> instanceProducerBuilder = () =>
+            InstanceProducer BuildInstanceProducer()
             {
                 var registration = this.SelectionBasedLifestyle.CreateRegistration(type, this);
 
                 return BuildInstanceProducerForConcreteUnregisteredType(type, registration);
-            };
+            }
 
-            return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(type, instanceProducerBuilder);
+            return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(type, BuildInstanceProducer);
         }
 
         private InstanceProducer GetOrBuildInstanceProducerForConcreteUnregisteredType(
@@ -829,8 +818,8 @@ namespace SimpleInjector
                 type,
                 numberOfConditionals: this.GetNumberOfConditionalRegistrationsFor(type),
                 containerHasRegistrations: this.HasRegistrations,
-                containerHasRelatedOneToOneMapping: this.ContainsOneToOneRegistrationForCollection(type),
                 collectionRegistrationDoesNotExists: this.IsCollectionButNoOneToToOneRegistrationExists(type),
+                containerHasRelatedOneToOneMapping: this.ContainsOneToOneRegistrationForCollection(type),
                 containerHasRelatedCollectionMapping: this.ContainsCollectionRegistrationFor(type),
                 skippedDecorators: this.GetNonGenericDecoratorsSkippedDuringAutoRegistration(type),
                 lookalikes: this.GetLookalikesForMissingType(type)));
@@ -861,8 +850,8 @@ namespace SimpleInjector
 
             throw new ActivationException(
                 StringResources.ImplicitRegistrationCouldNotBeMadeForType(
-                    this, concreteType, this.HasRegistrations)
-                + " " + exceptionMessage);
+                    this, concreteType, this.HasRegistrations) +
+                    " " + exceptionMessage);
         }
     }
 }

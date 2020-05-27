@@ -13,7 +13,7 @@
 
         public static void EnableContextualDecoratorSupport(this ContainerOptions options)
         {
-            if (GetContextualPredicates(options.Container) == null)
+            if (GetContextualPredicates(options.Container) is null)
             {
                 var predicates = new ContextualPredicateCollection();
 
@@ -32,7 +32,7 @@
         {
             var predicates = GetContextualPredicates(container);
 
-            if (predicates == null)
+            if (predicates is null)
             {
                 throw new InvalidOperationException(
                     "Please call container.Options.EnableContextualDecoratorSupport() first.");

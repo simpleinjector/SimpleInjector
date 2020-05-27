@@ -29,7 +29,7 @@
         public ConstructorInfo TryGetConstructor(Type type, out string errorMessage)
         {
             var constructor = this.GetConstructors(type).FirstOrDefault();
-            errorMessage = constructor == null ? BuildExceptionMessage(type) : null;
+            errorMessage = constructor is null ? BuildExceptionMessage(type) : null;
             return constructor;
         }
 

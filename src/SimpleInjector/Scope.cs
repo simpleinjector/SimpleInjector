@@ -92,7 +92,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
 
-            if (this.Container == null)
+            if (this.Container is null)
             {
                 throw new InvalidOperationException(
                     "This method can only be called on Scope instances that are related to a Container. " +
@@ -143,12 +143,7 @@ namespace SimpleInjector
                 this.RequiresInstanceNotDisposed();
                 this.PreventCyclicDependenciesDuringDisposal();
 
-                if (this.scopeEndActions is null)
-                {
-                    this.scopeEndActions = new List<Action>();
-                }
-
-                this.scopeEndActions.Add(action);
+                (this.scopeEndActions ?? (this.scopeEndActions = new List<Action>())).Add(action);
             }
         }
 
@@ -476,9 +471,9 @@ namespace SimpleInjector
             {
                 this.RequiresInstanceNotDisposed();
 
-                bool cacheIsEmpty = this.cachedInstances == null;
+                bool cacheIsEmpty = this.cachedInstances is null;
 
-                if (this.cachedInstances == null)
+                if (this.cachedInstances is null)
                 {
                     this.cachedInstances =
                         new Dictionary<Registration, object>(ReferenceEqualityComparer<Registration>.Instance);
@@ -503,10 +498,10 @@ namespace SimpleInjector
 
             if (!registration.SuppressDisposal)
             {
-#if NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
-                if (instance is IDisposable || instance is IAsyncDisposable)
-#else
+#if NETSTANDARD1_0 || NETSTANDARD1_3 || NET45
                 if (instance is IDisposable)
+#else
+                if (instance is IDisposable || instance is IAsyncDisposable)
 #endif
                 {
                     this.RegisterForDisposalInternal(instance);

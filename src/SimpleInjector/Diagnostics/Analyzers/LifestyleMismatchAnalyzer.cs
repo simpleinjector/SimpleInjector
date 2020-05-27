@@ -26,7 +26,6 @@ namespace SimpleInjector.Diagnostics.Analyzers
         public string GetGroupDescription(IEnumerable<DiagnosticResult> results)
         {
             int count = results.Count();
-
             return $"{count} {MismatchPlural(count)}.";
         }
 

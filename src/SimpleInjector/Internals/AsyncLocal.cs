@@ -25,7 +25,7 @@ namespace System.Threading
             [SecuritySafeCritical]
             set
             {
-                var wrapper = value == null ? null : new AsyncScopeWrapper(value);
+                var wrapper = value is null ? null : new AsyncScopeWrapper(value);
 
                 CallContext.LogicalSetData(this.key, wrapper);
             }

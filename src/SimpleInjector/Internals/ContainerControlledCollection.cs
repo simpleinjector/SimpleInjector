@@ -11,7 +11,8 @@ namespace SimpleInjector.Internals
 
     // A decoratable enumerable is a collection that holds a set of Expression objects. When a decorator is
     // applied to a collection, a new DecoratableEnumerable will be created
-    internal class ContainerControlledCollection<TService> : IList<TService>,
+    internal class ContainerControlledCollection<TService>
+        : IList<TService>,
         IContainerControlledCollection, IReadOnlyList<TService>
     {
         private readonly Container container;
@@ -32,7 +33,7 @@ namespace SimpleInjector.Internals
                 new LazyEx<InstanceProducer[]>(() => this.lazyProducers.Select(p => p.Value).ToArray());
         }
 
-        // This constructor is not called; its meta data is used to build valid KnownRelationship types.
+        // This constructor is not called; its metadata is used to build valid KnownRelationship types.
         internal ContainerControlledCollection(TService services)
         {
             throw new NotSupportedException("This constructor is not intended to be called.");
@@ -48,17 +49,8 @@ namespace SimpleInjector.Internals
 
         public TService this[int index]
         {
-            get
-            {
-                var producer = this.producers.Value[index];
-
-                return GetInstance(producer);
-            }
-
-            set
-            {
-                throw GetNotSupportedBecauseReadOnlyException();
-            }
+            get => GetInstance(this.producers.Value[index]);
+            set => throw GetNotSupportedBecauseReadOnlyException();
         }
 
         // Throws an InvalidOperationException on failure.
@@ -207,14 +199,14 @@ namespace SimpleInjector.Internals
             // the creation of concrete type would 'pollute' the list of registrations, and might result
             // in two registrations (since below we need to create a new instance producer out of it),
             // and that might cause duplicate diagnostic warnings.
-            if (producer == null)
+            if (producer is null)
             {
                 producer = this.GetInstanceProducerThroughUnregisteredTypeResolution(implementationType);
             }
 
             // If that still hasn't resulted in a producer, we create a new producer and return (or throw
             // an exception in case the implementation type is not a concrete type).
-            if (producer == null)
+            if (producer is null)
             {
                 return this.CreateNewExternalProducer(item);
             }
@@ -237,7 +229,7 @@ namespace SimpleInjector.Internals
                 includeInvalidContainerRegisteredTypes: true,
                 includeExternalProducers: false);
 
-            return registrations.FirstOrDefault(p => p.ServiceType == implementationType);
+            return Array.Find(registrations, p => p.ServiceType == implementationType);
         }
 
         private InstanceProducer? GetInstanceProducerThroughUnregisteredTypeResolution(Type implementationType)

@@ -534,7 +534,7 @@ namespace SimpleInjector
             // descriptor when one instance is resolved. We will have to get this last one as well.
             ServiceDescriptor? descriptor = services.LastOrDefault(d => d.ServiceType == serviceType);
 
-            if (descriptor == null && serviceType.GetTypeInfo().IsGenericType)
+            if (descriptor is null && serviceType.GetTypeInfo().IsGenericType)
             {
                 // In case the registration is made as open-generic type, the previous query will return
                 // null, and we need to go find the last open generic registration for the service type.

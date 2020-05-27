@@ -22,7 +22,7 @@ namespace SimpleInjector.Integration.WebApi
 
             set
             {
-                var wrapper = value == null ? null : new HttpRequestMessageWrapper(value);
+                var wrapper = value is null ? null : new HttpRequestMessageWrapper(value);
 
                 CallContext.LogicalSetData(Key, wrapper);
             }

@@ -40,7 +40,7 @@
         {
             AutomaticParameterizedFactoriesHelper behavior = GetBehavior(container);
 
-            if (behavior == null)
+            if (behavior is null)
             {
                 throw new InvalidOperationException(
                     "Make sure you call container.Options.EnableAutomaticParameterizedFactories() first.");
@@ -71,7 +71,7 @@
             {
                 var behavior = GetBehavior(container);
 
-                if (behavior == null)
+                if (behavior is null)
                 {
                     throw new InvalidOperationException("This factory contains parameterized methods. Make " +
                         "sure you call container.Options.EnableAutomaticParameterizedFactories() first.");
@@ -228,7 +228,7 @@
             bool IDependencyInjectionBehavior.VerifyDependency(
                 InjectionConsumerInfo dependency, out string errorMessage)
             {
-                if (this.FindThreadLocal(dependency.Target) == null)
+                if (this.FindThreadLocal(dependency.Target) is null)
                 {
                     return this.originalBehavior.VerifyDependency(dependency, out errorMessage);
                 }

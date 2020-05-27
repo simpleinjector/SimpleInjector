@@ -171,7 +171,7 @@ namespace SimpleInjector.Internals
 
             while (results.TotalSize > container.Options.MaximumNumberOfNodesPerDelegate)
             {
-                reducedNodes = reducedNodes ?? new Dictionary<Expression, InvocationExpression>(16);
+                reducedNodes ??= new Dictionary<Expression, InvocationExpression>(16);
 
                 Expression? mostReductiveNode = FindMostReductiveNodeOrNull(results,
                     container.Options.MaximumNumberOfNodesPerDelegate);
@@ -230,13 +230,13 @@ namespace SimpleInjector.Internals
             // because replacing a leaf node will cause all its parents to be replaced, making it impossible
             // to detect duplicate reduced expressions (see the ReduceObjectGraphSize method). This makes it
             // much less likely to be able to reuse a compiled delegate.
-            int minimumSizeOfNode = 10;
+            const int MinimumSizeOfNode = 10;
 
             // Here we sort not only by total cost, but in case there are multiple nodes with the same total
             // cost, we prefer the node with the biggest size. This has the same reason as explained above.
             var nodesByTotalCost =
                 from info in results.Nodes
-                where info.TreeSize <= maximumSizeOfNode && info.TreeSize >= minimumSizeOfNode
+                where info.TreeSize <= maximumSizeOfNode && info.TreeSize >= MinimumSizeOfNode
                 orderby info.TotalCost descending, info.TreeSize descending
                 select info;
 
@@ -294,7 +294,8 @@ namespace SimpleInjector.Internals
                     ? instance.Value as Registration
                     : null;
 
-                if (registration != null && object.ReferenceEquals(registration.Container, this.container)
+                if (registration != null
+                    && object.ReferenceEquals(registration.Container, this.container)
                     && typeof(ScopedRegistration<>).IsGenericTypeDefinitionOf(registration.GetType()))
                 {
                     return registration;
@@ -306,7 +307,7 @@ namespace SimpleInjector.Internals
 
         private sealed class ObjectGraphOptimizerExpressionVisitor : ExpressionVisitor
         {
-            private OptimizableRegistrationInfo[] registrationsToOptimize;
+            private readonly OptimizableRegistrationInfo[] registrationsToOptimize;
 
             private ObjectGraphOptimizerExpressionVisitor(
                 OptimizableRegistrationInfo[] registrationsToOptimize)
@@ -314,8 +315,8 @@ namespace SimpleInjector.Internals
                 this.registrationsToOptimize = registrationsToOptimize;
             }
 
-            public static Expression Optimize(Expression expression,
-                OptimizableRegistrationInfo[] registrationsToOptimize)
+            public static Expression Optimize(
+                Expression expression, OptimizableRegistrationInfo[] registrationsToOptimize)
             {
                 var optimizer = new ObjectGraphOptimizerExpressionVisitor(registrationsToOptimize);
                 return optimizer.Visit(expression);
@@ -323,8 +324,7 @@ namespace SimpleInjector.Internals
 
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
-                var registration =
-                    this.registrationsToOptimize.FirstOrDefault(r => r.OriginalExpression == node);
+                var registration = Array.Find(this.registrationsToOptimize, r => r.OriginalExpression == node);
 
                 return registration != null
                     ? registration.LazyScopeRegistrationGetInstanceExpression
@@ -338,8 +338,8 @@ namespace SimpleInjector.Internals
             internal readonly ParameterExpression Variable;
             internal readonly IEnumerable<OptimizableRegistrationInfo> Registrations;
 
-            public OptimizableLifestyleInfo(ScopedLifestyle lifestyle,
-                IEnumerable<OptimizableRegistrationInfo> registrations)
+            public OptimizableLifestyleInfo(
+                ScopedLifestyle lifestyle, IEnumerable<OptimizableRegistrationInfo> registrations)
             {
                 this.Lifestyle = lifestyle;
                 this.Registrations = registrations.ToArray();
@@ -376,18 +376,8 @@ namespace SimpleInjector.Internals
                     .MakeGenericType(this.Registration.GetType().GetGenericArguments());
             }
 
-            internal ParameterExpression Variable
-            {
-                get
-                {
-                    if (this.variable == null)
-                    {
-                        this.variable = Expression.Variable(this.lazyScopeRegistrationType);
-                    }
-
-                    return this.variable;
-                }
-            }
+            internal ParameterExpression Variable =>
+                this.variable ??= Expression.Variable(this.lazyScopeRegistrationType);
 
             internal OptimizableLifestyleInfo? LifestyleInfo { get; set; }
 
@@ -399,10 +389,10 @@ namespace SimpleInjector.Internals
         }
 
         [DebuggerDisplay(
-            nameof(ExpressionInfo.TotalCost) + ": {" + nameof(ExpressionInfo.TotalCost) + "}, " +
-            nameof(ExpressionInfo.Count) + ": {" + nameof(ExpressionInfo.Count) + "}, " +
-            nameof(ExpressionInfo.TreeSize) + ": {" + nameof(ExpressionInfo.TreeSize) + "}, " +
-            nameof(ExpressionInfo.Node) + ": {" + nameof(ExpressionInfo.Node) + "}")]
+            nameof(TotalCost) + ": {" + nameof(TotalCost) + "}, " +
+            nameof(Count) + ": {" + nameof(Count) + "}, " +
+            nameof(TreeSize) + ": {" + nameof(TreeSize) + "}, " +
+            nameof(Node) + ": {" + nameof(Node) + "}")]
         private sealed class ExpressionInfo
         {
             public ExpressionInfo(Expression node) => this.Node = node;
@@ -468,9 +458,7 @@ namespace SimpleInjector.Internals
 
             private ExpressionInfo GetInfo(Expression node)
             {
-                ExpressionInfo info;
-
-                if (this.nodes.TryGetValue(node, out info))
+                if (this.nodes.TryGetValue(node, out ExpressionInfo info))
                 {
                     return info;
                 }
@@ -495,13 +483,10 @@ namespace SimpleInjector.Internals
             }
 
             public static Expression Replace(Expression expression, Expression oldNode, Expression newNode) =>
-                new NodeReplacer(oldNode: oldNode, newNode: newNode)
-                    .Visit(expression);
+                new NodeReplacer(oldNode: oldNode, newNode: newNode).Visit(expression);
 
             public override Expression Visit(Expression node) =>
-                object.ReferenceEquals(node, this.oldNode)
-                    ? this.newNode
-                    : base.Visit(node);
+                object.ReferenceEquals(node, this.oldNode) ? this.newNode : base.Visit(node);
         }
     }
 }

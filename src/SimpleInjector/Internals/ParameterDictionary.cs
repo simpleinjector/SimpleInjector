@@ -43,10 +43,9 @@ namespace SimpleInjector.Internals
             {
                 Requires.IsNotNull(obj, nameof(obj));
 
-                return
-                    (obj.Name ?? string.Empty).GetHashCode()
-                    ^ obj.ParameterType.GetHashCode()
-                    ^ GetHashCode(obj.Member);
+                return Helpers.CombineHashes(
+                    Helpers.Hash(obj.Name ?? string.Empty, obj.ParameterType),
+                    GetHashCode(obj.Member));
             }
 
             // Although there is a lock around the creation of MemberInfo's in the System.Type for the
@@ -57,6 +56,7 @@ namespace SimpleInjector.Internals
             private static bool Equals(MemberInfo x, MemberInfo y) =>
                 x.DeclaringType == y.DeclaringType && x.Name == y.Name;
 
+            // The previous comment also holds for getting the hash code of MemberInfo.
             private static int GetHashCode(MemberInfo obj) =>
                 obj.DeclaringType.GetHashCode() ^ obj.Name.GetHashCode();
         }

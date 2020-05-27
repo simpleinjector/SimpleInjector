@@ -14,7 +14,7 @@ namespace SimpleInjector.Diagnostics
     /// Diagnostic result that warns about a component that depends on (too) many services.
     /// For more information, see: https://simpleinjector.org/diasr.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(SingleResponsibilityViolationDiagnosticResult.DebuggerDisplay) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public class SingleResponsibilityViolationDiagnosticResult : DiagnosticResult
     {
         internal SingleResponsibilityViolationDiagnosticResult(

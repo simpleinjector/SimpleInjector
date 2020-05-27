@@ -12,7 +12,7 @@ namespace SimpleInjector.Diagnostics
     /// <see cref="IDisposable"/>.
     /// For more information, see: https://simpleinjector.org/diadt.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(DisposableTransientComponentDiagnosticResult.DebuggerDisplay) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public class DisposableTransientComponentDiagnosticResult : DiagnosticResult
     {
         internal DisposableTransientComponentDiagnosticResult(

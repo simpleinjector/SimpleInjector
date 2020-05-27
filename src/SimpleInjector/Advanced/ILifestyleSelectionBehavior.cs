@@ -18,7 +18,8 @@ namespace SimpleInjector.Advanced
         /// <summary>Selects the lifestyle based on the supplied type information.</summary>
         /// <param name="implementationType">Type of the implementation to that is registered.</param>
         /// <returns>The suited <see cref="Lifestyle"/> for the given type.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when either one of the arguments is a null reference.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when either one of the arguments is a null reference.
+        /// </exception>
         Lifestyle SelectLifestyle(Type implementationType);
     }
 }

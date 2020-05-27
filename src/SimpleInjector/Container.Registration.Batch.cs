@@ -536,26 +536,21 @@ namespace SimpleInjector
             Requires.IsNotNull(options, nameof(options));
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
 
-            return this.GetTypesToRegisterInternal(serviceType, assemblies, options);
+            return this.GetTypesToRegisterInternal(serviceType, assemblies, options).ToArray();
         }
 
-        private Type[] GetTypesToRegisterInternal(
-            Type serviceType, IEnumerable<Assembly> assemblies, TypesToRegisterOptions options)
-        {
-            var types =
-                from assembly in assemblies.Distinct()
-                where !assembly.IsDynamic
-                from type in GetTypesFromAssembly(assembly)
-                where Types.IsConcreteType(type)
-                where options.IncludeGenericTypeDefinitions || !type.IsGenericTypeDefinition()
-                where Types.ServiceIsAssignableFromImplementation(serviceType, type)
-                let ctor = this.SelectImplementationTypeConstructorOrNull(type)
-                where ctor == null || options.IncludeDecorators || !Types.IsDecorator(serviceType, ctor)
-                where ctor == null || options.IncludeComposites || !Types.IsComposite(serviceType, ctor)
-                select type;
-
-            return types.ToArray();
-        }
+        private IEnumerable<Type> GetTypesToRegisterInternal(
+            Type serviceType, IEnumerable<Assembly> assemblies, TypesToRegisterOptions options) =>
+            from assembly in assemblies.Distinct()
+            where !assembly.IsDynamic
+            from type in GetTypesFromAssembly(assembly)
+            where Types.IsConcreteType(type)
+            where options.IncludeGenericTypeDefinitions || !type.IsGenericTypeDefinition()
+            where Types.ServiceIsAssignableFromImplementation(serviceType, type)
+            let ctor = this.SelectImplementationTypeConstructorOrNull(type)
+            where ctor is null || options.IncludeDecorators || !Types.IsDecorator(serviceType, ctor)
+            where ctor is null || options.IncludeComposites || !Types.IsComposite(serviceType, ctor)
+            select type;
 
         private NonGenericTypesToRegisterForOneToOneMappingResults
             GetNonGenericTypesToRegisterForOneToOneMapping(
@@ -564,7 +559,7 @@ namespace SimpleInjector
             var options = new TypesToRegisterOptions { IncludeDecorators = true };
 
             Type[] typesIncludingDecorators =
-                this.GetTypesToRegisterInternal(openGenericServiceType, assemblies, options);
+                this.GetTypesToRegisterInternal(openGenericServiceType, assemblies, options).ToArray();
 
             var partitions =
                 typesIncludingDecorators.Partition(type => !this.IsDecorator(openGenericServiceType, type));

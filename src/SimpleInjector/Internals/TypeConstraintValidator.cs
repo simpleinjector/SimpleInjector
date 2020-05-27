@@ -12,10 +12,7 @@ namespace SimpleInjector.Internals
     /// </summary>
     internal sealed class TypeConstraintValidator
     {
-        public TypeConstraintValidator(ArgumentMapping mapping)
-        {
-            this.Mapping = mapping;
-        }
+        public TypeConstraintValidator(ArgumentMapping mapping) => this.Mapping = mapping;
 
         internal ArgumentMapping Mapping { get; }
 

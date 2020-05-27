@@ -17,7 +17,7 @@ namespace SimpleInjector.Diagnostics
             {
                 // Stack overflow prevention
                 throw new ArgumentException(
-                    "nesting level bigger than 100 too high. Type: " + type.ToFriendlyName(),
+                    $"nesting level bigger than 100. Type: {type.ToFriendlyName()}.",
                     nameof(nestingLevel));
             }
 

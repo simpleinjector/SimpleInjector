@@ -26,8 +26,8 @@ namespace SimpleInjector
     /// <see cref="Container.RegisterDecorator(Type, Type, Predicate{DecoratorPredicateContext})">RegisterDecorator</see>
     /// method for more information.
     /// </remarks>
-    [DebuggerDisplay(nameof(DecoratorPredicateContext) +
-        " ({" + nameof(DecoratorPredicateContext.DebuggerDisplay) + ", nq})")]
+    [DebuggerDisplay(
+        nameof(DecoratorPredicateContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
     public sealed class DecoratorPredicateContext : ApiObject
     {
         internal DecoratorPredicateContext(

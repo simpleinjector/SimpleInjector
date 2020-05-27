@@ -105,9 +105,7 @@ namespace SimpleInjector.Internals
         {
             lock (this.producerCache)
             {
-                InstanceProducer producer;
-
-                if (!this.producerCache.TryGetValue(closedServiceType, out producer))
+                if (!this.producerCache.TryGetValue(closedServiceType, out InstanceProducer producer))
                 {
                     this.producerCache[closedServiceType] =
                         producer = this.BuildCollectionProducer(closedServiceType);
@@ -117,10 +115,8 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private void RemoveRegistrationsToOverride(Type serviceType)
-        {
+        private void RemoveRegistrationsToOverride(Type serviceType) =>
             this.registrationGroups.RemoveAll(group => group.ServiceType == serviceType || group.Appended);
-        }
 
         private void CheckForOverlappingRegistrations(Type serviceType)
         {
@@ -164,8 +160,8 @@ namespace SimpleInjector.Internals
 
             internal bool Appended { get; }
 
-            internal static RegistrationGroup CreateForUncontrolledProducer(Type serviceType,
-                InstanceProducer producer) =>
+            internal static RegistrationGroup CreateForUncontrolledProducer(
+                Type serviceType, InstanceProducer producer) =>
                 new RegistrationGroup(serviceType, appended: false)
                 {
                     UncontrolledProducer = producer

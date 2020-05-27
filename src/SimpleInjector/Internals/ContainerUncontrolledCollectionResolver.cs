@@ -36,10 +36,8 @@ namespace SimpleInjector.Internals
             }
         }
 
-        internal override void RegisterUncontrolledCollection(Type serviceType, InstanceProducer producer)
-        {
+        internal override void RegisterUncontrolledCollection(Type serviceType, InstanceProducer producer) =>
             this.AddRegistrationGroup(RegistrationGroup.CreateForUncontrolledProducer(serviceType, producer));
-        }
 
         protected override InstanceProducer BuildCollectionProducer(Type closedServiceType)
         {
@@ -50,24 +48,17 @@ namespace SimpleInjector.Internals
                 : this.CombineProducersToOne(closedServiceType, producers);
         }
 
-        protected override Type[] GetAllKnownClosedServiceTypes()
-        {
-            var closedServiceTypes =
-                from registrationGroup in this.RegistrationGroups
-                select registrationGroup.ServiceType;
+        protected override Type[] GetAllKnownClosedServiceTypes() => (
+            from registrationGroup in this.RegistrationGroups
+            select registrationGroup.ServiceType)
+            .Distinct()
+            .ToArray();
 
-            return closedServiceTypes.Distinct().ToArray();
-        }
-
-        private InstanceProducer[] GetAssignableProducers(Type closedServiceType)
-        {
-            var producers =
-                from registrationGroup in this.RegistrationGroups
-                where closedServiceType.IsAssignableFrom(registrationGroup.ServiceType)
-                select registrationGroup.UncontrolledProducer;
-
-            return producers.ToArray();
-        }
+        private InstanceProducer[] GetAssignableProducers(Type closedServiceType) => (
+            from registrationGroup in this.RegistrationGroups
+            where closedServiceType.IsAssignableFrom(registrationGroup.ServiceType)
+            select registrationGroup.UncontrolledProducer)
+            .ToArray();
 
         private InstanceProducer CombineProducersToOne(Type closedServiceType, InstanceProducer[] producers)
         {

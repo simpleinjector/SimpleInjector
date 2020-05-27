@@ -55,7 +55,8 @@ namespace SimpleInjector.Lifestyles
         /// <see cref="Scope"/> instance gets disposed and when the created object implements
         /// <see cref="IDisposable"/>.
         /// </summary>
-        public ThreadScopedLifestyle() : base("Thread Scoped")
+        public ThreadScopedLifestyle()
+            : base("Thread Scoped")
         {
         }
 

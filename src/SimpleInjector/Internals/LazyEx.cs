@@ -9,7 +9,7 @@ namespace SimpleInjector.Internals
     // This class replaces the .NET's default Lazy<T> implementation. The behavior of the
     // ExecutionAndPublication mode of the default implementation is unsuited for use inside Simple Injector
     // because it will ensure that the factory is called just once, which means it caches any thrown exception.
-    // That behavior is problematic because it can cause corruption of Simple Injector; for instance when, a
+    // That behavior is problematic because it can cause corruption of Simple Injector; for instance when a
     // ThreadAbortException is thrown during the execution of the factory. See: #731.
     // This implementation behaves different to Lazy<T> in the following respects:
     // * It only supports reference types
@@ -57,9 +57,8 @@ namespace SimpleInjector.Internals
 
         private T InitializeAndReturn()
         {
-            // NOTE: Locking on 'this' is typically not adviced, but this type is internal, which
-            // means the risk is minimal. Locking on 'this' allows us to safe some bytes for the extra
-            // lock object.
+            // NOTE: Locking on 'this' is typically not adviced, but this type is internal, which means the
+            // risk is minimal. Locking on 'this' allows us to safe some bytes for the extra lock object.
             // OPTIMIZATION: Because this is a very common code path, and very regularly part of a
             // user's stack trace, this code is inlined here to make the call stack shorter and more
             // readable (for user's and maintainers).
@@ -74,8 +73,7 @@ namespace SimpleInjector.Internals
                         throw new InvalidOperationException("The valueFactory produced null.");
                     }
 
-                    // We don't need the factory any longer. It might now be eligible for garbage
-                    // collection.
+                    // We don't need the factory any longer. It might now be eligible for garbage collection.
                     this.factory = null;
                 }
 

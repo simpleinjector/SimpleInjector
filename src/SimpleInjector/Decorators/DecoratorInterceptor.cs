@@ -38,7 +38,6 @@ namespace SimpleInjector.Decorators
         internal void ExpressionBuilt(object sender, ExpressionBuiltEventArgs e)
         {
             this.TryToApplyDecorator(e);
-
             this.TryToApplyDecoratorOnContainerUncontrolledCollections(e);
         }
 
@@ -172,7 +171,7 @@ namespace SimpleInjector.Decorators
 
                 var results = builder.BuildClosedGenericImplementation();
 
-                // decoratorType == null when type constraints don't match.
+                // decoratorType is null when type constraints don't match.
                 if (results.ClosedServiceTypeSatisfiesAllTypeConstraints)
                 {
                     Requires.HasFactoryCreatedDecorator(

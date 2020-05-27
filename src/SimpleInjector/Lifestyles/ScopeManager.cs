@@ -69,7 +69,7 @@ namespace SimpleInjector.Lifestyles
             Scope? scope = this.CurrentScopeInternal;
 
             // When the current scope is disposed, make the parent scope the current.
-            while (scope != null && scope.Disposed)
+            while (scope?.Disposed == true)
             {
                 this.CurrentScopeInternal = scope = scope.ParentScope;
             }

@@ -57,7 +57,8 @@ namespace SimpleInjector
         /// is a null reference.</exception>
         [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly",
             Justification = "TService is the name of the generic type argument. So this warning is a false positive.")]
-        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
+        [Obsolete(
+            "Please use Container." + nameof(Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
             error: true)]
@@ -85,7 +86,7 @@ namespace SimpleInjector
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
         [Obsolete(
-            "Please use Container." + nameof(Container.Collection) + "." +
+            "Please use Container." + nameof(Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
             error: true)]
@@ -112,7 +113,8 @@ namespace SimpleInjector
         /// element or when <typeparamref name="TService"/> is not assignable from any of the
         /// service types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
-        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
+        [Obsolete(
+            "Please use Container." + nameof(Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
             error: true)]
@@ -140,7 +142,8 @@ namespace SimpleInjector
         /// element, a generic type definition, or the <paramref name="serviceType"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
+        [Obsolete(
+            "Please use Container." + nameof(Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
             error: true)]
@@ -168,7 +171,8 @@ namespace SimpleInjector
         /// element or when <paramref name="serviceType"/> is not assignable from any of the
         /// service types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
-        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
+        [Obsolete(
+            "Please use Container." + nameof(Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
             error: true)]
@@ -190,7 +194,8 @@ namespace SimpleInjector
         /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
-        [Obsolete("Please use Container." + nameof(Container.Collection) + "." +
+        [Obsolete(
+            "Please use Container." + nameof(Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
             error: true)]

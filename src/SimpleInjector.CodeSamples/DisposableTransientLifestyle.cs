@@ -96,7 +96,7 @@
             public ScopedLifestyle ScopedLifestyle { get; }
 
             public override Expression BuildExpression() =>
-                this.instanceCreator == null
+                this.instanceCreator is null
                     ? this.BuildTransientExpression()
                     : this.BuildTransientExpression(this.instanceCreator);
         }

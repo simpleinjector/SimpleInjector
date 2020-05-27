@@ -6,7 +6,6 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Globalization;
     using System.Linq;
 
     /// <summary>
@@ -75,12 +74,7 @@ namespace SimpleInjector.Internals
         {
             var openGenericBaseType = this.closedServiceType.GetGenericTypeDefinition();
 
-            var openGenericBaseTypes = (
-                from baseType in this.openGenericImplementation.GetTypeBaseTypesAndInterfaces()
-                where openGenericBaseType.IsGenericTypeDefinitionOf(baseType)
-                select baseType)
-                .Distinct()
-                .ToArray();
+            var openGenericBaseTypes = this.GetOpenGenericBaseTypes(openGenericBaseType);
 
             return openGenericBaseTypes.Any(type =>
             {
@@ -94,6 +88,13 @@ namespace SimpleInjector.Internals
                 return unmappedArguments.All(argument => !argument.IsGenericParameter);
             });
         }
+
+        private Type[] GetOpenGenericBaseTypes(Type openGenericBaseType) => (
+            from baseType in this.openGenericImplementation.GetTypeBaseTypesAndInterfaces()
+            where openGenericBaseType.IsGenericTypeDefinitionOf(baseType)
+            select baseType)
+            .Distinct()
+            .ToArray();
 
         internal BuildResult BuildClosedGenericImplementation()
         {
@@ -287,7 +288,8 @@ namespace SimpleInjector.Internals
                 this.ClosedGenericImplementation = closedGenericImplementation;
             }
 
-            internal bool ClosedServiceTypeSatisfiesAllTypeConstraints => this.ClosedGenericImplementation != null;
+            internal bool ClosedServiceTypeSatisfiesAllTypeConstraints =>
+                this.ClosedGenericImplementation != null;
 
             internal Type? ClosedGenericImplementation { get; }
 
@@ -312,14 +314,14 @@ namespace SimpleInjector.Internals
             }
 
 #if DEBUG
-            public override string ToString()
-            {
-                // This is for our own debugging purposes. We don't use the DebuggerDisplayAttribute, since
-                // this code is hard to write (and maintain) as debugger display string.
-                return string.Format(CultureInfo.InvariantCulture, "ServiceType: {0}, Arguments: {1}",
+            // This is for our own debugging purposes. We don't use the DebuggerDisplayAttribute, because
+            // this code is hard to write (and maintain) as debugger display string.
+            public override string ToString() =>
+                string.Format(
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    "ServiceType: {0}, Arguments: {1}",
                     this.ServiceType.ToFriendlyName(),
                     this.Arguments.Select(type => type.ToFriendlyName()).ToCommaSeparatedText());
-            }
 #endif
         }
     }

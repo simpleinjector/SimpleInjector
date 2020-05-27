@@ -119,7 +119,7 @@ namespace SimpleInjector
             Requires.ServiceIsAssignableFromImplementation(
                 this.ImplementationType, instance.GetType(), nameof(instance));
 
-            if (this.instanceInitializer == null)
+            if (this.instanceInitializer is null)
             {
                 this.instanceInitializer = this.BuildInstanceInitializer();
             }
@@ -142,7 +142,7 @@ namespace SimpleInjector
             Requires.IsValidEnum(type, nameof(type));
             Requires.IsNotNullOrEmpty(justification, nameof(justification));
 
-            if (this.suppressions == null)
+            if (this.suppressions is null)
             {
                 this.suppressions = new HashSet<DiagnosticType>();
             }
@@ -150,8 +150,7 @@ namespace SimpleInjector
             this.suppressions.Add(type);
         }
 
-        internal bool ShouldNotBeSuppressed(DiagnosticType type) =>
-            this.suppressions == null || !this.suppressions.Contains(type);
+        internal bool ShouldNotBeSuppressed(DiagnosticType type) => this.suppressions?.Contains(type) != true;
 
         internal virtual KnownRelationship[] GetRelationshipsCore()
         {
@@ -417,7 +416,7 @@ namespace SimpleInjector
                 Expression expression = this.GetPlaceHolderFor(parameter);
                 InstanceProducer? producer = null;
 
-                if (expression == null)
+                if (expression is null)
                 {
                     producer = this.Container.Options.GetInstanceProducerFor(consumer);
                     expression = producer.BuildExpression();
@@ -493,17 +492,15 @@ namespace SimpleInjector
 
         private OverriddenParameter GetOverriddenParameterFor(ParameterInfo parameter)
         {
-            if (this.overriddenParameters != null)
+            if (this.overriddenParameters != null
+                && this.overriddenParameters.TryGetValue(parameter, out OverriddenParameter p))
             {
-                OverriddenParameter overriddenParameter;
-
-                if (this.overriddenParameters.TryGetValue(parameter, out overriddenParameter))
-                {
-                    return overriddenParameter;
-                }
+                return p;
             }
-
-            return default(OverriddenParameter);
+            else
+            {
+                return default;
+            }
         }
 
         private void AddRelationships(
@@ -562,16 +559,9 @@ namespace SimpleInjector
             }
         }
 
-        private static TService ThrowWhenNull<TService>(TService instance)
-            where TService : class
-        {
-            if (instance == null)
-            {
-                throw new ActivationException(StringResources.DelegateForTypeReturnedNull(typeof(TService)));
-            }
-
-            return instance;
-        }
+        private static T ThrowWhenNull<T>(T instance)
+            where T : class =>
+            instance ?? throw new ActivationException(StringResources.DelegateForTypeReturnedNull(typeof(T)));
 
         private struct DependencyData
         {

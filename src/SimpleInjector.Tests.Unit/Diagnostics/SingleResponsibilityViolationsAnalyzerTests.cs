@@ -83,7 +83,7 @@
             Assert.AreEqual("No warnings detected.", results.Description,
                 "The registration is considered to be valid, since both the type and decorator do not " +
                 "exceed the maximum number of dependencies. Message: {0}",
-                results == null ? null : results.Items().FirstOrDefault());
+                results is null ? null : results.Items().FirstOrDefault());
         }
 
         [TestMethod]

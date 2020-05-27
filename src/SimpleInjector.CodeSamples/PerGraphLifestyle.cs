@@ -14,7 +14,7 @@
 
         public static void EnableFor(Container container)
         {
-            if (container.ContainerScope.GetItem(Key) == null)
+            if (container.ContainerScope.GetItem(Key) is null)
             {
                 var localScope = new ThreadLocal<Scope>();
                 container.ContainerScope.SetItem(Key, localScope);

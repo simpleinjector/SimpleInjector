@@ -11,10 +11,7 @@ namespace SimpleInjector.Advanced
     {
         private readonly Container container;
 
-        internal DefaultDependencyInjectionBehavior(Container container)
-        {
-            this.container = container;
-        }
+        internal DefaultDependencyInjectionBehavior(Container container) => this.container = container;
 
         public bool VerifyDependency(InjectionConsumerInfo dependency, out string? errorMessage)
         {
@@ -37,7 +34,7 @@ namespace SimpleInjector.Advanced
             InstanceProducer? producer =
                 this.container.GetRegistrationEvenIfInvalid(target.TargetType, dependency);
 
-            if (producer == null && throwOnFailure)
+            if (producer is null && throwOnFailure)
             {
                 // By redirecting to Verify() we let the verify throw an expressive exception. If it doesn't
                 // we throw the exception ourselves.

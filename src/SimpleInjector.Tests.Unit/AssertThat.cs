@@ -105,7 +105,7 @@
 
         public static string TrimInside(this string value)
         {
-            if (value == null)
+            if (value is null)
             {
                 return value;
             }
@@ -176,7 +176,7 @@
 
         public static void StringContains(string expectedMessage, string actualMessage, string assertMessage)
         {
-            if (expectedMessage == null)
+            if (expectedMessage is null)
             {
                 return;
             }
@@ -193,7 +193,7 @@
         {
             Assert.IsNotNull(actualException, "actualException should not be null.");
 
-            if (expectedMessage == null)
+            if (expectedMessage is null)
             {
                 return;
             }
@@ -225,7 +225,7 @@
         {
             Assert.IsNotNull(actualException, "actualException should not be null.");
 
-            if (messageNotToBeExpected == null)
+            if (messageNotToBeExpected is null)
             {
                 return;
             }

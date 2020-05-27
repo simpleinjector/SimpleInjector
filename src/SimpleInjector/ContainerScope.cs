@@ -20,10 +20,7 @@ namespace SimpleInjector
     {
         private readonly Scope scope;
 
-        internal ContainerScope(Container container)
-        {
-            this.scope = new Scope(container);
-        }
+        internal ContainerScope(Container container) => this.scope = new Scope(container);
 
         /// <summary>
         /// Allows registering an <paramref name="action"/> delegate that will be called when the container

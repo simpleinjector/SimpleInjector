@@ -11,7 +11,6 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Threading;
     using SimpleInjector.Internals;
 
     /// <summary>
@@ -47,15 +46,15 @@ namespace SimpleInjector
         {
             var names = values.ToArray();
 
-            switch (names.Length)
+            return names.Length switch
             {
-                case 0: return string.Empty;
-                case 1: return names[0];
-                case 2: return names[0] + " and " + names[1];
-                default:
-                    // For three names or more, we use the Oxford comma.
-                    return string.Join(", ", names.Take(names.Length - 1)) + ", and " + names.Last();
-            }
+                0 => string.Empty,
+                1 => names[0],
+                2 => names[0] + " and " + names[1],
+
+                // For three names or more, we use the Oxford comma.
+                _ => string.Join(", ", names.Take(names.Length - 1)) + ", and " + names.Last(),
+            };
         }
 
         // This makes the collection immutable for the consumer. The creator might still be able to change
@@ -107,7 +106,7 @@ namespace SimpleInjector
             ThrowWhenCollectionCanNotBeIterated(
                 collection,
                 serviceType,
-                item => collectionContainsNullElements |= item == null);
+                item => collectionContainsNullElements |= item is null);
 
             ThrowWhenCollectionContainsNullElements(serviceType, collectionContainsNullElements);
         }
@@ -227,7 +226,7 @@ namespace SimpleInjector
             }
         }
 
-        // .NET 4.6 adds System.Array.Empty<T>, but we don't have that yet in .NET 4.0 and 4.5.
+        // .NET 4.6 adds System.Array.Empty<T>, but we don't have that yet in .NET 4.5.
         internal static class Array<T>
         {
             internal static readonly T[] Empty = new T[0];

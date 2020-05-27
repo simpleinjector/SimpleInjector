@@ -92,7 +92,7 @@
 
             var suitableParameters = (
                 from param in parametersForType
-                where (param.Parameter.Name == null && param.Parameter.Type == parameter.ParameterType) ||
+                where (param.Parameter.Name is null && param.Parameter.Type == parameter.ParameterType) ||
                     param.Parameter.Name == parameter.Name
                 select param.Parameter)
                 .ToArray();

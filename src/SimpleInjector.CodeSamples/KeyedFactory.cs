@@ -46,7 +46,7 @@
         {
             get
             {
-                if (this.instances == null)
+                if (this.instances is null)
                 {
                     this.instances = (IList<TService>)this.container.GetAllInstances<TService>();
                 }
@@ -144,7 +144,7 @@
 
             foreach (var tuple in implementations)
             {
-                if (tuple.Item3 == null)
+                if (tuple.Item3 is null)
                 {
                     this.container.Register(tuple.Item2, tuple.Item2);
                 }

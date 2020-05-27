@@ -520,32 +520,19 @@ namespace SimpleInjector
             }
         }
 
-        private void ThrowContainerDisposedException()
-        {
+        private void ThrowContainerDisposedException() =>
             throw new ObjectDisposedException(
                 objectName: null,
                 message: StringResources.ContainerCanNotBeUsedAfterDisposal(
                     this.GetType(), this.stackTraceThatDisposedTheContainer));
-        }
 
-        private static object ThrowWhenResolveInterceptorReturnsNull(object? instance)
-        {
-            if (instance is null)
-            {
-                throw new ActivationException(StringResources.ResolveInterceptorDelegateReturnedNull());
-            }
+        private static object ThrowWhenResolveInterceptorReturnsNull(object? instance) =>
+            instance ?? throw new ActivationException(StringResources.ResolveInterceptorDelegateReturnedNull());
 
-            return instance;
-        }
-
-        private ResolveInterceptor[] GetResolveInterceptorsFor(InitializationContext context)
-        {
-            return (
-                from resolveInterceptor in this.resolveInterceptors
-                where resolveInterceptor.Predicate(context)
-                select resolveInterceptor.Interceptor)
-                .ToArray();
-        }
+        private IEnumerable<ResolveInterceptor> GetResolveInterceptorsFor(InitializationContext context) =>
+            from resolveInterceptor in this.resolveInterceptors
+            where resolveInterceptor.Predicate(context)
+            select resolveInterceptor.Interceptor;
 
         private Action<T>[] GetInstanceInitializersFor<T>(Type type, Registration registration)
         {
@@ -616,13 +603,10 @@ namespace SimpleInjector
         // Instead of using the this.registrations instance, this method takes a snapshot. This allows the
         // container to be thread-safe, without using locks.
         private InstanceProducer? GetInstanceProducerForType(
-            Type serviceType, InjectionConsumerInfo consumer, Func<InstanceProducer?> buildInstanceProducer)
-        {
-            return
-                this.GetExplicitlyRegisteredInstanceProducer(serviceType, consumer)
-                ?? this.TryGetInstanceProducerForRegisteredCollection(serviceType)
-                ?? buildInstanceProducer();
-        }
+            Type serviceType, InjectionConsumerInfo consumer, Func<InstanceProducer?> buildInstanceProducer) =>
+            this.GetExplicitlyRegisteredInstanceProducer(serviceType, consumer)
+            ?? this.TryGetInstanceProducerForRegisteredCollection(serviceType)
+            ?? buildInstanceProducer();
 
         private InstanceProducer? GetExplicitlyRegisteredInstanceProducer(
             Type serviceType, InjectionConsumerInfo consumer) =>
@@ -652,10 +636,8 @@ namespace SimpleInjector
             return entry;
         }
 
-        private IRegistrationEntry? GetRegistrationalEntryOrNull(Type serviceType)
-        {
-            return this.explicitRegistrations.GetValueOrDefault(GetRegistrationKey(serviceType));
-        }
+        private IRegistrationEntry? GetRegistrationalEntryOrNull(Type serviceType) =>
+            this.explicitRegistrations.GetValueOrDefault(GetRegistrationKey(serviceType));
 
         private static Type GetRegistrationKey(Type serviceType) =>
             serviceType.IsGenericType()
@@ -679,7 +661,7 @@ namespace SimpleInjector
             this.GetLookalikesForMissingNonGenericType(missingServiceType)
                 .Concat(this.GetLookalikesForMissingGenericTypeDefinitions(missingServiceType))
                 .ToArray();
-        
+
         // A lookalike type is a registered type that shares the same type name (where casing is ignored
         // and the parent type name of a nested type is included) as the missing type. Nested types are
         // mostly excluded from this list, because it would be quite common for developers to have lots
@@ -753,21 +735,15 @@ namespace SimpleInjector
                 this.instanceInitializer = instanceInitializer;
             }
 
-            public bool AppliesTo(Type implementationType, InitializerContext context)
-            {
-                var typeHierarchy = Types.GetTypeHierarchyFor(implementationType);
-
-                return typeHierarchy.Contains(this.serviceType);
-            }
+            public bool AppliesTo(Type implementationType, InitializerContext context) =>
+                Types.GetTypeHierarchyFor(implementationType).Contains(this.serviceType);
 
             public Action<T> CreateAction<T>(InitializerContext context) =>
                 Helpers.CreateAction<T>(this.instanceInitializer);
 
             internal static IInstanceInitializer Create<TImplementation>(Action<TImplementation> initializer)
             {
-                return new TypedInstanceInitializer(
-                    serviceType: typeof(TImplementation),
-                    instanceInitializer: initializer);
+                return new TypedInstanceInitializer(typeof(TImplementation), initializer);
             }
         }
 

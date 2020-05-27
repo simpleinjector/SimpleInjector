@@ -22,7 +22,8 @@ namespace SimpleInjector.Advanced
         /// <param name="implementationType">Type of the implementation to find a suitable constructor for.</param>
         /// <param name="errorMessage">The reason why the resolution failed.</param>
         /// <returns>The <see cref="ConstructorInfo"/> or null.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="implementationType"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="implementationType"/> is null.
+        /// </exception>
         ConstructorInfo? TryGetConstructor(Type implementationType, out string? errorMessage);
     }
 }

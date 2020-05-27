@@ -6,7 +6,6 @@ namespace SimpleInjector
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -103,7 +102,7 @@ namespace SimpleInjector
             if (!type.IsGenericType())
             {
                 string message = StringResources.SuppliedTypeIsNotAGenericType(type) +
-                    (guidance == null ? string.Empty : (" " + guidance(type)));
+                    (guidance is null ? string.Empty : (" " + guidance(type)));
 
                 throw new ArgumentException(message, paramName);
             }
@@ -118,7 +117,7 @@ namespace SimpleInjector
             if (!type.ContainsGenericParameters())
             {
                 string message = StringResources.SuppliedTypeIsNotAnOpenGenericType(type) +
-                    (guidance == null ? string.Empty : (" " + guidance(type)));
+                    (guidance is null ? string.Empty : (" " + guidance(type)));
 
                 throw new ArgumentException(message, paramName);
             }
@@ -127,7 +126,7 @@ namespace SimpleInjector
         internal static void DoesNotContainNullValues<T>(IEnumerable<T?> collection, string paramName)
             where T : class
         {
-            if (collection != null && collection.Contains(null))
+            if (collection?.Contains(null) == true)
             {
                 throw new ArgumentException("The collection contains null elements.", paramName);
             }
@@ -311,7 +310,7 @@ namespace SimpleInjector
         {
             ConstructorInfo decoratorConstructor = container.Options.SelectConstructor(decoratorType);
 
-            Requires.DecoratesServiceType(serviceType, decoratorConstructor, paramName);
+            DecoratesServiceType(serviceType, decoratorConstructor, paramName);
         }
 
         internal static void AreRegistrationsForThisContainer(

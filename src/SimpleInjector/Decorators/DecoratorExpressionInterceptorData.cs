@@ -18,7 +18,7 @@ namespace SimpleInjector.Decorators
             this.Container = container;
             this.ServiceType = serviceType;
             this.DecoratorType = decoratorType;
-            this.DecoratorTypeFactory = factory == null ? null : this.WrapInNullProtector(factory);
+            this.DecoratorTypeFactory = factory is null ? null : this.WrapInNullProtector(factory);
             this.Predicate = predicate;
             this.Lifestyle = lifestyle;
         }
@@ -42,7 +42,7 @@ namespace SimpleInjector.Decorators
             {
                 Type type = decoratorTypeFactory(context);
 
-                if (type == null)
+                if (type is null)
                 {
                     throw new InvalidOperationException(
                         StringResources.DecoratorFactoryReturnedNull(this.ServiceType));

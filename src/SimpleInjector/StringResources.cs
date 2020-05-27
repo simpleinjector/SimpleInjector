@@ -43,7 +43,7 @@ namespace SimpleInjector
                 nameof(Container.Verify),
                 nameof(Container.GetRegistration));
 
-            if (stackTrace == null)
+            if (stackTrace is null)
             {
                 return message;
             }
@@ -60,7 +60,7 @@ namespace SimpleInjector
                 Environment.NewLine,
                 type.FullName);
 
-            if (stackTrace == null)
+            if (stackTrace is null)
             {
                 return message;
             }
@@ -134,7 +134,7 @@ namespace SimpleInjector
                 CallingPredicateContextConsumerOnDirectResolveExample(context));
 
         private static string CallingPredicateContextConsumerOnDirectResolveExample(PredicateContext context) =>
-            context.ImplementationType == null
+            context.ImplementationType is null
                 ? string.Empty
                 : Format(
                     ", e.g. container.RegisterConditional(typeof({0}), typeof({1}), " +

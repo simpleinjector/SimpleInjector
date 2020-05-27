@@ -152,27 +152,23 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private IEnumerable<InstanceProducer> GetOverlappingProducers(InstanceProducer producerToRegister)
-        {
-            return
-                from producer in this.CurrentProducers
-                where producer.FinalImplementationType != null
-                where !producer.Registration.WrapsInstanceCreationDelegate
-                where !producerToRegister.Registration.WrapsInstanceCreationDelegate
-                where producer.FinalImplementationType == producerToRegister.FinalImplementationType
-                select producer;
-        }
+        private IEnumerable<InstanceProducer> GetOverlappingProducers(InstanceProducer producerToRegister) =>
+            from producer in this.CurrentProducers
+            where producer.FinalImplementationType != null
+            where !producer.Registration.WrapsInstanceCreationDelegate
+            where !producerToRegister.Registration.WrapsInstanceCreationDelegate
+            where producer.FinalImplementationType == producerToRegister.FinalImplementationType
+            select producer;
 
-        private ActivationException ThrowMultipleApplicableRegistrationsFound(
-            InstanceProducer[] instanceProducers)
+        private ActivationException ThrowMultipleApplicableRegistrationsFound( InstanceProducer[] producers)
         {
-            var producersInfo =
-                from producer in instanceProducers
+            var producerInfos =
+                from producer in producers
                 select Tuple.Create(this.nonGenericServiceType, producer.Registration.ImplementationType, producer);
 
             return new ActivationException(
                 StringResources.MultipleApplicableRegistrationsFound(
-                    this.nonGenericServiceType, producersInfo.ToArray()));
+                    this.nonGenericServiceType, producerInfos.ToArray()));
         }
 
         private void ThrowWhenConditionalAndUnconditionalAreMixed(InstanceProducer producer)
@@ -216,10 +212,7 @@ namespace SimpleInjector.Internals
         {
             private readonly InstanceProducer producer;
 
-            public SingleInstanceProducerProvider(InstanceProducer producer)
-            {
-                this.producer = producer;
-            }
+            public SingleInstanceProducerProvider(InstanceProducer producer) => this.producer = producer;
 
             public IEnumerable<InstanceProducer> CurrentProducers => Enumerable.Repeat(this.producer, 1);
 
@@ -267,11 +260,10 @@ namespace SimpleInjector.Internals
 
             public InstanceProducer? TryGetProducer(InjectionConsumerInfo consumer, bool handled)
             {
-                Func<Type> implementationTypeProvider =
-                    () => this.GetImplementationTypeThroughFactory(consumer);
+                Type GetImplementationType() => this.GetImplementationTypeThroughFactory(consumer);
 
                 var context =
-                    new PredicateContext(this.serviceType, implementationTypeProvider, consumer, handled);
+                    new PredicateContext(this.serviceType, GetImplementationType, consumer, handled);
 
                 // NOTE: The producer should only get built after it matches the delegate, to prevent
                 // unneeded producers from being created, because this might cause diagnostic warnings,
@@ -285,7 +277,7 @@ namespace SimpleInjector.Internals
 
                 Type implementationType = this.implementationTypeFactory(context);
 
-                if (implementationType == null)
+                if (implementationType is null)
                 {
                     throw new InvalidOperationException(
                         StringResources.FactoryReturnedNull(this.serviceType));

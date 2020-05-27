@@ -5,10 +5,7 @@ namespace SimpleInjector.Internals
 {
     internal class ServiceCreatedListenerArgs
     {
-        public ServiceCreatedListenerArgs(InstanceProducer producer)
-        {
-            this.Producer = producer;
-        }
+        public ServiceCreatedListenerArgs(InstanceProducer producer) => this.Producer = producer;
 
         public bool Handled { get; set; }
         public InstanceProducer Producer { get; }

@@ -11,10 +11,7 @@ namespace SimpleInjector.Diagnostics
     {
         private readonly IContainerAnalyzer analyzer;
 
-        internal DiagnosticResultGrouper(IContainerAnalyzer analyzer)
-        {
-            this.analyzer = analyzer;
-        }
+        internal DiagnosticResultGrouper(IContainerAnalyzer analyzer) => this.analyzer = analyzer;
 
         internal static DiagnosticGroup Group(IContainerAnalyzer analyzer, DiagnosticResult[] results) =>
             new DiagnosticResultGrouper(analyzer).Group(results);

@@ -11,8 +11,8 @@ namespace SimpleInjector.Advanced
     /// Contains data that can be used to initialize a created instance. This data includes the actual
     /// created <see cref="Instance"/> and the <see cref="Context"/> information about the created instance.
     /// </summary>
-    [DebuggerDisplay(nameof(InstanceInitializationData) +
-        " ({" + nameof(InstanceInitializationData.DebuggerDisplay) + ", nq})")]
+    [DebuggerDisplay(
+        nameof(InstanceInitializationData) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
     public struct InstanceInitializationData : IEquatable<InstanceInitializationData>
     {
         /// <summary>Initializes a new instance of the <see cref="InstanceInitializationData"/> struct.</summary>
@@ -48,13 +48,14 @@ namespace SimpleInjector.Advanced
         public override int GetHashCode() => Helpers.Hash(this.Context, this.Instance);
 
         /// <inheritdoc />
-        public override bool Equals(object obj) => obj is InstanceInitializationData other && this.Equals(other);
+        public override bool Equals(object obj) => obj is InstanceInitializationData d && this.Equals(d);
 
         /// <inheritdoc />
         public bool Equals(InstanceInitializationData other) => this == other;
 
         /// <summary>
-        /// Indicates whether the values of two specified <see cref="InstanceInitializationData"/> objects are equal.
+        /// Indicates whether the values of two specified <see cref="InstanceInitializationData"/> objects are
+        /// equal.
         /// </summary>
         /// <param name="first">The first object to compare.</param>
         /// <param name="second">The second object to compare.</param>

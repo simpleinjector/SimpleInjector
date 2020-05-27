@@ -264,7 +264,8 @@ namespace SimpleInjector
         /// Transient.
         /// </para>
         /// </example>
-        public static ScopedLifestyle CreateHybrid(ScopedLifestyle defaultLifestyle, ScopedLifestyle fallbackLifestyle)
+        public static ScopedLifestyle CreateHybrid(
+            ScopedLifestyle defaultLifestyle, ScopedLifestyle fallbackLifestyle)
         {
             Requires.IsNotNull(defaultLifestyle, nameof(defaultLifestyle));
             Requires.IsNotNull(fallbackLifestyle, nameof(fallbackLifestyle));
@@ -467,8 +468,8 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="container"/> is a null
         /// reference.</exception>
         public InstanceProducer<TService> CreateProducer<TService, TImplementation>(Container container)
-            where TImplementation : class, TService
             where TService : class
+            where TImplementation : class, TService
         {
             return new InstanceProducer<TService>(this.CreateRegistration<TImplementation>(container));
         }
@@ -742,7 +743,7 @@ namespace SimpleInjector
 
                 var registration = (Registration)weakRegistration.Target;
 
-                if (registration == null)
+                if (registration is null)
                 {
                     registration = this.CreateRegistrationCore<TConcrete>(container);
                     weakRegistration.Target = registration;

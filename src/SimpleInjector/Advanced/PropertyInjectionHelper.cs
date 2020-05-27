@@ -131,7 +131,7 @@ namespace SimpleInjector.Advanced
         {
             MethodInfo? setMethod = property.GetSetMethod(nonPublic: true);
 
-            if (setMethod == null)
+            if (setMethod is null)
             {
                 throw new ActivationException(StringResources.PropertyHasNoSetter(property));
             }

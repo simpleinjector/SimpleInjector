@@ -33,7 +33,7 @@ namespace SimpleInjector.Lifestyles
 
         public override Expression BuildExpression()
         {
-            if (this.InstanceCreator == null)
+            if (this.InstanceCreator is null)
             {
                 this.scopeFactory = this.Lifestyle.CreateCurrentScopeProvider(this.Container);
 

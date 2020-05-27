@@ -8,7 +8,8 @@ namespace SimpleInjector.Lifestyles
 
     internal sealed class TransientLifestyle : Lifestyle
     {
-        internal TransientLifestyle() : base("Transient")
+        internal TransientLifestyle()
+            : base("Transient")
         {
         }
 
@@ -40,7 +41,7 @@ namespace SimpleInjector.Lifestyles
             public override Type ImplementationType => typeof(TImplementation);
 
             public override Expression BuildExpression() =>
-                this.instanceCreator == null
+                this.instanceCreator is null
                     ? this.BuildTransientExpression()
                     : this.BuildTransientExpression(this.instanceCreator);
         }

@@ -28,12 +28,12 @@ namespace SimpleInjector
         /// reference.</exception>
         public static void RegisterPackages(this Container container, IEnumerable<Assembly> assemblies)
         {
-            if (container == null)
+            if (container is null)
             {
                 throw new ArgumentNullException(nameof(container));
             }
 
-            if (assemblies == null)
+            if (assemblies is null)
             {
                 throw new ArgumentNullException(nameof(assemblies));
             }
@@ -54,12 +54,12 @@ namespace SimpleInjector
         public static IPackage[] GetPackagesToRegister(
             this Container container, IEnumerable<Assembly> assemblies)
         {
-            if (container == null)
+            if (container is null)
             {
                 throw new ArgumentNullException(nameof(container));
             }
 
-            if (assemblies == null)
+            if (assemblies is null)
             {
                 throw new ArgumentNullException(nameof(assemblies));
             }

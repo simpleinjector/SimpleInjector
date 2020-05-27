@@ -233,7 +233,7 @@ namespace SimpleInjector
         /// Please note that given example is just an uhhmm... example. In the case of the example the
         /// <b>MonitoringValidator&lt;T&gt;</b> is a decorator and instead of manually writing this code that
         /// many limitations, you can use one of the built-in
-        /// <see cref="Container.RegisterDecorator(System.Type, System.Type, Lifestyle)">RegisterDecorator</see> methods instead.
+        /// <see cref="Container.RegisterDecorator(Type, Type, Lifestyle)">RegisterDecorator</see> methods instead.
         /// These extension methods take care of any given generic type constraint, allow to register decorators
         /// conditionally and allow the decorator to be integrated into the container's pipeline, which allows
         /// it to be intercepted using the <see cref="ExpressionBuilding"/> event and allow any registered

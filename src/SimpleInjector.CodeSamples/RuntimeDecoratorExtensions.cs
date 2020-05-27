@@ -31,7 +31,7 @@
                 return mustDecorate;
             };
 
-            if (lifestyle == null)
+            if (lifestyle is null)
             {
                 container.RegisterDecorator(serviceType, decoratorType, predicate);
             }

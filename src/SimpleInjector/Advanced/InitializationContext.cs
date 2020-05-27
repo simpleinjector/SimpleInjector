@@ -16,8 +16,8 @@ namespace SimpleInjector.Advanced
     /// allows the user to examine the given instance to decide whether the <see cref="ResolveInterceptor"/>
     /// should be applied or not.
     /// </summary>
-    [DebuggerDisplay(nameof(InitializationContext) +
-        " ({" + nameof(InitializationContext.DebuggerDisplay) + ", nq})")]
+    [DebuggerDisplay(
+        nameof(InitializationContext) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
     public class InitializationContext
     {
         internal InitializationContext(InstanceProducer producer, Registration registration)

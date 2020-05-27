@@ -25,20 +25,14 @@ namespace SimpleInjector.Diagnostics.Analyzers
             return $"{count} torn {RegistrationsPlural(count)}.";
         }
 
-        public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
-        {
-            IEnumerable<InstanceProducer[]> tornRegistrationGroups = GetTornRegistrationGroups(producers);
-
-            var results =
-                from tornProducerGroup in tornRegistrationGroups
-                from producer in tornProducerGroup
-                where producer.Registration.ShouldNotBeSuppressed(DiagnosticType.TornLifestyle)
-                select CreateDiagnosticResult(
-                    diagnosedProducer: producer,
-                    affectedProducers: tornProducerGroup);
-
-            return results.ToArray();
-        }
+        public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers) => (
+            from tornProducerGroup in GetTornRegistrationGroups(producers)
+            from producer in tornProducerGroup
+            where producer.Registration.ShouldNotBeSuppressed(DiagnosticType.TornLifestyle)
+            select CreateDiagnosticResult(
+                diagnosedProducer: producer,
+                affectedProducers: tornProducerGroup))
+            .ToArray();
 
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity",
             Justification = "FxCop is unable to recognize nicely written LINQ statements from complex code.")]
@@ -55,18 +49,19 @@ namespace SimpleInjector.Diagnostics.Analyzers
             let key = new { registration.ImplementationType, lifestyle }
             group registrationGroup by key into registrationLifestyleGroup
             let possibleConflictingProducers = registrationLifestyleGroup.SelectMany(p => p).ToArray()
-            let hasConflict = registrationLifestyleGroup.Count() > 1
-
-                // HACK: Fixes #769. In case all producers in the group are Singleton and produce the same
-                // instance, it will not result in a torn registration, as a torn registration produces
-                // multiple instances. This is kind-of a hack, because the source of the problem lies within
-                // the ContainerControlledCollection.GetOrCreateInstanceProducer method, as it creates a new
-                // ExpressionRegistration instead of reusing the same. Changing that code, however, causes
-                // other bugs (and failing tests). Because of that, we filter the problem out at this stage.
-                && (possibleConflictingProducers.Any(p => p.Lifestyle != Lifestyle.Singleton)
-                    || possibleConflictingProducers.Select(p => p.GetInstance()).Distinct().Count() > 1)
-            where hasConflict
+            where HasConflict(registrationLifestyleGroup.Count(), possibleConflictingProducers)
             select possibleConflictingProducers;
+
+        // HACK: Fixes #769. In case all producers in the group are Singleton and produce the same
+        // instance, it will not result in a torn registration, as a torn registration produces
+        // multiple instances. This is kind-of a hack, because the source of the problem lies within
+        // the ContainerControlledCollection.GetOrCreateInstanceProducer method, as it creates a new
+        // ExpressionRegistration instead of reusing the same. Changing that code, however, causes
+        // other bugs (and failing tests). Because of that, we filter the problem out at this stage.
+        private static bool HasConflict(int groupSize, InstanceProducer[] possibleConflictingProducers) =>
+            groupSize > 1
+            && (possibleConflictingProducers.Any(p => p.Lifestyle != Lifestyle.Singleton)
+                || possibleConflictingProducers.Select(p => p.GetInstance()).Distinct().Count() > 1);
 
         private static TornLifestyleDiagnosticResult CreateDiagnosticResult(
             InstanceProducer diagnosedProducer,
@@ -85,8 +80,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 affectedProducers);
         }
 
-        private static string BuildDescription(InstanceProducer diagnosedProducer,
-             InstanceProducer[] affectedProducers)
+        private static string BuildDescription(
+            InstanceProducer diagnosedProducer, InstanceProducer[] affectedProducers)
         {
             Lifestyle lifestyle = diagnosedProducer.Registration.Lifestyle;
 

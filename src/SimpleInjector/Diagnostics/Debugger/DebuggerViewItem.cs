@@ -6,8 +6,7 @@ namespace SimpleInjector.Diagnostics.Debugger
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
 
-    [DebuggerDisplay("{" + nameof(DebuggerViewItem.Description) + ", nq}",
-        Name = "{" + nameof(DebuggerViewItem.Name) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(Description) + ", nq}", Name = "{" + nameof(Name) + ", nq}")]
     internal class DebuggerViewItem
     {
         internal DebuggerViewItem(string name, string description, object? value = null)

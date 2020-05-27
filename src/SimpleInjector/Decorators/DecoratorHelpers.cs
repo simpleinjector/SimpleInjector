@@ -46,12 +46,10 @@ namespace SimpleInjector.Decorators
         internal static Type DetermineImplementationType(Expression expression,
             InstanceProducer registeredProducer)
         {
-            var constantExpression = expression as ConstantExpression;
-
             // A ConstantExpression with null is supplied in case of a uncontrolled collection.
-            if (constantExpression != null && constantExpression.Value is null)
+            if (expression is ConstantExpression constant && constant.Value is null)
             {
-                return constantExpression.Type;
+                return constant.Type;
             }
 
             return registeredProducer.Registration.ImplementationType;
@@ -109,7 +107,7 @@ namespace SimpleInjector.Decorators
         {
             Type decoratorType = GetDecoratingBaseType(serviceType, decoratorConstructor);
 
-            if (decoratorType == null)
+            if (decoratorType is null)
             {
                 return 0;
             }
@@ -157,26 +155,21 @@ namespace SimpleInjector.Decorators
             IsDecorateeDependencyType(parameter.ParameterType, decoratingType)
             || IsDecorateeFactoryDependencyType(parameter.ParameterType, decoratingType);
 
-        internal static bool IsDecorateeDependencyType(Type dependencyType, Type serviceType)
-        {
-            return dependencyType == serviceType;
-        }
+        internal static bool IsDecorateeDependencyType(Type dependencyType, Type serviceType) =>
+            dependencyType == serviceType;
 
         internal static bool IsDecorateeFactoryDependencyType(Type dependencyType, Type decoratingType) =>
             IsScopelessDecorateeFactoryDependencyType(dependencyType, decoratingType)
             || IsScopeDecorateeFactoryDependencyParameter(dependencyType, decoratingType);
 
         internal static bool IsScopelessDecorateeFactoryDependencyType(
-            Type dependencyType, Type decoratingType)
-        {
-            return typeof(Func<>).IsGenericTypeDefinitionOf(dependencyType)
+            Type dependencyType, Type decoratingType) =>
+            typeof(Func<>).IsGenericTypeDefinitionOf(dependencyType)
                 && dependencyType == typeof(Func<>).MakeGenericType(decoratingType);
-        }
 
-        internal static bool IsScopeDecorateeFactoryDependencyParameter(Type parameterType, Type decoratingType)
-        {
-            return typeof(Func<,>).IsGenericTypeDefinitionOf(parameterType)
+        internal static bool IsScopeDecorateeFactoryDependencyParameter(
+            Type parameterType, Type decoratingType) =>
+            typeof(Func<,>).IsGenericTypeDefinitionOf(parameterType)
                 && parameterType == typeof(Func<,>).MakeGenericType(typeof(Scope), decoratingType);
-        }
     }
 }

@@ -169,7 +169,7 @@ namespace SimpleInjector.Lifestyles
                 expression = this.InterceptInstanceCreation(this.ServiceType, expression);
                 expression = this.WrapWithInitializer(this.ServiceType, expression);
 
-                // Optimization: We don't need to compile a delegate in case all we have is a constant.
+                // PERF: We don't need to compile a delegate in case all we have is a constant.
                 if (expression is ConstantExpression constantExpression)
                 {
                     return constantExpression.Value;
@@ -246,7 +246,7 @@ namespace SimpleInjector.Lifestyles
             private TImplementation CreateInstanceWithNullCheck()
             {
                 Expression expression =
-                    this.instanceCreator == null
+                    this.instanceCreator is null
                         ? this.BuildTransientExpression()
                         : this.BuildTransientExpression(this.instanceCreator);
 
@@ -259,7 +259,7 @@ namespace SimpleInjector.Lifestyles
                 return instance;
             }
 
-            // Implements #553
+            // Implements #553 Allows detection of Lifestyle Mismatches when iterated inside constructor.
             private TImplementation CreateInstance(Func<TImplementation> instanceCreator)
             {
                 var isCurrentThread = new ThreadLocal<bool> { Value = true };

@@ -22,14 +22,10 @@ namespace SimpleInjector.Internals
         internal static Expression Replace(
             Expression expressionToAlter, ConstantExpression nodeToFind, Expression replacementNode)
         {
-            var visitor = new SubExpressionReplacer(nodeToFind, replacementNode);
-
-            return visitor.Visit(expressionToAlter);
+            return new SubExpressionReplacer(nodeToFind, replacementNode).Visit(expressionToAlter);
         }
 
-        protected override Expression VisitConstant(ConstantExpression node)
-        {
-            return node == this.subExpressionToFind ? this.replacementExpression : base.VisitConstant(node);
-        }
+        protected override Expression VisitConstant(ConstantExpression node) =>
+            node == this.subExpressionToFind ? this.replacementExpression : base.VisitConstant(node);
     }
 }

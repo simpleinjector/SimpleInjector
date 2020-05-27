@@ -18,7 +18,7 @@ namespace SimpleInjector.Diagnostics
     /// implementation.
     /// For more information, see: https://simpleinjector.org/diasc.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(ShortCircuitedDependencyDiagnosticResult.DebuggerDisplay) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public class ShortCircuitedDependencyDiagnosticResult : DiagnosticResult
     {
         internal ShortCircuitedDependencyDiagnosticResult(

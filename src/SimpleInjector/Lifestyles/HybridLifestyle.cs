@@ -39,31 +39,23 @@ namespace SimpleInjector.Lifestyles
         internal static string GetHybridName(Lifestyle lifestyle) =>
             (lifestyle as IHybridLifestyle)?.GetHybridName() ?? lifestyle.Name;
 
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
-        {
-            Func<bool> test = () => this.lifestyleSelector(container);
-
-            return new HybridRegistration(
-                typeof(TConcrete),
-                test,
-                this.trueLifestyle.CreateRegistration<TConcrete>(container),
-                this.falseLifestyle.CreateRegistration<TConcrete>(container),
-                this,
-                container);
-        }
+        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
+            new HybridRegistration(
+                implementationType: typeof(TConcrete),
+                test: () => this.lifestyleSelector(container),
+                trueRegistration: this.trueLifestyle.CreateRegistration<TConcrete>(container),
+                falseRegistration: this.falseLifestyle.CreateRegistration<TConcrete>(container),
+                lifestyle: this,
+                container: container);
 
         protected internal override Registration CreateRegistrationCore<TService>(
-            Func<TService> instanceCreator, Container container)
-        {
-            Func<bool> test = () => this.lifestyleSelector(container);
-
-            return new HybridRegistration(
-                typeof(TService),
-                test,
-                this.trueLifestyle.CreateRegistration(instanceCreator, container),
-                this.falseLifestyle.CreateRegistration(instanceCreator, container),
-                this,
-                container);
-        }
+            Func<TService> instanceCreator, Container container) =>
+            new HybridRegistration(
+                implementationType: typeof(TService),
+                test: () => this.lifestyleSelector(container),
+                trueRegistration: this.trueLifestyle.CreateRegistration(instanceCreator, container),
+                falseRegistration: this.falseLifestyle.CreateRegistration(instanceCreator, container),
+                lifestyle: this,
+                container: container);
     }
 }

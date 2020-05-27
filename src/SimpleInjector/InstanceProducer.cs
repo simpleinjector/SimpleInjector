@@ -124,7 +124,7 @@ namespace SimpleInjector
         /// <summary>
         /// Gets the <see cref="Lifestyle"/> for this registration. The returned lifestyle can differ from the
         /// lifestyle that is used during the registration. This can happen for instance when the registration
-        /// is changed by an <see cref="SimpleInjector.Container.ExpressionBuilt">ExpressionBuilt</see>
+        /// is changed by an <see cref="Container.ExpressionBuilt">ExpressionBuilt</see>
         /// registration or gets decorated.
         /// </summary>
         /// <value>The <see cref="Lifestyle"/> for this registration.</value>
@@ -183,10 +183,10 @@ namespace SimpleInjector
         {
             get
             {
-                if (this.isValid == null)
+                if (this.isValid is null)
                 {
                     this.Exception = this.GetExceptionIfInvalid();
-                    this.isValid = this.Exception == null;
+                    this.isValid = this.Exception is null;
                 }
 
                 return this.isValid.GetValueOrDefault();
@@ -223,7 +223,7 @@ namespace SimpleInjector
             this.Lifestyle.Name);
 
         internal IEnumerable<InstanceProducer> SelfAndWrappedProducers =>
-            this.wrappedProducers == null ? this.Self : this.wrappedProducers.Concat(this.Self);
+            this.wrappedProducers is null ? this.Self : this.wrappedProducers.Concat(this.Self);
 
         private IEnumerable<InstanceProducer> Self => new[] { this };
 
@@ -284,7 +284,7 @@ namespace SimpleInjector
                 throw;
             }
 
-            if (instance == null)
+            if (instance is null)
             {
                 throw new ActivationException(StringResources.DelegateForTypeReturnedNull(this.ServiceType));
             }
@@ -348,11 +348,11 @@ namespace SimpleInjector
         /// This includes relationships between the registered type and its dependencies and relationships
         /// between applied decorators and their dependencies. Note that types that are not newed up by the
         /// container and properties that are injected inside a custom delegate that is registered using the
-        /// <see cref="SimpleInjector.Container.RegisterInitializer{TService}">RegisterInitializer</see>
+        /// <see cref="Container.RegisterInitializer{TService}">RegisterInitializer</see>
         /// method are unknown to the container and are not returned from this method.
         /// Also note that this method will return an empty collection when called before the
         /// registered type is requested from the container (or before
-        /// <see cref="SimpleInjector.Container.Verify()">Verify</see> is called).
+        /// <see cref="Container.Verify()">Verify</see> is called).
         /// </summary>
         /// <returns>An array of <see cref="KnownRelationship"/> instances.</returns>
         public KnownRelationship[] GetRelationships()
@@ -374,7 +374,7 @@ namespace SimpleInjector
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> have been called. These calls can be
         /// done directly and explicitly by the user on this instance, indirectly by calling
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> on an instance that depends on this
-        /// instance, or by calling <see cref="SimpleInjector.Container.Verify()">Verify</see> on the container.
+        /// instance, or by calling <see cref="Container.Verify()">Verify</see> on the container.
         /// </exception>
         public string VisualizeObjectGraph() => this.VisualizeObjectGraph(new VisualizationOptions());
 
@@ -389,7 +389,7 @@ namespace SimpleInjector
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> have been called. These calls can be
         /// done directly and explicitly by the user on this instance, indirectly by calling
         /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> on an instance that depends on this
-        /// instance, or by calling <see cref="SimpleInjector.Container.Verify()">Verify</see> on the container.
+        /// instance, or by calling <see cref="Container.Verify()">Verify</see> on the container.
         /// </exception>
         /// <exception cref="NullReferenceException">Thrown when options is null.</exception>
         public string VisualizeObjectGraph(VisualizationOptions options)
@@ -523,12 +523,7 @@ namespace SimpleInjector
         {
             lock (this.locker)
             {
-                if (this.verifiers == null)
-                {
-                    this.verifiers = new List<Action<Scope>>();
-                }
-
-                this.verifiers.Add(action);
+                (this.verifiers ??= new List<Action<Scope>>()).Add(action);
             }
         }
 
@@ -536,12 +531,7 @@ namespace SimpleInjector
         {
             lock (this.locker)
             {
-                if (this.wrappedProducers == null)
-                {
-                    this.wrappedProducers = new List<InstanceProducer>();
-                }
-
-                this.wrappedProducers.Add(currentProducer);
+                (this.wrappedProducers ??= new List<InstanceProducer>()).Add(currentProducer);
             }
         }
 
@@ -551,10 +541,7 @@ namespace SimpleInjector
                 new ReadOnlyCollection<KnownRelationship>(relationships.Distinct().ToArray());
         }
 
-        internal void EnsureTypeWillBeExplicitlyVerified()
-        {
-            this.isValid = null;
-        }
+        internal void EnsureTypeWillBeExplicitlyVerified() => this.isValid = null;
 
         internal void DoExtraVerfication(Scope scope)
         {
@@ -628,7 +615,7 @@ namespace SimpleInjector
         {
             var expression = this.Registration.BuildExpression();
 
-            if (expression == null)
+            if (expression is null)
             {
                 throw new ActivationException(StringResources.RegistrationReturnedNullFromBuildExpression(
                     this.Registration));

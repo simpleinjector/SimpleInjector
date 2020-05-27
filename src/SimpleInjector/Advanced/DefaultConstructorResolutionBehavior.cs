@@ -25,8 +25,7 @@ namespace SimpleInjector.Advanced
 
                 return null;
             }
-
-            if (constructors.Length > 1)
+            else if (constructors.Length > 1)
             {
                 errorMessage =
                     StringResources.TypeMustHaveASinglePublicConstructorButItHas(
@@ -34,9 +33,11 @@ namespace SimpleInjector.Advanced
 
                 return null;
             }
-
-            errorMessage = null;
-            return constructors[0];
+            else
+            {
+                errorMessage = null;
+                return constructors[0];
+            }
         }
 
         private static void VerifyTypeIsConcrete(Type implementationType)

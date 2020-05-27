@@ -12,7 +12,7 @@ namespace SimpleInjector.Diagnostics
     /// <summary>
     /// A hierarchical group of <see cref="DiagnosticResult"/>.
     /// </summary>
-    [DebuggerDisplay(nameof(DiagnosticGroup) + " (Name: {" + nameof(DiagnosticGroup.Name) + ", nq})")]
+    [DebuggerDisplay(nameof(DiagnosticGroup) + " (Name: {" + nameof(Name) + ", nq})")]
     public class DiagnosticGroup
     {
         internal DiagnosticGroup(

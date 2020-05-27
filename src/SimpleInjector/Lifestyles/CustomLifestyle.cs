@@ -64,7 +64,7 @@ namespace SimpleInjector.Lifestyles
             private Func<object> CreateInstanceCreator()
             {
                 Func<TImplementation> transientInstanceCreator =
-                    this.instanceCreator == null
+                    this.instanceCreator is null
                         ? (Func<TImplementation>)this.BuildTransientDelegate()
                         : this.BuildTransientDelegate(this.instanceCreator);
 
