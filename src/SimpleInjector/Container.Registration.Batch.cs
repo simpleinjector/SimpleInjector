@@ -281,6 +281,7 @@ namespace SimpleInjector
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
             error: true)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void RegisterCollection<TService>(IEnumerable<Assembly> assemblies)
             where TService : class
         {
@@ -309,6 +310,7 @@ namespace SimpleInjector
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
             error: true)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void RegisterCollection(Type serviceType, params Assembly[] assemblies)
         {
             this.Collection.Register(serviceType, assemblies);
@@ -336,6 +338,7 @@ namespace SimpleInjector
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +
             "Will be removed in version 6.0.",
             error: true)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void RegisterCollection(Type serviceType, IEnumerable<Assembly> assemblies)
         {
             this.Collection.Register(serviceType, assemblies);
