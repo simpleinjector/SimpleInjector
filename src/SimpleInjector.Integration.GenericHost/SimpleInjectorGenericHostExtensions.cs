@@ -38,26 +38,7 @@ namespace SimpleInjector
 
             options.Services.AddSingleton<IHostedService>(_ =>
             {
-                try
-                {
-                    return options.Container.GetInstance<THostedService>();
-                }
-                catch (ActivationException ex) when (ex.Message.Contains("is not registered"))
-                {
-                    throw new ActivationException(ex.Message + " " +
-                        "ASP.NET Core is trying to resolve your " +
-                        $"{typeof(THostedService).ToFriendlyName()} hosted service that you registered by " +
-                        "calling the AddHostedService<THostedService>() extension method, but it can't be " +
-                        "resolved due to a missing registration. In ASP.NET Core 3 and up, hosted " +
-                        "services are resolved much earlier in the pipeline, before the 'Configure' " +
-                        "method of your Startup class is invoked. If you are registering the missing " +
-                        "service inside the 'Configure' method, that would be the likely cause of the " +
-                        "issue. To fix the problem, you should ensure that all registration to the " +
-                        "container are done during the 'ConfigureServices' method of the Startup class. " +
-                        "For more information, see: https://simpleinjector.org/generichost or " +
-                        "https://simpleinjector.org/aspnetcore.",
-                        ex);
-                }
+                return options.Container.GetInstance<THostedService>();
             });
 
             return options;
