@@ -214,10 +214,10 @@ namespace SimpleInjector
         /// Gets or sets a value indicating whether the container should automatically trigger verification
         /// and diagnostics of its configuration when the first service is resolved (e.g. the first call to
         /// GetInstance). The behavior is identical to calling <see cref="Container.Verify()">Verify()</see>
-        /// manually. The default is false.
+        /// manually. The default is <b>true</b>.
         /// </summary>
         /// <value>The value indicating whether the container should automatically trigger verification.</value>
-        public bool EnableAutoVerification { get; set; }
+        public bool EnableAutoVerification { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether all the containers in the current AppDomain should throw

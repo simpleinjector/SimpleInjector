@@ -39,6 +39,7 @@
             int actualCallCount = 0;
 
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             container.Register<RealTimeProvider>();
             container.RegisterInitializer(context => actualCallCount++, TruePredicate);
@@ -90,6 +91,7 @@
             int actualPredicateCallCount = 0;
 
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             container.Register<RealTimeProvider>();
             container.RegisterInitializer(context => actualCallCount++, context =>
@@ -118,6 +120,7 @@
             int actualCallCount = 0;
 
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             container.Register<RealTimeProvider>();
             container.RegisterInitializer(context => actualCallCount++, TruePredicate);
@@ -158,6 +161,7 @@
             var actualContexts = new List<InstanceInitializationData>();
 
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             container.Register<RealTimeProvider>();
             container.RegisterInitializer(actualContexts.Add, TruePredicate);

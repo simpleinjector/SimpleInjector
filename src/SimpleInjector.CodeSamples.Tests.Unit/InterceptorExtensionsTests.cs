@@ -157,9 +157,7 @@
 
             container.Register<ICommand, FakeCommand>();
 
-            container.Register<FakeInterceptor>(Lifestyle.Singleton);
-
-            container.InterceptWith<FakeInterceptor>(IsACommandPredicate);
+            container.InterceptWith<FakeInterceptor>(Lifestyle.Singleton, IsACommandPredicate);
 
             // Act
             var command1 = container.GetInstance<ICommand>();

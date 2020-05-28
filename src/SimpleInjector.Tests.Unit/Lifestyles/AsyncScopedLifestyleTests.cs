@@ -409,6 +409,7 @@
         {
             // Arrange
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             container.Register<DisposableCommand>(Lifestyle.Singleton);
 
@@ -780,6 +781,7 @@
             DisposableCommand transientInstanceToDispose = null;
 
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             var lifestyle = new AsyncScopedLifestyle();
 

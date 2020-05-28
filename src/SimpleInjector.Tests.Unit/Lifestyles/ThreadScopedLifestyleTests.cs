@@ -588,6 +588,7 @@
             DisposableCommand transientInstanceToDispose = null;
 
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             container.Register<DisposableCommand>();
 

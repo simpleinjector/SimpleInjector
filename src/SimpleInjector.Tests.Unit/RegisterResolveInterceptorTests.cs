@@ -220,6 +220,7 @@
             var expectedInterceptedTypes = new[] { typeof(IEnumerable<ITimeProvider>) };
 
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             var contexts = new List<InitializationContext>();
 
@@ -255,6 +256,7 @@
             };
 
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             var contexts = new List<InitializationContext>();
 
