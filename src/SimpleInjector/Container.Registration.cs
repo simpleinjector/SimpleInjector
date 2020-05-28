@@ -7,6 +7,7 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Fluent;
     using SimpleInjector.Lifestyles;
 
 #if !PUBLISH
@@ -387,9 +388,12 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        public void Register<TConcrete>() where TConcrete : class
+        public IRegistrationResult<TConcrete, TConcrete> Register<TConcrete>() where TConcrete : class
         {
-            this.Register<TConcrete, TConcrete>(this.SelectionBasedLifestyle, "TConcrete", "TConcrete");
+            var registration =
+                this.Register<TConcrete, TConcrete>(this.SelectionBasedLifestyle, "TConcrete", "TConcrete");
+
+            return new RegistrationResult<TConcrete, TConcrete>(this, registration);
         }
 
         /// <summary>
@@ -404,9 +408,11 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        public void Register<TConcrete>(Lifestyle lifestyle) where TConcrete : class
+        public RegistrationResult<TConcrete, TConcrete> Register<TConcrete>(Lifestyle lifestyle) where TConcrete : class
         {
-            this.Register<TConcrete, TConcrete>(lifestyle, "TConcrete", "TConcrete");
+            var registration = this.Register<TConcrete, TConcrete>(lifestyle, "TConcrete", "TConcrete");
+
+            return new RegistrationResult<TConcrete, TConcrete>(this, registration);
         }
 
         /// <summary>
@@ -427,11 +433,14 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/>
         /// type is not a type that can be created by the container.
         /// </exception>
-        public void Register<TService, TImplementation>()
+        public RegistrationResult<TService, TImplementation> Register<TService, TImplementation>()
             where TService : class
             where TImplementation : class, TService
         {
-            this.Register<TService, TImplementation>(this.SelectionBasedLifestyle, "TService", "TImplementation");
+            var registration =
+                this.Register<TService, TImplementation>(this.SelectionBasedLifestyle, "TService", "TImplementation");
+
+            return new RegistrationResult<TService, TImplementation>(this, registration);
         }
 
         /// <summary>
@@ -448,11 +457,15 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/>
         /// type is not a type that can be created by the container.
         /// </exception>
-        public void Register<TService, TImplementation>(Lifestyle lifestyle)
+        public RegistrationResult<TService, TImplementation> Register<TService, TImplementation>(
+            Lifestyle lifestyle)
             where TService : class
             where TImplementation : class, TService
         {
-            this.Register<TService, TImplementation>(lifestyle, nameof(TService), nameof(TImplementation));
+            var registration =
+                this.Register<TService, TImplementation>(lifestyle, nameof(TService), nameof(TImplementation));
+
+            return new RegistrationResult<TService, TImplementation>(this, registration);
         }
 
         /// <summary>
@@ -473,9 +486,9 @@ namespace SimpleInjector
         /// <typeparamref name="TService"/> has already been registered.</exception>
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="instanceCreator"/> is a null reference.</exception>
-        public void Register<TService>(Func<TService> instanceCreator) where TService : class
+        public RegistrationResult<TService> Register<TService>(Func<TService> instanceCreator) where TService : class
         {
-            this.Register(instanceCreator, this.SelectionBasedLifestyle);
+            return this.Register(instanceCreator, this.SelectionBasedLifestyle);
         }
 
         /// <summary>
@@ -494,7 +507,8 @@ namespace SimpleInjector
         /// <typeparamref name="TService"/> has already been registered.</exception>
         /// <exception cref="ArgumentNullException">
         /// Thrown when one of the supplied arguments is a null reference.</exception>
-        public void Register<TService>(Func<TService> instanceCreator, Lifestyle lifestyle)
+        public RegistrationResult<TService> Register<TService>(
+            Func<TService> instanceCreator, Lifestyle lifestyle)
             where TService : class
         {
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
@@ -505,6 +519,8 @@ namespace SimpleInjector
             var registration = lifestyle.CreateRegistration(instanceCreator, this);
 
             this.AddRegistration(typeof(TService), registration);
+
+            return new RegistrationResult<TService>(this, registration);
         }
 
         /// <summary>
@@ -527,7 +543,7 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="concreteType"/> has already been registered.
         /// </exception>
-        public void Register(Type concreteType)
+        public ImplementationRegistrationResult Register(Type concreteType)
         {
             this.Register(
                 serviceType: concreteType,
@@ -535,6 +551,8 @@ namespace SimpleInjector
                 lifestyle: this.SelectionBasedLifestyle,
                 serviceTypeParamName: nameof(concreteType),
                 implementationTypeParamName: nameof(concreteType));
+
+            return new ImplementationRegistrationResult(this, concreteType, concreteType);
         }
 
         /// <summary>
@@ -561,7 +579,7 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
-        public void Register(Type serviceType, Type implementationType)
+        public ImplementationRegistrationResult Register(Type serviceType, Type implementationType)
         {
             this.Register(
                 serviceType: serviceType,
@@ -569,6 +587,8 @@ namespace SimpleInjector
                 lifestyle: this.SelectionBasedLifestyle,
                 serviceTypeParamName: nameof(serviceType),
                 implementationTypeParamName: nameof(implementationType));
+
+            return new ImplementationRegistrationResult(this, serviceType, implementationType);
         }
 
         /// <summary>
@@ -593,7 +613,7 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference.</exception>
-        public void Register(Type serviceType, Type implementationType, Lifestyle lifestyle)
+        public ImplementationRegistrationResult Register(Type serviceType, Type implementationType, Lifestyle lifestyle)
         {
             this.Register(
                 serviceType: serviceType,
@@ -601,6 +621,8 @@ namespace SimpleInjector
                 lifestyle: lifestyle,
                 serviceTypeParamName: nameof(serviceType),
                 implementationTypeParamName: nameof(implementationType));
+
+            return new ImplementationRegistrationResult(this, serviceType, implementationType);
         }
 
         /// <summary>
@@ -622,9 +644,9 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
-        public void Register(Type serviceType, Func<object> instanceCreator)
+        public RegistrationResult Register(Type serviceType, Func<object> instanceCreator)
         {
-            this.Register(serviceType, instanceCreator, this.SelectionBasedLifestyle);
+            return this.Register(serviceType, instanceCreator, this.SelectionBasedLifestyle);
         }
 
         /// <summary>
@@ -641,7 +663,8 @@ namespace SimpleInjector
         /// <paramref name="serviceType"/> has already been registered.</exception>
         /// <exception cref="ArgumentNullException">
         /// Thrown when one of the supplied arguments is a null reference.</exception>
-        public void Register(Type serviceType, Func<object> instanceCreator, Lifestyle lifestyle)
+        public RegistrationResult Register(
+            Type serviceType, Func<object> instanceCreator, Lifestyle lifestyle)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
@@ -655,6 +678,8 @@ namespace SimpleInjector
             var registration = lifestyle.CreateRegistration(serviceType, instanceCreator, this);
 
             this.AddRegistration(serviceType, registration);
+
+            return new RegistrationResult(this, serviceType, registration);
         }
 
         /// <summary>
@@ -755,7 +780,7 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
-        public void RegisterInstance(Type serviceType, object instance)
+        public InstanceRegistrationResult RegisterInstance(Type serviceType, object instance)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(instance, nameof(instance));
@@ -766,6 +791,8 @@ namespace SimpleInjector
             var registration = SingletonLifestyle.CreateSingleInstanceRegistration(serviceType, instance, this);
 
             this.AddRegistration(serviceType, registration);
+
+            return new InstanceRegistrationResult(this, serviceType, instance, registration);
         }
 
         /// <summary>
@@ -783,9 +810,12 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TConcrete"/> is a type
         /// that can not be created by the container.</exception>
-        public void RegisterSingleton<TConcrete>() where TConcrete : class
+        public IRegistrationResult<TConcrete> RegisterSingleton<TConcrete>() where TConcrete : class
         {
-            this.Register<TConcrete, TConcrete>(Lifestyle.Singleton, nameof(TConcrete), nameof(TConcrete));
+            var registration =
+                this.Register<TConcrete, TConcrete>(Lifestyle.Singleton, nameof(TConcrete), nameof(TConcrete));
+
+            return new RegistrationResult<TConcrete, TConcrete>(this, registration);
         }
 
         /// <summary>
@@ -807,14 +837,16 @@ namespace SimpleInjector
         /// <exception cref="ArgumentException">Thrown when the given <typeparamref name="TImplementation"/>
         /// type is not a type that can be created by the container.
         /// </exception>
-        public void RegisterSingleton<TService, TImplementation>()
+        public IRegistrationResult<TService, TImplementation> RegisterSingleton<TService, TImplementation>()
             where TService : class
             where TImplementation : class, TService
         {
-            this.Register<TService, TImplementation>(
+            var registration = this.Register<TService, TImplementation>(
                 lifestyle: Lifestyle.Singleton,
                 serviceTypeParamName: nameof(TService),
                 implementationTypeParamName: nameof(TImplementation));
+
+            return new RegistrationResult<TService, TImplementation>(this, registration);
         }
 
         /// <summary>
@@ -835,12 +867,12 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="instanceCreator"/> is a
         /// null reference.</exception>
-        public void RegisterSingleton<TService>(Func<TService> instanceCreator) where TService : class
+        public RegistrationResult<TService> RegisterSingleton<TService>(Func<TService> instanceCreator) where TService : class
         {
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
-            this.Register(instanceCreator, Lifestyle.Singleton);
+            return this.Register(instanceCreator, Lifestyle.Singleton);
         }
 
         /// <summary>
@@ -863,7 +895,7 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
-        public void RegisterSingleton(Type serviceType, Type implementationType)
+        public IRegistrationResult RegisterSingleton(Type serviceType, Type implementationType)
         {
             this.Register(
                 serviceType: serviceType,
@@ -871,6 +903,8 @@ namespace SimpleInjector
                 lifestyle: Lifestyle.Singleton,
                 serviceTypeParamName: nameof(serviceType),
                 implementationTypeParamName: nameof(implementationType));
+
+            return new ImplementationRegistrationResult(this, serviceType, implementationType);
         }
 
         /// <summary>
@@ -887,9 +921,9 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered, or when an
         /// the <paramref name="serviceType"/> has already been registered.
         /// </exception>
-        public void RegisterSingleton(Type serviceType, Func<object> instanceCreator)
+        public RegistrationResult RegisterSingleton(Type serviceType, Func<object> instanceCreator)
         {
-            this.Register(serviceType, instanceCreator, Lifestyle.Singleton);
+            return this.Register(serviceType, instanceCreator, Lifestyle.Singleton);
         }
 
         /// <summary>
@@ -1228,7 +1262,7 @@ namespace SimpleInjector
             this.resolveInterceptors.Add(new ContextualResolveInterceptor(interceptor, predicate));
         }
 
-        private void Register<TService, TImplementation>(
+        private Registration Register<TService, TImplementation>(
             Lifestyle lifestyle, string serviceTypeParamName, string implementationTypeParamName)
             where TService : class
             where TImplementation : class, TService
@@ -1243,6 +1277,8 @@ namespace SimpleInjector
             var registration = lifestyle.CreateRegistration<TImplementation>(this);
 
             this.AddRegistrationInternal(typeof(TService), registration);
+
+            return registration;
         }
 
         private void Register(

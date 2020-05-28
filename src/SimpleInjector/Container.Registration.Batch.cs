@@ -8,6 +8,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Reflection;
     using SimpleInjector.Decorators;
+    using SimpleInjector.Fluent;
 
 #if !PUBLISH
     /// <summary>Methods for batch registration.</summary>
@@ -35,9 +36,9 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the given set of
         /// <paramref name="assemblies"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
-        public void Register(Type openGenericServiceType, params Assembly[] assemblies)
+        public BatchRegistrationResult Register(Type openGenericServiceType, params Assembly[] assemblies)
         {
-            this.Register(openGenericServiceType, assemblies, this.SelectionBasedLifestyle);
+            return this.Register(openGenericServiceType, assemblies, this.SelectionBasedLifestyle);
         }
 
         /// <summary>
@@ -58,9 +59,9 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the given set of
         /// <paramref name="assemblies"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
-        public void Register(Type openGenericServiceType, IEnumerable<Assembly> assemblies)
+        public BatchRegistrationResult Register(Type openGenericServiceType, IEnumerable<Assembly> assemblies)
         {
-            this.Register(openGenericServiceType, assemblies, this.SelectionBasedLifestyle);
+            return this.Register(openGenericServiceType, assemblies, this.SelectionBasedLifestyle);
         }
 
         /// <summary>
@@ -82,11 +83,11 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the given
         /// <paramref name="assembly"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
-        public void Register(Type openGenericServiceType, Assembly assembly, Lifestyle lifestyle)
+        public BatchRegistrationResult Register(Type openGenericServiceType, Assembly assembly, Lifestyle lifestyle)
         {
             Requires.IsNotNull(assembly, nameof(assembly));
 
-            this.Register(openGenericServiceType, new[] { assembly }, lifestyle);
+            return this.Register(openGenericServiceType, new[] { assembly }, lifestyle);
         }
 
         /// <summary>
@@ -108,7 +109,7 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the given set of
         /// <paramref name="assemblies"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
-        public void Register(
+        public BatchRegistrationResult Register(
             Type openGenericServiceType, IEnumerable<Assembly> assemblies, Lifestyle lifestyle)
         {
             Requires.IsNotNull(openGenericServiceType, nameof(openGenericServiceType));
@@ -130,9 +131,11 @@ namespace SimpleInjector
             var results =
                 this.GetNonGenericTypesToRegisterForOneToOneMapping(openGenericServiceType, assemblies);
 
-            this.Register(openGenericServiceType, results.ImplementationTypes, lifestyle);
+            var registrator = this.Register(openGenericServiceType, results.ImplementationTypes, lifestyle);
 
             this.AddSkippedDecorators(openGenericServiceType, results.SkippedDecorators);
+
+            return registrator;
         }
 
         /// <summary>
@@ -150,9 +153,9 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the given set of
         /// <paramref name="implementationTypes"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
-        public void Register(Type openGenericServiceType, IEnumerable<Type> implementationTypes)
+        public BatchRegistrationResult Register(Type openGenericServiceType, IEnumerable<Type> implementationTypes)
         {
-            this.Register(openGenericServiceType, implementationTypes, this.SelectionBasedLifestyle);
+            return this.Register(openGenericServiceType, implementationTypes, this.SelectionBasedLifestyle);
         }
 
         /// <summary>
@@ -171,7 +174,7 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the given set of
         /// <paramref name="implementationTypes"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
-        public void Register(
+        public BatchRegistrationResult Register(
             Type openGenericServiceType, IEnumerable<Type> implementationTypes, Lifestyle lifestyle)
         {
             Requires.IsNotNull(openGenericServiceType, nameof(openGenericServiceType));
@@ -205,16 +208,21 @@ namespace SimpleInjector
                 implementationTypes,
                 nameof(implementationTypes));
 
-            var mappings =
-                from mapping in BatchMapping.Build(openGenericServiceType, implementationTypes)
-                let registration = lifestyle.CreateRegistration(mapping.ImplementationType, this)
-                from serviceType in mapping.ClosedServiceTypes
-                select new { serviceType, registration };
+            var registrator = new BatchRegistrationResult(
+                container: this,
+                serviceType: openGenericServiceType,
+                registrations:
+                    from mapping in BatchMapping.Build(openGenericServiceType, implementationTypes)
+                    let registration = lifestyle.CreateRegistration(mapping.ImplementationType, this)
+                    from serviceType in mapping.ClosedServiceTypes
+                    select new BatchRegistrationResult.Mapping(serviceType, registration));
 
-            foreach (var mapping in mappings)
+            foreach (var mapping in registrator.Registrations)
             {
-                this.AddRegistration(mapping.serviceType, mapping.registration);
+                this.AddRegistration(mapping.ServiceType, mapping.Registration);
             }
+
+            return registrator;
         }
 
         /// <summary>
@@ -235,9 +243,9 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the given set of
         /// <paramref name="assemblies"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
-        public void RegisterSingleton(Type openGenericServiceType, params Assembly[] assemblies)
+        public BatchRegistrationResult RegisterSingleton(Type openGenericServiceType, params Assembly[] assemblies)
         {
-            this.RegisterSingleton(openGenericServiceType, (IEnumerable<Assembly>)assemblies);
+            return this.RegisterSingleton(openGenericServiceType, (IEnumerable<Assembly>)assemblies);
         }
 
         /// <summary>
@@ -258,9 +266,9 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">Thrown when the given set of
         /// <paramref name="assemblies"/> contain multiple types that implement the same
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
-        public void RegisterSingleton(Type openGenericServiceType, IEnumerable<Assembly> assemblies)
+        public BatchRegistrationResult RegisterSingleton(Type openGenericServiceType, IEnumerable<Assembly> assemblies)
         {
-            this.Register(openGenericServiceType, assemblies, Lifestyle.Singleton);
+            return this.Register(openGenericServiceType, assemblies, Lifestyle.Singleton);
         }
 
         /// <summary>

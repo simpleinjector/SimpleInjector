@@ -9,6 +9,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Reflection;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Fluent;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
@@ -360,7 +361,8 @@ namespace SimpleInjector
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic
         /// collection (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        public void Append(Type serviceType, Registration registration)
+        public RegistrationAppendCollectionRegistrationResult Append(
+            Type serviceType, Registration registration)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(registration, nameof(registration));
@@ -375,7 +377,7 @@ namespace SimpleInjector
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(
                 serviceType, new[] { registration }, nameof(registration));
 
-            this.AppendToCollectionInternal(serviceType, registration);
+            return this.AppendToCollectionInternal(serviceType, registration);
         }
 
         /// <summary>
@@ -389,13 +391,13 @@ namespace SimpleInjector
         /// collection.</typeparam>
         /// <exception cref="ArgumentException">Thrown when the <typeparamref name="TService"/>is ambiguous.
         /// </exception>
-        public void Append<TService, TImplementation>()
+        public TypeAppendCollectionRegistrationResult Append<TService, TImplementation>()
             where TService : class
             where TImplementation : class, TService
         {
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
-            this.AppendToCollectionInternal(typeof(TService), typeof(TImplementation));
+            return this.AppendToCollectionInternal(typeof(TService), typeof(TImplementation));
         }
 
         /// <summary>
@@ -412,14 +414,15 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="lifestyle"/> is a null reference.
         /// </exception>
-        public void Append<TService, TImplementation>(Lifestyle lifestyle)
+        public RegistrationAppendCollectionRegistrationResult Append<TService, TImplementation>(
+            Lifestyle lifestyle)
             where TService : class
             where TImplementation : class, TService
         {
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
-            this.AppendToCollectionInternal(
+            return this.AppendToCollectionInternal(
                 typeof(TService), lifestyle.CreateRegistration<TImplementation>(this.Container));
         }
 
@@ -439,7 +442,7 @@ namespace SimpleInjector
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        public void Append(Type serviceType, Type implementationType)
+        public TypeAppendCollectionRegistrationResult Append(Type serviceType, Type implementationType)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(implementationType, nameof(implementationType));
@@ -453,7 +456,7 @@ namespace SimpleInjector
             Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
                 serviceType, implementationType, nameof(implementationType));
 
-            this.AppendToCollectionInternal(serviceType, implementationType);
+            return this.AppendToCollectionInternal(serviceType, implementationType);
         }
 
         /// <summary>
@@ -473,7 +476,8 @@ namespace SimpleInjector
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        public void Append(Type serviceType, Type implementationType, Lifestyle lifestyle)
+        public RegistrationAppendCollectionRegistrationResult Append(
+            Type serviceType, Type implementationType, Lifestyle lifestyle)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(implementationType, nameof(implementationType));
@@ -490,7 +494,7 @@ namespace SimpleInjector
 
             var registration = lifestyle.CreateRegistration(implementationType, this.Container);
 
-            this.AppendToCollectionInternal(serviceType, registration);
+            return this.AppendToCollectionInternal(serviceType, registration);
         }
 
         /// <summary>
@@ -510,14 +514,15 @@ namespace SimpleInjector
         /// <exception cref="NotSupportedException">Thrown when the method is called for a registration
         /// that is made with one of the <b>Collections.Register</b> overloads that accepts a dynamic collection
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
-        public void Append<TService>(Func<TService> instanceCreator, Lifestyle lifestyle)
+        public RegistrationAppendCollectionRegistrationResult Append<TService>(
+            Func<TService> instanceCreator, Lifestyle lifestyle)
             where TService : class
         {
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
-            this.AppendToCollectionInternal(
+            return this.AppendToCollectionInternal(
                 typeof(TService), lifestyle.CreateRegistration(instanceCreator, this.Container));
         }
 
@@ -538,13 +543,13 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is a null reference.
         /// </exception>
-        public void AppendInstance<TService>(TService instance)
+        public RegistrationAppendCollectionRegistrationResult AppendInstance<TService>(TService instance)
             where TService : class
         {
             Requires.IsNotNull(instance, nameof(instance));
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
-            this.AppendToCollectionInternal(
+            return this.AppendToCollectionInternal(
                 typeof(TService),
                 SingletonLifestyle.CreateSingleInstanceRegistration(
                     typeof(TService), instance, this.Container));
@@ -569,7 +574,7 @@ namespace SimpleInjector
         /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or
         /// <paramref name="instance"/> are null references.
         /// </exception>
-        public void AppendInstance(Type serviceType, object instance)
+        public RegistrationAppendCollectionRegistrationResult AppendInstance(Type serviceType, object instance)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(instance, nameof(instance));
@@ -581,7 +586,7 @@ namespace SimpleInjector
 
             // We need to build a registration using the actual instance type because serviceType
             // is allowed to be a generic type definition.
-            this.AppendToCollectionInternal(
+            return this.AppendToCollectionInternal(
                 serviceType,
                 SingletonLifestyle.CreateSingleInstanceRegistration(
                     instance.GetType(), instance, this.Container));
@@ -602,13 +607,13 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="containerUncontrolledCollection"/> is a null
         /// reference.</exception>
-        public void Register<TService>(IEnumerable<TService> containerUncontrolledCollection)
+        public UncontrolledCollectionRegistrationResult Register<TService>(IEnumerable<TService> containerUncontrolledCollection)
             where TService : class
         {
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
             Requires.IsNotNull(containerUncontrolledCollection, nameof(containerUncontrolledCollection));
 
-            this.RegisterContainerUncontrolledCollection(typeof(TService), containerUncontrolledCollection);
+            return this.RegisterContainerUncontrolledCollection(typeof(TService), containerUncontrolledCollection);
         }
 
         /// <summary>
@@ -624,7 +629,7 @@ namespace SimpleInjector
         /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when one of the elements of <paramref name="singletons"/>
         /// is a null reference.</exception>
-        public void Register<TService>(params TService[] singletons)
+        public RegistrationsCollectionRegistrationResult Register<TService>(params TService[] singletons)
             where TService : class
         {
             Requires.IsNotNull(singletons, nameof(singletons));
@@ -647,7 +652,7 @@ namespace SimpleInjector
                     this.Container,
                     singleton.GetType());
 
-            this.Register(typeof(TService), singletonRegistrations);
+            return this.Register(typeof(TService), singletonRegistrations);
         }
 
         /// <summary>
@@ -668,10 +673,10 @@ namespace SimpleInjector
         /// element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        public void Register<TService>(params Type[] serviceTypes)
+        public TypesCollectionRegistrationResult Register<TService>(params Type[] serviceTypes)
             where TService : class
         {
-            this.Register(typeof(TService), serviceTypes);
+            return this.Register(typeof(TService), serviceTypes);
         }
 
         /// <summary>
@@ -692,10 +697,10 @@ namespace SimpleInjector
         /// element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        public void Register<TService>(IEnumerable<Type> serviceTypes)
+        public TypesCollectionRegistrationResult Register<TService>(IEnumerable<Type> serviceTypes)
             where TService : class
         {
-            this.Register(typeof(TService), serviceTypes);
+            return this.Register(typeof(TService), serviceTypes);
         }
 
         /// <summary>
@@ -724,10 +729,11 @@ namespace SimpleInjector
         /// element, a generic type definition, or the <typeparamref name="TService"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        public void Register<TService>(IEnumerable<Type> serviceTypes, Lifestyle lifestyle)
+        public RegistrationsCollectionRegistrationResult Register<TService>(
+            IEnumerable<Type> serviceTypes, Lifestyle lifestyle)
             where TService : class
         {
-            this.Register(typeof(TService), serviceTypes, lifestyle);
+            return this.Register(typeof(TService), serviceTypes, lifestyle);
         }
 
         /// <summary>
@@ -748,10 +754,11 @@ namespace SimpleInjector
         /// element or when <typeparamref name="TService"/> is not assignable from any of the
         /// service types supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
-        public void Register<TService>(IEnumerable<Registration> registrations)
+        public RegistrationsCollectionRegistrationResult Register<TService>(
+            IEnumerable<Registration> registrations)
             where TService : class
         {
-            this.Register(typeof(TService), registrations);
+            return this.Register(typeof(TService), registrations);
         }
 
         /// <summary>
@@ -772,7 +779,7 @@ namespace SimpleInjector
         /// element, a generic type definition, or the <paramref name="serviceType"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        public void Register(Type serviceType, IEnumerable<Type> serviceTypes)
+        public TypesCollectionRegistrationResult Register(Type serviceType, IEnumerable<Type> serviceTypes)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(serviceTypes, nameof(serviceTypes));
@@ -788,7 +795,7 @@ namespace SimpleInjector
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(
                 serviceType, serviceTypes, nameof(serviceTypes));
 
-            this.RegisterCollectionInternal(serviceType, serviceTypes);
+            return this.RegisterCollectionInternal(serviceType, serviceTypes);
         }
 
         /// <summary>
@@ -817,7 +824,8 @@ namespace SimpleInjector
         /// element, a generic type definition, or the <paramref name="serviceType"/> is
         /// not assignable from one of the given <paramref name="serviceTypes"/> elements.
         /// </exception>
-        public void Register(Type serviceType, IEnumerable<Type> serviceTypes, Lifestyle lifestyle)
+        public RegistrationsCollectionRegistrationResult Register(
+            Type serviceType, IEnumerable<Type> serviceTypes, Lifestyle lifestyle)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(serviceTypes, nameof(serviceTypes));
@@ -835,7 +843,7 @@ namespace SimpleInjector
 
             var registrations = serviceTypes.Select(t => lifestyle.CreateRegistration(t, this.Container));
 
-            this.RegisterCollectionInternal(serviceType, registrations);
+            return this.RegisterCollectionInternal(serviceType, registrations);
         }
 
         /// <summary>
@@ -857,7 +865,8 @@ namespace SimpleInjector
         /// element or when <paramref name="serviceType"/> is not assignable from any of the service types
         /// supplied by the given <paramref name="registrations"/> instances.
         /// </exception>
-        public void Register(Type serviceType, IEnumerable<Registration> registrations)
+        public RegistrationsCollectionRegistrationResult Register(
+            Type serviceType, IEnumerable<Registration> registrations)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(registrations, nameof(registrations));
@@ -872,7 +881,7 @@ namespace SimpleInjector
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(
                 serviceType, registrations, nameof(registrations));
 
-            this.RegisterCollectionInternal(serviceType, registrations);
+            return this.RegisterCollectionInternal(serviceType, registrations);
         }
 
         /// <summary>
@@ -888,7 +897,8 @@ namespace SimpleInjector
         /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="serviceType"/> represents an
         /// open generic type.</exception>
-        public void Register(Type serviceType, IEnumerable containerUncontrolledCollection)
+        public UncontrolledCollectionRegistrationResult Register(
+            Type serviceType, IEnumerable containerUncontrolledCollection)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(containerUncontrolledCollection, nameof(containerUncontrolledCollection));
@@ -897,7 +907,7 @@ namespace SimpleInjector
 
             try
             {
-                this.RegisterContainerUncontrolledCollection(
+                return this.RegisterContainerUncontrolledCollection(
                     serviceType,
                     containerUncontrolledCollection.Cast<object>());
             }
@@ -924,10 +934,10 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference.</exception>
-        public void Register<TService>(params Assembly[] assemblies)
+        public TypesCollectionRegistrationResult Register<TService>(params Assembly[] assemblies)
             where TService : class
         {
-            this.Register(typeof(TService), assemblies);
+            return this.Register(typeof(TService), assemblies);
         }
 
         /// <summary>
@@ -943,10 +953,10 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference.</exception>
-        public void Register<TService>(IEnumerable<Assembly> assemblies)
+        public TypesCollectionRegistrationResult Register<TService>(IEnumerable<Assembly> assemblies)
             where TService : class
         {
-            this.Register(typeof(TService), assemblies);
+            return this.Register(typeof(TService), assemblies);
         }
 
         /// <summary>
@@ -973,10 +983,10 @@ namespace SimpleInjector
         /// <param name="lifestyle">The lifestyle to register instances with.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference.</exception>
-        public void Register<TService>(IEnumerable<Assembly> assemblies, Lifestyle lifestyle)
+        public RegistrationsCollectionRegistrationResult Register<TService>(IEnumerable<Assembly> assemblies, Lifestyle lifestyle)
             where TService : class
         {
-            this.Register(typeof(TService), assemblies, lifestyle);
+            return this.Register(typeof(TService), assemblies, lifestyle);
         }
 
         /// <summary>
@@ -996,9 +1006,9 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference.</exception>
-        public void Register(Type serviceType, params Assembly[] assemblies)
+        public TypesCollectionRegistrationResult Register(Type serviceType, params Assembly[] assemblies)
         {
-            this.Register(serviceType, (IEnumerable<Assembly>)assemblies);
+            return this.Register(serviceType, (IEnumerable<Assembly>)assemblies);
         }
 
         /// <summary>
@@ -1018,11 +1028,11 @@ namespace SimpleInjector
         /// <param name="assemblies">A list of assemblies that will be searched.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference.</exception>
-        public void Register(Type serviceType, IEnumerable<Assembly> assemblies)
+        public TypesCollectionRegistrationResult Register(Type serviceType, IEnumerable<Assembly> assemblies)
         {
             var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };
             var types = this.Container.GetTypesToRegister(serviceType, assemblies, compositesExcluded);
-            this.Register(serviceType, types);
+            return this.Register(serviceType, types);
         }
 
         /// <summary>
@@ -1053,11 +1063,12 @@ namespace SimpleInjector
         /// <param name="lifestyle">The lifestyle to register instances with.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments contain a null
         /// reference.</exception>
-        public void Register(Type serviceType, IEnumerable<Assembly> assemblies, Lifestyle lifestyle)
+        public RegistrationsCollectionRegistrationResult Register(
+            Type serviceType, IEnumerable<Assembly> assemblies, Lifestyle lifestyle)
         {
             var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };
             var types = this.Container.GetTypesToRegister(serviceType, assemblies, compositesExcluded);
-            this.Register(serviceType, types, lifestyle);
+            return this.Register(serviceType, types, lifestyle);
         }
 
         private ContainerControlledCollection<TService> CreateInternal<TService>(
@@ -1121,15 +1132,19 @@ namespace SimpleInjector
 
         // This method is internal to prevent the main API of the framework from being 'polluted'. The
         // Collections.Append method enabled public exposure.
-        private void AppendToCollectionInternal(Type itemType, Registration registration)
+        private RegistrationAppendCollectionRegistrationResult AppendToCollectionInternal(
+            Type itemType, Registration registration)
         {
             this.RegisterCollectionInternal(
                 itemType,
                 new[] { ContainerControlledItem.CreateFromRegistration(registration) },
                 appending: true);
+
+            return new RegistrationAppendCollectionRegistrationResult(this.Container, itemType, registration);
         }
 
-        private void AppendToCollectionInternal(Type itemType, Type implementationType)
+        private TypeAppendCollectionRegistrationResult AppendToCollectionInternal(
+            Type itemType, Type implementationType)
         {
             // NOTE: The supplied serviceTypes can be opened, partially-closed, closed, non-generic or even
             // abstract.
@@ -1137,22 +1152,30 @@ namespace SimpleInjector
                 itemType,
                 new[] { ContainerControlledItem.CreateFromType(implementationType) },
                 appending: true);
+
+            return new TypeAppendCollectionRegistrationResult(this.Container, itemType, implementationType);
         }
 
-        private void RegisterCollectionInternal(Type itemType, IEnumerable<Registration> registrations)
+        private RegistrationsCollectionRegistrationResult RegisterCollectionInternal(
+            Type itemType, IEnumerable<Registration> registrations)
         {
             var controlledItems =
                 registrations.Select(ContainerControlledItem.CreateFromRegistration).ToArray();
 
             this.RegisterCollectionInternal(itemType, controlledItems);
+
+            return new RegistrationsCollectionRegistrationResult(this.Container, itemType, registrations);
         }
 
-        private void RegisterCollectionInternal(Type itemType, IEnumerable<Type> serviceTypes)
+        private TypesCollectionRegistrationResult RegisterCollectionInternal(
+            Type itemType, IEnumerable<Type> serviceTypes)
         {
             // NOTE: The supplied serviceTypes can be opened, partially-closed, closed, non-generic or even
             // abstract.
             var controlledItems = serviceTypes.Select(ContainerControlledItem.CreateFromType).ToArray();
             this.RegisterCollectionInternal(itemType, controlledItems);
+            
+            return new TypesCollectionRegistrationResult(this.Container, itemType, serviceTypes);
         }
 
         private void RegisterCollectionInternal(
@@ -1171,7 +1194,8 @@ namespace SimpleInjector
             resolver.AddControlledRegistrations(itemType, controlledItems, append: appending);
         }
 
-        private void RegisterGenericContainerUncontrolledCollection(Type itemType, IEnumerable collection)
+        private UncontrolledCollectionRegistrationResult RegisterGenericContainerUncontrolledCollection(
+            Type itemType, IEnumerable collection)
         {
             var resolver = this.Container.GetContainerUncontrolledResolver(itemType);
 
@@ -1179,15 +1203,19 @@ namespace SimpleInjector
                 itemType, collection, this.Container);
 
             resolver.RegisterUncontrolledCollection(itemType, producer);
+
+            return new UncontrolledCollectionRegistrationResult(this.Container, itemType, collection);
         }
 
-        private void RegisterContainerUncontrolledCollection<T>(
+        private UncontrolledCollectionRegistrationResult RegisterContainerUncontrolledCollection<T>(
             Type itemType, IEnumerable<T> containerUncontrolledCollection)
         {
             IEnumerable readOnlyCollection = containerUncontrolledCollection.MakeReadOnly();
             IEnumerable castedCollection = Helpers.CastCollection(readOnlyCollection, itemType);
 
             this.RegisterGenericContainerUncontrolledCollection(itemType, castedCollection);
+
+            return new UncontrolledCollectionRegistrationResult(this.Container, itemType, castedCollection);
         }
 
         private CollectionResolver GetContainerControlledResolver(Type itemType) =>

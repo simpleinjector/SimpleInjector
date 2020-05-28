@@ -5,6 +5,7 @@ namespace SimpleInjector
 {
     using System;
     using SimpleInjector.Decorators;
+    using SimpleInjector.Fluent;
 
 #if !PUBLISH
     /// <summary>Methods for registration of decorators.</summary>
@@ -66,11 +67,13 @@ namespace SimpleInjector
         /// have a single public constructor, or when <typeparamref name="TDecorator"/> does not
         /// contain a constructor that has exactly one argument of type <typeparamref name="TService"/> or
         /// <see cref="Func{T}"/> where <b>T</b> is <typeparamref name="TService"/>.</exception>
-        public void RegisterDecorator<TService, TDecorator>()
+        public DecoratorRegistrationResult<TService, TDecorator> RegisterDecorator<TService, TDecorator>()
             where TService : class
             where TDecorator : class, TService
         {
             this.RegisterDecoratorCore(typeof(TService), typeof(TDecorator));
+
+            return new DecoratorRegistrationResult<TService, TDecorator>(this);
         }
 
         /// <summary>
@@ -123,11 +126,14 @@ namespace SimpleInjector
         /// not contain a constructor that has exactly one argument of type
         /// <typeparamref name="TService"/> or <see cref="Func{T}"/> where <b>T</b> is
         /// <typeparamref name="TService"/>.</exception>
-        public void RegisterDecorator<TService, TDecorator>(Lifestyle lifestyle)
+        public DecoratorRegistrationResult<TService, TDecorator> RegisterDecorator<TService, TDecorator>(
+            Lifestyle lifestyle)
             where TService : class
             where TDecorator : class, TService
         {
             this.RegisterDecoratorCore(typeof(TService), typeof(TDecorator), lifestyle: lifestyle);
+
+            return new DecoratorRegistrationResult<TService, TDecorator>(this);
         }
 
         /// <summary>
@@ -319,9 +325,11 @@ namespace SimpleInjector
         /// contain a constructor that has exactly one argument of type
         /// <paramref name="serviceType"/> or <see cref="Func{T}"/> where <b>T</b> is
         /// <paramref name="serviceType"/>.</exception>
-        public void RegisterDecorator(Type serviceType, Type decoratorType)
+        public DecoratorRegistrationResult RegisterDecorator(Type serviceType, Type decoratorType)
         {
             this.RegisterDecoratorCore(serviceType, decoratorType);
+
+            return new DecoratorRegistrationResult(this, serviceType, decoratorType);
         }
 
         /// <summary>
@@ -378,9 +386,12 @@ namespace SimpleInjector
         /// not contain a constructor that has exactly one argument of type
         /// <paramref name="serviceType"/> or <see cref="Func{T}"/> where <b>T</b> is
         /// <paramref name="serviceType"/>.</exception>
-        public void RegisterDecorator(Type serviceType, Type decoratorType, Lifestyle lifestyle)
+        public DecoratorRegistrationResult RegisterDecorator(
+            Type serviceType, Type decoratorType, Lifestyle lifestyle)
         {
             this.RegisterDecoratorCore(serviceType, decoratorType, lifestyle: lifestyle);
+
+            return new DecoratorRegistrationResult(this, serviceType, decoratorType);
         }
 
         /// <summary>
@@ -439,7 +450,7 @@ namespace SimpleInjector
         /// not contain a constructor that has exactly one argument of type
         /// <paramref name="serviceType"/> or <see cref="Func{T}"/> where <b>T</b> is
         /// <paramref name="serviceType"/>.</exception>
-        public void RegisterDecorator(
+        public DecoratorRegistrationResult RegisterDecorator(
             Type serviceType,
             Type decoratorType,
             Lifestyle lifestyle,
@@ -448,6 +459,8 @@ namespace SimpleInjector
             Requires.IsNotNull(predicate, nameof(predicate));
 
             this.RegisterDecoratorCore(serviceType, decoratorType, predicate, lifestyle);
+
+            return new DecoratorRegistrationResult(this, serviceType, decoratorType, predicate);
         }
 
         /// <summary>
@@ -525,7 +538,7 @@ namespace SimpleInjector
         /// <param name="predicate">The predicate that determines whether the decorator must be applied to a
         /// service type.</param>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
-        public void RegisterDecorator(
+        public DecoratorTypeFactoryRegistrationResult RegisterDecorator(
             Type serviceType,
             Func<DecoratorPredicateContext, Type> decoratorTypeFactory,
             Lifestyle lifestyle,
@@ -541,6 +554,9 @@ namespace SimpleInjector
                     this, serviceType, null, predicate, lifestyle, decoratorTypeFactory));
 
             this.ExpressionBuilt += interceptor.ExpressionBuilt;
+
+            return new DecoratorTypeFactoryRegistrationResult(
+                this, serviceType, decoratorTypeFactory, lifestyle, predicate);
         }
 
         /// <summary>
@@ -605,12 +621,14 @@ namespace SimpleInjector
         /// not contain a constructor that has exactly one argument of type
         /// <paramref name="serviceType"/> or <see cref="Func{T}"/> where <b>T</b> is
         /// <paramref name="serviceType"/>.</exception>
-        public void RegisterDecorator(
+        public DecoratorRegistrationResult RegisterDecorator(
             Type serviceType, Type decoratorType, Predicate<DecoratorPredicateContext> predicate)
         {
             Requires.IsNotNull(predicate, nameof(predicate));
 
             this.RegisterDecoratorCore(serviceType, decoratorType, predicate);
+
+            return new DecoratorRegistrationResult(this, serviceType, decoratorType, predicate);
         }
 
         private void RegisterDecoratorCore(

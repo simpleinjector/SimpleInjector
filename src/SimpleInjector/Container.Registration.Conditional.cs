@@ -4,6 +4,7 @@
 namespace SimpleInjector
 {
     using System;
+    using SimpleInjector.Fluent;
 
 #if !PUBLISH
     /// <summary>Methods for conditional registrations.</summary>
@@ -43,11 +44,14 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
-        public void RegisterConditional<TService, TImplementation>(Predicate<PredicateContext> predicate)
+        public ConditionalRegistrationResult<TService, TImplementation>
+            RegisterConditional<TService, TImplementation>(Predicate<PredicateContext> predicate)
             where TImplementation : class, TService
             where TService : class
         {
             this.RegisterConditional<TService, TImplementation>(this.SelectionBasedLifestyle, predicate);
+
+            return new ConditionalRegistrationResult<TService, TImplementation>(this, predicate);
         }
 
         /// <summary>
@@ -72,12 +76,15 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
-        public void RegisterConditional<TService, TImplementation>(Lifestyle lifestyle,
-            Predicate<PredicateContext> predicate)
+        public ConditionalRegistrationResult<TService, TImplementation>
+            RegisterConditional<TService, TImplementation>(
+                Lifestyle lifestyle, Predicate<PredicateContext> predicate)
             where TService : class
             where TImplementation : class, TService
         {
             this.RegisterConditional(typeof(TService), typeof(TImplementation), lifestyle, predicate);
+
+            return new ConditionalRegistrationResult<TService, TImplementation>(this, predicate);
         }
 
         /// <summary>
@@ -105,10 +112,12 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
-        public void RegisterConditional(
+        public ConditionalRegistrationResult RegisterConditional(
             Type serviceType, Type implementationType, Predicate<PredicateContext> predicate)
         {
             this.RegisterConditional(serviceType, implementationType, this.SelectionBasedLifestyle, predicate);
+
+            return new ConditionalRegistrationResult(this, serviceType, implementationType, predicate);
         }
 
         /// <summary>
@@ -136,7 +145,7 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
-        public void RegisterConditional(
+        public ConditionalRegistrationResult RegisterConditional(
             Type serviceType,
             Type implementationType,
             Lifestyle lifestyle,
@@ -166,6 +175,8 @@ namespace SimpleInjector
                 var registration = lifestyle.CreateRegistration(implementationType, this);
                 this.RegisterConditional(serviceType, registration, predicate);
             }
+
+            return new ConditionalRegistrationResult(this, serviceType, implementationType, predicate);
         }
 
         /// <summary>
@@ -196,7 +207,7 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
-        public void RegisterConditional(
+        public ConditionalTypeFactoryRegistrationResult RegisterConditional(
             Type serviceType,
             Func<TypeFactoryContext, Type> implementationTypeFactory,
             Lifestyle lifestyle,
@@ -210,6 +221,9 @@ namespace SimpleInjector
 
             this.GetOrCreateRegistrationalEntry(serviceType)
                 .Add(serviceType, implementationTypeFactory, lifestyle, predicate);
+
+            return new ConditionalTypeFactoryRegistrationResult(
+                this, serviceType, implementationTypeFactory, lifestyle, predicate);
         }
 
         /// <summary>
@@ -231,10 +245,13 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
-        public void RegisterConditional<TService>(
+        public ConditionalRegistrationResult RegisterConditional<TService>(
             Registration registration, Predicate<PredicateContext> predicate)
         {
             this.RegisterConditional(typeof(TService), registration, predicate);
+
+            return new ConditionalRegistrationResult(
+                this, typeof(TService), registration.ImplementationType, predicate);
         }
 
         /// <summary>
@@ -259,7 +276,7 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.
         /// </exception>
-        public void RegisterConditional(
+        public ConditionalRegistrationRegistrationResult RegisterConditional(
             Type serviceType, Registration registration, Predicate<PredicateContext> predicate)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
@@ -275,6 +292,8 @@ namespace SimpleInjector
             producer.Predicate = predicate;
 
             this.AddInstanceProducer(producer);
+
+            return new ConditionalRegistrationRegistrationResult(this, serviceType, registration, predicate);
         }
     }
 }
