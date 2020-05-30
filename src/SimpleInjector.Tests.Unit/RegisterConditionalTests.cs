@@ -1901,6 +1901,34 @@
             Assert.IsNull(context.Consumer, message: $"Actual: {context.Consumer}");
         }
 
+        // #229
+        [TestMethod]
+        public void RegisteringConditionalValueTypes_WithVerficationSuppressed_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.DependencyInjectionBehavior =
+                new VerficationlessInjectionBehavior(container.Options.DependencyInjectionBehavior);
+
+            var registration1 = Lifestyle.Singleton.CreateRegistration(typeof(int), 1, container);
+            var registration2 = Lifestyle.Singleton.CreateRegistration(typeof(double), 2.0, container);
+
+            container.RegisterConditional(typeof(int), registration1, _ => true);
+            container.RegisterConditional(typeof(double), registration2, _ => true);
+
+            container.Register(typeof(ServiceDependingOn<int>));
+            container.Register(typeof(ServiceDependingOn<double>));
+
+            // Act
+            int intValue = container.GetInstance<ServiceDependingOn<int>>().Dependency;
+            double doubleValue = container.GetInstance<ServiceDependingOn<double>>().Dependency;
+
+            // Assert
+            Assert.AreEqual(1, intValue);
+            Assert.AreEqual(2.0, doubleValue);
+        }
+
         private static void RegisterConditionalConstant<T>(Container container, T constant,
             Predicate<PredicateContext> predicate)
         {

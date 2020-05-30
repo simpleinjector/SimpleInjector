@@ -434,7 +434,7 @@ namespace SimpleInjector
 
             return InstanceProducer.Create(
                 producerType,
-                SingletonLifestyle.CreateSingleInstanceRegistration(producerType, instanceProducer!, this));
+                Lifestyle.Singleton.CreateRegistration(producerType, instanceProducer!, this));
         }
 
         private InstanceProducer BuildInstanceProducerForEnumerableOfInstanceProducers(
@@ -458,7 +458,7 @@ namespace SimpleInjector
 
             producerCollection.AppendAll(
                 from producer in collection!.GetProducers()
-                let reg = SingletonLifestyle.CreateSingleInstanceRegistration(producerType, producer, this)
+                let reg = Lifestyle.Singleton.CreateRegistration(producerType, producer, this)
                 select ContainerControlledItem.CreateFromRegistration(reg));
 
             return InstanceProducer.Create(

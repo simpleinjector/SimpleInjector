@@ -337,6 +337,25 @@
             Assert.AreEqual(typeof(LoggerDecorator), producer.Registration.ImplementationType, "After GetInstance");
         }
 
+        // #229
+        [TestMethod]
+        public void GetInstance_ForSingletonValueType_CanBeResolved()
+        {
+            // Arrange
+            int expectedValue = 4;
+
+            var container = new Container();
+
+            var registration = Lifestyle.Singleton.CreateRegistration(typeof(int), expectedValue, container);
+            var producer = new InstanceProducer<int>(registration);
+
+            // Act
+            int actualValue = producer.GetInstance();
+
+            // Assert
+            Assert.AreEqual(expectedValue, actualValue);
+        }
+
         public class OneAndTwo : IOne, ITwo
         {
         }

@@ -705,8 +705,10 @@ namespace SimpleInjector
             Requires.IsNotNull(instance, nameof(instance));
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
+            Type implementationType = instance.GetType();
+
             var registration = SingletonLifestyle.CreateSingleInstanceRegistration(
-                typeof(TService), instance, this, instance.GetType());
+                typeof(TService), implementationType, instance, this);
 
             this.AddRegistration(typeof(TService), registration);
         }
@@ -759,11 +761,11 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(instance, nameof(instance));
-            Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), nameof(serviceType));
-
             Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
 
-            var registration = SingletonLifestyle.CreateSingleInstanceRegistration(serviceType, instance, this);
+            // The instance type check is done inside CreateSingleInstanceRegistration.
+            var registration = SingletonLifestyle.CreateSingleInstanceRegistration(
+                serviceType, instance.GetType(), instance, this);
 
             this.AddRegistration(serviceType, registration);
         }

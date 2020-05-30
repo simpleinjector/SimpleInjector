@@ -546,8 +546,7 @@ namespace SimpleInjector
 
             this.AppendToCollectionInternal(
                 typeof(TService),
-                SingletonLifestyle.CreateSingleInstanceRegistration(
-                    typeof(TService), instance, this.Container));
+                Lifestyle.Singleton.CreateRegistration(typeof(TService), instance, this.Container));
         }
 
         /// <summary>
@@ -583,7 +582,7 @@ namespace SimpleInjector
             // is allowed to be a generic type definition.
             this.AppendToCollectionInternal(
                 serviceType,
-                SingletonLifestyle.CreateSingleInstanceRegistration(
+                Lifestyle.Singleton.CreateRegistration(
                     instance.GetType(), instance, this.Container));
         }
 
@@ -641,11 +640,7 @@ namespace SimpleInjector
 
             var singletonRegistrations =
                 from singleton in singletons
-                select SingletonLifestyle.CreateSingleInstanceRegistration(
-                    typeof(TService),
-                    singleton,
-                    this.Container,
-                    singleton.GetType());
+                select Lifestyle.Singleton.CreateRegistration(typeof(TService), singleton, this.Container);
 
             this.Register(typeof(TService), singletonRegistrations);
         }

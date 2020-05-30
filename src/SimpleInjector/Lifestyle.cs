@@ -113,7 +113,7 @@ namespace SimpleInjector
         /// </example>
         [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes",
             Justification = "It's not mutable.")]
-        public static readonly Lifestyle Singleton = new SingletonLifestyle();
+        public static readonly SingletonLifestyle Singleton = SingletonLifestyle.Instance;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal static readonly Lifestyle Unknown = new UnknownLifestyle();

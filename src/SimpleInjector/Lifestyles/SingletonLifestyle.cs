@@ -13,13 +13,46 @@ namespace SimpleInjector.Lifestyles
     using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
 
-    internal sealed class SingletonLifestyle : Lifestyle
+    /// <summary>
+    /// The singleton lifestyle.
+    /// </summary>
+    public sealed class SingletonLifestyle : Lifestyle
     {
-        internal SingletonLifestyle() : base("Singleton")
+        // Oh, the irony. Here the Singleton Design Pattern is applied to the Singleton Lifestyle.
+        internal static readonly SingletonLifestyle Instance = new SingletonLifestyle();
+
+        private SingletonLifestyle() : base("Singleton")
         {
         }
 
+        /// <inheritdoc />
         public override int Length => 1000;
+
+        /// <summary>
+        /// Creates a new <see cref="Registration"/> instance defining the creation of the
+        /// specified <paramref name="instance"/>. Properties, decorators, interceptors, and initializers
+        /// may be applied to this instance.
+        /// </summary>
+        /// <param name="instanceType">The type of the instance.</param>
+        /// <param name="instance">The instance to create a registration for.</param>
+        /// <param name="container">The <see cref="Container"/> instance for which a
+        /// <see cref="Registration"/> must be created.</param>
+        /// <returns>A new <see cref="Registration"/> instance.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when on of the supplied arguments is a null
+        /// reference.</exception>
+        public Registration CreateRegistration(Type instanceType, object instance, Container container)
+        {
+            Requires.IsNotNull(instanceType, nameof(instanceType));
+            Requires.IsNotNull(instance, nameof(instance));
+            Requires.IsNotNull(container, nameof(container));
+
+            // The instance type check is done inside CreateSingleInstanceRegistration.
+            return CreateSingleInstanceRegistration(
+                serviceType: instanceType,
+                implementationType: instance!.GetType(),
+                instance: instance!,
+                container: container);
+        }
 
         // This method seems somewhat redundant, since the exact same can be achieved by calling
         // Lifetime.Singleton.CreateRegistration(serviceType, () => instance, container). Calling that method
@@ -29,7 +62,7 @@ namespace SimpleInjector.Lifestyles
         // ExpressionBuilding event is called with a ConstantExpression, which is much more intuitive to
         // anyone handling that event.
         internal static Registration CreateSingleInstanceRegistration(
-            Type serviceType, object instance, Container container, Type? implementationType = null)
+            Type serviceType, Type implementationType, object instance, Container container)
         {
             Requires.IsNotNull(instance, nameof(instance));
 
@@ -37,14 +70,18 @@ namespace SimpleInjector.Lifestyles
             // In case of a COM object, we override the implementation type, because otherwise our internal
             // type checks (that call Type.IsAssignableFrom) would fail.
 #if !NETSTANDARD1_0 && !NETSTANDARD1_3
-            if (implementationType != null && implementationType.IsCOMObject)
+            if (implementationType.IsCOMObject)
             {
                 implementationType = serviceType;
+            }
+            else
+            {
+                Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), nameof(serviceType));
             }
 #endif
 
             return new SingletonInstanceLifestyleRegistration(
-                serviceType, implementationType ?? serviceType, instance, container);
+                serviceType, implementationType, instance, container);
         }
 
         internal static InstanceProducer CreateUncontrolledCollectionProducer(
@@ -58,7 +95,15 @@ namespace SimpleInjector.Lifestyles
         {
             Type enumerableType = typeof(IEnumerable<>).MakeGenericType(itemType);
 
-            var registration = CreateSingleInstanceRegistration(enumerableType, collection, container);
+            // collection.GetType() could be anything, including internal types, so we don't want to use
+            // that.
+            Type implementationType = enumerableType;
+
+            var registration = CreateSingleInstanceRegistration(
+                serviceType: enumerableType,
+                implementationType: implementationType,
+                instance: collection,
+                container: container);
 
             registration.IsCollection = true;
 
@@ -68,9 +113,11 @@ namespace SimpleInjector.Lifestyles
         internal static bool IsSingletonInstanceRegistration(Registration registration) =>
             registration is SingletonInstanceLifestyleRegistration;
 
+        /// <inheritdoc />
         protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
             new SingletonLifestyleRegistration<TConcrete>(container);
 
+        /// <inheritdoc />
         protected internal override Registration CreateRegistrationCore<TService>(
             Func<TService> instanceCreator, Container container)
         {

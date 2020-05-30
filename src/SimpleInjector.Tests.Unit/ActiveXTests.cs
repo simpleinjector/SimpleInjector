@@ -2,10 +2,10 @@
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    // #589
     [TestClass]
     public class ActiveXTests
     {
-        // #589
         [TestMethod]
         public void RegisterSingleton_RegisteringVerifyingAndResolvingAnActiveXObject_Succeeds()
         {
@@ -20,7 +20,20 @@
             ie.ToolBar = 0;
         }
 
-        // #589
+        [TestMethod]
+        public void RegisterInstanceGeneric_RegisteringVerifyingAndResolvingAnActiveXObject_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+            SHDocVw.InternetExplorer comObject = new SHDocVw.InternetExplorer();
+
+            // Act
+            container.RegisterInstance(comObject);
+            container.Verify();
+            var ie = container.GetInstance<SHDocVw.InternetExplorer>();
+            ie.ToolBar = 0;
+        }
+
         [TestMethod]
         public void RegisterInstance_RegisteringVerifyingAndResolvingAnActiveXObject_Succeeds()
         {
@@ -29,7 +42,7 @@
             SHDocVw.InternetExplorer comObject = new SHDocVw.InternetExplorer();
 
             // Act
-            container.RegisterInstance(comObject);
+            container.RegisterInstance(typeof(SHDocVw.InternetExplorer), comObject);
             container.Verify();
             var ie = container.GetInstance<SHDocVw.InternetExplorer>();
             ie.ToolBar = 0;
