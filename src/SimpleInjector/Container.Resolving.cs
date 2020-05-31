@@ -332,7 +332,7 @@ namespace SimpleInjector
                 () => this.BuildInstanceProducerForType<TService>());
         }
 
-        private InstanceProducer? GetInstanceProducerForType(Type serviceType, InjectionConsumerInfo context)
+        internal InstanceProducer? GetInstanceProducerForType(Type serviceType, InjectionConsumerInfo context)
         {
             return this.GetInstanceProducerForType(
                 serviceType, context, () => this.BuildInstanceProducerForType(serviceType));
@@ -401,75 +401,15 @@ namespace SimpleInjector
         }
 
         // This method allows using InstanceProducer<T> as dependency.
-        private InstanceProducer? TryBuildInstanceProducerForInstanceProducer(Type type)
-        {
-            // Check for InstanceProducer<T>, but prevent sub types of InstanceProducer<T>.
-            if (typeof(InstanceProducer<>).IsGenericTypeDefinitionOf(type))
-            {
-                return this.BuildInstanceProducerForInstanceProducer(type);
-            }
-            else if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(type)
-                && typeof(InstanceProducer<>).IsGenericTypeDefinitionOf(type.GetGenericArguments()[0]))
-            {
-                return this.BuildInstanceProducerForEnumerableOfInstanceProducers(type);
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private InstanceProducer BuildInstanceProducerForInstanceProducer(Type producerType)
-        {
-            Type serviceType = producerType.GetGenericArguments()[0];
-
-            var instanceProducer = this.GetInstanceProducerForType(serviceType, InjectionConsumerInfo.Root);
-
-            if (instanceProducer is null)
-            {
-                this.ThrowMissingInstanceProducerException(serviceType);
-            }
-
-            return InstanceProducer.Create(
-                producerType,
-                Lifestyle.Singleton.CreateRegistration(producerType, instanceProducer!, this));
-        }
-
-        private InstanceProducer BuildInstanceProducerForEnumerableOfInstanceProducers(
-            Type enumerableOfProducersType)
-        {
-            Type producerType = enumerableOfProducersType.GetGenericArguments()[0];
-            Type serviceType = producerType.GetGenericArguments()[0];
-
-            var collection = this.GetAllInstances(serviceType) as IContainerControlledCollection;
-
-            if (collection is null)
-            {
-                // This exception might not be expressive enough. If GetAllInstances succeeds, but the
-                // returned type is not an IContainerControlledCollection, it likely means the collection is
-                // container uncontrolled.
-                this.ThrowMissingInstanceProducerException(serviceType);
-            }
-
-            IContainerControlledCollection producerCollection =
-                ControlledCollectionHelper.CreateContainerControlledCollection(producerType, this);
-
-            producerCollection.AppendAll(
-                from producer in collection!.GetProducers()
-                let reg = Lifestyle.Singleton.CreateRegistration(producerType, producer, this)
-                select ContainerControlledItem.CreateFromRegistration(reg));
-
-            return InstanceProducer.Create(
-                serviceType: enumerableOfProducersType,
-                registration: producerCollection.CreateRegistration(enumerableOfProducersType, this));
-        }
+        private InstanceProducer? TryBuildInstanceProducerForInstanceProducer(Type type) =>
+            this.producerProducerBuilder.TryBuild(type);
 
         private InstanceProducer? TryBuildInstanceProducerForCollectionType(Type serviceType) =>
             this.TryBuildInstanceProducerForMutableCollection(serviceType) ??
             this.TryBuildInstanceProducerForStream(serviceType);
 
         private InstanceProducer? TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType) =>
-            this.producerBuilder.TryBuild(serviceType);
+            this.resolutionProducerBuilder.TryBuild(serviceType);
 
         private InstanceProducer? TryBuildInstanceProducerForMutableCollection(Type serviceType)
         {
@@ -750,7 +690,7 @@ namespace SimpleInjector
             }
         }
 
-        private void ThrowMissingInstanceProducerException(Type type)
+        internal void ThrowMissingInstanceProducerException(Type type)
         {
             if (Types.IsConcreteConstructableType(type))
             {

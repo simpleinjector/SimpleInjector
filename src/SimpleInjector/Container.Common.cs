@@ -80,7 +80,8 @@ namespace SimpleInjector
         private EventHandler<ExpressionBuildingEventArgs>? expressionBuilding;
         private EventHandler<ExpressionBuiltEventArgs>? expressionBuilt;
 
-        private readonly UnregisteredTypeResolutionInstanceProducerBuilder producerBuilder;
+        private readonly UnregisteredTypeResolutionInstanceProducerBuilder resolutionProducerBuilder;
+        private readonly InstanceProducerInstanceProducerBuilder producerProducerBuilder;
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
@@ -94,7 +95,8 @@ namespace SimpleInjector
 
             this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);
 
-            this.producerBuilder = new UnregisteredTypeResolutionInstanceProducerBuilder(
+            this.producerProducerBuilder = new InstanceProducerInstanceProducerBuilder(this);
+            this.resolutionProducerBuilder = new UnregisteredTypeResolutionInstanceProducerBuilder(
                 container: this,
                 shouldResolveUnregisteredTypes: () => this.resolveUnregisteredType != null,
                 resolveUnregisteredType: e => this.resolveUnregisteredType?.Invoke(this, e));
