@@ -82,6 +82,7 @@ namespace SimpleInjector
 
         private readonly UnregisteredTypeResolutionInstanceProducerBuilder resolutionProducerBuilder;
         private readonly InstanceProducerInstanceProducerBuilder producerProducerBuilder;
+        private readonly CollectionInstanceProducerBuilder collectionProducerBuilder;
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
@@ -95,6 +96,7 @@ namespace SimpleInjector
 
             this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);
 
+            this.collectionProducerBuilder = new CollectionInstanceProducerBuilder(this);
             this.producerProducerBuilder = new InstanceProducerInstanceProducerBuilder(this);
             this.resolutionProducerBuilder = new UnregisteredTypeResolutionInstanceProducerBuilder(
                 container: this,

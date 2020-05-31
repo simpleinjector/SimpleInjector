@@ -7,6 +7,10 @@ namespace SimpleInjector.Internals.Builders
     using System.Collections.Generic;
     using System.Linq;
 
+    /// <summary>
+    /// Builds InstanceProducers that can inject and resolve <see cref="InstanceProducer{TService}"/>
+    /// instances as singletons.
+    /// </summary>
     internal sealed class InstanceProducerInstanceProducerBuilder
     {
         private readonly Container container;

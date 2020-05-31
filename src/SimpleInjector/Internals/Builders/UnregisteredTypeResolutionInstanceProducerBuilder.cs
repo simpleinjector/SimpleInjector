@@ -7,6 +7,9 @@ namespace SimpleInjector.Internals.Builders
     using System.Collections.Generic;
     using SimpleInjector.Lifestyles;
 
+    /// <summary>
+    /// Builds InstanceProducers for types resolved through unregistered type resolution.
+    /// </summary>
     internal sealed class UnregisteredTypeResolutionInstanceProducerBuilder
     {
         private readonly Dictionary<Type, LazyEx<InstanceProducer>> resolveUnregisteredTypeRegistrations =
