@@ -43,27 +43,6 @@ namespace SimpleInjector.Internals.Builders
             return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(serviceType, BuildInstanceProducer);
         }
 
-        public InstanceProducer? TryBuild<TServiceType>()
-            where TServiceType : class
-        {
-            if (this.container.Options.ResolveUnregisteredConcreteTypes
-                && this.container.IsConcreteConstructableType(typeof(TServiceType)))
-            {
-                InstanceProducer BuildInstanceProducer()
-                {
-                    var registration =
-                        this.container.SelectionBasedLifestyle.CreateRegistration<TServiceType>(this.container);
-
-                    return BuildInstanceProducerForConcreteUnregisteredType(typeof(TServiceType), registration);
-                }
-
-                return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(
-                    typeof(TServiceType), BuildInstanceProducer);
-            }
-
-            return null;
-        }
-
         private static InstanceProducer BuildInstanceProducerForConcreteUnregisteredType(
             Type concreteType, Registration registration)
         {

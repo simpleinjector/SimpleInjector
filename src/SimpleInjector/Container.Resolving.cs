@@ -44,7 +44,7 @@ namespace SimpleInjector
             // Performance optimization: This if check is a duplicate to save a call to GetInstanceForType.
             if (!this.rootProducerCache.TryGetValue(typeof(TService), out InstanceProducer? instanceProducer))
             {
-                return (TService)this.GetInstanceForRootType<TService>();
+                return (TService)this.GetInstanceForRootType(typeof(TService));
             }
 
             if (instanceProducer is null)
@@ -313,28 +313,10 @@ namespace SimpleInjector
             }
         }
 
-        private InstanceProducer? GetInstanceProducerForType<TService>(InjectionConsumerInfo context)
-            where TService : class
-        {
-            // This generic overload allows retrieving types that are internal inside a sandbox.
-            return this.GetInstanceProducerForType(
-                typeof(TService),
-                context,
-                () => this.BuildInstanceProducerForType<TService>());
-        }
-
         internal InstanceProducer? GetInstanceProducerForType(Type serviceType, InjectionConsumerInfo context)
         {
             return this.GetInstanceProducerForType(
                 serviceType, context, () => this.BuildInstanceProducerForType(serviceType));
-        }
-
-        private object GetInstanceForRootType<TService>()
-            where TService : class
-        {
-            InstanceProducer? producer = this.GetInstanceProducerForType<TService>(InjectionConsumerInfo.Root);
-            this.AppendRootInstanceProducer(typeof(TService), producer);
-            return this.GetInstanceFromProducer(producer, typeof(TService));
         }
 
         private object GetInstanceForRootType(Type serviceType)
@@ -363,19 +345,11 @@ namespace SimpleInjector
             return instanceProducer!.GetInstance();
         }
 
-        private InstanceProducer? BuildInstanceProducerForType<TService>()
-            where TService : class
-        {
-            return this.BuildInstanceProducerForType(
-                typeof(TService),
-                () => this.unregisteredConcreteProducerBuilder.TryBuild<TService>());
-        }
-
         private InstanceProducer? BuildInstanceProducerForType(
             Type serviceType, bool autoCreateConcreteTypes = true)
         {
             var tryBuildInstanceProducerForConcrete = autoCreateConcreteTypes && !serviceType.IsAbstract()
-                ? () => this.TryBuildInstanceProducerForConcreteUnregisteredType(serviceType)
+                ? () => this.unregisteredConcreteProducerBuilder.TryBuild(serviceType)
                 : (Func<InstanceProducer?>)(() => null);
 
             return this.BuildInstanceProducerForType(serviceType, tryBuildInstanceProducerForConcrete);
@@ -390,9 +364,6 @@ namespace SimpleInjector
                 this.collectionProducerBuilder.TryBuild(serviceType) ??
                 tryBuildInstanceProducerForConcreteType();
         }
-
-        private InstanceProducer? TryBuildInstanceProducerForConcreteUnregisteredType(Type type) =>
-            this.unregisteredConcreteProducerBuilder.TryBuild(type);
 
         // We're registering a service type after 'locking down' the container here and that means that the
         // type is added to a copy of the registrations dictionary and the original replaced with a new one.
