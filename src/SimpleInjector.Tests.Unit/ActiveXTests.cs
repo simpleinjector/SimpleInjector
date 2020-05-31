@@ -1,20 +1,38 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
+    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     // #589
     [TestClass]
-    public class ActiveXTests
+    public sealed class ActiveXTests : IDisposable
     {
+        private SHDocVw.InternetExplorer comObject;
+
+        public ActiveXTests()
+        {
+             this.comObject = new SHDocVw.InternetExplorer();
+        }
+
+        public void Dispose()
+        {
+            if (this.comObject != null)
+            {
+                this.comObject.Quit();
+                this.comObject = null;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+        }
+
         [TestMethod]
         public void RegisterSingleton_RegisteringVerifyingAndResolvingAnActiveXObject_Succeeds()
         {
             // Arrange
             var container = new Container();
-            SHDocVw.InternetExplorer comObject = new SHDocVw.InternetExplorer();
 
             // Act
-            container.RegisterSingleton(() => comObject);
+            container.RegisterSingleton(() => this.comObject);
             container.Verify();
             var ie = container.GetInstance<SHDocVw.InternetExplorer>();
             ie.ToolBar = 0;
@@ -25,10 +43,9 @@
         {
             // Arrange
             var container = new Container();
-            SHDocVw.InternetExplorer comObject = new SHDocVw.InternetExplorer();
 
             // Act
-            container.RegisterInstance(comObject);
+            container.RegisterInstance(this.comObject);
             container.Verify();
             var ie = container.GetInstance<SHDocVw.InternetExplorer>();
             ie.ToolBar = 0;
@@ -39,10 +56,9 @@
         {
             // Arrange
             var container = new Container();
-            SHDocVw.InternetExplorer comObject = new SHDocVw.InternetExplorer();
 
             // Act
-            container.RegisterInstance(typeof(SHDocVw.InternetExplorer), comObject);
+            container.RegisterInstance(typeof(SHDocVw.InternetExplorer), this.comObject);
             container.Verify();
             var ie = container.GetInstance<SHDocVw.InternetExplorer>();
             ie.ToolBar = 0;
