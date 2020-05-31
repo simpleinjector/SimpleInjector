@@ -14,6 +14,7 @@ namespace SimpleInjector
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Debugger;
     using SimpleInjector.Internals;
+    using SimpleInjector.Internals.Builders;
     using SimpleInjector.Lifestyles;
 
     /// <summary>
@@ -79,6 +80,8 @@ namespace SimpleInjector
         private EventHandler<ExpressionBuildingEventArgs>? expressionBuilding;
         private EventHandler<ExpressionBuiltEventArgs>? expressionBuilt;
 
+        private readonly UnregisteredTypeResolutionInstanceProducerBuilder producerBuilder;
+
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
         {
@@ -91,7 +94,10 @@ namespace SimpleInjector
 
             this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);
 
-            this.AddContainerRegistrations();
+            this.producerBuilder = new UnregisteredTypeResolutionInstanceProducerBuilder(
+                container: this,
+                shouldResolveUnregisteredTypes: () => this.resolveUnregisteredType != null,
+                resolveUnregisteredType: e => this.resolveUnregisteredType?.Invoke(this, e));
         }
 
         // Wrapper for instance initializer delegates
@@ -643,19 +649,6 @@ namespace SimpleInjector
             serviceType.IsGenericType()
                 ? serviceType.GetGenericTypeDefinition()
                 : serviceType;
-
-        private void AddContainerRegistrations()
-        {
-            // Add the default registrations. This adds them as registration, but only in case some component
-            // starts depending on them.
-            var scopeLifestyle = new ScopedScopeLifestyle();
-
-            this.resolveUnregisteredTypeRegistrations[typeof(Scope)] = new LazyEx<InstanceProducer>(
-                () => scopeLifestyle.CreateProducer(() => scopeLifestyle.GetCurrentScope(this), this));
-
-            this.resolveUnregisteredTypeRegistrations[typeof(Container)] = new LazyEx<InstanceProducer>(
-                () => Lifestyle.Singleton.CreateProducer(() => this, this));
-        }
 
         private Type[] GetLookalikesForMissingType(Type missingServiceType) =>
             this.GetLookalikesForMissingNonGenericType(missingServiceType)

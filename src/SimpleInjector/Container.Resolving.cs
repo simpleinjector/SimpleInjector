@@ -11,6 +11,7 @@ namespace SimpleInjector
     using System.Reflection;
     using System.Threading;
     using SimpleInjector.Internals;
+    using SimpleInjector.Internals.Builders;
     using SimpleInjector.Lifestyles;
 
 #if !PUBLISH
@@ -23,9 +24,6 @@ namespace SimpleInjector
 
         private static readonly MethodInfo EnumerableToListMethod =
             typeof(Enumerable).GetMethod(nameof(Enumerable.ToList));
-
-        private readonly Dictionary<Type, LazyEx<InstanceProducer>> resolveUnregisteredTypeRegistrations =
-            new Dictionary<Type, LazyEx<InstanceProducer>>();
 
         private readonly Dictionary<Type, InstanceProducer?> emptyAndRedirectedCollectionRegistrationCache =
             new Dictionary<Type, InstanceProducer?>();
@@ -470,63 +468,8 @@ namespace SimpleInjector
             this.TryBuildInstanceProducerForMutableCollection(serviceType) ??
             this.TryBuildInstanceProducerForStream(serviceType);
 
-        // Instead of wrapping the complete method in a lock, we lock inside the individual methods. We
-        // don't want to hold a lock while calling back into user code, because who knows what the user
-        // is doing there. We don't want a dead lock.
         private InstanceProducer? TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType) =>
-            this.TryGetInstanceProducerForUnregisteredTypeResolutionFromCache(serviceType) ??
-            this.TryGetInstanceProducerThroughResolveUnregisteredTypeEvent(serviceType);
-
-        private InstanceProducer? TryGetInstanceProducerForUnregisteredTypeResolutionFromCache(Type serviceType)
-        {
-            lock (this.resolveUnregisteredTypeRegistrations)
-            {
-                return this.resolveUnregisteredTypeRegistrations.ContainsKey(serviceType)
-                    ? this.resolveUnregisteredTypeRegistrations[serviceType].Value
-                    : null;
-            }
-        }
-
-        private InstanceProducer? TryGetInstanceProducerThroughResolveUnregisteredTypeEvent(Type serviceType)
-        {
-            if (this.resolveUnregisteredType is null)
-            {
-                return null;
-            }
-
-            var e = new UnregisteredTypeEventArgs(serviceType);
-
-            this.resolveUnregisteredType(this, e);
-
-            return e.Handled
-                ? this.TryGetProducerFromUnregisteredTypeResolutionCacheOrAdd(e)
-                : null;
-        }
-
-        private InstanceProducer? TryGetProducerFromUnregisteredTypeResolutionCacheOrAdd(
-            UnregisteredTypeEventArgs e)
-        {
-            lock (this.resolveUnregisteredTypeRegistrations)
-            {
-                if (this.resolveUnregisteredTypeRegistrations.ContainsKey(e.UnregisteredServiceType))
-                {
-                    // This line will only get hit, in case a different thread came here first.
-                    return this.resolveUnregisteredTypeRegistrations[e.UnregisteredServiceType].Value;
-                }
-
-                var registration = e.Registration ?? new ExpressionRegistration(e.Expression!, this);
-
-                // By creating the InstanceProducer after checking the dictionary, we prevent the producer
-                // from being created twice when multiple threads are running. Having the same duplicate
-                // producer can cause a torn lifestyle warning in the container.
-                var producer = InstanceProducer.Create(e.UnregisteredServiceType, registration);
-
-                this.resolveUnregisteredTypeRegistrations[e.UnregisteredServiceType] =
-                    Helpers.ToLazy(producer);
-
-                return producer;
-            }
-        }
+            this.producerBuilder.TryBuild(serviceType);
 
         private InstanceProducer? TryBuildInstanceProducerForMutableCollection(Type serviceType)
         {
