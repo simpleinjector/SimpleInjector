@@ -67,9 +67,6 @@ namespace SimpleInjector
         private readonly ConditionalHashSet<InstanceProducer> externalProducers =
             new ConditionalHashSet<InstanceProducer>();
 
-        private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
-            new Dictionary<Type, InstanceProducer>();
-
         // Flag to signal that the container can't be altered by using any of the Register methods.
         private bool locked;
         private string? stackTraceThatLockedTheContainer;
@@ -83,6 +80,7 @@ namespace SimpleInjector
         private readonly UnregisteredTypeResolutionInstanceProducerBuilder resolutionProducerBuilder;
         private readonly InstanceProducerInstanceProducerBuilder producerProducerBuilder;
         private readonly CollectionInstanceProducerBuilder collectionProducerBuilder;
+        private readonly UnregisteredConcreteTypeInstanceProducerBuilder unregisteredConcreteProducerBuilder;
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
@@ -96,6 +94,7 @@ namespace SimpleInjector
 
             this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);
 
+            this.unregisteredConcreteProducerBuilder = new UnregisteredConcreteTypeInstanceProducerBuilder(this);
             this.collectionProducerBuilder = new CollectionInstanceProducerBuilder(this);
             this.producerProducerBuilder = new InstanceProducerInstanceProducerBuilder(this);
             this.resolutionProducerBuilder = new UnregisteredTypeResolutionInstanceProducerBuilder(

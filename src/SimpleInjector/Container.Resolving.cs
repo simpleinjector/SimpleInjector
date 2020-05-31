@@ -368,7 +368,7 @@ namespace SimpleInjector
         {
             return this.BuildInstanceProducerForType(
                 typeof(TService),
-                () => this.TryBuildInstanceProducerForConcreteUnregisteredType<TService>());
+                () => this.unregisteredConcreteProducerBuilder.TryBuild<TService>());
         }
 
         private InstanceProducer? BuildInstanceProducerForType(
@@ -385,99 +385,14 @@ namespace SimpleInjector
             Type serviceType, Func<InstanceProducer?> tryBuildInstanceProducerForConcreteType)
         {
             return
-                this.TryBuildInstanceProducerForInstanceProducer(serviceType) ??
-                this.TryBuildInstanceProducerThroughUnregisteredTypeResolution(serviceType) ??
-                this.TryBuildInstanceProducerForCollectionType(serviceType) ??
+                this.producerProducerBuilder.TryBuild(serviceType) ??
+                this.resolutionProducerBuilder.TryBuild(serviceType) ??
+                this.collectionProducerBuilder.TryBuild(serviceType) ??
                 tryBuildInstanceProducerForConcreteType();
         }
 
-        // This method allows using InstanceProducer<T> as dependency.
-        private InstanceProducer? TryBuildInstanceProducerForInstanceProducer(Type type) =>
-            this.producerProducerBuilder.TryBuild(type);
-
-        private InstanceProducer? TryBuildInstanceProducerForCollectionType(Type serviceType) =>
-            this.collectionProducerBuilder.TryBuild(serviceType);
-
-        private InstanceProducer? TryBuildInstanceProducerThroughUnregisteredTypeResolution(Type serviceType) =>
-            this.resolutionProducerBuilder.TryBuild(serviceType);
-
-        private InstanceProducer? TryBuildInstanceProducerForConcreteUnregisteredType<TConcrete>()
-            where TConcrete : class
-        {
-            if (this.Options.ResolveUnregisteredConcreteTypes
-                && this.IsConcreteConstructableType(typeof(TConcrete)))
-            {
-                InstanceProducer BuildInstanceProducer()
-                {
-                    var registration = this.SelectionBasedLifestyle.CreateRegistration<TConcrete>(this);
-
-                    return BuildInstanceProducerForConcreteUnregisteredType(typeof(TConcrete), registration);
-                }
-
-                return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(
-                    typeof(TConcrete), BuildInstanceProducer);
-            }
-
-            return null;
-        }
-
-        private InstanceProducer? TryBuildInstanceProducerForConcreteUnregisteredType(Type type)
-        {
-            if (!this.Options.ResolveUnregisteredConcreteTypes
-                || type.IsAbstract()
-                || type.IsValueType()
-                || type.ContainsGenericParameters()
-                || !this.IsConcreteConstructableType(type))
-            {
-                return null;
-            }
-
-            InstanceProducer BuildInstanceProducer()
-            {
-                var registration = this.SelectionBasedLifestyle.CreateRegistration(type, this);
-
-                return BuildInstanceProducerForConcreteUnregisteredType(type, registration);
-            }
-
-            return this.GetOrBuildInstanceProducerForConcreteUnregisteredType(type, BuildInstanceProducer);
-        }
-
-        private InstanceProducer GetOrBuildInstanceProducerForConcreteUnregisteredType(
-            Type concreteType, Func<InstanceProducer> instanceProducerBuilder)
-        {
-            // We need to take a lock here to make sure that we never create multiple InstanceProducer
-            // instances for the same concrete type, which is a problem when the LifestyleSelectionBehavior
-            // has been overridden. For instance in case the overridden behavior returns a Singleton lifestyle,
-            // but the concrete type is requested concurrently over multiple threads, not taking the lock
-            // could cause two InstanceProducers to be created, which might cause two instances from being
-            // created.
-            lock (this.unregisteredConcreteTypeInstanceProducers)
-            {
-                InstanceProducer producer;
-
-                if (!this.unregisteredConcreteTypeInstanceProducers.TryGetValue(concreteType, out producer))
-                {
-                    producer = instanceProducerBuilder.Invoke();
-
-                    this.unregisteredConcreteTypeInstanceProducers[concreteType] = producer;
-                }
-
-                return producer;
-            }
-        }
-
-        private static InstanceProducer BuildInstanceProducerForConcreteUnregisteredType(
-            Type concreteType, Registration registration)
-        {
-            var producer = InstanceProducer.Create(concreteType, registration);
-
-            producer.EnsureTypeWillBeExplicitlyVerified();
-
-            // Flag that this producer is resolved by the container or using unregistered type resolution.
-            producer.IsContainerAutoRegistered = true;
-
-            return producer;
-        }
+        private InstanceProducer? TryBuildInstanceProducerForConcreteUnregisteredType(Type type) =>
+            this.unregisteredConcreteProducerBuilder.TryBuild(type);
 
         // We're registering a service type after 'locking down' the container here and that means that the
         // type is added to a copy of the registrations dictionary and the original replaced with a new one.

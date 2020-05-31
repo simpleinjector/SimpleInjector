@@ -20,17 +20,17 @@ namespace SimpleInjector.Internals.Builders
             this.container = container;
         }
 
-        public InstanceProducer? TryBuild(Type type)
+        public InstanceProducer? TryBuild(Type serviceType)
         {
             // Check for InstanceProducer<T>, but prevent sub types of InstanceProducer<T>.
-            if (typeof(InstanceProducer<>).IsGenericTypeDefinitionOf(type))
+            if (typeof(InstanceProducer<>).IsGenericTypeDefinitionOf(serviceType))
             {
-                return this.BuildInstanceProducerForInstanceProducer(type);
+                return this.BuildInstanceProducerForInstanceProducer(serviceType);
             }
-            else if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(type)
-                && typeof(InstanceProducer<>).IsGenericTypeDefinitionOf(type.GetGenericArguments()[0]))
+            else if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(serviceType)
+                && typeof(InstanceProducer<>).IsGenericTypeDefinitionOf(serviceType.GetGenericArguments()[0]))
             {
-                return this.BuildInstanceProducerForEnumerableOfInstanceProducers(type);
+                return this.BuildInstanceProducerForEnumerableOfInstanceProducers(serviceType);
             }
             else
             {
