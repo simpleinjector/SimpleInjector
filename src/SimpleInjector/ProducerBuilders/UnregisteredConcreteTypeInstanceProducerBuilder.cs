@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
-namespace SimpleInjector.Internals.Builders
+namespace SimpleInjector.ProducerBuilders
 {
     using System;
     using System.Collections.Generic;
@@ -9,7 +9,7 @@ namespace SimpleInjector.Internals.Builders
     /// <summary>
     /// Builds InstanceProducers for concrete unregistered types.
     /// </summary>
-    internal sealed class UnregisteredConcreteTypeInstanceProducerBuilder
+    internal sealed class UnregisteredConcreteTypeInstanceProducerBuilder : IInstanceProducerBuilder
     {
         private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
             new Dictionary<Type, InstanceProducer>();

@@ -7,12 +7,9 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
     using System.Threading;
     using SimpleInjector.Internals;
-    using SimpleInjector.Internals.Builders;
-    using SimpleInjector.Lifestyles;
+    using SimpleInjector.ProducerBuilders;
 
 #if !PUBLISH
     /// <summary>Methods for resolving instances.</summary>
@@ -293,6 +290,12 @@ namespace SimpleInjector
         internal bool IsConcreteConstructableType(Type concreteType) =>
             this.Options.IsConstructableType(concreteType, out _);
 
+        internal InstanceProducer? GetInstanceProducerForType(Type serviceType, InjectionConsumerInfo context)
+        {
+            return this.GetInstanceProducerForType(
+                serviceType, context, () => this.BuildInstanceProducerForType(serviceType, true));
+        }
+
         private Action<T> GetInitializer<T>(Type implementationType, Registration context)
         {
             Action<T>[] initializersForType = this.GetInstanceInitializersFor<T>(implementationType, context);
@@ -311,12 +314,6 @@ namespace SimpleInjector
                     }
                 };
             }
-        }
-
-        internal InstanceProducer? GetInstanceProducerForType(Type serviceType, InjectionConsumerInfo context)
-        {
-            return this.GetInstanceProducerForType(
-                serviceType, context, () => this.BuildInstanceProducerForType(serviceType));
         }
 
         private object GetInstanceForRootType(Type serviceType)
@@ -348,21 +345,19 @@ namespace SimpleInjector
         private InstanceProducer? BuildInstanceProducerForType(
             Type serviceType, bool autoCreateConcreteTypes = true)
         {
-            var tryBuildInstanceProducerForConcrete = autoCreateConcreteTypes && !serviceType.IsAbstract()
-                ? () => this.unregisteredConcreteProducerBuilder.TryBuild(serviceType)
-                : (Func<InstanceProducer?>)(() => null);
+            foreach (IInstanceProducerBuilder builder in this.producerBuilders)
+            {
+                var producer = builder.TryBuild(serviceType);
 
-            return this.BuildInstanceProducerForType(serviceType, tryBuildInstanceProducerForConcrete);
-        }
+                if (producer != null)
+                {
+                    return producer;
+                }
+            }
 
-        private InstanceProducer? BuildInstanceProducerForType(
-            Type serviceType, Func<InstanceProducer?> tryBuildInstanceProducerForConcreteType)
-        {
-            return
-                this.producerProducerBuilder.TryBuild(serviceType) ??
-                this.resolutionProducerBuilder.TryBuild(serviceType) ??
-                this.collectionProducerBuilder.TryBuild(serviceType) ??
-                tryBuildInstanceProducerForConcreteType();
+            return autoCreateConcreteTypes
+                ? this.unregisteredConcreteTypeProducerBuilder.TryBuild(serviceType)
+                : null;
         }
 
         // We're registering a service type after 'locking down' the container here and that means that the

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
-namespace SimpleInjector.Internals.Builders
+namespace SimpleInjector.ProducerBuilders
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace SimpleInjector.Internals.Builders
     /// <summary>
     /// Builds InstanceProducers for all collections types except <see cref="IEnumerable{T}"/>.
     /// </summary>
-    internal sealed class CollectionInstanceProducerBuilder
+    internal sealed class CollectionInstanceProducerBuilder : IInstanceProducerBuilder
     {
         private static readonly MethodInfo EnumerableToArrayMethod =
             typeof(Enumerable).GetMethod(nameof(Enumerable.ToArray));

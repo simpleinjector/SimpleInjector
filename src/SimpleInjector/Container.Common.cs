@@ -14,8 +14,8 @@ namespace SimpleInjector
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Debugger;
     using SimpleInjector.Internals;
-    using SimpleInjector.Internals.Builders;
     using SimpleInjector.Lifestyles;
+    using SimpleInjector.ProducerBuilders;
 
     /// <summary>
     /// The container. Create an instance of this type for registration of dependencies.
@@ -77,10 +77,8 @@ namespace SimpleInjector
         private EventHandler<ExpressionBuildingEventArgs>? expressionBuilding;
         private EventHandler<ExpressionBuiltEventArgs>? expressionBuilt;
 
-        private readonly UnregisteredTypeResolutionInstanceProducerBuilder resolutionProducerBuilder;
-        private readonly InstanceProducerInstanceProducerBuilder producerProducerBuilder;
-        private readonly CollectionInstanceProducerBuilder collectionProducerBuilder;
-        private readonly UnregisteredConcreteTypeInstanceProducerBuilder unregisteredConcreteProducerBuilder;
+        private readonly IInstanceProducerBuilder[] producerBuilders;
+        private readonly IInstanceProducerBuilder unregisteredConcreteTypeProducerBuilder;
 
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
@@ -94,13 +92,19 @@ namespace SimpleInjector
 
             this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);
 
-            this.unregisteredConcreteProducerBuilder = new UnregisteredConcreteTypeInstanceProducerBuilder(this);
-            this.collectionProducerBuilder = new CollectionInstanceProducerBuilder(this);
-            this.producerProducerBuilder = new InstanceProducerInstanceProducerBuilder(this);
-            this.resolutionProducerBuilder = new UnregisteredTypeResolutionInstanceProducerBuilder(
-                container: this,
-                shouldResolveUnregisteredTypes: () => this.resolveUnregisteredType != null,
-                resolveUnregisteredType: e => this.resolveUnregisteredType?.Invoke(this, e));
+            // NOTE: The order of these builders is crucial.
+            this.producerBuilders = new IInstanceProducerBuilder[]
+            {
+                new InstanceProducerInstanceProducerBuilder(this),
+                new UnregisteredTypeResolutionInstanceProducerBuilder(
+                    container: this,
+                    shouldResolveUnregisteredTypes: () => this.resolveUnregisteredType != null,
+                    resolveUnregisteredType: e => this.resolveUnregisteredType?.Invoke(this, e)),
+                new CollectionInstanceProducerBuilder(this)
+            };
+
+            this.unregisteredConcreteTypeProducerBuilder =
+                new UnregisteredConcreteTypeInstanceProducerBuilder(this);
         }
 
         // Wrapper for instance initializer delegates

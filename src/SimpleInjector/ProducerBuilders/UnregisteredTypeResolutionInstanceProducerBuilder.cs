@@ -1,16 +1,17 @@
 ﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
-namespace SimpleInjector.Internals.Builders
+namespace SimpleInjector.ProducerBuilders
 {
     using System;
     using System.Collections.Generic;
+    using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Builds InstanceProducers for types resolved through unregistered type resolution.
     /// </summary>
-    internal sealed class UnregisteredTypeResolutionInstanceProducerBuilder
+    internal sealed class UnregisteredTypeResolutionInstanceProducerBuilder : IInstanceProducerBuilder
     {
         private readonly Dictionary<Type, LazyEx<InstanceProducer>> resolveUnregisteredTypeRegistrations =
             new Dictionary<Type, LazyEx<InstanceProducer>>();

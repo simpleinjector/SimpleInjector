@@ -1,17 +1,18 @@
 ﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
-namespace SimpleInjector.Internals.Builders
+namespace SimpleInjector.ProducerBuilders
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using SimpleInjector.Internals;
 
     /// <summary>
     /// Builds InstanceProducers that can inject and resolve <see cref="InstanceProducer{TService}"/>
     /// instances as singletons.
     /// </summary>
-    internal sealed class InstanceProducerInstanceProducerBuilder
+    internal sealed class InstanceProducerInstanceProducerBuilder : IInstanceProducerBuilder
     {
         private readonly Container container;
 
