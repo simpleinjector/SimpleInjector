@@ -50,6 +50,7 @@ IF "%inputOk%"=="false" (
 set /a nextMajorVersion=%version_major%+1
 
 set version_Core=%version%
+set version_DynamicAssemblyCompilation=%version_Core%
 set version_Packaging=%version_Core%
 set version_Integration_Web=%version_Core%
 set version_Integration_WebForms=%version_Core%
@@ -98,6 +99,7 @@ set targetPathCoreClr=%targetPath%\DOTNET
 set named_version=%version%%prereleasePostfix%
 
 set named_version_Core=%version_Core%%prereleasePostfix%
+set named_version_DynamicAssemblyCompilation=%version_DynamicAssemblyCompilation%%prereleasePostfix%
 set named_version_Integration_ServiceCollection=%version_Integration_ServiceCollection%%prereleasePostfix%
 set named_version_Integration_GenericHost=%version_Integration_GenericHost%%prereleasePostfix%
 set named_version_Integration_AspNetCore=%version_Integration_AspNetCore%%prereleasePostfix%
@@ -111,6 +113,7 @@ set named_version_Integration_WebApi=%version_Integration_WebApi%%prereleasePost
 set named_version_Packaging=%version_Packaging%%prereleasePostfix%
 
 set numeric_version_Core=%version_Core%.%buildNumber%
+set numeric_version_DynamicAssemblyCompilation=%version_DynamicAssemblyCompilation%.%buildNumber%
 set numeric_version_Integration_ServiceCollection=%version_Integration_ServiceCollection%.%buildNumber%
 set numeric_version_Integration_GenericHost=%version_Integration_GenericHost%.%buildNumber%
 set numeric_version_Integration_AspNetCore=%version_Integration_AspNetCore%.%buildNumber%
@@ -141,6 +144,7 @@ IF %step%==1 (
 
 	echo SET VERSION NUMBERS
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Core%</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
+	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_DynamicAssemblyCompilation%</VersionPrefix>" /source:SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_ServiceCollection%</VersionPrefix>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_GenericHost%</VersionPrefix>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_AspNetCore%</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
@@ -155,6 +159,7 @@ IF %step%==1 (
 	
 	echo SET PACKAGE RELEASE NOTES
 	
+	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_DynamicAssemblyCompilation%</PackageReleaseNotes>" /source:SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj
 	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_Integration_ServiceCollection%</PackageReleaseNotes>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
 	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_Integration_GenericHost%</PackageReleaseNotes>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj
 	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_Integration_AspNetCore%</PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
@@ -367,6 +372,9 @@ IF %step%==4 (
 	set coreLibraryNupkgDependencySearch="<dependency id=""SimpleInjector"" version=""%named_version_Core%"""
 	set coreLibraryNupkgDependencyReplace="<dependency id=""SimpleInjector"" version=""[%named_version_Core%,%nextMajorVersion%)"""
 
+	copy "SimpleInjector.DynamicAssemblyCompilation\bin\Release\SimpleInjector.DynamicAssemblyCompilation.%named_version_DynamicAssemblyCompilation%.nupkg" Releases\v%named_version%\
+	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.DynamicAssemblyCompilation.%named_version_DynamicAssemblyCompilation%.nupkg /sourceFile:SimpleInjector.DynamicAssemblyCompilation.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace% /force
+
 	copy "SimpleInjector.Integration.ServiceCollection\bin\Release\SimpleInjector.Integration.ServiceCollection.%named_version_Integration_ServiceCollection%.nupkg" Releases\v%named_version%\
 	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.ServiceCollection.%named_version_Integration_ServiceCollection%.nupkg /sourceFile:SimpleInjector.Integration.ServiceCollection.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace% /force
 	
@@ -392,6 +400,7 @@ IF %step%==4 (
 IF %step%==5 (
 	echo Running step 5: RESTORING VERSION NUMBERS
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
