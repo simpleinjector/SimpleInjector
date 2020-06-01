@@ -15,6 +15,8 @@
     <PackageId>SimpleInjector.DynamicAssemblyCompilation</PackageId>
     <PackageTags>simpleinjector;dynamic-assembly-compilation</PackageTags>
     <PackageIcon>simpleinjector.png</PackageIcon>
+    <PackageProjectUrl>https://simpleinjector.org</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
