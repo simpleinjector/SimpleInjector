@@ -266,7 +266,7 @@ namespace SimpleInjector
             return producerIsValid ? producer : null;
         }
 
-        internal Action<object> GetInitializer(Type implementationType, Registration context)
+        internal Action<object>? GetInitializer(Type implementationType, Registration context)
         {
             return this.GetInitializer<object>(implementationType, context);
         }
@@ -296,13 +296,17 @@ namespace SimpleInjector
                 serviceType, context, () => this.BuildInstanceProducerForType(serviceType, true));
         }
 
-        private Action<T> GetInitializer<T>(Type implementationType, Registration context)
+        private Action<T>? GetInitializer<T>(Type implementationType, Registration context)
         {
             Action<T>[] initializersForType = this.GetInstanceInitializersFor<T>(implementationType, context);
 
-            if (initializersForType.Length <= 1)
+            if (initializersForType.Length == 0)
             {
-                return initializersForType.FirstOrDefault();
+                return null;
+            }
+            else if (initializersForType.Length == 1)
+            {
+                return initializersForType[0];
             }
             else
             {

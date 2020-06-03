@@ -217,7 +217,7 @@ namespace SimpleInjector
 
         internal Expression WrapWithInitializer(Type implementationType, Expression expression)
         {
-            Action<object> initializer = this.Container.GetInitializer(implementationType, this);
+            Action<object>? initializer = this.Container.GetInitializer(implementationType, this);
 
             if (initializer != null)
             {
