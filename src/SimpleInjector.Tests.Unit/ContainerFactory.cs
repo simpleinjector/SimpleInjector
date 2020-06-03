@@ -6,8 +6,7 @@
         {
             var container = new Container();
 
-            container.Options.ExpressionCompilationBehavior =
-                new DynamicAssemblyExpressionCompilationBehavior();
+            container.Options.EnableDynamicAssemblyCompilation();
 
             container.Options.EnableAutoVerification = false;
 

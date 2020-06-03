@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
-namespace SimpleInjector
+namespace SimpleInjector.DynamicAssemblyCompilation
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +14,6 @@ namespace SimpleInjector
     using System.Security;
     using System.Threading;
     using SimpleInjector.Advanced;
-    using SimpleInjector.DynamicAssemblyCompilation;
 
     /// <summary>
     /// Defines the container's behavior for compiling expressions into delegates that are placed in a dynamic
