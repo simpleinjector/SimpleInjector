@@ -12,6 +12,7 @@ namespace SimpleInjector
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Diagnostics.Analyzers;
+    using SimpleInjector.Internals;
 
     /// <summary>Internal helper for string resources.</summary>
     internal static class StringResources
@@ -929,7 +930,7 @@ namespace SimpleInjector
         }
 
         internal static string MultipleApplicableRegistrationsFound(
-            Type serviceType, Tuple<Type, Type, InstanceProducer>[] overlappingRegistrations) =>
+            Type serviceType, IEnumerable<FoundInstanceProducer> overlappingRegistrations) =>
             Format(
                 "Multiple applicable registrations found for {0}. The applicable registrations are {1}. " +
                 "If your goal is to make one registration a fallback in case another registration is not " +
@@ -987,22 +988,17 @@ namespace SimpleInjector
                     ? relationship.Consumer.Target.Name
                     : "collection");
 
-        private static string BuildRegistrationName(
-            Tuple<Type, Type, InstanceProducer> registration, int index)
+        private static string BuildRegistrationName(FoundInstanceProducer registration, int index)
         {
-            Type serviceType = registration.Item1;
-            Type implementationType = registration.Item2;
-            InstanceProducer producer = registration.Item3;
-
             return Format(
                 "({0}) the {1} {2}registration for {3} using {4}",
                 index + 1,
-                producer.IsConditional ? "conditional" : "unconditional",
-                serviceType.IsGenericTypeDefinition()
+                registration.Producer.IsConditional ? "conditional" : "unconditional",
+                registration.ServiceType.IsGenericTypeDefinition()
                     ? "open-generic "
-                    : serviceType.IsGenericType() ? "closed-generic " : string.Empty,
-                serviceType.TypeName(),
-                implementationType.TypeName());
+                    : registration.ServiceType.IsGenericType() ? "closed-generic " : string.Empty,
+                registration.ServiceType.TypeName(),
+                registration.ImplementationType.TypeName());
         }
 
         private static string NonGenericTypeAlreadyRegistered(

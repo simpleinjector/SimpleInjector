@@ -100,15 +100,21 @@ namespace SimpleInjector.Internals
             Type serviceType, InjectionConsumerInfo consumer)
         {
             // Pre-condition: serviceType is always a closed-generic type
-            var producers = this.GetInstanceProducers(serviceType, consumer).ToArray();
+            List<FoundInstanceProducer>? producers = this.GetInstanceProducers(serviceType, consumer);
 
-            if (producers.Length <= 1)
+            if (producers is null)
             {
-                return producers.Select(p => p.Item3).FirstOrDefault();
+                return null;
             }
-
-            throw new ActivationException(
-                StringResources.MultipleApplicableRegistrationsFound(serviceType, producers));
+            else if (producers.Count == 1)
+            {
+                return producers[0].Producer;
+            }
+            else
+            {
+                throw new ActivationException(
+                    StringResources.MultipleApplicableRegistrationsFound(serviceType, producers));
+            }
         }
 
         public int GetNumberOfConditionalRegistrationsFor(Type serviceType) =>
@@ -238,10 +244,12 @@ namespace SimpleInjector.Internals
                     providerToRegister.ImplementationType!,
                     providerToRegister.IsConditional));
 
-        private IEnumerable<Tuple<Type, Type, InstanceProducer>> GetInstanceProducers(
+        private List<FoundInstanceProducer>? GetInstanceProducers(
             Type closedGenericServiceType, InjectionConsumerInfo consumer)
         {
             bool handled = false;
+
+            List<FoundInstanceProducer>? list = null;
 
             foreach (var provider in this.providers)
             {
@@ -250,14 +258,21 @@ namespace SimpleInjector.Internals
 
                 if (producer != null)
                 {
-                    yield return Tuple.Create(
-                        item1: provider.ServiceType,
-                        item2: provider.ImplementationType ?? producer.FinalImplementationType,
-                        item3: producer);
+                    if (list is null)
+                    {
+                        list = new List<FoundInstanceProducer>(capacity: 1);
+                    }
+
+                    list.Add(new FoundInstanceProducer(
+                        provider.ServiceType,
+                        provider.ImplementationType ?? producer.FinalImplementationType,
+                        producer));
 
                     handled = true;
                 }
             }
+
+            return list;
         }
 
         private sealed class ClosedToInstanceProducerProvider : IProducerProvider
