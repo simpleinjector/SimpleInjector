@@ -160,11 +160,14 @@ namespace SimpleInjector.Internals
             where producer.FinalImplementationType == producerToRegister.FinalImplementationType
             select producer;
 
-        private ActivationException ThrowMultipleApplicableRegistrationsFound( InstanceProducer[] producers)
+        private ActivationException ThrowMultipleApplicableRegistrationsFound(InstanceProducer[] producers)
         {
             var producerInfos =
                 from producer in producers
-                select Tuple.Create(this.nonGenericServiceType, producer.Registration.ImplementationType, producer);
+                select new FoundInstanceProducer(
+                    this.nonGenericServiceType,
+                    producer.Registration.ImplementationType,
+                    producer);
 
             return new ActivationException(
                 StringResources.MultipleApplicableRegistrationsFound(

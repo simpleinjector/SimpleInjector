@@ -18,5 +18,4 @@ namespace SimpleInjector.Internals
             this.Producer = producer;
         }
     }
-
 }
