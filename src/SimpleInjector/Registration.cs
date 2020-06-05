@@ -230,56 +230,26 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Builds a <see cref="Func{T}"/> delegate for the creation of the <typeparamref name="TService"/>
-        /// using the supplied <paramref name="instanceCreator"/>. The returned <see cref="Func{T}"/> might
-        /// be intercepted by a
+        /// Builds a <see cref="Func{T}"/> delegate for the creation of the <see cref="ImplementationType"/>.
+        /// When the <paramref name="instanceCreator"/> is supplied, it will be invoked for the creation of
+        /// <see cref="ImplementationType"/>, otherwise Auto-Wiring is used. The returned 
+        /// <see cref="Func{T}"/> might be intercepted by a
         /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event,
-        /// and the <paramref name="instanceCreator"/> will have been wrapped with a delegate that executes the
-        /// registered <see cref="SimpleInjector.Container.RegisterInitializer{TService}">initializers</see>
-        /// that are applicable to the given <typeparamref name="TService"/> (if any).
+        /// and initializers (if any) (<see cref="SimpleInjector.Container.RegisterInitializer{TService}"/>)
+        /// will be applied.
         /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve instances.</typeparam>
         /// <param name="instanceCreator">
         /// The delegate supplied by the user that allows building or creating new instances.</param>
         /// <returns>A <see cref="Func{T}"/> delegate.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
-        protected Func<TService> BuildTransientDelegate<TService>(Func<TService> instanceCreator)
-            where TService : class
+        protected Func<object> BuildTransientDelegate(Func<object>? instanceCreator = null)
         {
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-
             try
             {
                 Expression expression = this.BuildTransientExpression(instanceCreator);
 
                 // NOTE: The returned delegate could still return null (caused by the ExpressionBuilding event),
                 // but I don't feel like protecting us against such an obscure user bug.
-                return (Func<TService>)this.BuildDelegate(expression);
-            }
-            catch (CyclicDependencyException ex)
-            {
-                ex.AddTypeToCycle(this.ImplementationType);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Builds a <see cref="Func{T}"/> delegate for the creation of <see cref="ImplementationType"/>.
-        /// The returned <see cref="Func{T}"/> might be intercepted by a
-        /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event,
-        /// and the creation of the <see cref="ImplementationType"/> will have been wrapped with a
-        /// delegate that executes the registered
-        /// <see cref="SimpleInjector.Container.RegisterInitializer{TService}">initializers</see>
-        /// that are applicable to the given <see cref="ImplementationType"/> (if any).
-        /// </summary>
-        /// <returns>A <see cref="Func{T}"/> delegate.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
-        protected Func<object> BuildTransientDelegate()
-        {
-            try
-            {
-                Expression expression = this.BuildTransientExpression();
-
                 return (Func<object>)this.BuildDelegate(expression);
             }
             catch (CyclicDependencyException ex)
@@ -290,61 +260,27 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Builds an <see cref="Expression"/> that describes the creation of the <typeparamref name="TService"/>
-        /// using the supplied <paramref name="instanceCreator"/>. The returned <see cref="Expression"/> might
+        /// Builds an <see cref="Expression"/> that describes the creation of <see cref="ImplementationType"/>.
+        /// When the <paramref name="instanceCreator"/> is provided, the expression will contain an invocation
+        /// to that delegate. Otherwise, the type is constructed using Auto-Wiring (by invoking
+        /// the constructor of <see cref="ImplementationType"/>. The returned <see cref="Expression"/> might
         /// be intercepted by a
         /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event,
-        /// and the <paramref name="instanceCreator"/> will have been wrapped with a delegate that executes the
-        /// registered <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> that are
-        /// applicable to the given <typeparamref name="TService"/> (if any).
+        /// and initializers (if any) (<see cref="SimpleInjector.Container.RegisterInitializer"/>) will be
+        /// applied.
         /// </summary>
-        /// <typeparam name="TService">
-        /// The interface or base type that can be used to retrieve instances.
-        /// </typeparam>
         /// <param name="instanceCreator">
         /// The delegate supplied by the user that allows building or creating new instances.</param>
         /// <returns>An <see cref="Expression"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
         /// </exception>
-        protected Expression BuildTransientExpression<TService>(Func<TService> instanceCreator)
-            where TService : class
-        {
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-
-            try
-            {
-                Expression expression = Expression.Invoke(Expression.Constant(instanceCreator));
-
-                expression = WrapWithNullChecker<TService>(expression);
-                expression = this.WrapWithPropertyInjector(typeof(TService), expression);
-                expression = this.InterceptInstanceCreation(typeof(TService), expression);
-                expression = this.WrapWithInitializer(typeof(TService), expression);
-
-                return expression;
-            }
-            catch (CyclicDependencyException ex)
-            {
-                ex.AddTypeToCycle(this.ImplementationType);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Builds an <see cref="Expression"/> that describes the creation of <see cref="ImplementationType"/>.
-        /// The returned <see cref="Expression"/> might be intercepted
-        /// by a <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see>
-        /// event, and the creation of the <see cref="ImplementationType"/> will have been wrapped with
-        /// a delegate that executes the registered
-        /// <see cref="SimpleInjector.Container.RegisterInitializer">initializers</see> that are applicable
-        /// to the InstanceProducer's <see cref="InstanceProducer.ServiceType">ServiceType</see> (if any).
-        /// </summary>
-        /// <returns>An <see cref="Expression"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
-        protected Expression BuildTransientExpression()
+        protected Expression BuildTransientExpression(Func<object>? instanceCreator = null)
         {
             try
             {
-                Expression expression = this.BuildNewExpression();
+                Expression expression = instanceCreator is null
+                    ? this.BuildNewExpression()
+                    : this.BuildInvocationExpression(instanceCreator);
 
                 expression = this.WrapWithPropertyInjector(this.ImplementationType, expression);
                 expression = this.InterceptInstanceCreation(this.ImplementationType, expression);
@@ -400,6 +336,21 @@ namespace SimpleInjector
             this.AddRelationships(constructor, parameters);
 
             return expression;
+        }
+
+        private Expression BuildInvocationExpression(Func<object> instanceCreator)
+        {
+            Expression expression = Expression.Invoke(Expression.Constant(instanceCreator));
+
+            var funcType = typeof(Func<>).MakeGenericType(this.ImplementationType);
+
+            if (!funcType.IsAssignableFrom(instanceCreator.GetType()))
+            {
+                // The supplied Func<T> is not a Func{ImplementationType}, which means it needs a cast.
+                expression = Expression.Convert(expression, this.ImplementationType);
+            }
+
+            return this.WrapWithNullCheck(expression);
         }
 
         private ParameterDictionary<DependencyData> BuildConstructorParameters(ConstructorInfo constructor)
@@ -522,12 +473,22 @@ namespace SimpleInjector
             }
         }
 
-        private static Expression WrapWithNullChecker<TService>(Expression expression)
-            where TService : class
+        private Expression WrapWithNullCheck(Expression expression)
         {
-            Func<TService, TService> nullChecker = ThrowWhenNull<TService>;
+            if (expression.Type.IsValueType())
+            {
+                return expression;
+            }
 
-            return Expression.Invoke(Expression.Constant(nullChecker), expression);
+            Func<object> thrower = () => throw new ActivationException(
+                StringResources.DelegateForTypeReturnedNull(this.ImplementationType));
+
+            // Build the follwoing expression: "instanceCreator() ?? thrower()"
+            return Expression.Coalesce(
+                left: expression,
+                right: Expression.Convert(
+                    Expression.Invoke(Expression.Constant(thrower)),
+                    this.ImplementationType));
         }
 
         private static Expression BuildExpressionWithInstanceInitializer<TImplementation>(
@@ -558,10 +519,6 @@ namespace SimpleInjector
                 throw new ActivationException(message, ex);
             }
         }
-
-        private static T ThrowWhenNull<T>(T instance)
-            where T : class =>
-            instance ?? throw new ActivationException(StringResources.DelegateForTypeReturnedNull(typeof(T)));
 
         private struct DependencyData
         {

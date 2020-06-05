@@ -80,7 +80,7 @@ namespace SimpleInjector.Lifestyles
             }
 #endif
 
-            return new SingletonInstanceLifestyleRegistration(
+            return new SingletonInstanceRegistration(
                 serviceType, implementationType, instance, container);
         }
 
@@ -111,7 +111,7 @@ namespace SimpleInjector.Lifestyles
         }
 
         internal static bool IsSingletonInstanceRegistration(Registration registration) =>
-            registration is SingletonInstanceLifestyleRegistration;
+            registration is SingletonInstanceRegistration;
 
         /// <inheritdoc />
         protected internal override Registration CreateRegistrationCore(Type concreteType, Container container)
@@ -119,7 +119,7 @@ namespace SimpleInjector.Lifestyles
             Requires.IsNotNull(concreteType, nameof(concreteType));
             Requires.IsNotNull(container, nameof(container));
 
-            return new AutoWiredSingletonLifestyleRegistration(container, concreteType);
+            return new SingletonRegistration(container, concreteType);
         }
 
         /// <inheritdoc />
@@ -128,7 +128,7 @@ namespace SimpleInjector.Lifestyles
         {
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
-            return new DelegateSingletonLifestyleRegistration<TService>(container, instanceCreator);
+            return new SingletonRegistration(container, typeof(TService), instanceCreator);
         }
 
         private static ConstantExpression BuildConstantExpression(object instance, Type implementationType)
@@ -147,14 +147,14 @@ namespace SimpleInjector.Lifestyles
             return Expression.Constant(instance, implementationType);
         }
 
-        private sealed class SingletonInstanceLifestyleRegistration : Registration
+        private sealed class SingletonInstanceRegistration : Registration
         {
             private readonly object locker = new object();
 
             private object instance;
             private bool initialized;
 
-            internal SingletonInstanceLifestyleRegistration(
+            internal SingletonInstanceRegistration(
                 Type serviceType, Type implementationType, object instance, Container container)
                 : base(Lifestyle.Singleton, container)
             {
@@ -235,18 +235,19 @@ namespace SimpleInjector.Lifestyles
             }
         }
 
-        private abstract class SingletonLifestyleRegistration : Registration
+        private sealed class SingletonRegistration : Registration
         {
             private readonly object locker = new object();
-            //private readonly Func<TImplementation>? instanceCreator;
+            private readonly Func<object>? instanceCreator;
 
             private object? interceptedInstance;
 
-            public SingletonLifestyleRegistration(
-                Container container, Type implementationType)
+            public SingletonRegistration(
+                Container container, Type implementationType, Func<object>? instanceCreator = null)
                 : base(Lifestyle.Singleton, container)
             {
                 this.ImplementationType = implementationType;
+                this.instanceCreator = instanceCreator;
             }
 
             public override Type ImplementationType { get; }
@@ -296,7 +297,7 @@ namespace SimpleInjector.Lifestyles
 
             private object CreateInstanceWithNullCheck()
             {
-                Expression expression = this.CreateExpression();
+                Expression expression = this.BuildTransientExpression(this.instanceCreator);
 
                 Func<object> func = this.CompileExpression(expression);
 
@@ -306,8 +307,6 @@ namespace SimpleInjector.Lifestyles
 
                 return instance;
             }
-
-            protected abstract Expression CreateExpression();
 
             // Implements #553 Allows detection of Lifestyle Mismatches when iterated inside constructor.
             private object CreateInstance(Func<object> instanceCreator)
@@ -427,33 +426,6 @@ namespace SimpleInjector.Lifestyles
                         StringResources.DelegateForTypeReturnedNull(this.ImplementationType));
                 }
             }
-        }
-
-        private sealed class AutoWiredSingletonLifestyleRegistration : SingletonLifestyleRegistration
-        {
-            public AutoWiredSingletonLifestyleRegistration(Container container, Type concreteType)
-                : base(container, concreteType)
-            {
-            }
-
-            protected override Expression CreateExpression() => this.BuildTransientExpression();
-        }
-
-        private sealed class DelegateSingletonLifestyleRegistration<TImplementation>
-            : SingletonLifestyleRegistration
-            where TImplementation : class
-        {
-            readonly Func<TImplementation> instanceCreator;
-
-            public DelegateSingletonLifestyleRegistration(
-                Container container, Func<TImplementation> instanceCreator)
-                : base(container, typeof(TImplementation))
-            {
-                this.instanceCreator = instanceCreator;
-            }
-
-            protected override Expression CreateExpression() =>
-                this.BuildTransientExpression(this.instanceCreator);
         }
     }
 }

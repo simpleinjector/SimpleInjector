@@ -23,7 +23,7 @@
 
         protected override Registration CreateRegistrationCore(Type concreteType, Container container)
         {
-            return new PerThreadRegistration(this, container, concreteType);
+            return new PerThreadRegistration(this, container, concreteType, null);
         }
 
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
@@ -34,19 +34,22 @@
                 throw new ArgumentNullException(nameof(instanceCreator));
             }
 
-            return new PerThreadRegistration<TService>(this, container, instanceCreator);
+            return new PerThreadRegistration(this, container, typeof(TService), instanceCreator);
         }
 
         private class PerThreadRegistration : Registration
         {
             private readonly ThreadLocal<object> threadSpecificCache = new ThreadLocal<object>();
+            private readonly Func<object> creator;
 
             private Func<object> instanceProducer;
 
-            public PerThreadRegistration(Lifestyle lifestyle, Container container, Type implementationType)
+            public PerThreadRegistration(
+                Lifestyle lifestyle, Container container, Type implementationType, Func<object> creator)
                 : base(lifestyle, container)
             {
                 this.ImplementationType = implementationType;
+                this.creator = creator;
             }
 
             public override Type ImplementationType { get; }
@@ -75,23 +78,7 @@
                 return (TImplementation)value;
             }
 
-            protected virtual Func<object> BuildTransientInstanceCreator() => this.BuildTransientDelegate();
-        }
-
-        private sealed class PerThreadRegistration<TImplementation> : PerThreadRegistration
-            where TImplementation : class
-        {
-            private readonly Func<TImplementation> instanceCreator;
-
-            public PerThreadRegistration(
-                Lifestyle lifestyle, Container container, Func<TImplementation> instanceCreator)
-                : base(lifestyle, container, typeof(TImplementation))
-            {
-                this.instanceCreator = instanceCreator;
-            }
-
-            protected override Func<object> BuildTransientInstanceCreator() =>
-                this.BuildTransientDelegate(this.instanceCreator);
+            private Func<object> BuildTransientInstanceCreator() => this.BuildTransientDelegate(this.creator);
         }
     }
 }

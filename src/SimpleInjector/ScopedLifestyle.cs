@@ -108,7 +108,7 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
             Requires.IsNotNull(container, nameof(container));
 
-            return new DelegateScopedRegistration<TService>(this, container, instanceCreator);
+            return new ScopedRegistration(this, container, typeof(TService), instanceCreator);
         }
 
         /// <inheritdoc />
@@ -117,7 +117,7 @@ namespace SimpleInjector
             Requires.IsNotNull(concreteType, nameof(concreteType));
             Requires.IsNotNull(container, nameof(container));
 
-            return new AutoWiredScopedRegistration(this, container, concreteType);
+            return new ScopedRegistration(this, container, concreteType, null);
         }
 
         /// <summary>

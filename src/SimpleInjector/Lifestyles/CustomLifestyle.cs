@@ -33,23 +33,26 @@ namespace SimpleInjector.Lifestyles
         {
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
-            return new DelegateCustomRegistration<TService>(
-                this.lifestyleApplierFactory, this, container, instanceCreator);
+            return new CustomRegistration(
+                this.lifestyleApplierFactory, this, container, typeof(TService), instanceCreator);
         }
 
-        private class CustomRegistration : Registration
+        private sealed class CustomRegistration : Registration
         {
             private readonly CreateLifestyleApplier lifestyleApplierFactory;
+            private readonly Func<object>? instanceCreator;
 
             public CustomRegistration(
                 CreateLifestyleApplier lifestyleApplierFactory,
                 Lifestyle lifestyle,
                 Container container,
-                Type implementationType)
+                Type implementationType,
+                Func<object>? instanceCreator = null)
                 : base(lifestyle, container)
             {
                 this.lifestyleApplierFactory = lifestyleApplierFactory;
-                this.ImplementationType = implementationType; ;
+                this.ImplementationType = implementationType;
+                this.instanceCreator = instanceCreator;
             }
 
             public override Type ImplementationType { get; }
@@ -67,25 +70,7 @@ namespace SimpleInjector.Lifestyles
                         this.ImplementationType);
             }
 
-            protected virtual Func<object> CreateInstanceCreator() => this.BuildTransientDelegate();
-        }
-
-        private sealed class DelegateCustomRegistration<TImplementation> : CustomRegistration
-            where TImplementation : class
-        {
-            private readonly Func<TImplementation> instanceCreator;
-
-            public DelegateCustomRegistration(
-                CreateLifestyleApplier lifestyleApplierFactory,
-                Lifestyle lifestyle,
-                Container container,
-                Func<TImplementation> instanceCreator)
-                : base(lifestyleApplierFactory, lifestyle, container, typeof(TImplementation))
-            {
-                this.instanceCreator = instanceCreator;
-            }
-
-            protected override Func<object> CreateInstanceCreator() =>
+            private Func<object> CreateInstanceCreator() =>
                 this.BuildTransientDelegate(this.instanceCreator);
         }
     }

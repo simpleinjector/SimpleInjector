@@ -6,15 +6,18 @@ namespace SimpleInjector.Lifestyles
     using System;
     using System.Linq.Expressions;
 
-    internal abstract class ScopedRegistration : Registration
+    internal sealed class ScopedRegistration : Registration
     {
+        private readonly Func<object>? instanceCreator;
+
         private Func<Scope?>? scopeFactory;
 
         internal ScopedRegistration(
-            ScopedLifestyle lifestyle, Container container, Type implementationType)
+            ScopedLifestyle lifestyle, Container container, Type implementationType, Func<object>? creator)
             : base(lifestyle, container)
         {
             this.ImplementationType = implementationType;
+            this.instanceCreator = creator;
         }
 
         public override Type ImplementationType { get; }
@@ -29,7 +32,7 @@ namespace SimpleInjector.Lifestyles
             {
                 this.scopeFactory = this.Lifestyle.CreateCurrentScopeProvider(this.Container);
 
-                this.InstanceCreator = this.BuildInstanceCreator();
+                this.InstanceCreator = this.BuildTransientDelegate(this.instanceCreator);
             }
 
             return Expression.Call(
@@ -38,7 +41,7 @@ namespace SimpleInjector.Lifestyles
                     .MakeGenericMethod(this.ImplementationType));
         }
 
-        internal static Registration? GetScopedRegistration(MethodCallExpression node) =>
+        internal static ScopedRegistration? GetScopedRegistration(MethodCallExpression node) =>
             node.Object is ConstantExpression instance
                 ? instance.Value as ScopedRegistration
                 : null;
@@ -53,34 +56,5 @@ namespace SimpleInjector.Lifestyles
         public TImplementation GetInstance<TImplementation>()
             where TImplementation : class =>
             Scope.GetInstance<TImplementation>(this, this.scopeFactory!());
-
-        protected abstract Func<object> BuildInstanceCreator();
-    }
-
-    internal sealed class AutoWiredScopedRegistration : ScopedRegistration
-    {
-        internal AutoWiredScopedRegistration(
-            ScopedLifestyle lifestyle, Container container, Type implementationType)
-            : base(lifestyle, container, implementationType)
-        {
-        }
-
-        protected override Func<object> BuildInstanceCreator() => this.BuildTransientDelegate();
-    }
-
-    internal sealed class DelegateScopedRegistration<TImplementation> : ScopedRegistration
-        where TImplementation : class
-    {
-        private readonly Func<TImplementation> userSuppliedInstanceCreator;
-
-        internal DelegateScopedRegistration(
-            ScopedLifestyle lifestyle, Container container, Func<TImplementation> instanceCreator)
-            : base(lifestyle, container, typeof(TImplementation))
-        {
-            this.userSuppliedInstanceCreator = instanceCreator;
-        }
-
-        protected override Func<object> BuildInstanceCreator() =>
-            this.BuildTransientDelegate(this.userSuppliedInstanceCreator);
     }
 }

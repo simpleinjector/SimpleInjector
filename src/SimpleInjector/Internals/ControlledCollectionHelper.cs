@@ -178,11 +178,11 @@ namespace SimpleInjector.Internals
                 InjectionConsumerInfo? consumerInfo = null;
 
                 InjectionConsumerInfo GetConsumer() =>
-                    consumerInfo ?? (consumerInfo =
+                    consumerInfo ??=
                         new InjectionConsumerInfo(
                             this.Collection.GetType().GetConstructors(nonPublic: true)
                             .Single(ctor => !ctor.IsPublic)
-                            .GetParameters().Single()));
+                            .GetParameters().Single());
 
                 return
                     from producer in this.Collection.GetProducers()

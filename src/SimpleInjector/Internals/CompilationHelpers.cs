@@ -277,7 +277,7 @@ namespace SimpleInjector.Internals
 
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
-                var registration = ScopedRegistration.GetScopedRegistration(node);
+                ScopedRegistration? registration = ScopedRegistration.GetScopedRegistration(node);
 
                 if (registration != null && object.ReferenceEquals(registration.Container, this.container))
                 {
@@ -285,22 +285,6 @@ namespace SimpleInjector.Internals
                 }
 
                 return base.VisitMethodCall(node);
-            }
-
-            private Registration? GetScopedRegistration(MethodCallExpression node)
-            {
-                var registration = node.Object is ConstantExpression instance
-                    ? instance.Value as Registration
-                    : null;
-
-                if (registration != null
-                    && object.ReferenceEquals(registration.Container, this.container)
-                    && typeof(DelegateScopedRegistration<>).IsGenericTypeDefinitionOf(registration.GetType()))
-                {
-                    return registration;
-                }
-
-                return null;
             }
         }
 
