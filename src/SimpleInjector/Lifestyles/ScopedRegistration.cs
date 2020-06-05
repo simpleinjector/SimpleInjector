@@ -8,19 +8,14 @@ namespace SimpleInjector.Lifestyles
 
     internal sealed class ScopedRegistration : Registration
     {
-        private readonly Func<object>? instanceCreator;
-
         private Func<Scope?>? scopeFactory;
 
         internal ScopedRegistration(
             ScopedLifestyle lifestyle, Container container, Type implementationType, Func<object>? creator)
-            : base(lifestyle, container)
+            : base(lifestyle, container, implementationType, creator)
         {
-            this.ImplementationType = implementationType;
-            this.instanceCreator = creator;
         }
 
-        public override Type ImplementationType { get; }
         public new ScopedLifestyle Lifestyle => (ScopedLifestyle)base.Lifestyle;
 
         // Initialized when BuildExpression is called
@@ -32,7 +27,7 @@ namespace SimpleInjector.Lifestyles
             {
                 this.scopeFactory = this.Lifestyle.CreateCurrentScopeProvider(this.Container);
 
-                this.InstanceCreator = this.BuildTransientDelegate(this.instanceCreator);
+                this.InstanceCreator = this.BuildTransientDelegate();
             }
 
             return Expression.Call(

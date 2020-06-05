@@ -34,6 +34,8 @@ namespace SimpleInjector
 
         private readonly HashSet<KnownRelationship> knownRelationships = new HashSet<KnownRelationship>();
 
+        private readonly Func<object>? instanceCreator;
+
         private HashSet<DiagnosticType>? suppressions;
         private ParameterDictionary<OverriddenParameter>? overriddenParameters;
         private Action<object>? instanceInitializer;
@@ -43,20 +45,34 @@ namespace SimpleInjector
         /// </summary>
         /// <param name="lifestyle">The <see cref="Lifestyle"/> this that created this registration.</param>
         /// <param name="container">The <see cref="Container"/> instance for this registration.</param>
+        /// <param name="implementationType">The type of instance that will be created.</param>
+        /// <param name="instanceCreator">
+        /// The optional delegate supplied by the user that allows building or creating new instances.
+        /// If this argument is supplied, the <see cref="Expression"/> and <see cref="Func{T}"/> instances
+        /// build by this <see cref="Registration"/> instance wrap that delegate. When the delegate is omitted,
+        /// the built expressions and delegates invoke the <paramref name="implementationType"/>'s constructor.
+        /// </param>
         /// <exception cref="ArgumentNullException">Thrown when one of the supplied arguments is a null
         /// reference.</exception>
-        protected Registration(Lifestyle lifestyle, Container container)
+        protected Registration(
+            Lifestyle lifestyle,
+            Container container,
+            Type implementationType,
+            Func<object>? instanceCreator = null)
         {
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
             Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(implementationType, nameof(implementationType));
 
             this.Lifestyle = lifestyle;
             this.Container = container;
+            this.ImplementationType = implementationType;
+            this.instanceCreator = instanceCreator;
         }
 
         /// <summary>Gets the type that this instance will create.</summary>
         /// <value>The type that this instance will create.</value>
-        public abstract Type ImplementationType { get; }
+        public Type ImplementationType { get; }
 
         /// <summary>Gets the <see cref="Lifestyle"/> this that created this registration.</summary>
         /// <value>The <see cref="Lifestyle"/> this that created this registration.</value>
@@ -231,22 +247,18 @@ namespace SimpleInjector
 
         /// <summary>
         /// Builds a <see cref="Func{T}"/> delegate for the creation of the <see cref="ImplementationType"/>.
-        /// When the <paramref name="instanceCreator"/> is supplied, it will be invoked for the creation of
-        /// <see cref="ImplementationType"/>, otherwise Auto-Wiring is used. The returned 
-        /// <see cref="Func{T}"/> might be intercepted by a
+        /// The returned <see cref="Func{T}"/> might be intercepted by a
         /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event,
         /// and initializers (if any) (<see cref="SimpleInjector.Container.RegisterInitializer{TService}"/>)
         /// will be applied.
         /// </summary>
-        /// <param name="instanceCreator">
-        /// The delegate supplied by the user that allows building or creating new instances.</param>
         /// <returns>A <see cref="Func{T}"/> delegate.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.</exception>
-        protected Func<object> BuildTransientDelegate(Func<object>? instanceCreator = null)
+        protected Func<object> BuildTransientDelegate()
         {
             try
             {
-                Expression expression = this.BuildTransientExpression(instanceCreator);
+                Expression expression = this.BuildTransientExpression();
 
                 // NOTE: The returned delegate could still return null (caused by the ExpressionBuilding event),
                 // but I don't feel like protecting us against such an obscure user bug.
@@ -261,26 +273,20 @@ namespace SimpleInjector
 
         /// <summary>
         /// Builds an <see cref="Expression"/> that describes the creation of <see cref="ImplementationType"/>.
-        /// When the <paramref name="instanceCreator"/> is provided, the expression will contain an invocation
-        /// to that delegate. Otherwise, the type is constructed using Auto-Wiring (by invoking
-        /// the constructor of <see cref="ImplementationType"/>. The returned <see cref="Expression"/> might
-        /// be intercepted by a
+        /// The returned <see cref="Expression"/> might be intercepted by a
         /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event,
-        /// and initializers (if any) (<see cref="SimpleInjector.Container.RegisterInitializer"/>) will be
+        /// and initializers (if any) (<see cref="SimpleInjector.Container.RegisterInitializer"/>) can be
         /// applied.
         /// </summary>
-        /// <param name="instanceCreator">
-        /// The delegate supplied by the user that allows building or creating new instances.</param>
-        /// <returns>An <see cref="Expression"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
         /// </exception>
-        protected Expression BuildTransientExpression(Func<object>? instanceCreator = null)
+        protected Expression BuildTransientExpression()
         {
             try
             {
-                Expression expression = instanceCreator is null
+                Expression expression = this.instanceCreator is null
                     ? this.BuildNewExpression()
-                    : this.BuildInvocationExpression(instanceCreator);
+                    : this.BuildInvocationExpression(this.instanceCreator);
 
                 expression = this.WrapWithPropertyInjector(this.ImplementationType, expression);
                 expression = this.InterceptInstanceCreation(this.ImplementationType, expression);

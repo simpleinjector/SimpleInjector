@@ -150,14 +150,11 @@ namespace SimpleInjector.Internals
                 Type collectionType,
                 IContainerControlledCollection collection,
                 Container container)
-                : base(Lifestyle.Singleton, container)
+                : base(Lifestyle.Singleton, container, collectionType)
             {
                 this.Collection = collection;
-                this.ImplementationType = collectionType;
                 this.IsCollection = true;
             }
-
-            public override Type ImplementationType { get; }
 
             internal override bool MustBeVerified => !this.Collection.AllProducersVerified;
 

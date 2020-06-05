@@ -40,25 +40,20 @@
         private class PerThreadRegistration : Registration
         {
             private readonly ThreadLocal<object> threadSpecificCache = new ThreadLocal<object>();
-            private readonly Func<object> creator;
 
             private Func<object> instanceProducer;
 
             public PerThreadRegistration(
                 Lifestyle lifestyle, Container container, Type implementationType, Func<object> creator)
-                : base(lifestyle, container)
+                : base(lifestyle, container, implementationType, creator)
             {
-                this.ImplementationType = implementationType;
-                this.creator = creator;
             }
 
-            public override Type ImplementationType { get; }
-            
             public override Expression BuildExpression()
             {
                 if (this.instanceProducer is null)
                 {
-                    this.instanceProducer = this.BuildTransientInstanceCreator();
+                    this.instanceProducer = this.BuildTransientDelegate();
                 }
 
                 return Expression.Call(
@@ -77,8 +72,6 @@
 
                 return (TImplementation)value;
             }
-
-            private Func<object> BuildTransientInstanceCreator() => this.BuildTransientDelegate(this.creator);
         }
     }
 }

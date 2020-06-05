@@ -156,15 +156,13 @@ namespace SimpleInjector.Lifestyles
 
             internal SingletonInstanceRegistration(
                 Type serviceType, Type implementationType, object instance, Container container)
-                : base(Lifestyle.Singleton, container)
+                : base(Lifestyle.Singleton, container, implementationType)
             {
                 this.instance = instance;
                 this.ServiceType = serviceType;
-                this.ImplementationType = implementationType;
             }
 
             public Type ServiceType { get; }
-            public override Type ImplementationType { get; }
 
             public override Expression BuildExpression() =>
                 SingletonLifestyle.BuildConstantExpression(
@@ -238,19 +236,14 @@ namespace SimpleInjector.Lifestyles
         private sealed class SingletonRegistration : Registration
         {
             private readonly object locker = new object();
-            private readonly Func<object>? instanceCreator;
 
             private object? interceptedInstance;
 
             public SingletonRegistration(
                 Container container, Type implementationType, Func<object>? instanceCreator = null)
-                : base(Lifestyle.Singleton, container)
+                : base(Lifestyle.Singleton, container, implementationType, instanceCreator)
             {
-                this.ImplementationType = implementationType;
-                this.instanceCreator = instanceCreator;
             }
-
-            public override Type ImplementationType { get; }
 
             public override Expression BuildExpression() =>
                 SingletonLifestyle.BuildConstantExpression(
@@ -297,7 +290,7 @@ namespace SimpleInjector.Lifestyles
 
             private object CreateInstanceWithNullCheck()
             {
-                Expression expression = this.BuildTransientExpression(this.instanceCreator);
+                Expression expression = this.BuildTransientExpression();
 
                 Func<object> func = this.CompileExpression(expression);
 

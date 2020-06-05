@@ -278,12 +278,9 @@
     internal sealed class FakeRegistration : Registration
     {
         public FakeRegistration(Lifestyle lifestyle, Container container, Type implementationType)
-            : base(lifestyle, container)
+            : base(lifestyle, container, implementationType)
         {
-            this.ImplementationType = implementationType;
         }
-
-        public override Type ImplementationType { get; }
 
         public Expression ExpressionToReturn { get; set; }
 

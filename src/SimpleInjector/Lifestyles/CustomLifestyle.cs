@@ -40,7 +40,6 @@ namespace SimpleInjector.Lifestyles
         private sealed class CustomRegistration : Registration
         {
             private readonly CreateLifestyleApplier lifestyleApplierFactory;
-            private readonly Func<object>? instanceCreator;
 
             public CustomRegistration(
                 CreateLifestyleApplier lifestyleApplierFactory,
@@ -48,18 +47,14 @@ namespace SimpleInjector.Lifestyles
                 Container container,
                 Type implementationType,
                 Func<object>? instanceCreator = null)
-                : base(lifestyle, container)
+                : base(lifestyle, container, implementationType, instanceCreator)
             {
                 this.lifestyleApplierFactory = lifestyleApplierFactory;
-                this.ImplementationType = implementationType;
-                this.instanceCreator = instanceCreator;
             }
-
-            public override Type ImplementationType { get; }
 
             public override Expression BuildExpression()
             {
-                var creator = this.CreateInstanceCreator();
+                var creator = this.BuildTransientDelegate();
 
                 var lifestyleAppliedCreator = this.lifestyleApplierFactory(creator);
 
@@ -69,9 +64,6 @@ namespace SimpleInjector.Lifestyles
                             Expression.Constant(lifestyleAppliedCreator)),
                         this.ImplementationType);
             }
-
-            private Func<object> CreateInstanceCreator() =>
-                this.BuildTransientDelegate(this.instanceCreator);
         }
     }
 }

@@ -17,16 +17,13 @@ namespace SimpleInjector.Lifestyles
 
         internal ExpressionRegistration(
             Expression expression, Type implementationType, Lifestyle lifestyle, Container container)
-            : base(lifestyle, container)
+            : base(lifestyle, container, implementationType)
         {
             Requires.IsNotNull(expression, nameof(expression));
-            Requires.IsNotNull(implementationType, nameof(implementationType));
 
             this.expression = expression;
-            this.ImplementationType = implementationType;
         }
 
-        public override Type ImplementationType { get; }
         public override Expression BuildExpression() => this.expression;
 
         private static Lifestyle GetLifestyleFor(Expression expression) =>

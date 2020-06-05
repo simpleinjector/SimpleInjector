@@ -509,11 +509,10 @@
 
         private class DummyRegistration<TImplementation> : Registration
         {
-            public DummyRegistration(Lifestyle lifestyle) : base(lifestyle, new Container())
+            public DummyRegistration(Lifestyle lifestyle)
+                : base(lifestyle, new Container(), typeof(TImplementation))
             {
             }
-
-            public override Type ImplementationType => typeof(TImplementation);
 
             public override Expression BuildExpression()
             {

@@ -69,9 +69,7 @@
 
         private static void RegisterForDisposal(InstanceInitializationData data)
         {
-            var instance = data.Instance as IDisposable;
-
-            if (instance != null)
+            if (data.Instance is IDisposable instance)
             {
                 var registation = (IDisposableRegistration)data.Context.Registration;
                 registation.ScopedLifestyle.RegisterForDisposal(data.Context.Registration.Container, instance);
@@ -80,23 +78,17 @@
 
         private sealed class DisposableRegistration : Registration, IDisposableRegistration
         {
-            private readonly Func<object> creator;
-
             internal DisposableRegistration(
                 ScopedLifestyle s, Lifestyle l, Container c, Type concreteType, Func<object> ic = null)
-                : base(l, c)
+                : base(l, c, concreteType, ic)
             {
                 this.ScopedLifestyle = s;
-                this.ImplementationType = concreteType;
-                this.creator = ic;
                 DisposableTransientLifestyle.TryEnableTransientDisposalOrThrow(c);
             }
 
-            public override Type ImplementationType { get; }
-
             public ScopedLifestyle ScopedLifestyle { get; }
 
-            public override Expression BuildExpression() => this.BuildTransientExpression(this.creator);
+            public override Expression BuildExpression() => this.BuildTransientExpression();
         }
     }
 }

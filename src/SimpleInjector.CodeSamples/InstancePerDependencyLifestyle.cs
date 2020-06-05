@@ -22,16 +22,11 @@
 
         private class Reg : Registration
         {
-            private readonly Func<object> creator;
-
-            public Reg(Lifestyle l, Container c, Type t, Func<object> ic = null) : base(l, c)
+            public Reg(Lifestyle l, Container c, Type t, Func<object> ic = null) : base(l, c, t, ic)
             {
-                this.ImplementationType = t;
-                this.creator = ic;
             }
 
-            public override Type ImplementationType { get; }
-            public override Expression BuildExpression() => this.BuildTransientExpression(this.creator);
+            public override Expression BuildExpression() => this.BuildTransientExpression();
         }
     }
 }

@@ -28,19 +28,13 @@ namespace SimpleInjector.Lifestyles
 
         private sealed class TransientRegistration : Registration
         {
-            private readonly Func<object>? creator;
-
             public TransientRegistration(
                 Container container, Type implementationType, Func<object>? creator = null)
-                : base(Lifestyle.Transient, container)
+                : base(Lifestyle.Transient, container, implementationType, creator)
             {
-                this.ImplementationType = implementationType;
-                this.creator = creator;
             }
 
-            public override Type ImplementationType { get; }
-
-            public override Expression BuildExpression() => this.BuildTransientExpression(this.creator);
+            public override Expression BuildExpression() => this.BuildTransientExpression();
         }
     }
 }
