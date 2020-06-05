@@ -677,13 +677,14 @@
                 };
             }
 
-            protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
+            protected internal override Registration CreateRegistrationCore(
+                Type concreteType, Container container)
             {
-                return this.realLifestyle.CreateRegistration<TConcrete>(container);
+                return this.realLifestyle.CreateRegistrationCore(concreteType, container);
             }
 
-            protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
-                Container container)
+            protected internal override Registration CreateRegistrationCore<TService>(
+                Func<TService> instanceCreator, Container container)
             {
                 return this.realLifestyle.CreateRegistration(instanceCreator, container);
             }

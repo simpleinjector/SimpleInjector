@@ -114,8 +114,13 @@ namespace SimpleInjector.Lifestyles
             registration is SingletonInstanceLifestyleRegistration;
 
         /// <inheritdoc />
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
-            new SingletonLifestyleRegistration<TConcrete>(container);
+        protected internal override Registration CreateRegistrationCore(Type concreteType, Container container)
+        {
+            Requires.IsNotNull(concreteType, nameof(concreteType));
+            Requires.IsNotNull(container, nameof(container));
+
+            return new AutoWiredSingletonLifestyleRegistration(container, concreteType);
+        }
 
         /// <inheritdoc />
         protected internal override Registration CreateRegistrationCore<TService>(
@@ -123,7 +128,7 @@ namespace SimpleInjector.Lifestyles
         {
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
-            return new SingletonLifestyleRegistration<TService>(container, instanceCreator);
+            return new DelegateSingletonLifestyleRegistration<TService>(container, instanceCreator);
         }
 
         private static ConstantExpression BuildConstantExpression(object instance, Type implementationType)
@@ -230,22 +235,21 @@ namespace SimpleInjector.Lifestyles
             }
         }
 
-        private sealed class SingletonLifestyleRegistration<TImplementation> : Registration
-            where TImplementation : class
+        private abstract class SingletonLifestyleRegistration : Registration
         {
             private readonly object locker = new object();
-            private readonly Func<TImplementation>? instanceCreator;
+            //private readonly Func<TImplementation>? instanceCreator;
 
             private object? interceptedInstance;
 
             public SingletonLifestyleRegistration(
-                Container container, Func<TImplementation>? instanceCreator = null)
+                Container container, Type implementationType)
                 : base(Lifestyle.Singleton, container)
             {
-                this.instanceCreator = instanceCreator;
+                this.ImplementationType = implementationType;
             }
 
-            public override Type ImplementationType => typeof(TImplementation);
+            public override Type ImplementationType { get; }
 
             public override Expression BuildExpression() =>
                 SingletonLifestyle.BuildConstantExpression(
@@ -290,24 +294,23 @@ namespace SimpleInjector.Lifestyles
                 return this.interceptedInstance;
             }
 
-            private TImplementation CreateInstanceWithNullCheck()
+            private object CreateInstanceWithNullCheck()
             {
-                Expression expression =
-                    this.instanceCreator is null
-                        ? this.BuildTransientExpression()
-                        : this.BuildTransientExpression(this.instanceCreator);
+                Expression expression = this.CreateExpression();
 
-                Func<TImplementation> func = CompileExpression(expression);
+                Func<object> func = this.CompileExpression(expression);
 
-                TImplementation instance = this.CreateInstance(func);
+                object instance = this.CreateInstance(func);
 
-                EnsureInstanceIsNotNull(instance);
+                this.EnsureInstanceIsNotNull(instance);
 
                 return instance;
             }
 
+            protected abstract Expression CreateExpression();
+
             // Implements #553 Allows detection of Lifestyle Mismatches when iterated inside constructor.
-            private TImplementation CreateInstance(Func<TImplementation> instanceCreator)
+            private object CreateInstance(Func<object> instanceCreator)
             {
                 var isCurrentThread = new ThreadLocal<bool> { Value = true };
 
@@ -343,7 +346,7 @@ namespace SimpleInjector.Lifestyles
                             var matchingRelationship = this.FindMatchingCollectionRelationship(args.Producer);
 
                             var additionalInformation = StringResources.CollectionUsedDuringConstruction(
-                                typeof(TImplementation),
+                                this.ImplementationType,
                                 args.Producer,
                                 matchingRelationship);
 
@@ -354,7 +357,7 @@ namespace SimpleInjector.Lifestyles
                             // diagnostics can verify the relationship.
                             this.AddRelationship(
                                 new KnownRelationship(
-                                    implementationType: typeof(TImplementation),
+                                    implementationType: this.ImplementationType,
                                     lifestyle: this.Lifestyle,
                                     consumer: matchingRelationship?.Consumer ?? InjectionConsumerInfo.Root,
                                     dependency: args.Producer,
@@ -399,31 +402,58 @@ namespace SimpleInjector.Lifestyles
                     .FirstOrDefault();
             }
 
-            private static Func<TImplementation> CompileExpression(Expression expression)
+            private Func<object> CompileExpression(Expression expression)
             {
                 try
                 {
                     // Don't call BuildTransientDelegate, because that might do optimizations that are simply
                     // not needed, since the delegate will be called just once.
-                    return CompilationHelpers.CompileLambda<TImplementation>(expression);
+                    return (Func<object>)CompilationHelpers.CompileExpression(this.Container, expression, null);
                 }
                 catch (Exception ex)
                 {
                     string message = StringResources.ErrorWhileBuildingDelegateFromExpression(
-                        typeof(TImplementation), expression, ex);
+                        this.ImplementationType, expression, ex);
 
                     throw new ActivationException(message, ex);
                 }
             }
 
-            private static void EnsureInstanceIsNotNull(object instance)
+            private void EnsureInstanceIsNotNull(object instance)
             {
                 if (instance is null)
                 {
                     throw new ActivationException(
-                        StringResources.DelegateForTypeReturnedNull(typeof(TImplementation)));
+                        StringResources.DelegateForTypeReturnedNull(this.ImplementationType));
                 }
             }
+        }
+
+        private sealed class AutoWiredSingletonLifestyleRegistration : SingletonLifestyleRegistration
+        {
+            public AutoWiredSingletonLifestyleRegistration(Container container, Type concreteType)
+                : base(container, concreteType)
+            {
+            }
+
+            protected override Expression CreateExpression() => this.BuildTransientExpression();
+        }
+
+        private sealed class DelegateSingletonLifestyleRegistration<TImplementation>
+            : SingletonLifestyleRegistration
+            where TImplementation : class
+        {
+            readonly Func<TImplementation> instanceCreator;
+
+            public DelegateSingletonLifestyleRegistration(
+                Container container, Func<TImplementation> instanceCreator)
+                : base(container, typeof(TImplementation))
+            {
+                this.instanceCreator = instanceCreator;
+            }
+
+            protected override Expression CreateExpression() =>
+                this.BuildTransientExpression(this.instanceCreator);
         }
     }
 }

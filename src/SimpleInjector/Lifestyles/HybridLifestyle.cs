@@ -39,12 +39,12 @@ namespace SimpleInjector.Lifestyles
         internal static string GetHybridName(Lifestyle lifestyle) =>
             (lifestyle as IHybridLifestyle)?.GetHybridName() ?? lifestyle.Name;
 
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
+        protected internal override Registration CreateRegistrationCore(Type concreteType, Container container) =>
             new HybridRegistration(
-                implementationType: typeof(TConcrete),
+                implementationType: concreteType,
                 test: () => this.lifestyleSelector(container),
-                trueRegistration: this.trueLifestyle.CreateRegistration<TConcrete>(container),
-                falseRegistration: this.falseLifestyle.CreateRegistration<TConcrete>(container),
+                trueRegistration: this.trueLifestyle.CreateRegistration(concreteType, container),
+                falseRegistration: this.falseLifestyle.CreateRegistration(concreteType, container),
                 lifestyle: this,
                 container: container);
 

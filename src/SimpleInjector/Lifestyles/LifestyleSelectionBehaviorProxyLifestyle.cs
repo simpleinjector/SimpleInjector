@@ -21,9 +21,14 @@ namespace SimpleInjector.Lifestyles
 
         public override int Length => throw new NotImplementedException();
 
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
-            this.options.SelectLifestyle(typeof(TConcrete))
-                .CreateRegistration<TConcrete>(container);
+        // TODO: CreateRegistrationCore calls into CreateRegistration of the selected lifestyle, but I'm
+        // wondering whether this is correct. A call to CreateRegistrationCore means always creating a new
+        // instance, but CreateRegistration might return a cached one. Calling CreateRegistrationCore instead
+        // doesn't break a test, so we're clearly missing a test. Now the question becomes: what is the
+        // correct behavior???
+        protected internal override Registration CreateRegistrationCore(Type concreteType, Container container) =>
+            this.options.SelectLifestyle(concreteType)
+                .CreateRegistration(concreteType, container);
 
         protected internal override Registration CreateRegistrationCore<TService>(
             Func<TService> instanceCreator, Container container) =>

@@ -47,9 +47,9 @@
             var container = new Container();
 
             container.AddRegistration(typeof(IFoo),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
             container.AddRegistration(typeof(IBar),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -69,9 +69,9 @@
             var container = new Container();
 
             container.AddRegistration(typeof(IFoo),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
             container.AddRegistration(typeof(IBar),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -125,13 +125,13 @@
             var container = new Container();
 
             container.AddRegistration(typeof(IFoo),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
             container.AddRegistration(typeof(IFooExt),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
             container.AddRegistration(typeof(IBar),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
             container.AddRegistration(typeof(IBarExt),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -172,9 +172,9 @@
             var container = new Container();
 
             container.AddRegistration(typeof(IFoo),
-                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                new ThreadScopedLifestyle().CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
             container.AddRegistration(typeof(IBar),
-                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                new ThreadScopedLifestyle().CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -196,9 +196,9 @@
             var container = new Container();
 
             container.AddRegistration(typeof(IFoo),
-                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                new ThreadScopedLifestyle().CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
             container.AddRegistration(typeof(IBar),
-                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                new ThreadScopedLifestyle().CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -220,9 +220,9 @@
             var container = new Container();
 
             container.AddRegistration(typeof(IFoo),
-                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                new ThreadScopedLifestyle().CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
             container.AddRegistration(typeof(IBar),
-                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                new ThreadScopedLifestyle().CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -267,9 +267,9 @@
             var container = new Container();
 
             container.AddRegistration(typeof(IFoo),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
             container.AddRegistration(typeof(IBar),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
 
             container.RegisterDecorator(typeof(IFoo), typeof(FooDecorator), Lifestyle.Singleton);
 
@@ -310,9 +310,9 @@
             var container = new Container();
 
             container.AddRegistration(typeof(IFoo),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
             container.AddRegistration(typeof(IBar),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
 
             container.RegisterDecorator(typeof(IFoo), typeof(FooDecorator));
             container.RegisterDecorator(typeof(IBar), typeof(BarDecorator));
@@ -340,8 +340,8 @@
 
             var container = new Container();
 
-            var fooReg = Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false);
-            var barReg = Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false);
+            var fooReg = Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false);
+            var barReg = Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false);
 
             container.AddRegistration(typeof(IFoo), fooReg);
             container.AddRegistration(typeof(IFooExt), fooReg);
@@ -387,9 +387,9 @@
             // This should not result in a warning, because Transients will always return a new instance,
             // so even though there are multiple registrations, the behavior will be identical.
             container.AddRegistration(typeof(IFoo),
-                Lifestyle.Transient.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Transient.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
             container.AddRegistration(typeof(IBar),
-                Lifestyle.Transient.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Transient.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
 
             container.Verify();
 
@@ -426,9 +426,9 @@
 
             // We expect to see ambiguous lifestyle warning though, but that's what we test here.
             container.AddRegistration(typeof(IFoo),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
             container.AddRegistration(typeof(IBar),
-                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                new ThreadScopedLifestyle().CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -489,9 +489,9 @@
             var container = new Container();
 
             container.AddRegistration(typeof(IFoo),
-                Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
             container.AddRegistration(typeof(IBar),
-                new ThreadScopedLifestyle().CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false));
+                new ThreadScopedLifestyle().CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false));
 
             container.Verify(VerificationOption.VerifyOnly);
 
@@ -575,8 +575,8 @@
             // Arrange
             var container = new Container();
 
-            var reg1 = Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false);
-            var reg2 = Lifestyle.Singleton.CreateRegistrationInternal<FooBar>(container, preventTornLifestyles: false);
+            var reg1 = Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false);
+            var reg2 = Lifestyle.Singleton.CreateRegistrationInternal(typeof(FooBar), container, preventTornLifestyles: false);
 
             container.Collection.Register(typeof(IFoo), new[] { reg1, reg2 });
 

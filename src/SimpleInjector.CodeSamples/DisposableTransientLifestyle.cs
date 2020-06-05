@@ -38,8 +38,8 @@
             }
         }
 
-        protected override Registration CreateRegistrationCore<TConcrete>(Container c) =>
-            new DisposableRegistration<TConcrete>(this.scopedLifestyle, this, c, null);
+        protected override Registration CreateRegistrationCore(Type concreteType, Container c) =>
+            new DisposableRegistration(this.scopedLifestyle, this, c, concreteType);
 
         protected override Registration CreateRegistrationCore<TService>(Func<TService> ic, Container c) =>
             new DisposableRegistration<TService>(this.scopedLifestyle, this, c, ic);
@@ -95,10 +95,25 @@
 
             public ScopedLifestyle ScopedLifestyle { get; }
 
-            public override Expression BuildExpression() =>
-                this.instanceCreator is null
-                    ? this.BuildTransientExpression()
-                    : this.BuildTransientExpression(this.instanceCreator);
+            public override Expression BuildExpression() => this.BuildTransientExpression(this.instanceCreator);
+        }
+
+        private sealed class DisposableRegistration : Registration, IDisposableRegistration
+        {
+            internal DisposableRegistration(ScopedLifestyle s, Lifestyle l, Container c, Type concreteType)
+                : base(l, c)
+            {
+                this.ScopedLifestyle = s;
+                this.ImplementationType = concreteType;
+
+                DisposableTransientLifestyle.TryEnableTransientDisposalOrThrow(c);
+            }
+
+            public override Type ImplementationType { get; }
+
+            public ScopedLifestyle ScopedLifestyle { get; }
+
+            public override Expression BuildExpression() => this.BuildTransientExpression();
         }
     }
 }

@@ -6,30 +6,22 @@ namespace SimpleInjector.Lifestyles
     using System;
     using System.Linq.Expressions;
 
-    internal sealed class ScopedRegistration<TImplementation> : Registration
-        where TImplementation : class
+    internal abstract class ScopedRegistration : Registration
     {
-        private readonly Func<TImplementation>? userSuppliedInstanceCreator;
-
         private Func<Scope?>? scopeFactory;
 
         internal ScopedRegistration(
-            ScopedLifestyle lifestyle, Container container, Func<TImplementation> instanceCreator)
-            : this(lifestyle, container)
-        {
-            this.userSuppliedInstanceCreator = instanceCreator;
-        }
-
-        internal ScopedRegistration(ScopedLifestyle lifestyle, Container container)
+            ScopedLifestyle lifestyle, Container container, Type implementationType)
             : base(lifestyle, container)
         {
+            this.ImplementationType = implementationType;
         }
 
-        public override Type ImplementationType => typeof(TImplementation);
+        public override Type ImplementationType { get; }
         public new ScopedLifestyle Lifestyle => (ScopedLifestyle)base.Lifestyle;
 
         // Initialized when BuildExpression is called
-        internal Func<TImplementation>? InstanceCreator { get; private set; }
+        internal Func<object>? InstanceCreator { get; private set; }
 
         public override Expression BuildExpression()
         {
@@ -42,8 +34,14 @@ namespace SimpleInjector.Lifestyles
 
             return Expression.Call(
                 instance: Expression.Constant(this),
-                method: this.GetType().GetMethod(nameof(this.GetInstance)));
+                method: this.GetType().GetMethod(nameof(this.GetInstance))
+                    .MakeGenericMethod(this.ImplementationType));
         }
+
+        internal static Registration? GetScopedRegistration(MethodCallExpression node) =>
+            node.Object is ConstantExpression instance
+                ? instance.Value as ScopedRegistration
+                : null;
 
         // This method needs to be public, because the BuildExpression methods build a
         // MethodCallExpression using this method, and this would fail in partial trust when the
@@ -52,11 +50,37 @@ namespace SimpleInjector.Lifestyles
         // is most cases not be called. It will however be called when the expression that is built by
         // this instance will get compiled by someone else than the core library. That's why this method
         // is still important.
-        public TImplementation GetInstance() => Scope.GetInstance(this, this.scopeFactory!());
+        public TImplementation GetInstance<TImplementation>()
+            where TImplementation : class =>
+            Scope.GetInstance<TImplementation>(this, this.scopeFactory!());
 
-        private Func<TImplementation> BuildInstanceCreator() =>
-            this.userSuppliedInstanceCreator != null
-                ? this.BuildTransientDelegate(this.userSuppliedInstanceCreator)
-                : (Func<TImplementation>)this.BuildTransientDelegate();
+        protected abstract Func<object> BuildInstanceCreator();
+    }
+
+    internal sealed class AutoWiredScopedRegistration : ScopedRegistration
+    {
+        internal AutoWiredScopedRegistration(
+            ScopedLifestyle lifestyle, Container container, Type implementationType)
+            : base(lifestyle, container, implementationType)
+        {
+        }
+
+        protected override Func<object> BuildInstanceCreator() => this.BuildTransientDelegate();
+    }
+
+    internal sealed class DelegateScopedRegistration<TImplementation> : ScopedRegistration
+        where TImplementation : class
+    {
+        private readonly Func<TImplementation> userSuppliedInstanceCreator;
+
+        internal DelegateScopedRegistration(
+            ScopedLifestyle lifestyle, Container container, Func<TImplementation> instanceCreator)
+            : base(lifestyle, container, typeof(TImplementation))
+        {
+            this.userSuppliedInstanceCreator = instanceCreator;
+        }
+
+        protected override Func<object> BuildInstanceCreator() =>
+            this.BuildTransientDelegate(this.userSuppliedInstanceCreator);
     }
 }

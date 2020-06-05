@@ -119,14 +119,6 @@ namespace SimpleInjector
         internal static readonly Lifestyle Unknown = new UnknownLifestyle();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private static readonly MethodInfo OpenCreateRegistrationTConcreteMethod =
-            GetMethod(lifestyle => lifestyle.CreateRegistration<object>(null!));
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private static readonly MethodInfo OpenCreateRegistrationCoreTConcreteMethod =
-            GetMethod(lifestyle => lifestyle.CreateRegistrationCore<object>(null!));
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly MethodInfo OpenCreateRegistrationTServiceFuncMethod =
             GetMethod(lifestyle => lifestyle.CreateRegistration<object>(null!, null!));
 
@@ -561,7 +553,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container, nameof(container));
 
-            return this.CreateRegistrationInternal<TConcrete>(container, preventTornLifestyles: true);
+            return this.CreateRegistrationInternal(typeof(TConcrete), container, preventTornLifestyles: true);
         }
 
         /// <summary>
@@ -659,12 +651,11 @@ namespace SimpleInjector
 
         internal virtual int DependencyLength(Container container) => this.Length;
 
-        internal Registration CreateRegistrationInternal<TConcrete>(
-            Container container, bool preventTornLifestyles)
-            where TConcrete : class =>
+        internal Registration CreateRegistrationInternal(
+            Type concreteType, Container container, bool preventTornLifestyles) =>
             preventTornLifestyles
-                ? this.CreateRegistrationFromCache<TConcrete>(container)
-                : this.CreateRegistrationCore<TConcrete>(container);
+                ? this.CreateRegistrationFromCache(concreteType, container)
+                : this.CreateRegistrationCore(concreteType, container);
 
         internal Registration CreateDecoratorRegistration(
             Type concreteType, Container container, params OverriddenParameter[] overriddenParameters)
@@ -680,9 +671,9 @@ namespace SimpleInjector
         /// <summary>
         /// When overridden in a derived class,
         /// creates a new <see cref="Registration"/> instance defining the creation of the
-        /// specified <typeparamref name="TConcrete"/> with the caching as specified by this lifestyle.
+        /// specified <paramref name="concreteType"/> with the caching as specified by this lifestyle.
         /// </summary>
-        /// <typeparam name="TConcrete">The concrete type that will be registered.</typeparam>
+        /// <param name="concreteType">The concrete type that will be registered.</param>
         /// <param name="container">The <see cref="Container"/> instance for which a
         /// <see cref="Registration"/> must be created.</param>
         /// <returns>A new <see cref="Registration"/> instance.</returns>
@@ -691,8 +682,7 @@ namespace SimpleInjector
         /// to create and return a new <see cref="Registration"/>. Note that you should <b>always</b> create
         /// a new <see cref="Registration"/> instance. They should never be cached.
         /// </remarks>
-        protected internal abstract Registration CreateRegistrationCore<TConcrete>(Container container)
-            where TConcrete : class;
+        protected internal abstract Registration CreateRegistrationCore(Type concreteType, Container container);
 
         /// <summary>
         /// When overridden in a derived class,
@@ -715,37 +705,18 @@ namespace SimpleInjector
             Func<TService> instanceCreator, Container container)
             where TService : class;
 
-        private Registration CreateRegistrationInternal(
-            Type concreteType, Container container, bool preventTornLifestyles)
-        {
-            var closedCreateRegistrationMethod = preventTornLifestyles
-                ? OpenCreateRegistrationTConcreteMethod.MakeGenericMethod(concreteType)
-                : OpenCreateRegistrationCoreTConcreteMethod.MakeGenericMethod(concreteType);
-
-            try
-            {
-                return (Registration)closedCreateRegistrationMethod.Invoke(this, new object[] { container });
-            }
-            catch (MemberAccessException ex)
-            {
-                throw BuildUnableToResolveTypeDueToSecurityConfigException(
-                    concreteType, ex, nameof(concreteType));
-            }
-        }
-
-        private Registration CreateRegistrationFromCache<TConcrete>(Container container)
-            where TConcrete : class
+        private Registration CreateRegistrationFromCache(Type concreteType, Container container)
         {
             lock (container.LifestyleRegistrationCache)
             {
                 WeakReference weakRegistration =
-                    this.GetLifestyleRegistrationEntryFromCache(typeof(TConcrete), container);
+                    this.GetLifestyleRegistrationEntryFromCache(concreteType, container);
 
                 var registration = (Registration)weakRegistration.Target;
 
                 if (registration is null)
                 {
-                    registration = this.CreateRegistrationCore<TConcrete>(container);
+                    registration = this.CreateRegistrationCore(concreteType, container);
                     weakRegistration.Target = registration;
                 }
 

@@ -15,9 +15,9 @@ namespace SimpleInjector.Lifestyles
 
         public override int Length => 1;
 
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
+        protected internal override Registration CreateRegistrationCore(Type concreteType, Container container)
         {
-            return new TransientLifestyleRegistration<TConcrete>(this, container);
+            return new TransientLifestyleRegistration(this, container, concreteType);
         }
 
         protected internal override Registration CreateRegistrationCore<TService>(
@@ -44,6 +44,20 @@ namespace SimpleInjector.Lifestyles
                 this.instanceCreator is null
                     ? this.BuildTransientExpression()
                     : this.BuildTransientExpression(this.instanceCreator);
+        }
+
+        private sealed class TransientLifestyleRegistration : Registration
+        {
+            public TransientLifestyleRegistration(
+                Lifestyle lifestyle, Container container, Type implementationType)
+                : base(lifestyle, container)
+            {
+                this.ImplementationType = implementationType;
+            }
+
+            public override Type ImplementationType { get; }
+
+            public override Expression BuildExpression() => this.BuildTransientExpression();
         }
     }
 }

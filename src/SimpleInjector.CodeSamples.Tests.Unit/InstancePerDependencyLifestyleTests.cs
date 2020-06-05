@@ -30,8 +30,6 @@
             // Arrange
             var container = new Container();
 
-            var lifestyle = new InstancePerDependencyLifestyle();
-
             container.RegisterSingleton<CommandWithILoggerDependency>();
 
             container.Register<ILogger, NullLogger>(new InstancePerDependencyLifestyle());
