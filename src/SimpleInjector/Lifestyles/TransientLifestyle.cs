@@ -15,35 +15,26 @@ namespace SimpleInjector.Lifestyles
 
         public override int Length => 1;
 
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
+        protected internal override Registration CreateRegistrationCore(Type concreteType, Container container)
         {
-            return new TransientLifestyleRegistration<TConcrete>(this, container);
+            return new TransientRegistration(container, concreteType);
         }
 
         protected internal override Registration CreateRegistrationCore<TService>(
             Func<TService> instanceCreator, Container container)
         {
-            return new TransientLifestyleRegistration<TService>(this, container, instanceCreator);
+            return new TransientRegistration(container, typeof(TService), instanceCreator);
         }
 
-        private sealed class TransientLifestyleRegistration<TImplementation> : Registration
-            where TImplementation : class
+        private sealed class TransientRegistration : Registration
         {
-            private readonly Func<TImplementation>? instanceCreator;
-
-            public TransientLifestyleRegistration(
-                Lifestyle lifestyle, Container container, Func<TImplementation>? instanceCreator = null)
-                : base(lifestyle, container)
+            public TransientRegistration(
+                Container container, Type implementationType, Func<object>? creator = null)
+                : base(Lifestyle.Transient, container, implementationType, creator)
             {
-                this.instanceCreator = instanceCreator;
             }
 
-            public override Type ImplementationType => typeof(TImplementation);
-
-            public override Expression BuildExpression() =>
-                this.instanceCreator is null
-                    ? this.BuildTransientExpression()
-                    : this.BuildTransientExpression(this.instanceCreator);
+            public override Expression BuildExpression() => this.BuildTransientExpression();
         }
     }
 }

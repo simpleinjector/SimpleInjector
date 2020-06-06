@@ -143,7 +143,7 @@ namespace SimpleInjector
                 this.RequiresInstanceNotDisposed();
                 this.PreventCyclicDependenciesDuringDisposal();
 
-                (this.scopeEndActions ?? (this.scopeEndActions = new List<Action>())).Add(action);
+                (this.scopeEndActions ??= new List<Action>()).Add(action);
             }
         }
 
@@ -309,15 +309,15 @@ namespace SimpleInjector
         }
 
         internal static TImplementation GetInstance<TImplementation>(
-            ScopedRegistration<TImplementation> registration, Scope? scope)
+            ScopedRegistration registration, Scope? scope)
             where TImplementation : class
         {
             if (scope is null)
             {
-                return Scope.GetScopelessInstance(registration);
+                return (TImplementation)Scope.GetScopelessInstance(registration);
             }
 
-            return scope.GetInstanceInternal(registration);
+            return (TImplementation)scope.GetInstanceInternal(registration);
         }
 
         internal T GetOrSetItem<T>(object key, Func<Container, object, T> valueFactory)
@@ -448,9 +448,7 @@ namespace SimpleInjector
             }
         }
 
-        private static TImplementation GetScopelessInstance<TImplementation>(
-            ScopedRegistration<TImplementation> registration)
-            where TImplementation : class
+        private static object GetScopelessInstance(ScopedRegistration registration)
         {
             if (registration.Container.IsVerifying)
             {
@@ -459,13 +457,11 @@ namespace SimpleInjector
 
             throw new ActivationException(
                 StringResources.TheServiceIsRequestedOutsideTheContextOfAScopedLifestyle(
-                    typeof(TImplementation),
+                    registration.ImplementationType,
                     registration.Lifestyle));
         }
 
-        private TImplementation GetInstanceInternal<TImplementation>(
-            ScopedRegistration<TImplementation> registration)
-            where TImplementation : class
+        private object GetInstanceInternal(ScopedRegistration registration)
         {
             lock (this.syncRoot)
             {
@@ -480,19 +476,18 @@ namespace SimpleInjector
                 }
 
                 return !cacheIsEmpty && this.cachedInstances.TryGetValue(registration, out object? instance)
-                    ? (TImplementation)instance
+                    ? instance
                     : this.CreateAndCacheInstance(registration, this.cachedInstances);
             }
         }
 
-        private TImplementation CreateAndCacheInstance<TImplementation>(
-            ScopedRegistration<TImplementation> registration, Dictionary<Registration, object> cache)
-            where TImplementation : class
+        private object CreateAndCacheInstance(
+            ScopedRegistration registration, Dictionary<Registration, object> cache)
         {
             // registration.BuildExpression has been called, and InstanceCreate thus been initialized.
-            Func<TImplementation> instanceCreator = registration.InstanceCreator!;
+            Func<object> instanceCreator = registration.InstanceCreator!;
 
-            TImplementation instance = instanceCreator.Invoke();
+            object instance = instanceCreator.Invoke();
 
             cache[registration] = instance;
 

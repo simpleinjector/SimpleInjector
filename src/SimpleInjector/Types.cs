@@ -29,7 +29,7 @@ namespace SimpleInjector
             { typeof(string), "string" },
             { typeof(uint), "uint" },
             { typeof(ulong), "ulong" },
-            { typeof(ushort), "ushort" } ,
+            { typeof(ushort), "ushort" },
         };
 
         private static readonly Type[] AmbiguousTypes =

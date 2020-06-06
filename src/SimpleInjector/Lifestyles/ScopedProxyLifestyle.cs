@@ -20,8 +20,8 @@ namespace SimpleInjector.Lifestyles
         protected internal override Func<Scope?> CreateCurrentScopeProvider(Container container) =>
             GetDefaultScopedLifestyle(container).CreateCurrentScopeProvider(container);
 
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
-            GetDefaultScopedLifestyle(container).CreateRegistrationCore<TConcrete>(container);
+        protected internal override Registration CreateRegistrationCore(Type concreteType, Container container) =>
+            GetDefaultScopedLifestyle(container).CreateRegistrationCore(concreteType, container);
 
         protected internal override Registration CreateRegistrationCore<TService>(
             Func<TService> instanceCreator, Container container) =>

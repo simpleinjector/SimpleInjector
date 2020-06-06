@@ -150,8 +150,7 @@ namespace SimpleInjector.Internals
 
         private static NewExpression CreateNewLazyScopedRegistration(Registration registration)
         {
-            Type type = typeof(LazyScopedRegistration<>)
-                .MakeGenericType(registration.GetType().GetGenericArguments());
+            Type type = typeof(LazyScopedRegistration<>).MakeGenericType(registration.ImplementationType);
 
             return Expression.New(
                 type.GetConstructor(new[] { typeof(Registration) }),
@@ -278,30 +277,14 @@ namespace SimpleInjector.Internals
 
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
-                Registration? registration = this.GetScopedRegistration(node);
+                ScopedRegistration? registration = ScopedRegistration.GetScopedRegistration(node);
 
-                if (registration != null)
+                if (registration != null && object.ReferenceEquals(registration.Container, this.container))
                 {
                     this.perObjectGraphRegistrations.Add(new OptimizableRegistrationInfo(registration, node));
                 }
 
                 return base.VisitMethodCall(node);
-            }
-
-            private Registration? GetScopedRegistration(MethodCallExpression node)
-            {
-                var registration = node.Object is ConstantExpression instance
-                    ? instance.Value as Registration
-                    : null;
-
-                if (registration != null
-                    && object.ReferenceEquals(registration.Container, this.container)
-                    && typeof(ScopedRegistration<>).IsGenericTypeDefinitionOf(registration.GetType()))
-                {
-                    return registration;
-                }
-
-                return null;
             }
         }
 
@@ -373,7 +356,7 @@ namespace SimpleInjector.Internals
                 this.OriginalExpression = originalExpression;
 
                 this.lazyScopeRegistrationType = typeof(LazyScopedRegistration<>)
-                    .MakeGenericType(this.Registration.GetType().GetGenericArguments());
+                    .MakeGenericType(this.Registration.ImplementationType);
             }
 
             internal ParameterExpression Variable =>

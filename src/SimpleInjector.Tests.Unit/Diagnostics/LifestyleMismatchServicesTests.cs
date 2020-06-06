@@ -509,11 +509,10 @@
 
         private class DummyRegistration<TImplementation> : Registration
         {
-            public DummyRegistration(Lifestyle lifestyle) : base(lifestyle, new Container())
+            public DummyRegistration(Lifestyle lifestyle)
+                : base(lifestyle, new Container(), typeof(TImplementation))
             {
             }
-
-            public override Type ImplementationType => typeof(TImplementation);
 
             public override Expression BuildExpression()
             {
@@ -555,13 +554,13 @@
 
             public override int Length => this.realLifestyle.ComponentLength(null);
 
-            protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
+            protected internal override Registration CreateRegistrationCore(Type concreteType, Container container)
             {
-                return this.realLifestyle.CreateRegistration<TConcrete>(container);
+                return this.realLifestyle.CreateRegistration(concreteType, container);
             }
 
-            protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
-                Container container)
+            protected internal override Registration CreateRegistrationCore<TService>(
+                Func<TService> instanceCreator, Container container)
             {
                 return this.realLifestyle.CreateRegistration(instanceCreator, container);
             }
@@ -577,10 +576,10 @@
 
         public override int Length { get; }
 
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
-            Transient.CreateRegistration<TConcrete>(container);
+        protected internal override Registration CreateRegistrationCore(Type concreteType, Container container) =>
+            Transient.CreateRegistrationCore(concreteType, container);
 
         protected internal override Registration CreateRegistrationCore<TService>(Func<TService> creator, Container c) =>
-            Transient.CreateRegistration(creator, c);
+            Transient.CreateRegistrationCore(creator, c);
     }
 }

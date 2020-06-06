@@ -23,15 +23,12 @@ namespace SimpleInjector.Lifestyles
             Registration falseRegistration,
             Lifestyle lifestyle,
             Container container)
-            : base(lifestyle, container)
+            : base(lifestyle, container, implementationType)
         {
-            this.ImplementationType = implementationType;
             this.test = test;
             this.trueRegistration = trueRegistration;
             this.falseRegistration = falseRegistration;
         }
-
-        public override Type ImplementationType { get; }
 
         public override Expression BuildExpression()
         {

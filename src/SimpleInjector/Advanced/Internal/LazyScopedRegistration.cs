@@ -49,7 +49,7 @@ namespace SimpleInjector.Advanced.Internal
             if (this.instance is null)
             {
                 this.instance =
-                    Scope.GetInstance((ScopedRegistration<TImplementation>)this.registration, scope);
+                    Scope.GetInstance<TImplementation>((ScopedRegistration)this.registration, scope);
             }
 
             return this.instance;

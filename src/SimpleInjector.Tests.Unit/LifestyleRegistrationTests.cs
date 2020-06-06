@@ -263,13 +263,13 @@
 
         public override int Length => Transient.Length;
 
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container)
+        protected internal override Registration CreateRegistrationCore(Type concreteType, Container container)
         {
             return this.RegistrationToReturn;
         }
 
-        protected internal override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
-            Container container)
+        protected internal override Registration CreateRegistrationCore<TService>(
+            Func<TService> instanceCreator, Container container)
         {
             return this.RegistrationToReturn;
         }
@@ -278,12 +278,9 @@
     internal sealed class FakeRegistration : Registration
     {
         public FakeRegistration(Lifestyle lifestyle, Container container, Type implementationType)
-            : base(lifestyle, container)
+            : base(lifestyle, container, implementationType)
         {
-            this.ImplementationType = implementationType;
         }
-
-        public override Type ImplementationType { get; }
 
         public Expression ExpressionToReturn { get; set; }
 

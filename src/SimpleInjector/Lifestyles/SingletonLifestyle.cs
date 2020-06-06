@@ -80,7 +80,7 @@ namespace SimpleInjector.Lifestyles
             }
 #endif
 
-            return new SingletonInstanceLifestyleRegistration(
+            return new SingletonInstanceRegistration(
                 serviceType, implementationType, instance, container);
         }
 
@@ -111,11 +111,16 @@ namespace SimpleInjector.Lifestyles
         }
 
         internal static bool IsSingletonInstanceRegistration(Registration registration) =>
-            registration is SingletonInstanceLifestyleRegistration;
+            registration is SingletonInstanceRegistration;
 
         /// <inheritdoc />
-        protected internal override Registration CreateRegistrationCore<TConcrete>(Container container) =>
-            new SingletonLifestyleRegistration<TConcrete>(container);
+        protected internal override Registration CreateRegistrationCore(Type concreteType, Container container)
+        {
+            Requires.IsNotNull(concreteType, nameof(concreteType));
+            Requires.IsNotNull(container, nameof(container));
+
+            return new SingletonRegistration(container, concreteType);
+        }
 
         /// <inheritdoc />
         protected internal override Registration CreateRegistrationCore<TService>(
@@ -123,7 +128,7 @@ namespace SimpleInjector.Lifestyles
         {
             Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
 
-            return new SingletonLifestyleRegistration<TService>(container, instanceCreator);
+            return new SingletonRegistration(container, typeof(TService), instanceCreator);
         }
 
         private static ConstantExpression BuildConstantExpression(object instance, Type implementationType)
@@ -142,24 +147,22 @@ namespace SimpleInjector.Lifestyles
             return Expression.Constant(instance, implementationType);
         }
 
-        private sealed class SingletonInstanceLifestyleRegistration : Registration
+        private sealed class SingletonInstanceRegistration : Registration
         {
             private readonly object locker = new object();
 
             private object instance;
             private bool initialized;
 
-            internal SingletonInstanceLifestyleRegistration(
+            internal SingletonInstanceRegistration(
                 Type serviceType, Type implementationType, object instance, Container container)
-                : base(Lifestyle.Singleton, container)
+                : base(Lifestyle.Singleton, container, implementationType)
             {
                 this.instance = instance;
                 this.ServiceType = serviceType;
-                this.ImplementationType = implementationType;
             }
 
             public Type ServiceType { get; }
-            public override Type ImplementationType { get; }
 
             public override Expression BuildExpression() =>
                 SingletonLifestyle.BuildConstantExpression(
@@ -230,22 +233,17 @@ namespace SimpleInjector.Lifestyles
             }
         }
 
-        private sealed class SingletonLifestyleRegistration<TImplementation> : Registration
-            where TImplementation : class
+        private sealed class SingletonRegistration : Registration
         {
             private readonly object locker = new object();
-            private readonly Func<TImplementation>? instanceCreator;
 
             private object? interceptedInstance;
 
-            public SingletonLifestyleRegistration(
-                Container container, Func<TImplementation>? instanceCreator = null)
-                : base(Lifestyle.Singleton, container)
+            public SingletonRegistration(
+                Container container, Type implementationType, Func<object>? instanceCreator = null)
+                : base(Lifestyle.Singleton, container, implementationType, instanceCreator)
             {
-                this.instanceCreator = instanceCreator;
             }
-
-            public override Type ImplementationType => typeof(TImplementation);
 
             public override Expression BuildExpression() =>
                 SingletonLifestyle.BuildConstantExpression(
@@ -290,24 +288,21 @@ namespace SimpleInjector.Lifestyles
                 return this.interceptedInstance;
             }
 
-            private TImplementation CreateInstanceWithNullCheck()
+            private object CreateInstanceWithNullCheck()
             {
-                Expression expression =
-                    this.instanceCreator is null
-                        ? this.BuildTransientExpression()
-                        : this.BuildTransientExpression(this.instanceCreator);
+                Expression expression = this.BuildTransientExpression();
 
-                Func<TImplementation> func = CompileExpression(expression);
+                Func<object> func = this.CompileExpression(expression);
 
-                TImplementation instance = this.CreateInstance(func);
+                object instance = this.CreateInstance(func);
 
-                EnsureInstanceIsNotNull(instance);
+                this.EnsureInstanceIsNotNull(instance);
 
                 return instance;
             }
 
             // Implements #553 Allows detection of Lifestyle Mismatches when iterated inside constructor.
-            private TImplementation CreateInstance(Func<TImplementation> instanceCreator)
+            private object CreateInstance(Func<object> instanceCreator)
             {
                 var isCurrentThread = new ThreadLocal<bool> { Value = true };
 
@@ -343,7 +338,7 @@ namespace SimpleInjector.Lifestyles
                             var matchingRelationship = this.FindMatchingCollectionRelationship(args.Producer);
 
                             var additionalInformation = StringResources.CollectionUsedDuringConstruction(
-                                typeof(TImplementation),
+                                this.ImplementationType,
                                 args.Producer,
                                 matchingRelationship);
 
@@ -354,7 +349,7 @@ namespace SimpleInjector.Lifestyles
                             // diagnostics can verify the relationship.
                             this.AddRelationship(
                                 new KnownRelationship(
-                                    implementationType: typeof(TImplementation),
+                                    implementationType: this.ImplementationType,
                                     lifestyle: this.Lifestyle,
                                     consumer: matchingRelationship?.Consumer ?? InjectionConsumerInfo.Root,
                                     dependency: args.Producer,
@@ -399,29 +394,29 @@ namespace SimpleInjector.Lifestyles
                     .FirstOrDefault();
             }
 
-            private static Func<TImplementation> CompileExpression(Expression expression)
+            private Func<object> CompileExpression(Expression expression)
             {
                 try
                 {
                     // Don't call BuildTransientDelegate, because that might do optimizations that are simply
                     // not needed, since the delegate will be called just once.
-                    return CompilationHelpers.CompileLambda<TImplementation>(expression);
+                    return (Func<object>)CompilationHelpers.CompileExpression(this.Container, expression, null);
                 }
                 catch (Exception ex)
                 {
                     string message = StringResources.ErrorWhileBuildingDelegateFromExpression(
-                        typeof(TImplementation), expression, ex);
+                        this.ImplementationType, expression, ex);
 
                     throw new ActivationException(message, ex);
                 }
             }
 
-            private static void EnsureInstanceIsNotNull(object instance)
+            private void EnsureInstanceIsNotNull(object instance)
             {
                 if (instance is null)
                 {
                     throw new ActivationException(
-                        StringResources.DelegateForTypeReturnedNull(typeof(TImplementation)));
+                        StringResources.DelegateForTypeReturnedNull(this.ImplementationType));
                 }
             }
         }

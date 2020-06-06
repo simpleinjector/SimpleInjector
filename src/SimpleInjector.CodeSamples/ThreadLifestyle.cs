@@ -21,9 +21,9 @@
         // Greater than Scope, but smaller than Singleton.
         public override int Length => Lifestyle.Singleton.Length - 1;
 
-        protected override Registration CreateRegistrationCore<TConcrete>(Container container)
+        protected override Registration CreateRegistrationCore(Type concreteType, Container container)
         {
-            return new PerThreadRegistration<TConcrete>(this, container);
+            return new PerThreadRegistration(this, container, concreteType, null);
         }
 
         protected override Registration CreateRegistrationCore<TService>(Func<TService> instanceCreator,
@@ -34,52 +34,44 @@
                 throw new ArgumentNullException(nameof(instanceCreator));
             }
 
-            return new PerThreadRegistration<TService>(this, container, instanceCreator);
+            return new PerThreadRegistration(this, container, typeof(TService), instanceCreator);
         }
 
-        private sealed class PerThreadRegistration<TImplementation> : Registration
-            where TImplementation : class
+        private class PerThreadRegistration : Registration
         {
-            private readonly ThreadLocal<TImplementation> threadSpecificCache = new ThreadLocal<TImplementation>();
-            private readonly Func<TImplementation> instanceCreator;
+            private readonly ThreadLocal<object> threadSpecificCache = new ThreadLocal<object>();
 
-            private Func<TImplementation> instanceProducer;
+            private Func<object> instanceProducer;
 
-            public PerThreadRegistration(Lifestyle lifestyle, Container container,
-                Func<TImplementation> instanceCreator = null)
-                : base(lifestyle, container)
+            public PerThreadRegistration(
+                Lifestyle lifestyle, Container container, Type implementationType, Func<object> creator)
+                : base(lifestyle, container, implementationType, creator)
             {
-                this.instanceCreator = instanceCreator;
             }
 
-            public override Type ImplementationType => typeof(TImplementation);
-            
             public override Expression BuildExpression()
             {
                 if (this.instanceProducer is null)
                 {
-                    this.instanceProducer = this.BuildTransientInstanceCreator();
+                    this.instanceProducer = this.BuildTransientDelegate();
                 }
 
-                return Expression.Call(Expression.Constant(this), this.GetType().GetMethod("GetInstance"));
+                return Expression.Call(
+                    Expression.Constant(this),
+                    this.GetType().GetMethod(nameof(GetInstance)).MakeGenericMethod(this.ImplementationType));
             }
 
-            public TImplementation GetInstance()
+            public TImplementation GetInstance<TImplementation>()
             {
-                TImplementation value = this.threadSpecificCache.Value;
+                object value = this.threadSpecificCache.Value;
 
                 if (value is null)
                 {
                     this.threadSpecificCache.Value = value = this.instanceProducer();
                 }
 
-                return value;
+                return (TImplementation)value;
             }
-
-            private Func<TImplementation> BuildTransientInstanceCreator() =>
-                this.instanceCreator is null
-                    ? (Func<TImplementation>)this.BuildTransientDelegate()
-                    : this.BuildTransientDelegate(this.instanceCreator);
         }
     }
 }
