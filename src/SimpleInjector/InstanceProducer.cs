@@ -85,10 +85,16 @@ namespace SimpleInjector
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
         /// <param name="serviceType">The service type for which this instance is created.</param>
         /// <param name="registration">The <see cref="Registration"/>.</param>
-
         public InstanceProducer(Type serviceType, Registration registration)
             : this(serviceType, registration, ShouldBeRegisteredAsAnExternalProducer(registration))
         {
+        }
+
+        internal InstanceProducer(
+            Type serviceType, Registration registration, Predicate<PredicateContext>? predicate)
+            : this(serviceType, registration)
+        {
+            this.Predicate = predicate ?? Always;
         }
 
         internal InstanceProducer(Type serviceType, Registration registration, bool registerExternalProducer)
@@ -112,13 +118,6 @@ namespace SimpleInjector
 
             this.instanceCreator = this.BuildAndReplaceInstanceCreatorAndCreateFirstInstance;
             this.ImplementationType = registration.ImplementationType;
-        }
-
-        internal InstanceProducer(
-            Type serviceType, Registration registration, Predicate<PredicateContext>? predicate)
-            : this(serviceType, registration)
-        {
-            this.Predicate = predicate ?? Always;
         }
 
         // Flagging the registration with WrapsInstanceCreationDelegate prevents false diagnostic warnings.
@@ -206,8 +205,7 @@ namespace SimpleInjector
         // when the producer is valid.
         internal Exception? Exception { get; private set; }
 
-        // Will never return null.
-        internal Predicate<PredicateContext> Predicate { get; set; } = Always;
+        internal Predicate<PredicateContext> Predicate { get; } = Always;
 
         internal bool IsDecorated { get; set; }
 
@@ -412,54 +410,6 @@ namespace SimpleInjector
             }
 
             return InstanceProducerVisualizer.VisualizeIndentedObjectGraph(this, options);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="InstanceProducer{TService}"/> for the supplied
-        /// <paramref name="registration"/> where the <b>TService</b> generic type argument will become the
-        /// supplied <paramref name="serviceType"/>.
-        /// </summary>
-        /// <param name="serviceType">The service type.</param>
-        /// <param name="registration">The registration.</param>
-        /// <returns>A new <see cref="InstanceProducer{TService}"/>.</returns>
-        public static InstanceProducer Create(Type serviceType, Registration registration)
-        {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(registration, nameof(registration));
-            Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
-
-            return (InstanceProducer)Activator.CreateInstance(
-                typeof(InstanceProducer<>).MakeGenericType(serviceType),
-                registration);
-        }
-
-        internal static InstanceProducer Create(
-            Type serviceType, Registration registration, bool registerExternalProducer)
-        {
-            var producer = Create(serviceType, registration);
-
-            // We have to remove it, because the InstanceProducer ctor automatically adds it.
-            registration.Container.RemoveExternalProducer(producer);
-
-            if (registerExternalProducer)
-            {
-                registration.Container.RegisterExternalProducer(producer);
-            }
-
-            return producer;
-        }
-
-        // Flagging the registration with WrapsInstanceCreationDelegate prevents false diagnostic warnings.
-        internal static InstanceProducer Create(Type serviceType, Expression expression, Container container)
-        {
-            var p = Create(
-                serviceType,
-                new ExpressionRegistration(expression, container) { WrapsInstanceCreationDelegate = true });
-
-            // Overrides earlier set value. This prevents ExpressionBuilt from being applied.
-            p.lazyExpression = Helpers.ToLazy(expression);
-
-            return p;
         }
 
         // Throws an InvalidOperationException on failure.
