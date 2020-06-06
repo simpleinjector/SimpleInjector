@@ -95,7 +95,7 @@ namespace SimpleInjector
             // NOTE: The order of these builders is crucial.
             this.producerBuilders = new IInstanceProducerBuilder[]
             {
-                new InstanceProducerInstanceProducerBuilder(this),
+                new DependencyMetadataInstanceProducerBuilder(this),
                 new UnregisteredTypeResolutionInstanceProducerBuilder(
                     container: this,
                     shouldResolveUnregisteredTypes: () => this.resolveUnregisteredType != null,

@@ -95,7 +95,7 @@ namespace SimpleInjector.Internals
         {
             var collectionType = typeof(IEnumerable<TService>);
 
-            return InstanceProducer.Create(
+            return new InstanceProducer(
                 serviceType: collectionType,
                 registration: collection.CreateRegistration(collectionType, container));
         }

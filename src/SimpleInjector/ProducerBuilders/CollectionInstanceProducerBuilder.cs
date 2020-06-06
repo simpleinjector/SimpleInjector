@@ -90,7 +90,7 @@ namespace SimpleInjector.ProducerBuilders
             Registration registration =
                 new ExpressionRegistration(expression, serviceType, Lifestyle.Transient, this.container);
 
-            var producer = InstanceProducer.Create(serviceType, registration);
+            var producer = new InstanceProducer(serviceType, registration);
             producer.IsContainerAutoRegistered = !this.container.GetAllInstances(elementType).Any();
             return producer;
         }
@@ -135,7 +135,7 @@ namespace SimpleInjector.ProducerBuilders
             Registration registration =
                 new ExpressionRegistration(expression, serviceType, Lifestyle.Transient, this.container);
 
-            var producer = InstanceProducer.Create(serviceType, registration);
+            var producer = new InstanceProducer(serviceType, registration);
             producer.IsContainerAutoRegistered = true;
             return producer;
         }
@@ -187,7 +187,7 @@ namespace SimpleInjector.ProducerBuilders
 
             Registration registration = stream.CreateRegistration(collectionType, this.container);
 
-            var producer = InstanceProducer.Create(collectionType, registration);
+            var producer = new InstanceProducer(collectionType, registration);
             producer.IsContainerAutoRegistered = stream.Count == 0;
             return producer;
         }

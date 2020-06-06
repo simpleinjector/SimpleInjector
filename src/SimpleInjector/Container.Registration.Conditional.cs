@@ -271,8 +271,7 @@ namespace SimpleInjector
 
             this.ThrowWhenContainerIsLockedOrDisposed();
 
-            var producer = InstanceProducer.Create(serviceType, registration);
-            producer.Predicate = predicate;
+            var producer = new InstanceProducer(serviceType, registration, predicate);
 
             this.AddInstanceProducer(producer);
         }
