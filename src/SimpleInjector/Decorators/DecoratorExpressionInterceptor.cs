@@ -97,7 +97,7 @@ namespace SimpleInjector.Decorators
                 // registeredProducer here, since the lifestyle of the original producer can change after
                 // the ExpressionBuilt event has ran, which means that this would invalidate the diagnostic
                 // results.
-                var producer = InstanceProducer.Create(
+                var producer = new InstanceProducer(
                     registeredServiceType, originalRegistration, registerExternalProducer: false);
 
                 e.DecoratorInfo = new ServiceTypeDecoratorInfo(implementationType, producer);
@@ -185,7 +185,7 @@ namespace SimpleInjector.Decorators
 
             registration.AddRelationship(relationship);
 
-            return InstanceProducer.Create(parameter.ParameterType, registration);
+            return new InstanceProducer(parameter.ParameterType, registration);
         }
 
         private static void AddVerifierForDecorateeFactoryDependency(

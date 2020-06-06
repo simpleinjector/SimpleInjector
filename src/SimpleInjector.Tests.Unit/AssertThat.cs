@@ -154,6 +154,11 @@
             }
         }
 
+        public static void IsInstanceOfType<TExpectedType>(object actualInstance, string message = null)
+        {
+            IsInstanceOfType(typeof(TExpectedType), actualInstance, message);
+        }
+
         public static void IsInstanceOfType(Type expectedType, object actualInstance, string message = null)
         {
             Assert.IsNotNull(actualInstance, message);

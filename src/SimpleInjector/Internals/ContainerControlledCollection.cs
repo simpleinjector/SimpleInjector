@@ -180,7 +180,7 @@ namespace SimpleInjector.Internals
                 : new LazyEx<InstanceProducer>(() => this.GetOrCreateInstanceProducer(item));
 
         private static LazyEx<InstanceProducer> ToLazyInstanceProducer(Registration registration) =>
-            Helpers.ToLazy(InstanceProducer.Create(typeof(TService), registration));
+            Helpers.ToLazy(new InstanceProducer(typeof(TService), registration));
 
         // Note that the 'implementationType' could in fact be a service type as well and it is allowed
         // for the implementationType to equal TService. This will happen when someone does the following:
@@ -218,7 +218,7 @@ namespace SimpleInjector.Internals
                 return producer;
             }
 
-            return InstanceProducer.Create(
+            return new InstanceProducer(
                 typeof(TService),
                 new ExpressionRegistration(producer.BuildExpression(), this.container));
         }

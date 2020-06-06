@@ -86,7 +86,7 @@ namespace SimpleInjector.Lifestyles
 
         internal static InstanceProducer CreateUncontrolledCollectionProducer(
             Type itemType, IEnumerable collection, Container container) =>
-            InstanceProducer.Create(
+            new InstanceProducer(
                 typeof(IEnumerable<>).MakeGenericType(itemType),
                 CreateUncontrolledCollectionRegistration(itemType, collection, container));
 

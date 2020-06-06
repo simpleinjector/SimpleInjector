@@ -45,7 +45,7 @@ namespace SimpleInjector.Decorators
 
             registration.ReplaceRelationships(decoratorRelationships ?? Enumerable.Empty<KnownRelationship>());
 
-            var producer = InstanceProducer.Create(serviceType, registration);
+            var producer = new InstanceProducer(serviceType, registration);
             producer.IsDecorated = true;
 
             this.appliedDecorators.Add(new DecoratorInfo(decoratorType, producer));

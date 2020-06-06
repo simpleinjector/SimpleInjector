@@ -20,8 +20,8 @@ namespace SimpleInjector
     /// <summary>
     /// Produces instances for a given registration. Instances of this type are generally created by the
     /// container when calling one of the <b>Register</b> overloads. Instances can be retrieved by calling
-    /// <see cref="SimpleInjector.Container.GetCurrentRegistrations()">GetCurrentRegistrations()</see> or
-    /// <see cref="SimpleInjector.Container.GetRegistration(Type, bool)">GetRegistration(Type, bool)</see>.
+    /// <see cref="Container.GetCurrentRegistrations()">GetCurrentRegistrations()</see> or
+    /// <see cref="Container.GetRegistration(Type, bool)">GetRegistration(Type, bool)</see>.
     /// </summary>
     /// <remarks>
     /// The <b>Register</b> method overloads create <b>InstanceProducer</b> instances internally, but
@@ -31,15 +31,15 @@ namespace SimpleInjector
     /// lifestyle. The <b>InstanceProducer</b> on the other hand transforms this <b>Expression</b> to a
     /// delegate and allows the actual instance to be created. A <b>Registration</b> itself can't create any
     /// instance. The <b>InsanceProducer</b> allows intercepting created instances by hooking onto the
-    /// <see cref="SimpleInjector.Container.ExpressionBuilt">Container.ExpressionBuilt</see> event. The
-    /// <see cref="SimpleInjector.Container.RegisterDecorator(Type, Type)">RegisterDecorator</see> methods for
+    /// <see cref="Container.ExpressionBuilt">Container.ExpressionBuilt</see> event. The
+    /// <see cref="Container.RegisterDecorator(Type, Type)">RegisterDecorator</see> methods for
     /// instance work by hooking onto the <b>ExpressionBuilt</b> event and allow wrapping the returned instance
     /// with a decorator.
     /// </remarks>
     /// <example>
     /// The following example shows the creation of two different <b>InstanceProducer</b> instances that wrap
     /// the same <b>Registration</b> instance. Since the <b>Registration</b> is created using the
-    /// <see cref="SimpleInjector.Lifestyle.Singleton">Singleton</see> lifestyle, both producers will return
+    /// <see cref="Lifestyle.Singleton">Singleton</see> lifestyle, both producers will return
     /// the same instance. The <b>InstanceProducer</b> for the <code>Interface1</code> however, will wrap that
     /// instance in a (transient) <code>Interface1Decorator</code>.
     /// <code lang="cs"><![CDATA[
@@ -48,8 +48,8 @@ namespace SimpleInjector
     /// // ServiceImpl implements both Interface1 and Interface2.
     /// var registration = Lifestyle.Singleton.CreateRegistration<ServiceImpl, ServiceImpl>(container);
     ///
-    /// var producer1 = InstanceProducer.Create(typeof(Interface1), registration);
-    /// var producer2 = InstanceProducer.Create(typeof(Interface2), registration);
+    /// var producer1 = new InstanceProducer(typeof(Interface1), registration);
+    /// var producer2 = new InstanceProducer(typeof(Interface2), registration);
     ///
     /// container.RegisterDecorator(typeof(Interface1), typeof(Interface1Decorator));
     ///
@@ -63,7 +63,7 @@ namespace SimpleInjector
     /// ]]></code>
     /// </example>
     [DebuggerTypeProxy(typeof(InstanceProducerDebugView))]
-    [DebuggerDisplay("{" + nameof(InstanceProducer.DebuggerDisplay) + ", nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ", nq}")]
     public class InstanceProducer
     {
         internal static readonly IEqualityComparer<InstanceProducer> EqualityComparer =
@@ -85,21 +85,14 @@ namespace SimpleInjector
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer"/> class.</summary>
         /// <param name="serviceType">The service type for which this instance is created.</param>
         /// <param name="registration">The <see cref="Registration"/>.</param>
-        [Obsolete("To create a new InstanceProducer instance, please call InstanceProducer.Create, create " +
-            "a generic InstanceProducer<TService>, or call the CreateProducer method on Lifestyle (e.g. " +
-            "Lifestyle.Transient.CreateProducer). InstanceProducer will become abstract in a future release" +
-            ". Will be treated as an error from version 5.5. Will be removed in version 6.0.",
-            error: false)]
+
         public InstanceProducer(Type serviceType, Registration registration)
+            : this(serviceType, registration, ShouldBeRegisteredAsAnExternalProducer(registration))
         {
-            // NOTE: Creating non-generic InstanceProducer instances directly, disallows Simple Injector from
-            // injecting InstanceProducer<T> instances.
-            // As far as I can see, these are mutually exclusive features. Simple Injector will (now)
-            // internally always create an InstanceProducer<T>, but when a user creates a (non-generic)
-            // InstanceProducer, it is not part of injection list, and the producer can only be used as root
-            // type. Still, I want to guide users away from this constructor. This allows us to make
-            // InstanceProducer abstract in the future, which simplifies the API and prevents other problems
-            // if in the future we require InstanceProducer<T> in more scenarios.
+        }
+
+        internal InstanceProducer(Type serviceType, Registration registration, bool registerExternalProducer)
+        {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             Requires.IsNotNull(registration, nameof(registration));
             Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
@@ -112,13 +105,29 @@ namespace SimpleInjector
 
             this.lazyExpression = new LazyEx<Expression>(this.BuildExpressionInternal);
 
-            if (ShouldBeRegisteredAsAnExternalProducer(registration))
+            if (registerExternalProducer)
             {
                 registration.Container.RegisterExternalProducer(this);
             }
 
             this.instanceCreator = this.BuildAndReplaceInstanceCreatorAndCreateFirstInstance;
             this.ImplementationType = registration.ImplementationType;
+        }
+
+        internal InstanceProducer(
+            Type serviceType, Registration registration, Predicate<PredicateContext>? predicate)
+            : this(serviceType, registration)
+        {
+            this.Predicate = predicate ?? Always;
+        }
+
+        // Flagging the registration with WrapsInstanceCreationDelegate prevents false diagnostic warnings.
+        private InstanceProducer(Type serviceType, Expression expression, Container container)
+            : this(serviceType,
+                  new ExpressionRegistration(expression, container) { WrapsInstanceCreationDelegate = true })
+        {
+            // Overrides earlier set value. This prevents ExpressionBuilt from being applied.
+            this.lazyExpression = Helpers.ToLazy(expression);
         }
 
         /// <summary>
@@ -244,7 +253,7 @@ namespace SimpleInjector
             Requires.IsNotNull(expression, nameof(expression));
             Requires.IsNotNull(container, nameof(container));
 
-            return InstanceProducer.Create(serviceType, expression, container);
+            return new InstanceProducer(serviceType, expression, container);
         }
 
         /// <summary>Produces an instance.</summary>
@@ -422,33 +431,6 @@ namespace SimpleInjector
             return (InstanceProducer)Activator.CreateInstance(
                 typeof(InstanceProducer<>).MakeGenericType(serviceType),
                 registration);
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="InstanceProducer{TService}"/> for the supplied
-        /// <paramref name="registration"/> where the <b>TService</b> generic type argument will become the
-        /// supplied <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="TService">The service type.</typeparam>
-        /// <param name="registration">The registration.</param>
-        /// <returns>A new <see cref="InstanceProducer{TService}"/>.</returns>
-        public static InstanceProducer<TService> Create<TService>(Registration registration)
-            where TService : class
-        {
-            // This method seems completely redundant (because users can simply new the InstanceProducer<T>
-            // themselves. The addition of this method, however, does make the API more discoverable and
-            // consistent.
-            Requires.IsNotNull(registration, nameof(registration));
-
-            return new InstanceProducer<TService>(registration);
-        }
-
-        internal static InstanceProducer Create(
-            Type serviceType, Registration registration, Predicate<PredicateContext>? predicate)
-        {
-            var producer = Create(serviceType, registration);
-            producer.Predicate = predicate ?? Always;
-            return producer;
         }
 
         internal static InstanceProducer Create(

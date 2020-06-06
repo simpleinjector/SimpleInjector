@@ -21,9 +21,7 @@ namespace SimpleInjector
         /// <summary>Initializes a new instance of the <see cref="InstanceProducer{TService}"/> class.</summary>
         /// <param name="registration">The <see cref="Registration"/>.</param>
         public InstanceProducer(Registration registration)
-#pragma warning disable CS0618 // Type or member is obsolete
             : base(typeof(TService), registration)
-#pragma warning restore CS0618 // Type or member is obsolete
         {
         }
 

@@ -43,7 +43,7 @@ namespace SimpleInjector.Internals
 
             var collectionType = typeof(IEnumerable<>).MakeGenericType(closedServiceType);
 
-            return InstanceProducer.Create(
+            return new InstanceProducer(
                 serviceType: collectionType,
                 registration: collection.CreateRegistration(collectionType, this.Container));
         }

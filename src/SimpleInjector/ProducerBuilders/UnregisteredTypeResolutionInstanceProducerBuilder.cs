@@ -89,7 +89,7 @@ namespace SimpleInjector.ProducerBuilders
                 // By creating the InstanceProducer after checking the dictionary, we prevent the producer
                 // from being created twice when multiple threads are running. Having the same duplicate
                 // producer can cause a torn lifestyle warning in the container.
-                var producer = InstanceProducer.Create(e.UnregisteredServiceType, registration);
+                var producer = new InstanceProducer(e.UnregisteredServiceType, registration);
 
                 this.resolveUnregisteredTypeRegistrations[e.UnregisteredServiceType] =
                     Helpers.ToLazy(producer);

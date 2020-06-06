@@ -46,7 +46,7 @@ namespace SimpleInjector.ProducerBuilders
         private static InstanceProducer BuildInstanceProducerForConcreteUnregisteredType(
             Type concreteType, Registration registration)
         {
-            var producer = InstanceProducer.Create(concreteType, registration);
+            var producer = new InstanceProducer(concreteType, registration);
 
             producer.EnsureTypeWillBeExplicitlyVerified();
 

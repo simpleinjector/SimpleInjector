@@ -1711,11 +1711,11 @@
 
             var container = ContainerFactory.New();
 
-            var prod1 = InstanceProducer.Create(
+            var prod1 = new InstanceProducer(
                 serviceType,
                 Lifestyle.Transient.CreateRegistration(typeof(PluginImpl), container));
 
-            var prod2 = InstanceProducer.Create(
+            var prod2 = new InstanceProducer(
                 serviceType,
                 Lifestyle.Transient.CreateRegistration(typeof(PluginImpl2), container));
 

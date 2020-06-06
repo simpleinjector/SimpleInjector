@@ -73,11 +73,11 @@
 
             if (this.Options.AllowOverridingRegistrations)
             {
-                dict[name] = InstanceProducer.Create(serviceType, registration);
+                dict[name] = new InstanceProducer(serviceType, registration);
             }
             else
             {
-                dict.Add(name, InstanceProducer.Create(serviceType, registration));
+                dict.Add(name, new InstanceProducer(serviceType, registration));
             }
         }
 
