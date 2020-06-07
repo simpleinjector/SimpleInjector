@@ -30,10 +30,6 @@ namespace SimpleInjector.Internals
             return () => singleton;
         }
 
-        // Compile the expression. If the expression is compiled in a dynamic assembly, the compiled delegate
-        // is called (to ensure that it will run, because it tends to fail now and then) and the created
-        // instance is returned through the out parameter. Note that NO created instance will be returned when
-        // the expression is compiled using Expression.Compile)(.
         internal static Func<TResult> CompileExpression<TResult>(Container container, Expression expression)
         {
             // Skip compiling if all we need to do is return a singleton.
