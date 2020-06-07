@@ -18,9 +18,6 @@ namespace SimpleInjector.Internals
         private static readonly ConstructorInfo LazyScopeConstructor =
             Helpers.GetConstructor(() => new LazyScope(null!, null!));
 
-        private static readonly MethodInfo CreateConstantValueDelegateMethod =
-            Helpers.GetGenericMethodDefinition(() => CreateConstantValueDelegate<object>(null!));
-
         // NOTE: This method should be public. It is called using reflection.
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static Func<TResult> CreateConstantValueDelegate<TResult>(Expression expression)
@@ -53,12 +50,6 @@ namespace SimpleInjector.Internals
             Expression expression,
             Dictionary<Expression, InvocationExpression>? reducedNodes = null)
         {
-            if (expression is ConstantExpression)
-            {
-                return (Delegate)CreateConstantValueDelegateMethod.MakeGenericMethod(expression.Type)
-                    .Invoke(null, new[] { expression });
-            }
-
             // Reduce the size of the object graph to prevent the CLR from throwing stack overflow exceptions.
             expression = ReduceObjectGraphSize(expression, container, reducedNodes);
 
