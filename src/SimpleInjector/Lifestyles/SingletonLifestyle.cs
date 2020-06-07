@@ -260,27 +260,8 @@ namespace SimpleInjector.Lifestyles
                     {
                         if (this.interceptedInstance is null)
                         {
-                            this.interceptedInstance = this.CreateInstanceWithNullCheck();
-
-                            if (!this.SuppressDisposal)
-                            {
-                                if (this.interceptedInstance is IDisposable disposable)
-                                {
-                                    this.Container.ContainerScope.RegisterForDisposal(disposable);
-                                }
-                                else
-                                {
-                                    // In case an instance implements both IDisposable and IAsyncDisposable,
-                                    // it should only be registered once and RegisterForDisposal(IDisposable)
-                                    // can be used. That will still allows DisposeAsync to be called.
-#if NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
-                                    if (this.interceptedInstance is IAsyncDisposable asyncDisposable)
-                                    {
-                                        this.Container.ContainerScope.RegisterForDisposal(asyncDisposable);
-                                    }
-#endif
-                                }
-                            }
+                            this.interceptedInstance = this.GetInterceptedInstanceWithNullCheck();
+                            this.TryRegisterForDisposal(this.interceptedInstance);
                         }
                     }
                 }
@@ -288,21 +269,44 @@ namespace SimpleInjector.Lifestyles
                 return this.interceptedInstance;
             }
 
-            private object CreateInstanceWithNullCheck()
+            private object TryRegisterForDisposal(object instance)
             {
-                Expression expression = this.BuildTransientExpression();
-
-                Func<object> func = this.CompileExpression(expression);
-
-                object instance = this.CreateInstance(func);
-
-                this.EnsureInstanceIsNotNull(instance);
+                if (!this.SuppressDisposal)
+                {
+                    if (instance is IDisposable disposable)
+                    {
+                        this.Container.ContainerScope.RegisterForDisposal(disposable);
+                    }
+                    else
+                    {
+                        // In case an instance implements both IDisposable and IAsyncDisposable,
+                        // it should only be registered once and RegisterForDisposal(IDisposable)
+                        // can be used. That will still allows DisposeAsync to be called.
+#if NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
+                        if (this.interceptedInstance is IAsyncDisposable asyncDisposable)
+                        {
+                            this.Container.ContainerScope.RegisterForDisposal(asyncDisposable);
+                        }
+#endif
+                    }
+                }
 
                 return instance;
             }
 
+            private object GetInterceptedInstanceWithNullCheck()
+            {
+                // The BuildTransientExpression might cause the instance to be intercepted and properties
+                // to be injected.
+                Expression expression = this.BuildTransientExpression();
+
+                return this.Execute(this.Compile(expression))
+                    ?? throw new ActivationException(
+                        StringResources.DelegateForTypeReturnedNull(this.ImplementationType));
+            }
+
             // Implements #553 Allows detection of Lifestyle Mismatches when iterated inside constructor.
-            private object CreateInstance(Func<object> instanceCreator)
+            private object Execute(Func<object> instanceCreator)
             {
                 var isCurrentThread = new ThreadLocal<bool> { Value = true };
 
@@ -394,13 +398,14 @@ namespace SimpleInjector.Lifestyles
                     .FirstOrDefault();
             }
 
-            private Func<object> CompileExpression(Expression expression)
+            private Func<object> Compile(Expression expression)
             {
                 try
                 {
-                    // Don't call BuildTransientDelegate, because that might do optimizations that are simply
-                    // not needed, since the delegate will be called just once.
-                    return (Func<object>)CompilationHelpers.CompileExpression(this.Container, expression, null);
+                    // Compile without optimizations, because they are not needed for Singletons.
+                    var lambda = expression as LambdaExpression ?? Expression.Lambda(expression);
+
+                    return (Func<object>)lambda.Compile();
                 }
                 catch (Exception ex)
                 {
@@ -408,15 +413,6 @@ namespace SimpleInjector.Lifestyles
                         this.ImplementationType, expression, ex);
 
                     throw new ActivationException(message, ex);
-                }
-            }
-
-            private void EnsureInstanceIsNotNull(object instance)
-            {
-                if (instance is null)
-                {
-                    throw new ActivationException(
-                        StringResources.DelegateForTypeReturnedNull(this.ImplementationType));
                 }
             }
         }
