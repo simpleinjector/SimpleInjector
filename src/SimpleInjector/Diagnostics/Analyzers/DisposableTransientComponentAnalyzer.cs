@@ -29,24 +29,43 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 from producer in producers
                 let registration = producer.Registration
                 where registration.Lifestyle == Lifestyle.Transient
-                where typeof(IDisposable).IsAssignableFrom(registration.ImplementationType)
+                where GetDisposableType(registration.ImplementationType) != null
                 where registration.ShouldNotBeSuppressed(this.DiagnosticType)
                 select producer;
 
             var results =
                 from producer in invalidProducers
                 select new DisposableTransientComponentDiagnosticResult(
-                    producer.ServiceType, producer, BuildDescription(producer));
+                    producer.ServiceType, producer, BuildDescription(producer.Registration.ImplementationType));
 
             return results.ToArray();
         }
 
-        private static string BuildDescription(InstanceProducer producer) =>
+        private static string BuildDescription(Type implementationType) =>
             string.Format(
                 CultureInfo.InvariantCulture,
-                "{0} is registered as transient, but implements IDisposable.",
-                producer.Registration.ImplementationType.FriendlyName());
+                "{0} is registered as transient, but implements {1}.",
+                implementationType.FriendlyName(),
+                GetDisposableType(implementationType));
 
         private static string ComponentPlural(int number) => number == 1 ? "component" : "components";
+
+        private static Type? GetDisposableType(Type implementationType) 
+        {
+            if (typeof(IDisposable).IsAssignableFrom(implementationType))
+            {
+                return typeof(IDisposable);
+            }
+#if NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
+else if (typeof(IAsyncDisposable).IsAssignableFrom(implementationType))
+            {
+                return typeof(IAsyncDisposable);
+            }
+#endif
+            else
+            {
+                return null;
+            }
+        }
     }
 }
