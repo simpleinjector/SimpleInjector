@@ -345,9 +345,11 @@
         }
 
         [TestMethod]
-        public void RegisterForDisposal_WithNullArgument_ThrowsExpectedException()
+        public void RegisterIDisposableForDisposal_WithNullArgument_ThrowsExpectedException()
         {
             // Arrange
+            IDisposable invalidArgument = null;
+
             var container = new Container();
 
             // Act
@@ -355,7 +357,31 @@
             {
                 try
                 {
-                    scope.RegisterForDisposal(null);
+                    scope.RegisterForDisposal(invalidArgument);
+
+                    Assert.Fail("Exception expected.");
+                }
+                catch (ArgumentNullException)
+                {
+                    // This exception is expected.
+                }
+            }
+        }
+
+        [TestMethod]
+        public void RegisterIAsyncDisposableForDisposal_WithNullArgument_ThrowsExpectedException()
+        {
+            // Arrange
+            IAsyncDisposable invalidArgument = null;
+
+            var container = new Container();
+
+            // Act
+            using (var scope = AsyncScopedLifestyle.BeginScope(container))
+            {
+                try
+                {
+                    scope.RegisterForDisposal(invalidArgument);
 
                     Assert.Fail("Exception expected.");
                 }

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>SimpleInjector.CodeSamples.Tests.Unit</AssemblyName>
     <PackageId>SimpleInjector.CodeSamples.Tests.Unit</PackageId>

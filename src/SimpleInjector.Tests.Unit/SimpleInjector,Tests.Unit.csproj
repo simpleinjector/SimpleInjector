@@ -2,7 +2,7 @@
 
 
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>SimpleInjector.Tests.Unit</AssemblyName>
     <AssemblyOriginatorKeyFile>../fake.snk</AssemblyOriginatorKeyFile>

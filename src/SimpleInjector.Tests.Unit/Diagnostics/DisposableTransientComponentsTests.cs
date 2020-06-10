@@ -38,6 +38,50 @@
         }
 
         [TestMethod]
+        public void Analyze_TransientRegistrationForAsyncDisposableComponent_Warning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IPlugin, AsyncDisposablePlugin>();
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<DisposableTransientComponentDiagnosticResult>()
+                .ToArray();
+
+            // Assert
+            Assert.AreEqual(1, results.Length, Actual(results));
+            Assert.AreEqual(
+                "AsyncDisposablePlugin is registered as transient, but implements IAsyncDisposable.",
+                results.Single().Description,
+                Actual(results));
+        }
+
+        [TestMethod]
+        public void Analyze_TransientRegistrationForComponentImplementingBothIDisposableAndIAsyncDisposable_Warning()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<IPlugin, DisposableAsyncDisposablePlugin>();
+
+            container.Verify(VerificationOption.VerifyOnly);
+
+            // Act
+            var results = Analyzer.Analyze(container).OfType<DisposableTransientComponentDiagnosticResult>()
+                .ToArray();
+
+            // Assert
+            Assert.AreEqual(1, results.Length, Actual(results));
+            Assert.AreEqual(
+                "DisposableAsyncDisposablePlugin is registered as transient, but implements IDisposable.",
+                results.Single().Description,
+                Actual(results));
+        }
+
+        [TestMethod]
         public void Analyze_TransientRegistrationForDisposableComponent_ReturnsSeverityWarning()
         {
             // Arrange

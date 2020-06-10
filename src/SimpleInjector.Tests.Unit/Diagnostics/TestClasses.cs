@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
 
     public interface IFoo
     {
@@ -215,6 +216,20 @@
         public void Dispose()
         {
         }
+    }
+
+    public class AsyncDisposablePlugin : IPlugin, IAsyncDisposable
+    {
+        public ValueTask DisposeAsync() => default;
+    }
+
+    public class DisposableAsyncDisposablePlugin : IPlugin, IAsyncDisposable, IDisposable
+    {
+        public void Dispose()
+        {
+        }
+
+        public ValueTask DisposeAsync() => default;
     }
 
     public class PluginWith7Dependencies : IPlugin

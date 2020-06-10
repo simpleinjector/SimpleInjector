@@ -314,15 +314,35 @@
         }
 
         [TestMethod]
-        public void RegisterForDisposal_WithNullArgument_ThrowsExpectedException()
+        public void RegisterIDisposableForDisposal_WithNullArgument_ThrowsExpectedException()
         {
             // Arrange
             var container = new Container();
 
+            IDisposable invalidArgument = null;
+
             using (var scope = ThreadScopedLifestyle.BeginScope(container))
             {
                 // Act
-                Action action = () => scope.RegisterForDisposal(null);
+                Action action = () => scope.RegisterForDisposal(invalidArgument);
+
+                // Assert
+                AssertThat.Throws<ArgumentNullException>(action);
+            }
+        }
+
+        [TestMethod]
+        public void RegisterIAsyncDisposableForDisposal_WithNullArgument_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            IAsyncDisposable invalidArgument = null;
+
+            using (var scope = ThreadScopedLifestyle.BeginScope(container))
+            {
+                // Act
+                Action action = () => scope.RegisterForDisposal(invalidArgument);
 
                 // Assert
                 AssertThat.Throws<ArgumentNullException>(action);
