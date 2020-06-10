@@ -11,7 +11,7 @@
     {
         /// <summary>Runs all tests in the supplied assembly.</summary>
         /// <param name="testAssemblyName">The name of the assembly that contains the tests to run.</param>
-        public void Run(string testAssemblyName)
+        public void Run(string testAssemblyName, bool verboseOutput)
         {
             var testClasses =
                 from type in Assembly.Load(AssemblyName.GetAssemblyName(testAssemblyName)).GetExportedTypes()
@@ -23,7 +23,12 @@
 
             foreach (var testClass in testClasses)
             {
-                var results = this.RunTestMethods(testClass);
+                if (verboseOutput)
+                {
+                    Console.WriteLine(testClass.FullName + ":");
+                }
+
+                var results = this.RunTestMethods(testClass, verboseOutput);
                 tests += results.Item1;
                 failedTests.AddRange(results.Item2);
             }
@@ -98,7 +103,7 @@
             }
         }
 
-        private Tuple<int, List<MethodInfo>> RunTestMethods(Type testClass)
+        private Tuple<int, List<MethodInfo>> RunTestMethods(Type testClass, bool verboseOutput)
         {
             var testMethods =
                 from method in testClass.GetMethods()
@@ -109,6 +114,11 @@
 
             foreach (var testMethod in testMethods)
             {
+                if (verboseOutput)
+                {
+                    Console.WriteLine("  * " + testMethod.Name);
+                }
+
                 if (!this.RunTestMethod(testMethod))
                 {
                     failedTests.Add(testMethod);

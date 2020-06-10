@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <AssemblyName>PartialTrustTestRunner</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>PartialTrustTestRunner</PackageId>

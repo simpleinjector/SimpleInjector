@@ -187,8 +187,8 @@ IF %step%==1 (
 IF %step%==2 (
 	echo Running step 2: RUNNING TESTS IN PARTIAL TRUST
 
-	set testDll=SimpleInjector.Tests.Unit\bin\Release\net451\SimpleInjector.Tests.Unit.dll
-	set testRunner=SimpleInjector.Tests.Unit\bin\Release\net451\PartialTrustTestRunner.exe
+	set testDll=SimpleInjector.Tests.Unit\bin\Release\net461\SimpleInjector.Tests.Unit.dll
+	set testRunner=PartialTrustTestRunner\bin\Release\net461\PartialTrustTestRunner.exe
 	
 	echo %testRunner% %testDll%
 	%testRunner% %testDll%

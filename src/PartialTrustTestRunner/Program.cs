@@ -16,6 +16,16 @@
         public static void Main(string[] args)
         {
             string assemblyFile = args[0];
+            bool verboseOutput = args.Length > 1;
+
+            if (verboseOutput)
+            {
+                Console.WriteLine("Output: verbose");
+            }
+            else
+            {
+                Console.WriteLine("Output: silent");
+            }
 
             var domain = AppDomain.CreateDomain("Sandbox", null);
 
@@ -32,7 +42,7 @@
 
             try
             {
-                runner.Run(assemblyFile);
+                runner.Run(assemblyFile, verboseOutput);
             }
             catch (Exception ex)
             {
