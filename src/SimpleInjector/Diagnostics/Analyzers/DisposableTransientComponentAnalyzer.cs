@@ -46,7 +46,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 CultureInfo.InvariantCulture,
                 "{0} is registered as transient, but implements {1}.",
                 implementationType.FriendlyName(),
-                GetDisposableType(implementationType));
+                GetDisposableType(implementationType)!.ToFriendlyName());
 
         private static string ComponentPlural(int number) => number == 1 ? "component" : "components";
 
