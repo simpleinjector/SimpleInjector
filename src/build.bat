@@ -57,12 +57,6 @@ set version_Integration_WebForms=%version_Core%
 set version_Integration_Mvc=%version_Core%
 set version_Integration_Wcf=%version_Core%
 set version_Integration_WebApi=%version_Core%
-set version_Integration_ServiceCollection=%version_Core%
-set version_Integration_GenericHost=%version_Core%
-set version_Integration_AspNetCore=%version_Core%
-set version_Integration_AspNetCore_Mvc_Core=%version_Core%
-set version_Integration_AspNetCore_Mvc_ViewFeatures=%version_Core%
-set version_Integration_AspNetCore_Mvc=%version_Core%
 
 set referenceLibraryPath=..\..\simpleinjector-website.github.io\ReferenceLibrary
 if not exist %referenceLibraryPath% goto :referenceLibraryPath_missing
@@ -100,12 +94,6 @@ set named_version=%version%%prereleasePostfix%
 
 set named_version_Core=%version_Core%%prereleasePostfix%
 set named_version_DynamicAssemblyCompilation=%version_DynamicAssemblyCompilation%%prereleasePostfix%
-set named_version_Integration_ServiceCollection=%version_Integration_ServiceCollection%%prereleasePostfix%
-set named_version_Integration_GenericHost=%version_Integration_GenericHost%%prereleasePostfix%
-set named_version_Integration_AspNetCore=%version_Integration_AspNetCore%%prereleasePostfix%
-set named_version_Integration_AspNetCore_Mvc_Core=%version_Integration_AspNetCore_Mvc_Core%%prereleasePostfix%
-set named_version_Integration_AspNetCore_Mvc_ViewFeatures=%version_Integration_AspNetCore_Mvc_ViewFeatures%%prereleasePostfix%
-set named_version_Integration_AspNetCore_Mvc=%version_Integration_AspNetCore_Mvc%%prereleasePostfix%
 set named_version_Integration_Wcf=%version_Integration_Wcf%%prereleasePostfix%
 set named_version_Integration_Web=%version_Integration_Web%%prereleasePostfix%
 set named_version_Integration_Mvc=%version_Integration_Mvc%%prereleasePostfix%
@@ -114,9 +102,6 @@ set named_version_Packaging=%version_Packaging%%prereleasePostfix%
 
 set numeric_version_Core=%version_Core%.%buildNumber%
 set numeric_version_DynamicAssemblyCompilation=%version_DynamicAssemblyCompilation%.%buildNumber%
-set numeric_version_Integration_ServiceCollection=%version_Integration_ServiceCollection%.%buildNumber%
-set numeric_version_Integration_GenericHost=%version_Integration_GenericHost%.%buildNumber%
-set numeric_version_Integration_AspNetCore=%version_Integration_AspNetCore%.%buildNumber%
 set numeric_version_Integration_Wcf=%version_Integration_Wcf%.%buildNumber%
 set numeric_version_Integration_Web=%version_Integration_Web%.%buildNumber%
 set numeric_version_Integration_Mvc=%version_Integration_Mvc%.%buildNumber%
@@ -145,26 +130,11 @@ IF %step%==1 (
 	echo SET VERSION NUMBERS
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Core%</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_DynamicAssemblyCompilation%</VersionPrefix>" /source:SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj
-	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_ServiceCollection%</VersionPrefix>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
-	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_GenericHost%</VersionPrefix>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj
-	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_AspNetCore%</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
-	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_AspNetCore_Mvc_Core%</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj
-	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_AspNetCore_Mvc_ViewFeatures%</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures\SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures.csproj
-	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_AspNetCore_Mvc%</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_Wcf%</VersionPrefix>" /source:SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_Web%</VersionPrefix>" /source:SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_Mvc%</VersionPrefix>" /source:SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Integration_WebApi%</VersionPrefix>" /source:SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj
 	%replace% /line "<VersionPrefix>" "<VersionPrefix>%named_version_Packaging%</VersionPrefix>" /source:SimpleInjector.Packaging\SimpleInjector.Packaging.csproj
-	
-	echo SET PACKAGE RELEASE NOTES
-	
-	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_DynamicAssemblyCompilation%</PackageReleaseNotes>" /source:SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj
-	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_Integration_ServiceCollection%</PackageReleaseNotes>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
-	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_Integration_GenericHost%</PackageReleaseNotes>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj
-	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_Integration_AspNetCore%</PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
-	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_Integration_AspNetCore_Mvc_Core%</PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj
-	%replace% /line "<PackageReleaseNotes>" "<PackageReleaseNotes>%releaseNotesUrl%%version_Integration_AspNetCore_Mvc%</PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj
 
 	
 	rem echo BUILD SOLUTION
@@ -375,24 +345,6 @@ IF %step%==4 (
 	copy "SimpleInjector.DynamicAssemblyCompilation\bin\Release\SimpleInjector.DynamicAssemblyCompilation.%named_version_DynamicAssemblyCompilation%.nupkg" Releases\v%named_version%\
 	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.DynamicAssemblyCompilation.%named_version_DynamicAssemblyCompilation%.nupkg /sourceFile:SimpleInjector.DynamicAssemblyCompilation.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace% /force
 
-	copy "SimpleInjector.Integration.ServiceCollection\bin\Release\SimpleInjector.Integration.ServiceCollection.%named_version_Integration_ServiceCollection%.nupkg" Releases\v%named_version%\
-	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.ServiceCollection.%named_version_Integration_ServiceCollection%.nupkg /sourceFile:SimpleInjector.Integration.ServiceCollection.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace% /force
-	
-	copy "SimpleInjector.Integration.GenericHost\bin\Release\SimpleInjector.Integration.GenericHost.%named_version_Integration_GenericHost%.nupkg" Releases\v%named_version%\
-	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.GenericHost.%named_version_Integration_GenericHost%.nupkg /sourceFile:SimpleInjector.Integration.GenericHost.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace% /force
-	
-	copy "SimpleInjector.Integration.AspNetCore\bin\Release\SimpleInjector.Integration.AspNetCore.%named_version_Integration_AspNetCore%.nupkg" Releases\v%named_version%\
-	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.AspNetCore.%named_version_Integration_AspNetCore%.nupkg /sourceFile:SimpleInjector.Integration.AspNetCore.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace% /force
-	
-	copy "SimpleInjector.Integration.AspNetCore.Mvc.Core\bin\Release\SimpleInjector.Integration.AspNetCore.Mvc.Core.%named_version_Integration_AspNetCore_Mvc_Core%.nupkg" Releases\v%named_version%\
-	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.AspNetCore.Mvc.Core.%named_version_Integration_AspNetCore_Mvc_Core%.nupkg /sourceFile:SimpleInjector.Integration.AspNetCore.Mvc.Core.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace%
-	
-	copy "SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures\bin\Release\SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures.%named_version_Integration_AspNetCore_Mvc_ViewFeatures%.nupkg" Releases\v%named_version%\
-	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures.%named_version_Integration_AspNetCore_Mvc_ViewFeatures%.nupkg /sourceFile:SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace%
-	
-	copy "SimpleInjector.Integration.AspNetCore.Mvc\bin\Release\SimpleInjector.Integration.AspNetCore.Mvc.%named_version_Integration_AspNetCore_Mvc%.nupkg" Releases\v%named_version%\
-	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.Integration.AspNetCore.Mvc.%named_version_Integration_AspNetCore_Mvc%.nupkg /sourceFile:SimpleInjector.Integration.AspNetCore.Mvc.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace%
-
     echo Please run step 5
     goto :EOF	
 )
@@ -401,26 +353,11 @@ IF %step%==5 (
 	echo Running step 5: RESTORING VERSION NUMBERS
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures\SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Packaging\SimpleInjector.Packaging.csproj
-	
-	echo RESTORING PACKAGE RELEASE NOTES
-	
-	%replace% /line "<PackageReleaseNotes>" "    <PackageReleaseNotes></PackageReleaseNotes>" /source:SimpleInjector.Integration.ServiceCollection\SimpleInjector.Integration.ServiceCollection.csproj
-	%replace% /line "<PackageReleaseNotes>" "    <PackageReleaseNotes></PackageReleaseNotes>" /source:SimpleInjector.Integration.GenericHost\SimpleInjector.Integration.GenericHost.csproj
-	%replace% /line "<PackageReleaseNotes>" "    <PackageReleaseNotes></PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore\SimpleInjector.Integration.AspNetCore.csproj
-	%replace% /line "<PackageReleaseNotes>" "    <PackageReleaseNotes></PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore.Mvc.Core\SimpleInjector.Integration.AspNetCore.Mvc.Core.csproj
-	%replace% /line "<PackageReleaseNotes>" "    <PackageReleaseNotes></PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures\SimpleInjector.Integration.AspNetCore.Mvc.ViewFeatures.csproj
-	%replace% /line "<PackageReleaseNotes>" "    <PackageReleaseNotes></PackageReleaseNotes>" /source:SimpleInjector.Integration.AspNetCore.Mvc\SimpleInjector.Integration.AspNetCore.Mvc.csproj
 	
 	echo Done!
 	GOTO :EOF	
