@@ -1,7 +1,6 @@
 ﻿namespace SimpleInjector.CodeSamples
 {
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using System.Linq.Expressions;
@@ -10,24 +9,21 @@
     public static class ResolvingFactoriesExtensions
     {
         // This extension method is equivalent to the following registration, for each and every T:
-        // container.RegisterSingleton<Func<T>>(() => container.GetInstance<T>());
+        // container.RegisterInstance<Func<T>>(() => container.GetInstance<T>());
         // This is useful for consumers that need to create multiple instances of a dependency.
         // This mimics the behavior of Autofac. In Autofac this behavior is default.
         public static void AllowResolvingFuncFactories(this Container container)
         {
             container.ResolveUnregisteredType += (sender, e) =>
             {
-                if (e.UnregisteredServiceType.IsGenericType &&
-                    e.UnregisteredServiceType.GetGenericTypeDefinition() == typeof(Func<>))
+                if (e.UnregisteredServiceType.IsClosedTypeOf(typeof(Func<>)))
                 {
                     Type serviceType = e.UnregisteredServiceType.GetGenericArguments()[0];
 
                     InstanceProducer registration = container.GetRegistration(serviceType, true);
 
-                    Type funcType = typeof(Func<>).MakeGenericType(serviceType);
-
-                    var factoryDelegate =
-                        Expression.Lambda(funcType, registration.BuildExpression()).Compile();
+                    var factoryDelegate = Expression.Lambda(
+                        e.UnregisteredServiceType, registration.BuildExpression()).Compile();
 
                     e.Register(Expression.Constant(factoryDelegate));
                 }
@@ -43,20 +39,18 @@
         {
             container.ResolveUnregisteredType += (sender, e) =>
             {
-                if (e.UnregisteredServiceType.IsGenericType &&
-                    e.UnregisteredServiceType.GetGenericTypeDefinition() == typeof(Lazy<>))
+                if (e.UnregisteredServiceType.IsClosedTypeOf(typeof(Lazy<>)))
                 {
                     Type serviceType = e.UnregisteredServiceType.GetGenericArguments()[0];
 
                     InstanceProducer registration = container.GetRegistration(serviceType, true);
 
                     Type funcType = typeof(Func<>).MakeGenericType(serviceType);
-                    Type lazyType = typeof(Lazy<>).MakeGenericType(serviceType);
 
                     var factoryDelegate = Expression.Lambda(funcType, registration.BuildExpression()).Compile();
 
                     var lazyConstructor = (
-                        from ctor in lazyType.GetConstructors()
+                        from ctor in e.UnregisteredServiceType.GetConstructors()
                         where ctor.GetParameters().Length == 1
                         where ctor.GetParameters()[0].ParameterType == funcType
                         select ctor)
@@ -65,7 +59,7 @@
                     var expression = Expression.New(lazyConstructor, Expression.Constant(factoryDelegate));
 
                     var lazyRegistration = registration.Lifestyle.CreateRegistration(
-                        serviceType: lazyType,
+                        serviceType: e.UnregisteredServiceType,
                         instanceCreator: Expression.Lambda<Func<object>>(expression).Compile(),
                         container: container);
 
@@ -74,6 +68,23 @@
             };
         }
 
+        // This extension method is equivalent to the following registration, for each and every T:
+        // container.RegisterInstance<Func<P1, Pn, T>>((p1, pn) =>
+        //     new T(
+        //         container.GetInstance<IDependency1>(),
+        //         container.GetInstance<IDependency2>(),
+        //         p1,
+        //         pn);
+        //
+        // With the following conditions:
+        // * T is a concrete type
+        // * All Px input types are part of the signature of the constructor of T
+        //
+        // Example:
+        // public MyType(Func<string, int, bool, MyHandler> factory)
+        // {
+        //     MyHandler handler = factory("answer", 42, true);
+        // }
         public static void AllowResolvingParameterizedFuncFactories(this Container container)
         {
             container.ResolveUnregisteredType += (sender, e) =>
