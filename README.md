@@ -12,7 +12,7 @@ Many of the existing DI libraries have a big complicated legacy API or are new, 
 
 The following platforms are supported:
 
-* *.NET 4.0* and up.
+* *.NET 4.5* and up.
 * .NET Standard including:
   * Universal Windows Programs. 
   * Mono. 
