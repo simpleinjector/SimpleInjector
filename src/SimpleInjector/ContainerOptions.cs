@@ -233,8 +233,8 @@ namespace SimpleInjector
 
         /// <summary>
         /// Gets or sets a value indicating whether the container should resolve unregistered concrete types.
-        /// The default value is <c>true</c>. Consider changing the value to <c>false</c> to prevent
-        /// accidental creation of types you haven't registered explicitly.
+        /// The default value is <c>false</c>. For more information on why resolving unregistered concrete types is disallowed by
+        /// default, and what possible fixes you can apply, see https://simpleinjector.org/ructd.
         /// </summary>
         /// <value>The value indicating whether the container should resolve unregistered concrete types.</value>
         /// <exception cref="InvalidOperationException">
