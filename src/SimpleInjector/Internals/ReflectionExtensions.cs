@@ -42,12 +42,12 @@ namespace SimpleInjector
         public static PropertyInfo[] GetProperties(this Type type) => type.GetTypeInfo().DeclaredProperties.ToArray();
         public static Guid GetGuid(this Type type) => type.GetTypeInfo().GUID;
 
-        public static ConstructorInfo[] GetConstructors(this Type type, bool nonPublic) =>
+        public static ConstructorInfo[] GetConstructors(this Type type, bool includeNonPublic) =>
             type.GetTypeInfo().DeclaredConstructors
-            .Where(ctor => !ctor.IsStatic && (nonPublic || ctor.IsPublic)).ToArray();
+            .Where(ctor => !ctor.IsStatic && (includeNonPublic || ctor.IsPublic)).ToArray();
 
         public static ConstructorInfo[] GetConstructors(this Type type) =>
-            type.GetConstructors(nonPublic: false);
+            type.GetConstructors(includeNonPublic: false);
 
         public static ConstructorInfo? GetConstructor(this Type type, Type[] types) => (
             from constructor in type.GetConstructors()

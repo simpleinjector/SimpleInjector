@@ -7,6 +7,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
     using System.Globalization;
     using System.Linq;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     internal sealed class LifestyleMismatchAnalyzer : IContainerAnalyzer
     {
@@ -42,10 +43,19 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 relationship: relationship))
             .ToArray();
 
-        private static string BuildRelationshipDescription(KnownRelationship relationship) =>
-            string.Format(
+        private static string BuildRelationshipDescription(KnownRelationship relationship)
+        {
+            string additionalInformation1 =
+                relationship.GetAdditionalInformation(DiagnosticType.LifestyleMismatch);
+
+            string additionalInformation2 =
+                relationship.Dependency.Registration is ScopedRegistration scoped
+                ? scoped.AdditionalInformationForLifestyleMismatchDiagnostics
+                : string.Empty;
+
+            return string.Format(
                 CultureInfo.InvariantCulture,
-                "{0} ({1}) depends on {2}{3} ({4}).{5}{6}",
+                "{0} ({1}) depends on {2}{3} ({4}).{5}{6}{7}{8}",
                 relationship.ImplementationType.FriendlyName(),
                 relationship.Lifestyle.Name,
                 relationship.Dependency.ServiceType.FriendlyName(),
@@ -53,8 +63,11 @@ namespace SimpleInjector.Diagnostics.Analyzers
                     ? " implemented by " + relationship.Dependency.FinalImplementationType.FriendlyName()
                     : string.Empty,
                 relationship.Dependency.Lifestyle.Name,
-                relationship.AdditionalInformation == string.Empty ? string.Empty : " ",
-                relationship.AdditionalInformation);
+                additionalInformation1 == string.Empty ? string.Empty : " ",
+                additionalInformation1,
+                additionalInformation2 == string.Empty ? string.Empty : " ",
+                additionalInformation2);
+        }
 
         private static string ServicePlural(int number) => number == 1 ? "service" : "services";
 

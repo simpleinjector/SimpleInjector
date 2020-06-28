@@ -1,6 +1,8 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -159,6 +161,90 @@
             Assert.IsInstanceOfType(handler1, typeof(NullCommandHandler<int>));
             Assert.AreSame(handler1, handler2, "Handler is expected to be Scoped but was transient.");
             Assert.AreNotSame(handler2, handler3, "Handler is expected to be Scoped but was singleton.");
+        }
+
+        [TestMethod]
+        public void ResolvingCollection_WithScopedElement_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+
+            container.Collection.Append<ILogger, NullLogger>(Lifestyle.Scoped);
+
+            var scope = new Scope(container);
+
+            var collection = scope.GetInstance<IEnumerable<ILogger>>();
+
+            // Act
+            collection.ToArray();
+        }
+
+        [TestMethod]
+        public void ResolvingCollection_WithScopedElement_ResolvesTheElementAsScoped()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+
+            container.Collection.Append<ILogger, NullLogger>(Lifestyle.Scoped);
+
+            var scope1 = new Scope(container);
+            var scope2 = new Scope(container);
+
+            // Act
+            var logger1a = scope1.GetInstance<IEnumerable<ILogger>>().First();
+            var logger1b = scope1.GetInstance<IEnumerable<ILogger>>().First();
+            var logger2 = scope2.GetInstance<IEnumerable<ILogger>>().First();
+
+            // Assert
+            Assert.AreSame(logger1a, logger1b);
+            Assert.AreNotSame(logger1a, logger2);
+        }
+
+        [TestMethod]
+        public void ResolvingCollection_WithScopedElement_ResolvesTheElementAsScoped2()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+
+            container.Collection.Append<ILogger, NullLogger>(Lifestyle.Singleton);
+
+            container.RegisterSingleton<ServiceDependingOn<IEnumerable<ILogger>>>();
+
+            // Act
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void ResolvingCollection_WithScopedElement_ResolvesTheElementAsScoped3()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+
+            container.Collection.Append<ILogger, NullLogger>(Lifestyle.Scoped);
+
+            container.RegisterSingleton<ServiceDependingOn<IEnumerable<ILogger>>>();
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(@"
+                ServiceDependingOn<IEnumerable<ILogger>> (Singleton) depends on IEnumerable<ILogger> (Scoped).
+                IEnumerable<ILogger> was registered as Scoped by Simple Injector, because you set 
+                'Options.DefaultScopedLifestyle' to 'ScopedLifestyle.Flowing' while one or more elements of 
+                IEnumerable<ILogger> were registered as Scoped. This caused Simple Injector to capture the 
+                active Scope inside the IEnumerable<ILogger> and forced its lifestyle to be lowered to 
+                Scoped."
+                .TrimInside(),
+                action);
         }
 
         public class ScopedPluginProxy : IPlugin

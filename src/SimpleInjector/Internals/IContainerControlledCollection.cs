@@ -14,6 +14,8 @@ namespace SimpleInjector.Internals
 
         int Count { get; }
 
+        InjectionConsumerInfo InjectionConsumerInfo { get; }
+
         InstanceProducer[] GetProducers();
 
         void Append(ContainerControlledItem item);
