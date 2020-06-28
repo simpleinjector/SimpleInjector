@@ -2475,113 +2475,6 @@
                 action);
         }
 
-        [TestMethod]
-        public void InjectedScopeDecorateeFactory_WhenSuppliedWithAScopeInstance_CreatesScopedInstancesBasedOnThatScope()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
-
-            container.Register<ICommandHandler<int>, NullCommandHandler<int>>(Lifestyle.Scoped);
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(ScopedCommandHandlerProxy<>),
-                Lifestyle.Singleton);
-
-            var proxy = (ScopedCommandHandlerProxy<int>)container.GetInstance<ICommandHandler<int>>();
-            var factory = proxy.DecorateeFactory;
-
-            // Act
-            var scope1 = new Scope(container);
-            var handler1 = proxy.DecorateeFactory(scope1);
-            var handler2 = proxy.DecorateeFactory(scope1);
-            var handler3 = proxy.DecorateeFactory(new Scope(container));
-
-            // Assert
-            Assert.IsInstanceOfType(handler1, typeof(NullCommandHandler<int>));
-            Assert.AreSame(handler1, handler2, "Handler is expected to be Scoped but was transient.");
-            Assert.AreNotSame(handler2, handler3, "Handler is expected to be Scoped but was singleton.");
-        }
-
-        [TestMethod]
-        public void ScopedDecoratoreeFactory_SuppliedWithValidScopes_ReturnsInstancesAccordingToTheirLifestyle()
-        {
-            // Arrange
-            var container = new Container();
-            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
-
-            container.Register<IPlugin, PluginImpl>(Lifestyle.Scoped);
-            container.RegisterDecorator<IPlugin, ScopedPluginProxy>(Lifestyle.Singleton);
-
-            var proxy = (ScopedPluginProxy)container.GetInstance<IPlugin>();
-            Func<Scope, IPlugin> factory = proxy.Factory;
-
-            var validScope = new Scope(container);
-
-            // Act
-            var plugin1 = factory(validScope);
-            var plugin2 = factory(validScope);
-            var plugin3 = factory(new Scope(container));
-
-            // Assert
-            AssertThat.IsInstanceOfType(typeof(PluginImpl), plugin1);
-            Assert.AreSame(plugin1, plugin2, "Instance is not scoped but Transient.");
-            Assert.AreNotSame(plugin2, plugin3, "Instance is not scoped but Singleton.");
-        }
-
-        [TestMethod]
-        public void ScopedDecoratoreeFactory_SuppliedWithContainerlessScope_ThrowsDescriptiveException()
-        {
-            // Arrange
-            var container = new Container();
-            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
-
-            container.Register<IPlugin, PluginImpl>(Lifestyle.Scoped);
-            container.RegisterDecorator<IPlugin, ScopedPluginProxy>(Lifestyle.Singleton);
-
-            var proxy = (ScopedPluginProxy)container.GetInstance<IPlugin>();
-            Func<Scope, IPlugin> factory = proxy.Factory;
-
-            var containerlessScope = Activator.CreateInstance<Scope>();
-
-            // Act
-            Action action = () => factory(containerlessScope);
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "For scoped decoratee factories to function, they have to be supplied with a Scope " +
-                "instance that references the Container for which the object graph has been built. " +
-                "But the Scope instance, provided to this Func<Scope, IPlugin> delegate does not " +
-                "belong to any container. Please ensure the supplied Scope instance is created " +
-                "using the constructor overload that accepts a Container instance.",
-                action);
-        }
-
-        [TestMethod]
-        public void ScopedDecoratoreeFactory_SuppliedWithScopeOfDifferentContainer_ThrowsDescriptiveException()
-        {
-            // Arrange
-            var container = new Container();
-            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
-
-            container.Register<IPlugin, PluginImpl>(Lifestyle.Scoped);
-            container.RegisterDecorator<IPlugin, ScopedPluginProxy>(Lifestyle.Singleton);
-
-            var proxy = (ScopedPluginProxy)container.GetInstance<IPlugin>();
-            Func<Scope, IPlugin> factory = proxy.Factory;
-
-            var scopeFromAnotherContainer = new Scope(new Container());
-
-            // Act
-            Action action = () => factory(scopeFromAnotherContainer);
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "For scoped decoratee factories to function, they have to be supplied with a Scope " +
-                "instance that references the Container for which the object graph has been built. But the " +
-                "Scope instance, provided to this Func<Scope, IPlugin> delegate, references a different " +
-                "Container instance.",
-                action);
-        }
-
         // #414.
         [TestMethod]
         public void VisualizeObjectGraph_DecoratorWithFuncDecoratee_VisualizesTheDependenciesBelowTheFuncCorrectly()
@@ -2638,12 +2531,6 @@
             Assert.AreEqual(expected: "\n" + expectedGraph + "\n", actual: "\n" + actualGraph + "\n");
         }
 
-        public class ScopedPluginProxy : IPlugin
-        {
-            public readonly Func<Scope, IPlugin> Factory;
-            public ScopedPluginProxy(Func<Scope, IPlugin> factory) => this.Factory = factory;
-        }
-
         private static KnownRelationship GetValidRelationship()
         {
             // Arrange
@@ -2657,16 +2544,6 @@
         {
             public void Intercept(IInvocation invocation)
             {
-            }
-        }
-
-        public sealed class ScopedCommandHandlerProxy<T> : ICommandHandler<T>
-        {
-            public readonly Func<Scope, ICommandHandler<T>> DecorateeFactory;
-
-            public ScopedCommandHandlerProxy(Func<Scope, ICommandHandler<T>> decorateeFactory)
-            {
-                this.DecorateeFactory = decorateeFactory;
             }
         }
     }
