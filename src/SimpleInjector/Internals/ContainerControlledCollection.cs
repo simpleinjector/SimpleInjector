@@ -15,13 +15,21 @@ namespace SimpleInjector.Internals
         : IList<TService>,
         IContainerControlledCollection, IReadOnlyList<TService>
     {
-        private readonly Container container;
+        private static readonly InjectionConsumerInfo ConsumerInfo =
+            new InjectionConsumerInfo(
+                // Finds the TService parameter of the ctor(TService) constructor.
+                typeof(ContainerControlledCollection<TService>).GetConstructors(includeNonPublic: true)
+                    .Select(ctor => ctor.GetParameters())
+                    .Where(p => p.Length == 1 && p[0].ParameterType == typeof(TService))
+                    .Select(p => p[0])
+                    .Single());
 
-        private readonly List<LazyEx<InstanceProducer>> lazyProducers = new List<LazyEx<InstanceProducer>>();
+        private readonly Container container;
+        private readonly List<LazyEx<InstanceProducer>> lazyProducers;
 
         // PERF: This is an optimization.
         // warning: this changes the behavior and makes the loading of producers less lazy, but according to
-        // our specs (test), this seems to be allowed.
+        // our specs (tests), this seems to be allowed.
         private readonly LazyEx<InstanceProducer[]> producers;
 
         // This constructor needs to be public. It is called using reflection.
@@ -29,8 +37,21 @@ namespace SimpleInjector.Internals
         {
             this.container = container;
 
+            this.lazyProducers = new List<LazyEx<InstanceProducer>>();
             this.producers =
                 new LazyEx<InstanceProducer[]>(() => this.lazyProducers.Select(p => p.Value).ToArray());
+        }
+
+        // This constructor is called when we're in 'flowing' mode, because in that case we need to set the
+        // scope before forwarding the call to InstanceProducers.
+        protected ContainerControlledCollection(
+            Container container, ContainerControlledCollection<TService> definition)
+        {
+            this.container = container;
+
+            // Reference the producers from the definition. This doesn't cause any new objects.
+            this.lazyProducers = definition.lazyProducers;
+            this.producers = definition.producers;
         }
 
         // This constructor is not called; its metadata is used to build valid KnownRelationship types.
@@ -38,6 +59,8 @@ namespace SimpleInjector.Internals
         {
             throw new NotSupportedException("This constructor is not intended to be called.");
         }
+
+        public InjectionConsumerInfo InjectionConsumerInfo => ConsumerInfo;
 
         public bool AllProducersVerified => this.lazyProducers.All(lazy => lazy.IsValueCreated);
 
@@ -47,7 +70,7 @@ namespace SimpleInjector.Internals
 
         internal InstanceProducer? ParentProducer { get; set; }
 
-        public TService this[int index]
+        public virtual TService this[int index]
         {
             get => GetInstance(this.producers.Value[index]);
             set => throw GetNotSupportedBecauseReadOnlyException();
@@ -63,7 +86,7 @@ namespace SimpleInjector.Internals
             }
         }
 
-        public int IndexOf(TService item)
+        public virtual int IndexOf(TService item)
         {
             // InstanceProducers never return null, so we can short-circuit the operation and return -1.
             if (item is null)
@@ -104,7 +127,7 @@ namespace SimpleInjector.Internals
 
         bool ICollection<TService>.Contains(TService item) => this.IndexOf(item) > -1;
 
-        void ICollection<TService>.CopyTo(TService[] array, int arrayIndex)
+        public virtual void CopyTo(TService[] array, int arrayIndex)
         {
             Requires.IsNotNull(array, nameof(array));
 
@@ -132,14 +155,14 @@ namespace SimpleInjector.Internals
             this.lazyProducers.Add(this.ToLazyInstanceProducer(item));
         }
 
-        InstanceProducer[] IContainerControlledCollection.GetProducers() => this.producers.Value;
+        public InstanceProducer[] GetProducers() => this.producers.Value;
 
-        public IEnumerator<TService> GetEnumerator() => new Enumerator(this.producers.Value);
+        public virtual IEnumerator<TService> GetEnumerator() => new Enumerator(this.producers.Value);
 
-        IEnumerator IEnumerable.GetEnumerator() => new Enumerator(this.producers.Value);
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private static TService GetInstance(InstanceProducer producer)
+        protected static TService GetInstance(InstanceProducer producer)
         {
             var service = (TService)producer.GetInstance();
 

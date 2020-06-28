@@ -4,9 +4,12 @@
 namespace SimpleInjector.Advanced
 {
     using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using SimpleInjector.Diagnostics;
 
     /// <summary>
     /// A known relationship defines a relationship between two types. The Diagnostics Debug View uses this
@@ -15,6 +18,8 @@ namespace SimpleInjector.Advanced
     [DebuggerDisplay("{" + nameof(KnownRelationship.DebuggerDisplay) + ",nq}")]
     public sealed class KnownRelationship : IEquatable<KnownRelationship?>
     {
+        private Dictionary<DiagnosticType, string>? additionalInformation;
+
         // This constructor is here for backwards compatibility: the library itself uses the internal ctor.
 
         /// <summary>Initializes a new instance of the <see cref="KnownRelationship"/> class.</summary>
@@ -37,8 +42,7 @@ namespace SimpleInjector.Advanced
             Type implementationType,
             Lifestyle lifestyle,
             InjectionConsumerInfo consumer,
-            InstanceProducer dependency,
-            string? additionalInformation = null)
+            InstanceProducer dependency)
         {
             Requires.IsNotNull(implementationType, nameof(implementationType));
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
@@ -49,7 +53,6 @@ namespace SimpleInjector.Advanced
             this.Lifestyle = lifestyle;
             this.Consumer = consumer;
             this.Dependency = dependency;
-            this.AdditionalInformation = additionalInformation ?? string.Empty;
         }
 
         /// <summary>Gets the implementation type of the parent type of the relationship.</summary>
@@ -65,11 +68,30 @@ namespace SimpleInjector.Advanced
         /// <value>The type that the parent depends on.</value>
         public InstanceProducer Dependency { get; }
 
+        internal void AddAdditionalInformation(DiagnosticType type, string message)
+        {
+            if (this.additionalInformation is null)
+            {
+                this.additionalInformation = new Dictionary<DiagnosticType, string>();
+            }
+
+            this.additionalInformation[type] = message ?? string.Empty;
+        }
+
+        internal string GetAdditionalInformation(DiagnosticType type)
+        {
+            if (this.additionalInformation != null
+                && this.additionalInformation.TryGetValue(type, out string message))
+            {
+                return message;
+            }
+
+            return string.Empty;
+        }
+
         internal bool UseForVerification { get; set; } = true;
 
         internal InjectionConsumerInfo Consumer { get; }
-
-        internal string AdditionalInformation { get; } = string.Empty;
 
         [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
             Justification = "This method is called by the debugger.")]
@@ -114,6 +136,22 @@ namespace SimpleInjector.Advanced
                 && this.Lifestyle.Equals(other.Lifestyle)
                 && this.Dependency.Equals(other.Dependency)
                 && this.Consumer.Equals(other.Consumer);
+        }
+
+        internal KnownRelationship ReplaceLifestyle(Lifestyle lifestyle)
+        {
+            var newRelationship = new KnownRelationship(
+                this.ImplementationType,
+                lifestyle,
+                this.Consumer,
+                this.Dependency);
+
+            if (this.additionalInformation != null)
+            {
+                newRelationship.additionalInformation = this.additionalInformation.MakeCopy();
+            }
+
+            return newRelationship;
         }
     }
 }

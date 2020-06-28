@@ -21,6 +21,8 @@ namespace SimpleInjector.Lifestyles
         // Initialized when BuildExpression is called
         internal Func<object>? InstanceCreator { get; private set; }
 
+        internal string AdditionalInformationForLifestyleMismatchDiagnostics { get; set; } = string.Empty;
+
         public override Expression BuildExpression()
         {
             if (this.InstanceCreator is null)

@@ -64,14 +64,6 @@ namespace SimpleInjector.Lifestyles
         private IEnumerable<KnownRelationship> GetRelationshipsThisLifestyle(Registration registration) =>
             from relationship in registration.GetRelationships()
             let mustReplace = object.ReferenceEquals(relationship.Lifestyle, registration.Lifestyle)
-            select mustReplace ? this.ReplaceLifestyle(relationship) : relationship;
-
-        private KnownRelationship ReplaceLifestyle(KnownRelationship relationship) =>
-            new KnownRelationship(
-                relationship.ImplementationType,
-                this.Lifestyle,
-                relationship.Consumer,
-                relationship.Dependency,
-                relationship.AdditionalInformation);
+            select mustReplace ? relationship.ReplaceLifestyle(this.Lifestyle) : relationship;
     }
 }

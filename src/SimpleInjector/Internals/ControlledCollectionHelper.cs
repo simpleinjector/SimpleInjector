@@ -10,6 +10,7 @@ namespace SimpleInjector.Internals
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Lifestyles;
 
     // This class allows an ContainerControlledCollection<T> to notify about the creation of its wrapped items.
     // This is solely used for diagnostic verification.
@@ -106,9 +107,77 @@ namespace SimpleInjector.Internals
             // We need special handling for Collection<T> (and ReadOnlyCollection<T>), because the
             // ContainerControlledCollection does not (and can't) inherit it. So we have to wrap that
             // stream into a Collection<T> or ReadOnlyCollection<T>.
-            return TryCreateRegistrationForCollectionOfT(collectionType, instance, container)
-                ?? new ContainerControlledCollectionRegistration(collectionType, instance, container);
+            return
+                TryCreateRegistrationForFlowingCollection(instance, collectionType, container)
+                ?? TryCreateRegistrationForCollectionOfT(collectionType, instance, container)
+                ?? new ContainerControlledCollectionRegistration(
+                    Lifestyle.Singleton, collectionType, instance, container);
         }
+
+        private static ScopedRegistration? TryCreateRegistrationForFlowingCollection(
+            IContainerControlledCollection instance, Type collectionType, Container container)
+        {
+            // Only create a scoped collection when we're in flowing mode and the graph contains scoped
+            // components, because this makes it less likely to hit a Lifestyle Mismatch, as users typically
+            // expect collections to be singletons. Downside of this approach is that all wrapped instance
+            // producers need to be built here.
+            if (ScopedLifestyle.Flowing != container.Options.DefaultScopedLifestyle
+                || !ContainsScopedComponents(instance))
+            {
+                return null;
+            }
+
+            Type elementType = collectionType.GetGenericArguments()[0];
+
+            var ctor = typeof(FlowingContainerControlledCollection<>).MakeGenericType(elementType)
+                .GetConstructors().Single();
+
+            Expression newCollectionExpression = Expression.New(
+                ctor,
+                container.GetRegistration(typeof(Scope), true)!.BuildExpression(),
+                Expression.Constant(instance));
+
+            // Wrap the collection in a Collection<T> or ReadOnlyCollection<T>
+            if (collectionType.GetGenericTypeDefinition() == typeof(Collection<>)
+                || collectionType.GetGenericTypeDefinition() == typeof(ReadOnlyCollection<>))
+            {
+                newCollectionExpression = Expression.New(
+                    collectionType.GetConstructors().Where(c => c.GetParameters().Length == 1).First(),
+                    newCollectionExpression);
+            }
+
+            return new ScopedRegistration(
+                container.Options.DefaultScopedLifestyle!,
+                container,
+                collectionType,
+                (Func<object>)container.Options.ExpressionCompilationBehavior.Compile(newCollectionExpression))
+            {
+                AdditionalInformationForLifestyleMismatchDiagnostics =
+                    StringResources.FlowingCollectionIsScopedBecause(collectionType)
+            };
+        }
+
+        private static bool ContainsScopedComponents(IContainerControlledCollection instance)
+        {
+            foreach (var producer in instance.GetProducers())
+            {
+                // We need to build the expressions here, because that could trigger expression built events,
+                // which can change the lifestyle of the producer (e.g. because of applied decorators).
+                producer.BuildExpression();
+
+                if (ContainsScopedComponentsInGraph(producer))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool ContainsScopedComponentsInGraph(InstanceProducer producer) =>
+            producer.Lifestyle == Lifestyle.Singleton ? false :
+            producer.Lifestyle is ScopedLifestyle ? true :
+            producer.GetRelationships().Any(r => ContainsScopedComponentsInGraph(r.Dependency));
 
         internal static bool IsContainerControlledCollectionExpression(Expression enumerableExpression)
         {
@@ -133,7 +202,7 @@ namespace SimpleInjector.Internals
                 || collectionType.GetGenericTypeDefinition() == typeof(ReadOnlyCollection<>))
             {
                 return new ContainerControlledCollectionRegistration(
-                    collectionType, controlledCollection, container)
+                    Lifestyle.Singleton, collectionType, controlledCollection, container)
                 {
                     Expression = Expression.Constant(
                         Activator.CreateInstance(collectionType, controlledCollection),
@@ -147,10 +216,11 @@ namespace SimpleInjector.Internals
         private sealed class ContainerControlledCollectionRegistration : Registration
         {
             internal ContainerControlledCollectionRegistration(
+                Lifestyle lifestyle,
                 Type collectionType,
                 IContainerControlledCollection collection,
                 Container container)
-                : base(Lifestyle.Singleton, container, collectionType)
+                : base(lifestyle, container, collectionType)
             {
                 this.Collection = collection;
                 this.IsCollection = true;
@@ -174,12 +244,7 @@ namespace SimpleInjector.Internals
             {
                 InjectionConsumerInfo? consumerInfo = null;
 
-                InjectionConsumerInfo GetConsumer() =>
-                    consumerInfo ??=
-                        new InjectionConsumerInfo(
-                            this.Collection.GetType().GetConstructors(nonPublic: true)
-                            .Single(ctor => !ctor.IsPublic)
-                            .GetParameters().Single());
+                InjectionConsumerInfo GetConsumer() => consumerInfo ??= this.Collection.InjectionConsumerInfo;
 
                 return
                     from producer in this.Collection.GetProducers()

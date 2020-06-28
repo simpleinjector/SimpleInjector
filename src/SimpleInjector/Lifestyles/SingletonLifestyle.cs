@@ -11,6 +11,7 @@ namespace SimpleInjector.Lifestyles
     using System.Linq.Expressions;
     using System.Threading;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics;
     using SimpleInjector.Internals;
 
     /// <summary>
@@ -351,13 +352,16 @@ namespace SimpleInjector.Lifestyles
                             // the construction of this (Singleton) instance, which might cause Lifestyle
                             // Mismatches. That's why this is added as a known relationship. This way
                             // diagnostics can verify the relationship.
-                            this.AddRelationship(
-                                new KnownRelationship(
+                            var relationship = new KnownRelationship(
                                     implementationType: this.ImplementationType,
                                     lifestyle: this.Lifestyle,
                                     consumer: matchingRelationship?.Consumer ?? InjectionConsumerInfo.Root,
-                                    dependency: args.Producer,
-                                    additionalInformation: additionalInformation));
+                                    dependency: args.Producer);
+
+                            relationship.AddAdditionalInformation(
+                                DiagnosticType.LifestyleMismatch, additionalInformation);
+
+                            this.AddRelationship(relationship);
                         }
                     }
                 };

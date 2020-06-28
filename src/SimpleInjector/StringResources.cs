@@ -157,6 +157,14 @@ namespace SimpleInjector
                 nameof(Container.ExpressionBuilding),
                 nameof(Container.ExpressionBuilt));
 
+        internal static string FlowingCollectionIsScopedBecause(Type collectionType) =>
+            Format(
+                "{0} was registered as Scoped by Simple Injector, because you set 'Options.DefaultScoped" +
+                "Lifestyle' to 'ScopedLifestyle.Flowing' while one or more elements of {0} were registered " +
+                "as Scoped. This caused Simple Injector to capture the active Scope inside the {0} and " +
+                "forced its lifestyle to be lowered to Scoped.",
+                collectionType.TypeName());
+
         internal static string MultipleClosedTypesAreAssignableFromType(
             Type type, Type genericTypeDefinition, Type[] types, string otherMethod) =>
             Format(

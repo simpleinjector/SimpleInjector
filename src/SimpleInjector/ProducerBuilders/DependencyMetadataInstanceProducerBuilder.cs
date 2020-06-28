@@ -89,7 +89,7 @@ namespace SimpleInjector.ProducerBuilders
 
         private static object CreateMetadata(Type metadataType, InstanceProducer instanceProducer)
         {
-            var ctor = metadataType.GetConstructors(nonPublic: true).Single();
+            var ctor = metadataType.GetConstructors(includeNonPublic: true).Single();
             return ctor.Invoke(new object[] { instanceProducer });
         }
     }

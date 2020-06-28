@@ -31,7 +31,7 @@ namespace SimpleInjector.ProducerBuilders
 
             // Add the default registrations. This adds them as registration, but only in case some component
             // starts depending on them.
-            var scopeLifestyle = new ScopedScopeLifestyle();
+            var scopeLifestyle = ScopedScopeLifestyle.Instance;
 
             this.resolveUnregisteredTypeRegistrations[typeof(Scope)] = new LazyEx<InstanceProducer>(
                 () => scopeLifestyle.CreateProducer(() => scopeLifestyle.GetCurrentScope(container), container));

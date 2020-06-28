@@ -971,54 +971,6 @@
         }
 
         [TestMethod]
-        public void GetInstance_ResolvingScopedDependencyDirectlyFromScope_ResolvesTheInstanceAsScoped()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            // We need a 'dummy' scoped lifestyle to be able to use Lifestyle.Scoped
-            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
-
-            container.Register<ILogger, NullLogger>(Lifestyle.Scoped);
-
-            var scope1 = new Scope(container);
-            var scope2 = new Scope(container);
-
-            // Act
-            var s1 = scope1.GetInstance<ServiceDependingOn<ILogger>>();
-            var s2 = scope1.GetInstance<ServiceDependingOn<ILogger>>();
-            var s3 = scope2.GetInstance<ServiceDependingOn<ILogger>>();
-
-            // Assert
-            Assert.AreSame(s1.Dependency, s2.Dependency, "Logger was expected to be scoped but was transient.");
-            Assert.AreNotSame(s3.Dependency, s2.Dependency, "Logger was expected to be scoped but was singleton.");
-        }
-
-        [TestMethod]
-        public void GetInstance_LambdaThatCallsBackIntoContainerExecutedFromScopeResolve_ResolvesTheInstanceAsScoped()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
-
-            // Calling back into the container to get a scoped instance, from within an instanceCreator lambda,
-            // should work, in case the the root object is resolved from a scope.
-            container.Register<ILogger>(() => container.GetInstance<NullLogger>());
-            container.Register<NullLogger>(Lifestyle.Scoped);
-            container.Register<ServiceDependingOn<ILogger>>();
-
-            var scope = new Scope(container);
-
-            // Act
-            var s1 = scope.GetInstance<ServiceDependingOn<ILogger>>();
-            var s2 = scope.GetInstance<ServiceDependingOn<ILogger>>();
-
-            // Assert
-            Assert.AreSame(s1.Dependency, s2.Dependency, "Logger was expected to be scoped.");
-        }
-
-        [TestMethod]
         public void GetInstance_ResolvingAnInstanceDependingOnScopeWithAnActiveLifetimeScopeButNoDefaultScopedLifestyleSet_Throws()
         {
             // Arrange
