@@ -7,7 +7,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>SimpleInjector.Integration.Web.Mvc</AssemblyName>
     <AssemblyOriginatorKeyFile>../SimpleInjector.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>SimpleInjector.Integration.Web.Mvc</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -18,6 +18,8 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
+    <Version>5.0.0-Doug</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

@@ -44,7 +44,6 @@ namespace SimpleInjector.Internals
         {
             this.container.ThrowWhenContainerIsLockedOrDisposed();
 
-            this.ThrowWhenConditionalIsRegisteredInOverridingMode(producer);
             this.ThrowWhenOverlappingRegistrationsExist(producer);
 
             if (this.container.Options.AllowOverridingRegistrations)
@@ -65,9 +64,7 @@ namespace SimpleInjector.Internals
 
             var provider = new OpenGenericToInstanceProducerProvider(
                 serviceType, implementationType, lifestyle, predicate, this.container);
-
-            this.ThrowWhenConditionalIsRegisteredInOverridingMode(provider);
-
+            
             this.ThrowWhenProviderToRegisterOverlapsWithExistingProvider(provider);
 
             if (provider.AppliesToAllClosedServiceTypes && this.container.Options.AllowOverridingRegistrations)
@@ -88,9 +85,7 @@ namespace SimpleInjector.Internals
 
             var provider = new OpenGenericToInstanceProducerProvider(
                 serviceType, implementationTypeFactory, lifestyle, predicate, this.container);
-
-            this.ThrowWhenConditionalIsRegisteredInOverridingMode(provider);
-
+            
             this.ThrowWhenProviderToRegisterOverlapsWithExistingProvider(provider);
 
             this.providers.Add(provider);
@@ -160,37 +155,6 @@ namespace SimpleInjector.Internals
                             overlappingProvider)
                         : new InvalidOperationException(
                             StringResources.TypeAlreadyRegistered(producerToRegister.ServiceType));
-                }
-            }
-        }
-
-        private void ThrowWhenConditionalIsRegisteredInOverridingMode(InstanceProducer producer)
-        {
-            if (producer.IsConditional && this.container.Options.AllowOverridingRegistrations)
-            {
-                throw new NotSupportedException(
-                    StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
-            }
-        }
-
-        private void ThrowWhenConditionalIsRegisteredInOverridingMode(
-            OpenGenericToInstanceProducerProvider provider)
-        {
-            if (!provider.AppliesToAllClosedServiceTypes && this.container.Options.AllowOverridingRegistrations)
-            {
-                // We allow the registration in case it doesn't have a predicate (meaning that the type is
-                // solely conditional by its generic type constraints) while it is the first registration.
-                // In that case there is no ambiguity, since there's nothing to replace (fixes #116).
-                if (provider.Predicate != null)
-                {
-                    throw new NotSupportedException(
-                        StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
-                }
-
-                if (this.providers.Count > 0)
-                {
-                    throw new NotSupportedException(
-                        StringResources.MakingRegistrationsWithTypeConstraintsInOverridingModeIsNotSupported());
                 }
             }
         }

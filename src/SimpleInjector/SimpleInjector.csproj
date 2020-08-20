@@ -7,7 +7,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>SimpleInjector</AssemblyName>
     <AssemblyOriginatorKeyFile>../SimpleInjector.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>SimpleInjector</PackageId>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.0' ">1.6.0</NetStandardImplicitPackageVersion>
@@ -21,6 +21,8 @@
     <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>5.1.0-Doug</Version>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">

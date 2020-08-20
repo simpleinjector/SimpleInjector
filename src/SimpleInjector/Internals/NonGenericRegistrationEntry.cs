@@ -42,7 +42,6 @@ namespace SimpleInjector.Internals
         {
             this.container.ThrowWhenContainerIsLockedOrDisposed();
             this.ThrowWhenConditionalAndUnconditionalAreMixed(producer);
-            this.ThrowWhenConditionalIsRegisteredInOverridingMode(producer);
 
             this.ThrowWhenTypeAlreadyRegistered(producer);
             this.ThrowWhenIdenticalImplementationIsAlreadyRegistered(producer);
@@ -178,15 +177,6 @@ namespace SimpleInjector.Internals
         {
             this.ThrowWhenNonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(producer);
             this.ThrowWhenNonGenericTypeAlreadyRegisteredAsConditionalRegistration(producer);
-        }
-
-        private void ThrowWhenConditionalIsRegisteredInOverridingMode(InstanceProducer producer)
-        {
-            if (producer.IsConditional && this.container.Options.AllowOverridingRegistrations)
-            {
-                throw new NotSupportedException(
-                    StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
-            }
         }
 
         private void ThrowWhenNonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(
