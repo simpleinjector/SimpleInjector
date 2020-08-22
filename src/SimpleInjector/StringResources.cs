@@ -583,15 +583,41 @@ namespace SimpleInjector
                 nameof(Registration.BuildExpression));
 
         internal static string MultipleTypesThatRepresentClosedGenericType(
-            Type closedServiceType, Type[] implementations) =>
-            Format(
+            Type closedServiceType, Type[] implementations)
+        {
+            string registerAsCollection =
+                Format(
+                    " Did you mean to register the types as a collection using the {0} method instead?",
+                    CollectionsRegisterMethodName);
+
+            var assemblytLoadedMoreThanOnce = NoteAssemblyLoadedMoreThanOnceOnDuplicateTypes(implementations);
+
+            var implementationNames =
+                from implementation in implementations
+                group implementation by implementation.ToFriendlyName(fullyQualifiedName: false) into g
+                from item in g
+                select item.ToFriendlyName(fullyQualifiedName: g.Count() > 1 || UseFullyQualifiedTypeNames);
+
+            return Format(
                 "In the supplied list of types or assemblies, there are {0} types that represent the " +
-                "same closed-generic type {1}. Did you mean to register the types as a collection " +
-                "using the {2} method instead? Conflicting types: {3}.",
+                "same closed-generic type {1}.{2} Conflicting types: {3}.",
                 implementations.Length,
                 closedServiceType.TypeName(),
-                CollectionsRegisterMethodName,
-                implementations.Select(TypeName).ToCommaSeparatedText());
+                assemblytLoadedMoreThanOnce ?? registerAsCollection,
+                implementationNames.ToCommaSeparatedText());
+        }
+
+        private static string NoteAssemblyLoadedMoreThanOnceOnDuplicateTypes(Type[] implementations)
+        {
+            Type duplicateAssemblyLookalike =
+                GetDuplicateLoadedAssemblyLookalikeTypeOrNull(
+                    implementations[0],
+                    implementations.Skip(1).ToArray());
+
+            return duplicateAssemblyLookalike != null
+                ? AssemblyLoadedMoreThanOnce(implementations[0], duplicateAssemblyLookalike)
+                : string.Empty;
+        }
 
         internal static string CantGenerateFuncForDecorator(
             Type serviceType, Type decorateeFactoryType, Type decoratorType) =>
@@ -1178,18 +1204,7 @@ namespace SimpleInjector
 
             if (duplicateAssemblyLookalike != null)
             {
-                return Format(
-                    " Type {0} is a member of the assembly {1} which seems to have been loaded more than " +
-                    "once. The CLR believes the second instance of the assembly is a different assembly " +
-                    "to the first. It is this multiple loading of assemblies that is causing this issue. " +
-                    "The most likely cause is that the same assembly has been loaded from different " +
-                    "locations within different contexts. " +
-                    "{2}" +
-                    "Please see https://simpleinjector.org/asmld for more information about this " +
-                    "problem and how to solve it.",
-                    Types.ToCSharpFriendlyName(duplicateAssemblyLookalike, fullyQualifiedName: true),
-                    serviceType.GetAssembly().FullName,
-                    BuildAssemblyLocationMessage(serviceType, duplicateAssemblyLookalike));
+                return AssemblyLoadedMoreThanOnce(serviceType, duplicateAssemblyLookalike);
             }
             else
             {
@@ -1199,6 +1214,22 @@ namespace SimpleInjector
                     lookalikes.First().ToFriendlyName(fullyQualifiedName: true),
                     serviceType.ToFriendlyName(fullyQualifiedName: true));
             }
+        }
+
+        private static string AssemblyLoadedMoreThanOnce(Type serviceType, Type duplicateAssemblyLookalike)
+        {
+            return Format(
+                " Type {0} is a member of the assembly {1} which seems to have been loaded more than " +
+                "once. The CLR believes the second instance of the assembly is a different assembly " +
+                "to the first. It is this multiple loading of assemblies that is causing this issue. " +
+                "The most likely cause is that the same assembly has been loaded from different " +
+                "locations within different contexts. " +
+                "{2}" +
+                "Please see https://simpleinjector.org/asmld for more information about this " +
+                "problem and how to solve it.",
+                Types.ToCSharpFriendlyName(duplicateAssemblyLookalike, fullyQualifiedName: true),
+                serviceType.GetAssembly().FullName,
+                BuildAssemblyLocationMessage(serviceType, duplicateAssemblyLookalike));
         }
 
         private static string NoteThatConcreteTypeCanNotBeResolvedDueToConfiguration(
