@@ -262,10 +262,10 @@ namespace SimpleInjector
             "application. For more information, see https://simpleinjector.org/scoped.";
 
         internal static string MakingConditionalRegistrationsInOverridingModeIsNotSupported() =>
-            "The making of conditional registrations is not supported when " +
-            $"{nameof(ContainerOptions.AllowOverridingRegistrations)} is set, because it is impossible " +
-            "for the container to detect whether the registration should replace a different registration " +
-            "or not.";
+            "The making of new conditional registrations for an already registered service type is not " +
+            $"supported when {nameof(ContainerOptions.AllowOverridingRegistrations)} is set, because it is " +
+            $"impossible for the container to detect whether the conditional registration should appended " +
+            $"or replace another registration.";
 
         internal static string MakingRegistrationsWithTypeConstraintsInOverridingModeIsNotSupported() =>
             MakingConditionalRegistrationsInOverridingModeIsNotSupported() +
