@@ -1929,6 +1929,25 @@
             Assert.AreEqual(2.0, doubleValue);
         }
 
+        // #836
+        interface IFoo { }
+        class Foo : IFoo { public bool Debug { get; set; } }
+
+        [TestMethod]
+        public void RegisteringConditional_WithDifferentInstancesOfSameTypeForSameService_Succeeds()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.RegisterConditional<IFoo>(
+                Lifestyle.Singleton.CreateRegistration(typeof(IFoo), new Foo { }, container),
+                c => c.Consumer.Target.Name.StartsWith("debug", StringComparison.Ordinal));
+
+            container.RegisterConditional<IFoo>(
+                Lifestyle.Singleton.CreateRegistration(typeof(IFoo), new Foo { Debug = true }, container),
+                c => !c.Handled);
+        }
+
         private static void RegisterConditionalConstant<T>(Container container, T constant,
             Predicate<PredicateContext> predicate)
         {
