@@ -166,7 +166,9 @@ namespace SimpleInjector.Internals
 
         private void ThrowWhenConditionalIsRegisteredInOverridingMode(InstanceProducer producer)
         {
-            if (producer.IsConditional && this.container.Options.AllowOverridingRegistrations)
+            if (producer.IsConditional
+                && this.container.Options.AllowOverridingRegistrations
+                && this.providers.Any())
             {
                 throw new NotSupportedException(
                     StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
@@ -176,21 +178,21 @@ namespace SimpleInjector.Internals
         private void ThrowWhenConditionalIsRegisteredInOverridingMode(
             OpenGenericToInstanceProducerProvider provider)
         {
-            if (!provider.AppliesToAllClosedServiceTypes && this.container.Options.AllowOverridingRegistrations)
+            if (!provider.AppliesToAllClosedServiceTypes
+                && this.container.Options.AllowOverridingRegistrations)
             {
-                // We allow the registration in case it doesn't have a predicate (meaning that the type is
-                // solely conditional by its generic type constraints) while it is the first registration.
-                // In that case there is no ambiguity, since there's nothing to replace (fixes #116).
-                if (provider.Predicate != null)
-                {
-                    throw new NotSupportedException(
-                        StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
-                }
-
                 if (this.providers.Count > 0)
                 {
-                    throw new NotSupportedException(
-                        StringResources.MakingRegistrationsWithTypeConstraintsInOverridingModeIsNotSupported());
+                    if (provider.Predicate != null)
+                    {
+                        throw new NotSupportedException(
+                            StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
+                    }
+                    else
+                    {
+                        throw new NotSupportedException(
+                            StringResources.MakingRegistrationsWithTypeConstraintsInOverridingModeIsNotSupported());
+                    }
                 }
             }
         }

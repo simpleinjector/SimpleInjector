@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Linq.Expressions;
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector;
@@ -15,10 +14,27 @@
     public class RegisterConditionalTests
     {
         [TestMethod]
-        public void RegisterConditionalNonGeneric_AllowOverridingRegistrations_NotSupported()
+        public void RegisterConditionalNonGeneric_AllowOverridingRegistrationsWithNoSimilarRegistrations_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            container.RegisterConditional(typeof(ILogger), typeof(NullLogger), Lifestyle.Singleton, c => true);
+
+            // Assert
+            Assert.IsNotNull(container.GetInstance<ILogger>());
+        }
+
+        [TestMethod]
+        public void RegisterConditionalNonGeneric_AllowOverridingRegistrationsWithExistingSimilarRegistration_NotSupported()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional(typeof(ILogger), typeof(ConsoleLogger), Lifestyle.Singleton, c => true);
 
             container.Options.AllowOverridingRegistrations = true;
 
@@ -27,15 +43,17 @@
                 Lifestyle.Singleton, c => true);
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
-                "The making of conditional registrations is not supported when AllowOverridingRegistrations " +
-                "is set, because it is impossible for the container to detect whether the registration " +
-                "should replace a different registration or not.",
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
+                The making of new conditional registrations for an already registered service type is not
+                supported when AllowOverridingRegistrations is set, because it is impossible for the
+                container to detect whether the conditional registration should appended or replace another
+                registration."
+                .TrimInside(),
                 action);
         }
 
         [TestMethod]
-        public void RegisterConditionalOpenGeneric_AllowOverridingRegistrations_NotSupported()
+        public void RegisterConditionalOpenGeneric_AllowOverridingRegistrationsWithNoSimilarRegistrations_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -43,22 +61,55 @@
             container.Options.AllowOverridingRegistrations = true;
 
             // Act
+            container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), c => true);
+
+            // Assert
+            Assert.IsNotNull(container.GetInstance<IGeneric<int>>());
+        }
+
+        [TestMethod]
+        public void RegisterConditionalOpenGeneric_AllowOverridingRegistrationsWithExistingSimilarRegistration_NotSupported()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            container.RegisterConditional(typeof(IGeneric<>), typeof(DefaultGenericType<>), c => true);
+
+            // Act
             Action action = () => container.RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>),
                 Lifestyle.Singleton, c => true);
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
-                "The making of conditional registrations is not supported when AllowOverridingRegistrations " +
-                "is set, because it is impossible for the container to detect whether the registration " +
-                "should replace a different registration or not.",
+                "The making of new conditional registrations for an already registered service type is " +
+                "not supported",
                 action);
         }
 
         [TestMethod]
-        public void RegisterConditionalOnClosedGeneric_AllowOverridingRegistrations_NotSupported()
+        public void RegisterConditionalOnClosedGeneric_AllowOverridingRegistrationsWithNoSimilarRegistrations_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            container.RegisterConditional(typeof(IGeneric<int>), typeof(GenericType<int>), c => true);
+
+            // Assert
+            Assert.IsNotNull(container.GetInstance<IGeneric<int>>());
+        }
+
+        [TestMethod]
+        public void RegisterConditionalOnClosedGeneric_AllowOverridingRegistrationsWithExistingSimilarRegistration_NotSupported()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional(typeof(IGeneric<float>), typeof(GenericType<float>), p => true);
 
             container.Options.AllowOverridingRegistrations = true;
 
@@ -67,10 +118,12 @@
                 Lifestyle.Singleton, c => true);
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
-                "The making of conditional registrations is not supported when AllowOverridingRegistrations " +
-                "is set, because it is impossible for the container to detect whether the registration " +
-                "should replace a different registration or not.",
+            AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(@"
+                The making of new conditional registrations for an already registered service type is not
+                supported when AllowOverridingRegistrations is set, because it is impossible for the
+                container to detect whether the conditional registration should appended or replace another
+                registration."
+                .TrimInside(),
                 action);
         }
 
@@ -837,12 +890,32 @@
         }
 
         [TestMethod]
-        public void RegisterConditionalFactory_AllowOverridingRegistrations_NotSupported()
+        public void RegisterConditionalFactory_AllowOverridingRegistrationsNoSimilarRegistrations_Succeeds()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             container.Options.AllowOverridingRegistrations = true;
+
+            // Act
+            container.RegisterConditional(typeof(IGeneric<>),
+                c => typeof(GenericType<>),
+                Lifestyle.Singleton,
+                c => true);
+
+            // Assert
+            Assert.IsNotNull(container.GetInstance<IGeneric<int>>());
+        }
+
+        [TestMethod]
+        public void RegisterConditionalFactory_AllowOverridingRegistrationsWithSimilarRegistrations_NotSupported()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.AllowOverridingRegistrations = true;
+
+            container.RegisterConditional(typeof(IGeneric<>), typeof(DefaultGenericType<>), c => false);
 
             // Act
             Action action = () => container.RegisterConditional(typeof(IGeneric<>),

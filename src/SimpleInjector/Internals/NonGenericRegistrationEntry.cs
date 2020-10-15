@@ -182,7 +182,14 @@ namespace SimpleInjector.Internals
 
         private void ThrowWhenConditionalIsRegisteredInOverridingMode(InstanceProducer producer)
         {
-            if (producer.IsConditional && this.container.Options.AllowOverridingRegistrations)
+            // We do not support replacing conditional registrations, because we can't distinquish between
+            // appending a conditional registration and replacing an existing registration, and if there are
+            // multiple conditional registrations, which one must be replaced? But in case there are no
+            // registrations for the same service type, it means the conditional is appended, and this is
+            // completely safe.
+            if (producer.IsConditional
+                && this.container.Options.AllowOverridingRegistrations
+                && this.providers.Any())
             {
                 throw new NotSupportedException(
                     StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
