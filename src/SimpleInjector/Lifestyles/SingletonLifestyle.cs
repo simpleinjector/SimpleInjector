@@ -163,6 +163,8 @@ namespace SimpleInjector.Lifestyles
                 this.ServiceType = serviceType;
             }
 
+            internal override bool ResolvesExternallyOwnedInstance => true;
+
             public Type ServiceType { get; }
 
             public override Expression BuildExpression() =>
