@@ -317,7 +317,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<NotSupportedException>(
-                "making of conditional registrations is not supported when AllowOverridingRegistrations is set",
+                "making of new conditional registrations for an already registered service type is not supported",
                 action);
         }
 
