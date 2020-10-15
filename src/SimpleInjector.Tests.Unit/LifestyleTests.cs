@@ -293,6 +293,20 @@
             AssertThat.ThrowsWithParamName("serviceType", action);
         }
 
+        // #859
+        // Due to a design flaw in v5.0.0, this caused the new overload on SingletonLifestyle to be called.
+        [TestMethod]
+        public void Lifestyle_Singleton_CreateRegistration_CalledWithFuncObjectInstanceCreator_Succeeds()
+        {
+            // Arrange
+            Container container = new Container();
+
+            Func<object> instanceCreator = () => new NullLogger();
+
+            // Act
+            Lifestyle.Singleton.CreateRegistration(typeof(ILogger), instanceCreator, container);
+        }
+
         private sealed class FakeLifestyle : Lifestyle
         {
             public FakeLifestyle(string name)
