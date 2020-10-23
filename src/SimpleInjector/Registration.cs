@@ -97,6 +97,8 @@ namespace SimpleInjector
 
         internal virtual bool MustBeVerified => false;
 
+        internal virtual bool ResolvesExternallyOwnedInstance => false;
+
         /// <summary>Gets or sets a value indicating whether this registration object contains a user
         /// supplied instanceCreator factory delegate.</summary>
         internal bool WrapsInstanceCreationDelegate { get; set; }

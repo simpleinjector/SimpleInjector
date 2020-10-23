@@ -157,6 +157,8 @@ namespace SimpleInjector.Internals
             where producer.FinalImplementationType != null
             where !producer.Registration.WrapsInstanceCreationDelegate
             where !producerToRegister.Registration.WrapsInstanceCreationDelegate
+            where !producer.Registration.ResolvesExternallyOwnedInstance
+            where !producerToRegister.Registration.ResolvesExternallyOwnedInstance
             where producer.FinalImplementationType == producerToRegister.FinalImplementationType
             select producer;
 
