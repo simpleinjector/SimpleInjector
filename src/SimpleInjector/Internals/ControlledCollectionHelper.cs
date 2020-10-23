@@ -152,8 +152,8 @@ namespace SimpleInjector.Internals
                 collectionType,
                 (Func<object>)container.Options.ExpressionCompilationBehavior.Compile(newCollectionExpression))
             {
-                AdditionalInformationForLifestyleMismatchDiagnostics =
-                    StringResources.FlowingCollectionIsScopedBecause(collectionType)
+                AdditionalInformationForLifestyleMismatchDiagnosticsProvider =
+                    () => StringResources.FlowingCollectionIsScopedBecause(collectionType)
             };
         }
 
@@ -161,11 +161,8 @@ namespace SimpleInjector.Internals
         {
             foreach (var producer in instance.GetProducers())
             {
-                // We need to build the expressions here, because that could trigger expression built events,
-                // which can change the lifestyle of the producer (e.g. because of applied decorators).
-                producer.BuildExpression();
-
-                if (ContainsScopedComponentsInGraph(producer))
+                // This will trigger building the expression
+                if (producer.ContainsScopedComponentsInGraph())
                 {
                     return true;
                 }
@@ -173,11 +170,6 @@ namespace SimpleInjector.Internals
 
             return false;
         }
-
-        private static bool ContainsScopedComponentsInGraph(InstanceProducer producer) =>
-            producer.Lifestyle == Lifestyle.Singleton ? false :
-            producer.Lifestyle is ScopedLifestyle ? true :
-            producer.GetRelationships().Any(r => ContainsScopedComponentsInGraph(r.Dependency));
 
         internal static bool IsContainerControlledCollectionExpression(Expression enumerableExpression)
         {

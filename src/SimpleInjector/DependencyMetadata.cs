@@ -13,8 +13,11 @@ namespace SimpleInjector
     public sealed class DependencyMetadata<TService> : ApiObject, IEquatable<DependencyMetadata<TService>?>
         where TService : class
     {
-        internal DependencyMetadata(InstanceProducer dependency)
+        private readonly Scope? scope;
+
+        internal DependencyMetadata(Scope? scope, InstanceProducer dependency)
         {
+            this.scope = scope;
             this.Dependency = dependency;
         }
 
@@ -35,18 +38,40 @@ namespace SimpleInjector
         /// <returns>An instance. Will never return null.</returns>
         /// <exception cref="ActivationException">When the instance could not be retrieved or is null.
         /// </exception>
-        public TService GetInstance() => (TService)this.Dependency.GetInstance();
+        public TService GetInstance()
+        {
+            if (this.scope is null)
+            {
+                return (TService)this.Dependency.GetInstance();
+            }
+            else
+            {
+                Container container = this.scope.Container!;
+                Scope? originalScope = container.CurrentThreadResolveScope;
+                container.CurrentThreadResolveScope = this.scope;
+
+                try
+                {
+                    return (TService)this.Dependency.GetInstance();
+                }
+                finally
+                {
+                    container.CurrentThreadResolveScope = originalScope;
+                }
+            }
+        }
 
         /// <inheritdoc />
         public bool Equals(DependencyMetadata<TService>? other) =>
             other != null
-            && this.Dependency.Equals(other.Dependency);
+            && this.Dependency.Equals(other.Dependency)
+            && object.ReferenceEquals(this.scope, other.scope);
 
         /// <inheritdoc />
         public override bool Equals(object obj) =>
             obj is DependencyMetadata<TService> other && this.Equals(other);
 
         /// <inheritdoc />
-        public override int GetHashCode() => this.Dependency.GetHashCode();
+        public override int GetHashCode() => Helpers.Hash(this.Dependency, this.scope);
     }
 }
