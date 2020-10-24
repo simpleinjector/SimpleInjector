@@ -449,7 +449,32 @@
             var handlers2 = container.GetAllInstances<IEventHandler<StructEvent>>().ToArray();
 
             // Assert
+            Assert.AreEqual(2, handlers1.Count());
             Assert.AreNotSame(handlers1.First(), handlers2.First());
+            Assert.AreSame(handlers1.Last(), handlers2.Last());
+        }
+        
+        // #857
+        [TestMethod]
+        public void GetAllInstances_OpenGenericsRegisteredWithSingletonLifestyle_ResolvesInstancesUsingExpectedLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register(
+                typeof(IEventHandler<>),
+                new[] { typeof(NewConstraintEventHandler<>), typeof(StructConstraintEventHandler<>) },
+                Lifestyle.Singleton);
+
+            container.Register(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>), Lifestyle.Transient);
+
+            // Act
+            var handlers1 = container.GetAllInstances<IEventHandler<StructEvent>>().ToArray();
+            var handlers2 = container.GetAllInstances<IEventHandler<StructEvent>>().ToArray();
+
+            // Assert
+            Assert.AreEqual(2, handlers1.Count());
+            Assert.AreSame(handlers1.First(), handlers2.First());
             Assert.AreSame(handlers1.Last(), handlers2.Last());
         }
 
