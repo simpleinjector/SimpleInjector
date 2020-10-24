@@ -234,17 +234,50 @@ namespace SimpleInjector.Internals
                 return this.CreateNewExternalProducer(item);
             }
 
-            // If there is such a producer registered we return a new one with the service type.
-            // This producer will be automatically registered as external producer.
-            if (producer.ServiceType == typeof(TService))
+            if (AreAmbiguous(item, producer))
             {
-                return producer;
+                // Sometehing special just happened. The user registered an item as part of the collection
+                // which forwards to a registered type (which is legal), but explicitly supplied a lifestyle
+                // as part of the collection, while that forwarded type points to a registration with a
+                // different lifestyle.
+                // Example 1:
+                //   container.Collection.Register<ILogger>(new[] { typeof(ILogger) }, Lifestyle.Singleton);
+                //   container.Register<ILogger, SqlLogger>(Lifestyle.Scoped);
+                // Example 2:
+                //   container.Collection.Register<ILogger>(new[] { typeof(SqlLogger) }, Lifestyle.Singleton);
+                //   container.Register<SqlLogger>(Lifestyle.Scoped);
+                // Here we throw an exception, because it's not feasible to communicate this error through
+                // diagnostics. That would force quite some changes to get this done, because at this stage,
+                // we can't create a new InstanceProducer with the collection's lifestyle.
+                throw new ActivationException(
+                    StringResources.AmbiquousLifestyleFoundForResolvedProducerOfCollection(
+                        serviceType: typeof(TService),
+                        registeredType: item.RegisteredImplementationType,
+                        itemLifestyle: item.Lifestyle!,
+                        producerLifestyle: producer.Registration.Lifestyle));
             }
 
-            return new InstanceProducer(
-                typeof(TService),
-                new ExpressionRegistration(producer.BuildExpression(), this.container));
+            // The item maps to the collection abstraction itself,
+            // e.g. using the following registration: Collection.Register<ILogger>(typeof(ILogger)).
+            if (item.ImplementationType == typeof(TService))
+            {
+                // The producer will have the same ServiceType as TService, which means we can return it
+                // directly. No wrapping it in an ExpressionRegistration needed.
+                return producer;
+            }
+            else
+            {
+                // We can't simply return the producer here, because its service type is unequal to that of
+                // the collection. This will cause any possible decorator to not be applied. We, therefore,
+                // have to (unfortunately) wrap it in a new InstanceProducer that has the same service type.
+                return new InstanceProducer(
+                    typeof(TService),
+                    new ExpressionRegistration(producer.BuildExpression(), this.container));
+            }
         }
+
+        private static bool AreAmbiguous(ContainerControlledItem item, InstanceProducer producer) =>
+            item.Lifestyle != null && producer.Registration.Lifestyle != item.Lifestyle;
 
         private InstanceProducer? GetExplicitRegisteredInstanceProducer(Type implementationType)
         {
@@ -279,7 +312,7 @@ namespace SimpleInjector.Internals
                         foundAbstractType: item.ImplementationType));
             }
 
-            Lifestyle lifestyle = this.container.SelectionBasedLifestyle;
+            Lifestyle lifestyle = item.Lifestyle ?? this.container.SelectionBasedLifestyle;
 
             // This producer will be automatically registered as external producer.
             return lifestyle.CreateProducer(typeof(TService), item.ImplementationType, this.container);

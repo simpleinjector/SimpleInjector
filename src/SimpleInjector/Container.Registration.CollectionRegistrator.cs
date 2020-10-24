@@ -488,9 +488,16 @@ namespace SimpleInjector
             Requires.OpenGenericTypeDoesNotContainUnresolvableTypeArguments(
                 serviceType, implementationType, nameof(implementationType));
 
-            var registration = lifestyle.CreateRegistration(implementationType, this.Container);
+            if (implementationType.ContainsGenericParameter())
+            {
+                this.AppendToCollectionInternal(serviceType, implementationType, lifestyle);
+            }
+            else
+            {
+                var registration = lifestyle.CreateRegistration(implementationType, this.Container);
 
-            this.AppendToCollectionInternal(serviceType, registration);
+                this.AppendToCollectionInternal(serviceType, registration);
+            }
         }
 
         /// <summary>
@@ -828,9 +835,13 @@ namespace SimpleInjector
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(
                 serviceType, serviceTypes, nameof(serviceTypes));
 
-            var registrations = serviceTypes.Select(t => lifestyle.CreateRegistration(t, this.Container));
+            var controlledItems = serviceTypes.Select(type =>
+                type.ContainsGenericParameters() || type.IsAbstract()
+                    ? ContainerControlledItem.CreateFromType(type, lifestyle)
+                    : ContainerControlledItem.CreateFromRegistration(
+                        lifestyle.CreateRegistration(type, this.Container)));
 
-            this.RegisterCollectionInternal(serviceType, registrations);
+            this.RegisterCollectionInternal(serviceType, controlledItems.ToArray());
         }
 
         /// <summary>
@@ -1124,13 +1135,14 @@ namespace SimpleInjector
                 appending: true);
         }
 
-        private void AppendToCollectionInternal(Type itemType, Type implementationType)
+        private void AppendToCollectionInternal(
+            Type itemType, Type implementationType, Lifestyle? lifestyle = null)
         {
             // NOTE: The supplied serviceTypes can be opened, partially-closed, closed, non-generic or even
             // abstract.
             this.RegisterCollectionInternal(
                 itemType,
-                new[] { ContainerControlledItem.CreateFromType(implementationType) },
+                new[] { ContainerControlledItem.CreateFromType(implementationType, lifestyle) },
                 appending: true);
         }
 

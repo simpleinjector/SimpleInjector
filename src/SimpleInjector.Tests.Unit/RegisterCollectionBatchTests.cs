@@ -114,6 +114,93 @@
             Assert.AreEqual(expected.ToFriendlyNamesText(), actual.ToFriendlyNamesText());
         }
 
+        // #857
+        [TestMethod]
+        public void GetAllInstances_OpenGenericsRegisteredWithSingletonLifestyle_ResolvesInstancesUsingExpectedLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Register(
+                typeof(IEventHandler<>),
+                new[] { typeof(NewConstraintEventHandler<>), typeof(StructConstraintEventHandler<>) },
+                Lifestyle.Singleton);
+
+            // Act
+            var handlers1 = container.GetAllInstances<IEventHandler<StructEvent>>().ToArray();
+            var handlers2 = container.GetAllInstances<IEventHandler<StructEvent>>().ToArray();
+
+            // Assert
+            Assert.AreEqual(2, handlers1.Count());
+            Assert.AreSame(handlers1.First(), handlers2.First());
+            Assert.AreSame(handlers1.Last(), handlers2.Last());
+        }
+
+        // #857
+        [TestMethod]
+        public void GetAllInstances_OpenGenericsRegisteredWithSingletonLifestyleAndMappingToAmbigousRegistration_ThrowsAnException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register(
+                typeof(NewConstraintEventHandler<>),
+                typeof(NewConstraintEventHandler<>),
+                Lifestyle.Transient);
+
+            container.Collection.Register(
+                typeof(IEventHandler<>),
+                new[] { typeof(NewConstraintEventHandler<>), typeof(StructConstraintEventHandler<>) },
+                Lifestyle.Singleton);
+
+            // Act
+            Action action = () => container.GetAllInstances<IEventHandler<StructEvent>>().ToArray();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                The registration for the collection of IEventHandler<StructEvent> (i.e.
+                IEnumerable<IEventHandler<StructEvent>>) is supplied with the type
+                NewConstraintEventHandler<TEvent>, which was either registered explicitly, or was resolved
+                using unregistered type resolution. It was, however, done so using a different lifestyle.
+                The collection was made explicitly for the Singleton lifestyle, while the explicit
+                registration was given the Transient lifestyle. For Simple Injector to be able to resolve this
+                collection, these lifestyle must match."
+                .TrimInside(),
+                action);
+        }
+
+        // #857
+        [TestMethod]
+        public void GetAllInstances_OpenGenericsRegisteredWithSingletonLifestyleAndMappingToAmbigousAbstraction_ThrowsAnException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register(
+                typeof(IEventHandler<>),
+                typeof(StructConstraintEventHandler<>),
+                Lifestyle.Transient);
+
+            container.Collection.Register(
+                typeof(IEventHandler<>),
+                new[] { typeof(NewConstraintEventHandler<>), typeof(IEventHandler<>) },
+                Lifestyle.Singleton);
+
+            // Act
+            Action action = () => container.GetAllInstances<IEventHandler<StructEvent>>().ToArray();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(@"
+                The registration for the collection of IEventHandler<StructEvent> (i.e.
+                IEnumerable<IEventHandler<StructEvent>>) is supplied with the type IEventHandler<TEvent>,
+                which was either registered explicitly, or was resolved using unregistered type resolution.
+                It was, however, done so using a different lifestyle. The collection was made explicitly for
+                the Singleton lifestyle, while the explicit registration was given the Transient lifestyle.
+                For Simple Injector to be able to resolve this collection, these lifestyle must match."
+                .TrimInside(),
+                action);
+        }
+
         #region IService
 
         // Instance of this type should be returned on container.GetInstance<IService<float, double>>() and

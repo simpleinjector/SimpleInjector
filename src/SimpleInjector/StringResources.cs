@@ -295,6 +295,20 @@ namespace SimpleInjector
                 registeredType.TypeName(),
                 foundAbstractType.TypeName());
 
+        internal static string AmbiquousLifestyleFoundForResolvedProducerOfCollection(
+            Type serviceType, Type registeredType, Lifestyle itemLifestyle, Lifestyle producerLifestyle) =>
+            Format(
+                "The registration for the collection of {0} (i.e. IEnumerable<{0}>) is supplied with the " +
+                "type {1}, which was either registered explicitly, or was resolved using unregistered type " +
+                "resolution. It was, however, done so using a different lifestyle. The collection was made " +
+                "explicitly for the {2} lifestyle, while the explicit registration was given the {3} " +
+                "lifestyle. For Simple Injector to be able to resolve this collection, these lifestyle " +
+                "must match.",
+                serviceType.TypeName(),
+                registeredType.TypeName(),
+                itemLifestyle.Name,
+                producerLifestyle.Name);
+
         internal static string NonGenericTypeAlreadyRegisteredAsUnconditionalRegistration(Type serviceType) =>
             NonGenericTypeAlreadyRegistered(serviceType, existingRegistrationIsConditional: false);
 

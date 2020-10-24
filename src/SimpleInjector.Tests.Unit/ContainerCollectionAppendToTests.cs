@@ -431,6 +431,52 @@
             Assert.AreSame(handler1, handler2, "The instance was expected to be registered as singleton");
         }
 
+        // #857
+        [TestMethod]
+        public void GetAllInstances_OpenGenericAppendedWithDifferentLifestyles_ResolvesInstancesUsingExpectedLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Append(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
+            container.Collection.Append(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>),
+                Lifestyle.Singleton);
+
+            // Act
+            var handlers1 = container.GetAllInstances<IEventHandler<StructEvent>>().ToArray();
+            var handlers2 = container.GetAllInstances<IEventHandler<StructEvent>>().ToArray();
+
+            // Assert
+            Assert.AreEqual(2, handlers1.Count());
+            Assert.AreNotSame(handlers1.First(), handlers2.First());
+            Assert.AreSame(handlers1.Last(), handlers2.Last());
+        }
+
+        [TestMethod]
+        public void GetAllInstances_OpenGenericAppendedWithForwardedLifestyles_ResolvesInstancesUsingExpectedLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Collection.Append(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>));
+            container.Collection.Append(typeof(IEventHandler<>), typeof(StructConstraintEventHandler<>));
+
+            container.Register(
+                typeof(StructConstraintEventHandler<>),
+                typeof(StructConstraintEventHandler<>),
+                Lifestyle.Singleton);
+
+            container.Register(typeof(IEventHandler<>), typeof(NewConstraintEventHandler<>), Lifestyle.Transient);
+
+            // Act
+            var handlers1 = container.GetAllInstances<IEventHandler<StructEvent>>().ToArray();
+            var handlers2 = container.GetAllInstances<IEventHandler<StructEvent>>().ToArray();
+
+            // Assert
+            Assert.AreNotSame(handlers1.First(), handlers2.First());
+            Assert.AreSame(handlers1.Last(), handlers2.Last());
+        }
+
         private static Registration CreateRegistration(Container container) =>
             Lifestyle.Transient.CreateRegistration<PluginImpl>(container);
     }
