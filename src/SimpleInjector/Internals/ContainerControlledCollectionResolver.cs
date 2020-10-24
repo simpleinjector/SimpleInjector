@@ -84,7 +84,7 @@ namespace SimpleInjector.Internals
             select item.Registration != null
                 ? item
                 : ContainerControlledItem.CreateFromType(
-                    openGenericImplementation, result.ClosedGenericImplementation!))
+                    openGenericImplementation, result.ClosedGenericImplementation!, item.Lifestyle))
             .ToArray();
     }
 }
