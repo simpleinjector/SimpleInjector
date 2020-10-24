@@ -50,7 +50,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
             string additionalInformation2 =
                 relationship.Dependency.Registration is ScopedRegistration scoped
-                ? scoped.AdditionalInformationForLifestyleMismatchDiagnostics
+                ? scoped.AdditionalInformationForLifestyleMismatchDiagnosticsProvider()
                 : string.Empty;
 
             return string.Format(
