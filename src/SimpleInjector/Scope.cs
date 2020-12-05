@@ -689,7 +689,7 @@ namespace SimpleInjector
 
                 this.disposables = null;
 
-                DisposeInstancesInReverseOrder(instances);
+                this.DisposeInstancesInReverseOrder(instances);
             }
         }
 
@@ -721,7 +721,7 @@ namespace SimpleInjector
 
         // This method simulates the behavior of a set of nested 'using' statements: It ensures that dispose
         // is called on each element, even if a previous instance threw an exception.
-        private static void DisposeInstancesInReverseOrder(
+        private void DisposeInstancesInReverseOrder(
             List<object> disposables, int startingAsIndex = int.MinValue)
         {
             if (startingAsIndex == int.MinValue)
@@ -733,7 +733,7 @@ namespace SimpleInjector
             {
                 while (startingAsIndex >= 0)
                 {
-                    object instance = disposables[startingAsIndex];
+                    object instance = AsyncDisposableTypeCache.Unwrap(disposables[startingAsIndex]);
 
                     if (instance is IDisposable disposable)
                     {
@@ -741,9 +741,7 @@ namespace SimpleInjector
                     }
                     else
                     {
-                        throw new InvalidOperationException(
-                            StringResources.TypeOnlyImplementsIAsyncDisposable(
-                                AsyncDisposableTypeCache.Unwrap(instance)));
+                        this.ThrowTypeOnlyImplementsIAsyncDisposable(instance);
                     }
 
                     startingAsIndex--;
@@ -753,8 +751,29 @@ namespace SimpleInjector
             {
                 if (startingAsIndex >= 0)
                 {
-                    DisposeInstancesInReverseOrder(disposables, startingAsIndex - 1);
+                    this.DisposeInstancesInReverseOrder(disposables, startingAsIndex - 1);
                 }
+            }
+        }
+
+        private void ThrowTypeOnlyImplementsIAsyncDisposable(object instance)
+        {
+            // In case there is no active (ambient) scope, Verify creates and disposes of its own
+            // scope, but Verify() is completely synchronous and creating a VerifyAsync makes
+            // little sense because:
+            //  1. in many cases the user will call Verify() in a context where there is no option
+            //     to await (ASP.NET Core startup, ASP.NET MVC startup, etc).
+            //  2. Verify is called during a call to GetInstance when auto verification is enabled.
+            //     Adding VerifyAsync() would, therefore, mena adding an GetInstanceAsync(), but
+            //     would be a bad to add such method (see: https://stackoverflow.com/a/43240576/).
+            // At this point, we can either:
+            //  1. ignore the instance with the risk of causing a memory leak
+            //  2. call DisposeAsync().GetAwaiter().GetResult() with the possible risk of deadlock.
+            // Because 2 a really, really bad place to be in, we pick 1 and ignore it.
+            if (this.Container?.IsVerifying != true)
+            {
+                throw new InvalidOperationException(
+                    StringResources.TypeOnlyImplementsIAsyncDisposable(instance));
             }
         }
 

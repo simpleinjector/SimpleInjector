@@ -1,4 +1,6 @@
-﻿namespace SimpleInjector.Tests.Unit
+﻿using SimpleInjector.Lifestyles;
+
+namespace SimpleInjector.Tests.Unit
 {
     internal static class ContainerFactory
     {

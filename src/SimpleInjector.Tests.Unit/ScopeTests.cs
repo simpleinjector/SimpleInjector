@@ -225,7 +225,7 @@
         }
 
         [TestMethod]
-        public async Task DisposeScopeAsync_WithSyncAndAsyncDisposableScopedInstanceDeleteRegistration_DisposesThatInstanceOnlyAsynchronously()
+        public async Task DisposeScopeAsync_WithSyncAndAsyncDisposableScopedInstanceDelegateRegistration_DisposesThatInstanceOnlyAsynchronously()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -248,7 +248,7 @@
         }
 
         [TestMethod]
-        public async Task DisposeScopeAsync_WithAsyncDisposableScopedDeleteRegistration_DisposesThatInstance()
+        public async Task DisposeScopeAsync_WithAsyncDisposableScopedDelegateRegistration_DisposesThatInstance()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -265,6 +265,29 @@
 
             // Assert
             Assert.IsTrue(plugin.AsyncDisposed);
+        }
+
+        [TestMethod]
+        public void Dispose_WithSyncAsyncDisposableScopedRegistration_DisposesThatInstance()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<SyncAsyncDisposable>(Lifestyle.Scoped);
+
+            var scope = AsyncScopedLifestyle.BeginScope(container);
+
+            var plugin = container.GetInstance<SyncAsyncDisposable>();
+
+            // Act
+            // Because SyncAsyncDisposable implements IDisposable, the sync dispose call should succeed.
+            scope.Dispose();
+
+            // Assert
+            Assert.IsTrue(plugin.SyncDisposed);
+            Assert.IsFalse(plugin.AsyncDisposed,
+                "DisposeAsync was called, but this involves blocking which could cause a deadlock. A no-no.");
         }
 
         [TestMethod]
