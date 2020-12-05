@@ -33,6 +33,7 @@ namespace SimpleInjector
         public static bool IsPrimitive(this Type type) => type.GetTypeInfo().IsPrimitive;
         public static bool IsNestedPublic(this Type type) => type.GetTypeInfo().IsNestedPublic;
         public static bool IsPublic(this Type type) => type.GetTypeInfo().IsPublic;
+        public static bool IsSealed(this Type type) => type.GetTypeInfo().IsSealed;
         public static Type[] GetGenericParameterConstraints(this Type type) => type.GetTypeInfo().GetGenericParameterConstraints();
         public static bool IsClass(this Type type) => type.GetTypeInfo().IsClass;
         public static bool IsInterface(this Type type) => type.GetTypeInfo().IsInterface;

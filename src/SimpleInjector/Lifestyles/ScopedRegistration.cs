@@ -5,10 +5,12 @@ namespace SimpleInjector.Lifestyles
 {
     using System;
     using System.Linq.Expressions;
+    using System.Runtime.CompilerServices;
 
     internal sealed class ScopedRegistration : Registration
     {
         private Func<Scope?>? scopeFactory;
+        private DisposabilityTypeInfo? disposability;
 
         internal ScopedRegistration(
             ScopedLifestyle lifestyle, Container container, Type implementationType, Func<object>? creator)
@@ -22,6 +24,20 @@ namespace SimpleInjector.Lifestyles
         internal Func<object>? InstanceCreator { get; private set; }
 
         internal string AdditionalInformationForLifestyleMismatchDiagnostics { get; set; } = string.Empty;
+
+        internal DisposabilityTypeInfo Disposability
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (this.disposability is null)
+                {
+                    this.disposability = new DisposabilityTypeInfo(this.ImplementationType, this);
+                }
+
+                return this.disposability.Value;
+            }
+        }
 
         public override Expression BuildExpression()
         {

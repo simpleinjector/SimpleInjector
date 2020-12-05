@@ -1,8 +1,10 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    
+    using SimpleInjector.Lifestyles;
+
     [TestClass]
     public class ScopeTests
     {
@@ -140,6 +142,297 @@
 
             // Assert
             Assert.IsNotNull(logger);
+        }
+
+        [TestMethod]
+        public async Task DisposeScopeAsync_WithNonDisposableScopedInstance_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<IFoo, NonDisposable>(Lifestyle.Scoped);
+
+            var scope = AsyncScopedLifestyle.BeginScope(container);
+
+            container.GetInstance<IFoo>();
+
+            // Act
+            await scope.DisposeScopeAsync();
+        }
+
+        [TestMethod]
+        public async Task DisposeScopeAsync_WithSynchronousDisposableScopedInstance_DisposesThatInstance()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<Disposable>(Lifestyle.Scoped);
+
+            var scope = AsyncScopedLifestyle.BeginScope(container);
+
+            var plugin = container.GetInstance<Disposable>();
+
+            // Act
+            await scope.DisposeScopeAsync();
+
+            // Assert
+            Assert.IsTrue(plugin.Disposed);
+        }
+
+        [TestMethod]
+        public async Task DisposeScopeAsync_WithAsynchronousDisposableScopedInstance_DisposesThatInstance()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<AsyncDisposable>(Lifestyle.Scoped);
+
+            var scope = AsyncScopedLifestyle.BeginScope(container);
+
+            var plugin = container.GetInstance<AsyncDisposable>();
+
+            // Act
+            await scope.DisposeScopeAsync();
+
+            // Assert
+            Assert.IsTrue(plugin.AsyncDisposed);
+        }
+
+        [TestMethod]
+        public async Task DisposeScopeAsync_WithSyncAndAsyncDisposableScopedInstance_DisposesThatInstanceOnlyAsynchronously()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<SyncAsyncDisposable>(Lifestyle.Scoped);
+
+            var scope = AsyncScopedLifestyle.BeginScope(container);
+
+            var plugin = container.GetInstance<SyncAsyncDisposable>();
+
+            // Act
+            await scope.DisposeScopeAsync();
+
+            // Assert
+            Assert.IsTrue(plugin.AsyncDisposed);
+            Assert.IsFalse(plugin.SyncDisposed,
+                "In case both interfaces are implemented, only DisposeAsync should be called. " +
+                "The C# compiler acts this way as well.");
+        }
+
+        [TestMethod]
+        public async Task DisposeScopeAsync_WithSyncAndAsyncDisposableScopedInstanceDeleteRegistration_DisposesThatInstanceOnlyAsynchronously()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<IFoo>(() => new SyncAsyncDisposable(), Lifestyle.Scoped);
+
+            var scope = AsyncScopedLifestyle.BeginScope(container);
+
+            var plugin = container.GetInstance<IFoo>() as SyncAsyncDisposable;
+
+            // Act
+            await scope.DisposeScopeAsync();
+
+            // Assert
+            Assert.IsTrue(plugin.AsyncDisposed);
+            Assert.IsFalse(plugin.SyncDisposed,
+                "In case both interfaces are implemented, only DisposeAsync should be called. " +
+                "The C# compiler acts this way as well.");
+        }
+
+        [TestMethod]
+        public async Task DisposeScopeAsync_WithAsyncDisposableScopedDeleteRegistration_DisposesThatInstance()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<SealedAsyncDisposable>(() => new SealedAsyncDisposable(), Lifestyle.Scoped);
+
+            var scope = AsyncScopedLifestyle.BeginScope(container);
+
+            var plugin = container.GetInstance<SealedAsyncDisposable>();
+
+            // Act
+            await scope.DisposeScopeAsync();
+
+            // Assert
+            Assert.IsTrue(plugin.AsyncDisposed);
+        }
+
+        [TestMethod]
+        public async Task DisposeScopeAsync_RegisterForIDisposableOnMixedDisposable_DisposesThatInstanceOnlyAsynchronously()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var scope = new Scope(container);
+
+            var plugin = new SyncAsyncDisposable();
+            scope.RegisterForDisposal((IDisposable)plugin);
+
+            // Act
+            await scope.DisposeScopeAsync();
+
+            // Assert
+            Assert.IsTrue(plugin.AsyncDisposed);
+            Assert.IsFalse(plugin.SyncDisposed,
+                "In case both interfaces are implemented, only DisposeAsync should be called. " +
+                "The C# compiler acts this way as well.");
+        }
+
+        [TestMethod]
+        public async Task DisposeScopeAsync_WithAsyncDisposableSingleton_DisposesThatInstanceWhenContainerGetsDisposed()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<IFoo>(() => new SyncAsyncDisposable(), Lifestyle.Singleton);
+
+            var plugin = container.GetInstance<IFoo>() as SyncAsyncDisposable;
+
+            Assert.IsFalse(plugin.AsyncDisposed, "Setup failed");
+
+            // Act
+            await container.DisposeContainerAsync();
+
+            // Assert
+            Assert.IsTrue(plugin.AsyncDisposed);
+        }
+
+        [TestMethod]
+        public void Dispose_WithAsyncDisposable_ThrowsException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<AsyncDisposable>(Lifestyle.Scoped);
+
+            var scope = AsyncScopedLifestyle.BeginScope(container);
+
+            var plugin = container.GetInstance<AsyncDisposable>();
+
+            // Act
+            Action action = () => scope.Dispose();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "AsyncDisposable only implements IAsyncDisposable, but not IDisposable. Make sure to call " +
+                "Scope.DisposeScopeAsync() instead of Dispose().",
+                action);
+        }
+
+        [TestMethod]
+        public async Task GetAllDisposables_WithSyncAndAsyncDisposableInstances_ReturnsThoseInstances()
+        {
+            var container = ContainerFactory.New();
+            container.Options.ResolveUnregisteredConcreteTypes = false;
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<NonDisposable>(Lifestyle.Scoped);
+            container.Register<AsyncDisposable>(Lifestyle.Scoped);
+            container.Register<SealedAsyncDisposable>(Lifestyle.Scoped);
+            container.Register<SyncAsyncDisposable>(Lifestyle.Scoped);
+            container.Register<Disposable>(Lifestyle.Scoped);
+
+            var scope = AsyncScopedLifestyle.BeginScope(container);
+
+            IAsyncDisposable disposable0 = container.GetInstance<SealedAsyncDisposable>();
+            IAsyncDisposable disposable1 = container.GetInstance<SyncAsyncDisposable>();
+            IAsyncDisposable disposable2 = container.GetInstance<AsyncDisposable>();
+            IDisposable disposable3 = container.GetInstance<Disposable>();
+            object nonDisposable = container.GetInstance<NonDisposable>();
+
+            // Act
+            object[] disposables = scope.GetAllDisposables();
+
+            // Assert
+            Assert.AreEqual(4, disposables.Length);
+            Assert.AreSame(disposable0, disposables[0], disposables[0]?.ToString());
+            Assert.AreSame(disposable1, disposables[1], disposables[1]?.ToString());
+            Assert.AreSame(disposable2, disposables[2], disposables[2]?.ToString());
+            Assert.AreSame(disposable3, disposables[3], disposables[3]?.ToString());
+
+            await scope.DisposeScopeAsync();
+        }
+
+        [TestMethod]
+        public async Task GetDisposables_WithSyncAndAsyncDisposableInstances_OnlyReturnsSyncDisposables()
+        {
+            var container = ContainerFactory.New();
+            container.Options.ResolveUnregisteredConcreteTypes = false;
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<NonDisposable>(Lifestyle.Scoped);
+            container.Register<AsyncDisposable>(Lifestyle.Scoped);
+            container.Register<SealedAsyncDisposable>(Lifestyle.Scoped);
+            container.Register<SyncAsyncDisposable>(Lifestyle.Scoped);
+            container.Register<Disposable>(Lifestyle.Scoped);
+
+            var scope = AsyncScopedLifestyle.BeginScope(container);
+
+            container.GetInstance<NonDisposable>();
+            container.GetInstance<SealedAsyncDisposable>();
+            container.GetInstance<AsyncDisposable>();
+
+            IDisposable service0 = container.GetInstance<SyncAsyncDisposable>();
+            IDisposable service1 = container.GetInstance<Disposable>();
+
+            // Act
+            IDisposable[] disposables = scope.GetDisposables();
+
+            // Assert
+            Assert.AreEqual(2, disposables.Length);
+            Assert.AreSame(service0, disposables[0], disposables[0]?.ToString());
+            Assert.AreSame(service1, disposables[1], disposables[1]?.ToString());
+
+            await scope.DisposeScopeAsync();
+        }
+
+        public interface IFoo { }
+
+        public class NonDisposable : IFoo { }
+
+        public class Disposable : IFoo, IDisposable
+        {
+            public bool Disposed { get; private set; }
+
+            public void Dispose() => this.Disposed = true;
+        }
+
+        public class AsyncDisposable : IFoo, IAsyncDisposable
+        {
+            public bool AsyncDisposed { get; private set; }
+
+            public ValueTask DisposeAsync()
+            {
+                this.AsyncDisposed = true;
+                return default;
+            }
+        }
+
+        public sealed class SealedAsyncDisposable : AsyncDisposable { }
+
+        public class SyncAsyncDisposable : IFoo, IAsyncDisposable, IDisposable
+        {
+            public bool SyncDisposed { get; private set; }
+            public bool AsyncDisposed { get; private set; }
+
+            public void Dispose() => this.SyncDisposed = true;
+
+            public ValueTask DisposeAsync()
+            {
+                this.AsyncDisposed = true;
+                return default;
+            }
         }
     }
 }

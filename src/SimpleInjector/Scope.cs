@@ -6,10 +6,43 @@ namespace SimpleInjector
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Runtime.CompilerServices;
+    using System.Threading.Tasks;
     using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
+
+#if NETSTANDARD2_1
+    using DisposeAsyncTask = System.Threading.Tasks.ValueTask;
+
+    public partial class Scope : IAsyncDisposable
+    {
+        private static readonly ValueTask CompletedTask = default(ValueTask);
+        
+        /// <summary>
+        /// Releases all instances that are cached by the <see cref="Scope"/> object asynchronously.
+        /// </summary>
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public async Task DisposeScopeAsync() => await this.DisposeAsync().ConfigureAwait(false);
+
+        /// <summary>
+        /// Releases all instances that are cached by the <see cref="Scope"/> object asynchronously.
+        /// </summary>
+        public virtual ValueTask DisposeAsync() => this.DisposeInternalAsync();
+    }
+#else
+    using DisposeAsyncTask = System.Threading.Tasks.Task;
+
+    public partial class Scope
+    {
+        private static readonly Task CompletedTask = Task.FromResult(string.Empty);
+
+        /// <summary>
+        /// Releases all instances that are cached by the <see cref="Scope"/> object asynchronously.
+        /// </summary>
+        public async Task DisposeScopeAsync() => await this.DisposeInternalAsync().ConfigureAwait(false);
+    }
+#endif
 
     /// <summary>Implements a cache for <see cref="ScopedLifestyle"/> implementations.</summary>
     /// <remarks>
@@ -170,12 +203,61 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(disposable, nameof(disposable));
 
+            this.RegisterForDisposal((object)disposable);
+        }
+
+        /// <summary>
+        /// Adds the <paramref name="disposable"/> to the list of items that will get disposed when the
+        /// scope ends.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Instances that are registered for disposal, will be disposed in opposite order of registration and
+        /// they are guaranteed to be disposed when <see cref="Scope.Dispose()"/> is called (even when
+        /// exceptions are thrown). This mimics the behavior of the C# and VB <code>using</code> statements,
+        /// where the <see cref="IDisposable.Dispose"/> method is called inside the <code>finally</code> block.
+        /// </para>
+        /// <para>
+        /// <b>Thread safety:</b> Calls to this method are thread safe.
+        /// </para>
+        /// </remarks>
+        /// <param name="disposable">The instance that should be disposed when the scope ends.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference
+        /// (Nothing in VB).</exception>
+        /// <exception cref="ArgumentException">Thrown when the argument neither implements IDisposable nor
+        /// IAsyncDisposable.</exception>
+        /// <exception cref="ObjectDisposedException">Thrown when the scope has been disposed.</exception>
+        public void RegisterForDisposal(object disposable)
+        {
+            Requires.IsNotNull(disposable, nameof(disposable));
+
             lock (this.syncRoot)
             {
                 this.RequiresInstanceNotDisposed();
                 this.PreventCyclicDependenciesDuringDisposal();
 
-                this.RegisterForDisposalInternal(disposable);
+#if NETSTANDARD2_1
+                if (disposable is IDisposable || disposable is IAsyncDisposable)
+                {
+                    this.RegisterForDisposalInternal(disposable);
+                }
+#else
+                // A value of null means that it's possible the registration returns (sometimes) disposable
+                // instances (due to the dynamic nature of the registration), which is why we have to fallback
+                // to this (slower) type checking call.
+                if (AsyncDisposableTypeCache.IsAsyncDisposable(disposable))
+                {
+                    this.RegisterForDisposalInternal(new AsyncDisposableWrapper(disposable));
+                }
+                else if (disposable is IDisposable)
+                {
+                    this.RegisterForDisposalInternal(disposable);
+                }
+#endif
+                else
+                {
+                    throw new ArgumentException("Instance should be disposable.", nameof(disposable));
+                }
             }
         }
 
@@ -233,7 +315,7 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Returns the list of <see cref="IDisposable"/> instances that will be disposed of when this
+        /// Returns a copy of the list of <see cref="IDisposable"/> instances that will be disposed of when this
         /// <see cref="Scope"/> instance is being disposed. The list contains scoped instances that are cached
         /// in this <see cref="Scope"/> instance, and instances explicitly registered for disposal using
         /// <see cref="RegisterForDisposal(IDisposable)"/>. The instances are returned in order of creation.
@@ -256,19 +338,53 @@ namespace SimpleInjector
                 return Helpers.Array<IDisposable>.Empty;
             }
 
-            this.disposables.OfType<IDisposable>().ToArray();
-
             var list = new List<IDisposable>(this.disposables.Count);
 
             foreach (var instance in this.disposables)
             {
-                if (instance is IDisposable disposable)
+                if (AsyncDisposableTypeCache.Unwrap(instance) is IDisposable disposable)
                 {
                     list.Add(disposable);
                 }
             }
 
             return list.ToArray();
+        }
+
+        /// <summary>
+        /// Returns a copy of the list of IDisposable and IAsyncDisposable instances that will be disposed of
+        /// when this <see cref="Scope"/> instance is being disposed. The list contains scoped instances that
+        /// are cached in this <see cref="Scope"/> instance, and instances explicitly registered for disposal
+        /// using <see cref="RegisterForDisposal(object)"/>. The instances are returned in order of creation.
+        /// When <see cref="Dispose()">Scope.Dispose</see> is called, the scope will ensure
+        /// <see cref="IDisposable.Dispose"/> is called on each instance in this list. The instance will be
+        /// disposed in opposite order as they appear in the list.
+        /// </summary>
+        /// <remarks>
+        /// <b>Thread safety:</b> This method is <b>not</b> thread safe and should not be used in combination
+        /// with any of the thread-safe methods.
+        /// </remarks>
+        /// <returns>The list of <see cref="IDisposable"/> instances that will be disposed of when this
+        /// <see cref="Scope"/> instance is being disposed.</returns>
+        public object[] GetAllDisposables()
+        {
+            this.RequiresInstanceNotDisposed();
+
+            if (this.disposables is null)
+            {
+                return Helpers.Array<object>.Empty;
+            }
+            else
+            { 
+                var list = this.disposables.ToArray();
+
+                for (int index = 0; index < list.Length; index++)
+                {
+                    list[index] = AsyncDisposableTypeCache.Unwrap(list[index]);
+                }
+
+                return list;
+            }
         }
 
         /// <summary>Releases all instances that are cached by the <see cref="Scope"/> object.</summary>
@@ -374,7 +490,7 @@ namespace SimpleInjector
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ClearState()
         {
             this.cachedInstances = null;
@@ -477,11 +593,11 @@ namespace SimpleInjector
 
                 return !cacheIsEmpty && this.cachedInstances.TryGetValue(registration, out object? instance)
                     ? instance
-                    : this.CreateAndCacheInstance(registration, this.cachedInstances);
+                    : this.CreateAndCacheInstanceInternal(registration, this.cachedInstances);
             }
         }
 
-        private object CreateAndCacheInstance(
+        private object CreateAndCacheInstanceInternal(
             ScopedRegistration registration, Dictionary<Registration, object> cache)
         {
             // registration.BuildExpression has been called, and InstanceCreate thus been initialized.
@@ -491,22 +607,70 @@ namespace SimpleInjector
 
             cache[registration] = instance;
 
-            if (!registration.SuppressDisposal)
-            {
-#if NETSTANDARD1_0 || NETSTANDARD1_3 || NET45
-                if (instance is IDisposable)
-#else
-                if (instance is IDisposable || instance is IAsyncDisposable)
-#endif
-                {
-                    this.RegisterForDisposalInternal(instance);
-                }
-            }
+            this.TryRegisterForDisposalInternal(registration, instance);
 
             return instance;
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void TryRegisterForDisposalInternal(ScopedRegistration registration, object instance)
+        {
+            if (registration.SuppressDisposal)
+            {
+                return;
+            }
+
+            var disposability = registration.Disposability;
+
+            if (disposability.Sync == Disposability.Never && disposability.Async == Disposability.Never)
+            {
+                // Break out. Based on static type information we know for sure that the instance never be
+                // disposable.
+                return;
+            }
+            else if (disposability.Async == Disposability.Always)
+            {
+                // Based on static type information we know for sure that the instance will be IAsyncDisposable.
+#if NETSTANDARD2_1
+                this.RegisterForDisposalInternal(instance);
+#else
+                // IAsyncDisposable implementations need to be wrapped when not running .NET Standard 2.1.
+                // This way we can do a simple type check for AsyncDisposableWrapper during disposal,
+                // which is much faster than having to call (the slow) IsAsyncDisposable again. Unfortunately,
+                // this does cause the creation of an extra object (this AsyncDisposableWrapper).
+                this.RegisterForDisposalInternal(new AsyncDisposableWrapper(instance));
+#endif
+            }
+            else if (disposability.Sync == Disposability.Always)
+            {
+                // Based on static type information we know for sure that the instance will be IDisposable.
+                this.RegisterForDisposalInternal(instance);
+            }
+            else
+            {
+#if NETSTANDARD2_1
+                if (instance is IDisposable || instance is IAsyncDisposable)
+                {
+                    this.RegisterForDisposalInternal(instance);
+                }
+#else
+                // Due to the dynamic nature of the registration (either because of the registration was done
+                // using a factory delegate, or because the expression got intercepted), we need to check to
+                // see if this specific instance is disposable. Unfortunately, this call is much slower
+                // compared to simply doing 'instance is IAsyncDisposable'.
+                if (AsyncDisposableTypeCache.IsAsyncDisposable(instance))
+                {
+                    this.RegisterForDisposalInternal(new AsyncDisposableWrapper(instance));
+                }
+                else if (instance is IDisposable)
+                {
+                    this.RegisterForDisposalInternal(instance);
+                }
+#endif
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void RegisterForDisposalInternal(object disposable)
         {
             if (this.disposables is null)
@@ -529,7 +693,7 @@ namespace SimpleInjector
             }
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void RequiresInstanceNotDisposed()
         {
             if (this.state == DisposeState.Disposed)
@@ -543,7 +707,7 @@ namespace SimpleInjector
             throw new ObjectDisposedException(this.GetType().FullName);
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void PreventCyclicDependenciesDuringDisposal()
         {
             if (this.recursionDuringDisposalCounter > MaximumDisposeRecursion)
@@ -578,7 +742,8 @@ namespace SimpleInjector
                     else
                     {
                         throw new InvalidOperationException(
-                            StringResources.TypeOnlyImplementsIAsyncDisposable(instance));
+                            StringResources.TypeOnlyImplementsIAsyncDisposable(
+                                AsyncDisposableTypeCache.Unwrap(instance)));
                     }
 
                     startingAsIndex--;
@@ -591,6 +756,192 @@ namespace SimpleInjector
                     DisposeInstancesInReverseOrder(disposables, startingAsIndex - 1);
                 }
             }
+        }
+
+        private async DisposeAsyncTask DisposeInternalAsync()
+        {
+            if (this.state == DisposeState.Alive)
+            {
+                this.state = DisposeState.Disposing;
+
+                try
+                {
+                    await this.DisposeRecursivelyAsync().ConfigureAwait(false);
+                }
+                finally
+                {
+                    this.state = DisposeState.Disposed;
+
+                    this.manager?.RemoveScope(this);
+
+                    // Remove all references, so we won't hold on to created instances even if the scope
+                    // accidentally keeps referenced. This prevents leaking memory.
+                    this.ClearState();
+                }
+            }
+        }
+
+        private async DisposeAsyncTask DisposeRecursivelyAsync(bool operatingInException = false)
+        {
+            if (this.disposables is null && (operatingInException || this.scopeEndActions is null))
+            {
+                return;
+            }
+
+            this.recursionDuringDisposalCounter++;
+
+            try
+            {
+                if (!operatingInException)
+                {
+                    while (this.scopeEndActions != null)
+                    {
+                        this.ExecuteAllRegisteredEndScopeActions();
+                        this.recursionDuringDisposalCounter++;
+                    }
+                }
+
+                await this.DisposeAllRegisteredDisposablesAsync().ConfigureAwait(false);
+            }
+            catch
+            {
+                // When an exception is thrown during disposing, we immediately stop executing all
+                // registered actions, but continue disposing all cached instances. This simulates the
+                // behavior of a using statement, where the actions are part of the try-block.
+                bool firstException = !operatingInException;
+
+                if (firstException)
+                {
+                    // We must reset the counter here, because even if a recursion was detected in one of the
+                    // actions, we still want to try disposing all instances.
+                    this.recursionDuringDisposalCounter = 0;
+                    operatingInException = true;
+                }
+
+                throw;
+            }
+            finally
+            {
+                // We must break out of the recursion when we reach MaxRecursion, because not doing so
+                // could cause a stack overflow.
+                if (this.recursionDuringDisposalCounter <= MaximumDisposeRecursion)
+                {
+                    await this.DisposeRecursivelyAsync(operatingInException).ConfigureAwait(false);
+                }
+            }
+        }
+
+        private DisposeAsyncTask DisposeAllRegisteredDisposablesAsync()
+        {
+            if (this.disposables != null)
+            {
+                var instances = this.disposables;
+
+                this.disposables = null;
+
+                return DisposeInstancesInReverseOrderAsync(instances);
+            }
+            else
+            {
+                return CompletedTask;
+            }
+        }
+
+        // This method simulates the behavior of a set of nested 'using' statements: It ensures that dispose
+        // is called on each element, even if a previous instance threw an exception.
+        private static async DisposeAsyncTask DisposeInstancesInReverseOrderAsync(
+            List<object> disposables, int startingAsIndex = int.MinValue)
+        {
+            if (startingAsIndex == int.MinValue)
+            {
+                startingAsIndex = disposables.Count - 1;
+            }
+
+            try
+            {
+                while (startingAsIndex >= 0)
+                {
+                    object instance = disposables[startingAsIndex];
+
+                    await DisposeInstanceAsync(instance).ConfigureAwait(false);
+
+                    startingAsIndex--;
+                }
+            }
+            finally
+            {
+                if (startingAsIndex >= 0)
+                {
+                    await DisposeInstancesInReverseOrderAsync(disposables, startingAsIndex - 1).ConfigureAwait(false);
+                }
+            }
+        }
+
+        private static DisposeAsyncTask DisposeInstanceAsync(object instance)
+        {
+            // Always try disposing asynchronously first. When DisposeAsync() is called, Dispose()
+            // doesn't have to be called any longer.
+#if NETSTANDARD2_1
+            if (instance is IAsyncDisposable asyncDisposable)
+            {
+                return asyncDisposable.DisposeAsync();
+            }
+#else
+            if (instance is AsyncDisposableWrapper wrapper)
+            {
+                return wrapper.DisposeAsync();
+            }
+#endif
+            else
+            {
+                // Dispose synchronously.
+                ((IDisposable)instance).Dispose();
+                return CompletedTask;
+            }
+        }
+
+#if !NETSTANDARD2_1
+        private sealed class AsyncDisposableWrapper
+        {
+            public AsyncDisposableWrapper(object instance) => this.Instance = instance;
+
+            public readonly object Instance;
+
+            public Task DisposeAsync() => DisposableHelpers.DisposeAsync(this.Instance);
+        }
+#endif
+
+        private static class AsyncDisposableTypeCache
+        {
+#if NETSTANDARD2_1
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static object Unwrap(object instance) => instance;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static bool IsAsyncDisposable(object instance) => instance is IAsyncDisposable;
+#else
+            // All methods of this class are called within a lock. No need to lock on Cache.
+            private static Dictionary<Type, bool> Cache = new Dictionary<Type, bool>();
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static object Unwrap(object instance) =>
+                instance is AsyncDisposableWrapper w ? w.Instance : instance;
+
+            public static bool IsAsyncDisposable(object instance)
+            {
+                Type type = instance.GetType();
+                if (Cache.TryGetValue(type, out bool isAsyncDisposable))
+                {
+                    return isAsyncDisposable;
+                }
+                else
+                {
+                    isAsyncDisposable = DisposableHelpers.IsAsyncDisposableType(type);
+                    Cache[type] = isAsyncDisposable;
+                    return isAsyncDisposable;
+                }
+            }
+#endif
         }
     }
 }

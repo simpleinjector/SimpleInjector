@@ -993,11 +993,22 @@ namespace SimpleInjector
                 assembly.FullName,
                 innerException.Message);
 
-        internal static string TypeOnlyImplementsIAsyncDisposable(object instance) =>
-            Format(
+        internal static string TypeOnlyImplementsIAsyncDisposable(object instance)
+        {
+            string asyncDisposeMethod =
+#if NETSTANDARD2_1
+                nameof(Scope.DisposeAsync);
+#else
+                nameof(Scope.DisposeScopeAsync);
+#endif
+
+            return Format(
                 "{0} only implements IAsyncDisposable, but not IDisposable. " +
-                "Make sure to call Scope.DisposeAsync() instead of Dispose().",
-                instance.GetType().TypeName());
+                "Make sure to call Scope.{1}() instead of Dispose().",
+                instance.GetType().TypeName(),
+                asyncDisposeMethod);
+        }
+
 
         private static bool IsListOrArrayRelationship(KnownRelationship relationship) =>
             typeof(List<>).IsGenericTypeDefinitionOf(relationship.Consumer.Target.TargetType)

@@ -7,6 +7,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using SimpleInjector.Internals;
 
     internal class DisposableTransientComponentAnalyzer : IContainerAnalyzer
     {
@@ -29,7 +30,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 from producer in producers
                 let registration = producer.Registration
                 where registration.Lifestyle == Lifestyle.Transient
-                where GetDisposableType(registration.ImplementationType) != null
+                where DisposableHelpers.IsSyncOrAsyncDisposableType(registration.ImplementationType)
                 where registration.ShouldNotBeSuppressed(this.DiagnosticType)
                 select producer;
 
@@ -46,26 +47,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 CultureInfo.InvariantCulture,
                 "{0} is registered as transient, but implements {1}.",
                 implementationType.FriendlyName(),
-                GetDisposableType(implementationType)!.ToFriendlyName());
+                typeof(IDisposable).IsAssignableFrom(implementationType) ? "IDisposable" : "IAsyncDisposable");
 
         private static string ComponentPlural(int number) => number == 1 ? "component" : "components";
-
-        private static Type? GetDisposableType(Type implementationType) 
-        {
-            if (typeof(IDisposable).IsAssignableFrom(implementationType))
-            {
-                return typeof(IDisposable);
-            }
-#if NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
-else if (typeof(IAsyncDisposable).IsAssignableFrom(implementationType))
-            {
-                return typeof(IAsyncDisposable);
-            }
-#endif
-            else
-            {
-                return null;
-            }
-        }
     }
 }
