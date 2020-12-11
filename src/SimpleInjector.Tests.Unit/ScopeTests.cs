@@ -1,6 +1,7 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Lifestyles;
@@ -349,7 +350,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
                 "AsyncDisposable only implements IAsyncDisposable, but not IDisposable. Make sure to call " +
-                "Scope.DisposeScopeAsync() instead of Dispose().",
+                "Scope.DisposeScopeAsync() instead of Scope.Dispose().",
                 action);
         }
 
@@ -418,6 +419,68 @@
             Assert.AreSame(service1, disposables[1], disposables[1]?.ToString());
 
             await scope.DisposeScopeAsync();
+        }
+
+        [TestMethod]
+        public void Dispose_ContainerAndAysncDisposableResolvedAsSingletons_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<AsyncDisposable>(Lifestyle.Singleton);
+
+            // It might seem odd to test especially in the context of having the Container resolved as
+            // dependency, but there was actually a bug with that particular case that caused Dispose to throw
+            // an ObjectDisposedException (oh the irony), instead of the correct InvalidOperationException.
+            container.Register<ServiceDependingOn<Container>>(Lifestyle.Singleton);
+
+            container.Verify();
+
+            // Act
+            Action action = () => container.Dispose();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                expectedMessage: "AsyncDisposable only implements IAsyncDisposable, but not IDisposable. " +
+                "Make sure to call Container.DisposeScopeAsync() instead of Container.Dispose().",
+                action);
+        }
+
+        [TestMethod]
+        public void ContainerScopeGetDisposables_WithContainerResolvedAsDependency_DoesNotContainTheContainer()
+        {
+            // Arrange
+            var container = new Container();
+
+            // It would be awkward if the container would hold a reference to itself for disposal.
+            container.Register<ServiceDependingOn<Container>>(Lifestyle.Singleton);
+
+            // Act
+            container.Verify();
+
+            // Assert
+            Assert.IsFalse(container.ContainerScope.GetAllDisposables().Contains(container));
+            Assert.IsFalse(container.ContainerScope.GetDisposables().Contains(container));
+        }
+
+        [TestMethod]
+        public void GetDisposables_WithScopeResolvedAsDependency_DoesNotContainTheScope()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+
+            // It would be awkward if the scope would hold a reference to itself for disposal.
+            container.Register<ServiceDependingOn<Scope>>(Lifestyle.Scoped);
+
+            var scope = new Scope(container);
+
+            // Act
+            scope.GetInstance<ServiceDependingOn<Scope>>();
+
+            // Assert
+            Assert.IsFalse(scope.GetAllDisposables().Contains(container));
+            Assert.IsFalse(scope.GetDisposables().Contains(container));
         }
 
         public interface IFoo { }

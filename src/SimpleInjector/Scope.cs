@@ -107,6 +107,8 @@ namespace SimpleInjector
 
         internal Scope? ParentScope { get; }
 
+        internal bool IsContainerScope { get; set; }
+
         /// <summary>Gets an instance of the given <typeparamref name="TService"/> for the current scope.</summary>
         /// <typeparam name="TService">The type of the service to resolve.</typeparam>
         /// <remarks><b>Thread safety:</b> Calls to this method are thread safe.</remarks>
@@ -375,7 +377,7 @@ namespace SimpleInjector
                 return Helpers.Array<object>.Empty;
             }
             else
-            { 
+            {
                 var list = this.disposables.ToArray();
 
                 for (int index = 0; index < list.Length; index++)
@@ -758,22 +760,31 @@ namespace SimpleInjector
 
         private void ThrowTypeOnlyImplementsIAsyncDisposable(object instance)
         {
-            // In case there is no active (ambient) scope, Verify creates and disposes of its own
-            // scope, but Verify() is completely synchronous and creating a VerifyAsync makes
-            // little sense because:
-            //  1. in many cases the user will call Verify() in a context where there is no option
-            //     to await (ASP.NET Core startup, ASP.NET MVC startup, etc).
-            //  2. Verify is called during a call to GetInstance when auto verification is enabled.
-            //     Adding VerifyAsync() would, therefore, mena adding an GetInstanceAsync(), but
-            //     would be a bad to add such method (see: https://stackoverflow.com/a/43240576/).
-            // At this point, we can either:
-            //  1. ignore the instance with the risk of causing a memory leak
-            //  2. call DisposeAsync().GetAwaiter().GetResult() with the possible risk of deadlock.
-            // Because 2 a really, really bad place to be in, we pick 1 and ignore it.
-            if (this.Container?.IsVerifying != true)
+            // Must first check for disposal because IsVerifying throws when the container is disposed of.
+            if (this.Container?.IsDisposed == true)
             {
-                throw new InvalidOperationException(
-                    StringResources.TypeOnlyImplementsIAsyncDisposable(instance));
+                // In case there is no active (ambient) scope, Verify creates and disposes of its own scope.
+                // Verify(), however, is completely synchronous and add a Container.VerifyAsync() method makes
+                // little sense because:
+                //  1. in many cases the user will call Verify() in a context where there is no option
+                //     to await (ASP.NET Core startup, ASP.NET MVC startup, etc).
+                //  2. Verify is called during a call to GetInstance when auto verification is enabled.
+                //     Adding VerifyAsync() would, therefore, mena adding an GetInstanceAsync(), but
+                //     would be a bad to add such method (see: https://stackoverflow.com/a/43240576/).
+                // At this point, we can either:
+                //  1. ignore the instance with the risk of causing a memory leak
+                //  2. call DisposeAsync().GetAwaiter().GetResult() with the possible risk of deadlock.
+                // Because 2 a really, really bad place to be in, we pick 1 and choose to ignore those async
+                // disposables during verification. If this is a problem the user can two things to prevent
+                // those disposables from _not_ being disposed:
+                // 1. Wrap the call to Verify() in a Scope
+                // 2. Skip the call to Verify() and rely on auto verification, which will typically be
+                //    executed within the context of an active scope.
+                if (this.Container?.IsVerifying != true)
+                {
+                    throw new InvalidOperationException(
+                        StringResources.TypeOnlyImplementsIAsyncDisposable(instance, this.IsContainerScope));
+                }
             }
         }
 

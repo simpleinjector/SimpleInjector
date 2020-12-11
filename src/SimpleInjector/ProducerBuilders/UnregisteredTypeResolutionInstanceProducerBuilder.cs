@@ -37,7 +37,8 @@ namespace SimpleInjector.ProducerBuilders
                 () => scopeLifestyle.CreateProducer(() => scopeLifestyle.GetCurrentScope(container), container));
 
             this.resolveUnregisteredTypeRegistrations[typeof(Container)] = new LazyEx<InstanceProducer>(
-                () => Lifestyle.Singleton.CreateProducer(() => container, container));
+                () => new InstanceProducer(typeof(Container),
+                    Lifestyle.Singleton.CreateRegistration(typeof(Container), container, container)));
         }
 
         // Instead of wrapping the complete method in a lock, we lock inside the individual methods. We
