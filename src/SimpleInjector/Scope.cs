@@ -761,7 +761,7 @@ namespace SimpleInjector
         private void ThrowTypeOnlyImplementsIAsyncDisposable(object instance)
         {
             // Must first check for disposal because IsVerifying throws when the container is disposed of.
-            if (this.Container?.IsDisposed == true)
+            if (this.Container?.IsDisposed != true)
             {
                 // In case there is no active (ambient) scope, Verify creates and disposes of its own scope.
                 // Verify(), however, is completely synchronous and add a Container.VerifyAsync() method makes
