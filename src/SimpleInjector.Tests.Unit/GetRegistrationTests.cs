@@ -32,15 +32,18 @@
             // Arrange
             var container = ContainerFactory.New();
 
+            container.ResolveUnregisteredType += (s, e) => { };
+
             // Act
             var prod = container.GetRegistration(typeof(ITimeProvider));
 
             Assert.IsNull(prod, "Test setup failed");
 
-            Assert.IsTrue(container.IsLocked, @"
-                Even if GetRegistration returns null, and no InstanceProducer is built, the container
-                should be locked, because all kinds of things could have happened on the background, such as
-                the invocation of unregistered type resolution event handlers.");
+            Assert.IsFalse(container.IsLocked, @"
+                GetRegistration should not cause the container to be locked when GetRegistration returns
+                null, even when ResolveUnregisteredType events are registered. The idea is that when the
+                events didn't respond to the unregistered type, they don't noticably change the state of
+                the system that would force the container to be locked.");
         }
 
         [TestMethod]
@@ -81,7 +84,7 @@
 
             // Arrange
             Assert.IsTrue(container.IsLocked, @"
-            Whenever a not explicitly made registration can be returned using unregistered type resolution,
+            Whenever a not-explicitly made registration can be returned using unregistered type resolution,
             the container needs to be locked, changing the container might invalidate the registration.
             For instance, adding unregistered type resolution events later, might cause a different registration to
             be returned when GetRegistration is called again.");

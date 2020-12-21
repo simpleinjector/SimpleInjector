@@ -43,6 +43,7 @@
             var resolvedInstances = new InstanceInitializationDataCollection();
 
             var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
             container.Options.RegisterResolveInterceptor(resolvedInstances.Intercept, Always);
 

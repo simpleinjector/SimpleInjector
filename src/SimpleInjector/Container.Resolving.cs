@@ -218,7 +218,7 @@ namespace SimpleInjector
         /// always return <b>null</b> or always return a producer that is able to return the expected instance.
         /// </para>
         /// </remarks>
-        /// <param name="serviceType">The <see cref="System.Type"/> that the returned instance producer should produce.</param>
+        /// <param name="serviceType">The <see cref="Type"/> that the returned instance producer should produce.</param>
         /// <param name="throwOnFailure">The indication whether the method should return null or throw
         /// an exception when the type is not registered.</param>
         /// <returns>An <see cref="InstanceProducer"/> or <b>null</b>.</returns>
@@ -238,17 +238,23 @@ namespace SimpleInjector
 
                 if (producer is null)
                 {
-                    // The producer is created implicitly. This forces us to lock the container.
-                    // Such implicit registration could be done through in numberous ways (such as
-                    // through unregistered type resolution, or because the type is concrete). Being able to
-                    // make registrations after such call, could lead to unexpected behavior, which is why
-                    // locking the container makes most sense.
-                    // We even lock when the producer is null, because unregistered type resolution events may
-                    // have been invoked.
-                    this.LockContainer();
-
                     producer = this.GetRegistrationEvenIfInvalid(
                         serviceType, InjectionConsumerInfo.Root, autoCreateConcreteTypes: true);
+
+                    if (producer != null)
+                    {
+                        // The producer is created implicitly. This forces us to lock the container. Such
+                        // implicit registration could be done through in numberous ways (e.g. through
+                        // unregistered type resolution, or because the type is concrete). Being able to make
+                        // registrations after such call, could lead to unexpected behavior, which is why
+                        // locking the container is important.
+                        // We don't lock when the producer is null, even though unregistered type resolution
+                        // events may have been invoked. The assumption is that events that don't add the
+                        // registration have no effect on the system.
+                        // NOTE: Lock should be called *after* getting the producer, because it would
+                        // otherwise cause the configuration to be verified without that just-added producer.
+                        this.LockContainer();
+                    }
                 }
 
                 // Add the producer, even when it's null.
