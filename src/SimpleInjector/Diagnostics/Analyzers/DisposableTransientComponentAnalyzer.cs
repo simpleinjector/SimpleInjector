@@ -25,51 +25,32 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers)
         {
-            var results =
+            var invalidProducers =
                 from producer in producers
                 let registration = producer.Registration
                 where registration.Lifestyle == Lifestyle.Transient
                 where GetDisposableType(registration.ImplementationType) != null
                 where registration.ShouldNotBeSuppressed(this.DiagnosticType)
-                group producer by producer.Registration.ImplementationType into g
-                from producer in g
+                select producer;
+
+            var results =
+                from producer in invalidProducers
                 select new DisposableTransientComponentDiagnosticResult(
-                    producer.ServiceType, producer, BuildDescription(g.Key, g));
+                    producer.ServiceType, producer, BuildDescription(producer.Registration.ImplementationType));
 
             return results.ToArray();
         }
 
-        private static string BuildDescription(
-            Type implementationType, IEnumerable<InstanceProducer> producers) =>
+        private static string BuildDescription(Type implementationType) =>
             string.Format(
                 CultureInfo.InvariantCulture,
-                "{0} is registered as transient, but implements {1}.{2}",
+                "{0} is registered as transient, but implements {1}.",
                 implementationType.FriendlyName(),
-                (GetDisposableType(implementationType)!).ToFriendlyName(),
-                OtherServiceTypesThanImplementationType(implementationType, producers)
-                    ? BuildServiceDescription(implementationType, producers)
-                    : string.Empty);
-
-        private static bool OtherServiceTypesThanImplementationType(
-            Type implementationType, IEnumerable<InstanceProducer> producers) =>
-            producers.Select(p => p.ServiceType).Distinct().Except(new[] { implementationType }).Any();
-
-        private static string BuildServiceDescription(
-            Type implementationType, IEnumerable<InstanceProducer> producers)
-        {
-            var serviceTypes = producers.Select(p => p.ServiceType).Distinct().ToArray();
-
-            return string.Format(
-                CultureInfo.InvariantCulture,
-                " {0} was registered for {1} {2}.",
-                implementationType.ToFriendlyName(),
-                serviceTypes.Length == 1 ? "service" : "services",
-                serviceTypes.Select(t => t.FriendlyName()).ToCommaSeparatedText());
-        }
+                GetDisposableType(implementationType)!.ToFriendlyName());
 
         private static string ComponentPlural(int number) => number == 1 ? "component" : "components";
 
-        private static Type? GetDisposableType(Type implementationType)
+        private static Type? GetDisposableType(Type implementationType) 
         {
             if (typeof(IDisposable).IsAssignableFrom(implementationType))
             {

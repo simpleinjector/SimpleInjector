@@ -1,6 +1,5 @@
 ﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
-    using System;
     using System.Linq;
     using Lifestyles;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -32,9 +31,9 @@
 
             // Assert
             Assert.AreEqual(1, results.Length, Actual(results));
-            Assert.IsTrue(
-                results.Single().Description.StartsWith(
-                    "DisposablePlugin is registered as transient, but implements IDisposable."),
+            Assert.AreEqual(
+                "DisposablePlugin is registered as transient, but implements IDisposable.",
+                results.Single().Description,
                 Actual(results));
         }
 
@@ -54,9 +53,9 @@
 
             // Assert
             Assert.AreEqual(1, results.Length, Actual(results));
-            Assert.IsTrue(
-                results.Single().Description.StartsWith(
-                    "AsyncDisposablePlugin is registered as transient, but implements IAsyncDisposable."),
+            Assert.AreEqual(
+                "AsyncDisposablePlugin is registered as transient, but implements IAsyncDisposable.",
+                results.Single().Description,
                 Actual(results));
         }
 
@@ -76,9 +75,9 @@
 
             // Assert
             Assert.AreEqual(1, results.Length, Actual(results));
-            Assert.IsTrue(
-                results.Single().Description.StartsWith(
-                    "DisposableAsyncDisposablePlugin is registered as transient, but implements IDisposable."),
+            Assert.AreEqual(
+                "DisposableAsyncDisposablePlugin is registered as transient, but implements IDisposable.",
+                results.Single().Description,
                 Actual(results));
         }
 
@@ -175,76 +174,7 @@
             Assert.AreEqual(0, results.Length, Actual(results));
         }
 
-        // #864
-        [TestMethod]
-        public void Analyze_TransientSelfRegisteredDisposableComponent_DoesNotReportItsRegisteredServices()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Register<DisposablePlugin, DisposablePlugin>();
-
-            // Act
-            string description = GetSingleDisposableTransientComponentDiagnosticDescription(container);
-
-            // Assert
-            Assert.IsTrue(
-                description.Equals("DisposablePlugin is registered as transient, but implements IDisposable."),
-                message: "Actual: " + description);
-        }
-
-        // #864
-        [TestMethod]
-        public void Analyze_TransientDisposableComponentRegisteredByService_ReportsTheUsedServiceType()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Register<IPlugin, DisposablePlugin>();
-
-            // Act
-            string description = GetSingleDisposableTransientComponentDiagnosticDescription(container);
-
-            // Assert
-            Assert.IsTrue(
-                description.Contains(" DisposablePlugin was registered for service IPlugin."),
-                message: "Actual: " + description);
-        }
-
-        // #864
-        [TestMethod]
-        public void Analyze_TransientDisposableComponentRegisteredByMultipleServices_ReportsAllServices()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Register<IPlugin, AsyncDisposablePlugin>();
-            container.Register<IAsyncDisposable, AsyncDisposablePlugin>();
-
-            container.Verify(VerificationOption.VerifyOnly);
-
-            // Act
-            string description =
-                Analyzer.Analyze(container).OfType<DisposableTransientComponentDiagnosticResult>()
-                .First()
-                .Description;
-
-            // Assert
-            Assert.IsTrue(
-                description.Contains(
-                    " AsyncDisposablePlugin was registered for services IPlugin and IAsyncDisposable."),
-                message: "Actual: " + description);
-        }
-
         private static string Actual(DisposableTransientComponentDiagnosticResult[] results) =>
             "actual: " + string.Join(" - ", results.Select(r => r.Description));
-
-        private static string GetSingleDisposableTransientComponentDiagnosticDescription(Container c)
-        {
-            c.Verify(VerificationOption.VerifyOnly);
-            return Analyzer.Analyze(c).OfType<DisposableTransientComponentDiagnosticResult>()
-                .Single()
-                .Description;
-        }
     }
 }
