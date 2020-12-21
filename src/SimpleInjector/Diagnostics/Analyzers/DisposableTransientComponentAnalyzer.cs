@@ -37,17 +37,22 @@ namespace SimpleInjector.Diagnostics.Analyzers
             var results =
                 from producer in invalidProducers
                 select new DisposableTransientComponentDiagnosticResult(
-                    producer.ServiceType, producer, BuildDescription(producer.Registration.ImplementationType));
+                    producer.ServiceType, producer, BuildDescription(producer));
 
             return results.ToArray();
         }
 
-        private static string BuildDescription(Type implementationType) =>
+        private static string BuildDescription(InstanceProducer producer) =>
             string.Format(
                 CultureInfo.InvariantCulture,
-                "{0} is registered as transient, but implements {1}.",
-                implementationType.FriendlyName(),
-                typeof(IDisposable).IsAssignableFrom(implementationType) ? "IDisposable" : "IAsyncDisposable");
+                "{0} is registered {1}as transient, but implements {2}.",
+                producer.Registration.ImplementationType.FriendlyName(),
+                producer.ServiceType == producer.Registration.ImplementationType
+                    ? string.Empty
+                    : $"for {producer.ServiceType.FriendlyName()} ",
+                typeof(IDisposable).IsAssignableFrom(producer.Registration.ImplementationType)
+                    ? "IDisposable"
+                    : "IAsyncDisposable");
 
         private static string ComponentPlural(int number) => number == 1 ? "component" : "components";
     }
