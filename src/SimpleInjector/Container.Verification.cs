@@ -110,9 +110,17 @@ namespace SimpleInjector
                 this.IsVerifying = true;
 
                 this.LockContainer();
+
                 bool original = this.Options.SuppressLifestyleMismatchVerification;
 
-                this.VerificationScope = new ContainerVerificationScope(this);
+                var scope = this.Options.DefaultScopedLifestyle?.GetCurrentScope(this);
+
+                // If there is a current active scope, prefer using that scope for verification. This prevents
+                // this method from having to manage a verification scope, which means calling Dispose() which
+                // is problematic when there are IAsyncDisposable registrations. Downside of using the active
+                // scope is that those components could be kept alive much longer (depending on when the
+                // active scope is disposed of).
+                this.VerificationScope = scope ?? new ContainerVerificationScope(this);
 
                 try
                 {
@@ -131,10 +139,26 @@ namespace SimpleInjector
                 finally
                 {
                     this.Options.SuppressLifestyleMismatchVerification = original;
-                    this.IsVerifying = false;
+                    
                     var scopeToDispose = this.VerificationScope;
                     this.VerificationScope = null;
-                    scopeToDispose.Dispose();
+
+                    try
+                    {
+                        // Only when Verify created the scope itself, should it dispose it. This will prevent
+                        // us from having to call Dispose, which will throw when there are IAsyncDisposable
+                        // registrations.
+                        if (scopeToDispose is ContainerVerificationScope)
+                        {
+                            scopeToDispose.Dispose();
+                        }
+                    }
+                    finally
+                    {
+                        // Must be reset after calling Dispose(), because Scope.Dispose() ignores
+                        // IAsyncDisposables during verification.
+                        this.IsVerifying = false;
+                    }
                 }
             }
         }

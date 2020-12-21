@@ -5,8 +5,9 @@ namespace SimpleInjector.Tests.Unit
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Advanced;
+    using SimpleInjector.Lifestyles;
 
     [TestClass]
     public class VerifyTests
@@ -731,6 +732,65 @@ namespace SimpleInjector.Tests.Unit
             // This should succeed, because container-registered instances have a low risk of causing errors
             // and the container will report them quite easily.
             container.Verify(VerificationOption.VerifyAndDiagnose);
+        }
+
+        [TestMethod]
+        public void Verify_WithAsyncDisposableScopedRegistration_Succeeds()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<AsyncDisposablePlugin>(Lifestyle.Scoped);
+
+            // Act
+            container.Verify();
+        }
+
+        [TestMethod]
+        public async Task AutoVerification_WithAsyncDisposableScopedRegistration_Succeeds()
+        {
+            // Arrange
+            bool disposed = false;
+            bool created = false;
+            var container = new Container();
+            container.Options.EnableAutoVerification = true;
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<PluginImpl>();
+            container.Register(() =>
+                {
+                    created = true;
+                    return new AsyncDisposablePlugin { Disposing = () => disposed = true };
+                },
+                Lifestyle.Scoped);
+
+            var ambientScope = AsyncScopedLifestyle.BeginScope(container);
+
+            // Triggers auto verification on AsyncDisposablePlugin
+            container.GetInstance<PluginImpl>();
+
+            // Assert
+            Assert.IsTrue(created, "Auto verification didn't seem to go off.");
+            Assert.IsFalse(disposed, "Auto verification should have used ambient scope, not its own.");
+
+            // Act
+            await ambientScope.DisposeScopeAsync();
+
+            // Assert
+            Assert.IsTrue(disposed,
+                "Component should have tracked in ambient scope and disposed when calling DisposeScopeAsync.");
+        }
+
+        public class AsyncDisposablePlugin : IAsyncDisposable
+        {
+            public Action Disposing;
+
+            public ValueTask DisposeAsync()
+            {
+                this.Disposing?.Invoke();
+                return default;
+            }
         }
 
         public class PluginWithBooleanDependency : IPlugin

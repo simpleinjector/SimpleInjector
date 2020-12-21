@@ -20,7 +20,8 @@ namespace SimpleInjector
     {
         private readonly Scope scope;
 
-        internal ContainerScope(Container container) => this.scope = new Scope(container);
+        internal ContainerScope(Container container) =>
+            this.scope = new Scope(container) { IsContainerScope = true };
 
         /// <summary>
         /// Allows registering an <paramref name="action"/> delegate that will be called when the container
@@ -57,6 +58,24 @@ namespace SimpleInjector
         /// </exception>
         /// <exception cref="ObjectDisposedException">Thrown when the container has been disposed.</exception>
         public void RegisterForDisposal(IDisposable disposable) => this.scope.RegisterForDisposal(disposable);
+
+        /// <summary>
+        /// Adds the <paramref name="disposable"/> to the list of items that will get disposed when the
+        /// container gets disposed.
+        /// </summary>
+        /// <remarks>
+        /// Instances that are registered for disposal, will be disposed in opposite order of registration and
+        /// they are guaranteed to be disposed when <see cref="Container.Dispose()"/> is called (even when
+        /// exceptions are thrown). This mimics the behavior of the C# and VB <c>using</c> statements,
+        /// where the <see cref="IDisposable.Dispose"/> method is called inside the <c>finally</c> block.
+        /// </remarks>
+        /// <param name="disposable">The instance that should be disposed when the scope ends.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.
+        /// </exception>
+        /// <exception cref="ArgumentException">Thrown when one of the arguments is not a disposable type.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">Thrown when the container has been disposed.</exception>
+        public void RegisterForDisposal(object disposable) => this.scope.RegisterForDisposal(disposable);
 
         /// <summary>
         /// Retrieves an item from the scope stored by the given <paramref name="key"/> or null when no
@@ -113,9 +132,24 @@ namespace SimpleInjector
         /// disposed in opposite order as they appear in the list.
         /// </summary>
         /// <returns>The list of <see cref="IDisposable"/> instances that will be disposed of when thi
-        /// <see cref="SimpleInjector.Scope"/>
+        /// <see cref="Scope"/>
         /// instance is being disposed.</returns>
         public IDisposable[] GetDisposables() => this.scope.GetDisposables();
+
+        /// <summary>
+        /// Returns a copy of the list of IDisposable and IAsyncDisposable instances that will be disposed of
+        /// when this <see cref="Scope"/> instance is being disposed. The list contains scoped instances that
+        /// are cached in this <see cref="Container"/> instance, and instances explicitly registered for
+        /// disposal using <see cref="RegisterForDisposal(object)"/>. The instances are returned in order of
+        /// creation.
+        /// </summary>
+        /// <remarks>
+        /// <b>Thread safety:</b> This method is <b>not</b> thread safe and should not be used in combination
+        /// with any of the thread-safe methods.
+        /// </remarks>
+        /// <returns>The list of <see cref="IDisposable"/> instances that will be disposed of when this
+        /// <see cref="Scope"/> instance is being disposed.</returns>
+        public object[] GetAllDisposables() => this.scope.GetAllDisposables();
 
         // This method is internal, because we don't want to expose Dispose through its public API. That would
         // allow the container scope to be disposed, while the container isn't. Disposing should happen using the

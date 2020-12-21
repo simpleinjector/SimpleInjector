@@ -183,6 +183,8 @@ namespace SimpleInjector
 
         internal bool HasResolveInterceptors => this.resolveInterceptors.Count > 0;
 
+        internal bool IsDisposed => this.disposed;
+
         /// <summary>
         /// Returns an array with the current registrations. This list contains all explicitly registered
         /// types, and all implicitly registered instances. Implicit registrations are  all concrete

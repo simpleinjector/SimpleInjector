@@ -34,7 +34,7 @@ namespace SimpleInjector
 
         private readonly HashSet<KnownRelationship> knownRelationships = new HashSet<KnownRelationship>();
 
-        private readonly Func<object>? instanceCreator;
+        internal readonly Func<object>? instanceCreator;
 
         private HashSet<DiagnosticType>? suppressions;
         private ParameterDictionary<OverriddenParameter>? overriddenParameters;
@@ -94,6 +94,8 @@ namespace SimpleInjector
         public bool SuppressDisposal { get; set; }
 
         internal bool IsCollection { get; set; }
+
+        internal bool? ExpressionIntercepted { get; private set; }
 
         internal virtual bool MustBeVerified => false;
 
@@ -194,7 +196,12 @@ namespace SimpleInjector
         internal Expression InterceptInstanceCreation(
             Type implementationType, Expression instanceCreatorExpression)
         {
-            return this.Container.OnExpressionBuilding(this, implementationType, instanceCreatorExpression);
+            var interceptedExpression =
+                this.Container.OnExpressionBuilding(this, implementationType, instanceCreatorExpression);
+
+            this.ExpressionIntercepted = interceptedExpression != instanceCreatorExpression;
+
+            return interceptedExpression;
         }
 
         internal void AddRelationship(KnownRelationship relationship)

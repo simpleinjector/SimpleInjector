@@ -23,7 +23,7 @@ namespace SimpleInjector.Lifestyles
             // Notify the container that we're using the thread-resolve scope.
             container.UseCurrentThreadResolveScope();
 
-            return () => container!.GetVerificationOrResolveScopeForCurrentThread();
+            return () => container.GetVerificationOrResolveScopeForCurrentThread();
         }
 
         protected override Scope? GetCurrentScopeCore(Container container) =>

@@ -298,21 +298,9 @@ namespace SimpleInjector.Lifestyles
             {
                 if (!this.SuppressDisposal)
                 {
-                    if (instance is IDisposable disposable)
+                    if (DisposableHelpers.IsAsyncOrAsyncDisposable(instance))
                     {
-                        this.Container.ContainerScope.RegisterForDisposal(disposable);
-                    }
-                    else
-                    {
-                        // In case an instance implements both IDisposable and IAsyncDisposable,
-                        // it should only be registered once and RegisterForDisposal(IDisposable)
-                        // can be used. That will still allows DisposeAsync to be called.
-#if NET461 || NETSTANDARD2_0 || NETSTANDARD2_1
-                        if (this.interceptedInstance is IAsyncDisposable asyncDisposable)
-                        {
-                            this.Container.ContainerScope.RegisterForDisposal(asyncDisposable);
-                        }
-#endif
+                        this.Container.ContainerScope.RegisterForDisposal(instance);
                     }
                 }
 
