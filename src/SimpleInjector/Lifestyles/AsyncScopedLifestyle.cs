@@ -90,6 +90,10 @@ namespace SimpleInjector.Lifestyles
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
         protected override Scope? GetCurrentScopeCore(Container container) =>
             GetScopeManager(container).CurrentScope;
+        
+        /// <inheritdoc />
+        protected override void SetCurrentScopeCore(Scope scope) =>
+            GetScopeManager(scope.Container!).SetCurrentScope(scope);
 
         private static ScopeManager GetScopeManager(Container c) => c.ContainerScope.GetOrSetItem(managerKey, CreateManager);
 

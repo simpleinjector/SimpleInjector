@@ -30,6 +30,8 @@ namespace SimpleInjector.Lifestyles
             set { this.scopeReplacer(value); }
         }
 
+        internal void SetCurrentScope(Scope scope) => this.CurrentScopeInternal = scope;
+
         internal Scope BeginScope() =>
             this.CurrentScopeInternal = new Scope(this.container, this, this.GetCurrentScopeWithAutoCleanup());
 

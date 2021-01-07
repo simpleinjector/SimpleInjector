@@ -1162,6 +1162,22 @@
             Assert.IsTrue(instanceToDispose.HasBeenDisposed);
         }
 
+        [TestMethod]
+        public void GetCurrentScope_WithCurrentScopeSet_ReturnsTheSetScope()
+        {
+            var lifestyle = new AsyncScopedLifestyle();
+            var container = new Container();
+            var expectedScope = new Scope(container);
+
+            // Act
+            lifestyle.SetCurrentScope(expectedScope);
+
+            // Assert
+            var actualScope = lifestyle.GetCurrentScope(container);
+
+            Assert.AreSame(expectedScope, actualScope);
+        }
+
         private static async Task Inner(Container container, ICommand command)
         {
             DisposableCommand cmd1, cmd2;
