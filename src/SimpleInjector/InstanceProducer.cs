@@ -329,6 +329,10 @@ namespace SimpleInjector
 
                 throw;
             }
+            catch (TypeInitializationException ex)
+            {
+                throw this.MakeMoreExpressiveTypeInitializationException(ex);
+            }
             catch (Exception ex)
             {
                 if (this.MustWrapThrownException(ex))
@@ -610,9 +614,17 @@ namespace SimpleInjector
         private object BuildAndReplaceInstanceCreatorAndCreateFirstInstance()
         {
             this.instanceCreator = this.BuildInstanceCreator();
-            var instance = this.instanceCreator();
-            this.InstanceSuccessfullyCreated = true;
-            return instance;
+
+            try
+            {
+                var instance = this.instanceCreator();
+                this.InstanceSuccessfullyCreated = true;
+                return instance;
+            }
+            catch (TypeInitializationException ex)
+            {
+                throw this.MakeMoreExpressiveTypeInitializationException(ex);
+            }
         }
 
         // Prevents any recursive calls from taking place.
@@ -672,6 +684,25 @@ namespace SimpleInjector
             // be added, will clutter the diagnostic API and will cause the Verify() method to verify those
             // producers needlessly.
             return !(registration is ExpressionRegistration);
+        }
+
+        private Exception MakeMoreExpressiveTypeInitializationException(
+            TypeInitializationException ex)
+        {
+            Type implementationType = this.Registration.ImplementationType;
+
+            // #812 The exceptions thrown by the runtime in case of a type initialization error are
+            // unproductive. Here we throw a more expressive exception. This is done by appending the
+            // inner exception's message to the exception message and replacing the type name with a
+            // 'friendly type name', which is especially useful in the case of generic types.
+            return new ActivationException(
+                ex.Message
+                    // When the type in question is nested, the exception will contain just the simple
+                    // type name, while for non-nested types, the full name is used (don't ask why).
+                    .Replace($"'{implementationType.FullName}'", implementationType.ToFriendlyName())
+                    .Replace($"'{implementationType.Name}'", implementationType.ToFriendlyName()) +
+                    " " + ex.InnerException?.Message,
+                ex);
         }
 
         [ExcludeFromCodeCoverage]
