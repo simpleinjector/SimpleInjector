@@ -93,6 +93,35 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// Sets the given <paramref name="scope"/> as current scope in the given context.
+        /// </summary>
+        /// <param name="scope">The current scope.</param>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="scope"/> is a null reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="scope"/> is not related to
+        /// a <see cref="Container"/>.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when there is already an active scope in the
+        /// current context.</exception>
+        /// <exception cref="NotSupportedException">Thrown when the implementation does not support setting
+        /// the current scope.</exception>
+        public void SetCurrentScope(Scope scope)
+        {
+            Requires.IsNotNull(scope, nameof(scope));
+
+            if (scope.Container is null)
+            {
+                throw new ArgumentException("The scope has no related Container.", nameof(scope));
+            }
+
+            if (this.GetCurrentScope(scope.Container) != null)
+            {
+                throw new InvalidOperationException(
+                    $"This method can only be called in case {nameof(GetCurrentScope)} returns null.");
+            }
+
+            this.SetCurrentScopeCore(scope);
+        }
+
+        /// <summary>
         /// Creates a delegate that upon invocation return the current <see cref="Scope"/> for this
         /// lifestyle and the given <paramref name="container"/>, or null when the delegate is executed outside
         /// the context of such scope.
@@ -138,6 +167,17 @@ namespace SimpleInjector
             Func<Scope?> currentScopeProvider = this.CreateCurrentScopeProvider(container);
 
             return currentScopeProvider.Invoke();
+        }
+
+        /// <summary>
+        /// Sets the given <paramref name="scope"/> as current scope in the given context.
+        /// </summary>
+        /// <param name="scope">The scope instance to set.</param>
+        protected virtual void SetCurrentScopeCore(Scope scope)
+        {
+            throw new NotSupportedException(
+                $"Setting the current scope is not supported by the {this.Name} lifestyle " +
+                $"({this.GetType().ToFriendlyName()}.");
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]

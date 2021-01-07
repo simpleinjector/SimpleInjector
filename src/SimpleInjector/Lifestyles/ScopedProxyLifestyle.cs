@@ -5,6 +5,8 @@ namespace SimpleInjector.Lifestyles
 {
     using System;
 
+    // This lifestyle is exposed by the Lifestyle.Scoped property and forwards any calls to the lifestyle
+    // configured in Container.Options.DefaultScopedLifestyle.
     internal sealed class ScopedProxyLifestyle : ScopedLifestyle
     {
         public ScopedProxyLifestyle() : base("Scoped")
@@ -29,6 +31,9 @@ namespace SimpleInjector.Lifestyles
 
         protected override Scope? GetCurrentScopeCore(Container container) =>
             GetDefaultScopedLifestyle(container).GetCurrentScope(container);
+
+        protected override void SetCurrentScopeCore(Scope scope) =>
+            GetDefaultScopedLifestyle(scope.Container!).SetCurrentScope(scope);
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static ScopedLifestyle GetDefaultScopedLifestyle(Container container) =>
