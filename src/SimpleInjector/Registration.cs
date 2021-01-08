@@ -8,6 +8,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Internals;
@@ -21,9 +22,9 @@ namespace SimpleInjector
     /// service type. <see cref="Expression"/>s returned from the
     /// <see cref="Registration.BuildExpression()">BuildExpression</see> method can be
     /// intercepted by any event registered with <see cref="SimpleInjector.Container.ExpressionBuilding" />, have
-    /// <see cref="SimpleInjector.Container.RegisterInitializer{TService}(Action{TService})">initializers</see>
+    /// <see cref="Container.RegisterInitializer{TService}(Action{TService})">initializers</see>
     /// applied, and the caching particular to its lifestyle have been applied. Interception using the
-    /// <see cref="SimpleInjector.Container.ExpressionBuilt">Container.ExpressionBuilt</see> will <b>not</b>
+    /// <see cref="Container.ExpressionBuilt">Container.ExpressionBuilt</see> will <b>not</b>
     /// be applied in the <b>Registration</b>, but will be applied in <see cref="InstanceProducer"/>.</remarks>
     /// <example>
     /// See the <see cref="Lifestyle"/> documentation for an example.
@@ -340,6 +341,8 @@ namespace SimpleInjector
 
         private Expression BuildNewExpression()
         {
+            this.EnsureImplementationTypeInitialized();
+
             ConstructorInfo constructor = this.Container.Options.SelectConstructor(this.ImplementationType);
 
             ParameterDictionary<DependencyData> parameters = this.BuildConstructorParameters(constructor);
@@ -351,6 +354,37 @@ namespace SimpleInjector
             this.AddRelationships(constructor, parameters);
 
             return expression;
+        }
+
+        // Implements #812.
+        // The exceptions thrown by the runtime in case of a type initialization error are unproductive.
+        // Using this method we can throw a more expressive exception. This is done by appending the inner
+        // exception's message to the exception message and replacing the type name with a friendly type name,
+        // which is especially useful in the case of generic types. Unfortunately, we can only reliably do
+        // this by triggering type initialization, which means we are slightly changing the behavior
+        // of Simple Injector. Type initialiation now runs earlier in the pipeline, and could even potentially
+        // run in cases where it would normally not run (in case the type is a stand-in where the user
+        // replaces the type by altering the expression tree). This, however, is such a rare scenario that I
+        // consider this to be a fair trade off.
+        private void EnsureImplementationTypeInitialized()
+        {
+            try
+            {
+                // The Class Constructor of a type is guaranteed to be to be called just once.
+                RuntimeHelpers.RunClassConstructor(this.ImplementationType.TypeHandle);
+            }
+            catch (TypeInitializationException ex)
+            {
+                Type type = this.ImplementationType;
+
+                // When the type in question is nested, the exception will contain just the simple
+                // type name, while for non-nested types, CLR uses the full name (because of... reasons?).
+                string message = ex.Message
+                    .Replace($"'{type.FullName}'", type.ToFriendlyName())
+                    .Replace($"'{type.Name}'", type.ToFriendlyName());
+
+                throw new ActivationException(message + " " + ex.InnerException?.Message, ex);
+            }
         }
 
         private Expression BuildInvocationExpression(Func<object> instanceCreator)
