@@ -356,98 +356,6 @@
             Assert.AreEqual(expectedValue, actualValue);
         }
 
-        // #812
-        [TestMethod]
-        public void GetInstance_ResolvingATypeWithTypeInitializationException_ThrowsExpressiveException()
-        {
-            // Act
-            var container = new Container();
-
-            container.Register<TopLevelClassWithFailingTypeInitializer>();
-
-            // Act
-            Action action = () => container.GetInstance<TopLevelClassWithFailingTypeInitializer>();
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "The type initializer for TopLevelClassWithFailingTypeInitializer threw an " +
-                "exception. <Inner exception>.",
-                action);
-        }
-
-        // #812
-        [TestMethod]
-        public void GetInstance_ResolvingANestedTypeWithTypeInitializationException_ThrowsExpressiveException()
-        {
-            // Act
-            var container = new Container();
-
-            container.Register<NestedClassWithFailingTypeInitializer>();
-
-            // Act
-            Action action = () => container.GetInstance<NestedClassWithFailingTypeInitializer>();
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "The type initializer for InstanceProducerTests.NestedClassWithFailingTypeInitializer " +
-                "threw an exception. <Inner exception>.",
-                action);
-        }
-
-        // #812
-        [TestMethod]
-        public void GetInstance_ResolvingAGenericNestedTypeWithTypeInitializationException_ThrowsExpressiveException()
-        {
-            // Act
-            var container = new Container();
-
-            container.Register(typeof(NestedClassWithFailingTypeInitializer<>));
-
-            // Act
-            Action action = () => container.GetInstance<NestedClassWithFailingTypeInitializer<object>>();
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "The type initializer for InstanceProducerTests" +
-                ".NestedClassWithFailingTypeInitializer<object> threw an exception. <Inner exception>.",
-                action);
-        }
-
-        // #812
-        [TestMethod]
-        public void GetInstance_ResolvingASingletonWithTypeInitializationException_ThrowsExpressiveException()
-        {
-            // Act
-            var container = new Container();
-
-            container.RegisterSingleton<NestedClassWithFailingTypeInitializer>();
-
-            // Act
-            Action action = () => container.GetInstance<NestedClassWithFailingTypeInitializer>();
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "The type initializer for InstanceProducerTests.NestedClassWithFailingTypeInitializer " +
-                "threw an exception. <Inner exception>.",
-                action);
-        }
-
-        public class NestedClassWithFailingTypeInitializer
-        {
-            static NestedClassWithFailingTypeInitializer()
-            {
-                throw new Exception("<Inner exception>.");
-            }
-        }
-
-        public class NestedClassWithFailingTypeInitializer<T>
-        {
-            static NestedClassWithFailingTypeInitializer()
-            {
-                throw new Exception("<Inner exception>.");
-            }
-        }
-
         public class OneAndTwo : IOne, ITwo
         {
         }
@@ -471,14 +379,6 @@
             public NodeFactory(IEnumerable<INode> nodes)
             {
             }
-        }
-    }
-
-    public class TopLevelClassWithFailingTypeInitializer
-    {
-        static TopLevelClassWithFailingTypeInitializer()
-        {
-            throw new Exception("<Inner exception>.");
         }
     }
 }
