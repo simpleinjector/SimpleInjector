@@ -4,6 +4,7 @@
 namespace SimpleInjector
 {
     using System;
+    using System.Runtime.CompilerServices;
     using SimpleInjector.Lifestyles;
 
     /// <summary>
@@ -93,14 +94,14 @@ namespace SimpleInjector
         }
 
         /// <summary>
-        /// Sets the given <paramref name="scope"/> as current scope in the given context.
+        /// Sets the given <paramref name="scope"/> as current scope in the given context. An existing scope
+        /// will be overridden and <i>not</i> disposed of. If the overridden scope must be disposed of, this
+        /// must be done manually.
         /// </summary>
         /// <param name="scope">The current scope.</param>
         /// <exception cref="NullReferenceException">Thrown when <paramref name="scope"/> is a null reference.</exception>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="scope"/> is not related to
         /// a <see cref="Container"/>.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when there is already an active scope in the
-        /// current context.</exception>
         /// <exception cref="NotSupportedException">Thrown when the implementation does not support setting
         /// the current scope.</exception>
         public void SetCurrentScope(Scope scope)
@@ -110,12 +111,6 @@ namespace SimpleInjector
             if (scope.Container is null)
             {
                 throw new ArgumentException("The scope has no related Container.", nameof(scope));
-            }
-
-            if (this.GetCurrentScope(scope.Container) != null)
-            {
-                throw new InvalidOperationException(
-                    $"This method can only be called in case {nameof(GetCurrentScope)} returns null.");
             }
 
             this.SetCurrentScopeCore(scope);
@@ -180,7 +175,7 @@ namespace SimpleInjector
                 $"({this.GetType().ToFriendlyName()}.");
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Scope GetCurrentScopeOrThrow(Container container)
         {
             Scope? scope = this.GetCurrentScopeInternal(container);
@@ -193,7 +188,7 @@ namespace SimpleInjector
             return scope!;
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Scope? GetCurrentScopeInternal(Container container)
         {
             // If we are running verification in the current thread, we prefer returning a verification scope
