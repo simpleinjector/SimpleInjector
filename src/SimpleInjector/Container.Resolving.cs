@@ -372,23 +372,7 @@ namespace SimpleInjector
         // swapping safes us from using locks.
         private void AppendRootInstanceProducer(Type serviceType, InstanceProducer? rootProducer)
         {
-            var snapshotCopy = this.rootProducerCache.MakeCopy();
-
-            // This registration might already exist if it was added made by another thread. That's why we
-            // need to use the indexer, instead of Add.
-            snapshotCopy[serviceType] = rootProducer;
-
-            // Prevent the compiler, JIT, and processor to reorder these statements to prevent the instance
-            // producer from being added after the snapshot has been made accessible to other threads.
-            // This is important on architectures with a weak memory model (such as ARM).
-#if NETSTANDARD1_0 || NETSTANDARD1_3
-            Interlocked.MemoryBarrier();
-#else
-            Thread.MemoryBarrier();
-#endif
-
-            // Replace the original with the new version that includes the serviceType (make snapshot public).
-            this.rootProducerCache = snapshotCopy;
+            Helpers.InterlockedAddAndReplace(ref this.rootProducerCache, serviceType, rootProducer);
 
             if (rootProducer != null)
             {

@@ -11,6 +11,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Threading;
     using SimpleInjector.Internals;
 
     /// <summary>
@@ -73,6 +74,29 @@ namespace SimpleInjector
             {
                 return CreateReadOnlyCollection(collection);
             }
+        }
+
+        // Adds the key and value to the dictionary by adding them to a copy of source and replacing source
+        // with the copy.
+        internal static void InterlockedAddAndReplace<TKey, TValue>(
+            ref Dictionary<TKey, TValue> source, TKey key, TValue value)
+        {
+            var snapshot = MakeCopy(source);
+
+            // This registration might already exist if it was added made by another thread. That's why we
+            // need to use the indexer, instead of Add.
+            snapshot[key] = value;
+
+            // Prevent the compiler, JIT, and processor to reorder these statements to prevent the instance
+            // value from being added after the snapshot has been made accessible to other threads.
+            // This is important on architectures with a weak memory model (such as ARM).
+#if NETSTANDARD1_0 || NETSTANDARD1_3
+            Interlocked.MemoryBarrier();
+#else
+            Thread.MemoryBarrier();
+#endif
+
+            source = snapshot;
         }
 
         internal static Dictionary<TKey, TValue> MakeCopy<TKey, TValue>(this Dictionary<TKey, TValue> source)

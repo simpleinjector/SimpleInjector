@@ -950,7 +950,9 @@ namespace SimpleInjector
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static bool IsAsyncDisposable(object instance) => instance is IAsyncDisposable;
 #else
-            // All methods of this class are called within a lock. No need to lock on Cache.
+            // This instance is never updated, only completely replaced.
+            // Although IsAsyncDisposable called from within the context of a lock(), that lock is specific
+            // to a Scope instance. This still allows parallel access to this dictionary.
             private static Dictionary<Type, bool> Cache = new Dictionary<Type, bool>();
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -967,7 +969,9 @@ namespace SimpleInjector
                 else
                 {
                     isAsyncDisposable = DisposableHelpers.IsAsyncDisposableType(type);
-                    Cache[type] = isAsyncDisposable;
+
+                    Helpers.InterlockedAddAndReplace(ref Cache, type, isAsyncDisposable);
+
                     return isAsyncDisposable;
                 }
             }
