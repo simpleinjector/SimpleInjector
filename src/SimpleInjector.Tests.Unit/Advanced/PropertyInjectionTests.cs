@@ -46,6 +46,61 @@
         }
 
         [TestMethod]
+        public void InjectingAllProperties_OnBaseTypeWithPrivateWritableProperty_DoesNotInjectThisProperty()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
+
+            // Act
+            var service = container.GetInstance<SubClassOfBaseClassWithPrivateProperty<ITimeProvider>>();
+
+            // Assert
+            Assert.IsNull(service.GetBaseClassDependency(),
+                "Simple Injector does not inject this dependency, because it uses Type.GetRuntimeProperties()" +
+                "to get the dependencies. GetRuntimeProperties only returns properties that are accessible " +
+                "to the resolved component.");
+        }
+
+        [TestMethod]
+        public void InjectingAllProperties_OnSubTypeThatOverridesPropertyFromBaseClass_InjectsPropertyOnce()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
+
+            // Act
+            var service = container.GetInstance<SubClassWithOverriddenProperty<ITimeProvider>>();
+
+            // Assert
+            Assert.IsNotNull(service.Dependency, "The dependency should be injected.");
+            Assert.AreEqual(1, service.GetPropertySetCount(),
+                "Property should only have been injected once (for performance and to prevent confusion).");
+            Assert.AreEqual(0, service.GetBaseClassPropertySetCount(),
+                "Property should only have been injected once (for performance and to prevent confusion), " +
+                "but was injected again through its base type. ");
+        }
+
+        [TestMethod]
+        public void InjectingAllProperties_OnSubTypeThatOverridesAbstractPropertyFromBaseClass_InjectsPropertyOnce()
+        {
+            // Arrange
+            var container = CreateContainerThatInjectsAllProperties();
+
+            container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
+
+            // Act
+            var service = container.GetInstance<SubClassWithOverriddenAbstractProperty<ITimeProvider>>();
+
+            // Assert
+            Assert.IsNotNull(service.Dependency, "The dependency should be injected.");
+            Assert.AreEqual(1, service.GetPropertySetCount(),
+                "Property should only have been injected once (for performance and to prevent confusion).");
+        }
+
+        [TestMethod]
         public void InjectingAllProperties_OnTypeWithPublicWritablePropertyButRegistrationMissing_ThrowsException()
         {
             // Arrange
@@ -380,6 +435,80 @@
         public class SubClassServiceWithProperty<TDependency> : BaseClassServiceWithProperty<TDependency>
         {
             public TDependency Dependency { get; set; }
+        }
+
+        public class BaseClassWithPrivateProperty<TDependency> : IService
+        {
+            private TDependency BaseClassDependency { get; set; }
+
+            public TDependency GetBaseClassDependency() => this.BaseClassDependency;
+        }
+
+        public class SubClassOfBaseClassWithPrivateProperty<TDependency>
+            : BaseClassWithPrivateProperty<TDependency>
+        {
+            public TDependency SubClassDependency { get; set; }
+        }
+
+        public class BaseClassWithVirtualProperty<TDependency> : IService
+        {
+            private int count;
+            private TDependency dependency;
+
+            public virtual TDependency Dependency
+            {
+                get => this.dependency;
+                set
+                {
+                    this.count++;
+                    this.dependency = value;
+                }
+            }
+
+            public int GetBaseClassPropertySetCount() => this.count;
+        }
+
+        public class SubClassWithOverriddenProperty<TDependency>
+            : BaseClassWithVirtualProperty<TDependency>
+        {
+            private int count;
+            private TDependency dependency;
+
+            public override TDependency Dependency
+            {
+                get => this.dependency;
+                set
+                {
+                    this.count++;
+                    this.dependency = value;
+                }
+            }
+
+            public int GetPropertySetCount() => this.count;
+        }
+
+        public abstract class BaseClassWithAbstractProperty<TDependency> : IService
+        {
+            public abstract TDependency Dependency { get; set; }
+        }
+
+        public class SubClassWithOverriddenAbstractProperty<TDependency>
+            : BaseClassWithAbstractProperty<TDependency>
+        {
+            private int count;
+            private TDependency dependency;
+
+            public override TDependency Dependency
+            {
+                get => this.dependency;
+                set
+                {
+                    this.count++;
+                    this.dependency = value;
+                }
+            }
+
+            public int GetPropertySetCount() => this.count;
         }
 
         public class ServiceWithReadOnlyPropertyDependency<TDependency>
