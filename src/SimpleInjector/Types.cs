@@ -225,6 +225,9 @@ namespace SimpleInjector
             return thisType.Concat(type.GetBaseTypesAndInterfaces());
         }
 
+        // TODO: There is some weird inconsistency in this method. In case supplied type derives directly
+        // from System.Object, typeof(object) is returned. But if the supplid type has a different base type,
+        // the result will not include typeof(object).
         private static IEnumerable<Type> GetBaseTypes(this Type type)
         {
             Type? baseType = type.BaseType() ?? (type != typeof(object) ? typeof(object) : null);

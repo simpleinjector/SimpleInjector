@@ -40,6 +40,8 @@ namespace SimpleInjector
         public static bool IsGenericParameter(this Type type) => type.GetTypeInfo().IsGenericParameter;
         public static GenericParameterAttributes GetGenericParameterAttributes(this Type type) => type.GetTypeInfo().GenericParameterAttributes;
         public static Assembly GetAssembly(this Type type) => type.GetTypeInfo().Assembly;
+
+        /// <summary>WARNING: Only returns properties of the given type; NOT its base types.</summary>
         public static PropertyInfo[] GetProperties(this Type type) => type.GetTypeInfo().DeclaredProperties.ToArray();
         public static Guid GetGuid(this Type type) => type.GetTypeInfo().GUID;
 
