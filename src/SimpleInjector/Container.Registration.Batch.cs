@@ -498,6 +498,47 @@ namespace SimpleInjector
 
         /// <summary>
         /// Returns all concrete types that are located in the supplied <paramref name="assemblies"/>
+        /// and implement or inherit from the supplied <typeparamref name="TService"/> and match the specified
+        /// <paramref name="options."/>.
+        /// </summary>
+        /// <remarks>
+        /// Use this method when you need influence the types that are registered using
+        /// <see cref="Register(Type, IEnumerable{Assembly})">Register</see>.
+        /// The <b>Register</b> overloads that take a collection of <see cref="Assembly"/>
+        /// objects use this method internally to get the list of types that need to be registered. Instead of
+        /// calling  such overload, you can call an overload that takes a list of <see cref="Type"/> objects
+        /// and pass  in a filtered result from this <b>GetTypesToRegister</b> method.
+        /// <code lang="cs"><![CDATA[
+        /// var container = new Container();
+        ///
+        /// var assemblies = new[] { typeof(FileLogger).Assembly };
+        /// var options = new TypesToRegisterOptions { IncludeGenericTypeDefinitions: true };
+        /// var types = container.GetTypesToRegister<ILogger>(assemblies, options)
+        ///     .Where(t => t.IsPublic);
+        ///
+        /// container.Collection.Register<ILogger>(types);
+        /// ]]></code>
+        /// This example calls the <b>GetTypesToRegister</b> method to request a list of concrete implementations
+        /// of the <b>ILogger</b> interface from the assembly of that interface. After that
+        /// all internal types are filtered out. This list is supplied to the
+        /// <see cref="ContainerCollectionRegistrator.Register{TService}(IEnumerable{Type})">
+        /// Collection.Register&lt;TService&gt;((IEnumerable&lt;Type&gt;)</see> overload to finish the
+        /// registration.
+        /// </remarks>
+        /// <typeparam name="TService">The base type or interface to find derived types for.</typeparam>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <param name="options">The options.</param>
+        /// <returns>A collection of types.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null reference.
+        /// </exception>
+        public IEnumerable<Type> GetTypesToRegister<TService>(
+            IEnumerable<Assembly> assemblies, TypesToRegisterOptions options)
+        {
+            return this.GetTypesToRegister(typeof(TService), assemblies, options);
+        }
+
+        /// <summary>
+        /// Returns all concrete types that are located in the supplied <paramref name="assemblies"/>
         /// and implement or inherit from the supplied <paramref name="serviceType"/> and match the specified
         /// <paramref name="options."/>. <paramref name="serviceType"/> can be an open-generic type.
         /// </summary>
