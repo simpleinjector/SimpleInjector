@@ -167,7 +167,7 @@ namespace SimpleInjector
         /// </para>
         /// </remarks>
         /// <returns>An <see cref="InstanceProducer"/> or <b>null</b>.</returns>
-        public InstanceProducer<TService>? GetRegistration<TService>()
+        public InstanceProducer? GetRegistration<TService>()
             where TService : class
         {
             return this.GetRegistration<TService>(throwOnFailure: false);
@@ -188,16 +188,16 @@ namespace SimpleInjector
         /// </para>
         /// <para>
         /// <b>Note:</b> This method is <i>not</i> guaranteed to always return the same
-        /// <see cref="InstanceProducer"/> instance for a given <see cref="System.Type"/>. It will however either
+        /// <see cref="InstanceProducer"/> instance for a given <see cref="Type"/>. It will however either
         /// always return <b>null</b> or always return a producer that is able to return the expected instance.
         /// </para>
         /// </remarks>
         /// <param name="throwOnFailure">The indication whether the method should return null or throw
         /// an exception when the type is not registered.</param>
         /// <returns>An <see cref="InstanceProducer"/> or <b>null</b>.</returns>
-        public InstanceProducer<TService>? GetRegistration<TService>(bool throwOnFailure)
+        public InstanceProducer? GetRegistration<TService>(bool throwOnFailure)
         {
-            return (InstanceProducer<TService>?)this.GetRegistration(typeof(TService), throwOnFailure);
+            return this.GetRegistration(typeof(TService), throwOnFailure);
         }
 
         /// <summary>
