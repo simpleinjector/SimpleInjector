@@ -5,7 +5,6 @@ namespace SimpleInjector.Diagnostics
 {
     using System;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
     /// <summary>
@@ -62,8 +61,6 @@ namespace SimpleInjector.Diagnostics
         [DebuggerHidden]
         internal string Name => DocumentationAttribute.GetDocumentationAttribute(this.DiagnosticType).Name;
 
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay => string.Format(
             CultureInfo.InvariantCulture,

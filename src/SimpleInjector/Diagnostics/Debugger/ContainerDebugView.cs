@@ -6,7 +6,6 @@ namespace SimpleInjector.Diagnostics.Debugger
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using SimpleInjector.Diagnostics.Analyzers;
 
@@ -28,11 +27,6 @@ namespace SimpleInjector.Diagnostics.Debugger
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public DebuggerViewItem[]? Items { get; private set; }
 
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
-            Justification = @"
-                We must catch all exceptions here, because this constructor is called by the Visual Studio
-                debugger and it won't hide any failure in case of an exception. We catch and show the
-                exception in the debug view instead.")]
         private void Initialize()
         {
             if (!this.container.SuccesfullyVerified)

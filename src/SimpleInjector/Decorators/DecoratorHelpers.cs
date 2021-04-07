@@ -7,7 +7,6 @@ namespace SimpleInjector.Decorators
     using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -41,8 +40,6 @@ namespace SimpleInjector.Decorators
             return (IEnumerable)readOnlyCollection;
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
-            Justification = "I don't care about the extra casts. This is not a performance critical part.")]
         internal static Type DetermineImplementationType(Expression expression,
             InstanceProducer registeredProducer)
         {

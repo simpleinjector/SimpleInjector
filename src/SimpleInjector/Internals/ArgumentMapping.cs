@@ -5,7 +5,6 @@ namespace SimpleInjector.Internals
 {
     using System;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
     /// <summary>
@@ -21,10 +20,6 @@ namespace SimpleInjector.Internals
             this.ConcreteType = concreteType;
         }
 
-        [SuppressMessage(
-            "Microsoft.Performance",
-            "CA1811:AvoidUncalledPrivateCode",
-            Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay =>
             $"Argument: {this.Argument.ToFriendlyName()}, " +

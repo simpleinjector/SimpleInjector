@@ -6,7 +6,6 @@ namespace SimpleInjector
     using System;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq.Expressions;
 
@@ -107,8 +106,6 @@ namespace SimpleInjector
         // memory in a 32bit process).
         internal Decorators.ServiceTypeDecoratorInfo? DecoratorInfo { get; set; }
 
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay => string.Format(
             CultureInfo.InvariantCulture,

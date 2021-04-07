@@ -8,7 +8,6 @@ namespace SimpleInjector
     // of InstanceProducers on value types, but that required the creation of non-generic InstanceProducer
     // instances, which is now not possible any longer.
     using System;
-    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Produces instances for a given registration. Instances of this type are generally created by the
@@ -28,8 +27,6 @@ namespace SimpleInjector
         /// <summary>Produces an instance.</summary>
         /// <returns>An instance. Will never return null.</returns>
         /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification =
-            "A property is not appropriate, because get instance could possibly be a heavy operation.")]
         public new TService GetInstance() => (TService)base.GetInstance();
     }
 }

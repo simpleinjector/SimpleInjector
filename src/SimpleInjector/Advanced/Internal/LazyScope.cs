@@ -4,15 +4,12 @@
 namespace SimpleInjector.Advanced.Internal
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// This is an internal type. Only depend on this type when you want to be absolutely sure a future
     /// version of the framework will break your code.
     /// </summary>
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-    [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes",
-        Justification = "This struct is not intended for public use.")]
     public struct LazyScope
     {
         private readonly Container container;

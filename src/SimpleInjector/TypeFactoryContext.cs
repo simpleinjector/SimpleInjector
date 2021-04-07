@@ -5,7 +5,6 @@ namespace SimpleInjector
 {
     using System;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using SimpleInjector.Advanced;
 
@@ -40,8 +39,6 @@ namespace SimpleInjector
         public InjectionConsumerInfo? Consumer =>
             this.consumer != InjectionConsumerInfo.Root ? this.consumer : null;
 
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay => string.Format(
             CultureInfo.InvariantCulture,

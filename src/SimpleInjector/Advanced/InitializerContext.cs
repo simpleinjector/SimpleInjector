@@ -5,13 +5,12 @@ namespace SimpleInjector.Advanced
 {
     using System;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
     /// <summary>
-    /// An instance of this type will be supplied to the <see cref="System.Predicate{T}" />
+    /// An instance of this type will be supplied to the <see cref="Predicate{T}" />
     /// delegate that is that is supplied to the
-    /// <see cref="SimpleInjector.Container.RegisterInitializer(Action{InstanceInitializationData}, Predicate{InitializerContext})">RegisterInitializer</see>
+    /// <see cref="Container.RegisterInitializer(Action{InstanceInitializationData}, Predicate{InitializerContext})">RegisterInitializer</see>
     /// overload that takes this delegate. This type contains contextual information about the creation and it
     /// allows the user to examine the given instance to decide whether the instance should be initialized or
     /// not.
@@ -33,8 +32,6 @@ namespace SimpleInjector.Advanced
         /// /// <value>The <see cref="Registration"/>.</value>
         public Registration Registration { get; }
 
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay =>
             string.Format(CultureInfo.InvariantCulture,

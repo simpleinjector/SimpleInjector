@@ -6,7 +6,6 @@ namespace SimpleInjector.Decorators
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -103,8 +102,6 @@ namespace SimpleInjector.Decorators
             this.e.KnownRelationships.AddRange(decoratorRegistration.GetRelationships());
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily",
-            Justification = "This is not a performance critical path.")]
         private Expression BuildDecoratorExpression(out Registration decoratorRegistration)
         {
             Type decoratorTypeDefinition = this.DecoratorTypeDefinition!;

@@ -5,9 +5,6 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Threading;
     using SimpleInjector.Internals;
     using SimpleInjector.ProducerBuilders;
 
@@ -105,8 +102,6 @@ namespace SimpleInjector
         /// <param name="serviceType">An object that specifies the type of service object to get.</param>
         /// <returns>A service object of type serviceType.  -or- null if there is no service object of type
         /// <paramref name="serviceType"/>.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes",
-            Justification = "Users are not expected to inherit from this class and override this implementation.")]
         object? IServiceProvider.GetService(Type serviceType)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));

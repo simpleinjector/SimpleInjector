@@ -6,7 +6,6 @@ namespace SimpleInjector
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading;
@@ -36,10 +35,6 @@ namespace SimpleInjector
     /// <see cref="AddRegistration"/> or anything related to registering from multiple threads concurrently.
     /// </para>
     /// </remarks>
-    [SuppressMessage(
-        "Microsoft.Maintainability",
-        "CA1506:AvoidExcessiveClassCoupling",
-        Justification = "Not much we can do about this. Container is the facade where users work with.")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public partial class Container : ApiObject, IDisposable
     {

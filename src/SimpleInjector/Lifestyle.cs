@@ -6,7 +6,6 @@ namespace SimpleInjector
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Internals;
@@ -60,8 +59,6 @@ namespace SimpleInjector
         /// container.Register<ISomeService, SomeServiceImpl>();
         /// ]]></code>
         /// </example>
-        [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes",
-            Justification = "It's not mutable.")]
         public static readonly Lifestyle Transient = new TransientLifestyle();
 
         /// <summary>
@@ -84,8 +81,6 @@ namespace SimpleInjector
         /// container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Scoped);
         /// ]]></code>
         /// </example>
-        [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes",
-            Justification = "It's not mutable.")]
         public static readonly ScopedLifestyle Scoped = new ScopedProxyLifestyle();
 
         /// <summary>
@@ -111,8 +106,6 @@ namespace SimpleInjector
         /// container.Register<ITimeProvider, RealTimeProvider>(Lifestyle.Singleton);
         /// ]]></code>
         /// </example>
-        [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes",
-            Justification = "It's not mutable.")]
         public static readonly SingletonLifestyle Singleton = SingletonLifestyle.Instance;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

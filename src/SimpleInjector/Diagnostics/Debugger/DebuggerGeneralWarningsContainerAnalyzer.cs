@@ -3,16 +3,11 @@
 
 namespace SimpleInjector.Diagnostics.Analyzers
 {
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using SimpleInjector.Diagnostics.Debugger;
 
     internal static class DebuggerGeneralWarningsContainerAnalyzer
     {
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification =
-                "FxCop is being smart here. The code is called by a class that is instantiated in the " +
-                "debugger.")]
         internal static DebuggerViewItem Analyze(Container container)
         {
             const string WarningsName = "Configuration Warnings";

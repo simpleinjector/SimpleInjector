@@ -3,7 +3,6 @@
 
 namespace SimpleInjector.Internals
 {
-    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
 
     /// <summary>
@@ -11,9 +10,6 @@ namespace SimpleInjector.Internals
     /// by preventing recursive calls to an InstanceProducer. A CyclicDependencyValidator instance checks a
     /// single InstanceProducer and therefore a single service type.
     /// </summary>
-    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
-        Justification = "Same as for other parts of the library that use ThreadLocal<T>. It's difficult " +
-            "to implement, while the downsides are minimal.")]
     internal sealed class CyclicDependencyValidator
     {
         private readonly ThreadLocal<bool> producerVisited = new ThreadLocal<bool>();

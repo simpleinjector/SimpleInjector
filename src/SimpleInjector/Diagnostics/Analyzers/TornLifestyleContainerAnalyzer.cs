@@ -5,7 +5,6 @@ namespace SimpleInjector.Diagnostics.Analyzers
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using SimpleInjector.Lifestyles;
@@ -34,8 +33,6 @@ namespace SimpleInjector.Diagnostics.Analyzers
                 affectedProducers: tornProducerGroup))
             .ToArray();
 
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity",
-            Justification = "FxCop is unable to recognize nicely written LINQ statements from complex code.")]
         private static IEnumerable<InstanceProducer[]> GetTornRegistrationGroups(
             IEnumerable<InstanceProducer> producers) =>
             from producer in producers

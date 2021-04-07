@@ -258,8 +258,6 @@ namespace SimpleInjector
         /// <returns>An instance. Will never return null.</returns>
         /// <exception cref="ActivationException">When the instance could not be retrieved or is null.
         /// </exception>
-        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification =
-            "A property is not appropriate, because get instance could possibly be a heavy operation.")]
         public object GetInstance()
         {
             // We must lock the container, because not locking could lead to race conditions.

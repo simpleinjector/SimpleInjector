@@ -6,7 +6,6 @@ namespace SimpleInjector
     using System;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
 
@@ -56,8 +55,6 @@ namespace SimpleInjector
         /// <value>The current expression that is about to be decorated.</value>
         public Expression Expression => this.context.Expression;
 
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal string DebuggerDisplay => this.context.DebuggerDisplay;
     }

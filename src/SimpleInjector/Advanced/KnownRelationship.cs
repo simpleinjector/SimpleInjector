@@ -5,9 +5,7 @@ namespace SimpleInjector.Advanced
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using SimpleInjector.Diagnostics;
 
@@ -93,8 +91,6 @@ namespace SimpleInjector.Advanced
 
         internal InjectionConsumerInfo Consumer { get; }
 
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string DebuggerDisplay => string.Format(
             CultureInfo.InvariantCulture,
@@ -106,8 +102,6 @@ namespace SimpleInjector.Advanced
             nameof(this.Dependency),
             this.Dependency.DebuggerDisplay);
 
-        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification = "This method is called by the debugger.")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string ImplementationTypeDebuggerDisplay => this.ImplementationType.ToFriendlyName();
 

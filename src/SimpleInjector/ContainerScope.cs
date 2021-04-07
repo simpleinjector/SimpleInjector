@@ -4,18 +4,11 @@
 namespace SimpleInjector
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using SimpleInjector.Advanced;
 
     /// <summary>
     /// The scope that manages the lifetime of singletons and other container-controlled instances.
     /// </summary>
-    [SuppressMessage(
-        "Microsoft.Design",
-        "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
-        Justification =
-            "This type has an internal Dispose method, which is called by Container.Dispose. " +
-            "Users should not be able to dispose this class directly bu do so by calling Container.Dispose.")]
     public partial class ContainerScope : ApiObject
     {
         private readonly Scope scope;

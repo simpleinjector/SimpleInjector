@@ -6,7 +6,6 @@ namespace SimpleInjector
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
 
 #if !PUBLISH
     /// <summary>Methods for registration of collections.</summary>
@@ -55,8 +54,6 @@ namespace SimpleInjector
         /// reference.</exception>
         /// <exception cref="ArgumentException">Thrown when one of the elements of <paramref name="singletons"/>
         /// is a null reference.</exception>
-        [SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly",
-            Justification = "TService is the name of the generic type argument. So this warning is a false positive.")]
         [Obsolete(
             "Please use Container." + nameof(Collection) + "." +
             nameof(ContainerCollectionRegistrator.Register) + " instead. " +

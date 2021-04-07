@@ -5,7 +5,6 @@ namespace SimpleInjector.Diagnostics.Analyzers
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
 
@@ -30,11 +29,6 @@ namespace SimpleInjector.Diagnostics.Analyzers
             select warning)
             .ToArray();
 
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification =
-            "Reducing cyclomatic complexity of this method would mean breaking it up in smaller methods, " +
-            "but that would force us to create a number of small classes just for this, because C# does " +
-            "not allow returning anonymous types through private methods. I think keeping everything in " +
-            "one method is the cleanest approach.")]
         private static IEnumerable<AmbiguousLifestylesDiagnosticResult> GetDiagnosticWarnings(
             IEnumerable<InstanceProducer> instanceProducers)
         {
