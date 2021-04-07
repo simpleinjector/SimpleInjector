@@ -34,8 +34,7 @@ namespace SimpleInjector
         internal static int Hash(object? a, object? b, object? c, object? d) =>
             Hash(Hash(Hash(a, b), c), d);
 
-        internal static LazyEx<T> ToLazy<T>(T value) where T : class =>
-            new LazyEx<T>(value);
+        internal static LazyEx<T> ToLazy<T>(T value) where T : class => new(value);
 
         internal static T AddReturn<T>(this HashSet<T> set, T value)
         {

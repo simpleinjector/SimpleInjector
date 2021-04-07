@@ -71,8 +71,8 @@ namespace SimpleInjector
 
         private static readonly Predicate<PredicateContext> Always = context => true;
 
-        private readonly object locker = new object();
-        private LazyEx<Expression> lazyExpression;
+        private readonly object locker = new();
+        private readonly LazyEx<Expression> lazyExpression;
 
         private CyclicDependencyValidator? validator;
         private Func<object> instanceCreator;
@@ -317,7 +317,7 @@ namespace SimpleInjector
             }
             catch (CyclicDependencyException ex)
             {
-                // When a cyclic dependency is detected, a CyclicDependencyException will buble up, and will
+                // When a cyclic dependency is detected, a CyclicDependencyException will bubble up, and will
                 // get enriched by Registration instances with type information about the types in the chain.
                 // In case the current producer is the OriginatingProducer, we should transform the exception
                 // into an ActivationException to prevent types from being added that are not part of the

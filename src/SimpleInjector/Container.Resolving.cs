@@ -20,7 +20,7 @@ namespace SimpleInjector
         // PERF: The rootProducerCache uses a special equality comparer that does a quicker lookup of types.
         // PERF: This collection is updated by replacing the complete collection.
         private Dictionary<Type, InstanceProducer?> rootProducerCache =
-            new Dictionary<Type, InstanceProducer?>(ReferenceEqualityComparer<Type>.Instance);
+            new(ReferenceEqualityComparer<Type>.Instance);
 
         private enum MutableCollectionType
         {

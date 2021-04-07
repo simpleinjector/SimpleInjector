@@ -18,9 +18,9 @@ namespace SimpleInjector
     public partial class Container
     {
         // Flag to signal that the container's configuration is currently being verified.
-        private readonly ThreadLocal<bool> isVerifying = new ThreadLocal<bool>();
+        private readonly ThreadLocal<bool> isVerifying = new();
 
-        private readonly ThreadLocal<Scope?> resolveScope = new ThreadLocal<Scope?>();
+        private readonly ThreadLocal<Scope?> resolveScope = new();
 
         private bool usingCurrentThreadResolveScope;
 

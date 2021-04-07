@@ -14,8 +14,7 @@ namespace SimpleInjector
 #endif
     public partial class Container
     {
-        private readonly Dictionary<Type, List<Type>> skippedNonGenericDecorators =
-            new Dictionary<Type, List<Type>>();
+        private readonly Dictionary<Type, List<Type>> skippedNonGenericDecorators = new();
 
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given set of

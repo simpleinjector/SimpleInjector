@@ -33,7 +33,7 @@ namespace SimpleInjector
     {
         private static readonly Action<object> NoOp = _ => { };
 
-        private readonly HashSet<KnownRelationship> knownRelationships = new HashSet<KnownRelationship>();
+        private readonly HashSet<KnownRelationship> knownRelationships = new();
 
         internal readonly Func<object>? instanceCreator;
 

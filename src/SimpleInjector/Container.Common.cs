@@ -49,23 +49,19 @@ namespace SimpleInjector
         private static long counter;
 
         private readonly object locker = new object();
-        private readonly List<IInstanceInitializer> instanceInitializers = new List<IInstanceInitializer>();
-        private readonly List<ContextualResolveInterceptor> resolveInterceptors =
-            new List<ContextualResolveInterceptor>();
+        private readonly List<IInstanceInitializer> instanceInitializers = new();
+        private readonly List<ContextualResolveInterceptor> resolveInterceptors = new();
 
         private readonly long containerId;
 
         // Collection of (both conditional and unconditional) instance producers that are explicitly
         // registered by the user and implicitly registered through unregistered type resolution.
-        private readonly Dictionary<Type, IRegistrationEntry> explicitRegistrations =
-            new Dictionary<Type, IRegistrationEntry>(64);
+        private readonly Dictionary<Type, IRegistrationEntry> explicitRegistrations = new(64);
 
-        private readonly Dictionary<Type, CollectionResolver> collectionResolvers =
-            new Dictionary<Type, CollectionResolver>();
+        private readonly Dictionary<Type, CollectionResolver> collectionResolvers = new();
 
         // This list contains all instance producers that not yet have been explicitly registered in the container.
-        private readonly ConditionalHashSet<InstanceProducer> externalProducers =
-            new ConditionalHashSet<InstanceProducer>();
+        private readonly ConditionalHashSet<InstanceProducer> externalProducers = new();
 
         // Flag to signal that the container can't be altered by using any of the Register methods.
         private bool locked;
@@ -119,7 +115,7 @@ namespace SimpleInjector
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
         public ContainerOptions Options { get; }
 
-        /// <summary>Gets the container scope that that manages the lifetime of singletons and other
+        /// <summary>Gets the container scope that manages the lifetime of singletons and other
         /// container-controlled instances. Use this property to register actions that need to be called
         /// and instances that need to be disposed when the container gets disposed.</summary>
         /// <value>The <see cref="ContainerOptions"/> instance for this container.</value>
