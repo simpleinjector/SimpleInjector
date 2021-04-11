@@ -5,6 +5,7 @@ namespace SimpleInjector
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using SimpleInjector.Internals;
     using SimpleInjector.ProducerBuilders;
 
@@ -18,6 +19,8 @@ namespace SimpleInjector
         // PERF: This collection is updated by replacing the complete collection.
         private Dictionary<Type, InstanceProducer?> rootProducerCache =
             new(ReferenceEqualityComparer<Type>.Instance);
+
+        private DictionaryOfType<InstanceProducer?> typedRootProducerCache = new();
 
         private enum MutableCollectionType
         {
@@ -36,9 +39,9 @@ namespace SimpleInjector
             this.LockContainer();
 
             // Performance optimization: This if check is a duplicate to save a call to GetInstanceForType.
-            if (!this.rootProducerCache.TryGetValue(typeof(TService), out InstanceProducer? instanceProducer))
+            if (!this.typedRootProducerCache.TryGetValue<TService>(out InstanceProducer? instanceProducer))
             {
-                return (TService)this.GetInstanceForRootType(typeof(TService));
+                return this.GetInstanceForRootType<TService>();
             }
 
             if (instanceProducer is null)
@@ -321,6 +324,16 @@ namespace SimpleInjector
             }
         }
 
+
+        private TService GetInstanceForRootType<TService>()
+        {
+            InstanceProducer? producer =
+                this.GetInstanceProducerForType(typeof(TService), InjectionConsumerInfo.Root);
+
+            this.AppendRootInstanceProducer<TService>(producer);
+            return (TService)this.GetInstanceFromProducer(producer, typeof(TService));
+        }
+
         private object GetInstanceForRootType(Type serviceType)
         {
             if (serviceType.ContainsGenericParameters())
@@ -379,6 +392,13 @@ namespace SimpleInjector
             {
                 this.RemoveExternalProducer(rootProducer);
             }
+        }
+
+        private void AppendRootInstanceProducer<TService>(InstanceProducer? rootProducer)
+        {
+            this.typedRootProducerCache.Add<TService>(rootProducer);
+
+            this.AppendRootInstanceProducer(typeof(TService), rootProducer);
         }
 
         private void ThrowInvalidRegistrationException(Type serviceType, InstanceProducer? producer)
