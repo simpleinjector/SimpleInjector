@@ -17,7 +17,7 @@ namespace SimpleInjector.Integration.Web.Mvc
         private readonly Func<Type, Registration> registrationFactory;
 
         // Supply false for cacheAttributeInstances, because otherwise attributes become singletons and this
-        // has can cause all sorts of concurrency bugs, because attributes will becomes singletons.
+        // can cause all sorts of concurrency bugs, because attributes will become singletons.
         internal SimpleInjectorFilterAttributeFilterProvider(Container container)
             : base(cacheAttributeInstances: false)
         {
