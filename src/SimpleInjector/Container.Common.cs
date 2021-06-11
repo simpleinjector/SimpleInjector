@@ -590,6 +590,11 @@ namespace SimpleInjector
                 entry.Add(producer);
 
                 this.RemoveExternalProducer(producer);
+
+                // There could already be a 'null' entry in the root-producer cache, which will happen when
+                // GetRegistration(X) is called before X is registered. We need to clear the cache to prevent
+                // the cached 'null' to be returned from GetRegistration instead of this producer. See #909.
+                this.rootProducerCache.Remove(producer.ServiceType);
             }
         }
 

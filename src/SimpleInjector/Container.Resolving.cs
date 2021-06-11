@@ -239,7 +239,7 @@ namespace SimpleInjector
                     if (producer != null)
                     {
                         // The producer is created implicitly. This forces us to lock the container. Such
-                        // implicit registration could be done through in numberous ways (e.g. through
+                        // implicit registration could be done through in numerous ways (e.g. through
                         // unregistered type resolution, or because the type is concrete). Being able to make
                         // registrations after such call, could lead to unexpected behavior, which is why
                         // locking the container is important.
@@ -252,7 +252,10 @@ namespace SimpleInjector
                     }
                 }
 
-                // Add the producer, even when it's null.
+                // PERF: Add the producer, even when it's null to prevent this if-block from re-executing when
+                // the method is called more often for the same service type. Performance of this if-block is
+                // slow and the users might call it many times in the happy path of their application. Also
+                // note that GetService is calling back into this method
                 this.AppendRootInstanceProducer(serviceType, producer);
             }
 

@@ -316,5 +316,46 @@
             Assert.IsNotNull(registration, "The GetRegistration method is expected to return an " +
                 "InstanceProducer since it is explicitly registered by the user.");
         }
+
+        // #909
+        [TestMethod]
+        public void GetRegistration_OnRegisteredTypeWithGetRegistrationCalledBeforeRegistration_ReturnsThatRegistration()
+        {
+            // Arrange
+            var container = new Container();
+
+            var registration = container.GetRegistration<RealTimeProvider>();
+
+            Assert.IsNull(registration, "Test setup failed.");
+
+            container.Register<RealTimeProvider>();
+
+            // Act
+            registration = container.GetRegistration<RealTimeProvider>();
+
+            // Assert
+            Assert.IsNotNull(registration);
+        }
+
+        // #909
+        [TestMethod]
+        public void GetService_OnRegisteredTypeWithGetRegistrationCalledBeforeRegistration_ReturnsThatService()
+        {
+            // Arrange
+            var container = new Container();
+            IServiceProvider provider = container;
+
+            var registration = container.GetRegistration<RealTimeProvider>();
+
+            Assert.IsNull(registration, "Test setup failed.");
+
+            container.Register<RealTimeProvider>();
+
+            // Act
+            var service = provider.GetService(typeof(RealTimeProvider));
+
+            // Assert
+            Assert.IsNotNull(service);
+        }
     }
 }
