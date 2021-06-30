@@ -147,7 +147,7 @@ namespace SimpleInjector
             Type knownImplementationType, Type currentExpressionType) =>
             Format(
                 "You are trying to set the {0}.{1} property with an Expression instance that has a type " +
-                "of {2}. The expression type however should be a {3} (or a sub type). You can't change " +
+                "of {2}. The expression type, however, should be a {3} (or a sub type). You can't change " +
                 "the type of the expression using the {4} event. If you need to change the " +
                 "implementation, please use the {5} event instead.",
                 nameof(ExpressionBuildingEventArgs),
@@ -582,7 +582,7 @@ namespace SimpleInjector
         internal static string DependencyNotValidForInjectionAccordingToCustomInjectionBehavior(
             IDependencyInjectionBehavior behavior, InjectionConsumerInfo dependency) =>
             Format(
-                "The conumer-dependency pair {0} is not valid for injection according to the custom {1} of" +
+                "The consumer-dependency pair {0} is not valid for injection according to the custom {1} of" +
                 "type {2}. The {2}, however, didn't supply a reason why.",
                 dependency,
                 nameof(IDependencyInjectionBehavior),
