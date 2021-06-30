@@ -215,5 +215,52 @@
                 .TrimInside(),
                 action);
         }
+
+        [TestMethod]
+        public void When_resolving_a_lookalike_type_with_missing_dependencies_the_full_type_name_is_mentioned()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ILogger, NullLogger>();
+            container.Register<SimpleInjector.Tests.Unit.Duplicates.UserController>();
+
+            // Register lookalike
+            // UserServiceBase dependency not registered
+            container.Register<SimpleInjector.Tests.Unit.UserController>();
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                The constructor of type SimpleInjector.Tests.Unit.UserController "
+                .TrimInside(),
+                action);
+        }
+
+        [TestMethod]
+        public void When_resolving_a_service_depending_on_an_unregistered_lookalike_mentions_its_fullname()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Register<ILogger, NullLogger>();
+            container.Register<SimpleInjector.Tests.Unit.Duplicates.UserController>();
+
+            // Register service depending on unregistered lookalike.
+            container.Register<IX, XDependingOn<SimpleInjector.Tests.Unit.UserController>>();
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+                The constructor of type XDependingOn<UserController> contains the parameter with name 
+                'dependency' and type SimpleInjector.Tests.Unit.UserController, but UserController is not
+                registered."
+                .TrimInside(),
+                action);
+        }
     }
 }

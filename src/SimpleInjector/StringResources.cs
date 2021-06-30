@@ -106,7 +106,7 @@ namespace SimpleInjector
             Type[] lookalikes) =>
             Format(
                 "No registration for type {0} could be found.{1}{2}{3}{4}{5}{6}{7}",
-                serviceType.TypeName(),
+                serviceType.TypeName(forceFullQualification: lookalikes.Any()),
                 GetAdditionalInformationAboutExistingConditionalRegistrations(
                     serviceType: serviceType,
                     consumerImplementationType: serviceType,
@@ -330,6 +330,7 @@ namespace SimpleInjector
         internal static string ParameterTypeMustBeRegistered(
             Container container,
             InjectionTargetInfo target,
+            bool forceFullQualificationOfTarget,
             int numberOfConditionals,
             bool hasRelatedOneToOneMapping,
             bool collectionRegistrationDoesNotExists,
@@ -342,8 +343,8 @@ namespace SimpleInjector
                 : "Type {0} contains the property ";
 
             formatString +=
-                "with name '{1}' and type {2}, but {2} is not registered. " +
-                "For {2} to be resolved, it must be registered in the container.{3}";
+                "with name '{1}' and type {2}, but {3} is not registered. " +
+                "For {3} to be resolved, it must be registered in the container.{4}";
 
             string extraInfo = string.Concat(
                 GetAdditionalInformationAboutExistingConditionalRegistrations(target, numberOfConditionals),
@@ -356,8 +357,9 @@ namespace SimpleInjector
 
             return Format(
                 formatString,
-                target.Member.DeclaringType.TypeName(),
+                target.Member.DeclaringType.TypeName(forceFullQualificationOfTarget),
                 target.Name,
+                target.TargetType.TypeName(forceFullQualification: lookalikes.Any()),
                 target.TargetType.TypeName(),
                 extraInfo);
         }
@@ -1373,6 +1375,11 @@ namespace SimpleInjector
             .FirstOrDefault();
 
         private static string TypeName(this Type type) => type.ToFriendlyName(UseFullyQualifiedTypeNames);
+
+        private static string TypeName(this Type type, bool forceFullQualification) =>
+            forceFullQualification
+                ? type.ToFriendlyName(true)
+                : type.ToFriendlyName(UseFullyQualifiedTypeNames);
 
         private static string CSharpFriendlyName(this Type type) =>
             Types.ToCSharpFriendlyName(type, UseFullyQualifiedTypeNames);
