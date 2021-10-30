@@ -348,6 +348,30 @@
             Assert_AllOfType<AmbiguousLifestylesDiagnosticResult>(results);
         }
 
+        // #925
+        [TestMethod]
+        public void Verify_ScopedDecoratorRegisteredTwice_ShouldSucceed()
+        {
+            // Arrange
+            var container = new Container();
+
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<INonGenericService, RealNonGenericService>(Lifestyle.Scoped);
+
+            container.RegisterDecorator<INonGenericService, NonGenericServiceDecorator>(Lifestyle.Scoped);
+            container.RegisterDecorator<INonGenericService, NonGenericServiceDecoratorWithFunc>(Lifestyle.Scoped);
+
+            // Here the NonGenericServiceDecorator is registered for a second time. Although, technically,
+            // this makes NonGenericServiceDecorator ambiguous, with decorators, registering a decorator twice
+            // is often done deliberate. In this case, the Ambiguous Lifestyles warning should not go off and
+            // the configuration should be considered valid.
+            container.RegisterDecorator<INonGenericService, NonGenericServiceDecorator>(Lifestyle.Scoped);
+
+            // Act
+          container.Verify();
+        }
+
         private static void Assert_ContainsDescription(IEnumerable<DiagnosticResult> results,
             string expectedDescription)
         {

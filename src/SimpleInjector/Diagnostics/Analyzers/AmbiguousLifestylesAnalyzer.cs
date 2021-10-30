@@ -25,9 +25,28 @@ namespace SimpleInjector.Diagnostics.Analyzers
 
         public DiagnosticResult[] Analyze(IEnumerable<InstanceProducer> producers) => (
             from warning in GetDiagnosticWarnings(producers)
-            where warning.DiagnosedRegistration.Registration.ShouldNotBeSuppressed(this.DiagnosticType)
+            where this.ShouldIncludeWarning(warning)
             select warning)
             .ToArray();
+
+        private bool ShouldIncludeWarning(AmbiguousLifestylesDiagnosticResult warning)
+        {
+            if (warning.DiagnosedRegistration.IsDecorated)
+            {
+                // #925 Suppressing the warning for decorators allows the same decorator type to be applied
+                // multiple times to the same graph, which is often a deliberate choice of the user. e.g., a
+                // user might want to do this:
+                // container.Register<IService, MyService>();
+                // container.RegisterDecorator<IService, Decorator_X>(Lifestyle.Scoped);
+                // container.RegisterDecorator<IService, Decorator_Y>(Lifestyle.Scoped);
+                // container.RegisterDecorator<IService, Decorator_X>(Lifestyle.Scoped); // apply again
+                // Not ignoring the warning disallows the user from doing this, because it's not possible to
+                // manually suppress the warning.
+                return false;
+            }
+
+            return warning.DiagnosedRegistration.Registration.ShouldNotBeSuppressed(this.DiagnosticType);
+        }
 
         private static IEnumerable<AmbiguousLifestylesDiagnosticResult> GetDiagnosticWarnings(
             IEnumerable<InstanceProducer> instanceProducers)
