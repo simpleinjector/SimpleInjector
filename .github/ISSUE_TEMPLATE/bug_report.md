@@ -34,7 +34,7 @@ Please provide a Minimal, Complete, and Verifiable example that reproduces the p
 
 ## Additional context
 Add any other context about the problem here. e.g.:
-* Library versions (version of Simple Injector and all affected integration packages)
+* Library versions (version of Simple Injector and all affected integration packages). Don't say you're using the "latest" versions, but please state the actual version numbers. Depending on when someone reads it, it might not be the latest anymore and also you might think you're on the latest version when you aren't.
 * .NET version
 * Used libraries or frameworks (with version) that are required
 
