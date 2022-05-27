@@ -61,11 +61,11 @@ set version_Integration_WebApi=%version_Core%
 set referenceLibraryPath=..\..\simpleinjector-website.github.io\ReferenceLibrary
 if not exist %referenceLibraryPath% goto :referenceLibraryPath_missing
 
-set vsvars32_bat="%programfiles(x86)%\Microsoft Visual Studio\2019\Community\Common7\Tools\VsMSBuildCmd.bat"
+set vsvars32_bat="%programfiles%\Microsoft Visual Studio\2022\Community\Common7\Tools\VsMSBuildCmd.bat"
 if not exist %vsvars32_bat% goto :vsvars32_bat_missing
 @call %vsvars32_bat%
 
-set msbuild="%programfiles(x86)%\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
+set msbuild="%programfiles%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
 if not exist %msbuild% goto :msbuild_exe_missing
 
 set attrib=%systemroot%\System32\attrib.exe
