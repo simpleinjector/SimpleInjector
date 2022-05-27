@@ -278,6 +278,6 @@
             }
         }
 
-        private static string ToFriendlyName(Type type) => type.ToFriendlyName();
+        private static string ToFriendlyName(Type type) => type is null ? "<null>" : type.ToFriendlyName();
     }
 }
