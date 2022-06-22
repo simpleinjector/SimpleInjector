@@ -9,6 +9,8 @@ namespace SimpleInjector.Lifestyles
 
     internal sealed class ScopedRegistration : Registration
     {
+        private static readonly Func<string> EmptyStringProvider = () => string.Empty;
+
         private Func<Scope?>? scopeFactory;
         private DisposabilityTypeInfo? disposability;
 
@@ -23,7 +25,10 @@ namespace SimpleInjector.Lifestyles
         // Initialized when BuildExpression is called
         internal Func<object>? InstanceCreator { get; private set; }
 
-        internal string AdditionalInformationForLifestyleMismatchDiagnostics { get; set; } = string.Empty;
+        // MEM: We store a delegate here instead of the final string, because the formatted string will take
+        // up a lot of memory, especially because there could be many scoped registrations with this info set.
+        internal Func<string> AdditionalInformationForLifestyleMismatchDiagnosticsProvider { get; set; } =
+            EmptyStringProvider;
 
         internal DisposabilityTypeInfo Disposability
         {

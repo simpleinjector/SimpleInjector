@@ -410,6 +410,9 @@ namespace SimpleInjector
             return InstanceProducerVisualizer.VisualizeIndentedObjectGraph(this, options);
         }
 
+        // This method has a side effect: it will ensure the expression is built.
+        internal bool ContainsScopedComponentsInGraph() => ContainsScopedComponentsInGraph(this);
+
         // Throws an InvalidOperationException on failure.
         internal Expression VerifyExpressionBuilding()
         {
@@ -490,6 +493,21 @@ namespace SimpleInjector
                     StringResources.ConfigurationInvalidCreatingInstanceFailed(this.ServiceType, ex),
                     ex);
             }
+        }
+
+        private static bool ContainsScopedComponentsInGraph(InstanceProducer producer)
+        {
+            if (!producer.IsExpressionCreated)
+            {
+                // We need to build the expressions here, because that could trigger expression built events,
+                // which can change the lifestyle of the producer (e.g. because of applied decorators).
+                producer.BuildExpression();
+            }
+
+            return
+                producer.Lifestyle is SingletonLifestyle ? false :
+                producer.Lifestyle is ScopedLifestyle ? true :
+                producer.GetRelationships().Any(r => ContainsScopedComponentsInGraph(r.Dependency));
         }
 
         private Action<Scope>[] GetVerifiers()

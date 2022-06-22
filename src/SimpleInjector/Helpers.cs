@@ -20,7 +20,7 @@ namespace SimpleInjector
     internal static class Helpers
     {
         // Use System.Numerics.Hashing.HashHelpers.Combine instead, when all targets can take a dependency on
-        // System.Numerics.Hashing. The uses hashing algorithm here, is identical to that in HashHelpers.
+        // System.Numerics.Hashing. The used hashing algorithm here is identical to that in HashHelpers.
         internal static int CombineHashes(int a, int b)
         {
             uint num = (uint)((a << 5) | (int)((uint)a >> 27));

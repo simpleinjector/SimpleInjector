@@ -160,10 +160,21 @@ namespace SimpleInjector
         internal static string FlowingCollectionIsScopedBecause(Type collectionType) =>
             Format(
                 "{0} was registered as Scoped by Simple Injector, because you set 'Options.DefaultScoped" +
-                "Lifestyle' to 'ScopedLifestyle.Flowing' while one or more elements of {0} were registered " +
-                "as Scoped. This caused Simple Injector to capture the active Scope inside the {0} and " +
+                "Lifestyle' to 'ScopedLifestyle.Flowing' while one or more elements of {1} were registered " +
+                "as Scoped. This caused Simple Injector to capture the active Scope inside the {1} and " +
                 "forced its lifestyle to be lowered to Scoped.",
-                collectionType.TypeName());
+                collectionType.TypeName(),
+                collectionType.ToFriendlyName());
+
+        internal static string FlowingMetadataIsScopedBecause(Type metadataType) =>
+            Format(
+                "{0} was registered as Scoped by Simple Injector, because you set 'Options.DefaultScoped" +
+                "Lifestyle' to 'ScopedLifestyle.Flowing' while its described dependency {1} or one of its " +
+                "dependencies was registered as Scoped. This caused Simple Injector to capture the active " +
+                "Scope inside the {2} and forced its lifestyle to be lowered to Scoped.",
+                metadataType.ToFriendlyName(),
+                metadataType.GetGenericArguments()[0].ToFriendlyName(),
+                metadataType.ToFriendlyName());
 
         internal static string MultipleClosedTypesAreAssignableFromType(
             Type type, Type genericTypeDefinition, Type[] types, string otherMethod) =>
