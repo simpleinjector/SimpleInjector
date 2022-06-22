@@ -1075,7 +1075,7 @@
                 There is already an open-generic registration for IGeneric<T> (with implementation
                 GenericType<T>) that overlaps with the registration of IGeneric<int> that you are trying to
                 make. If your intention is to use GenericType<T> as fallback registration, please instead
-                call: RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), c => !c.Handled)."
+                call: RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), c => !c.Handled)"
                 .TrimInside(),
                 action);
         }
@@ -1116,7 +1116,7 @@
                 GenericType<List<T>>) that overlaps with the registration of IGeneric<List<int>> that you
                 are trying to make. If your intention is to use GenericType<List<T>> as fallback
                 registration, please instead call:
-                RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), c => !c.Handled)."
+                RegisterConditional(typeof(IGeneric<>), typeof(GenericType<>), c => !c.Handled)"
                 .TrimInside(),
                 action);
         }

@@ -941,7 +941,8 @@ namespace SimpleInjector
                 "There is already an open-generic registration for {0} (with implementation {1}) that " +
                 "overlaps with the registration of {2} that you are trying to make. If your intention is " +
                 "to use {1} as fallback registration, please instead call: " +
-                "{5}(typeof({3}), typeof({4}), c => !c.Handled).",
+                "{5}(typeof({3}), typeof({4}), c => !c.Handled) and register this fallback registration " +
+                "after that of {2}.",
                 closedServiceType.GetGenericTypeDefinition().TypeName(),
                 overlappingGenericImplementationType.TypeName(),
                 closedServiceType.TypeName(),
