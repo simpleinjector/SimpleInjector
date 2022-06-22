@@ -179,7 +179,7 @@ namespace SimpleInjector.Decorators
                 parameter.ParameterType, Lifestyle.Singleton, decorateeProducer)
             {
                 // Make sure the relationship is not traversed when doing verification, because that leads to
-                // false positivies.
+                // false positives.
                 UseForVerification = false
             };
 
