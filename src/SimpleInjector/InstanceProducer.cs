@@ -150,7 +150,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Gets the originally registered implementation type. Note that the actual type, returned by
-        /// <see cref="GetInstance"/>, will be different from <see cref="ImplementationType"/> when
+        /// <see cref="GetInstance()"/>, will be different from <see cref="ImplementationType"/> when
         /// decorators or interceptors are applied. This property will always return the originally registered
         /// implementation type. In case the implementation type is unknown, which happens for instance when
         /// registering <see cref="Func{TResult}"/> delegates, the service type is returned.
@@ -255,9 +255,29 @@ namespace SimpleInjector
         }
 
         /// <summary>Produces an instance.</summary>
+        /// <param name="scope">The scope from which the item must be returned.</param>
         /// <returns>An instance. Will never return null.</returns>
-        /// <exception cref="ActivationException">When the instance could not be retrieved or is null.
-        /// </exception>
+        /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
+        public object GetInstance(Scope scope)
+        {
+            Requires.IsNotNull(scope, nameof(scope));
+
+            Scope? originalScope = this.Container.CurrentThreadResolveScope;
+
+            try
+            {
+                this.Container.CurrentThreadResolveScope = scope;
+                return this.GetInstance();
+            }
+            finally
+            {
+                this.Container.CurrentThreadResolveScope = originalScope;
+            }
+        }
+
+        /// <summary>Produces an instance.</summary>
+        /// <returns>An instance. Will never return null.</returns>
+        /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
         public object GetInstance()
         {
             // We must lock the container, because not locking could lead to race conditions.
@@ -376,9 +396,9 @@ namespace SimpleInjector
         /// </summary>
         /// <returns>A string representation of the object graph.</returns>
         /// <exception cref="InvalidOperationException">Thrown when this method is called before
-        /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> have been called. These calls can be
+        /// <see cref="GetInstance()"/> or <see cref="BuildExpression"/> have been called. These calls can be
         /// done directly and explicitly by the user on this instance, indirectly by calling
-        /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> on an instance that depends on this
+        /// <see cref="GetInstance()"/> or <see cref="BuildExpression"/> on an instance that depends on this
         /// instance, or by calling <see cref="Container.Verify()">Verify</see> on the container.
         /// </exception>
         public string VisualizeObjectGraph() => this.VisualizeObjectGraph(new VisualizationOptions());
@@ -391,9 +411,9 @@ namespace SimpleInjector
         /// the object graph.</param>
         /// <returns>A string representation of the object graph.</returns>
         /// <exception cref="InvalidOperationException">Thrown when this method is called before
-        /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> have been called. These calls can be
+        /// <see cref="GetInstance()"/> or <see cref="BuildExpression"/> have been called. These calls can be
         /// done directly and explicitly by the user on this instance, indirectly by calling
-        /// <see cref="GetInstance"/> or <see cref="BuildExpression"/> on an instance that depends on this
+        /// <see cref="GetInstance()"/> or <see cref="BuildExpression"/> on an instance that depends on this
         /// instance, or by calling <see cref="Container.Verify()">Verify</see> on the container.
         /// </exception>
         /// <exception cref="NullReferenceException">Thrown when options is null.</exception>

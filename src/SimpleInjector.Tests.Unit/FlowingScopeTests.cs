@@ -247,6 +247,52 @@
                 action);
         }
 
+        [TestMethod]
+        public void GetInstanceScope_CalledMultipleTimesFromTheSameScope_ReturnsTheSameScopedInstances()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+
+            container.Register<ILogger, NullLogger>(Lifestyle.Scoped);
+
+            container.Register<ServiceDependingOn<ILogger>>();
+
+            InstanceProducer producer = container.GetRegistration<ServiceDependingOn<ILogger>>();
+
+            var scope = new Scope(container);
+
+            // Act
+            var service1 = producer.GetInstance(scope) as ServiceDependingOn<ILogger>;
+            var service2 = producer.GetInstance(scope) as ServiceDependingOn<ILogger>;
+
+            // Assert
+            Assert.AreSame(service1.Dependency, service2.Dependency);
+        }
+
+        [TestMethod]
+        public void GetInstanceScope_CalledWithDifferentScopes_ReturnsDifferentScopedInstances()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+
+            container.Register<ILogger, NullLogger>(Lifestyle.Scoped);
+
+            container.Register<ServiceDependingOn<ILogger>>();
+
+            InstanceProducer producer = container.GetRegistration<ServiceDependingOn<ILogger>>();
+
+            // Act
+            var service1 = producer.GetInstance(new Scope(container)) as ServiceDependingOn<ILogger>;
+            var service2 = producer.GetInstance(new Scope(container)) as ServiceDependingOn<ILogger>;
+
+            // Assert
+            Assert.AreNotSame(service1.Dependency, service2.Dependency);
+        }
+
         public class ScopedPluginProxy : IPlugin
         {
             public readonly Func<Scope, IPlugin> Factory;

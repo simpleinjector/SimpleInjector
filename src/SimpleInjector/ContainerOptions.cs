@@ -11,7 +11,7 @@ namespace SimpleInjector
 
     /// <summary>
     /// Delegate that allows intercepting calls to <see cref="Container.GetInstance"/> and
-    /// <see cref="InstanceProducer.GetInstance"/>.
+    /// <see cref="InstanceProducer.GetInstance()"/>.
     /// </summary>
     /// <param name="context">Contextual information about the to be created object.</param>
     /// <param name="instanceProducer">A delegate that produces the actual instance according to its
