@@ -287,7 +287,9 @@ namespace SimpleInjector
                 return name;
             }
 
-            name = name.Contains("`") ? name.Substring(0, name.LastIndexOf('`')) : name;
+            name = name.IndexOf("`", StringComparison.Ordinal) > -1
+                ? name.Substring(0, name.LastIndexOf("`", StringComparison.Ordinal))
+                : name;
 
             return name + "<" + argumentsFormatter(genericArguments) + ">";
         }
