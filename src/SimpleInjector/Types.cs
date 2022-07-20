@@ -131,13 +131,15 @@ namespace SimpleInjector
         }
 
         // Return a list of all base types T inherits, all interfaces T implements and T itself.
-        internal static ICollection<Type> GetTypeHierarchyFor(Type type)
+        internal static List<Type> GetTypeHierarchyFor(Type type)
         {
-            var types = new List<Type>(4);
+            Type[] interfaces = type.GetInterfaces();
+
+            var types = new List<Type>(interfaces.Length + 4);
 
             types.Add(type);
             types.AddRange(GetBaseTypes(type));
-            types.AddRange(type.GetInterfaces());
+            types.AddRange(interfaces);
 
             return types;
         }

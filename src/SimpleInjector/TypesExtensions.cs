@@ -85,16 +85,28 @@ namespace SimpleInjector
         public static Type[] GetClosedTypesOf(this Type type, Type genericTypeDefinition)
             => GetClosedTypesOfInternal(type, genericTypeDefinition).ToArray();
 
-        private static IEnumerable<Type> GetClosedTypesOfInternal(Type type, Type genericTypeDefinition)
+        private static List<Type> GetClosedTypesOfInternal(Type type, Type genericTypeDefinition)
         {
             Requires.IsNotNull(type, nameof(type));
             Requires.IsNotNull(genericTypeDefinition, nameof(genericTypeDefinition));
             Requires.IsOpenGenericType(genericTypeDefinition, nameof(genericTypeDefinition));
 
-            return
-                from assigableType in Types.GetTypeHierarchyFor(type)
-                where genericTypeDefinition.IsGenericTypeDefinitionOf(assigableType)
-                select assigableType;
+            List<Type> assigableTypes = Types.GetTypeHierarchyFor(type);
+
+            // PERF: To prevent memory allocations we don't use a LINQ query to filter out values, but simply remove
+            // non-matching elements from the list.
+            for (int index = assigableTypes.Count - 1; index >= 0; index--)
+            {
+                Type assigableType = assigableTypes[index];
+
+                if (!genericTypeDefinition.IsGenericTypeDefinitionOf(assigableType)
+                    || assigableType.ContainsGenericParameters())
+                {
+                    assigableTypes.RemoveAt(index);
+                }
+            }
+
+            return assigableTypes;
         }
     }
 }

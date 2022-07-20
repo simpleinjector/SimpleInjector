@@ -4,7 +4,6 @@
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector;
-    using SimpleInjector.Tests.Unit;
 
     using ArgEx = System.ArgumentException;
     using ArgNull = System.ArgumentNullException;
@@ -24,11 +23,11 @@
         [TestMethod] public void ReturnsTrue_1() => IsClosedTypeOf(typeof(IX<int>), typeof(IX<>));
         [TestMethod] public void ReturnsTrue_2() => IsClosedTypeOf(typeof(IntX), typeof(IX<>));
         [TestMethod] public void ReturnsTrue_3() => IsClosedTypeOf(typeof(GenX<int>), typeof(IX<>));
-        [TestMethod] public void ReturnsTrue_4() => IsClosedTypeOf(typeof(GenX<>), typeof(IX<>));
-        [TestMethod] public void ReturnsTrue_5() => IsClosedTypeOf(typeof(IntFloatX), typeof(IX<>));
+        [TestMethod] public void ReturnsTrue_4() => IsClosedTypeOf(typeof(IntFloatX), typeof(IX<>));
 
         [TestMethod] public void ReturnsFalse_1() => IsNotClosedTypeOf(typeof(NoX), typeof(IX<>));
         [TestMethod] public void ReturnsFalse_2() => IsNotClosedTypeOf(typeof(IX<int>), typeof(GenX<>));
+        [TestMethod] public void ReturnsFalse_3() => IsNotClosedTypeOf(typeof(GenX<>), typeof(IX<>));
 
         [TestMethod] public void Throws_1() => IsClosedTypeOf_Throws<ArgNull>(null, typeof(IFoo<>));
         [TestMethod] public void Throws_2() => IsClosedTypeOf_Throws<ArgNull>(typeof(NullLogger), null);
@@ -47,8 +46,8 @@
 
             Assert.AreEqual(expected, actual,
                 message:
-                    "type: " + type.ToFriendlyName() + ", " +
-                    "genericTypeDefinition: " + genericTypeDefinition.ToFriendlyName());
+                    nameof(type) + ": " + type.ToFriendlyName() + ", " +
+                    nameof(genericTypeDefinition) + ": " + genericTypeDefinition.ToFriendlyName());
         }
 
         private static void IsClosedTypeOf_Throws<T>(Type type, Type genericType) where T : Exception =>
@@ -64,6 +63,7 @@
         [TestMethod] public void Returns_4() => _(typeof(IntFloatX), typeof(IX<>), expected: new[] { typeof(IX<float>), typeof(IX<int>) });
         [TestMethod] public void Returns_5() => _(typeof(NoX), typeof(IX<>), expected: Type.EmptyTypes);
         [TestMethod] public void Returns_6() => _(typeof(IX<int>), typeof(GenX<>), expected: Type.EmptyTypes);
+        [TestMethod] public void Returns_7() => _(typeof(GenX<>), typeof(IX<>), expected: Type.EmptyTypes);
 
         [TestMethod] public void Throws_1() => _<ArgNull>(null, typeof(IFoo<>));
         [TestMethod] public void Throws_2() => _<ArgNull>(typeof(NullLogger), null);
@@ -95,6 +95,7 @@
         [TestMethod] public void Throws_1() => _<InvalidOperationException>(typeof(IntFloatX), typeof(IX<>));
         [TestMethod] public void Throws_2() => _<ArgEx>(typeof(NoX), typeof(IX<>));
         [TestMethod] public void Throws_3() => _<ArgEx>(typeof(IX<int>), typeof(GenX<>));
+        [TestMethod] public void Throws_4() => _<ArgEx>(typeof(GenX<>), typeof(IX<>));
 
         [TestMethod]
         public void GetClosedTypeOf_AmbiquousRequest_ThrowsExceptionWithExpectedMessage()
