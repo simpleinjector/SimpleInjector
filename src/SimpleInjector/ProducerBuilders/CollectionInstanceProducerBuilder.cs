@@ -22,8 +22,7 @@ namespace SimpleInjector.ProducerBuilders
         private static readonly MethodInfo EnumerableToListMethod =
             typeof(Enumerable).GetMethod(nameof(Enumerable.ToList));
 
-        private readonly Dictionary<Type, InstanceProducer?> emptyAndRedirectedCollectionRegistrationCache =
-            new Dictionary<Type, InstanceProducer?>();
+        private readonly Dictionary<Type, InstanceProducer?> emptyAndRedirectedCollectionRegistrationCache = new();
 
         private readonly Container container;
 
@@ -98,9 +97,10 @@ namespace SimpleInjector.ProducerBuilders
         private Expression BuildMutableCollectionExpressionFromControlledCollection(
             Type serviceType, Type elementType)
         {
-            var streamExpression = Expression.Constant(
-                value: this.container.GetAllInstances(elementType),
-                type: typeof(IEnumerable<>).MakeGenericType(elementType));
+            InstanceProducer streamRegistration =
+                this.container.GetRegistration(typeof(IEnumerable<>).MakeGenericType(elementType))!;
+
+            Expression streamExpression = streamRegistration.BuildExpression();
 
             if (serviceType.IsArray)
             {

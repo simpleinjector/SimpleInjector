@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -291,6 +292,105 @@
 
             // Assert
             Assert.AreNotSame(service1.Dependency, service2.Dependency);
+        }
+
+        [TestMethod]
+        public void ScopeGetInstance_ResolvingArrayOnASecondScopeAfterTheFirstIsDisposed_ResultsInANewScopedInstance()
+        {
+            this.ScopeGetInstance_ResolvingCollectionOnASecondScopeAfterTheFirstIsDisposed_ResultsInANewScopedInstance(
+                scope => scope.GetInstance<ILogger[]>().Single());
+        }
+
+        [TestMethod]
+        public void ScopeGetInstance_ResolvingEnumerableOnASecondScopeAfterTheFirstIsDisposed_ResultsInANewScopedInstance()
+        {
+            this.ScopeGetInstance_ResolvingCollectionOnASecondScopeAfterTheFirstIsDisposed_ResultsInANewScopedInstance(
+                scope => scope.GetInstance<IEnumerable<ILogger>>().Single());
+        }
+
+        [TestMethod]
+        public void ScopeGetInstance_ResolvingReadOnlyCollectionOnASecondScopeAfterTheFirstIsDisposed_ResultsInANewScopedInstance()
+        {
+            this.ScopeGetInstance_ResolvingCollectionOnASecondScopeAfterTheFirstIsDisposed_ResultsInANewScopedInstance(
+                scope => scope.GetInstance<ReadOnlyCollection<ILogger>>().Single());
+        }
+
+        private void ScopeGetInstance_ResolvingCollectionOnASecondScopeAfterTheFirstIsDisposed_ResultsInANewScopedInstance(
+            Func<Scope, ILogger> loggerResolver)
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+            container.Collection.Append<ILogger, NullLogger>(Lifestyle.Scoped);
+
+            container.Verify();
+
+            ILogger logger1, logger2;
+
+            // Act
+            using (var scope = new Scope(container))
+            {
+                logger1 = loggerResolver(scope);
+            }
+
+            using (var scope = new Scope(container))
+            {
+                logger2 = scope.GetInstance<ReadOnlyCollection<ILogger>>().Single();
+            }
+
+            // Assert
+            Assert.AreNotSame(logger1, logger2);
+        }
+
+        [TestMethod]
+        public void ScopeGetInstance_ResolvingTypeDependingOnArrayOnASecondScopeAfterTheFirstIsDisposed_ResultsInANewScopedInstance()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+            container.Collection.Append<ILogger, NullLogger>(Lifestyle.Scoped);
+            container.Register<ServiceDependingOn<ILogger[]>>();
+
+            ILogger logger1;
+            ILogger logger2;
+
+            using (var scope = new Scope(container))
+            {
+                logger1 = scope.GetInstance<ServiceDependingOn<ILogger[]>>().Dependency.Single();
+            }
+
+            using (var scope = new Scope(container))
+            {
+                logger2 = scope.GetInstance<ServiceDependingOn<ILogger[]>>().Dependency.Single();
+            }
+
+            // Assert
+            Assert.AreNotSame(logger1, logger2);
+        }
+
+        [TestMethod]
+        public void ScopeGetInstance_ScopeRegistrationsBothAvailableThroughCollectionsAsThroughOneToOneMappings_ResolveAsTheSameInstanceWithinASingleScope()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+            container.Register<ILogger, NullLogger>(Lifestyle.Scoped);
+            container.Collection.Append<ILogger, NullLogger>(Lifestyle.Scoped);
+
+            var scope1 = new Scope(container);
+            var scope2 = new Scope(container);
+
+            // Act
+            var singleInstance1 = scope1.GetInstance<ILogger>();
+            var collectionInstance1 = scope1.GetInstance<ILogger[]>().Single();
+
+            var singleInstance2 = scope2.GetInstance<ILogger>();
+            var collectionInstance2 = scope2.GetInstance<ILogger[]>().Single();
+
+            // Assert
+            Assert.AreSame(singleInstance1, collectionInstance1);
+            Assert.AreNotSame(singleInstance1, singleInstance2);
+            Assert.AreSame(singleInstance2, collectionInstance2);
         }
 
         public class ScopedPluginProxy : IPlugin
