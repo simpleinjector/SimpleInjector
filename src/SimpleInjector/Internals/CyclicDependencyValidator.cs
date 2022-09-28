@@ -10,13 +10,15 @@ namespace SimpleInjector.Internals
     /// Allows verifying whether a given type has a direct or indirect dependency on itself. Verifying is done
     /// by preventing recursive calls to an InstanceProducer. A CyclicDependencyValidator instance checks a
     /// single InstanceProducer and therefore a single service type.
+    /// </summary>
+    /// <remarks>
     /// DESIGN: An instance or expression can be requested from multiple threads simultaniously, which means
     /// that this class must be thread-safe but also prevent reporting false positives in cyclic dependencies
     /// when called from multiple thread. Originally, this was done by wrapping a ThreadLocal{bool}, but this
-    /// lead to memory leaks, as in most cases the ThreadLocal{bool} couldn't be disposed. THat's why this
-    /// class now wraps a list of currently entered threads. Because the list is nulled when there are no
-    /// entering threads, this is a very memory-efficient solution.
-    /// </summary>
+    /// lead to memory leaks (see #956 and #540), as in most cases the ThreadLocal{bool} couldn't be disposed.
+    /// THat's why this class now wraps a list of currently entered threads. Because the list is nulled when
+    /// there are no entering threads, it is a very memory-efficient solution.
+    /// </remarks>
     internal sealed class CyclicDependencyValidator
     {
         private readonly InstanceProducer producer;
@@ -93,9 +95,9 @@ namespace SimpleInjector.Internals
 
                 if (this.enteredThreads.Count == 0)
                 {
-                    // Nullify the list. Although this causes the production of way more
-                    // garbage during the warm-up phase when the instance producer is
-                    // depended upon a lot, it ensures that the least amount of memory
+                    // Dereference the list. Although this causes the production of way
+                    // more garbage during the warm-up phase when the instance producer
+                    // is depended upon a lot, it ensures that the least amount of memory
                     // is used when the warmup phase is complete and all expression trees
                     // have been compiled.
                     this.enteredThreads = null;
