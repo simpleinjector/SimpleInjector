@@ -107,7 +107,7 @@ namespace SimpleInjector
 
             this.ServiceType = serviceType;
             this.Registration = registration;
-            this.validator = new CyclicDependencyValidator(this);
+            this.validator = new CyclicDependencyValidator();
 
             this.lazyExpression = new LazyEx<Expression>(this.BuildExpressionInternal);
 
@@ -658,7 +658,7 @@ namespace SimpleInjector
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private void CheckForCyclicDependencies()
         {
-            this.validator?.Check();
+            this.validator?.Check(this);
         }
 
         // This method will be inlined by the JIT.

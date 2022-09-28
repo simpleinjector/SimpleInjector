@@ -21,8 +21,6 @@ namespace SimpleInjector.Internals
     /// </remarks>
     internal sealed class CyclicDependencyValidator
     {
-        private readonly InstanceProducer producer;
-
         // If needed, we can do an extra optimization, which is to have an extra int field for the first
         // entered thread. This prevents the list from having to be newed in most cases, as typically there
         // is only on thread entering at the same time. This does complicate the code of this class though.
@@ -31,20 +29,21 @@ namespace SimpleInjector.Internals
         // path, however, is somethings we prevent at all costs.
         private List<int>? enteredThreads;
 
-        internal CyclicDependencyValidator(InstanceProducer producer)
-        {
-            this.producer = producer;
-        }
-
         // Checks whether this is a recursive call (and thus a cyclic dependency) and throw in that case.
-        internal void Check()
+        // MEMORY: By passing the instance producer in through this method instead of through the ctor,
+        // this class becomes 8 bytes smaller (on 64 bits) and results in less memory used. This is
+        // important, because every InstanceProducer gets its own validator and 95% of all validators
+        // stay in memory.
+        // TODO: We can reduce an extra 8 bytes of memory per InstanceProducer by merging this class into
+        // the InstanceProducer itself.
+        internal void Check(InstanceProducer producer)
         {
             lock (this)
             {                
                 if (this.IsCurrentThreadReentering())
                 {
                     throw new CyclicDependencyException(
-                        this.producer, this.producer.Registration.ImplementationType);
+                        producer, producer.Registration.ImplementationType);
                 }
 
                 this.MarkCurrentThreadAsEntering();
