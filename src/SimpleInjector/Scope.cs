@@ -769,7 +769,7 @@ namespace SimpleInjector
                 //  1. in many cases the user will call Verify() in a context where there is no option
                 //     to await (ASP.NET Core startup, ASP.NET MVC startup, etc).
                 //  2. Verify is called during a call to GetInstance when auto verification is enabled.
-                //     Adding VerifyAsync() would, therefore, mena adding an GetInstanceAsync(), but
+                //     Adding VerifyAsync() would, therefore, mean adding an GetInstanceAsync(), but
                 //     would be a bad to add such method (see: https://stackoverflow.com/a/43240576/).
                 // At this point, we can either:
                 //  1. ignore the instance with the risk of causing a memory leak

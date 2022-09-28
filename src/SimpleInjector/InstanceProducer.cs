@@ -358,12 +358,13 @@ namespace SimpleInjector
             }
             finally
             {
-                // NOTE:  We don't remove the cyclic dependency validator while building the expression.
+                // NOTE: We don't remove the cyclic dependency validator while building the expression.
                 // Instead we reset it so it can be checked later on again. We do this because only if
                 // GetInstance has been called we can know for sure that there's no cyclic dependency. There
                 // could be a 'runtime cyclic dependency' caused by a registered delegate that calls back into
                 // the container manually. This will not be detected during building the expression, because
                 // the delegate won't (always) get executed at this point.
+                // See e.g.: CyclicDependencyTests.Verify_DelegateRegistrationDependingOnItself_Throws
                 this.ResetCyclicDependencyValidator();
             }
         }
