@@ -62,14 +62,13 @@ namespace SimpleInjector.Internals
 
         private bool IsCurrentThreadReentering()
         {
-            if (this.enteredThreads != null)
-            {
-                int currentThreadId = Environment.CurrentManagedThreadId;
+            if (this.enteredThreads is null) return false;
 
-                foreach (int threadId in this.enteredThreads)
-                {
-                    if (threadId == currentThreadId) return true;
-                }
+            int currentThreadId = Environment.CurrentManagedThreadId;
+
+            foreach (int threadId in this.enteredThreads)
+            {
+                if (threadId == currentThreadId) return true;
             }
 
             return false;
@@ -77,31 +76,30 @@ namespace SimpleInjector.Internals
 
         private void MarkCurrentThreadAsEntering()
         {
-            int currentThreadId = Environment.CurrentManagedThreadId;
-
             if (this.enteredThreads is null)
             {
+                // Create a list with an array of one. In all but the rarest cases we'll see multiple threads
+                // entering at the same time.
                 this.enteredThreads = new(1);
             }
 
-            this.enteredThreads.Add(currentThreadId);
+            this.enteredThreads.Add(Environment.CurrentManagedThreadId);
         }
 
         private void MarkCurrentThreadAsLeaving()
         {
-            if (this.enteredThreads != null)
-            {
-                this.enteredThreads.Remove(Environment.CurrentManagedThreadId);
+            if (this.enteredThreads is null) return;
 
-                if (this.enteredThreads.Count == 0)
-                {
-                    // Dereference the list. Although this causes the production of way
-                    // more garbage during the warm-up phase when the instance producer
-                    // is depended upon a lot, it ensures that the least amount of memory
-                    // is used when the warmup phase is complete and all expression trees
-                    // have been compiled.
-                    this.enteredThreads = null;
-                }
+            this.enteredThreads.Remove(Environment.CurrentManagedThreadId);
+
+            if (this.enteredThreads.Count == 0)
+            {
+                // Dereference the list. Although this causes the production of way
+                // more garbage during the warm-up phase when the instance producer
+                // is depended upon a lot, it ensures that the least amount of memory
+                // is used when the warmup phase is complete and all expression trees
+                // have been compiled.
+                this.enteredThreads = null;
             }
         }
     }
