@@ -896,8 +896,9 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers an <see cref="Action{T}"/> delegate that runs after the creation of instances that
-        /// implement or derive from the given <typeparamref name="TService"/>. Please note that only instances
-        /// that are created by the container (using constructor injection) can be initialized this way.
+        /// implement or derive from the given <typeparamref name="TService"/>. The delegate will be called
+        /// on all objects returned from the container, including types registered using
+        /// <see cref="RegisterInstance"/>.
         /// </summary>
         /// <typeparam name="TService">The type for which the initializer will be registered.</typeparam>
         /// <param name="instanceInitializer">The delegate that will be called after the instance has been
@@ -971,55 +972,6 @@ namespace SimpleInjector
         /// type. This makes it possible to have multiple initializers to be applied on a single returned
         /// instance while keeping performance high.
         /// </para>
-        /// <para>
-        /// Registered initializers will only be applied to instances that are created by the container self
-        /// (using constructor injection). Types that are newed up manually by supplying a
-        /// <see cref="Func{T}"/> delegate to the container (using the
-        /// <see cref="Register{TService}(Func{TService})"/> method) or registered as single instance
-        /// (using <see cref="RegisterInstance{TService}(TService)"/>) will not trigger initialization.
-        /// When initialization of these instances is needed, this must be done manually, as can be seen in
-        /// the following example:
-        /// <code lang="cs"><![CDATA[
-        /// [TestMethod]
-        /// public static void TestRegisterInitializer()
-        /// {
-        ///     // Arrange
-        ///     int initializerCallCount = 0;
-        ///
-        ///     var container = new Container();
-        ///
-        ///     // Define a initializer for ICommand
-        ///     Action<ICommand> commandInitializer = command =>
-        ///     {
-        ///         initializerCallCount++;
-        ///     });
-        ///
-        ///     // Configuring that initializer.
-        ///     container.RegisterInitializer<ICommand>(commandInitializer);
-        ///
-        ///     container.Register<ICommand>(() =>
-        ///     {
-        ///         // Create a ConcreteCommand manually: will not be initialized.
-        ///         var command = new ConcreteCommand("Data Source=.;Initial Catalog=db;");
-        ///
-        ///         // Run the initializer manually.
-        ///         commandInitializer(command);
-        ///
-        ///         return command;
-        ///     });
-        ///
-        ///     // Act
-        ///     var command = container.GetInstance<ICommand>();
-        ///
-        ///     // Assert
-        ///     // The initializer will only be called once.
-        ///     Assert.AreEqual(1, initializerCallCount);
-        /// }
-        /// ]]></code>
-        /// The previous example shows how a manually created instance can still be initialized. Try to
-        /// prevent creating types manually, by changing the design of those classes. If possible, create a
-        /// single public constructor that only contains dependencies that can be resolved.
-        /// </para>
         /// </remarks>
         public void RegisterInitializer<TService>(Action<TService> instanceInitializer)
             where TService : class
@@ -1033,8 +985,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Registers an <see cref="Action{InstanceInitializationData}"/> delegate that runs after the
-        /// creation of instances for which the supplied <paramref name="predicate"/> returns true. Please
-        /// note that only instances that are created by the container can be initialized this way.
+        /// creation of instances for which the supplied <paramref name="predicate"/> returns true.
         /// </summary>
         /// <param name="instanceInitializer">The delegate that will be called after the instance has been
         /// constructed and before it is returned.</param>
