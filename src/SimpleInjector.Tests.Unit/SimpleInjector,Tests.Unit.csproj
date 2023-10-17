@@ -1,54 +1,60 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project>
 
+    <!--
+    CA1707 // Identifiers should not contain underscores
+    Can be safely ignored in test projects
+    -->
+    <PropertyGroup>
+        <TargetFramework>net461</TargetFramework>
+        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+        <RuntimeIdentifiers>win10-x86</RuntimeIdentifiers>
 
-  <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>SimpleInjector.Tests.Unit</AssemblyName>
-    <AssemblyOriginatorKeyFile>../fake.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>SimpleInjector.Tests.Unit</PackageId>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <RuntimeIdentifiers>win10-x86</RuntimeIdentifiers>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <RootNamespace>SimpleInjector.Tests.Unit</RootNamespace>
-  </PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);CA1707</NoWarn>
 
+        <AssemblyName>SimpleInjector.Tests.Unit</AssemblyName>
+        <PackageId>SimpleInjector.Tests.Unit</PackageId>
+        <Product>SimpleInjector.Tests.Unit</Product>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj" />
-    <ProjectReference Include="..\SimpleInjector\SimpleInjector.csproj" />
-  </ItemGroup>
+        <Title>SimpleInjector Tests Unit</Title>
+        <AssemblyTitle>SimpleInjector Tests Unit</AssemblyTitle>
+        <Description>SimpleInjector Tests Unit.</Description>
+    </PropertyGroup>
 
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
-    <ProjectReference Include="..\PartialTrustTestRunner\PartialTrustTestRunner.csproj" />
-    <Reference Include="System.Linq.Expressions" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+        <PackageReference Include="MSTest.TestAdapter" Version="1.2.0" />
+        <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
+        <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.0.0" />
+        <PackageReference Include="Castle.Core" Version="4.2.1" />
+    </ItemGroup>
+    
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+        <Reference Include="System.Linq.Expressions" />
+        <Reference Include="Microsoft.CSharp" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="1.2.0" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
-    <PackageReference Include="Castle.Core" Version="4.2.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="$(SrcFolder)SimpleInjector\SimpleInjector.csproj" />
+        <ProjectReference Include="$(SrcFolder)SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <COMReference Include="SHDocVw">
-      <Guid>{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>1</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
+    <!--<ItemGroup>
+        <COMReference Include="SHDocVw">
+            <Guid>{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}</Guid>
+            <VersionMajor>1</VersionMajor>
+            <VersionMinor>1</VersionMinor>
+            <Lcid>0</Lcid>
+            <WrapperTool>tlbimp</WrapperTool>
+            <Isolated>False</Isolated>
+            <EmbedInteropTypes>True</EmbedInteropTypes>
+        </COMReference>
+    </ItemGroup>-->
+    
 </Project>

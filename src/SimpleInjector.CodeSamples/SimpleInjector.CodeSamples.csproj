@@ -1,29 +1,40 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project>
+    
+    <PropertyGroup>
+        <TargetFramework>net45</TargetFramework>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
 
-  <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>SimpleInjector.CodeSamples</AssemblyName>
-    <PackageId>SimpleInjector.CodeSamples</PackageId>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-  </PropertyGroup>
+        <AssemblyName>SimpleInjector.CodeSamples</AssemblyName>
+        <PackageId>SimpleInjector.CodeSamples</PackageId>
+        <Product>SimpleInjector.CodeSamples</Product>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector\SimpleInjector.csproj" />
-  </ItemGroup>
+        <Title>Simple Injector Code Samples</Title>
+        <AssemblyTitle>Simple Injector Code Samples</AssemblyTitle>
+        <Description>Simple Injector Code Samples.</Description>
+        <Copyright>Copyright © Simple Injector Contributors</Copyright>
 
-  <ItemGroup>
-    <PackageReference Include="System.Linq" Version="4.1.0" />
-  </ItemGroup>
+        <PackageReleaseNotes>See: https://github.com/simpleinjector/SimpleInjector/releases/tag/5.0.0</PackageReleaseNotes>
+        <PackageTags>Samples CodeSamples</PackageTags>
+        <VersionPrefix>5.0.0</VersionPrefix>
+    </PropertyGroup>
+    
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System.Runtime" />
-    <Reference Include="System.Reflection" />
-    <Reference Include="System.Linq.Expressions" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+    <ItemGroup>
+        <PackageReference Include="System.Linq" Version="4.1.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+        <Reference Include="System.Linq.Expressions" />
+        <Reference Include="System.Reflection" />
+        <Reference Include="System.Runtime" />
+        <Reference Include="Microsoft.CSharp" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="$(SrcFolder)SimpleInjector\SimpleInjector.csproj" />
+    </ItemGroup>
 
 </Project>

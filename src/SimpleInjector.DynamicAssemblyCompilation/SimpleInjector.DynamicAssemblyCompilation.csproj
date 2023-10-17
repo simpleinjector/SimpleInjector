@@ -1,48 +1,30 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <Description>Dynamic Assembly Compilation plugin for Simple Injector.</Description>
-    <AssemblyTitle>Dynamic Assembly Compilation plugin for Simple Injector.</AssemblyTitle>
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <VersionPrefix>5.0.0</VersionPrefix>
-    <AssemblyVersion>5.0.0.0</AssemblyVersion>
-    <Authors>Simple Injector Contributors</Authors>
-    <TargetFrameworks>net45</TargetFrameworks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>SimpleInjector.DynamicAssemblyCompilation</AssemblyName>
-    <AssemblyOriginatorKeyFile>../SimpleInjector.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>SimpleInjector.DynamicAssemblyCompilation</PackageId>
-    <PackageTags>simpleinjector;dynamic-assembly-compilation</PackageTags>
-    <PackageIcon>simpleinjector.png</PackageIcon>
-    <PackageProjectUrl>https://simpleinjector.org</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
-    <LangVersion>preview</LangVersion>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+﻿<Project>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFrameworks>net45</TargetFrameworks>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector\SimpleInjector.csproj" />
-  </ItemGroup>
+        <AssemblyName>SimpleInjector.DynamicAssemblyCompilation</AssemblyName>
+        <PackageId>SimpleInjector.DynamicAssemblyCompilation</PackageId>
+        <Product>SimpleInjector.DynamicAssemblyCompilation</Product>
 
-  <ItemGroup>
-    <None Include="..\Graphics\simpleinjector.png" Pack="true" PackagePath="" />
-  </ItemGroup>
+        <Title>Dynamic Assembly Compilation plugin for Simple Injector.</Title>
+        <AssemblyTitle>Dynamic Assembly Compilation plugin for Simple Injector.</AssemblyTitle>
+        <Description>Dynamic Assembly Compilation plugin for Simple Injector.</Description>
 
-  <Target Name="PostcompileScript" AfterTargets="Build" Condition=" '$(IsCrossTargetingBuild)' != 'true' ">
-    <Exec Command="dotnet pack --no-build --configuration $(Configuration)" />
-  </Target>
+        <PackageTags>dynamic-assembly-compilation</PackageTags>
+        <VersionPrefix>5.0.0</VersionPrefix>
+    </PropertyGroup>
+
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+        <Reference Include="Microsoft.CSharp" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(SrcFolder)SimpleInjector\SimpleInjector.csproj" />
+    </ItemGroup>
+
 </Project>

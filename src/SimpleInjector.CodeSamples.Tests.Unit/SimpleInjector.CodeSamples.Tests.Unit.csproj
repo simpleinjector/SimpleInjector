@@ -1,33 +1,47 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project>
 
-  <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyName>SimpleInjector.CodeSamples.Tests.Unit</AssemblyName>
-    <PackageId>SimpleInjector.CodeSamples.Tests.Unit</PackageId>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <RuntimeIdentifiers>win10-x86</RuntimeIdentifiers>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-  </PropertyGroup>
+    <!--
+    CA1707 // Identifiers should not contain underscores
+    Can be safely ignored in test projects
+    -->
+    <PropertyGroup>
+        <TargetFramework>net461</TargetFramework>
+        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+        <RuntimeIdentifiers>win10-x86</RuntimeIdentifiers>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj" />
-    <ProjectReference Include="..\SimpleInjector.Tests.Unit\SimpleInjector,Tests.Unit.csproj" />
-    <ProjectReference Include="..\SimpleInjector\SimpleInjector.csproj" />
-    <ProjectReference Include="..\SimpleInjector.CodeSamples\SimpleInjector.CodeSamples.csproj" />
-  </ItemGroup>
+        <IsPackable>false</IsPackable>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);CA1707</NoWarn>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="1.2.0" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
-  </ItemGroup>
+        <AssemblyName>SimpleInjector.CodeSamples.Tests.Unit</AssemblyName>
+        <PackageId>SimpleInjector.CodeSamples.Tests.Unit</PackageId>
+        <Product>SimpleInjector.CodeSamples.Tests.Unit</Product>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
+        <Title>SimpleInjector CodeSamples Tests Unit</Title>
+        <AssemblyTitle>SimpleInjector CodeSamples Tests Unit</AssemblyTitle>
+        <Description>SimpleInjector CodeSamples Tests Unit.</Description>
+    </PropertyGroup>
+
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+        <PackageReference Include="MSTest.TestAdapter" Version="1.2.0" />
+        <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+        <Reference Include="Microsoft.CSharp" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(SrcFolder)SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj" />
+        <ProjectReference Include="$(SrcFolder)SimpleInjector.Tests.Unit\SimpleInjector,Tests.Unit.csproj" />
+        <ProjectReference Include="$(SrcFolder)SimpleInjector\SimpleInjector.csproj" />
+        <ProjectReference Include="$(SrcFolder)SimpleInjector.CodeSamples\SimpleInjector.CodeSamples.csproj" />
+    </ItemGroup>
 
 </Project>

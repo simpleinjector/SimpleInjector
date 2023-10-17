@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <!--
+    *********************************************************
+    * Options to display useful debugging logs during build *
+    *********************************************************
+    -->
+    <PropertyGroup>
+        <DisplayBuildInfo>true</DisplayBuildInfo>
+        <DisplayAdjustedNugetVersion>true</DisplayAdjustedNugetVersion>
+    </PropertyGroup>
+    <!--
+    ***********************************************************************************************
+    * These settings in normal situatuin wil be provided by MSBuild per project.                  *
+    * in case anything is missing, this will serve as fallback and fill in the missing settings. *
+    ***********************************************************************************************
+    -->
+    <PropertyGroup Label="Settings per project (provided by MSBuild)">
+        <ProjectName    Condition=" '$(ProjectName)'    == '' ">$(MSBuildProjectName)</ProjectName>
+        <Configurations Condition=" '$(Configurations)' == '' ">Debug;Debug-NoAnalyzers;Release</Configurations>
+        <Configuration  Condition=" '$(Configuration)'  == '' ">Debug</Configuration>
+        <OutputType     Condition=" '$(OutputType)'     == '' ">Library</OutputType>
+    </PropertyGroup>
+
+    <!--
+    ***********************************************************************************************
+    * These settings should be configured per project in the .csproj file.                        *
+    * in case anything is missing, this will serve as fallback and fill in the missing settings. *
+    ***********************************************************************************************
+    -->
+    <PropertyGroup Label="Settings per project (from .csproj)">
+        <AssemblyName   Condition=" '$(AssemblyName)'   == '' ">$(ProjectName)</AssemblyName>
+        <AssemblyTitle  Condition=" '$(AssemblyTitle)'  == '' ">$([System.Text.RegularExpressions.Regex]::Replace($(AssemblyName), `((?&lt;=[a-z])[A-Z]|[A-Z](?=[a-z]))`, ' $1').Trim())</AssemblyTitle>
+        <Title          Condition=" '$(Title)'          == '' ">$(AssemblyTitle)</Title>
+        <RootNamespace  Condition=" '$(RootNamespace)'  == '' ">$(AssemblyName.Replace(" ", "_"))</RootNamespace>
+    </PropertyGroup>
+
+    <!--
+    **************************************************************
+    * These setting can be overrding in the project .csproj file *
+    **************************************************************
+    -->
+    <PropertyGroup Label="Overridable in projects">
+        <!-- Version information can be overriding per project in the .csproj
+             this will fallback to the spcified 'VersionPrefix'
+             in case the project specify nothing -->
+        <VersionPrefix   Condition=" '$(VersionPrefix)'   == '' ">5.4.1</VersionPrefix>
+        <AssemblyVersion Condition=" '$(AssemblyVersion)' == '' ">$(VersionPrefix)</AssemblyVersion>
+        <Version         Condition=" '$(Version)'         == '' ">$(VersionPrefix)</Version>
+        <PackageVersion  Condition=" '$(PackageVersion)'  == '' ">$(VersionPrefix)</PackageVersion>
+
+        <!-- Project's nuget tags will be constructed from project specific tags
+             in addition to common tags -->
+        <ProjectTags>$(PackageTags)</ProjectTags>
+        <PackageTags>simpleinjector architecture dependency-injection DI easy easy-to-use Inversion-of-Control IOC</PackageTags>
+        <PackageTags Condition=" '$(ProjectTags)' != '' ">$(PackageTags) $(ProjectTags)</PackageTags>
+
+        <!-- Fallback to default project url when the project does not set <PackageProjectUrl> property -->
+        <PackageProjectUrl Condition=" '$(PackageProjectUrl)'  == '' ">https://simpleinjector.org</PackageProjectUrl>
+
+        <!-- Fallback to default repository url when the project does not set <RepositoryUrl> property -->
+        <RepositoryUrl Condition=" '$(RepositoryUrl)'  == '' ">https://github.com/simpleinjector/SimpleInjector</RepositoryUrl>
+
+        <!-- Fallback to default ReleaseNotes when the project does not set <PackageReleaseNotes> property -->
+        <PackageReleaseNotes Condition=" '$(PackageReleaseNotes)' == '' ">See: https://github.com/simpleinjector/SimpleInjector/releases</PackageReleaseNotes>
+
+        <!-- set this to 'false' in the .csproj file to disable Documentation Generation per project -->
+        <GenerateDocumentationFile Condition=" '$(GenerateDocumentationFile)' == '' ">true</GenerateDocumentationFile>
+        
+        <!-- set this to 'true' in the .csproj file of the test projects to include test framework's nugets  -->
+        <IsTestProj Condition=" '$(IsTestProj)' == '' ">false</IsTestProj>
+        
+        <!-- set this to 'true' in the project .csproj file to include and enable StyleCop Analyzers -->
+        <AddStyleCop Condition=" '$(AddStyleCop)' == '' ">false</AddStyleCop>
+
+        <!-- set this to 'true' in the project .csproj file to include and enable SourceLink -->
+        <AddSourceLink Condition=" '$(AddSourceLink)' == '' ">true</AddSourceLink>
+        
+        <!-- set this to 'true' in the .csproj file to enable Package Validation.
+             this is important to detect any 'breaking changes' in the public api of the library.
+             see here for more info:
+             https://learn.microsoft.com/en-us/dotnet/fundamentals/package-validation/baseline-version-validator -->
+        <PkgValidation Condition=" '$(PkgValidation)' == '' ">false</PkgValidation>
+    </PropertyGroup>
+
+    <!--
+    ********************************
+    * Calculate the absolute paths *
+    ********************************
+    -->
+    <PropertyGroup Label="Absolute Paths">
+        <!-- Calculate the absolute paths for solution root, build output and the src folders. -->
+        <RootFolder>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\))</RootFolder>
+        <BuildFolder>$(RootFolder)artifacts\</BuildFolder>
+        <SrcFolder>$(RootFolder)src\</SrcFolder>
+
+        <!-- Calculate the absolute path for the keys.
+             if SimpleInjector.snk keyfile exist, then it will be used, otherwise fallback to fake.snk -->
+        <KeyFile>$(SrcFolder)SimpleInjector.snk</KeyFile>
+        <AltKeyFile>$(SrcFolder)fake.snk</AltKeyFile>
+
+        <!-- Calculate the absolute path for the output folder based on:
+             - Prefix for project type (Library or Test).
+             - Configuration (Debug or Release).
+             - ProjectName. -->
+        <Prefix>Lib</Prefix>
+        <Prefix Condition=" '$(IsTestProj)' == 'true' ">Test</Prefix>
+        <ProjectOutputPath>$(BuildFolder)$(Prefix).$(Configuration)\$(ProjectName)\</ProjectOutputPath>
+        <ProjectObjPath>$(BuildFolder)obj.$(Configuration)\$(ProjectName)\</ProjectObjPath>
+    </PropertyGroup>
+
+    <!--
+    ***************************************
+    * Nuget package metadata and settings *
+    ***************************************
+    -->
+    <PropertyGroup Label="Packaging">
+        <Copyright>Copyright © Simple Injector Contributors</Copyright>
+        <Company>Simple Injector</Company>
+        <Authors>Simple Injector Contributors</Authors>
+        <RepositoryType>git</RepositoryType>
+        <NeutralLanguage>en-US</NeutralLanguage>
+
+        <PackageIcon>simpleinjector.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+
+        <!--<PackageLicenseFile>LICENSE</PackageLicenseFile>-->
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageLicenseExpression Condition=" '$(PackageLicenseFile)' != '' "></PackageLicenseExpression>
+
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+        <PackageOutputPath Condition=" '$(BuildFolder)' != '' ">$(BuildFolder)Packages\</PackageOutputPath>
+        <PackageOutputPath Condition=" '$(PackageOutputPath)' == '' ">$(RootFolder)artifacts\Packages\</PackageOutputPath>
+        <Product Condition=" '$(Product)' == '' ">$(AssemblyName)</Product>
+        <PackageId Condition=" '$(PackageId)' == '' ">$(AssemblyName)</PackageId>
+        <IsPackable Condition=" '$(IsPackable)' == '' ">true</IsPackable>
+
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <IncludeBuildOutput>true</IncludeBuildOutput>
+        <IsPublishable>true</IsPublishable>
+        <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
+        <DevelopmentDependency>false</DevelopmentDependency>
+        <SuppressDependenciesWhenPacking>false</SuppressDependenciesWhenPacking>
+        <PackAsTool>false</PackAsTool>
+
+        <AllowUnsafeBlocks Condition=" '$(AllowUnsafeBlocks)' == '' ">false</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <!--
+    **************************************************************************************
+    * We have to supress these warnings that caused by enabling 'CodeAnalysis'.          *
+    * if we add StyleCop, we will get more errors and warning.                           *
+    *                                                                                    *
+    * it's better to have look at each individual warning                                *
+    *                                                                                    *
+    * see here for more info:                                                            *
+    * https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ *
+    **************************************************************************************
+    -->
+    <PropertyGroup>
+        <NoWarn>$(NoWarn);CA1062;CA1822;CA1815;CA1851;CA1019</NoWarn>
+        <NoWarn>$(NoWarn);CA1032;CA2000;CA1021;CA1031;CA2002</NoWarn>
+        <NoWarn>$(NoWarn);CA1508;CA1820;CA2213;CA1033;CA1001</NoWarn>
+        <NoWarn>$(NoWarn);CA1854;CA1506;CA1825;CA1307;CA1816</NoWarn>
+        <NoWarn>$(NoWarn);CA1805;CA1014;CA1721;CA1305;CA1852</NoWarn>
+        <NoWarn>$(NoWarn);CA1200;CA2208;CA2007;CA1812;CA1310</NoWarn>
+        <NoWarn>$(NoWarn);CA1725;CA1819;CA1034;CA1710;CA1303</NoWarn>
+        <NoWarn>$(NoWarn);CS1573</NoWarn>       
+
+        <NoWarn>$(NoWarn);CS8625;CS8603;CS8601;CS8600;CS8618</NoWarn>
+        <NoWarn>$(NoWarn);CS8602;CS8604;CS8629</NoWarn>
+
+        <NoWarn>$(NoWarn);CA1040;CA1806;CA1024;CA1063;CA1829</NoWarn>
+        <NoWarn>$(NoWarn);CA1051;CA2201;CA1711;CA2237;CA1052</NoWarn>
+        <NoWarn>$(NoWarn);CA1003;CA1715;CA1005;CA1018;CA1012</NoWarn>
+        <NoWarn>$(NoWarn);CA1000;CA1065;CA1810;CA2008;CA1823</NoWarn>
+        <NoWarn>$(NoWarn);CA1724;IDE0039;CS8620;CA1045;CA1813</NoWarn>
+    </PropertyGroup>
+
+    <!--
+     1 CA1062 // Validate arguments of public methods
+     2 CA1822 // Mark members as static
+     3 CA1815 // Override equals and operator equals on value types
+     4 CA1851 // Possible multiple enumerations of 'IEnumerable' collection
+     5 CA1019 // Define accessors for attribute arguments
+     6 CA1032 // Implement standard exception constructors
+     7 CA2000 // Dispose objects before losing scope
+     8 CA1021 // Avoid out parameters
+     9 CA1031 // Do not catch general exception types
+    10 CA2002 // Do not lock on objects with weak identity
+    11 CA1508 // Avoid dead conditional code
+    12 CA1820 // Test for empty strings using string length
+    13 CA2213 // Disposable fields should be disposed
+    14 CA1033 // Interface methods should be callable by child types
+    15 CA1001 // Types that own disposable fields should be disposable
+    16 CA1854 // Prefer the IDictionary.TryGetValue(TKey, out TValue) method
+    17 CA1506 // Avoid excessive class coupling
+    18 CA1825 // Avoid zero-length array allocations
+    19 CA1307 // Specify StringComparison for clarity
+    20 CA1816 // Call GC.SuppressFinalize correctly
+    21 CA1805 // Do not initialize unnecessarily
+    22 CA1014 // Mark assemblies with CLSCompliantAttribute
+    23 CA1721 // Property names should not match get methods
+    24 CA1305 // Specify IFormatProvider
+    25 CA1852 // Seal internal types
+    26 CA1200 // Avoid using cref tags with a prefix
+    27 CA2208 // Instantiate argument exceptions correctly
+    28 CA2007 // Consider calling ConfigureAwait on the awaited task
+    29 CA1812 // Avoid uninstantiated internal classes
+    30 CA1310 // Specify StringComparison for correctness
+    31 CA1725 // Parameter names should match base declaration
+    32 CA1819 // Properties should not return arrays
+    33 CA1034 // Nested types should not be visible
+    34 CA1710 // Identifiers should have correct suffix
+    35 CA1303 // Do not pass literals as localized parameters
+    36 CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
+    -->
+
+    <!--
+    ********************************************************
+    * These warnings caused by <Nullable>enable</Nullable> *
+    *                                                      *
+    * Need to be fixed one by one                          *
+    ********************************************************
+    35 CS8625 // Cannot convert null literal to non-nullable reference type.
+    36 CS8603 // Possible null reference return.
+    37 CS8601 // Possible null reference assignment.
+    38 CS8600 // Converting null literal or possible null value to non-nullable type.
+    39 CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    40 CS8602 // Dereference of a possibly null reference.
+    41 CS8604 // Possible null reference argument.
+    42 CS8629 // Nullable value type may be null.
+    -->
+
+    <!--
+    **************************************************
+    * These warnings from test projects              *
+    *                                                *
+    * Some of them can be ignored, but some critical *
+    * and can lead to false positive tests           *
+    **************************************************
+    CA1040 // Avoid empty interfaces
+    CA1806 // Do not ignore method results
+    CA1024 // Use properties where appropriate
+    CA1063 // Implement IDisposable Correctly
+    CA1829 // Use Length/Count property instead of Count() when available
+    CA1051 // Do not declare visible instance fields
+    CA2201 // Do not raise reserved exception types
+    CA1711 // Identifiers should not have incorrect suffix
+    CA2237 // Mark ISerializable types with serializable
+    CA1052 // Static holder types should be Static or NotInheritable
+    CA1003 // Use generic event handler instances
+    CA1715 // Identifiers should have correct prefix
+    CA1005 // Avoid excessive parameters on generic types
+    CA1018 // Mark attributes with AttributeUsageAttribute
+    CA1012 // Abstract types should not have public constructors
+    CA1000 // Do not declare static members on generic types
+    CA1065 // Do not raise exceptions in unexpected locations
+    CA1810 // Initialize reference type static fields inline
+    CA2008 // Do not create tasks without passing a TaskScheduler
+    CA1823 // Avoid unused private fields
+    CA1724 // Type names should not match namespaces
+    IDE0039 // Use local function
+    CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+    CA1045 // Do not pass types by reference
+    CA1813 // Avoid unsealed attributes
+    -->
+    <!--
+    *********************************************************************
+    * Set the build output path, including the targeted framework name. *
+    *********************************************************************
+    -->
+    <PropertyGroup Label="Output">
+        <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
+        <OutputPath>$(ProjectOutputPath)</OutputPath>
+        <BaseIntermediateOutputPath>$(ProjectObjPath)</BaseIntermediateOutputPath>
+    </PropertyGroup>
+    
+    <!--
+    ********************************************************************
+    * Set the absolute path for the documentation file of the project. *
+    * all documentation files will be in the 'Docs' folder.            *
+    ********************************************************************
+    -->
+    <PropertyGroup Label="Documentation">
+        <DocumentationFile>$(BuildFolder)Docs\$(ProjectName).xml</DocumentationFile>
+    </PropertyGroup>
+
+    <!--
+    ****************************************
+    * Setting for C# language and features *
+    ****************************************
+    -->
+    <PropertyGroup Label="C# Settings">
+        <LangVersion>preview</LangVersion>
+        <Features>strict</Features>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
+    </PropertyGroup>
+
+    <!--
+    **********************
+    * Build optimization *
+    **********************
+    -->
+    <PropertyGroup Label="Build Settings">
+        <!-- see here for more info:
+             https://devblogs.microsoft.com/visualstudio/vs-toolbox-accelerate-your-builds-of-sdk-style-net-projects/ -->
+        <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+        
+        <!-- see here for more info:
+             https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-options/code-generation#deterministic -->
+        <Deterministic>true</Deterministic>
+        
+        <!-- see here for more info:
+             https://learn.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#continuousintegrationbuild -->
+        <ContinuousIntegrationBuild>false</ContinuousIntegrationBuild>
+        <ContinuousIntegrationBuild Condition=" ( '$(GITHUB_ACTIONS)' == 'true' ) or
+                                                ( '$(TF_BUILD)' == 'true' ) ">true</ContinuousIntegrationBuild>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+    <!--
+    *********************************************************************
+    * Code Optimize base on the active configuration (Debug or Release) *
+    *********************************************************************
+    -->
+    <PropertyGroup Label="Debugging">
+        <Optimize>false</Optimize>
+        <DebugType>portable</DebugType>        
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <Optimize>True</Optimize>
+        <AnalysisMode>None</AnalysisMode>
+    </PropertyGroup>
+
+    <!--
+    ********************************************************
+    * Configurations of the generated AssemblyInfo.cs file *
+    ********************************************************
+    -->
+    <PropertyGroup Label="AssemblyInfo">
+        <!--
+        The generator will use the configured settings in the properties:
+        <Company>...</Company>
+        <Title>...</Title>
+        <Description>...</Description>
+        <Copyright>...</Copyright>
+        <Product>...</Product>
+        <Version>...</Version>
+        <FileVersion>...</FileVersion>
+        <InformationalVersion>...</InformationalVersion>
+        <Configuration>...</Configuration>
+        <NeutralLanguage>...</NeutralLanguage>
+        
+        see here for more info:
+        https://learn.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#assembly-attribute-properties
+        -->
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <GenerateAssemblyCompanyAttribute>true</GenerateAssemblyCompanyAttribute>
+        <GenerateAssemblyTitleAttribute>true</GenerateAssemblyTitleAttribute>
+        <GenerateAssemblyDescriptionAttribute>true</GenerateAssemblyDescriptionAttribute>
+        <GenerateAssemblyCopyrightAttribute>true</GenerateAssemblyCopyrightAttribute>
+        <GenerateAssemblyProductAttribute>true</GenerateAssemblyProductAttribute>
+        <GenerateAssemblyVersionAttribute>true</GenerateAssemblyVersionAttribute>
+        <GenerateAssemblyFileVersionAttribute>true</GenerateAssemblyFileVersionAttribute>
+        <GenerateAssemblyInformationalVersionAttribute>true</GenerateAssemblyInformationalVersionAttribute>
+        <GenerateAssemblyConfigurationAttribute>true</GenerateAssemblyConfigurationAttribute>
+        
+        <GenerateNeutralResourcesLanguageAttribute>true</GenerateNeutralResourcesLanguageAttribute>
+
+        <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
+    </PropertyGroup>
+
+    <!--
+    ********************************
+    * Strong name signing settings *
+    ********************************
+    -->
+    <PropertyGroup Label="Signing">
+        <!-- Default to use 'SimpleInjector.snk' keyfile, if it's not Exist
+             fallback to the alternative 'fake.snk' keyfile. -->
+        <AssemblyOriginatorKeyFile Condition="  Exists('$(KeyFile)') ">$(KeyFile)</AssemblyOriginatorKeyFile>
+        <AssemblyOriginatorKeyFile Condition=" !Exists('$(KeyFile)') ">$(AltKeyFile)</AssemblyOriginatorKeyFile>
+        <PublicSign                Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+        <SignAssembly>true</SignAssembly>
+        <DelaySign>false</DelaySign>
+    </PropertyGroup>
+
+    <!--
+    **********************
+    * SourceLink setting *
+    **********************
+    -->
+    <PropertyGroup Label="SourceLink">
+        <!-- Enabling SourceLink, is really, really useful for developers
+             to easy debug and step-in in SimpleInjector code when debugging -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <PublishRepositoryUrl Condition=" '$(AddSourceLink)' != 'true' ">false</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <!--
+    *******************************
+    * Package Validation settings *
+    *******************************
+    -->
+    <PropertyGroup Label="Package Validation" Condition=" 'PkgValidation' == 'true' ">
+        <!-- see the note in the previous property <PkgValidation> -->
+        <EnablePackageValidation>true</EnablePackageValidation>
+        <PackageValidationBaselineVersion>5.4.1</PackageValidationBaselineVersion>
+        <GenerateCompatibilitySuppressionFile>true</GenerateCompatibilitySuppressionFile>
+        <EnableStrictModeForCompatibleFrameworksInPackage>true</EnableStrictModeForCompatibleFrameworksInPackage>
+        <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
+    </PropertyGroup>
+
+    <!--
+    **************************************
+    * Nugets Used by projects Management *
+    **************************************
+    -->
+    <PropertyGroup Label="Nuget Package Properties">
+        <!-- Currently disabled.
+             see here for more info:
+             https://devblogs.microsoft.com/nuget/introducing-central-package-management/ -->
+        <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+        <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    </PropertyGroup>
+
+    <!--
+    **************************
+    * Code Analysis settings *
+    **************************
+    -->
+    <PropertyGroup Label="Analyzing And Errors">
+        <!-- Set this to 'none' to disable Code Analysis -->
+        <AnalysisMode>All</AnalysisMode>
+        <WarningLevel>7</WarningLevel>
+        <ErrorReport>prompt</ErrorReport>
+        <AnalysisLevel>latest-all</AnalysisLevel>
+        <!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
+        <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+        <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    </PropertyGroup>
+  
+    <!--
+    ============================================================
+    = ItemGroups for Items and packages to include in projects =
+    ============================================================
+    -->
+
+    <!--
+    *****************************************************
+    * Include these files in the generated .nupkg files *
+    *****************************************************
+    -->
+    <ItemGroup Label="PackFiles">
+        <None Include="$(RootFolder)LICENSE"                    Link=".Files\Docs\LICENSE"       Pack="true" PackagePath="\" />
+        <None Include="$(RootFolder)README.md"                  Link=".Files\Docs\README.md"     Pack="true" PackagePath="\" />
+        <None Include="$(SrcFolder)Graphics\simpleinjector.png" Link=".Files\simpleinjector.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <!--
+    *********************************************************************************
+    * Include/Exclude StyleCop Package based on 'AddStyleCop' setting               *
+    * if included, will not be runtime dependence, it's just compile time Analyzer. *
+    *********************************************************************************
+    -->
+    <ItemGroup Label="Style Cop Packages" Condition=" '$(AddStyleCop)' == 'true' ">
+        <PackageReference Include="StyleCop.Analyzers" PrivateAssets="all" />
+    </ItemGroup>
+
+    <!--
+    ****************************************************************************************
+    * Include/Exclude SourceLink Packages based on 'AddSourceLink' setting                 *
+    * if included, will not be runtime dependence, it's just msbuild (props and targets) . *
+    ****************************************************************************************
+    -->
+    <ItemGroup Label="SourceLink Packages" Condition=" '$(AddSourceLink)' == 'true' ">
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+    </ItemGroup>
+
+    <!--
+    ***************************************************************
+    * Include/Exclude Test Packages based on 'IsTestProj' setting *
+    ***************************************************************
+    -->
+    <ItemGroup Label="Packages For Test Projects" Condition=" '$(IsTestProj)' == 'true'">
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="Moq" />
+        <PackageReference Include="coverlet.collector" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="FluentAssertions.Analyzers">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+
+        <PackageReference Include="MSTest.TestFramework" />
+        <PackageReference Include="MSTest.TestAdapter" />
+        <PackageReference Include="Microsoft.UnitTestFramework.Extensions" />
+
+        <PackageReference Include="NUnit" />
+        <PackageReference Include="NUnit3TestAdapter" />
+        <PackageReference Include="NUnit.Analyzers" />
+
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+        <PackageReference Include="xunit.analyzers" />
+    </ItemGroup>
+
+    <!--
+    *******************************************************************
+    * All of these are included in the project to easing access them. *
+    * they are not part of any compilation or package generation.     *
+    *                                                                 *
+    * will be displayed in the sub folder '.Files' in the project.    *
+    *******************************************************************
+    -->
+    <ItemGroup>
+        <None Include="$(RootFolder).gitattributes"        Link=".Files\Config\.gitattributes" />
+        <None Include="$(SrcFolder).gitignore"             Link=".Files\Config\.gitignore" />
+        <None Include="$(SrcFolder).editorconfig"          Link=".Files\Config\.editorconfig" />
+        <None Include="$(SrcFolder)empty.ruleset"          Link=".Files\Config\empty.ruleset" />
+        <None Include="$(SrcFolder)Settings.StyleCop"      Link=".Files\Config\Settings.StyleCop" />
+        <None Include="$(SrcFolder)SimpleInjector.FxCop"   Link=".Files\Config\SimpleInjector.FxCop" />
+        <None Include="$(SrcFolder)SimpleInjector.ruleset" Link=".Files\Config\SimpleInjector.ruleset" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="$(RootFolder)appveyor.bat"         Link=".Files\Build\appveyor.bat" />
+        <None Include="$(RootFolder)appveyor.yml"         Link=".Files\Build\appveyor.yml" />
+        <None Include="$(SrcFolder)Directory.Build.props" Link=".Files\Build\Directory.Build.props" />
+        <None Include="$(SrcFolder)build.bat"             Link=".Files\Build\build.bat" />
+        <None Include="$(SrcFolder)publish2nuget.bat"     Link=".Files\Build\publish2nuget.bat" />
+        <None Include="$(SrcFolder)runcoverage.bat"       Link=".Files\Build\runcoverage.bat" />
+        <None Include="$(SrcFolder)runtests.bat"          Link=".Files\Build\runtests.bat" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="$(RootFolder)docs\Simple Injector Contributor License Agreement.docx" Link=".Files\Docs\Simple Injector Contributor License Agreement.docx" />
+        <None Include="$(RootFolder)docs\Simple Injector Contributor License Agreement.pdf"  Link=".Files\Docs\Simple Injector Contributor License Agreement.pdf" />
+        <None Include="$(SrcFolder)changes.txt" Link=".Files\Docs\changes.txt" />
+    </ItemGroup>
+
+    <!--
+    ===============================================================
+    = Targets used to (integrate into/intercept) MSBuild pipeline =
+    ===============================================================
+    -->
+    
+    <!--
+    ***************************************************************
+    * This is the important and core logic of Semantic Versioning *
+    ***************************************************************
+    -->
+
+    <!-- Use version range on project references (to limit on major version in generated packages) -->
+    <Target Name="ShowAdjustedNugetVersion"
+            AfterTargets="_GetProjectReferenceVersions"
+            Condition=" '$(DisplayAdjustedNugetVersion)' == 'true' ">
+        <PropertyGroup>
+            <ReferencesMessage>
+                -----------------------------------------------------------
+                | Current Project Package version -> @(_ProjectReferencesWithVersions->'%(ProjectVersion)')
+                -----------------------------------------------------------
+            </ReferencesMessage>
+        </PropertyGroup>
+        <Message Importance="High" Text="$(ReferencesMessage)"/>
+        <ItemGroup>
+            <_ProjectReferencesWithVersions Condition="'%(ProjectVersion)' != ''">
+                <ProjectVersion>[$([System.Text.RegularExpressions.Regex]::Match('%(ProjectVersion)', '\d+').Value), $([MSBuild]::Add($([System.Text.RegularExpressions.Regex]::Match('%(ProjectVersion)', '\d+').Value), 1)))</ProjectVersion>
+            </_ProjectReferencesWithVersions>
+        </ItemGroup>
+        <PropertyGroup>
+            <ReferencesMessage>
+                -----------------------------------------------------------
+                | Nuget will use this version  -> @(_ProjectReferencesWithVersions->'%(ProjectVersion)')
+                -----------------------------------------------------------
+            </ReferencesMessage>
+        </PropertyGroup>
+        <Message Importance="High" Text="$(ReferencesMessage)"/>
+    </Target>
+    
+    <!--
+    ********************************************************************************
+    * This target will display helpful info in the MSBuild log console and CI logs *
+    ********************************************************************************
+    -->
+    <Target Name="ShowBuildInfo"
+			BeforeTargets="Build"
+            Condition=" '$(DisplayBuildInfo)' == 'true' ">
+        <PropertyGroup>
+            <ConfigMultilineMessage>
+                -----------------------------------------------------------
+                | Environment ->
+                |	User Name       : $([System.Environment]::UserName)
+                |	Machine Name    : $([System.Environment]::MachineName)
+                |	OS Version      : $([System.Environment]::OSVersion)
+                |	Processor Count : $([System.Environment]::ProcessorCount)
+                |	Parent          : $([System.IO.Directory]::GetParent('.\'))
+                |..........................................................
+                | MS Build v$(MSBuildVersion) ->
+                |	Tools Path       : $(MSBuildToolsPath)
+                |	Runtime Type     : $(MSBuildRuntimeType)
+                |	SDKs Path        : $(MSBuildSDKsPath)
+                |..........................................................
+                | Solution Global ->
+                |..........................................................
+                |	Root  Folder        : $(RootFolder)
+                |	Src Folder          : $(SrcFolder)
+                |	Build Folder        : $(BuildFolder)
+                |	Package Output Path : $(PackageOutputPath)
+                |----------------------------------------------------------
+                | Project [ $(AssemblyName) ] ->
+                |..........................................................
+                |	Directory                : $([MSBuild]::NormalizeDirectory('.\'))
+                |	File Path                : $(MSBuildProjectFullPath)
+                |	Intermediate Output Path : $(BaseIntermediateOutputPath)
+                |	Output Path              : $(OutputPath)
+                |..........................................................
+                |	Assembly Title           : $(AssemblyTitle)
+                |	Root Namespace           : $(RootNamespace)
+                |	Is Test Proj             : $(IsTestProj)
+                |	StyleCop Enabled         : $(AddStyleCop)
+                |	Allow Unsafe Blocks      : $(AllowUnsafeBlocks)
+                |..........................................................
+                |	Output Type              : $(OutputType)
+                |	Configuration            : $(Configuration)
+                |	Platform Target          : $(PlatformTarget)
+                |	Target Framework (s)     : $(TargetFrameworks)
+                |	Target Framework         : $(TargetFramework)
+                |	Runtime Identifier (s)   : $(RuntimeIdentifiers)
+                |	Runtime Identifier       : $(RuntimeIdentifier)
+                -----------------------------------------------------------
+            </ConfigMultilineMessage>
+        </PropertyGroup>
+        <Message Importance="high" Text="$(ConfigMultilineMessage)" />
+    </Target>
+
+</Project>

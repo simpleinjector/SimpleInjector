@@ -1,22 +1,30 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project>
+    
+    <PropertyGroup>
+        <TargetFramework>net461</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <IsPackable>false</IsPackable>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 
-  <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
-    <AssemblyName>PartialTrustTestRunner</AssemblyName>
-    <OutputType>Exe</OutputType>
-    <PackageId>PartialTrustTestRunner</PackageId>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-  </PropertyGroup>
+        <AssemblyName>PartialTrustTestRunner</AssemblyName>
+        <PackageId>PartialTrustTestRunner</PackageId>
+        <Product>SimpleInjector.PartialTrustConsole</Product>
 
-  <ItemGroup>
-    <PackageReference Include="MSTest.TestFramework" Version="1.0.8-rc" />
-  </ItemGroup>
+        <Title>SimpleInjector Partial Trust Test Runner</Title>
+        <AssemblyTitle>SimpleInjector Partial Trust Test Runner</AssemblyTitle>
+        <Description>SimpleInjector Partial Trust Test Runner.</Description>
+    </PropertyGroup>
+    
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+    <ItemGroup>
+        <PackageReference Include="MSTest.TestFramework" Version="1.0.8-rc" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+        <Reference Include="Microsoft.CSharp" />
+    </ItemGroup>
 
 </Project>

@@ -1,15 +1,4 @@
-﻿using System.Reflection;
-using System.Runtime.InteropServices;
-
-// General Information about an assembly is controlled through the following
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyTitle("SimpleInjector.Integration.Wcf")]
-[assembly: AssemblyDescription("Integration library for Windows Communication Foundation for the Simple Injector Inversion of Control library.")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Simple Injector Contributors")]
-[assembly: AssemblyProduct("SimpleInjector.Integration.Wcf")]
-[assembly: AssemblyCopyright("Copyright © Simple Injector Contributors")]
+﻿using System.Runtime.InteropServices;
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from

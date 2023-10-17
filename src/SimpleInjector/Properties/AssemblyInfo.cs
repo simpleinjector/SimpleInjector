@@ -1,9 +1,9 @@
-﻿using System;
-using System.Reflection;
-using System.Resources;
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
+
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Security;
 
 #if !PUBLISH
 [assembly: InternalsVisibleTo("SimpleInjector.Tests.Unit, PublicKey=" +
@@ -14,15 +14,5 @@ using System.Security;
     "05cc27d4")]
 #endif
 
-[assembly: AssemblyTitle("Simple Injector")]
-[assembly: AssemblyDescription("Simple Injector is an easy-to-use Inversion of Control library for .NET.")]
-[assembly: AssemblyCopyright("Copyright © Simple Injector Contributors")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Simple Injector")]
-[assembly: AssemblyProduct("Simple Injector")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-
 [assembly: ComVisible(false)]
 [assembly: CLSCompliant(true)]
-[assembly: NeutralResourcesLanguage("en-US")]

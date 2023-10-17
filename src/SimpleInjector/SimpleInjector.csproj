@@ -1,51 +1,75 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <VersionPrefix>5.0.0</VersionPrefix>
-    <AssemblyVersion>5.0.0.0</AssemblyVersion>
-    <TargetFrameworks>netstandard1.0;netstandard1.3;netstandard2.0;netstandard2.1;net45;net461</TargetFrameworks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>SimpleInjector</AssemblyName>
-    <AssemblyOriginatorKeyFile>../SimpleInjector.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>SimpleInjector</PackageId>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.0' ">1.6.0</NetStandardImplicitPackageVersion>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.0</NetStandardImplicitPackageVersion>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
-    <LangVersion>preview</LangVersion>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+﻿<Project>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-    <PackageReference Include="System.ComponentModel" Version="4.0.1" />
-  </ItemGroup>
+    <!--
+    The package now will include LICENSE and README.md files.
+    if you add 'net7.0;' to TargetList be prepared 
+    to punch of waning about Nullablity, you should consider them
+    as somthing need attention.
+    most of them caused be missing '?' that was there in the overring methods
+    -->
+    <PropertyGroup Label="Target Framework List">
+        <TargetList>
+            netstandard1.0;
+            netstandard1.3;
+            netstandard2.0;
+            netstandard2.1;
+            net45;
+            net461;
+        </TargetList>
+    </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="System.ComponentModel" Version="4.0.1" />
-  </ItemGroup>
-  
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="System.ComponentModel" Version="4.0.1" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFrameworks>$(TargetList)</TargetFrameworks>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-    <PackageReference Include="System.ComponentModel" Version="4.0.1" />
-  </ItemGroup>
+        <AssemblyName>SimpleInjector</AssemblyName>
+        <PackageId>SimpleInjector</PackageId>
+        <Product>Simple Injector</Product>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
+        <Title>Simple Injector</Title>
+        <AssemblyTitle>Simple Injector</AssemblyTitle>
+        <Description>Simple Injector is an easy, flexible and fast dependency injection library that uses best practice to guide your solutions toward the pit of success.</Description>
+        <Copyright>Copyright © Simple Injector Contributors</Copyright>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
+        <PackageReleaseNotes>See: https://github.com/simpleinjector/SimpleInjector/releases/tag/v5.4.1</PackageReleaseNotes>
+
+        <AddSourceLink>true</AddSourceLink>
+        <!--
+        [assembly: AssemblyTitle("Simple Injector")]
+        [assembly: AssemblyDescription("Simple Injector is an easy-to-use Inversion of Control library for .NET.")]
+        [assembly: AssemblyCopyright("Copyright © Simple Injector Contributors")]
+        [assembly: AssemblyConfiguration("")]
+        [assembly: AssemblyCompany("Simple Injector")]
+        [assembly: AssemblyProduct("Simple Injector")]
+        [assembly: AssemblyTrademark("")]
+        [assembly: AssemblyCulture("")]
+
+        <VersionPrefix>5.0.0</VersionPrefix>
+        <AssemblyVersion>5.0.0.0</AssemblyVersion>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        
+        <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+        <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+        <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+        <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+        <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+        <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+        <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+        -->
+
+        <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.0' or '$(TargetFramework)' == 'netstandard1.3'">1.6.0</NetStandardImplicitPackageVersion>
+    </PropertyGroup>
+
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' or '$(TargetFramework)' == 'netstandard1.3' or '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1' ">
+        <PackageReference Include="System.ComponentModel" Version="4.0.1" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net45' or '$(TargetFramework)' == 'net461' ">
+        <Reference Include="System" />
+        <Reference Include="Microsoft.CSharp" />
+    </ItemGroup>
+
 </Project>
