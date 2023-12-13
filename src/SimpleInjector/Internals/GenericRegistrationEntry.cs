@@ -12,6 +12,12 @@ namespace SimpleInjector.Internals
         private readonly List<IProducerProvider> providers = new();
         private readonly ContainerOptions options;
 
+        // PERF: #985 These two collections exist solely for performance optimizations. Registering many
+        // closed-generic types of the same generic abstractions got exponentially slower with the number
+        // of registrations. These two collections help optimize this.
+        private Dictionary<Type, ClosedToInstanceProducerProviderDictionaryEntry>? closedProviders;
+        private List<OpenGenericToInstanceProducerProvider>? openProviders;
+
         internal GenericRegistrationEntry(Container container)
         {
             this.options = container.Options;
@@ -49,19 +55,55 @@ namespace SimpleInjector.Internals
         {
             this.Container.ThrowWhenContainerIsLockedOrDisposed();
 
-            this.ThrowWhenConditionalIsRegisteredInOverridingMode(producer);
+            Type serviceType = producer.ServiceType;
 
             if (!this.AllowOverridingRegistrations)
             {
-                this.ThrowWhenOverlappingRegistrationsExist(producer); // O(n) operation
+                this.ThrowWhenOverlappingRegistrationsExist(producer);
             }
-
-            if (this.AllowOverridingRegistrations)
+            else
             {
-                this.providers.RemoveAll(p => p.ServiceType == producer.ServiceType); // O(n) operation
+                this.ThrowWhenConditionalIsRegisteredInOverridingMode(producer);
+
+                if (this.closedProviders != null)
+                {
+                    if (this.closedProviders.ContainsKey(serviceType))
+                    {
+                        this.closedProviders.Remove(serviceType);
+                        this.providers.RemoveAll(p => p.ServiceType == serviceType);
+                    }
+                }
             }
 
-            this.providers.Add(new ClosedToInstanceProducerProvider(producer));
+            var provider = new ClosedToInstanceProducerProvider(producer);
+            
+            this.AddClosedToInstanceProducerProvider(provider);
+        }
+
+        private void AddClosedToInstanceProducerProvider(ClosedToInstanceProducerProvider provider)
+        {
+            Type serviceType = provider.ServiceType;
+
+            this.providers.Add(provider);
+
+            if (this.closedProviders is null)
+            {
+                this.closedProviders = new Dictionary<Type, ClosedToInstanceProducerProviderDictionaryEntry>
+                {
+                    [serviceType] = new ClosedToInstanceProducerProviderDictionaryEntry(provider)
+                };
+            }
+            else
+            {
+                if (this.closedProviders.TryGetValue(serviceType, out var entry))
+                {
+                    entry.Add(provider);
+                }
+                else
+                {
+                    this.closedProviders[serviceType] = new ClosedToInstanceProducerProviderDictionaryEntry(provider);
+                }
+            }
         }
 
         public void AddGeneric(
@@ -84,10 +126,12 @@ namespace SimpleInjector.Internals
                 if (provider.GetAppliesToAllClosedServiceTypes())
                 {
                     this.providers.RemoveAll(p => p.GetAppliesToAllClosedServiceTypes());
+
+                    this.openProviders?.RemoveAll(p => p.GetAppliesToAllClosedServiceTypes());
                 }
             }
 
-            this.providers.Add(provider);
+            this.AddOpenGenericToInstanceProducerProvider(provider);
         }
 
         public void Add(
@@ -105,7 +149,19 @@ namespace SimpleInjector.Internals
 
             this.ThrowWhenProviderToRegisterOverlapsWithExistingProvider(provider);
 
+            this.AddOpenGenericToInstanceProducerProvider(provider);
+        }
+
+        private void AddOpenGenericToInstanceProducerProvider(OpenGenericToInstanceProducerProvider provider)
+        {
             this.providers.Add(provider);
+
+            if (this.openProviders is null)
+            {
+                this.openProviders = new List<OpenGenericToInstanceProducerProvider>();
+            }
+
+            this.openProviders.Add(provider);
         }
 
         public InstanceProducer? TryGetInstanceProducer(
@@ -172,14 +228,49 @@ namespace SimpleInjector.Internals
 
         private IProducerProvider? GetFirstOverlappingProvider(InstanceProducer producerToRegister)
         {
+            ClosedToInstanceProducerProvider? firstOverlappingClosedProvider = null;
+            OpenGenericToInstanceProducerProvider? firstOverlappingOpenProvider = null;
+
+            if (this.closedProviders != null)
+            {
+                // PERF: Only closed providers exist. We can speed up the operation by going just through
+                // the closed providers for the given service type.
+                if (this.closedProviders.TryGetValue(producerToRegister.ServiceType, out var entry))
+                {
+                    firstOverlappingClosedProvider = entry.OverlapsWith(producerToRegister);
+                }
+            }
+
+            if (this.openProviders != null)
+            {
+                foreach (var openProvider in this.openProviders)
+                {
+                    if (openProvider.OverlapsWith(producerToRegister))
+                    {
+                        firstOverlappingOpenProvider = openProvider;
+                        break;
+                    }
+                }
+            }
+
+            // PERF: Is most cases we can prevent going through the list when there's only one of the two
+            // overlapping.
+            if (firstOverlappingClosedProvider is null && firstOverlappingOpenProvider is null) return null;
+            if (firstOverlappingClosedProvider != null) return firstOverlappingClosedProvider;
+            if (firstOverlappingOpenProvider != null) return firstOverlappingOpenProvider;
+
+            // To bad, there is both an overlapping open and a closed provider. Since we must report the first
+            // first overlapping provider, we have to go through the list (again).
             foreach (var provider in this.providers)
             {
-                if (provider.OverlapsWith(producerToRegister))
+                if (provider == firstOverlappingClosedProvider ||
+                    provider == firstOverlappingOpenProvider)
                 {
                     return provider;
                 }
             }
 
+            // Will never come here, but the C# compiler doesn't know.
             return null;
         }
 
@@ -540,6 +631,56 @@ namespace SimpleInjector.Internals
                 GenericTypeBuilder.IsImplementationApplicableToEveryGenericType(
                     this.ServiceType,
                     implementationType);
+        }
+
+        private sealed class ClosedToInstanceProducerProviderDictionaryEntry
+        {
+            private readonly ClosedToInstanceProducerProvider firstProvider;
+
+            private List<ClosedToInstanceProducerProvider>? providers;
+
+            public ClosedToInstanceProducerProviderDictionaryEntry(ClosedToInstanceProducerProvider firstProvider)
+            {
+                this.firstProvider = firstProvider;
+            }
+
+            public int Count => this.providers?.Count ?? 1;
+
+            internal void Add(ClosedToInstanceProducerProvider provider)
+            {
+                if (this.providers is null)
+                {
+                    this.providers = new List<ClosedToInstanceProducerProvider>
+                    {
+                        this.firstProvider,
+                        provider
+                    };
+                }
+                else
+                {
+                    this.providers.Add(provider);
+                }
+            }
+
+            internal ClosedToInstanceProducerProvider? OverlapsWith(InstanceProducer producerToRegister)
+            {
+                if (this.providers is null)
+                {
+                    return this.firstProvider.OverlapsWith(producerToRegister) ? this.firstProvider : null;
+                }
+                else
+                {
+                    foreach (var provider in this.providers)
+                    {
+                        if (provider.OverlapsWith(producerToRegister))
+                        {
+                            return provider;
+                        }
+                    }
+
+                    return null;
+                }
+            }
         }
     }
 }
