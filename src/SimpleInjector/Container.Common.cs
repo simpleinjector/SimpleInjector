@@ -38,12 +38,11 @@ namespace SimpleInjector
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public partial class Container : ApiObject, IDisposable
     {
-        internal readonly Dictionary<object, Dictionary<Type, WeakReference>> LifestyleRegistrationCache =
-            new Dictionary<object, Dictionary<Type, WeakReference>>();
+        internal readonly Dictionary<object, Dictionary<Type, WeakReference>> LifestyleRegistrationCache = new();
 
         private static long counter;
 
-        private readonly object locker = new object();
+        private readonly object locker = new();
         private readonly List<IInstanceInitializer> instanceInitializers = new();
         private readonly List<ContextualResolveInterceptor> resolveInterceptors = new();
 

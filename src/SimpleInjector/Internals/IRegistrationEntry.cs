@@ -26,6 +26,7 @@ namespace SimpleInjector.Internals
 
         InstanceProducer? TryGetInstanceProducer(Type serviceType, InjectionConsumerInfo consumer);
 
+        // This method is only called when we're about to throw an exception.
         int GetNumberOfConditionalRegistrationsFor(Type serviceType);
     }
 }
