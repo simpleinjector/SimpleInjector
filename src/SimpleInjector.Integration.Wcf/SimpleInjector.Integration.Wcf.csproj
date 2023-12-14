@@ -1,38 +1,35 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <VersionPrefix>5.0.0</VersionPrefix>
-    <AssemblyVersion>5.0.0.0</AssemblyVersion>
-    <TargetFramework>net45</TargetFramework>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>SimpleInjector.Integration.Wcf</AssemblyName>
-    <AssemblyOriginatorKeyFile>../SimpleInjector.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>SimpleInjector.Integration.Wcf</PackageId>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <LangVersion>preview</LangVersion>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+<Project>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector\SimpleInjector.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net45</TargetFramework>
+        
+        <AssemblyName>SimpleInjector.Integration.Wcf</AssemblyName>
+        <PackageId>SimpleInjector.Integration.Wcf</PackageId>
+        <Product>SimpleInjector.Integration.Wcf</Product>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Activation" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
+        <Title>Simple Injector WCF Integration</Title>
+        <AssemblyTitle>Simple Injector WCF Integration</AssemblyTitle>
+        <Description>The Simple Injector WCF Integration package adds a ServiceHost and ServiceHostFactory to allow dependency injection on WCF service types.</Description>
+        <Copyright>Copyright © Simple Injector Contributors 2012 - 2020</Copyright>
 
-  <ItemGroup>
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Activation" />
-  </ItemGroup>
+        <PackageReleaseNotes>See: https://github.com/simpleinjector/SimpleInjector/releases/tag/5.0.0</PackageReleaseNotes>
+        <PackageTags>per-web-request web wcf integration</PackageTags>
+        <VersionPrefix>5.0.0</VersionPrefix>
+        <PackageProjectUrl>https://simpleinjector.org/wcf</PackageProjectUrl>
+    </PropertyGroup>
+
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+    <ItemGroup>
+        <ProjectReference Include="$(SrcFolder)SimpleInjector\SimpleInjector.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+        <Reference Include="System.ServiceModel" />
+        <Reference Include="System.ServiceModel.Activation" />
+        <Reference Include="Microsoft.CSharp" />
+    </ItemGroup>
+
 </Project>

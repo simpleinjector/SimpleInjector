@@ -50,11 +50,12 @@
         public static DirectoryInfo GetRepositoryRoot()
         {
             var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-
-            while (dir.Name != "src")
+            while (dir.Name != "artifacts")
             {
                 dir = dir.Parent;
             }
+
+            dir = new DirectoryInfo(Path.Combine(dir.Parent.FullName, "src"));
 
             return dir;
         }

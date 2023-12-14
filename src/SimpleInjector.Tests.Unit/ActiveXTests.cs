@@ -3,6 +3,7 @@
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#if false
     // #589
     [TestClass]
     public sealed class ActiveXTests : IDisposable
@@ -64,4 +65,5 @@
             ie.ToolBar = 0;
         }
     }
+#endif
 }

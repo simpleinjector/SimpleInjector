@@ -1,15 +1,7 @@
-﻿using System.Reflection;
-using System.Runtime.InteropServices;
+﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
+// Licensed under the MIT License. See LICENSE file in the project root for license information.
 
-// General Information about an assembly is controlled through the following
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyTitle("SimpleInjector.Integration.Web")]
-[assembly: AssemblyDescription("Integration library for ASP.NET for the Simple Injector Inversion of Control library.")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Simple Injector")]
-[assembly: AssemblyProduct("SimpleInjector.Integration.Web")]
-[assembly: AssemblyCopyright("Copyright © Simple Injector Contributors")]
+using System.Runtime.InteropServices;
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from

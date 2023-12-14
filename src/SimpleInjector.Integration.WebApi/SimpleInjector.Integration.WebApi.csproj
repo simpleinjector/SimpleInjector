@@ -1,34 +1,39 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <VersionPrefix>5.0.0</VersionPrefix>
-    <AssemblyVersion>5.0.0.0</AssemblyVersion>
-    <TargetFramework>net45</TargetFramework>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>SimpleInjector.Integration.WebApi</AssemblyName>
-    <AssemblyOriginatorKeyFile>../SimpleInjector.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>SimpleInjector.Integration.WebApi</PackageId>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <LangVersion>preview</LangVersion>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net45</TargetFramework>
+        
+        <AssemblyName>SimpleInjector.Integration.WebApi</AssemblyName>
+        <PackageId>SimpleInjector.Integration.WebApi</PackageId>
+        <Product>SimpleInjector.Integration.WebApi</Product>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleInjector\SimpleInjector.csproj" />
-  </ItemGroup>
+        <Title>Simple Injector ASP.NET Web API Integration</Title>
+        <AssemblyTitle>Simple Injector ASP.NET Web API Integration</AssemblyTitle>
+        <Description>Simple Injector ASP.NET Web API Integration.</Description>
+        <Copyright>Copyright © Simple Injector Contributors 2014 - 2020</Copyright>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="4.0.20710" />
-    <PackageReference Include="System.Runtime" Version="4.1.0" />
-    <PackageReference Include="System.ComponentModel" Version="4.0.1" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
+        <PackageReleaseNotes>See: https://github.com/simpleinjector/SimpleInjector/releases/tag/5.0.0</PackageReleaseNotes>
+        <PackageTags>DependencyResolver</PackageTags>
+        <VersionPrefix>5.0.0</VersionPrefix>
+        <PackageProjectUrl>https://simpleinjector.org/webapi</PackageProjectUrl>
+    </PropertyGroup>
+
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+        <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="4.0.20710" />
+        <PackageReference Include="System.Runtime" Version="4.1.0" />
+        <PackageReference Include="System.ComponentModel" Version="4.0.1" />
+    </ItemGroup>
+    
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+        <Reference Include="System" />
+        <Reference Include="Microsoft.CSharp" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(SrcFolder)SimpleInjector\SimpleInjector.csproj" />
+    </ItemGroup>
+
 </Project>
