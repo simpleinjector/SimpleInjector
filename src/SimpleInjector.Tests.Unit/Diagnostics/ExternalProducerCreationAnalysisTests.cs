@@ -37,7 +37,7 @@
 
             container.Register<IUserRepository, InMemoryUserRepository>(Lifestyle.Transient);
 
-            Lifestyle.Singleton.CreateProducer(typeof(RealUserService), typeof(RealUserService), container);
+            this.CreateUnusedInstanceProducer(container);
 
             GC.Collect();
 
@@ -52,6 +52,14 @@
                 "The producer should have been disposed and therefor not visible in the results. " +
                 "There is a warning and this means that the container keeps a reference to the producer, " +
                 "which means there is a memory leak in the container.");
+        }
+
+        private void CreateUnusedInstanceProducer(Container container)
+        {
+            // NOTE: Creation of this instance producer is pulled out of the test method, because in debug
+            // mode within VS 2022, the instance seems to be kept referenced during the method call, causing
+            // GC.Collect to have no impact on the removal. With VS 2019, the test would simply succeed.
+            Lifestyle.Singleton.CreateProducer(typeof(RealUserService), typeof(RealUserService), container);
         }
 
         [TestMethod]

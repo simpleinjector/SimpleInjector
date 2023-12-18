@@ -197,11 +197,7 @@
             // Arrange
             var container = new Container();
 
-            var stream = container.Collection.Create<ILogger>(typeof(FailingConstructorLogger));
-
-            // Explicitly clear the reference to stream, so ensure GC.Collect cleans it up (only needed when
-            // running in debug).
-            stream = null;
+            this.CreateUnusedCollection(container);
 
             // Notice the explicit call to GC.Collect(). Simple Injector holds on to 'stuff' using WeakReferences
             // to ensure that to memory is leaked, but as long as stream is referenced, should it as well be
@@ -212,6 +208,15 @@
             // If Verify fails, it means we are still holding on to the collection somewhere. This can cause
             // a memory leak.
             container.Verify();
+        }
+
+        private void CreateUnusedCollection(Container container)
+        {
+            // NOTE: Creation of this collection is pulled out of the test method, because in debug mode
+            // within VS 2022, the instance seems to be kept referenced during the method call, causing
+            // GC.Collect to have no impact on the removal. Even storing it in a local field and setting the
+            // field to null afterwards has no effect. With VS 2019, the test would simply succeed.
+            container.Collection.Create<ILogger>(typeof(FailingConstructorLogger));
         }
 
         [TestMethod]
