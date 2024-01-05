@@ -87,15 +87,34 @@ namespace SimpleInjector
             }
         }
 
-        // NOTE: IsVerifying is thread-specific. We return null is the container is verifying on a
+        // NOTE: IsVerifying is thread-specific. We return null when the container is verifying on a
         // different thread.
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal Scope? GetVerificationOrResolveScopeForCurrentThread() =>
-            this.VerificationScope != null && this.IsVerifying
-                ? this.VerificationScope
-                : this.usingCurrentThreadResolveScope
-                    ? this.resolveScope.Value
-                    : null;
+        internal Scope? GetVerificationOrResolveScopeForCurrentThread()
+        {
+            if (this.VerificationScope != null && this.IsVerifying)
+            {
+                return this.GetScopeWhileVerifying();
+            }
+            else
+            {
+                return this.usingCurrentThreadResolveScope ? this.resolveScope.Value : null;
+            }
+        }
+
+        private Scope? GetScopeWhileVerifying()
+        {
+            if (this.usingCurrentThreadResolveScope)
+            {
+                // resolveScope.Value will be not null when someone called Scope.GetInstance. In that case we
+                // prefer using this scope, rather than the verification scope.
+                return this.resolveScope.Value ?? this.VerificationScope;
+            }
+            else
+            {
+                return this.VerificationScope;
+            }
+        }
 
         internal void UseCurrentThreadResolveScope() => this.usingCurrentThreadResolveScope = true;
 

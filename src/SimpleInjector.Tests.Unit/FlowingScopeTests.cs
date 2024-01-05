@@ -393,6 +393,42 @@
             Assert.AreSame(singleInstance2, collectionInstance2);
         }
 
+        // #966
+        [TestMethod]
+        public void Scoped_instances_resolved_from_different_scopes_within_the_context_of_a_singleton_ctor_resolve_as_different_instances()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+
+            container.Register<NullLogger>(Lifestyle.Scoped);
+            container.Register<ResolvingFromScopesInCtor<NullLogger>>(Lifestyle.Singleton);
+
+            // Act
+            var instance = container.GetInstance<ResolvingFromScopesInCtor<NullLogger>>();
+
+            // Assert
+            Assert.AreNotSame(instance.Service1, instance.Service2);
+        }
+
+        public class ResolvingFromScopesInCtor<TService> where TService : class
+        {
+            public TService Service1 { get; }
+            public TService Service2 { get; }
+
+            public ResolvingFromScopesInCtor(Container container)
+            {
+                var scope1 = new Scope(container) { Name = "Scope1" };
+                var scope2 = new Scope(container) { Name = "Scope2" };
+
+                this.Service1 = scope1.GetInstance<TService>();
+                this.Service2 = scope2.GetInstance<TService>();
+
+                Assert.AreSame(this.Service1, scope1.GetInstance<TService>());
+                Assert.AreSame(this.Service2, scope2.GetInstance<TService>());
+            }
+        }
+
         public class ScopedPluginProxy : IPlugin
         {
             public readonly Func<Scope, IPlugin> Factory;
