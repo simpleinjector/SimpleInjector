@@ -418,8 +418,8 @@
 
             public ResolvingFromScopesInCtor(Container container)
             {
-                var scope1 = new Scope(container) { Name = "Scope1" };
-                var scope2 = new Scope(container) { Name = "Scope2" };
+                var scope1 = new Scope(container);
+                var scope2 = new Scope(container);
 
                 this.Service1 = scope1.GetInstance<TService>();
                 this.Service2 = scope2.GetInstance<TService>();
