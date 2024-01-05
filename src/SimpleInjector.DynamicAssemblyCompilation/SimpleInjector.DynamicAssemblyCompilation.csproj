@@ -6,7 +6,7 @@
     <VersionPrefix>5.0.0</VersionPrefix>
     <AssemblyVersion>5.0.0.0</AssemblyVersion>
     <Authors>Simple Injector Contributors</Authors>
-    <TargetFrameworks>net45</TargetFrameworks>
+    <TargetFrameworks>net45;net461</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>SimpleInjector.DynamicAssemblyCompilation</AssemblyName>
