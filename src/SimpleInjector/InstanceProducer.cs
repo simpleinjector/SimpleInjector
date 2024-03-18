@@ -24,6 +24,7 @@ namespace SimpleInjector
     /// <see cref="Container.GetRegistration(Type, bool)">GetRegistration(Type, bool)</see>.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// The <b>Register</b> method overloads create <b>InstanceProducer</b> instances internally, but
     /// <b>InstanceProducer</b>s can be created manually to implement special scenarios. An
     /// <b>InstanceProducer</b> wraps <see cref="Registration"/> instance. The <b>Registration</b> builds an
@@ -35,6 +36,16 @@ namespace SimpleInjector
     /// <see cref="Container.RegisterDecorator(Type, Type)">RegisterDecorator</see> methods for
     /// instance work by hooking onto the <b>ExpressionBuilt</b> event and allow wrapping the returned instance
     /// with a decorator.
+    /// </para>
+    /// <para>
+    /// <b>IMPORTANT:</b> <see cref="InstanceProducer"/> function as a mini-container for a single
+    /// registration. Creation and use of InstanceProducers has a big performance and memory overhead.
+    /// Prefer creating a single InstanceProducer for a given registration, and cache that instance if
+    /// nessesary, rather than multiple or an infinite number of InstanceProducers. Created
+    /// InstanceProducers also integrate in the verification process, which can cause Simple Injector to
+    /// give verification warnings when it finds multiple InstanceProducers for the same implementation
+    /// type.
+    /// </para>
     /// </remarks>
     /// <example>
     /// The following example shows the creation of two different <b>InstanceProducer</b> instances that wrap

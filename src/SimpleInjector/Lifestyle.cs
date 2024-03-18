@@ -445,6 +445,15 @@ namespace SimpleInjector
         /// that will create new instances of specified <typeparamref name="TImplementation"/> with the
         /// caching as specified by this lifestyle.
         /// </summary>
+        /// <remarks>
+        /// <b>IMPORTANT:</b> <see cref="InstanceProducer"/> function as a mini-container for a single
+        /// registration. Creation and use of InstanceProducers has a big performance and memory overhead.
+        /// Prefer creating a single InstanceProducer for a given registration, and cache that instance if
+        /// nessesary, rather than multiple or an infinite number of InstanceProducers. Created
+        /// InstanceProducers also integrate in the verification process, which can cause Simple Injector to
+        /// give verification warnings when it finds multiple InstanceProducers for the same implementation
+        /// type.
+        /// </remarks>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <typeparam name="TImplementation">The concrete type that will be created.</typeparam>
         /// <param name="container">The <see cref="Container"/> instance for which a
@@ -464,6 +473,15 @@ namespace SimpleInjector
         /// that will create new instances of specified <paramref name="implementationType"/> caching as
         /// specified by this lifestyle.
         /// </summary>
+        /// <remarks>
+        /// <b>IMPORTANT:</b> <see cref="InstanceProducer"/> function as a mini-container for a single
+        /// registration. Creation and use of InstanceProducers has a big performance and memory overhead.
+        /// Prefer creating a single InstanceProducer for a given registration, and cache that instance if
+        /// nessesary, rather than multiple or an infinite number of InstanceProducers. Created
+        /// InstanceProducers also integrate in the verification process, which can cause Simple Injector to
+        /// give verification warnings when it finds multiple InstanceProducers for the same implementation
+        /// type.
+        /// </remarks>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <param name="implementationType">The concrete type that will be created.</param>
         /// <param name="container">The <see cref="Container"/> instance for which a
@@ -490,6 +508,15 @@ namespace SimpleInjector
         /// that will create new instances instance using the supplied <paramref name="instanceCreator"/>
         /// with the caching as specified by this lifestyle.
         /// </summary>
+        /// <remarks>
+        /// <b>IMPORTANT:</b> <see cref="InstanceProducer"/> function as a mini-container for a single
+        /// registration. Creation and use of InstanceProducers has a big performance and memory overhead.
+        /// Prefer creating a single InstanceProducer for a given registration, and cache that instance if
+        /// nessesary, rather than multiple or an infinite number of InstanceProducers. Created
+        /// InstanceProducers also integrate in the verification process, which can cause Simple Injector to
+        /// give verification warnings when it finds multiple InstanceProducers for the same implementation
+        /// type.
+        /// </remarks>
         /// <typeparam name="TService">The interface or base type that can be used to retrieve the instances.</typeparam>
         /// <param name="instanceCreator">A delegate that will create a new instance of
         /// <typeparamref name="TService"/> every time it is called.</param>
@@ -512,6 +539,15 @@ namespace SimpleInjector
         /// that will create new instances of specified <paramref name="implementationType"/> with the
         /// caching as specified by this lifestyle.
         /// </summary>
+        /// <remarks>
+        /// <b>IMPORTANT:</b> <see cref="InstanceProducer"/> function as a mini-container for a single
+        /// registration. Creation and use of InstanceProducers has a big performance and memory overhead.
+        /// Prefer creating a single InstanceProducer for a given registration, and cache that instance if
+        /// nessesary, rather than multiple or an infinite number of InstanceProducers. Created
+        /// InstanceProducers also integrate in the verification process, which can cause Simple Injector to
+        /// give verification warnings when it finds multiple InstanceProducers for the same implementation
+        /// type.
+        /// </remarks>
         /// <param name="serviceType">The interface or base type that can be used to retrieve the instances.</param>
         /// <param name="implementationType">The concrete type that will be registered.</param>
         /// <param name="container">The <see cref="Container"/> instance for which a
