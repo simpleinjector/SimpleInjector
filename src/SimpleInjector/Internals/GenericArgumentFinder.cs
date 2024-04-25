@@ -173,7 +173,9 @@ namespace SimpleInjector.Internals
                 return new ArgumentMapping[] { mapping };
             }
 
-            var argumentTypeDefinition = mapping.Argument.GetGenericTypeDefinition();
+            var argumentTypeDefinition = mapping.Argument.IsArray
+                ? this.GetGenericArrayDefinition(mapping.Argument)
+                : mapping.Argument.GetGenericTypeDefinition();
 
             // Try to get mappings for each type in the type hierarchy that is compatible to the  argument.
             return (
@@ -182,6 +184,23 @@ namespace SimpleInjector.Internals
                 select arg)
                 .ToArray();
         }
+
+        private Type GetGenericArrayDefinition(Type type)
+        {
+            var elementType = type.GetElementType();
+
+            if (elementType.IsArray)
+            {
+                elementType = this.GetGenericArrayDefinition(elementType);
+            }
+            else if (elementType.IsGenericType())
+            {
+                elementType = elementType.GetGenericTypeDefinition();
+            }
+
+            return elementType.MakeArrayType();
+        }
+
 
         private ArgumentMapping[] ConvertToOpenImplementationArgumentMappingsForType(
            ArgumentMapping mapping, Type type, IList<Type> processedTypes)

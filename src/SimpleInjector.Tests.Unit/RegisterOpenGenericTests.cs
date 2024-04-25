@@ -1348,6 +1348,75 @@
                 actualInstance: container.GetInstance<INewConstraintedGeneric<int>>());
         }
 
+        [TestMethod]
+        public void Verify_ClosedGenericRegistrationOfOpenGenericTypeWithGenericArrayType_Succeeds()
+        {
+            var container = new Container();
+
+            container.Register<IQueryHandler<GenericArrayQuery<int>, Tuple<int>[]>, GenericArrayQueryHandler<int>>();
+
+            container.Register<ServiceDependingOn<IQueryHandler<GenericArrayQuery<int>, Tuple<int>[]>>>();
+
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void Verify_ClosedGenericRegistrationOfOpenGenericTypeWithGenericArrayTypeAfterOtherClosedRegistrationForSameType_Succeeds()
+        {
+            var container = new Container();
+
+            container.Register<IQueryHandler<SimpleQuery, object>, SimpleQueryHandler>();
+
+            container.Register<IQueryHandler<GenericArrayQuery<int>, Tuple<int>[]>, GenericArrayQueryHandler<int>>();
+
+            container.Register<ServiceDependingOn<IQueryHandler<GenericArrayQuery<int>, Tuple<int>[]>>>();
+
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void Verify_OpenGenericRegistrationOfOpenGenericTypeWithGenericArrayTypeAfterClosedRegistrationForSameType_Succeeds()
+        {
+            var container = new Container();
+
+            container.Register<IQueryHandler<SimpleQuery, object>, SimpleQueryHandler>();
+
+            container.Register(typeof(IQueryHandler<,>), typeof(GenericArrayQueryHandler<>));
+
+            container.Register<ServiceDependingOn<IQueryHandler<GenericArrayQuery<int>, Tuple<int>[]>>>();
+
+            container.Verify();
+        }
+
+        [TestMethod]
+        public void GetInstance_OpenGenericRegistrationOfOpenGenericTypeWithGenericArrayType_Succeeds()
+        {
+            var container = new Container();
+
+            container.Register(typeof(IQueryHandler<,>), typeof(GenericArrayQueryHandler<>));
+
+            container.GetInstance<IQueryHandler<GenericArrayQuery<int>, Tuple<int>[]>>();
+        }
+
+        [TestMethod]
+        public void GetInstance_OpenGenericRegistrationOfOpenGenericTypeWithGenericEnumerableElementType_Succeeds()
+        {
+            var container = new Container();
+
+            container.Register(typeof(IQueryHandler<,>), typeof(GenericEnumerableQueryHandler<>));
+
+            container.GetInstance<IQueryHandler<GenericEnumerableQuery<int>, IEnumerable<Tuple<int>>>>();
+        }
+
+        public class SimpleQuery : IQuery<object> { }
+        public class SimpleQueryHandler : IQueryHandler<SimpleQuery, object> { }
+
+        public class GenericArrayQuery<T> : IQuery<Tuple<T>[]> { }
+        public class GenericArrayQueryHandler<T> : IQueryHandler<GenericArrayQuery<T>, Tuple<T>[]> { }
+
+        public class GenericEnumerableQuery<T> : IQuery<IEnumerable<Tuple<T>>> { }
+        public class GenericEnumerableQueryHandler<T> : IQueryHandler<GenericEnumerableQuery<T>, IEnumerable<Tuple<T>>> { }
+
         public interface IService<T> { }
 
         public class ServiceImplementation<T> : IService<T> { }
