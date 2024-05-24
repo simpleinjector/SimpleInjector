@@ -709,35 +709,21 @@ namespace SimpleInjector
                 select type;
         }
 
-        private sealed class ContextualResolveInterceptor
+        private sealed class ContextualResolveInterceptor(
+            ResolveInterceptor interceptor, Predicate<InitializationContext> predicate)
         {
-            public readonly ResolveInterceptor Interceptor;
-            public readonly Predicate<InitializationContext> Predicate;
-
-            public ContextualResolveInterceptor(
-                ResolveInterceptor interceptor, Predicate<InitializationContext> predicate)
-            {
-                this.Interceptor = interceptor;
-                this.Predicate = predicate;
-            }
+            public readonly ResolveInterceptor Interceptor = interceptor;
+            public readonly Predicate<InitializationContext> Predicate = predicate;
         }
 
-        private sealed class TypedInstanceInitializer : IInstanceInitializer
+        private sealed class TypedInstanceInitializer(Type serviceType, object instanceInitializer)
+            : IInstanceInitializer
         {
-            private readonly Type serviceType;
-            private readonly object instanceInitializer;
-
-            private TypedInstanceInitializer(Type serviceType, object instanceInitializer)
-            {
-                this.serviceType = serviceType;
-                this.instanceInitializer = instanceInitializer;
-            }
-
             public bool AppliesTo(Type implementationType, InitializerContext context) =>
-                Types.GetTypeHierarchyFor(implementationType).Contains(this.serviceType);
+                Types.GetTypeHierarchyFor(implementationType).Contains(serviceType);
 
             public Action<T> CreateAction<T>(InitializerContext context) =>
-                Helpers.CreateAction<T>(this.instanceInitializer);
+                Helpers.CreateAction<T>(instanceInitializer);
 
             internal static IInstanceInitializer Create<TImplementation>(Action<TImplementation> initializer)
             {
@@ -745,24 +731,14 @@ namespace SimpleInjector
             }
         }
 
-        private sealed class ContextualInstanceInitializer : IInstanceInitializer
-        {
-            private readonly Predicate<InitializerContext> predicate;
-            private readonly Action<InstanceInitializationData> instanceInitializer;
-
-            private ContextualInstanceInitializer(
+        private sealed class ContextualInstanceInitializer(
                 Predicate<InitializerContext> predicate,
-                Action<InstanceInitializationData> instanceInitializer)
-            {
-                this.predicate = predicate;
-                this.instanceInitializer = instanceInitializer;
-            }
-
-            public bool AppliesTo(Type implementationType, InitializerContext context) =>
-                this.predicate(context);
+                Action<InstanceInitializationData> instanceInitializer) : IInstanceInitializer
+        {
+            public bool AppliesTo(Type implementationType, InitializerContext context) => predicate(context);
 
             public Action<T> CreateAction<T>(InitializerContext context) =>
-                instance => this.instanceInitializer(new InstanceInitializationData(context, instance!));
+                instance => instanceInitializer(new InstanceInitializationData(context, instance!));
 
             internal static IInstanceInitializer Create(
                 Action<InstanceInitializationData> instanceInitializer,

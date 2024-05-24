@@ -687,16 +687,10 @@ namespace SimpleInjector
             }
         }
 
-        private sealed class BatchMapping
+        private sealed class BatchMapping(Type implementationType, IEnumerable<Type> closedServiceTypes)
         {
-            private BatchMapping(Type implementationType, IEnumerable<Type> closedServiceTypes)
-            {
-                this.ImplementationType = implementationType;
-                this.ClosedServiceTypes = closedServiceTypes;
-            }
-
-            internal Type ImplementationType { get; }
-            internal IEnumerable<Type> ClosedServiceTypes { get; }
+            public readonly Type ImplementationType = implementationType;
+            public readonly IEnumerable<Type> ClosedServiceTypes = closedServiceTypes;
 
             public static BatchMapping[] Build(Type openServiceType, IEnumerable<Type> implementationTypes)
             {
@@ -710,12 +704,9 @@ namespace SimpleInjector
                 return mappings;
             }
 
-            public static BatchMapping Build(Type openServiceType, Type implementationType)
-            {
-                return new BatchMapping(
-                    implementationType: implementationType,
-                    closedServiceTypes: implementationType.GetBaseTypesAndInterfacesFor(openServiceType));
-            }
+            public static BatchMapping Build(Type openServiceType, Type implementationType) => new(
+                implementationType,
+                implementationType.GetBaseTypesAndInterfacesFor(openServiceType));
 
             private static void RequiresNoDuplicateRegistrations(BatchMapping[] mappings)
             {
@@ -745,17 +736,11 @@ namespace SimpleInjector
             }
         }
 
-        private class NonGenericTypesToRegisterForOneToOneMappingResults
+        private sealed class NonGenericTypesToRegisterForOneToOneMappingResults(
+            List<Type> skippedDecorators, List<Type> implementationTypes)
         {
-            public NonGenericTypesToRegisterForOneToOneMappingResults(
-                List<Type> skippedDecorators, List<Type> implementationTypes)
-            {
-                this.SkippedDecorators = skippedDecorators;
-                this.ImplementationTypes = implementationTypes;
-            }
-
-            public List<Type> SkippedDecorators { get; }
-            public List<Type> ImplementationTypes { get; }
+            public readonly List<Type> SkippedDecorators = skippedDecorators;
+            public readonly List<Type> ImplementationTypes = implementationTypes;
         }
     }
 }

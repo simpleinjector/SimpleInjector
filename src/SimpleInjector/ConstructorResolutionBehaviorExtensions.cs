@@ -40,8 +40,7 @@ namespace SimpleInjector
         }
 
         private static ActivationException BuildActivationException(
-            IConstructorResolutionBehavior behavior, Type implementationType, string? message) =>
-            new ActivationException(
+            IConstructorResolutionBehavior behavior, Type implementationType, string? message) => new(
                 message is null || string.IsNullOrWhiteSpace(message)
                     ? StringResources.TypeHasNoInjectableConstructorAccordingToCustomResolutionBehavior(
                         behavior, implementationType)

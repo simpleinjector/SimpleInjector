@@ -526,22 +526,22 @@ namespace SimpleInjector
                 descriptions.Add("Allows Overriding Registrations");
             }
 
-            if (!(this.ConstructorResolutionBehavior is DefaultConstructorResolutionBehavior))
+            if (this.ConstructorResolutionBehavior is not DefaultConstructorResolutionBehavior)
             {
                 descriptions.Add("Custom Constructor Resolution");
             }
 
-            if (!(this.DependencyInjectionBehavior is DefaultDependencyInjectionBehavior))
+            if (this.DependencyInjectionBehavior is not DefaultDependencyInjectionBehavior)
             {
                 descriptions.Add("Custom Dependency Injection");
             }
 
-            if (!(this.PropertySelectionBehavior is DefaultPropertySelectionBehavior))
+            if (this.PropertySelectionBehavior is not DefaultPropertySelectionBehavior)
             {
                 descriptions.Add("Custom Property Selection");
             }
 
-            if (!(this.LifestyleSelectionBehavior is DefaultLifestyleSelectionBehavior))
+            if (this.LifestyleSelectionBehavior is not DefaultLifestyleSelectionBehavior)
             {
                 descriptions.Add("Custom Lifestyle Selection");
             }
