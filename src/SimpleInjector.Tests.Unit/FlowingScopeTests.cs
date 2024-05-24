@@ -411,6 +411,19 @@
             Assert.AreNotSame(instance.Service1, instance.Service2);
         }
 
+        // #998
+        [TestMethod]
+        public void Verify_OnCollectionComponent_InjectedWithATransientDecorator_Succeeds()
+        {
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+            container.Register<IPlugin, PluginImpl>();
+            container.RegisterDecorator<IPlugin, PluginDecorator>();
+            container.Collection.Register<IX>(typeof(XDependingOn<IPlugin>));
+            
+            container.Verify();
+        }
+
         public class ResolvingFromScopesInCtor<TService> where TService : class
         {
             public TService Service1 { get; }
@@ -443,6 +456,11 @@
             {
                 this.DecorateeFactory = decorateeFactory;
             }
+        }
+
+        public sealed class PluginDecorator : IPlugin
+        {
+            public PluginDecorator(IPlugin plugin) { }
         }
     }
 }

@@ -536,11 +536,19 @@ namespace SimpleInjector
                 producer.BuildExpression();
             }
 
-            return
-                producer.Lifestyle is SingletonLifestyle ? false :
-                producer.Lifestyle is ScopedLifestyle ? true :
-                producer.GetRelationships().Any(r => ContainsScopedComponentsInGraph(r.Dependency));
+            return ContainsScopedComponentsInGraphRecursive(producer);
         }
+
+        // We suppress building expressions for dependencies, because in the case of a decorator, the list of
+        // relationships will contain the decoratee, which will have its IsExpressionCreated set to false,
+        // even after BuildExpression() is called on the decorator. Calling BuildExpression on the decoratee
+        // will cause its producer to change and the decorator to be applied... again. This would cause the
+        // generation of an endless stream of new decorators and will lead to a stackoverflow exception.
+        // This is why BuildExpression is not called here.
+        private static bool ContainsScopedComponentsInGraphRecursive(InstanceProducer producer) => 
+            producer.Lifestyle is SingletonLifestyle ? false :
+            producer.Lifestyle is ScopedLifestyle ? true :
+            producer.GetRelationships().Any(r => ContainsScopedComponentsInGraphRecursive(r.Dependency));
 
         private Action<Scope>[] GetVerifiers()
         {
