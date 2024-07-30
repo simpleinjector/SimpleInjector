@@ -14,7 +14,11 @@ namespace SimpleInjector
     /// or bigger than one-instance-per-object-graph. In other words, a call to GetInstance() will never create
     /// more than one instance of such registered type.
     /// </summary>
-    public abstract class ScopedLifestyle : Lifestyle
+    /// <remarks>Initializes a new instance of the <see cref="ScopedLifestyle"/> class.</remarks>
+    /// <param name="name">The user friendly name of this lifestyle.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null or an empty string.
+    /// </exception>
+    public abstract class ScopedLifestyle(string name) : Lifestyle(name)
     {
         /// <summary>
         /// Gets the scoped lifestyle that allows Scoped registrations to be resolved direclty from the
@@ -23,14 +27,6 @@ namespace SimpleInjector
         /// asynchronous context.
         /// </summary>
         public static readonly ScopedLifestyle Flowing = new FlowingScopedLifestyle();
-
-        /// <summary>Initializes a new instance of the <see cref="ScopedLifestyle"/> class.</summary>
-        /// <param name="name">The user friendly name of this lifestyle.</param>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="name"/> is null or an empty string.
-        /// </exception>
-        protected ScopedLifestyle(string name) : base(name)
-        {
-        }
 
         /// <inheritdoc />
         public override int Length => 500;

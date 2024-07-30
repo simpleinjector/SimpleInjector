@@ -11,7 +11,6 @@ namespace SimpleInjector
     using System.Reflection;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
-    using SimpleInjector.Diagnostics.Analyzers;
     using SimpleInjector.Internals;
 
     /// <summary>Internal helper for string resources.</summary>

@@ -13,7 +13,7 @@ namespace SimpleInjector
     // Internal helper methods on System.Type.
     internal static class Types
     {
-        private static readonly Dictionary<Type, string> CSharpKeywordTypes = new Dictionary<Type, string>
+        private static readonly Dictionary<Type, string> CSharpKeywordTypes = new()
         {
             { typeof(bool), "bool" },
             { typeof(byte), "byte" },
@@ -33,7 +33,7 @@ namespace SimpleInjector
         };
 
         private static readonly Type[] AmbiguousTypes =
-            new[] { typeof(Type), typeof(string), typeof(Scope), typeof(Container) };
+            [typeof(Type), typeof(string), typeof(Scope), typeof(Container)];
 
         private static readonly Func<Type[], string> FullyQualifiedNameArgumentsFormatter =
             args => string.Join(", ", args.Select(a => a.ToFriendlyName(fullyQualifiedName: true)).ToArray());
@@ -135,9 +135,8 @@ namespace SimpleInjector
         {
             Type[] interfaces = type.GetInterfaces();
 
-            var types = new List<Type>(interfaces.Length + 4);
+            var types = new List<Type>(interfaces.Length + 4) { type };
 
-            types.Add(type);
             types.AddRange(GetBaseTypes(type));
             types.AddRange(interfaces);
 

@@ -252,7 +252,7 @@ namespace SimpleInjector
         // .NET 4.6 adds System.Array.Empty<T>, but we don't have that yet in .NET 4.5.
         internal static class Array<T>
         {
-            internal static readonly T[] Empty = new T[0];
+            internal static readonly T[] Empty = [];
         }
     }
 }

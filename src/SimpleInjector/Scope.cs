@@ -56,7 +56,7 @@ namespace SimpleInjector
     {
         private const int MaximumDisposeRecursion = 100;
 
-        private readonly object syncRoot = new object();
+        private readonly object syncRoot = new();
         private readonly ScopeManager? manager;
 
         private IDictionary? items;
@@ -587,11 +587,8 @@ namespace SimpleInjector
 
                 bool cacheIsEmpty = this.cachedInstances is null;
 
-                if (this.cachedInstances is null)
-                {
-                    this.cachedInstances =
+                this.cachedInstances ??=
                         new Dictionary<Registration, object>(ReferenceEqualityComparer<Registration>.Instance);
-                }
 
                 return !cacheIsEmpty && this.cachedInstances.TryGetValue(registration, out object? instance)
                     ? instance
@@ -675,10 +672,7 @@ namespace SimpleInjector
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void RegisterForDisposalInternal(object disposable)
         {
-            if (this.disposables is null)
-            {
-                this.disposables = new List<object>(capacity: 4);
-            }
+            this.disposables ??= new List<object>(capacity: 4);
 
             this.disposables.Add(disposable);
         }
@@ -764,8 +758,8 @@ namespace SimpleInjector
             if (this.Container?.IsDisposed != true)
             {
                 // In case there is no active (ambient) scope, Verify creates and disposes of its own scope.
-                // Verify(), however, is completely synchronous and add a Container.VerifyAsync() method makes
-                // little sense because:
+                // Verify(), however, is completely synchronous and adding a Container.VerifyAsync() method
+                // makes little sense because:
                 //  1. in many cases the user will call Verify() in a context where there is no option
                 //     to await (ASP.NET Core startup, ASP.NET MVC startup, etc).
                 //  2. Verify is called during a call to GetInstance when auto verification is enabled.
@@ -931,11 +925,9 @@ namespace SimpleInjector
         }
 
 #if !NETSTANDARD2_1
-        private sealed class AsyncDisposableWrapper
+        private sealed class AsyncDisposableWrapper(object instance)
         {
-            public AsyncDisposableWrapper(object instance) => this.Instance = instance;
-
-            public readonly object Instance;
+            public readonly object Instance = instance;
 
             public Task DisposeAsync() => DisposableHelpers.DisposeAsync(this.Instance);
         }
@@ -953,7 +945,7 @@ namespace SimpleInjector
             // This instance is never updated, only completely replaced.
             // Although IsAsyncDisposable called from within the context of a lock(), that lock is specific
             // to a Scope instance. This still allows parallel access to this dictionary.
-            private static Dictionary<Type, bool> Cache = new Dictionary<Type, bool>();
+            private static Dictionary<Type, bool> Cache = new();
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             internal static object Unwrap(object instance) =>

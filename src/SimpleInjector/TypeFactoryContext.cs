@@ -13,7 +13,7 @@ namespace SimpleInjector
     /// </summary>
     /// <remarks>
     /// Please see the
-    /// <see cref="Container.RegisterConditional(System.Type, System.Type, Lifestyle, Predicate{PredicateContext})">Register</see>
+    /// <see cref="Container.RegisterConditional(Type, Type, Lifestyle, Predicate{PredicateContext})">Register</see>
     /// method for more information.
     /// </remarks>
     [DebuggerDisplay(nameof(TypeFactoryContext) + " ({" + nameof(TypeFactoryContext.DebuggerDisplay) + ", nq})")]
