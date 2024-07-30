@@ -177,7 +177,7 @@ namespace SimpleInjector
                 metadataType.ToFriendlyName());
 
         internal static string MultipleClosedTypesAreAssignableFromType(
-            Type type, Type genericTypeDefinition, Type[] types, string otherMethod) =>
+            Type type, Type genericTypeDefinition, IList<Type> types, string otherMethod) =>
             Format(
                 "Your request is ambiguous. " +
                 "There are multiple closed version of {0} that are assignable from {1}, namely: {2}. " +

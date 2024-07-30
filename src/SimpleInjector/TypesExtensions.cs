@@ -54,16 +54,16 @@ namespace SimpleInjector
         /// are found.</exception>
         public static Type GetClosedTypeOf(this Type type, Type genericTypeDefinition)
         {
-            Type[] types = GetClosedTypesOfInternal(type, genericTypeDefinition).ToArray();
+            List<Type> types = GetClosedTypesOfInternal(type, genericTypeDefinition);
 
-            if (types.Length == 0)
+            if (types.Count == 0)
             {
                 throw new ArgumentException(
                     StringResources.TypeIsNotAssignableFromOpenGenericType(type, genericTypeDefinition),
                     nameof(type));
             }
 
-            if (types.Length > 1)
+            if (types.Count > 1)
             {
                 throw new InvalidOperationException(
                     StringResources.MultipleClosedTypesAreAssignableFromType(
