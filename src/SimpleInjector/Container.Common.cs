@@ -38,15 +38,14 @@ namespace SimpleInjector
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public partial class Container : ApiObject, IDisposable
     {
-        internal readonly Dictionary<object, Dictionary<Type, WeakReference>> LifestyleRegistrationCache = new();
+        private static long Counter;
 
-        private static long counter;
+        internal readonly Dictionary<object, Dictionary<Type, WeakReference>> LifestyleRegistrationCache = new();
+        internal readonly long ContainerId;
 
         private readonly object locker = new();
         private readonly List<IInstanceInitializer> instanceInitializers = new();
         private readonly List<ContextualResolveInterceptor> resolveInterceptors = new();
-
-        private readonly long containerId;
 
         // Collection of (both conditional and unconditional) instance producers that are explicitly
         // registered by the user and implicitly registered through unregistered type resolution.
@@ -73,7 +72,7 @@ namespace SimpleInjector
         /// <summary>Initializes a new instance of the <see cref="Container"/> class.</summary>
         public Container()
         {
-            this.containerId = Interlocked.Increment(ref counter);
+            this.ContainerId = Interlocked.Increment(ref Counter);
 
             this.ContainerScope = new ContainerScope(this);
 

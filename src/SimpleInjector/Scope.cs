@@ -6,7 +6,9 @@ namespace SimpleInjector
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Runtime.CompilerServices;
+    using System.Threading;
     using System.Threading.Tasks;
     using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
@@ -52,12 +54,16 @@ namespace SimpleInjector
     /// thread-safe methods. This means that once the Scope is ready for disposal, only a single thread should
     /// access it. Also note that although the scope is thread safe, cached instances might not be.
     /// </remarks>
+    [DebuggerDisplay("{DebugString,nq}")]
     public partial class Scope : ApiObject, IDisposable, IServiceProvider
     {
         private const int MaximumDisposeRecursion = 100;
 
+        private static long counter = 0;
+
         private readonly object syncRoot = new();
         private readonly ScopeManager? manager;
+        private readonly long scopeId = Interlocked.Increment(ref counter);
 
         private IDictionary? items;
         private Dictionary<Registration, object>? cachedInstances;
@@ -108,6 +114,11 @@ namespace SimpleInjector
         internal Scope? ParentScope { get; }
 
         internal bool IsContainerScope { get; set; }
+
+        private string DebugString =>
+            "Scope #" + this.scopeId
+            + (this.ParentScope is not null ? (" for Parent #" + this.ParentScope.scopeId) : "")
+            + (this.Container is not null ? (" for Container #" + this.Container!.ContainerId) : "");
 
         /// <summary>Gets an instance of the given <typeparamref name="TService"/> for the current scope.</summary>
         /// <typeparam name="TService">The type of the service to resolve.</typeparam>
