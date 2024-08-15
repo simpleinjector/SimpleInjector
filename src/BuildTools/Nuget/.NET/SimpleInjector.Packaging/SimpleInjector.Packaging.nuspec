@@ -17,6 +17,10 @@
         <dependency id="System.Reflection" version="4.1.0" />
         <dependency id="SimpleInjector" version="{versionCore}" />
       </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="System.Reflection" version="4.1.0" />
+        <dependency id="SimpleInjector" version="{versionCore}" />
+      </group>
     </dependencies>
     <id>SimpleInjector.Packaging</id>
     <title>Simple Injector Packaging</title>
