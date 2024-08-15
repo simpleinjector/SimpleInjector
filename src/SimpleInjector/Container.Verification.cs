@@ -275,7 +275,7 @@ namespace SimpleInjector
         private static void VerifyContainerUncontrolledCollection(object instance, InstanceProducer producer)
         {
             bool isContainerUncontrolledCollection =
-                producer.Registration.IsCollection && !(instance is IContainerControlledCollection);
+                producer.Registration.IsCollection && instance is not IContainerControlledCollection;
 
             if (isContainerUncontrolledCollection)
             {

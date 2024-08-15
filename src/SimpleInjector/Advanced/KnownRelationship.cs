@@ -68,10 +68,7 @@ namespace SimpleInjector.Advanced
 
         internal void AddAdditionalInformation(DiagnosticType type, string message)
         {
-            if (this.additionalInformation is null)
-            {
-                this.additionalInformation = new Dictionary<DiagnosticType, string>();
-            }
+            this.additionalInformation ??= [];
 
             this.additionalInformation[type] = message ?? string.Empty;
         }

@@ -35,10 +35,7 @@ namespace SimpleInjector.Lifestyles
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                if (this.disposability is null)
-                {
-                    this.disposability = new DisposabilityTypeInfo(this.ImplementationType, this);
-                }
+                this.disposability ??= new DisposabilityTypeInfo(this.ImplementationType, this);
 
                 return this.disposability.Value;
             }
