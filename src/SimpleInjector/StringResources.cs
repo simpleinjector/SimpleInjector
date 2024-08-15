@@ -285,6 +285,30 @@ namespace SimpleInjector
         internal static string NonGenericTypeAlreadyRegisteredAsConditionalRegistration(Type serviceType) =>
             NonGenericTypeAlreadyRegistered(serviceType, existingRegistrationIsConditional: true);
 
+        internal static string GetAdditionalInformationForLifestyleMismatchCausedByMutableCollectionType(
+            KnownRelationship relationship)
+        {
+            if (!StringResources.IsListOrArrayRelationship(relationship)) return string.Empty;
+
+            Type dependencyType = relationship.Consumer.Target.TargetType;
+
+            Type elementType =
+                dependencyType.GetGenericArguments().FirstOrDefault() ?? dependencyType.GetElementType();
+
+            // This message only uses unqualitified type names, because it is appended to a message that
+            // already contains the fully qualified names in case UseFullyQualifiedTypeNames is set.
+            return Format(
+                "{0} is a mutable collection type. Simple Injector always creates the mutable collection " +
+                "types array and List<T> as transient, because a consumer can change the contents of such " +
+                "collection, which could break seemingly unrelated parts parts of your application if the " +
+                "collection was shared between consumers. Instead, either consider lowering the lifestyle " +
+                "of {1} or change {1}'s dependency from {0} to one of the collection types that stream " +
+                "services (e.g. IEnumerable<{2}>, ICollection<{2}>, etc).",
+                dependencyType.ShortTypeName(),
+                relationship.Consumer.ImplementationType.ShortTypeName(),
+                elementType.ShortTypeName());
+        }
+
         internal static string CollectionUsedDuringConstruction(
             Type consumer, InstanceProducer producer, KnownRelationship? relationship = null) =>
             relationship != null && IsListOrArrayRelationship(relationship)
@@ -1384,6 +1408,8 @@ namespace SimpleInjector
                 && serviceType.GetGenericTypeDefinition().ToFriendlyName(fullyQualifiedName: true) == lookalikeName)
             select lookalike)
             .FirstOrDefault();
+
+        private static string ShortTypeName(this Type type) => type.ToFriendlyName(fullyQualifiedName: false);
 
         private static string TypeName(this Type type) => type.ToFriendlyName(UseFullyQualifiedTypeNames);
 

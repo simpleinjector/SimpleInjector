@@ -51,7 +51,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
             string additionalInformation2 =
                 relationship.Dependency.Registration is ScopedRegistration scoped
                 ? scoped.AdditionalInformationForLifestyleMismatchDiagnosticsProvider()
-                : string.Empty;
+                : StringResources.GetAdditionalInformationForLifestyleMismatchCausedByMutableCollectionType(
+                    relationship);
 
             return string.Format(
                 CultureInfo.InvariantCulture,
