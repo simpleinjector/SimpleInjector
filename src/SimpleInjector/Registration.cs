@@ -140,10 +140,7 @@ namespace SimpleInjector
             Requires.ServiceIsAssignableFromImplementation(
                 this.ImplementationType, instance.GetType(), nameof(instance));
 
-            if (this.instanceInitializer is null)
-            {
-                this.instanceInitializer = this.BuildInstanceInitializer();
-            }
+            this.instanceInitializer ??= this.BuildInstanceInitializer();
 
             this.instanceInitializer(instance);
         }
@@ -163,10 +160,7 @@ namespace SimpleInjector
             Requires.IsValidEnum(type, nameof(type));
             Requires.IsNotNullOrEmpty(justification, nameof(justification));
 
-            if (this.suppressions is null)
-            {
-                this.suppressions = new HashSet<DiagnosticType>();
-            }
+            this.suppressions ??= new();
 
             this.suppressions.Add(type);
         }
@@ -284,8 +278,8 @@ namespace SimpleInjector
         /// <summary>
         /// Builds an <see cref="Expression"/> that describes the creation of <see cref="ImplementationType"/>.
         /// The returned <see cref="Expression"/> might be intercepted by a
-        /// <see cref="SimpleInjector.Container.ExpressionBuilding">Container.ExpressionBuilding</see> event,
-        /// and initializers (if any) (<see cref="SimpleInjector.Container.RegisterInitializer"/>) can be
+        /// <see cref="Container.ExpressionBuilding">Container.ExpressionBuilding</see> event,
+        /// and initializers (if any) (<see cref="Container.RegisterInitializer"/>) can be
         /// applied.
         /// </summary>
         /// <exception cref="ArgumentNullException">Thrown when one of the arguments is a null reference.

@@ -51,7 +51,7 @@ namespace SimpleInjector
         public string Name => this.Parameter != null ? this.Parameter.Name : this.Property!.Name;
 
         /// <summary>Gets the type of the target.</summary>
-        /// <value>A <see cref="System.Type"/> containing the type of the target.</value>
+        /// <value>A <see cref="Type"/> containing the type of the target.</value>
         public Type TargetType =>
             this.Parameter != null ? this.Parameter.ParameterType : this.Property!.PropertyType;
 
@@ -170,7 +170,7 @@ namespace SimpleInjector
         /// <returns>A collection of the custom attributes that are applied to element and that match T, or an
         /// empty collection if no such attributes exist.</returns>
         public IEnumerable<T> GetCustomAttributes<T>(bool inherit) where T : Attribute =>
-            this.Parameter != null
+            this.Parameter is not null
                 ? this.Parameter.GetCustomAttributes(typeof(T), inherit).Cast<T>()
                 : this.Property!.GetCustomAttributes(typeof(T), inherit).Cast<T>();
 

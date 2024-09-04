@@ -488,7 +488,7 @@ namespace SimpleInjector
         {
             lock (this.locker)
             {
-                (this.verifiers ??= new List<Action<Scope>>()).Add(action);
+                (this.verifiers ??= new()).Add(action);
             }
         }
 
@@ -496,7 +496,7 @@ namespace SimpleInjector
         {
             lock (this.locker)
             {
-                (this.wrappedProducers ??= new List<InstanceProducer>()).Add(currentProducer);
+                (this.wrappedProducers ??= new()).Add(currentProducer);
             }
         }
 
@@ -601,13 +601,9 @@ namespace SimpleInjector
 
         private Expression BuildExpressionInternal()
         {
-            var expression = this.Registration.BuildExpression();
-
-            if (expression is null)
-            {
-                throw new ActivationException(StringResources.RegistrationReturnedNullFromBuildExpression(
+            var expression = this.Registration.BuildExpression()
+                ?? throw new ActivationException(StringResources.RegistrationReturnedNullFromBuildExpression(
                     this.Registration));
-            }
 
             ExpressionBuiltEventArgs? e = this.Container.OnExpressionBuilt(this, expression);
 
@@ -640,7 +636,7 @@ namespace SimpleInjector
         {
             return this.IsContainerAutoRegistered
                 || this.Registration.WrapsInstanceCreationDelegate
-                || !(ex is ActivationException);
+                || ex is not ActivationException;
         }
 
         private string BuildActivationExceptionMessage(Exception innerException)
@@ -728,7 +724,7 @@ namespace SimpleInjector
             // the decorator sub system) that is only used for diagnostics. Allowing the latter producers to
             // be added, will clutter the diagnostic API and will cause the Verify() method to verify those
             // producers needlessly.
-            return !(registration is ExpressionRegistration);
+            return registration is not ExpressionRegistration;
         }
 
         [ExcludeFromCodeCoverage]

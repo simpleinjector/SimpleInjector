@@ -16,10 +16,9 @@ namespace SimpleInjector
     public class InjectionConsumerInfo : ApiObject, IEquatable<InjectionConsumerInfo?>
     {
         // Bogus values for implementationType and property. They will never be used, but can't be null.
-        internal static readonly InjectionConsumerInfo Root =
-            new InjectionConsumerInfo(
-                implementationType: typeof(object),
-                property: typeof(string).GetProperties()[0]);
+        internal static readonly InjectionConsumerInfo Root = new(
+            implementationType: typeof(object),
+            property: typeof(string).GetProperties()[0]);
 
         private readonly Type implementationType;
         private readonly InjectionTargetInfo target;
