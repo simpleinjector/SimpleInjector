@@ -82,15 +82,15 @@ namespace SimpleInjector
             this.SelectionBasedLifestyle = new LifestyleSelectionBehaviorProxyLifestyle(this.Options);
 
             // NOTE: The order of these builders is crucial.
-            this.producerBuilders = new IInstanceProducerBuilder[]
-            {
+            this.producerBuilders =
+            [
                 new DependencyMetadataInstanceProducerBuilder(this),
                 new UnregisteredTypeResolutionInstanceProducerBuilder(
                     container: this,
                     shouldResolveUnregisteredTypes: () => this.resolveUnregisteredType != null,
                     resolveUnregisteredType: e => this.resolveUnregisteredType?.Invoke(this, e)),
                 new CollectionInstanceProducerBuilder(this)
-            };
+            ];
 
             this.unregisteredConcreteTypeProducerBuilder =
                 new UnregisteredConcreteTypeInstanceProducerBuilder(this);

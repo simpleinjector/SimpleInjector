@@ -595,18 +595,10 @@ namespace SimpleInjector
             return producer;
         }
 
-        internal Lifestyle SelectLifestyle(Type implementationType)
-        {
-            var lifestyle = this.LifestyleSelectionBehavior.SelectLifestyle(implementationType);
-
-            if (lifestyle is null)
-            {
-                throw new ActivationException(StringResources.LifestyleSelectionBehaviorReturnedNull(
+        internal Lifestyle SelectLifestyle(Type implementationType) =>
+            this.LifestyleSelectionBehavior.SelectLifestyle(implementationType)
+                ?? throw new ActivationException(StringResources.LifestyleSelectionBehaviorReturnedNull(
                     this.LifestyleSelectionBehavior, implementationType));
-            }
-
-            return lifestyle;
-        }
 
         internal void RaiseContainerLockingAndReset()
         {

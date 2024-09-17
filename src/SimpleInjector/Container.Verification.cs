@@ -288,16 +288,17 @@ namespace SimpleInjector
 
         private void ThrowOnDiagnosticWarnings()
         {
-            var errors = (
-                from result in Analyzer.Analyze(this)
-                where result.Severity > DiagnosticSeverity.Information
-                select result)
-                .ToArray();
+            DiagnosticResult[] errors = this.GetDiagnosticWarnings().ToArray();
 
             if (errors.Length > 0)
             {
                 throw new DiagnosticVerificationException(errors);
             }
         }
+
+        private IEnumerable<DiagnosticResult> GetDiagnosticWarnings() =>
+            from result in Analyzer.Analyze(this)
+            where result.Severity > DiagnosticSeverity.Information
+            select result;
     }
 }

@@ -19,11 +19,7 @@ namespace SimpleInjector
         private Dictionary<Type, InstanceProducer?> rootProducerCache =
             new(ReferenceEqualityComparer<Type>.Instance);
 
-        private enum MutableCollectionType
-        {
-            Array,
-            List,
-        }
+        private enum MutableCollectionType { Array, List }
 
         /// <summary>Gets an instance of the given <typeparamref name="TService"/>.</summary>
         /// <typeparam name="TService">Type of object requested.</typeparam>
@@ -304,25 +300,22 @@ namespace SimpleInjector
         {
             Action<T>[] initializersForType = this.GetInstanceInitializersFor<T>(implementationType, context);
 
-            if (initializersForType.Length == 0)
+            return initializersForType.Length switch
             {
-                return null;
-            }
-            else if (initializersForType.Length == 1)
-            {
-                return initializersForType[0];
-            }
-            else
-            {
-                return obj =>
-                {
-                    for (int index = 0; index < initializersForType.Length; index++)
-                    {
-                        initializersForType[index](obj);
-                    }
-                };
-            }
+                0 => null,
+                1 => initializersForType[0],
+                _ => CreateCompositeInitializer(initializersForType)
+            };
         }
+
+        private static Action<T> CreateCompositeInitializer<T>(Action<T>[] initializers) =>
+            obj =>
+            {
+                for (int index = 0; index < initializers.Length; index++)
+                {
+                    initializers[index](obj);
+                }
+            };
 
         private object GetInstanceForRootType(Type serviceType)
         {
