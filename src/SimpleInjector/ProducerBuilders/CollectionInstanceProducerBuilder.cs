@@ -14,7 +14,7 @@ namespace SimpleInjector.ProducerBuilders
     /// <summary>
     /// Builds InstanceProducers for all collections types except <see cref="IEnumerable{T}"/>.
     /// </summary>
-    internal sealed class CollectionInstanceProducerBuilder : IInstanceProducerBuilder
+    internal sealed class CollectionInstanceProducerBuilder(Container container) : IInstanceProducerBuilder
     {
         private static readonly MethodInfo EnumerableToArrayMethod =
             typeof(Enumerable).GetMethod(nameof(Enumerable.ToArray));
@@ -23,13 +23,6 @@ namespace SimpleInjector.ProducerBuilders
             typeof(Enumerable).GetMethod(nameof(Enumerable.ToList));
 
         private readonly Dictionary<Type, InstanceProducer?> emptyAndRedirectedCollectionRegistrationCache = new();
-
-        private readonly Container container;
-
-        public CollectionInstanceProducerBuilder(Container container)
-        {
-            this.container = container;
-        }
 
         public InstanceProducer? TryBuild(Type serviceType) =>
             this.TryBuildInstanceProducerForMutableCollection(serviceType) ??
@@ -65,7 +58,7 @@ namespace SimpleInjector.ProducerBuilders
             }
 
             // GetAllInstances locks the container
-            if (this.container.GetAllInstances(elementType) is IContainerControlledCollection)
+            if (container.GetAllInstances(elementType) is IContainerControlledCollection)
             {
                 return this.BuildMutableCollectionProducerFromControlledCollection(serviceType, elementType);
             }
@@ -87,18 +80,19 @@ namespace SimpleInjector.ProducerBuilders
             // longest lifestyle might cause the array to be cached in a way that is incorrect, because
             // who knows what kind of lifestyles the used created.
             Registration registration =
-                new ExpressionRegistration(expression, serviceType, Lifestyle.Transient, this.container);
+                new ExpressionRegistration(expression, serviceType, Lifestyle.Transient, container);
 
-            var producer = new InstanceProducer(serviceType, registration);
-            producer.IsContainerAutoRegistered = !this.container.GetAllInstances(elementType).Any();
-            return producer;
+            return new InstanceProducer(serviceType, registration)
+            {
+                IsContainerAutoRegistered = !container.GetAllInstances(elementType).Any()
+            };
         }
 
         private Expression BuildMutableCollectionExpressionFromControlledCollection(
             Type serviceType, Type elementType)
         {
             InstanceProducer streamRegistration =
-                this.container.GetRegistration(typeof(IEnumerable<>).MakeGenericType(elementType))!;
+                container.GetRegistration(typeof(IEnumerable<>).MakeGenericType(elementType))!;
 
             Expression streamExpression = streamRegistration.BuildExpression();
 
@@ -122,7 +116,7 @@ namespace SimpleInjector.ProducerBuilders
         private InstanceProducer BuildMutableCollectionProducerFromUncontrolledCollection(
             Type serviceType, Type elementType)
         {
-            InstanceProducer? enumerableProducer = this.container.GetRegistration(
+            InstanceProducer? enumerableProducer = container.GetRegistration(
                 typeof(IEnumerable<>).MakeGenericType(elementType), throwOnFailure: true);
             Expression enumerableExpression = enumerableProducer!.BuildExpression();
 
@@ -133,11 +127,12 @@ namespace SimpleInjector.ProducerBuilders
                 arg0: enumerableExpression);
 
             Registration registration =
-                new ExpressionRegistration(expression, serviceType, Lifestyle.Transient, this.container);
+                new ExpressionRegistration(expression, serviceType, Lifestyle.Transient, container);
 
-            var producer = new InstanceProducer(serviceType, registration);
-            producer.IsContainerAutoRegistered = true;
-            return producer;
+            return new InstanceProducer(serviceType, registration)
+            {
+                IsContainerAutoRegistered = true
+            };
         }
 
         private InstanceProducer? TryBuildInstanceProducerForStream(Type serviceType)
@@ -180,16 +175,17 @@ namespace SimpleInjector.ProducerBuilders
 
             Type elementType = collectionType.GetGenericArguments()[0];
 
-            if (!(this.container.GetAllInstances(elementType) is IContainerControlledCollection stream))
+            if (container.GetAllInstances(elementType) is not IContainerControlledCollection stream)
             {
                 return null;
             }
 
-            Registration registration = stream.CreateRegistration(collectionType, this.container);
+            Registration registration = stream.CreateRegistration(collectionType, container);
 
-            var producer = new InstanceProducer(collectionType, registration);
-            producer.IsContainerAutoRegistered = stream.Count == 0;
-            return producer;
+            return new InstanceProducer(collectionType, registration)
+            {
+                IsContainerAutoRegistered = stream.Count == 0
+            };
         }
     }
 }

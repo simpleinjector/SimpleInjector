@@ -9,33 +9,25 @@ namespace SimpleInjector.ProducerBuilders
     /// <summary>
     /// Builds InstanceProducers for concrete unregistered types.
     /// </summary>
-    internal sealed class UnregisteredConcreteTypeInstanceProducerBuilder : IInstanceProducerBuilder
+    internal sealed class UnregisteredConcreteTypeInstanceProducerBuilder(Container container)
+        : IInstanceProducerBuilder
     {
-        private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers =
-            new Dictionary<Type, InstanceProducer>();
-
-        private readonly Container container;
-
-        public UnregisteredConcreteTypeInstanceProducerBuilder(Container container)
-        {
-            this.container = container;
-        }
+        private readonly Dictionary<Type, InstanceProducer> unregisteredConcreteTypeInstanceProducers = new();
 
         public InstanceProducer? TryBuild(Type serviceType)
         {
-            if (!this.container.Options.ResolveUnregisteredConcreteTypes
+            if (!container.Options.ResolveUnregisteredConcreteTypes
                 || serviceType.IsAbstract()
                 || serviceType.IsValueType()
                 || serviceType.ContainsGenericParameters()
-                || !this.container.IsConcreteConstructableType(serviceType))
+                || !container.IsConcreteConstructableType(serviceType))
             {
                 return null;
             }
 
             InstanceProducer BuildInstanceProducer()
             {
-                var registration =
-                    this.container.SelectionBasedLifestyle.CreateRegistration(serviceType, this.container);
+                var registration = container.SelectionBasedLifestyle.CreateRegistration(serviceType, container);
 
                 return BuildInstanceProducerForConcreteUnregisteredType(serviceType, registration);
             }
@@ -67,8 +59,7 @@ namespace SimpleInjector.ProducerBuilders
             // created.
             lock (this.unregisteredConcreteTypeInstanceProducers)
             {
-                if (!this.unregisteredConcreteTypeInstanceProducers
-                    .TryGetValue(concreteType, out InstanceProducer producer))
+                if (!this.unregisteredConcreteTypeInstanceProducers.TryGetValue(concreteType, out var producer))
                 {
                     producer = instanceProducerBuilder.Invoke();
 

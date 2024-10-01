@@ -15,15 +15,8 @@ namespace SimpleInjector.ProducerBuilders
     /// Builds InstanceProducers that can inject and resolve <see cref="InstanceProducer{TService}"/>
     /// instances as singletons.
     /// </summary>
-    internal sealed class DependencyMetadataInstanceProducerBuilder : IInstanceProducerBuilder
+    internal sealed class DependencyMetadataInstanceProducerBuilder(Container container) : IInstanceProducerBuilder
     {
-        private readonly Container container;
-
-        public DependencyMetadataInstanceProducerBuilder(Container container)
-        {
-            this.container = container;
-        }
-
         public InstanceProducer? TryBuild(Type serviceType)
         {
             if (typeof(DependencyMetadata<>).IsGenericTypeDefinitionOf(serviceType))
@@ -46,11 +39,11 @@ namespace SimpleInjector.ProducerBuilders
             Type serviceType = metadataType.GetGenericArguments()[0];
 
             InstanceProducer? instanceProducer =
-                this.container.GetInstanceProducerForType(serviceType, InjectionConsumerInfo.Root);
+                container.GetInstanceProducerForType(serviceType, InjectionConsumerInfo.Root);
 
             if (instanceProducer is null)
             {
-                this.container.ThrowMissingInstanceProducerException(serviceType);
+                container.ThrowMissingInstanceProducerException(serviceType);
             }
 
             return new InstanceProducer(
@@ -63,18 +56,18 @@ namespace SimpleInjector.ProducerBuilders
             Type metadataType = enumerableOfProducersType.GetGenericArguments()[0];
             Type serviceType = metadataType.GetGenericArguments()[0];
 
-            var collection = this.container.GetAllInstances(serviceType) as IContainerControlledCollection;
+            var collection = container.GetAllInstances(serviceType) as IContainerControlledCollection;
 
             if (collection is null)
             {
                 // This exception might not be expressive enough. If GetAllInstances succeeds, but the
                 // returned type is not an IContainerControlledCollection, it likely means the collection is
                 // container uncontrolled.
-                this.container.ThrowMissingInstanceProducerException(serviceType);
+                container.ThrowMissingInstanceProducerException(serviceType);
             }
 
             IContainerControlledCollection metadataCollection =
-                ControlledCollectionHelper.CreateContainerControlledCollection(metadataType, this.container);
+                ControlledCollectionHelper.CreateContainerControlledCollection(metadataType, container);
 
             metadataCollection.AppendAll(
                 from producer in collection!.GetProducers()
@@ -83,7 +76,7 @@ namespace SimpleInjector.ProducerBuilders
 
             return new InstanceProducer(
                 serviceType: enumerableOfProducersType,
-                registration: metadataCollection.CreateRegistration(enumerableOfProducersType, this.container));
+                registration: metadataCollection.CreateRegistration(enumerableOfProducersType, container));
         }
 
         private Registration CreateMetadataRegistration(Type metadataType, InstanceProducer producer)
@@ -93,7 +86,7 @@ namespace SimpleInjector.ProducerBuilders
                 var registration = (ScopedRegistration)Lifestyle.Scoped.CreateRegistration(
                     serviceType: metadataType,
                     instanceCreator: this.BuildMetadataInstanceCreator(metadataType, producer, flowing: true),
-                    container: this.container);
+                    container: container);
 
                 registration.AdditionalInformationForLifestyleMismatchDiagnosticsProvider =
                     () => StringResources.FlowingMetadataIsScopedBecause(metadataType);
@@ -105,7 +98,7 @@ namespace SimpleInjector.ProducerBuilders
                 return Lifestyle.Singleton.CreateRegistration(
                     serviceType: metadataType,
                     instanceCreator: this.BuildMetadataInstanceCreator(metadataType, producer, flowing: false),
-                    container: this.container);
+                    container: container);
             }
         }
 
@@ -114,7 +107,7 @@ namespace SimpleInjector.ProducerBuilders
         // expect metadata to be singletons. Downside of this approach is that the instance producer needs
         // to be built here.
         private bool ShouldFlow(InstanceProducer producer) =>
-            ScopedLifestyle.Flowing == this.container.Options.DefaultScopedLifestyle
+            ScopedLifestyle.Flowing == container.Options.DefaultScopedLifestyle
                 && producer.ContainsScopedComponentsInGraph();
 
         private Func<object> BuildMetadataInstanceCreator(
@@ -123,13 +116,13 @@ namespace SimpleInjector.ProducerBuilders
             ConstructorInfo ctor = metadataType.GetConstructors(includeNonPublic: true)[0];
 
             Expression scopeExpression = flowing
-                ? this.container.GetRegistration(typeof(Scope), true)!.BuildExpression()
+                ? container.GetRegistration(typeof(Scope), true)!.BuildExpression()
                 : Expression.Constant(null, typeof(Scope));
 
             Expression newMetadataExpression =
                 Expression.New(ctor, scopeExpression, Expression.Constant(producer));
 
-            return (Func<object>)CompilationHelpers.CompileExpression(this.container, newMetadataExpression);
+            return (Func<object>)CompilationHelpers.CompileExpression(container, newMetadataExpression);
         }
     }
 }
