@@ -4,6 +4,7 @@
     <AssemblyVersion>5.0.0.0</AssemblyVersion>
     <TargetFrameworks>netstandard1.0;netstandard1.3;netstandard2.0;netstandard2.1;net45;net461</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>SimpleInjector</AssemblyName>
     <AssemblyOriginatorKeyFile>../SimpleInjector.snk</AssemblyOriginatorKeyFile>
