@@ -12,7 +12,7 @@ namespace SimpleInjector.Diagnostics.Analyzers
         {
             const string WarningsName = "Configuration Warnings";
 
-            var producersToAnalyze = Analyzer.GetProducersToAnalyze(container);
+            var producersToAnalyze = container.GetProducersToAnalyze();
 
             var analysisResults = (
                 from analyzer in ContainerAnalyzerProvider.Analyzers

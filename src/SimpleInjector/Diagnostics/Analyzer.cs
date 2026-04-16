@@ -36,7 +36,7 @@ namespace SimpleInjector.Diagnostics
             Requires.IsNotNull(container, nameof(container));
             RequiresContainerToBeVerified(container);
 
-            var producersToAnalyze = GetProducersToAnalyze(container);
+            var producersToAnalyze = container.GetProducersToAnalyze();
 
             var analyzerResultsCollection = (
                 from analyzer in ContainerAnalyzerProvider.Analyzers
@@ -55,46 +55,6 @@ namespace SimpleInjector.Diagnostics
                 from result in analyzerResults.Results
                 select result)
                 .ToArray();
-        }
-
-        internal static InstanceProducer[] GetProducersToAnalyze(Container container) =>
-            container
-            .GetCurrentRegistrations()
-            .SelectMany(SelfAndWrappedProducers)
-            .SelectMany(GetSelfAndDependentProducers)
-            .Distinct(InstanceProducer.EqualityComparer)
-            .ToArray();
-
-        private static IEnumerable<InstanceProducer> SelfAndWrappedProducers(InstanceProducer producer) =>
-            producer.SelfAndWrappedProducers;
-
-        private static IEnumerable<InstanceProducer> GetSelfAndDependentProducers(InstanceProducer producer) =>
-            GetSelfAndDependentProducers(producer,
-                new HashSet<InstanceProducer>(InstanceProducer.EqualityComparer));
-
-        private static IEnumerable<InstanceProducer> GetSelfAndDependentProducers(InstanceProducer producer,
-            HashSet<InstanceProducer> set)
-        {
-            // Prevent stack overflow exception in case the graph is cyclic.
-            if (set.Contains(producer))
-            {
-                yield break;
-            }
-
-            // Return self
-            yield return set.AddReturn(producer);
-
-            // Return dependent producers
-            foreach (var relationship in producer.GetRelationships())
-            {
-                if (relationship.UseForVerification)
-                {
-                    foreach (var dependentProducer in GetSelfAndDependentProducers(relationship.Dependency, set))
-                    {
-                        yield return set.AddReturn(dependentProducer);
-                    }
-                }
-            }
         }
 
         private static void RequiresContainerToBeVerified(Container container)

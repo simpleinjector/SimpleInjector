@@ -248,7 +248,7 @@ namespace SimpleInjector
 
         internal InstanceProducer[] GetRootRegistrations(bool includeInvalidContainerRegisteredTypes)
         {
-            var currentRegistrations = this.GetCurrentRegistrations(
+            var currentRegistrations = this.GetProducersToAnalyze(
                 includeInvalidContainerRegisteredTypes: includeInvalidContainerRegisteredTypes);
 
             // Get the non-root producers. Producers of a controlled collection are considered to be roots.
@@ -262,6 +262,15 @@ namespace SimpleInjector
 
             return currentRegistrations.Except(nonRootProducers, InstanceProducer.EqualityComparer).ToArray();
         }
+
+        internal InstanceProducer[] GetProducersToAnalyze(
+            bool includeInvalidContainerRegisteredTypes = false, bool includeExternalProducers = true) =>
+            this
+            .GetCurrentRegistrations(includeInvalidContainerRegisteredTypes, includeExternalProducers)
+            .SelectMany(SelfAndWrappedProducers)
+            .SelectMany(GetSelfAndDependentProducers)
+            .Distinct(InstanceProducer.EqualityComparer)
+            .ToArray();
 
         internal InstanceProducer[] GetCurrentRegistrations(
             bool includeInvalidContainerRegisteredTypes, bool includeExternalProducers = true)
@@ -706,6 +715,37 @@ namespace SimpleInjector
                 let friendlyName = type.GetGenericTypeDefinition().ToFriendlyName()
                 where StringComparer.OrdinalIgnoreCase.Equals(friendlyName, missingTypeDefName)
                 select type;
+        }
+
+        private static IEnumerable<InstanceProducer> SelfAndWrappedProducers(InstanceProducer producer) =>
+            producer.SelfAndWrappedProducers;
+
+        private static IEnumerable<InstanceProducer> GetSelfAndDependentProducers(InstanceProducer producer) =>
+            GetSelfAndDependentProducers(producer, new(InstanceProducer.EqualityComparer));
+
+        private static IEnumerable<InstanceProducer> GetSelfAndDependentProducers(
+            InstanceProducer producer, HashSet<InstanceProducer> set)
+        {
+            // Prevent stack overflow exception in case the graph is cyclic.
+            if (set.Contains(producer))
+            {
+                yield break;
+            }
+
+            // Return self
+            yield return set.AddReturn(producer);
+
+            // Return dependent producers
+            foreach (var relationship in producer.GetRelationships())
+            {
+                if (relationship.UseForVerification)
+                {
+                    foreach (var dependentProducer in GetSelfAndDependentProducers(relationship.Dependency, set))
+                    {
+                        yield return set.AddReturn(dependentProducer);
+                    }
+                }
+            }
         }
 
         private sealed class ContextualResolveInterceptor(
