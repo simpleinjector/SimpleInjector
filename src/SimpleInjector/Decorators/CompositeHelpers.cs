@@ -51,8 +51,16 @@ namespace SimpleInjector.Decorators
             compositeConstructor.GetParameters()
                 .Any(parameter => IsCompositeParameter(parameter, serviceType));
 
-        private static bool IsCompositeParameter(ParameterInfo parameter, Type serviceType) =>
-            Types.IsGenericCollectionType(parameter.ParameterType)
-                && parameter.ParameterType.GetGenericArguments()[0] == serviceType;
+        private static bool IsCompositeParameter(ParameterInfo parameter, Type serviceType)
+        {
+            var type = parameter.ParameterType;
+
+            if (Types.IsGenericCollectionType(type) && type.GetGenericArguments()[0] == serviceType)
+            {
+                return true;
+            }
+
+            return type.IsArray && type.GetElementType() == serviceType;
+        }
     }
 }

@@ -32,7 +32,12 @@ namespace SimpleInjector.Tests.Unit
             {
                 typeof(NonGeneric1),
                 typeof(NonGeneric2),
-                typeof(NonGenericComposite),
+                typeof(NonGenericIEnumerableComposite),
+                typeof(NonGenericICollectionComposite),
+                typeof(NonGenericIListComposite),
+                typeof(NonGenericIReadOnlyCollectionComposite),
+                typeof(NonGenericIReadOnlyListComposite),
+                typeof(NonGenericArrayComposite),
                 typeof(NonGenericWrappingCollection),
             };
 
@@ -55,12 +60,17 @@ namespace SimpleInjector.Tests.Unit
                 typeof(NonGeneric1),
                 typeof(NonGeneric2),
                 typeof(NonGenericDecorator),
-                typeof(NonGenericComposite),
                 typeof(NonGenericWrappingCollection),
                 typeof(NonGenericCompositeDecorator),
+                typeof(NonGenericIEnumerableComposite),
+                typeof(NonGenericICollectionComposite),
+                typeof(NonGenericIListComposite),
+                typeof(NonGenericIReadOnlyCollectionComposite),
+                typeof(NonGenericIReadOnlyListComposite),
+                typeof(NonGenericArrayComposite),
             };
 
-            var options = new TypesToRegisterOptions { IncludeDecorators = true };
+            var options = new TypesToRegisterOptions { IncludeDecorators = true, IncludeComposites = true };
 
             // Act
             var actualTypes = GetTypesToRegister(typeof(IService<>), options);
@@ -79,7 +89,12 @@ namespace SimpleInjector.Tests.Unit
                 typeof(NonGeneric1),
                 typeof(NonGeneric2),
                 typeof(GenericTypeDef<>),
-                typeof(NonGenericComposite),
+                typeof(NonGenericIEnumerableComposite),
+                typeof(NonGenericICollectionComposite),
+                typeof(NonGenericIListComposite),
+                typeof(NonGenericIReadOnlyCollectionComposite),
+                typeof(NonGenericIReadOnlyListComposite),
+                typeof(NonGenericArrayComposite),
                 typeof(GenericComposite<>),
                 typeof(NonGenericWrappingCollection),
                 typeof(GenericWrappingCollection<>),
@@ -127,7 +142,12 @@ namespace SimpleInjector.Tests.Unit
                 typeof(GenericTypeDef<>),
                 typeof(NonGenericDecorator),
                 typeof(GenericDecorator<>),
-                typeof(NonGenericComposite),
+                typeof(NonGenericIEnumerableComposite),
+                typeof(NonGenericICollectionComposite),
+                typeof(NonGenericIListComposite),
+                typeof(NonGenericIReadOnlyCollectionComposite),
+                typeof(NonGenericIReadOnlyListComposite),
+                typeof(NonGenericArrayComposite),
                 typeof(GenericComposite<>),
                 typeof(NonGenericWrappingCollection),
                 typeof(GenericWrappingCollection<>),
@@ -212,7 +232,12 @@ namespace SimpleInjector.Tests.Unit
 
         public class GenericDecorator<T>(IService<T> d) : IService<T>;
 
-        public class NonGenericComposite(IEnumerable<IService<int>> services) : IService<int>;
+        public class NonGenericIEnumerableComposite(IEnumerable<IService<int>> services) : IService<int>;
+        public class NonGenericICollectionComposite(ICollection<IService<int>> services) : IService<int>;
+        public class NonGenericIListComposite(IList<IService<int>> services) : IService<int>;
+        public class NonGenericIReadOnlyCollectionComposite(IReadOnlyCollection<IService<int>> services) : IService<int>;
+        public class NonGenericIReadOnlyListComposite(IReadOnlyList<IService<int>> services) : IService<int>;
+        public class NonGenericArrayComposite(IService<int>[] services) : IService<int>;
 
         public class GenericComposite<T>(IEnumerable<IService<T>> services) : IService<T>;
 
