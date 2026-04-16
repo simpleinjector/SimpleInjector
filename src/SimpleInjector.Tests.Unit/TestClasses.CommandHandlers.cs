@@ -1,25 +1,20 @@
-﻿namespace SimpleInjector.Tests.Unit
+﻿#pragma warning disable CS9113 // Parameter is unread.
+namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    public interface ISpecialCommand
-    {
-    }
+    public interface ISpecialCommand;
 
-    public interface ICommandHandler<TCommand>
-    {
-    }
+    public interface ICommandHandler<TCommand>;
 
     public interface ICommandHandlerDecorator<TCommand> : ICommandHandler<TCommand>
     {
         ICommandHandler<TCommand> Decorated { get; }
     }
 
-    public struct StructCommand
-    {
-    }
+    public struct StructCommand;
     
     public static class CommandHandlerExtensions
     {
@@ -55,160 +50,96 @@
         }
     }
 
-    public class GenericHandler<TCommand, TDependency> : ICommandHandler<TCommand>
+    public class GenericHandler<TCommand, TDependency>(TDependency dependency) : ICommandHandler<TCommand>;
+
+    public class CommandHandlerDecorator<TCommand>(ICommandHandler<TCommand> decoratee) : ICommandHandler<TCommand>
     {
-        public GenericHandler(TDependency dependency)
-        {
-        }
+        public ICommandHandler<TCommand> Decoratee { get; } = decoratee;
     }
 
-    public class CommandHandlerDecorator<TCommand> : ICommandHandler<TCommand>
+    public class AsyncCommandHandlerProxy<T>(Container container, Func<ICommandHandler<T>> decorateeFactory)
+        : ICommandHandler<T>
     {
-        public CommandHandlerDecorator(ICommandHandler<TCommand> decoratee)
-        {
-            this.Decoratee = decoratee;
-        }
-
-        public ICommandHandler<TCommand> Decoratee { get; }
+        public Func<ICommandHandler<T>> DecorateeFactory { get; } = decorateeFactory;
     }
 
-    public class AsyncCommandHandlerProxy<T> : ICommandHandler<T>
+    public class LifetimeScopeCommandHandlerProxy<T>(
+        Func<ICommandHandler<T>> decorateeFactory, Container container) : ICommandHandler<T>
     {
-        public AsyncCommandHandlerProxy(Container container, Func<ICommandHandler<T>> decorateeFactory)
-        {
-            this.DecorateeFactory = decorateeFactory;
-        }
-
-        public Func<ICommandHandler<T>> DecorateeFactory { get; }
+        public Func<ICommandHandler<T>> DecorateeFactory { get; } = decorateeFactory;
     }
 
-    public class LifetimeScopeCommandHandlerProxy<T> : ICommandHandler<T>
+    public class TransactionalCommandHandlerDecorator<T>(ICommandHandler<T> decorated)
+        : ICommandHandler<T>, ICommandHandlerDecorator<T>
     {
-        public LifetimeScopeCommandHandlerProxy(Func<ICommandHandler<T>> decorateeFactory, Container container)
-        {
-            this.DecorateeFactory = decorateeFactory;
-        }
-
-        public Func<ICommandHandler<T>> DecorateeFactory { get; }
+        public ICommandHandler<T> Decorated { get; } = decorated;
     }
 
-    public class TransactionalCommandHandlerDecorator<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>
-    {
-        public TransactionalCommandHandlerDecorator(ICommandHandler<T> decorated)
-        {
-            this.Decorated = decorated;
-        }
-
-        public ICommandHandler<T> Decorated { get; }
-    }
-
-    public class ClassConstraintHandlerDecorator<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>
+    public class ClassConstraintHandlerDecorator<T>(ICommandHandler<T> wrapped)
+        : ICommandHandler<T>, ICommandHandlerDecorator<T>
         where T : class
     {
-        public ClassConstraintHandlerDecorator(ICommandHandler<T> wrapped)
-        {
-            this.Decorated = wrapped;
-        }
-
-        public ICommandHandler<T> Decorated { get; }
+        public ICommandHandler<T> Decorated { get; } = wrapped;
     }
 
     // This is not a decorator, the class implements ICommandHandler<int> but wraps ICommandHandler<byte>
-    public class BadCommandHandlerDecorator1 : ICommandHandler<int>
+    public class BadCommandHandlerDecorator1(ICommandHandler<byte> handler) : ICommandHandler<int>
     {
-        public BadCommandHandlerDecorator1(ICommandHandler<byte> handler)
-        {
-        }
-
         public void Handle(int command)
         {
         }
     }
 
     // This is not a decorator, the class takes 2 generic types but wraps ICommandHandler<T>
-    public class CommandHandlerDecoratorWithUnresolvableArgument<T, TUnresolved> : ICommandHandler<T>
-    {
-        public CommandHandlerDecoratorWithUnresolvableArgument(ICommandHandler<T> handler)
-        {
-        }
-    }
-
-    public class StubCommandHandler : ICommandHandler<RealCommand>
+    public class CommandHandlerDecoratorWithUnresolvableArgument<T, TUnresolved>(ICommandHandler<T> handler)
+        : ICommandHandler<T>
     {
     }
 
-    public class StructCommandHandler : ICommandHandler<StructCommand>
+    public class StubCommandHandler : ICommandHandler<RealCommand>;
+
+    public class StructCommandHandler : ICommandHandler<StructCommand>;
+
+    public class RealCommandHandler : ICommandHandler<RealCommand>;
+
+    public class RealCommandHandlerDecorator(ICommandHandler<RealCommand> decorated)
+        : ICommandHandler<RealCommand>, ICommandHandlerDecorator<RealCommand>
     {
+        public ICommandHandler<RealCommand> Decorated { get; } = decorated;
     }
 
-    public class RealCommandHandler : ICommandHandler<RealCommand>
+    public class TransactionHandlerDecorator<T>(ICommandHandler<T> decorated)
+        : ICommandHandler<T>, ICommandHandlerDecorator<T>
     {
+        public ICommandHandler<T> Decorated { get; } = decorated;
     }
 
-    public class RealCommandHandlerDecorator : ICommandHandler<RealCommand>, ICommandHandlerDecorator<RealCommand>
+    public class ContextualHandlerDecorator<T>(ICommandHandler<T> decorated, DecoratorContext context)
+        : ICommandHandler<T>, ICommandHandlerDecorator<T>
     {
-        public RealCommandHandlerDecorator(ICommandHandler<RealCommand> decorated)
-        {
-            this.Decorated = decorated;
-        }
+        public ICommandHandler<T> Decorated { get; } = decorated;
 
-        public ICommandHandler<RealCommand> Decorated { get; }
+        public DecoratorContext Context { get; } = context;
     }
 
-    public class TransactionHandlerDecorator<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>
+    public class SpecialCommandHandlerDecorator<T>(ICommandHandler<T> decorated)
+        : ICommandHandler<T> where T : ISpecialCommand
     {
-        public TransactionHandlerDecorator(ICommandHandler<T> decorated)
-        {
-            this.Decorated = decorated;
-        }
-
-        public ICommandHandler<T> Decorated { get; }
-    }
-
-    public class ContextualHandlerDecorator<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>
-    {
-        public ContextualHandlerDecorator(ICommandHandler<T> decorated, DecoratorContext context)
-        {
-            this.Decorated = decorated;
-            this.Context = context;
-        }
-
-        public ICommandHandler<T> Decorated { get; }
-
-        public DecoratorContext Context { get; }
-    }
-
-    public class SpecialCommandHandlerDecorator<T> : ICommandHandler<T> where T : ISpecialCommand
-    {
-        public SpecialCommandHandlerDecorator(ICommandHandler<T> decorated)
-        {
-        }
-
         public void Handle(T command)
         {
         }
     }
 
-    public class LogExceptionCommandHandlerDecorator<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>
+    public class LogExceptionCommandHandlerDecorator<T>(ICommandHandler<T> decorated)
+        : ICommandHandler<T>, ICommandHandlerDecorator<T>
     {
-        public LogExceptionCommandHandlerDecorator(ICommandHandler<T> decorated)
-        {
-            this.Decorated = decorated;
-        }
-
-        public ICommandHandler<T> Decorated { get; }
+        public ICommandHandler<T> Decorated { get; } = decorated;
     }
 
-    public class LoggingHandlerDecorator1<T> : ICommandHandler<T>, ICommandHandlerDecorator<T>
+    public class LoggingHandlerDecorator1<T>(ICommandHandler<T> wrapped, ILogger logger)
+        : ICommandHandler<T>, ICommandHandlerDecorator<T>
     {
-        private readonly ILogger logger;
-
-        public LoggingHandlerDecorator1(ICommandHandler<T> wrapped, ILogger logger)
-        {
-            this.Decorated = wrapped;
-            this.logger = logger;
-        }
-
-        public ICommandHandler<T> Decorated { get; }
+        public ICommandHandler<T> Decorated { get; } = wrapped;
     }
 }
+#pragma warning restore CS9113 // Parameter is unread.
