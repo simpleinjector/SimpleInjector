@@ -1,4 +1,5 @@
-﻿namespace SimpleInjector.Tests.Unit
+﻿#pragma warning disable CS9113 // Parameter is unread.
+namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Collections.Generic;
@@ -9,9 +10,7 @@
     [TestClass]
     public class GetTypesToRegisterTests
     {
-        public interface IService<T>
-        {
-        }
+        public interface IService<T>;
 
         [TestMethod]
         public void TypesToRegisterOptions_WithDefaultValues_ContainsExpectedValues()
@@ -201,48 +200,31 @@
                 message));
         }
 
-        public abstract class AbstractService : IService<int> { }
+        public abstract class AbstractService : IService<int>;
 
-        public class NonGeneric1 : IService<int> { }
+        public class NonGeneric1 : IService<int>;
 
-        public class NonGeneric2 : IService<int> { }
+        public class NonGeneric2 : IService<int>;
 
-        public class GenericTypeDef<T> : IService<T> { }
+        public class GenericTypeDef<T> : IService<T>;
 
-        public class NonGenericDecorator : IService<int> { public NonGenericDecorator(IService<int> d) { } }
+        public class NonGenericDecorator(IService<int> d) : IService<int>;
 
-        public class GenericDecorator<T> : IService<T> { public GenericDecorator(IService<T> d) { } }
+        public class GenericDecorator<T>(IService<T> d) : IService<T>;
 
-        public class NonGenericComposite : IService<int>
-        {
-            public NonGenericComposite(IEnumerable<IService<int>> services) { }
-        }
+        public class NonGenericComposite(IEnumerable<IService<int>> services) : IService<int>;
 
-        public class GenericComposite<T> : IService<T>
-        {
-            public GenericComposite(IEnumerable<IService<T>> services) { }
-        }
+        public class GenericComposite<T>(IEnumerable<IService<T>> services) : IService<T>;
 
-        public class NonGenericWrappingCollection : IService<int>
-        {
-            // This is not a composite
-            public NonGenericWrappingCollection(IEnumerable<IService<string>> services) { }
-        }
+        // This is not a composite
+        public class NonGenericWrappingCollection(IEnumerable<IService<string>> services) : IService<int>;
 
-        public class GenericWrappingCollection<T> : IService<T>
-        {
-            // This is not a composite
-            public GenericWrappingCollection(IEnumerable<IService<string>> services) { }
-        }
+        // This is not a composite
+        public class GenericWrappingCollection<T>(IEnumerable<IService<string>> services) : IService<T>;
 
-        public class NonGenericCompositeDecorator : IService<int>
-        {
-            public NonGenericCompositeDecorator(IService<int> d, IEnumerable<IService<int>> services) { }
-        }
+        public class NonGenericCompositeDecorator(IService<int> d, IEnumerable<IService<int>> services) : IService<int>;
 
-        public class GenericCompositeDecorator<T> : IService<T>
-        {
-            public GenericCompositeDecorator(IService<T> d, IEnumerable<IService<T>> services) { }
-        }
+        public class GenericCompositeDecorator<T>(IService<T> d, IEnumerable<IService<T>> services) : IService<T>;
     }
 }
+#pragma warning restore CS9113 // Parameter is unread.
