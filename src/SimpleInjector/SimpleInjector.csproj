@@ -20,7 +20,7 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
-    <LangVersion>preview</LangVersion>
+    <LangVersion>14</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

@@ -16,6 +16,7 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <RootNamespace>SimpleInjector.Tests.Unit</RootNamespace>
+    <LangVersion>14</LangVersion>
   </PropertyGroup>
 
 

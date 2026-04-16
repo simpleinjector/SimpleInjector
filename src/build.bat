@@ -1,6 +1,5 @@
-@ECHO OFF
 
-set visualStudioPath=%programfiles%\Microsoft Visual Studio\2022\Community
+set visualStudioPath=%programfiles%\Microsoft Visual Studio\18\Community
 
 for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /format:list') do set datetime=%%I
 
@@ -17,8 +16,6 @@ IF "%2"=="1" (
 ) ELSE IF "%2"=="3" (
 	set step=%2
 ) ELSE IF "%2"=="4" (
-	set step=%2
-) ELSE IF "%2"=="5" (
 	set step=%2
 ) ELSE (
 	set step=%3
@@ -152,7 +149,7 @@ IF %step%==1 (
 	rem %msbuild% "SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj" /nologo
 	rem %msbuild% "SimpleInjector.Packaging\SimpleInjector.Packaging.csproj" /nologo
 	
-    echo Please compile the solution in RELEASE mode and run step 2
+    echo Please compile the solution in RELEASE mode and run step 2.
     goto :EOF
 )
 
@@ -175,46 +172,14 @@ IF %step%==2 (
 )
 
 IF %step%==3 (
-	echo Running step 3: BUILDING DOCUMENTATION
-
-	%msbuild% "SimpleInjector.Documentation\SimpleInjector.Documentation.shfbproj" /nologo /p:Configuration=%configuration% /p:DefineConstants="%defineConstantsNet%"
-
-	mkdir Releases\v%named_version%
-	copy Help\SimpleInjector.chm Releases\v%named_version%\SimpleInjector.chm
-
-
-	echo CREATING ONLINE DOCUMENTATION
-
-	del Help\SimpleInjector.chm
-	del Help\*.aspx
-	del Help\*.php
-	copy Help\Index.html Help\index.tmp
-	del Help\Index.html
-	copy Help\index.tmp Help\index.htm
-	del Help\index.tmp
-	REM For some strange reason, the following call does not compress the complete help directory, while calling it manually does work
-	REM %compress% "%CD%\Help" "%CD%\Releases\v%named_version%\SimpleInjector Online Documentation v%named_version%.zip"
-
-	IF "%prereleasePostfix%"=="" (
-		echo COPYING ONLINE DOCUMENTATION TO WEBSITE REPOSITORY
-
-		%xcopy% Help %referenceLibraryPath% /E /H /Y /I
-		%xcopy% Help %referenceLibraryPath%\%version_major%.%version_minor% /E /H /Y /I
-	)
-
-    echo Please run step 4
-    goto :EOF	
-)
-
-IF %step%==4 (
-	echo Running step 4: CREATING NUGET PACKAGES
-	
+	echo Running step 3: CREATING NUGET PACKAGES
     rmdir Releases\temp /s /q
-	
 	mkdir Releases\temp
+	mkdir "%CD%\Releases\v%named_version%"
+	
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector Releases\temp /E /H
 	%attrib% -r "%CD%\Releases\temp\*.*" /s /d
-	del Releases\temp\.gitignore /s /q
+	del Releases\temp\.gitignore /s /q	
 	copy SimpleInjector\bin\Release\net45\SimpleInjector.dll Releases\temp\lib\net45\SimpleInjector.dll
 	copy SimpleInjector\bin\Release\net45\SimpleInjector.xml Releases\temp\lib\net45\SimpleInjector.xml
 	copy SimpleInjector\bin\Release\net461\SimpleInjector.dll Releases\temp\lib\net461\SimpleInjector.dll
@@ -347,12 +312,12 @@ IF %step%==4 (
 	copy "SimpleInjector.DynamicAssemblyCompilation\bin\Release\SimpleInjector.DynamicAssemblyCompilation.%named_version_DynamicAssemblyCompilation%.nupkg" Releases\v%named_version%\
 	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.DynamicAssemblyCompilation.%named_version_DynamicAssemblyCompilation%.nupkg /sourceFile:SimpleInjector.DynamicAssemblyCompilation.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace% /force
 
-    echo Please run step 5
+    echo Please run step 4
     goto :EOF	
 )
 
-IF %step%==5 (
-	echo Running step 5: RESTORING VERSION NUMBERS
+IF %step%==4 (
+	echo Running step 4: RESTORING VERSION NUMBERS
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj
 	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj

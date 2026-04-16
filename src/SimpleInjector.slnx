@@ -1,0 +1,46 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="Mixed Platforms" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/BuildTools/">
+    <File Path="appveyor.bat" />
+    <File Path="appveyor.yml" />
+    <File Path="build.bat" />
+    <File Path="BuildTools/BetterAssemblyInfoTask.dll" />
+    <File Path="BuildTools/BetterAssemblyInfoTask.pdb" />
+    <File Path="BuildTools/replace.exe" />
+    <File Path="BuildTools/zip.vbs" />
+    <File Path="publish2nuget.bat" />
+    <Project Path="PartialTrustTestRunner/PartialTrustTestRunner.csproj" />
+  </Folder>
+  <Folder Name="/Documentation Genaration/">
+    <File Path="SandcastleGUI.exe" />
+    <File Path="SimpleInjector.SandcastleGUI" />
+  </Folder>
+  <Folder Name="/Documentation/">
+    <File Path="changes.txt" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="empty.ruleset" />
+    <File Path="Settings.StyleCop" />
+    <File Path="SimpleInjector.FxCop" />
+    <File Path="SimpleInjector.ncover" />
+    <File Path="SimpleInjector.ruleset" />
+  </Folder>
+  <Project Path="SimpleInjector.CI/SimpleInjector.CI.csproj" Id="6c96df05-104b-4ad0-b686-0fb59aef1dc2" />
+  <Project Path="SimpleInjector.CodeSamples.Tests.Unit/SimpleInjector.CodeSamples.Tests.Unit.csproj" />
+  <Project Path="SimpleInjector.CodeSamples/SimpleInjector.CodeSamples.csproj" />
+  <Project Path="SimpleInjector.Conventions.Tests/SimpleInjector.Conventions.Tests.csproj" />
+  <Project Path="SimpleInjector.DynamicAssemblyCompilation/SimpleInjector.DynamicAssemblyCompilation.csproj" />
+  <Project Path="SimpleInjector.Integration.Wcf/SimpleInjector.Integration.Wcf.csproj" />
+  <Project Path="SimpleInjector.Integration.Web.Mvc/SimpleInjector.Integration.Web.Mvc.csproj" />
+  <Project Path="SimpleInjector.Integration.Web.Tests.Unit/SimpleInjector.Integration.Web.Tests.Unit.csproj" />
+  <Project Path="SimpleInjector.Integration.Web/SimpleInjector.Integration.Web.csproj" />
+  <Project Path="SimpleInjector.Integration.WebApi/SimpleInjector.Integration.WebApi.csproj" />
+  <Project Path="SimpleInjector.Packaging/SimpleInjector.Packaging.csproj" />
+  <Project Path="SimpleInjector.Tests.Unit/SimpleInjector,Tests.Unit.csproj" />
+  <Project Path="SimpleInjector/SimpleInjector.csproj" />
+</Solution>
