@@ -1,5 +1,4 @@
-﻿#pragma warning disable CS9113 // Parameter is unread.
-namespace SimpleInjector.Tests.Unit
+﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Collections.Generic;
@@ -209,4 +208,3 @@ namespace SimpleInjector.Tests.Unit
         }
     }
 }
-#pragma warning restore CS9113 // Parameter is unread.

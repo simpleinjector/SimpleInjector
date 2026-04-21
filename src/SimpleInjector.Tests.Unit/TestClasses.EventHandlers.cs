@@ -1,5 +1,4 @@
-﻿#pragma warning disable CS9113 // Parameter is unread.
-namespace SimpleInjector.Tests.Unit
+﻿namespace SimpleInjector.Tests.Unit
 {
     public interface IAuditableEvent;
 
@@ -55,4 +54,3 @@ namespace SimpleInjector.Tests.Unit
 
     internal class InternalEventHandler<TEvent> : IEventHandler<TEvent>;
 }
-#pragma warning restore CS9113 // Parameter is unread.

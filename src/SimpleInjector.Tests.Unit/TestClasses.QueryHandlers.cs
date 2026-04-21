@@ -1,5 +1,4 @@
-﻿#pragma warning disable CS9113 // Parameter is unread.
-namespace SimpleInjector.Tests.Unit
+﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Collections.ObjectModel;
@@ -31,4 +30,3 @@ namespace SimpleInjector.Tests.Unit
 
     public class NonCacheableQueryHandler : IQueryHandler<NonCacheableQuery, DayOfWeek[]>;
 }
-#pragma warning restore CS9113 // Parameter is unread.
