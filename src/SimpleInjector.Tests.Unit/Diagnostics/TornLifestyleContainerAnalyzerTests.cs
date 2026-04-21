@@ -1,5 +1,6 @@
 ﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Lifestyles;
@@ -668,6 +669,21 @@
             Assert.IsFalse(results.Any(), Actual(results));
         }
 
+        // See issue #1010
+        [TestMethod]
+        public void Verify_MultipleRegistrationsForTheSameCollection_DoesNotCauseAnyDiagnosticWarnigns()
+        {
+            var container = new Container();
+
+            var reg1 = container.Collection.CreateRegistration<ILogger>(typeof(NullLogger));
+            var reg2 = container.Collection.CreateRegistration<ILogger>(typeof(ConsoleLogger));
+
+            container.Verify();
+
+            GC.KeepAlive(reg1);
+            GC.KeepAlive(reg2);
+        }
+
         private static void Assert_ContainsDescription(TornLifestyleDiagnosticResult[] results,
             string expectedDescription)
         {
@@ -681,5 +697,7 @@
 
         private static string Actual(IEnumerable<DiagnosticResult> results) =>
             "Actual: " + string.Join(" - ", results.Select(r => r.Description));
+
+        private class Consumer1(IEnumerable<ILogger> loggers);
     }
 }

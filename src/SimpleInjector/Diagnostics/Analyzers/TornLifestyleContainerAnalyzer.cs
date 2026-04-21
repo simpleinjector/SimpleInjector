@@ -40,6 +40,12 @@ namespace SimpleInjector.Diagnostics.Analyzers
             where producer.Registration.Lifestyle != Lifestyle.Transient
             where !SingletonLifestyle.IsSingletonInstanceRegistration(producer.Registration)
             where !producer.Registration.WrapsInstanceCreationDelegate
+            // Collections should be skipped. If there are multiple collection registrations for the same
+            // type, this means that the user created them (or one of them) explicitly (e.g. using
+            // Collection.CreateRegistration). In that case we must assume that the user did so explicitly
+            // (likely because both collections contain different dependencies and are, for instance,
+            // registered conditionally).
+            where !producer.Registration.IsCollection
             group producer by producer.Registration into registrationGroup
             let registration = registrationGroup.Key
             let lifestyle = registration.Lifestyle.IdentificationKey
