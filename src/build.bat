@@ -1,10 +1,8 @@
+@ECHO OFF
 
 set visualStudioPath=%programfiles%\Microsoft Visual Studio\18\Community
-
-for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /format:list') do set datetime=%%I
-
 set buildNumber=0 
-set copyrightYear=%datetime:~0,4%
+set copyrightYear=%date:~-4%
 set version=%1
 set prereleasePostfix=
 set releaseNotesUrl=https://github.com/simpleinjector/SimpleInjector/releases/tag/v
