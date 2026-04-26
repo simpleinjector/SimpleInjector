@@ -56,20 +56,13 @@ public class UserController : Controller
         return View(this.repository.GetAll());
     }
 }
-    
-public class SqlUserRepository : IUserRepository
-{
-    private readonly ILogger logger;
 
-    // Use constructor injection for the dependencies
-    public SqlUserRepository(ILogger logger)
-    {
-        this.logger = logger;
-    }
-    
+// Use constructor injection using C# 11 primary constructor syntax
+public class SqlUserRepository(ILogger logger) : IUserRepository
+{
     public User GetById(Guid id)
     {
-        this.logger.Log("Getting User " + id);
+        logger.Log("Getting User " + id);
         // retrieve from db.
     }
 }
