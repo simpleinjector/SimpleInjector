@@ -137,18 +137,25 @@ namespace SimpleInjector
         public object GetInstance(Type serviceType)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
-            var container = this.EnsureContainerNotNull();
 
-            Scope? originalScope = container.CurrentThreadResolveScope;
+            if (this.Container is null)
+            {
+                throw new InvalidOperationException(
+                    "This method can only be called on Scope instances that are related to a Container. " +
+                    "Please use the overloaded constructor of Scope create an instance with a Container.");
+            }
+
+            Scope? originalScope = this.Container.CurrentThreadResolveScope;
+
+            this.Container.CurrentThreadResolveScope = this;
 
             try
             {
-                container.CurrentThreadResolveScope = this;
-                return container.GetInstance(serviceType);
+                return this.Container.GetInstance(serviceType);
             }
             finally
             {
-                container.CurrentThreadResolveScope = originalScope;
+                this.Container.CurrentThreadResolveScope = originalScope;
             }
         }
 
@@ -160,19 +167,7 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public IEnumerable<TService> GetAllInstances<TService>() where TService : class
         {
-            var container = this.EnsureContainerNotNull();
-
-            Scope? originalScope = container.CurrentThreadResolveScope;
-
-            try
-            {
-                container.CurrentThreadResolveScope = this;
-                return container.GetAllInstances<TService>();
-            }
-            finally
-            {
-                container.CurrentThreadResolveScope = originalScope;
-            }
+            return this.GetInstance<IEnumerable<TService>>();
         }
 
         /// <summary>
@@ -183,33 +178,9 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public IEnumerable<object> GetAllInstances(Type serviceType)
         {
-            var container = this.EnsureContainerNotNull();
+            Requires.IsNotNull(serviceType, nameof(serviceType));
 
-            Scope? originalScope = container.CurrentThreadResolveScope;
-
-            try
-            {
-                container.CurrentThreadResolveScope = this;
-                return container.GetAllInstances(serviceType);
-            }
-            finally
-            {
-                container.CurrentThreadResolveScope = originalScope;
-            }
-        }
-
-        private Container EnsureContainerNotNull()
-        {
-            if (this.Container is null)
-            {
-                throw new InvalidOperationException(
-                    "This method can only be called on Scope instances that are related to a Container. " +
-                    "Please use the overloaded constructor of Scope create an instance with a Container.");
-            }
-            else
-            {
-                return this.Container;
-            }
+            return (IEnumerable<object>)this.GetInstance(typeof(IEnumerable<>).MakeGenericType(serviceType));
         }
 
         /// <summary>
@@ -243,7 +214,7 @@ namespace SimpleInjector
                 this.RequiresInstanceNotDisposed();
                 this.PreventCyclicDependenciesDuringDisposal();
 
-                (this.scopeEndActions ??= new List<Action>()).Add(action);
+                (this.scopeEndActions ??= []).Add(action);
             }
         }
 
@@ -334,7 +305,7 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// <b>Thread safety:</b> Calls to this method are thread safe, but users should take proper
-        /// percussions when they call both <b>GetItem</b> and <see cref="SetItem"/>.
+        /// precautions when they call both <b>GetItem</b> and <see cref="SetItem"/>.
         /// </remarks>
         /// <param name="key">The key of the item to retrieve.</param>
         /// <returns>The stored item or null.</returns>
@@ -353,7 +324,7 @@ namespace SimpleInjector
         /// <summary>Stores an item by the given <paramref name="key"/> in the scope.</summary>
         /// <remarks>
         /// <b>Thread safety:</b> Calls to this method are thread safe, but users should take proper
-        /// percussions when they call both <see cref="GetItem"/> and <b>SetItem</b>.
+        /// precautions when they call both <see cref="GetItem"/> and <b>SetItem</b>.
         /// </remarks>
         /// <param name="key">The key of the item to insert or override.</param>
         /// <param name="item">The actual item. May be null.</param>
@@ -365,10 +336,7 @@ namespace SimpleInjector
 
             lock (this.syncRoot)
             {
-                if (this.items is null)
-                {
-                    this.items = new Dictionary<object, object?>(capacity: 1);
-                }
+                this.items ??= new Dictionary<object, object?>(capacity: 1);
 
                 if (item is null)
                 {
@@ -469,14 +437,9 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
 
-            IServiceProvider? provider = this.Container;
-
-            if (provider is null)
-            {
-                throw new InvalidOperationException(
-                    "This method can only be called on Scope instances that are related to a Container. " +
-                    "Please use the overloaded constructor of Scope create an instance with a Container.");
-            }
+            IServiceProvider? provider = this.Container ?? throw new InvalidOperationException(
+                "This method can only be called on Scope instances that are related to a Container. " +
+                "Please use the overloaded constructor of Scope create an instance with a Container.");
 
             Scope? originalScope = this.Container!.CurrentThreadResolveScope;
 
@@ -507,10 +470,7 @@ namespace SimpleInjector
         {
             lock (this.syncRoot)
             {
-                if (this.items is null)
-                {
-                    this.items = new Dictionary<object, object>(capacity: 1);
-                }
+                this.items ??= new Dictionary<object, object>(capacity: 1);
 
                 object? item = this.items[key];
 
@@ -1010,7 +970,7 @@ namespace SimpleInjector
             // This instance is never updated, only completely replaced.
             // Although IsAsyncDisposable called from within the context of a lock(), that lock is specific
             // to a Scope instance. This still allows parallel access to this dictionary.
-            private static Dictionary<Type, bool> Cache = new();
+            private static Dictionary<Type, bool> Cache = [];
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             internal static object Unwrap(object instance) =>
