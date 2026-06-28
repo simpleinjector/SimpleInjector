@@ -370,7 +370,7 @@ namespace SimpleInjector
 
             if (this.disposables is null)
             {
-                return Helpers.Array<IDisposable>.Empty;
+                return [];
             }
 
             var list = new List<IDisposable>(this.disposables.Count);
@@ -407,7 +407,7 @@ namespace SimpleInjector
 
             if (this.disposables is null)
             {
-                return Helpers.Array<object>.Empty;
+                return [];
             }
             else
             {

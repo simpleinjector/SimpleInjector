@@ -777,13 +777,13 @@ namespace SimpleInjector
         {
             // Build the following delegate: () => (ServiceType)instanceCreator();
             var invocationExpression =
-                Expression.Invoke(Expression.Constant(instanceCreator), Helpers.Array<Expression>.Empty);
+                Expression.Invoke(Expression.Constant(instanceCreator), []);
 
             var convertExpression = Expression.Convert(invocationExpression, serviceType);
 
             // This might throw an MemberAccessException when serviceType is internal while we're running in
             // a Silverlight sandbox.
-            return Expression.Lambda(convertExpression, Helpers.Array<ParameterExpression>.Empty).Compile();
+            return Expression.Lambda(convertExpression, []).Compile();
         }
 
         private static ArgumentException BuildUnableToResolveTypeDueToSecurityConfigException(

@@ -665,7 +665,7 @@ namespace SimpleInjector
                 }
             }
 
-            return Helpers.Array<Type>.Empty;
+            return [];
         }
 
         private static void CollectionDoesNotContainOpenGenericTypes(

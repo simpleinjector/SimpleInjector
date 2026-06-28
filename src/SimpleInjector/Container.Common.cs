@@ -552,7 +552,7 @@ namespace SimpleInjector
         {
             if (this.instanceInitializers.Count == 0)
             {
-                return Helpers.Array<Action<T>>.Empty;
+                return [];
             }
 
             var context = new InitializerContext(registration);
