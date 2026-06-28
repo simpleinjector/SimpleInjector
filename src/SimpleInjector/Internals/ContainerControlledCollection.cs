@@ -9,8 +9,6 @@ namespace SimpleInjector.Internals
     using System.Linq;
     using SimpleInjector.Lifestyles;
 
-    // A decoratable enumerable is a collection that holds a set of Expression objects. When a decorator is
-    // applied to a collection, a new DecoratableEnumerable will be created
     internal class ContainerControlledCollection<TService>
         : IList<TService>,
         IContainerControlledCollection, IReadOnlyList<TService>

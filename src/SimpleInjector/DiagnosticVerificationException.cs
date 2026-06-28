@@ -17,8 +17,7 @@ namespace SimpleInjector
 #endif
     public class DiagnosticVerificationException : Exception
     {
-        private static readonly ReadOnlyCollection<DiagnosticResult> Empty =
-            new(Helpers.Array<DiagnosticResult>.Empty);
+        private static readonly ReadOnlyCollection<DiagnosticResult> Empty = new([]);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagnosticVerificationException" /> class.

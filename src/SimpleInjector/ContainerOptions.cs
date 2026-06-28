@@ -162,12 +162,11 @@ namespace SimpleInjector
             "Please use the UseStrictLifestyleMismatchBehavior property instead. Note that " +
             "UseStrictLifestyleMismatchBehavior's behavior is negated. This means that if you're currently " +
             "supplying 'false' to UseLoosenedLifestyleMismatchBehavior, you will have to supply 'true' to " +
-            "UseStrictLifestyleMismatchBehavior instead, and vise versa. Also note that 'loosend' behavior " +
-            "became the default in 5.0 — In case you are assinging UseLoosenedLifestyleMismatchBehavior to " +
+            "UseStrictLifestyleMismatchBehavior instead, and vise versa. Also note that 'loosened' behavior " +
+            "became the default in 5.0 — In case you are assigning UseLoosenedLifestyleMismatchBehavior to " +
             "'true', the call can be removed safely. " +
-            "Will be treated as an error from version 5.6. " +
             "Will be removed in version 6.0.",
-            error: false)]
+            error: true)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public bool UseLoosenedLifestyleMismatchBehavior
         {
@@ -451,8 +450,8 @@ namespace SimpleInjector
             nameof(ExpressionCompilationBehavior) + " property with a new " +
             "DynamicAssemblyExpressionCompilationBehavior instance that is located in the " +
             "SimpleInjector.DynamicAssemblyCompilation package. " +
-            "Will be treated as an error from version 5.6. Will be removed in version 6.0.",
-            error: false)]
+            "Will be removed in version 6.0.",
+            error: true)]
         public bool EnableDynamicAssemblyCompilation { get; set; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

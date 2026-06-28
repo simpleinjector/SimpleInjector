@@ -1,7 +1,12 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using SimpleInjector.Lifestyles;
 
     [TestClass]
     public class ContainerScopeTests
@@ -10,7 +15,7 @@
         public void GetItem_NoValueSet_ReturnsNull()
         {
             // Arrange
-            object key = new object();
+            object key = new();
 
             var container = ContainerFactory.New();
 
@@ -25,8 +30,8 @@
         public void GetItem_WithValueSet_ReturnsThatItem()
         {
             // Arrange
-            object key = new object();
-            object expectedItem = new object();
+            object key = new();
+            object expectedItem = new();
 
             var container = ContainerFactory.New();
 
@@ -43,8 +48,8 @@
         public void GetItem_WithValueSetInOneContainer_DoesNotReturnThatItemInAnotherContainer()
         {
             // Arrange
-            object key = new object();
-            object expectedItem = new object();
+            object key = new();
+            object expectedItem = new();
 
             var container1 = ContainerFactory.New();
             var container2 = ContainerFactory.New();
@@ -62,9 +67,9 @@
         public void GetItem_WithValueSetTwice_ReturnsLastItem()
         {
             // Arrange
-            object key = new object();
-            object firstItem = new object();
-            object expectedItem = new object();
+            object key = new();
+            object firstItem = new();
+            object expectedItem = new();
 
             var container = ContainerFactory.New();
 
@@ -82,7 +87,7 @@
         public void GetItem_WithValueReset_ReturnsNull()
         {
             // Arrange
-            object key = new object();
+            object key = new();
 
             var container = ContainerFactory.New();
 
@@ -177,6 +182,119 @@
 
             // Assert
             Assert.AreSame(instance1, instance2);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_ResolvingACollectionWithMixedLifestylesForFlowingScope_ResolvesInstancesWithExpectedLifestylesForNestedScopes()
+        {
+            this.GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesForNestedScopes(true);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_ResolvingACollectionWithMixedLifestylesForNormalScope_ResolvesInstancesWithExpectedLifestylesForNestedScopes()
+        {
+            this.GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesForNestedScopes(false);
+        }
+
+        private void GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesForNestedScopes(
+            bool useFlowingScope)
+        {
+            var container = ContainerFactory.New();
+
+            container.Options.DefaultScopedLifestyle = useFlowingScope
+                ? ScopedLifestyle.Flowing
+                : new AsyncScopedLifestyle();
+
+            container.Collection.Append<ILogger, ConsoleLogger>(Lifestyle.Transient);
+            container.Collection.Append<ILogger, NullLogger>(Lifestyle.Scoped);
+            container.Collection.Append<ILogger, Logger<int>>(Lifestyle.Singleton);
+
+            using (var parentScope = CreateScope(useFlowingScope, container))
+            {
+                IEnumerable<ILogger> parentLoggers = parentScope.GetAllInstances<ILogger>();
+
+                var transientLogger = parentLoggers.First();
+                var scopedLogger = parentLoggers.Second();
+                var singletonLogger = parentLoggers.Last();
+
+                Assert.AreNotSame(transientLogger, parentLoggers.First());
+                Assert.AreSame(scopedLogger, parentLoggers.Second());
+                Assert.AreSame(singletonLogger, parentLoggers.Last());
+
+                using (var nestedScope = CreateScope(useFlowingScope, container))
+                {
+                    IEnumerable<ILogger> nestedLoggers = nestedScope.GetAllInstances<ILogger>();
+                    
+                    // IMPORTANT: Under flowing scopes, resolving Scoped instances from a stream behaves
+                    // different compared to 'normal' scopes.
+                    if (useFlowingScope)
+                    {
+                        // Each flowing scope will get its own IEnumerable<T> instance, and resolving from the
+                        // parentLoggers will, therefore, resolve instances from within that scope.
+                        Assert.AreNotSame(parentLoggers, nestedLoggers);
+                        Assert.AreNotSame(parentLoggers.Second(), nestedLoggers.Second());
+                    }
+                    else
+                    {
+                        // With 'normal' scoping, IEnumerable<T> will be singletons and since scopes are
+                        // ambient and we're now running inside the nested scope, also the parentLoggers
+                        // return the same scoped instance.
+                        Assert.AreSame(parentLoggers, nestedLoggers);
+                        Assert.AreSame(parentLoggers.Second(), nestedLoggers.Second());
+                    }
+
+                    Assert.AreSame(parentLoggers.Last(), nestedLoggers.Last());
+                }
+            }
+        }
+
+        [TestMethod]
+        public void GetAllInstances_ResolvingACollectionWithMixedLifestylesForFlowingScope_ResolvesInstancesWithExpectedLifestylesFromForUnrelatedScopes()
+        {
+            this.GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesFromForUnrelatedScopes(true);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_ResolvingACollectionWithMixedLifestylesForNormalScope_ResolvesInstancesWithExpectedLifestylesFromForUnrelatedScopes()
+        {
+            this.GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesFromForUnrelatedScopes(false);
+        }
+
+        private void GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesFromForUnrelatedScopes(
+            bool useFlowingScope)
+        {
+            var container = ContainerFactory.New();
+
+            container.Options.DefaultScopedLifestyle = useFlowingScope
+                ? ScopedLifestyle.Flowing
+                : new AsyncScopedLifestyle();
+
+            container.Collection.Append<ILogger, ConsoleLogger>(Lifestyle.Singleton);
+            container.Collection.Append<ILogger, NullLogger>(Lifestyle.Scoped);
+
+            ILogger singletonLogger;
+            ILogger scopedLogger;
+
+            using (var parentScope = CreateScope(useFlowingScope, container))
+            {
+                IEnumerable<ILogger> parentLoggers = parentScope.GetAllInstances<ILogger>();
+
+                singletonLogger = parentLoggers.First();
+                scopedLogger = parentLoggers.Second();
+            }
+
+            using (var scope = CreateScope(useFlowingScope, container))
+            {
+                IEnumerable<ILogger> loggers = scope.GetAllInstances<ILogger>();
+
+                Assert.AreSame(singletonLogger, loggers.First());
+                Assert.AreNotSame(scopedLogger, loggers.Second());
+            }
+        }
+
+        private static Scope CreateScope(bool useFlowingScope, Container container)
+        {
+            return useFlowingScope ? new Scope(container) : AsyncScopedLifestyle.BeginScope(container);
         }
     }
 }

@@ -187,7 +187,7 @@ namespace SimpleInjector.Internals
                     this.GetMatchingGenericArgumentsForOpenImplementationBasedOn(openCandidateServiceType));
             }
 
-            return new CandicateServiceType(openCandidateServiceType, Helpers.Array<Type>.Empty);
+            return new CandicateServiceType(openCandidateServiceType, []);
         }
 
         private bool MatchesClosedGenericBaseType(CandicateServiceType openCandidateServiceType)

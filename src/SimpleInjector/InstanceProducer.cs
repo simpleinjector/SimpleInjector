@@ -554,7 +554,7 @@ namespace SimpleInjector
         {
             lock (this.locker)
             {
-                return this.verifiers?.ToArray() ?? Helpers.Array<Action<Scope>>.Empty;
+                return this.verifiers?.ToArray() ?? [];
             }
         }
 

@@ -658,6 +658,30 @@ namespace SimpleInjector
         }
 
         /// <summary>
+        /// Registers that the same instance of <paramref name="concreteType"/> will be returned every time it
+        /// is requested (singleton).
+        /// </summary>
+        /// <param name="concreteType">The concrete type that will be registered. This can be an open-generic type.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="concreteType"/> is a null
+        /// references.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="concreteType"/> represents
+        /// a type that can not be created by the container.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this container instance is locked and can not be altered, or when an
+        /// the <paramref name="concreteType"/> has already been registered.
+        /// </exception>
+        public void RegisterSingleton(Type concreteType)
+        {
+            this.Register(
+                serviceType: concreteType,
+                implementationType: concreteType,
+                lifestyle: Lifestyle.Singleton,
+                serviceTypeParamName: nameof(concreteType),
+                implementationTypeParamName: nameof(concreteType));
+        }
+
+        /// <summary>
         /// Registers a single instance that will be returned when an instance of type
         /// <typeparamref name="TService"/> is requested. This <paramref name="instance"/> must be thread-safe
         /// when working in a multi-threaded environment.

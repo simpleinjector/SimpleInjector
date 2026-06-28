@@ -214,7 +214,23 @@
                 "The given type Func<object> is not a concrete type. " +
                 "Please use one of the other overloads to register this type.", action);
         }
-        
+
+        [TestMethod]
+        public void RegisterConcreteSingleton_WhenResolved_AlwaysReturnsTheSameInstance()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            container.RegisterSingleton(typeof(SqlUserRepository));
+
+            // Assert
+            var instance1 = container.GetInstance(typeof(SqlUserRepository));
+            var instance2 = container.GetInstance(typeof(SqlUserRepository));
+
+            Assert.AreSame(instance1, instance2);
+        }
+
         public abstract class AbstractTypeWithSinglePublicConstructor
         {
             public AbstractTypeWithSinglePublicConstructor()

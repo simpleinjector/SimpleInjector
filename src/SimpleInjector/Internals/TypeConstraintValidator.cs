@@ -45,7 +45,7 @@ namespace SimpleInjector.Internals
             return HasDefaultConstructor(this.Mapping.ConcreteType);
         }
 
-        private static bool HasDefaultConstructor(Type t) => t.GetConstructor(Helpers.Array<Type>.Empty) != null;
+        private static bool HasDefaultConstructor(Type t) => t.GetConstructor([]) != null;
 
         private bool ParameterSatisfiesReferenceTypeConstraint()
         {
