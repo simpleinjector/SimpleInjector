@@ -184,10 +184,19 @@
             Assert.AreSame(instance1, instance2);
         }
 
-        [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesForNestedScopes(
+        [TestMethod]
+        public void GetAllInstances_ResolvingACollectionWithMixedLifestylesForFlowingScope_ResolvesInstancesWithExpectedLifestylesForNestedScopes()
+        {
+            this.GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesForNestedScopes(true);
+        }
+
+        [TestMethod]
+        public void GetAllInstances_ResolvingACollectionWithMixedLifestylesForNormalScope_ResolvesInstancesWithExpectedLifestylesForNestedScopes()
+        {
+            this.GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesForNestedScopes(false);
+        }
+
+        private void GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesForNestedScopes(
             bool useFlowingScope)
         {
             var container = ContainerFactory.New();
@@ -239,11 +248,19 @@
             }
         }
 
+        [TestMethod]
+        public void GetAllInstances_ResolvingACollectionWithMixedLifestylesForFlowingScope_ResolvesInstancesWithExpectedLifestylesFromForUnrelatedScopes()
+        {
+            this.GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesFromForUnrelatedScopes(true);
+        }
 
-        [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesFromForUnrelatedScopes(
+        [TestMethod]
+        public void GetAllInstances_ResolvingACollectionWithMixedLifestylesForNormalScope_ResolvesInstancesWithExpectedLifestylesFromForUnrelatedScopes()
+        {
+            this.GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesFromForUnrelatedScopes(false);
+        }
+
+        private void GetAllInstances_ResolvingACollectionWithMixedLifestyles_ResolvesInstancesWithExpectedLifestylesFromForUnrelatedScopes(
             bool useFlowingScope)
         {
             var container = ContainerFactory.New();
