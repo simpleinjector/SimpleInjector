@@ -137,24 +137,78 @@ namespace SimpleInjector
         public object GetInstance(Type serviceType)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
+            var container = this.EnsureContainerNotNull();
 
+            Scope? originalScope = container.CurrentThreadResolveScope;
+
+            try
+            {
+                container.CurrentThreadResolveScope = this;
+                return container.GetInstance(serviceType);
+            }
+            finally
+            {
+                container.CurrentThreadResolveScope = originalScope;
+            }
+        }
+
+        /// <summary>
+        /// Gets all instances of the given <typeparamref name="TService"/> for the current scope.
+        /// </summary>
+        /// <typeparam name="TService">Type of object requested.</typeparam>
+        /// <returns>A sequence of instances of the requested TService.</returns>
+        /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
+        public IEnumerable<TService> GetAllInstances<TService>() where TService : class
+        {
+            var container = this.EnsureContainerNotNull();
+
+            Scope? originalScope = container.CurrentThreadResolveScope;
+
+            try
+            {
+                container.CurrentThreadResolveScope = this;
+                return container.GetAllInstances<TService>();
+            }
+            finally
+            {
+                container.CurrentThreadResolveScope = originalScope;
+            }
+        }
+
+        /// <summary>
+        /// Gets all instances of the given <paramref name="serviceType"/> for the current scope.
+        /// </summary>
+        /// <param name="serviceType">Type of object requested.</param>
+        /// <returns>A sequence of instances of the requested service type.</returns>
+        /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
+        public IEnumerable<object> GetAllInstances(Type serviceType)
+        {
+            var container = this.EnsureContainerNotNull();
+
+            Scope? originalScope = container.CurrentThreadResolveScope;
+
+            try
+            {
+                container.CurrentThreadResolveScope = this;
+                return container.GetAllInstances(serviceType);
+            }
+            finally
+            {
+                container.CurrentThreadResolveScope = originalScope;
+            }
+        }
+
+        private Container EnsureContainerNotNull()
+        {
             if (this.Container is null)
             {
                 throw new InvalidOperationException(
                     "This method can only be called on Scope instances that are related to a Container. " +
                     "Please use the overloaded constructor of Scope create an instance with a Container.");
             }
-
-            Scope? originalScope = this.Container.CurrentThreadResolveScope;
-
-            try
+            else
             {
-                this.Container.CurrentThreadResolveScope = this;
-                return this.Container.GetInstance(serviceType);
-            }
-            finally
-            {
-                this.Container.CurrentThreadResolveScope = originalScope;
+                return this.Container;
             }
         }
 
