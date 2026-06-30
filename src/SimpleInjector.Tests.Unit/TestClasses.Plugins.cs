@@ -11,7 +11,7 @@
 
     public class PluginImpl2 : IPlugin;
 
-    public class PluginWithDependency<TDependency>(TDependency dependency) : IPlugin;
+    public record PluginWithDependency<TDependency>(TDependency Dependency) : IPlugin;
 
     public class PluginDecorator(IPlugin decoratee) : IPlugin
     {

@@ -2580,26 +2580,11 @@
         public Predicate<DecoratorPredicateContext> Predicate { get; set; }
     }
 
-    public class DependencyInfo
-    {
-        public DependencyInfo(Type serviceType, Lifestyle lifestyle)
-        {
-            this.ServiceType = serviceType;
-            this.Lifestyle = lifestyle;
-        }
+    public record DependencyInfo(Type ServiceType, Lifestyle Lifestyle);
 
-        public Type ServiceType { get; }
+    public class RealCommand;
 
-        public Lifestyle Lifestyle { get; }
-    }
-
-    public class RealCommand
-    {
-    }
-
-    public class SpecialCommand : ISpecialCommand
-    {
-    }
+    public class SpecialCommand : ISpecialCommand;
 
     public class MultipleConstructorsCommandHandlerDecorator<T> : ICommandHandler<T>
     {
@@ -2616,26 +2601,18 @@
         }
     }
 
-    public class InvalidDecoratorCommandHandlerDecorator<T> : ICommandHandler<T>
+    // This is no decorator, since it lacks the ICommandHandler<T> parameter.
+    public class InvalidDecoratorCommandHandlerDecorator<T>(ILogger logger) : ICommandHandler<T>
     {
-        // This is no decorator, since it lacks the ICommandHandler<T> parameter.
-        public InvalidDecoratorCommandHandlerDecorator(ILogger logger)
-        {
-        }
-
         public void Handle(T command)
         {
         }
     }
 
-    public class InvalidCommandHandlerDecoratorWithTwoDecoratees<T> : ICommandHandler<T>
+    public class InvalidCommandHandlerDecoratorWithTwoDecoratees<T>(
+        ICommandHandler<T> decorated1, ICommandHandler<T> decorated2, ILogger logger)
+        : ICommandHandler<T>
     {
-        // This is not a decorator as it expects more than one ICommandHandler<T> parameter.
-        public InvalidCommandHandlerDecoratorWithTwoDecoratees(ICommandHandler<T> decorated1,
-            ICommandHandler<T> decorated2, ILogger logger)
-        {
-        }
-
         public void Handle(T command)
         {
         }
@@ -2648,15 +2625,10 @@
         public string Item2 { get; set; }
     }
 
-    public class HandlerDecoratorWithProperties<T> : HandlerDecoratorWithPropertiesBase, ICommandHandler<T>
+    public class HandlerDecoratorWithProperties<T>(ICommandHandler<T> wrapped)
+        : HandlerDecoratorWithPropertiesBase
+        , ICommandHandler<T>
     {
-        private readonly ICommandHandler<T> wrapped;
-
-        public HandlerDecoratorWithProperties(ICommandHandler<T> wrapped)
-        {
-            this.wrapped = wrapped;
-        }
-
         public void Handle(T command)
         {
         }
@@ -2669,14 +2641,9 @@
         }
     }
 
-    public class NonGenericServiceDecorator : INonGenericService
+    public class NonGenericServiceDecorator(INonGenericService decorated) : INonGenericService
     {
-        public NonGenericServiceDecorator(INonGenericService decorated)
-        {
-            this.DecoratedService = decorated;
-        }
-
-        public INonGenericService DecoratedService { get; }
+        public INonGenericService DecoratedService { get; } = decorated;
 
         public void DoSomething()
         {
@@ -2684,14 +2651,9 @@
         }
     }
 
-    public class NonGenericServiceDecorator<T> : INonGenericService
+    public class NonGenericServiceDecorator<T>(INonGenericService decorated) : INonGenericService
     {
-        public NonGenericServiceDecorator(INonGenericService decorated)
-        {
-            this.DecoratedService = decorated;
-        }
-
-        public INonGenericService DecoratedService { get; }
+        public INonGenericService DecoratedService { get; } = decorated;
 
         public void DoSomething()
         {
@@ -2699,14 +2661,9 @@
         }
     }
 
-    public class NonGenericServiceDecoratorWithFunc : INonGenericService
+    public class NonGenericServiceDecoratorWithFunc(Func<INonGenericService> decoratedCreator) : INonGenericService
     {
-        public NonGenericServiceDecoratorWithFunc(Func<INonGenericService> decoratedCreator)
-        {
-            this.DecoratedServiceCreator = decoratedCreator;
-        }
-
-        public Func<INonGenericService> DecoratedServiceCreator { get; }
+        public Func<INonGenericService> DecoratedServiceCreator { get; } = decoratedCreator;
 
         public void DoSomething()
         {
@@ -2714,80 +2671,53 @@
         }
     }
 
-    public class NonGenericServiceDecoratorWithScopeFunc : INonGenericService
+    public class NonGenericServiceDecoratorWithScopeFunc(
+        Container container, Func<Scope, INonGenericService> decoratedCreator)
+        : INonGenericService
     {
-        private readonly Container container;
-
-        public NonGenericServiceDecoratorWithScopeFunc(
-            Container container, Func<Scope, INonGenericService> decoratedCreator)
-        {
-            this.DecoratedServiceCreator = decoratedCreator;
-            this.container = container;
-        }
-
-        public Func<Scope, INonGenericService> DecoratedServiceCreator { get; }
+        public Func<Scope, INonGenericService> DecoratedServiceCreator { get; } = decoratedCreator;
 
         public void DoSomething()
         {
-            using (var scope = new Scope(this.container))
+            using (var scope = new Scope(container))
             {
                 this.DecoratedServiceCreator(scope).DoSomething();
             }
         }
     }
 
-    public class NonGenericServiceDecoratorWithBothDecorateeAndFunc : INonGenericService
+    public class NonGenericServiceDecoratorWithBothDecorateeAndFunc(
+        INonGenericService decoratee, Func<INonGenericService> decoratedCreator)
+        : INonGenericService
     {
-        public NonGenericServiceDecoratorWithBothDecorateeAndFunc(INonGenericService decoratee,
-            Func<INonGenericService> decoratedCreator)
-        {
-        }
-
         public void DoSomething()
         {
         }
     }
 
-    public class EnumerableDecorator<T> : IEnumerable<T>
+    public class EnumerableDecorator<T>(IEnumerable<T> decoratedCollection) : IEnumerable<T>
     {
-        private readonly IEnumerable<T> decoratedCollection;
-
-        public EnumerableDecorator(IEnumerable<T> decoratedCollection)
-        {
-            this.decoratedCollection = decoratedCollection;
-        }
-
         // Scenario: do some filtering here, based on the user's role.
-        public IEnumerator<T> GetEnumerator() => this.decoratedCollection.GetEnumerator();
+        public IEnumerator<T> GetEnumerator() => decoratedCollection.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
     }
 
-    public class InvalidCommandHandlerDecoratorWithDecorateeAndFactory<T> : ICommandHandler<T>
+    public class InvalidCommandHandlerDecoratorWithDecorateeAndFactory<T>(
+        ICommandHandler<T> decorated, Func<ICommandHandler<T>> decoratedFactory)
+        : ICommandHandler<T>
     {
-        // This is not a decorator as it expects more than one ICommandHandler<T> parameter.
-        public InvalidCommandHandlerDecoratorWithDecorateeAndFactory(ICommandHandler<T> decorated,
-            Func<ICommandHandler<T>> decoratedFactory)
-        {
-        }
-
         public void Handle(T command)
         {
         }
     }
 
-    public class CommandHandlerDecoratorWithDependency<TCommand, TDependency> : ICommandHandler<TCommand>
+    public class CommandHandlerDecoratorWithDependency<TCommand, TDependency>(
+        TDependency dependency, ICommandHandler<TCommand> decoratee)
+        : ICommandHandler<TCommand>
     {
-        public readonly TDependency Dependency;
-        public readonly ICommandHandler<TCommand> Decoratee;
-
-        public CommandHandlerDecoratorWithDependency(
-            TDependency dependency,
-            ICommandHandler<TCommand> decoratee)
-        {
-            this.Dependency = dependency;
-            this.Decoratee = decoratee;
-        }
+        public readonly TDependency Dependency = dependency;
+        public readonly ICommandHandler<TCommand> Decoratee = decoratee;
 
         public void Handle(TCommand command)
         {
