@@ -835,19 +835,9 @@ namespace SimpleInjector.Tests.Unit
             container.GetInstance<ServiceDependingOn<ConcreteCommand>>();
         }
 
-        public class CompositeService<T> where T : struct
-        {
-            public CompositeService(Nullable<T>[] dependencies)
-            {
-            }
-        }
+        public class CompositeService<T>(Nullable<T>[] dependencies) where T : struct;
 
-        private sealed class Wrapper<T>
-        {
-            public Wrapper(IEnumerable<T> wrappedCollection)
-            {
-            }
-        }
+        private sealed class Wrapper<T>(IEnumerable<T> wrappedCollection);
 
         private sealed class HandleTest
         {

@@ -254,20 +254,13 @@
             Assert.AreSame(expectedLifestyle, actualLifestyle);
         }
 
-        private sealed class CustomScopedLifestyle : ScopedLifestyle
+        private sealed class CustomScopedLifestyle(Scope scope = null, int? length = null)
+            : ScopedLifestyle("Custom Scope")
         {
-            private readonly Scope scope;
-
-            public CustomScopedLifestyle(Scope scope = null, int? length = null) : base("Custom Scope")
-            {
-                this.scope = scope;
-                this.Length = length ?? base.Length;
-            }
-
-            public override int Length { get; }
+            public override int Length => length ?? base.Length;
 
             protected internal override Func<Scope> CreateCurrentScopeProvider(Container container) =>
-                () => this.scope;
+                () => scope;
         }
     }
 }

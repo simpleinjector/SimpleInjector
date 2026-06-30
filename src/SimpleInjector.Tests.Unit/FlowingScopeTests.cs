@@ -442,25 +442,17 @@
             }
         }
 
-        public class ScopedPluginProxy : IPlugin
+        public class ScopedPluginProxy(Func<Scope, IPlugin> factory) : IPlugin
         {
-            public readonly Func<Scope, IPlugin> Factory;
-            public ScopedPluginProxy(Func<Scope, IPlugin> factory) => this.Factory = factory;
+            public readonly Func<Scope, IPlugin> Factory = factory;
         }
 
-        public sealed class ScopedCommandHandlerProxy<T> : ICommandHandler<T>
+        public sealed class ScopedCommandHandlerProxy<T>(Func<Scope, ICommandHandler<T>> decorateeFactory)
+            : ICommandHandler<T>
         {
-            public readonly Func<Scope, ICommandHandler<T>> DecorateeFactory;
-
-            public ScopedCommandHandlerProxy(Func<Scope, ICommandHandler<T>> decorateeFactory)
-            {
-                this.DecorateeFactory = decorateeFactory;
-            }
+            public readonly Func<Scope, ICommandHandler<T>> DecorateeFactory = decorateeFactory;
         }
 
-        public sealed class PluginDecorator : IPlugin
-        {
-            public PluginDecorator(IPlugin plugin) { }
-        }
+        public sealed class PluginDecorator(IPlugin plugin) : IPlugin;
     }
 }

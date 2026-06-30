@@ -2029,16 +2029,12 @@
                 predicate);
         }
 
-        private class LoggerWithDependency<TDependency1, TDependency2> : ILogger
+        private class LoggerWithDependency<TDependency1, TDependency2>(
+            TDependency1 dependency1, TDependency2 dependency2)
+            : ILogger
         {
-            public LoggerWithDependency(TDependency1 dependency1, TDependency2 dependency2)
-            {
-                this.Dependency1 = dependency1;
-                this.Dependency2 = dependency2;
-            }
-
-            public TDependency1 Dependency1 { get; }
-            public TDependency2 Dependency2 { get; }
+            public TDependency1 Dependency1 { get; } = dependency1;
+            public TDependency2 Dependency2 { get; } = dependency2;
         }
 
         private sealed class InjectAllProperties : IPropertySelectionBehavior
@@ -2046,14 +2042,11 @@
             public bool SelectProperty(Type implementationType, PropertyInfo propertyInfo) => true;
         }
 
-        private sealed class VerficationlessInjectionBehavior : IDependencyInjectionBehavior
+        private sealed class VerficationlessInjectionBehavior(IDependencyInjectionBehavior real)
+            : IDependencyInjectionBehavior
         {
-            private readonly IDependencyInjectionBehavior real;
-
-            public VerficationlessInjectionBehavior(IDependencyInjectionBehavior real) => this.real = real;
-
             public InstanceProducer GetInstanceProducer(InjectionConsumerInfo dependency, bool @throw) =>
-                this.real.GetInstanceProducer(dependency, @throw);
+                real.GetInstanceProducer(dependency, @throw);
 
             // Suppress verification.
             public bool VerifyDependency(InjectionConsumerInfo dependency, out string errorMessage)

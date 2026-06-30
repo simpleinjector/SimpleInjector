@@ -307,17 +307,9 @@
             Lifestyle.Singleton.CreateRegistration(typeof(ILogger), instanceCreator, container);
         }
 
-        private sealed class FakeLifestyle : Lifestyle
+        private sealed class FakeLifestyle(string name) : Lifestyle(name)
         {
-            public FakeLifestyle(string name)
-                : base(name)
-            {
-            }
-
-            public override int Length
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public override int Length => throw new NotImplementedException();
 
             protected internal override Registration CreateRegistrationCore(
                 Type concreteType, Container container)

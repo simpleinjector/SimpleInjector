@@ -356,9 +356,6 @@
             AssertThat.SequenceEquals(expectedTypes, actualTypes);
         }
 
-        private static string ToActualTypeNames<T>(IEnumerable<T> instances) =>
-            "Actual: " + instances.Select(GetType).ToFriendlyNamesText();
-
         private static Type GetType<T>(T instance) => instance.GetType();
     }
 }

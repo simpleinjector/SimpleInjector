@@ -61,8 +61,8 @@
         }
 
         private sealed class MyCommand;
-        private sealed class MyCommandHandler(ILogger logger) : ICommandHandler<MyCommand> { }
-        private sealed class MyCommandHandlerDecorator<T>(ICommandHandler<T> decoratee) : ICommandHandler<T> { }
+        private sealed class MyCommandHandler(ILogger logger) : ICommandHandler<MyCommand>;
+        private sealed class MyCommandHandlerDecorator<T>(ICommandHandler<T> decoratee) : ICommandHandler<T>;
         private sealed class NoOpLogger : ILogger;
     }
 }

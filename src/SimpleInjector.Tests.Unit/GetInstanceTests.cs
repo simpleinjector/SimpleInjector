@@ -452,7 +452,7 @@
                 action);
         }
 
-        //// Seems like there are tests missing, but all other cases are already covered by other test classes.
+        // Seems like there are tests missing, but all other cases are already covered by other test classes.
 
         public static class SomeGenericNastyness<TBla>
         {

@@ -14,18 +14,9 @@
     [TestClass]
     public partial class RegisterCollectionTests
     {
-        public interface ILogStuf
-        {
-        }
-
-        public interface ITypeConverter<out TBase>
-        {
-            // TBase ConvertFromString(string value);
-        }
-
-        private interface IGenericDictionary<T> : IDictionary
-        {
-        }
+        public interface ILogStuf;
+        public interface ITypeConverter<out TBase>;
+        private interface IGenericDictionary<T> : IDictionary;
 
         private static readonly Assembly CurrentAssembly = typeof(RegisterCollectionTests).GetTypeInfo().Assembly;
 
@@ -2674,70 +2665,27 @@
         }
 
         // Events
-        public class CustomerMovedEvent
-        {
-        }
-
-        public class CustomerMovedAbroadEvent : CustomerMovedEvent
-        {
-        }
-
-        public class SpecialCustomerMovedEvent : CustomerMovedEvent
-        {
-        }
+        public class CustomerMovedEvent;
+        public class CustomerMovedAbroadEvent : CustomerMovedEvent;
+        public class SpecialCustomerMovedEvent : CustomerMovedEvent;
 
         // Handler implementations
-        public class CustomerMovedEventHandler : IEventHandler<CustomerMovedEvent>
-        {
-        }
+        public class CustomerMovedEventHandler : IEventHandler<CustomerMovedEvent>;
+        public class CustomerMovedAbroadEventHandler : IEventHandler<CustomerMovedAbroadEvent>;
+        public class HandlerWithTwoImplementations : IEventHandler<int>, IEventHandler<double>;
 
-        public class CustomerMovedAbroadEventHandler : IEventHandler<CustomerMovedAbroadEvent>
-        {
-        }
+        public class LogStuff1 : ILogStuf;
+        public class LogStuff2 : ILogStuf;
+        public class LogStuff3 : ILogStuf;
 
-        public class HandlerWithTwoImplementations : IEventHandler<int>, IEventHandler<double>
-        {
-        }
+        public class BaseClass;
+        public class DerivedA : BaseClass;
+        public class DerivedB : BaseClass;
+        public class BaseClassCovariant<T> : ICovariant<T> where T : BaseClass;
+        public class DerivedACovariant<T> : ICovariant<T> where T : DerivedA;
 
-        public class LogStuff1 : ILogStuf
-        {
-        }
-
-        public class LogStuff2 : ILogStuf
-        {
-        }
-
-        public class LogStuff3 : ILogStuf
-        {
-        }
-
-        public class BaseClass
-        {
-        }
-
-        public class DerivedA : BaseClass
-        {
-        }
-
-        public class DerivedB : BaseClass
-        {
-        }
-
-        public class DerivedAConverter : ITypeConverter<DerivedA>
-        {
-        }
-
-        public class DerivedBConverter : ITypeConverter<DerivedB>
-        {
-        }
-
-        public class BaseClassCovariant<T> : ICovariant<T> where T : BaseClass
-        {
-        }
-
-        public class DerivedACovariant<T> : ICovariant<T> where T : DerivedA
-        {
-        }
+        public class DerivedAConverter : ITypeConverter<DerivedA>;
+        public class DerivedBConverter : ITypeConverter<DerivedB>;
 
         private sealed class LeftEnumerable<T> : IEnumerable<T>
         {
@@ -2759,34 +2707,19 @@
             IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
         }
 
-        private sealed class PluginContainer
+        private sealed class PluginContainer(IEnumerable<IPlugin> plugins)
         {
-            public PluginContainer(IEnumerable<IPlugin> plugins)
-            {
-                this.Plugins = plugins;
-            }
-
-            public IEnumerable<IPlugin> Plugins { get; }
+            public IEnumerable<IPlugin> Plugins { get; } = plugins;
         }
 
-        private class ClassDependingOn<TDependency>
+        private class ClassDependingOn<TDependency>(TDependency dependency)
         {
-            public ClassDependingOn(TDependency dependency)
-            {
-                this.Dependency = dependency;
-            }
-
-            public TDependency Dependency { get; }
+            public TDependency Dependency { get; } = dependency;
         }
 
-        private sealed class CompositeCommand
+        private sealed class CompositeCommand(ICommand[] commands)
         {
-            public CompositeCommand(ICommand[] commands)
-            {
-                this.Commands = commands;
-            }
-
-            public ICommand[] Commands { get; }
+            public ICommand[] Commands { get; } = commands;
         }
     }
 }

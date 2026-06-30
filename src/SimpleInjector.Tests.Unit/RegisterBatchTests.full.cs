@@ -10,7 +10,7 @@
     public partial class RegisterBatchTestsFull
     {
         private static readonly IEnumerable<Assembly> Assemblies =
-            new[] { typeof(RegisterBatchTestsFull).GetTypeInfo().Assembly };
+            [typeof(RegisterBatchTestsFull).GetTypeInfo().Assembly];
 
         // This is the open generic interface that will be used as service type.
         public interface IServiceFull<TA, TB>
@@ -117,48 +117,28 @@
             Assert.IsTrue(result.Contains(typeof(InternalConcrete4Full)));
         }
 
-        #region IServiceFull
-
-        public class ServiceImplFull<TA, TB> : IServiceFull<TA, TB>
-        {
-        }
+        public class ServiceImplFull<TA, TB> : IServiceFull<TA, TB>;
 
         // An generic abstract class. Should not be used by the registration.
-        public abstract class OpenGenericBaseFull<T> : IServiceFull<T, string>
-        {
-        }
+        public abstract class OpenGenericBaseFull<T> : IServiceFull<T, string>;
 
         // A non-generic abstract class. Should not be used by the registration.
-        public abstract class ClosedGenericBaseFull : IServiceFull<int, object>
-        {
-        }
+        public abstract class ClosedGenericBaseFull : IServiceFull<int, object>;
 
         // A non-abstract generic type. Should not be used by the registration.
-        public class OpenGenericFull<T> : OpenGenericBaseFull<T>
-        {
-        }
+        public class OpenGenericFull<T> : OpenGenericBaseFull<T>;
 
         // Instance of this type should be returned on container.GetInstance<IService<int, string>>()
-        public class Concrete1Full : IServiceFull<string, object>
-        {
-        }
+        public class Concrete1Full : IServiceFull<string, object>;
 
         // Instance of this type should be returned on container.GetInstance<IService<string, object>>()
-        public class Concrete2Full : OpenGenericBaseFull<int>
-        {
-        }
+        public class Concrete2Full : OpenGenericBaseFull<int>;
 
         // Instance of this type should be returned on container.GetInstance<IService<float, double>>() and
         // on container.GetInstance<IService<Type, Type>>()
-        public class Concrete3Full : IServiceFull<Type, Type>
-        {
-        }
+        public class Concrete3Full : IServiceFull<Type, Type>;
 
         // Internal type.
-        private class InternalConcrete4Full : IServiceFull<decimal, decimal>
-        {
-        }
-
-        #endregion
+        private class InternalConcrete4Full : IServiceFull<decimal, decimal>;
     }
 }

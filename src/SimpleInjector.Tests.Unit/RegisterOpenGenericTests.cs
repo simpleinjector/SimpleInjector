@@ -1408,70 +1408,50 @@
             container.GetInstance<IQueryHandler<GenericEnumerableQuery<int>, IEnumerable<Tuple<int>>>>();
         }
 
-        public class SimpleQuery : IQuery<object> { }
-        public class SimpleQueryHandler : IQueryHandler<SimpleQuery, object> { }
+        public class SimpleQuery : IQuery<object>;
+        public class SimpleQueryHandler : IQueryHandler<SimpleQuery, object>;
 
-        public class GenericArrayQuery<T> : IQuery<Tuple<T>[]> { }
-        public class GenericArrayQueryHandler<T> : IQueryHandler<GenericArrayQuery<T>, Tuple<T>[]> { }
+        public class GenericArrayQuery<T> : IQuery<Tuple<T>[]>;
+        public class GenericArrayQueryHandler<T> : IQueryHandler<GenericArrayQuery<T>, Tuple<T>[]>;
 
-        public class GenericEnumerableQuery<T> : IQuery<IEnumerable<Tuple<T>>> { }
-        public class GenericEnumerableQueryHandler<T> : IQueryHandler<GenericEnumerableQuery<T>, IEnumerable<Tuple<T>>> { }
+        public class GenericEnumerableQuery<T> : IQuery<IEnumerable<Tuple<T>>>;
+        public class GenericEnumerableQueryHandler<T> : IQueryHandler<GenericEnumerableQuery<T>, IEnumerable<Tuple<T>>>;
 
-        public interface IService<T> { }
+        public interface IService<T>;
 
-        public class ServiceImplementation<T> : IService<T> { }
+        public class ServiceImplementation<T> : IService<T>;
 
-        public class FailingServiceDecorator<T> : IService<T>
-        {
-            public FailingServiceDecorator(IService<T> d)
-            {
-            }
-        }
+        public class FailingServiceDecorator<T>(RegisterOpenGenericTests.IService<T> d) : IService<T>;
     }
 
-    public interface IQueryDispatcher<TQuery, TResult> { }
+    public interface IQueryDispatcher<TQuery, TResult>;
 
-    public class QueryDispatcher<TQuery, TResult> : IQueryDispatcher<TQuery, TResult> where TQuery : IQuery<TResult>
+    public class QueryDispatcher<TQuery, TResult>(IEnumerable<IQueryHandler<TQuery, TResult>> collection)
+        : IQueryDispatcher<TQuery, TResult> where TQuery : IQuery<TResult>
     {
-        public QueryDispatcher(IEnumerable<IQueryHandler<TQuery, TResult>> collection) { }
     }
 
-    public class MultipleResultsQuery : IQuery<bool>, IQuery<int> { }
+    public class MultipleResultsQuery : IQuery<bool>, IQuery<int>;
 
-    public class MultipleResultsIntQueryHandler : IQueryHandler<MultipleResultsQuery, int> { }
-    public class MultipleResultsBoolQueryHandler : IQueryHandler<MultipleResultsQuery, bool> { }
+    public class MultipleResultsIntQueryHandler : IQueryHandler<MultipleResultsQuery, int>;
+    public class MultipleResultsBoolQueryHandler : IQueryHandler<MultipleResultsQuery, bool>;
 
-    public class CyclicDependencyCommandHandler<TCommand> : ICommandHandler<TCommand>
+    public class CyclicDependencyCommandHandler<TCommand>(ICommandHandler<TCommand> recursive)
+        : ICommandHandler<TCommand>
     {
-        private readonly ICommandHandler<TCommand> recursive;
-
-        public CyclicDependencyCommandHandler(ICommandHandler<TCommand> recursive)
-        {
-            this.recursive = recursive;
-        }
-
         public void Handle(TCommand command)
         {
         }
     }
 
-    public sealed class DefaultStuffDoer<T> : IDoStuff<T>
+    public sealed class DefaultStuffDoer<T>(IService<T, int> service) : IDoStuff<T>
     {
-        public DefaultStuffDoer(IService<T, int> service)
-        {
-            this.Service = service;
-        }
-
-        public IService<T, int> Service { get; }
+        public IService<T, int> Service { get; } = service;
     }
 
-    public class SpecialEntity
-    {
-    }
+    public class SpecialEntity;
 
-    public class UpdateCommand<TEntity>
-    {
-    }
+    public class UpdateCommand<TEntity>;
 
     public class UpdateCommandHandler<TEntity, TCommand> : ICommandHandler<TCommand>
         where TEntity : SpecialEntity

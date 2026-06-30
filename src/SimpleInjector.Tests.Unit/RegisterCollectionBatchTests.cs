@@ -1,27 +1,19 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class RegisterCollectionBatchTests
     {
-        public interface ICommandHandler<T>
-        {
-        }
+        public interface ICommandHandler<T>;
 
         // This is the open generic interface that will be used as service type.
-        public interface IService<TA, TB>
-        {
-        }
+        public interface IService<TA, TB>;
 
         // An non-generic interface that inherits from the closed generic IGenericService.
-        public interface INonGeneric : IService<float, double>
-        {
-        }
+        public interface INonGeneric : IService<float, double>;
 
         [TestMethod]
         public void RegisterCollectionTypes_ConcreteTypeImplementingMultipleClosedVersions_CanResolveBoth()
@@ -183,7 +175,7 @@
 
             container.Collection.Register(
                 typeof(IEventHandler<>),
-                new[] { typeof(NewConstraintEventHandler<>), typeof(IEventHandler<>) },
+                [typeof(NewConstraintEventHandler<>), typeof(IEventHandler<>)],
                 Lifestyle.Singleton);
 
             // Act
@@ -201,34 +193,14 @@
                 action);
         }
 
-        #region IService
-
         // Instance of this type should be returned on container.GetInstance<IService<float, double>>() and
         // on container.GetInstance<IService<Type, Type>>()
-        public class Concrete3 : IService<Type, Type>, INonGeneric
-        {
-        }
+        public class Concrete3 : IService<Type, Type>, INonGeneric;
 
-        public class DecimalHandler : ICommandHandler<decimal>
-        {
-        }
-
-        public class FloatHandler : ICommandHandler<float>
-        {
-        }
-
-        public class ObjectHandler : ICommandHandler<object>
-        {
-        }
-
-        public class GenericHandler<T> : ICommandHandler<T>
-        {
-        }
-
-        public class GenericStructHandler<T> : ICommandHandler<T> where T : struct
-        {
-        }
-
-        #endregion
+        public class DecimalHandler : ICommandHandler<decimal>;
+        public class FloatHandler : ICommandHandler<float>;
+        public class ObjectHandler : ICommandHandler<object>;
+        public class GenericHandler<T> : ICommandHandler<T>;
+        public class GenericStructHandler<T> : ICommandHandler<T> where T : struct;
     }
 }

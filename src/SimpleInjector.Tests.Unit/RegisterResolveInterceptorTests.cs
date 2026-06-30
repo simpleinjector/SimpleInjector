@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Runtime.Remoting.Contexts;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
 
@@ -316,27 +315,11 @@
             }
         }
 
-        private sealed class InstanceInitializationPair
-        {
-            public InstanceInitializationPair(InitializationContext context, object instance)
-            {
-                this.Context = context;
-                this.Instance = instance;
-            }
+        private sealed record InstanceInitializationPair(InitializationContext Context, object Instance);
 
-            public InitializationContext Context { get; }
-            public object Instance { get; }
-        }
-
-        private sealed class Interceptor
+        private sealed class Interceptor(Action before)
         {
-            private readonly Action before;
             private int recursiveCount = 20;
-
-            public Interceptor(Action before)
-            {
-                this.before = before;
-            }
 
             internal object Intercept(InitializationContext context, Func<object> instanceProducer)
             {
@@ -347,7 +330,7 @@
 
                 this.recursiveCount--;
 
-                this.before();
+                before();
 
                 return instanceProducer();
             }

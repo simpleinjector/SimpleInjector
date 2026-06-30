@@ -13,7 +13,7 @@
         public void GetItem_NoValueSet_ReturnsNull()
         {
             // Arrange
-            object key = new object();
+            object key = new();
 
             var scope = new Scope(new Container());
 
@@ -28,8 +28,8 @@
         public void GetItem_WithValueSet_ReturnsThatItem()
         {
             // Arrange
-            object key = new object();
-            object expectedItem = new object();
+            object key = new();
+            object expectedItem = new();
 
             var scope = new Scope(new Container());
 
@@ -483,9 +483,9 @@
             Assert.IsFalse(scope.GetDisposables().Contains(container));
         }
 
-        public interface IFoo { }
+        public interface IFoo;
 
-        public class NonDisposable : IFoo { }
+        public class NonDisposable : IFoo;
 
         public class Disposable : IFoo, IDisposable
         {
@@ -505,7 +505,7 @@
             }
         }
 
-        public sealed class SealedAsyncDisposable : AsyncDisposable { }
+        public sealed class SealedAsyncDisposable : AsyncDisposable;
 
         public class SyncAsyncDisposable : IFoo, IAsyncDisposable, IDisposable
         {

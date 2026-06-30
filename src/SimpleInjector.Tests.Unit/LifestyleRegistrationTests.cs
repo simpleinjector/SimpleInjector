@@ -241,9 +241,7 @@
             public TDependency Dependency { get; set; }
         }
 
-        private sealed class RealTimeProviderSubType : RealTimeProvider
-        {
-        }
+        private sealed class RealTimeProviderSubType : RealTimeProvider;
 
         private sealed class PredicatePropertySelectionBehavior : IPropertySelectionBehavior
         {
@@ -253,12 +251,8 @@
         }
     }
 
-    internal sealed class FakeLifestyle : Lifestyle
+    internal sealed class FakeLifestyle() : Lifestyle("Fake")
     {
-        public FakeLifestyle() : base("Fake")
-        {
-        }
-
         public Registration RegistrationToReturn { get; set; }
 
         public override int Length => Transient.Length;
@@ -275,13 +269,9 @@
         }
     }
 
-    internal sealed class FakeRegistration : Registration
+    internal sealed class FakeRegistration(Lifestyle lifestyle, Container container, Type implementationType)
+        : Registration(lifestyle, container, implementationType)
     {
-        public FakeRegistration(Lifestyle lifestyle, Container container, Type implementationType)
-            : base(lifestyle, container, implementationType)
-        {
-        }
-
         public Expression ExpressionToReturn { get; set; }
 
         public override Expression BuildExpression() => this.ExpressionToReturn;

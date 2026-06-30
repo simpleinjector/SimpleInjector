@@ -9,30 +9,20 @@
     [TestClass]
     public class RegisterBatchTests
     {
-        public interface IBatchCommandHandler<T>
-        {
-        }
+        public interface IBatchCommandHandler<T>;
 
         // This is the open generic interface that will be used as service type.
-        public interface IService<TA, TB>
-        {
-        }
+        public interface IService<TA, TB>;
 
         // An non-generic interface that inherits from the closed generic IGenericService.
-        public interface INonGeneric : IService<float, double>
-        {
-        }
+        public interface INonGeneric : IService<float, double>;
 
-        public interface IInvalid<TA, TB>
-        {
-        }
+        public interface IInvalid<TA, TB>;
 
-        public interface ISkipDecorator<T>
-        {
-        }
+        public interface ISkipDecorator<T>;
 
         private static readonly IEnumerable<Assembly> Assemblies =
-            new[] { typeof(RegisterBatchTests).GetTypeInfo().Assembly };
+            [typeof(RegisterBatchTests).GetTypeInfo().Assembly];
 
         [TestMethod]
         public void RegisterAssemblies_WithNonGenericType_Fails()
@@ -575,101 +565,41 @@
                 action);
         }
 
-        public class SkippedDecorator : ISkipDecorator<int>
-        {
-            public SkippedDecorator(ISkipDecorator<int> validator)
-            {
-            }
-        }
+        public class SkippedDecorator(RegisterBatchTests.ISkipDecorator<int> validator) : ISkipDecorator<int>;
 
-        public class SkippedDecoratorController
-        {
-            public SkippedDecoratorController(ISkipDecorator<int> service)
-            {
-            }
-        }
-
-        #region IInvalid
+        public class SkippedDecoratorController(RegisterBatchTests.ISkipDecorator<int> service);
 
         // Both Invalid1 and Invalid2 implement the same closed generic type.
-        public class Invalid1 : IInvalid<int, double>
-        {
-        }
+        public class Invalid1 : IInvalid<int, double>;
+        public class Invalid2 : IInvalid<int, double>;
 
-        public class Invalid2 : IInvalid<int, double>
-        {
-        }
-
-        #endregion
-
-        #region IService
-
-        public class ServiceImpl<TA, TB> : IService<TA, TB>
-        {
-        }
+        public class ServiceImpl<TA, TB> : IService<TA, TB>;
 
         // An generic abstract class. Should not be used by the registration.
-        public abstract class OpenGenericBase<T> : IService<T, string>
-        {
-        }
+        public abstract class OpenGenericBase<T> : IService<T, string>;
 
         // A non-generic abstract class. Should not be used by the registration.
-        public abstract class ClosedGenericBase : IService<int, object>
-        {
-        }
+        public abstract class ClosedGenericBase : IService<int, object>;
 
         // A non-abstract generic type. Should not be used by the registration.
-        public class OpenGeneric<T> : OpenGenericBase<T>
-        {
-        }
+        public class OpenGeneric<T> : OpenGenericBase<T>;
 
         // Instance of this type should be returned on container.GetInstance<IService<int, string>>()
-        public class Concrete1 : IService<string, object>
-        {
-        }
+        public class Concrete1 : IService<string, object>;
 
         // Instance of this type should be returned on container.GetInstance<IService<string, object>>()
-        public class Concrete2 : OpenGenericBase<int>
-        {
-        }
+        public class Concrete2 : OpenGenericBase<int>;
 
         // Instance of this type should be returned on container.GetInstance<IService<float, double>>() and
         // on container.GetInstance<IService<Type, Type>>()
-        public class Concrete3 : INonGeneric, IService<Type, Type>
-        {
-        }
+        public class Concrete3 : INonGeneric, IService<Type, Type>;
 
-        public class MultiInterfaceHandler : IBatchCommandHandler<int>, IBatchCommandHandler<double>
-        {
-        }
-
-        public class DecimalHandler : IBatchCommandHandler<decimal>
-        {
-        }
-
-        public class FloatHandler : IBatchCommandHandler<float>
-        {
-        }
-
-        public class ObjectHandler : IBatchCommandHandler<object>
-        {
-        }
-
-        public class GenericHandler<T> : IBatchCommandHandler<T>
-        {
-        }
-
-        public class GenericStructHandler<T> : IBatchCommandHandler<T> where T : struct
-        {
-        }
-
-        public class ServiceDecorator : IService<int, object>
-        {
-            public ServiceDecorator(IService<int, object> decorated)
-            {
-            }
-        }
-
-        #endregion
+        public class MultiInterfaceHandler : IBatchCommandHandler<int>, IBatchCommandHandler<double>;
+        public class DecimalHandler : IBatchCommandHandler<decimal>;
+        public class FloatHandler : IBatchCommandHandler<float>;
+        public class ObjectHandler : IBatchCommandHandler<object>;
+        public class GenericHandler<T> : IBatchCommandHandler<T>;
+        public class GenericStructHandler<T> : IBatchCommandHandler<T> where T : struct;
+        public class ServiceDecorator(RegisterBatchTests.IService<int, object> decorated) : IService<int, object>;
     }
 }

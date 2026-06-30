@@ -407,14 +407,9 @@
             }
         }
 
-        private sealed class CommandClient
+        private sealed class CommandClient(RegisterInitializerTests.ICommand command)
         {
-            public CommandClient(ICommand command)
-            {
-                this.Command = command;
-            }
-
-            public ICommand Command { get; }
+            public ICommand Command { get; } = command;
         }
     }
 }

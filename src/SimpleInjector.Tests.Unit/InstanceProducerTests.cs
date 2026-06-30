@@ -9,21 +9,10 @@
     [TestClass]
     public class InstanceProducerTests
     {
-        public interface IOne
-        {
-        }
-
-        public interface ITwo
-        {
-        }
-
-        public interface INode
-        {
-        }
-
-        public interface INodeFactory
-        {
-        }
+        public interface IOne;
+        public interface ITwo;
+        public interface INode;
+        public interface INodeFactory;
 
         [TestMethod]
         public void GetInstance_Always_LocksTheContainer()
@@ -356,29 +345,9 @@
             Assert.AreEqual(expectedValue, actualValue);
         }
 
-        public class OneAndTwo : IOne, ITwo
-        {
-        }
-
-        public class OneDecorator : IOne
-        {
-            public OneDecorator(IOne one)
-            {
-            }
-        }
-
-        public class NodeOne : INode
-        {
-            public NodeOne(INodeFactory nodeFactory)
-            {
-            }
-        }
-
-        public class NodeFactory : INodeFactory
-        {
-            public NodeFactory(IEnumerable<INode> nodes)
-            {
-            }
-        }
+        public class OneAndTwo : IOne, ITwo;
+        public class OneDecorator(InstanceProducerTests.IOne one) : IOne;
+        public class NodeOne(InstanceProducerTests.INodeFactory nodeFactory) : INode;
+        public class NodeFactory(IEnumerable<InstanceProducerTests.INode> nodes) : INodeFactory;
     }
 }

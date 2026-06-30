@@ -1075,7 +1075,7 @@
             {
             }
 
-            internal DisposablePlugin(Action<DisposablePlugin> disposing = null)
+            internal DisposablePlugin(Action<DisposablePlugin> disposing)
             {
                 this.disposing = disposing;
             }
@@ -1094,7 +1094,7 @@
 
         private sealed class DisposableObject : IDisposable
         {
-            private Action<DisposableObject> disposing;
+            private readonly Action<DisposableObject> disposing;
 
             public DisposableObject()
             {
@@ -1129,17 +1129,9 @@
             }
         }
 
-        private sealed class FakeScopedLifestyle : ScopedLifestyle
+        private sealed class FakeScopedLifestyle(Scope scope) : ScopedLifestyle("Fake Scope")
         {
-            private readonly Scope scope;
-
-            public FakeScopedLifestyle(Scope scope)
-                : base("Fake Scope")
-            {
-                this.scope = scope;
-            }
-
-            protected internal override Func<Scope> CreateCurrentScopeProvider(Container c) => () => this.scope;
+            protected internal override Func<Scope> CreateCurrentScopeProvider(Container c) => () => scope;
         }
     }
 }

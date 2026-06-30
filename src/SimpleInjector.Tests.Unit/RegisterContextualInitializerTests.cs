@@ -12,7 +12,6 @@
     public class RegisterContextualInitializerTests
     {
         private static readonly Predicate<InitializerContext> TruePredicate = c => true;
-        private static readonly Predicate<InitializerContext> FalsePredicate = c => true;
 
         [TestMethod]
         public void BuildExpression_ContainerWithoutRegisterInitializerApplied_DoesNotApplyEventToExpression()
@@ -426,7 +425,7 @@
         {
             // Arrange
             var context = CreateDummyInitializationContext();
-            object instance = new object();
+            object instance = new();
 
             var a = new InstanceInitializationData(context, instance);
             var b = new InstanceInitializationData(context, instance);
@@ -439,7 +438,7 @@
         public void Equals_TwoInstanceInitializationContextWithSameInstanceButDifferentRegistrations_AreNotConsideredEqual()
         {
             // Arrange
-            object instance = new object();
+            object instance = new();
 
             var a = new InstanceInitializationData(CreateDummyInitializationContext(), instance);
             var b = new InstanceInitializationData(CreateDummyInitializationContext(), instance);
