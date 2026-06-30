@@ -860,7 +860,7 @@
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
                 The constructor of type PluginWithDependency<ILogger> contains the parameter with name
-                'dependency' and type ILogger, but ILogger is not registered."
+                'Dependency' and type ILogger, but ILogger is not registered."
                 .TrimInside(),
                 action);
         }
