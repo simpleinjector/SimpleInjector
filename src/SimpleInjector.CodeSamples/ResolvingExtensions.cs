@@ -14,18 +14,18 @@
         public static bool CanGetInstance(this Container container, Type serviceType) =>
             container.GetRegistration(serviceType) != null;
 
-        public static bool TryGetInstance<T>(this Container container, out T instance)
+        public static bool TryGetInstance<T>(this Container container, out T instance) where T : class
         {
-            IServiceProvider provider = container;
-            instance = (T)provider.GetService(typeof(T));
-            return instance != null;
-        }
-
-        public static bool TryGetInstance(this Container container, Type serviceType, out object instance)
-        {
-            IServiceProvider provider = container;
-            instance = provider.GetService(serviceType);
-            return instance != null;
+            if (container.TryGetInstance(typeof(T), out var result))
+            {
+                instance = (T)result;
+                return true;
+            }
+            else
+            {
+                instance = null;
+                return false;
+            }
         }
     }
 }

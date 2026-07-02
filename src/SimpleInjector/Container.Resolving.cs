@@ -11,7 +11,7 @@ namespace SimpleInjector
 #if !PUBLISH
     /// <summary>Methods for resolving instances.</summary>
 #endif
-    public partial class Container : IServiceProvider
+    public partial class Container
     {
         // Cache for producers that are resolved as root type
         // PERF: The rootProducerCache uses a special equality comparer that does a quicker lookup of types.
@@ -98,7 +98,9 @@ namespace SimpleInjector
         /// <param name="serviceType">An object that specifies the type of service object to get.</param>
         /// <returns>A service object of type serviceType.  -or- null if there is no service object of type
         /// <paramref name="serviceType"/>.</returns>
-        object? IServiceProvider.GetService(Type serviceType)
+        /// <param name="instance">The created instance.</param>
+        /// <returns>Try when the instance was retrieved; otherwise false.</returns>
+        public bool TryGetInstance(Type serviceType, out object? instance)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
             this.ThrowWhenDisposed();
@@ -109,9 +111,11 @@ namespace SimpleInjector
                 instanceProducer = this.GetRegistration(serviceType);
             }
 
-            return instanceProducer?.IsValid == true
+            instance = instanceProducer?.IsValid == true
                 ? instanceProducer.GetInstance()
                 : null;
+
+            return instance is not null;
         }
 
         /// <summary>

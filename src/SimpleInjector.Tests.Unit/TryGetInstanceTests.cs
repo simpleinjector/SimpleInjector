@@ -4,10 +4,10 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class GetServiceTests
+    public class TryGetInstanceTests
     {
         [TestMethod]
-        public void GetService_RequestingARegisteredType_ReturnsExpectedInstance()
+        public void TryGetInstance_RequestingARegisteredType_ReturnsExpectedInstance()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -17,7 +17,7 @@
             container.RegisterInstance<IUserRepository>(expectedInstance);
 
             // Act
-            var actualInstance = ((IServiceProvider)container).GetService(typeof(IUserRepository));
+            container.TryGetInstance(typeof(IUserRepository), out var actualInstance);
 
             // Assert
             Assert.AreEqual(expectedInstance, actualInstance, "The IServiceProvider.GetService method did " +
@@ -25,13 +25,13 @@
         }
 
         [TestMethod]
-        public void GetService_RequestingANonregisteredType_ReturnsNull()
+        public void TryGetInstance_RequestingANonregisteredType_ReturnsNull()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            var actualInstance = ((IServiceProvider)container).GetService(typeof(IUserRepository));
+            container.TryGetInstance(typeof(IUserRepository), out var actualInstance);
 
             // Assert
             Assert.IsNull(actualInstance, "The contract of the IServiceProvider states that it returns " +
@@ -39,13 +39,13 @@
         }
 
         [TestMethod]
-        public void GetService_RequestingANonregisteredType2_ReturnsNull()
+        public void TryGetInstance_RequestingANonregisteredType2_ReturnsNull()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            var actualInstance = ((IServiceProvider)container).GetService(typeof(string));
+            container.TryGetInstance(typeof(string), out var actualInstance);
 
             // Assert
             Assert.IsNull(actualInstance, "The contract of the IServiceProvider states that it returns " +
@@ -53,13 +53,13 @@
         }
 
         [TestMethod]
-        public void GetService_RequestingANonregisteredType3_ReturnsNull()
+        public void TryGetInstance_RequestingANonregisteredType3_ReturnsNull()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             // Act
-            var actualInstance = ((IServiceProvider)container).GetService(typeof(int));
+            container.TryGetInstance(typeof(int), out var actualInstance);
 
             // Assert
             Assert.IsNull(actualInstance, "The contract of the IServiceProvider states that it returns " +
@@ -67,7 +67,7 @@
         }
 
         [TestMethod]
-        public void GetService_RequestingANonregisteredType_WillNotSuppressErrorsThrownFromUnregisteredTypeResolution()
+        public void TryGetInstance_RequestingANonregisteredType_WillNotSuppressErrorsThrownFromUnregisteredTypeResolution()
         {
             // Arrange
             var container = ContainerFactory.New();
@@ -82,25 +82,23 @@
                 }
             };
 
-            IServiceProvider serviceProvider = container;
-
             // Act
-            Action action = () => serviceProvider.GetService(typeof(IUserRepository));
+            Action action = () => container.TryGetInstance(typeof(IUserRepository), out var instance);
 
             // Assert
             AssertThat.Throws<ActivationException>(action);
         }
 
         [TestMethod]
-        public void GetService_RequestingAUnregisteredTypeTwice_ReturnsNullSecondTime()
+        public void TryGetInstance_RequestingAUnregisteredTypeTwice_ReturnsNullSecondTime()
         {
             // Arrange
-            IServiceProvider container = ContainerFactory.New();
+            var container = ContainerFactory.New();
 
-            container.GetService(typeof(IUserRepository));
+            container.TryGetInstance(typeof(IUserRepository), out _);
 
             // Act
-            var actualInstance = container.GetService(typeof(IUserRepository));
+            container.TryGetInstance(typeof(IUserRepository), out var actualInstance);
 
             // Assert
             Assert.IsNull(actualInstance, "The contract of the IServiceProvider states that it returns " +
@@ -108,32 +106,30 @@
         }
 
         [TestMethod]
-        public void GetService_RequestedOnUnregisteredInvalidType_ReturnsNull()
+        public void TryGetInstance_RequestedOnUnregisteredInvalidType_ReturnsNull()
         {
             // Arrange
             Type invalidServiceType = typeof(ServiceWithUnregisteredDependencies);
 
-            IServiceProvider container = ContainerFactory.New();
+            var container = ContainerFactory.New();
 
             // Act
-            var registration = container.GetService(invalidServiceType);
+            container.TryGetInstance(invalidServiceType, out var registration);
 
             // Assert
             Assert.IsNull(registration);
         }
 
         [TestMethod]
-        public void GetService_RequestedOnRegisteredInvalidType_ReturnsInstance()
+        public void TryGetInstance_RequestedOnRegisteredInvalidType_ReturnsInstance()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             container.Register<ServiceWithUnregisteredDependencies>();
 
-            IServiceProvider provider = container;
-
             // Act
-            Action action = () => provider.GetService(typeof(ServiceWithUnregisteredDependencies));
+            Action action = () => container.TryGetInstance(typeof(ServiceWithUnregisteredDependencies), out _);
 
             // Assert
             AssertThat.Throws<ActivationException>(action);

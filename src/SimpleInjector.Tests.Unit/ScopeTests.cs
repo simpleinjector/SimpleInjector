@@ -129,17 +129,17 @@
         }
 
         [TestMethod]
-        public void GetService_OnRegisteredInstance_ReturnsThatInstance()
+        public void TryGetInstance_OnRegisteredInstance_ReturnsThatInstance()
         {
             // Arrange
             var container = ContainerFactory.New();
 
             container.Register<ILogger, NullLogger>();
 
-            IServiceProvider activeScope = new Scope(container);
+            var activeScope = new Scope(container);
 
             // Act
-            var logger = activeScope.GetService(typeof(ILogger));
+            activeScope.TryGetInstance(typeof(ILogger), out var logger);
 
             // Assert
             Assert.IsNotNull(logger);

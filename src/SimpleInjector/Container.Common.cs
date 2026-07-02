@@ -27,7 +27,7 @@ namespace SimpleInjector
     /// </para>
     /// <para>
     /// It is therefore safe to call <see cref="GetInstance"/>, <see cref="GetAllInstances"/>,
-    /// <see cref="IServiceProvider.GetService">GetService</see>, <see cref="GetRegistration(System.Type)"/> and
+    /// <see cref="TryGetInstance">TryGetInstance</see>, <see cref="GetRegistration(System.Type)"/> and
     /// <see cref="GetCurrentRegistrations()"/> and anything related to resolving instances from multiple thread
     /// concurrently. It is however <b>unsafe</b> to call
     /// <see cref="Register{TService, TImplementation}(Lifestyle)">RegisterXXX</see>,

@@ -5,7 +5,6 @@ namespace SimpleInjector.Integration.Web.Mvc
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Web.Mvc;
 
     /// <summary>MVC <see cref="IDependencyResolver"/> for Simple Injector.</summary>
@@ -66,12 +65,10 @@ namespace SimpleInjector.Integration.Web.Mvc
         /// <value>The <see cref="Container"/>.</value>
         public Container Container { get; }
 
-        private IServiceProvider ServiceProvider => this.Container;
-
         /// <summary>Resolves singly registered services that support arbitrary object creation.</summary>
         /// <param name="serviceType">The type of the requested service or object.</param>
         /// <returns>The requested service or object.</returns>
-        public object GetService(Type serviceType)
+        public object? GetService(Type serviceType)
         {
             if (serviceType is null)
             {
@@ -88,7 +85,7 @@ namespace SimpleInjector.Integration.Web.Mvc
                 return this.Container.GetInstance(serviceType);
             }
             
-            return this.ServiceProvider.GetService(serviceType);
+            return this.Container.TryGetInstance(serviceType, out var service) ? service : null;
         }
 
         /// <summary>Resolves multiply registered services.</summary>
@@ -105,11 +102,11 @@ namespace SimpleInjector.Integration.Web.Mvc
 
             // The IDependencyResolver doesn't state what is expected from the returned enumerable. We,
             // therefore, simply assume it is correct to return a stream.
-            var services = (IEnumerable<object>)this.ServiceProvider.GetService(collectionType);
+            this.Container.TryGetInstance(collectionType, out var services);
 
             // NOTE: The contract of IDependencyResolver isn't very clear, but MVC will break when null
             // is returned.
-            return services ?? Enumerable.Empty<object>();
+            return services as IEnumerable<object> ?? [];
         }
     }
 }

@@ -343,7 +343,6 @@
         {
             // Arrange
             var container = new Container();
-            IServiceProvider provider = container;
 
             var registration = container.GetRegistration<RealTimeProvider>();
 
@@ -352,7 +351,7 @@
             container.Register<RealTimeProvider>();
 
             // Act
-            var service = provider.GetService(typeof(RealTimeProvider));
+            container.TryGetInstance(typeof(RealTimeProvider), out var service);
 
             // Assert
             Assert.IsNotNull(service);

@@ -55,7 +55,7 @@ namespace SimpleInjector
     /// access it. Also note that although the scope is thread safe, cached instances might not be.
     /// </remarks>
     [DebuggerDisplay("{DebugString,nq}")]
-    public partial class Scope : ApiObject, IDisposable, IServiceProvider
+    public partial class Scope : ApiObject, IDisposable
     {
         private const int MaximumDisposeRecursion = 100;
 
@@ -433,20 +433,25 @@ namespace SimpleInjector
         /// <param name="serviceType">An object that specifies the type of service object to get.</param>
         /// <returns>A service object of type serviceType -or- null if there is no service object of type
         /// <paramref name="serviceType"/>.</returns>
-        object? IServiceProvider.GetService(Type serviceType)
+        /// <param name="instance">The created instance</param>
+        /// <returns>Try when the instance was retrieved; otherwise false.</returns>
+        public bool TryGetInstance(Type serviceType, out object? instance)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
 
-            IServiceProvider? provider = this.Container ?? throw new InvalidOperationException(
-                "This method can only be called on Scope instances that are related to a Container. " +
-                "Please use the overloaded constructor of Scope create an instance with a Container.");
+            if (this.Container is null)
+            {
+                throw new InvalidOperationException(
+                    "This method can only be called on Scope instances that are related to a Container. " +
+                    "Please use the overloaded constructor of Scope create an instance with a Container.");
+            }
 
             Scope? originalScope = this.Container!.CurrentThreadResolveScope;
 
             try
             {
                 this.Container.CurrentThreadResolveScope = this;
-                return provider.GetService(serviceType);
+                return this.Container.TryGetInstance(serviceType, out instance);
             }
             finally
             {

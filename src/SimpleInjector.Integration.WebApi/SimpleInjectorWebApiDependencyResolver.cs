@@ -5,7 +5,6 @@ namespace SimpleInjector.Integration.WebApi
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dependencies;
@@ -127,8 +126,6 @@ namespace SimpleInjector.Integration.WebApi
             }
         }
 
-        private IServiceProvider ServiceProvider => this.container;
-
         /// <summary>Starts a resolution scope.</summary>
         /// <returns>The dependency scope.</returns>
         IDependencyScope IDependencyResolver.BeginScope()
@@ -142,7 +139,7 @@ namespace SimpleInjector.Integration.WebApi
         /// <summary>Retrieves a service from the scope.</summary>
         /// <param name="serviceType">The service to be retrieved.</param>
         /// <returns>The retrieved service.</returns>
-        object IDependencyScope.GetService(Type serviceType)
+        object? IDependencyScope.GetService(Type serviceType)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
 
@@ -156,7 +153,7 @@ namespace SimpleInjector.Integration.WebApi
                 return this.container.GetInstance(serviceType);
             }
 
-            return this.ServiceProvider.GetService(serviceType);
+            return this.container.TryGetInstance(serviceType, out var instance) ? instance : null;
         }
 
         /// <summary>Retrieves a collection of services from the scope.</summary>
@@ -170,11 +167,11 @@ namespace SimpleInjector.Integration.WebApi
 
             // The IDependencyResolver doesn't state what is expected from the returned enumerable. We,
             // therefore, simply assume it is correct to return a stream.
-            var services = (IEnumerable<object>)this.ServiceProvider.GetService(collectionType);
+            this.container.TryGetInstance(collectionType, out var services);
 
             // NOTE: The contract of IDependencyScope isn't very clear, but Web API will break when null
             // is returned.
-            return services ?? Enumerable.Empty<object>();
+            return services as IEnumerable<object> ?? [];
         }
 
         /// <summary>
@@ -184,7 +181,7 @@ namespace SimpleInjector.Integration.WebApi
         public void Dispose()
         {
             // NOTE: Dispose is called by Web API outside the context of the CallContext in which it was
-            // created (which is fucking awful btw and should be considered a design flaw).
+            // created (which is awful btw and should be considered a design flaw).
             this.scope?.Dispose();
         }
     }
