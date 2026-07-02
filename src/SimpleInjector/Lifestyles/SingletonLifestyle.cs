@@ -92,7 +92,6 @@ namespace SimpleInjector.Lifestyles
             // Fixes #589
             // In case of a COM object, we override the implementation type, because otherwise our internal
             // type checks (that call Type.IsAssignableFrom) would fail.
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3
             if (implementationType.IsCOMObject)
             {
                 implementationType = serviceType;
@@ -101,7 +100,6 @@ namespace SimpleInjector.Lifestyles
             {
                 Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), nameof(serviceType));
             }
-#endif
 
             return new SingletonInstanceRegistration(
                 serviceType, implementationType, instance, container);
@@ -160,12 +158,10 @@ namespace SimpleInjector.Lifestyles
             // Internally, Expression.Constant just does a simple Type.IsAssignableFrom check, which returns
             // false for COM objects. Unfortunately, the IsCOMObject property is only available in .NET
             // Standard 2.0 and up.
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3
             if (instance.GetType().IsCOMObject)
             {
                 return Expression.Constant(instance);
             }
-#endif
 
             return Expression.Constant(instance, implementationType);
         }

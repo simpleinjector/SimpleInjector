@@ -12,9 +12,7 @@ namespace SimpleInjector
     /// <summary>
     /// Thrown by the container in case of a diagnostic error.
     /// </summary>
-#if NET45 || NET461
     [Serializable]
-#endif
     public class DiagnosticVerificationException : Exception
     {
         private static readonly ReadOnlyCollection<DiagnosticResult> Empty = new([]);
@@ -66,33 +64,8 @@ namespace SimpleInjector
         internal DiagnosticVerificationException(string message, DiagnosticResult error)
             : base(message)
         {
-            this.Errors = new ReadOnlyCollection<DiagnosticResult>(new[] { error });
+            this.Errors = new ReadOnlyCollection<DiagnosticResult>([error]);
         }
-
-#if NET45 || NET461
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DiagnosticVerificationException" /> class with serialized data.
-        /// </summary>
-        /// <param name="info">
-        /// The <see cref="System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception
-        /// being thrown.
-        /// </param>
-        /// <param name="context">
-        /// The <see cref="System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or
-        /// destination.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// The <paramref name="info" /> parameter is null.
-        /// </exception>
-        /// <exception cref="System.Runtime.Serialization.SerializationException">
-        /// The class name is null or hresult is zero (0).
-        /// </exception>
-        protected DiagnosticVerificationException(System.Runtime.Serialization.SerializationInfo info,
-            System.Runtime.Serialization.StreamingContext context)
-            : base(info, context)
-        {
-        }
-#endif
 
         /// <summary>Gets the list of <see cref="DiagnosticResult"/> instances.</summary>
         /// <value>A list of <see cref="DiagnosticResult"/> instances.</value>

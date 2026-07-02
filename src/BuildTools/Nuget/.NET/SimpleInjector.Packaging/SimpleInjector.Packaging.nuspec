@@ -10,13 +10,8 @@
     <repository type="git" url="https://github.com/simpleinjector/SimpleInjector" />
     <icon>simpleinjector.png</icon>
     <dependencies>
-      <group targetFramework=".NETFramework4.5">
+      <group targetFramework=".NETFramework4.6.1">
         <dependency id="SimpleInjector" version="[{versionCore},6)" />
-      </group>
-      <group targetFramework=".NETStandard1.0">
-        <dependency id="NETStandard.Library" version="1.6.0" />
-        <dependency id="System.Reflection" version="4.1.0" />
-        <dependency id="SimpleInjector" version="{versionCore}" />
       </group>
       <group targetFramework=".NETStandard2.0">
         <dependency id="System.Reflection" version="4.1.0" />

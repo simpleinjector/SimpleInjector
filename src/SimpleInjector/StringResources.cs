@@ -25,12 +25,6 @@ namespace SimpleInjector
         private const string CollectionsAppendMethodName =
             nameof(Container) + "." + nameof(Container.Collection) + "." + nameof(ContainerCollectionRegistrator.Append);
 
-        // Assembly.Location only exists in .NETStandard1.5 and up, .NET4.0 and PCL, but we only compile
-        // against .NETStandard1.0 and .NETStandard1.3. We don't want to add an extra build directive solely
-        // for the Location property.
-        private static readonly PropertyInfo AssemblyLocationProperty =
-            typeof(Assembly).GetProperties().SingleOrDefault(p => p.Name == "Location");
-
         internal static bool UseFullyQualifiedTypeNames { get; set; }
 
         internal static string ContainerCanNotBeChangedAfterUse(string? stackTrace)
@@ -1383,8 +1377,8 @@ namespace SimpleInjector
         }
 
         private static string? GetAssemblyLocationOrNull(Type type) =>
-            AssemblyLocationProperty != null && !type.GetAssembly().IsDynamic
-                ? (string)AssemblyLocationProperty.GetValue(type.GetAssembly(), null)
+            !type.GetAssembly().IsDynamic
+                ? type.GetAssembly().Location
                 : null;
 
         private static Type GetDuplicateLoadedAssemblyLookalikeTypeOrNull(

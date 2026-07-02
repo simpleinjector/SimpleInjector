@@ -24,7 +24,7 @@ namespace SimpleInjector
         {
             if (!this.disposed)
             {
-                this.stackTraceThatDisposedTheContainer = GetStackTraceOrNull();
+                this.stackTraceThatDisposedTheContainer = GetStackTrace();
 
                 try
                 {
@@ -48,7 +48,7 @@ namespace SimpleInjector
         {
             if (!this.disposed)
             {
-                this.stackTraceThatDisposedTheContainer = GetStackTraceOrNull();
+                this.stackTraceThatDisposedTheContainer = GetStackTrace();
 
                 try
                 {

@@ -445,7 +445,7 @@ namespace SimpleInjector
             {
                 if (!this.disposed)
                 {
-                    this.stackTraceThatDisposedTheContainer = GetStackTraceOrNull();
+                    this.stackTraceThatDisposedTheContainer = GetStackTrace();
 
                     try
                     {
@@ -461,14 +461,7 @@ namespace SimpleInjector
         }
 
         [DebuggerStepThrough]
-        private static string? GetStackTraceOrNull()
-        {
-#if !NETSTANDARD1_0 && !NETSTANDARD1_3
-            return new System.Diagnostics.StackTrace(fNeedFileInfo: true, skipFrames: 2).ToString();
-#else
-            return null;
-#endif
-        }
+        private static string? GetStackTrace() => new StackTrace(fNeedFileInfo: true, skipFrames: 2).ToString();
 
         private static Func<object> ApplyResolveInterceptor(
             ResolveInterceptor interceptor, InitializationContext context, Func<object> wrappedProducer)
@@ -498,7 +491,7 @@ namespace SimpleInjector
             {
                 if (!this.locked)
                 {
-                    this.stackTraceThatLockedTheContainer = GetStackTraceOrNull();
+                    this.stackTraceThatLockedTheContainer = GetStackTrace();
 
                     try
                     {

@@ -182,10 +182,6 @@ IF %step%==3 (
 	copy SimpleInjector\bin\Release\net45\SimpleInjector.xml Releases\temp\lib\net45\SimpleInjector.xml
 	copy SimpleInjector\bin\Release\net461\SimpleInjector.dll Releases\temp\lib\net461\SimpleInjector.dll
 	copy SimpleInjector\bin\Release\net461\SimpleInjector.xml Releases\temp\lib\net461\SimpleInjector.xml
-	copy SimpleInjector\bin\Release\netstandard1.0\SimpleInjector.dll "Releases\temp\lib\netstandard1.0\SimpleInjector.dll"
-	copy SimpleInjector\bin\Release\netstandard1.0\SimpleInjector.xml "Releases\temp\lib\netstandard1.0\SimpleInjector.xml"
-	copy SimpleInjector\bin\Release\netstandard1.3\SimpleInjector.dll "Releases\temp\lib\netstandard1.3\SimpleInjector.dll"
-	copy SimpleInjector\bin\Release\netstandard1.3\SimpleInjector.xml "Releases\temp\lib\netstandard1.3\SimpleInjector.xml"
 	copy SimpleInjector\bin\Release\netstandard2.0\SimpleInjector.dll "Releases\temp\lib\netstandard2.0\SimpleInjector.dll"
 	copy SimpleInjector\bin\Release\netstandard2.0\SimpleInjector.xml "Releases\temp\lib\netstandard2.0\SimpleInjector.xml"
 	copy SimpleInjector\bin\Release\netstandard2.1\SimpleInjector.dll "Releases\temp\lib\netstandard2.1\SimpleInjector.dll"
@@ -202,8 +198,8 @@ IF %step%==3 (
 	del Releases\temp\.gitignore /s /q
 	copy SimpleInjector.Packaging\bin\Release\net45\SimpleInjector.Packaging.dll "Releases\temp\lib\net45\SimpleInjector.Packaging.dll"
 	copy SimpleInjector.Packaging\bin\Release\net45\SimpleInjector.Packaging.xml "Releases\temp\lib\net45\SimpleInjector.Packaging.xml"
-	copy SimpleInjector.Packaging\bin\Release\netstandard1.0\SimpleInjector.Packaging.dll "Releases\temp\lib\netstandard1.0\SimpleInjector.Packaging.dll"
-	copy SimpleInjector.Packaging\bin\Release\netstandard1.0\SimpleInjector.Packaging.xml "Releases\temp\lib\netstandard1.0\SimpleInjector.Packaging.xml"
+	copy SimpleInjector.Packaging\bin\Release\netstandard2.0\SimpleInjector.Packaging.dll "Releases\temp\lib\netstandard2.0\SimpleInjector.Packaging.dll"
+	copy SimpleInjector.Packaging\bin\Release\netstandard2.0\SimpleInjector.Packaging.xml "Releases\temp\lib\netstandard2.0\SimpleInjector.Packaging.xml"
 	%replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {version} %named_version_Packaging%
 	%replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {versionCore} %named_version_Core%
 	%replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {year} %copyrightYear%

@@ -4,16 +4,11 @@
 namespace SimpleInjector
 {
     using System;
-#if NET45 || NET461
-    using System.Runtime.Serialization;
-#endif
 
     /// <summary>
     /// The standard exception thrown when a container has an error in resolving an object.
     /// </summary>
-#if NET45 || NET461
     [Serializable]
-#endif
     public class ActivationException : Exception
     {
         /// <inheritdoc />
@@ -32,13 +27,5 @@ namespace SimpleInjector
             : base(message, innerException)
         {
         }
-
-#if NET45 || NET461
-        /// <inheritdoc />
-        protected ActivationException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
-            : base(info, context)
-        {
-        }
-#endif
     }
 }

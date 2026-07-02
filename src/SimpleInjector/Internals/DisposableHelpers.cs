@@ -13,7 +13,7 @@ namespace SimpleInjector.Internals
 
     internal static class DisposableHelpers
     {
-        // Only allows diposing of IAsyncDisposable; not for IDisposable
+        // Only allows disposing of IAsyncDisposable; not for IDisposable
         private static Func<object, Task>? asyncDisposer;
 
 #if NETSTANDARD2_1

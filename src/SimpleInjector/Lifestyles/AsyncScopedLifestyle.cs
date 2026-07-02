@@ -27,7 +27,6 @@ namespace SimpleInjector.Lifestyles
     /// }
     /// ]]></code>
     /// </example>
-#if !NETSTANDARD1_0
     public class AsyncScopedLifestyle : ScopedLifestyle
     {
         private static readonly object managerKey = new object();
@@ -104,44 +103,4 @@ namespace SimpleInjector.Lifestyles
             return new ScopeManager(container, () => asyncLocal.Value, s => asyncLocal.Value = s);
         }
     }
-#else
-    [Obsolete(Error, error: true)]
-    public class AsyncScopedLifestyle : ScopedLifestyle
-    {
-        private const string Error =
-            "The AsyncScopedLifestyle is only available under .NETStandard 1.3 and up, but you are " +
-            "referencing the .NETStandard 1.0 version of Simple Injector.";
-
-        /// <summary>Initializes a new instance of the <see cref="AsyncScopedLifestyle"/> class.</summary>
-        public AsyncScopedLifestyle()
-            : base("Async Scoped")
-        {
-            throw new NotSupportedException(Error);
-        }
-
-        /// <summary>
-        /// Begins a new scope for the given <paramref name="container"/>.
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <returns>A new <see cref="Scope"/> instance.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when the <paramref name="container"/> is a null reference.</exception>
-        public static Scope BeginScope(Container container)
-        {
-            throw new NotSupportedException(Error);
-        }
-
-        /// <summary>
-        /// Creates a delegate that upon invocation return the current <see cref="Scope"/> for this
-        /// lifestyle and the given <paramref name="container"/>, or null when the delegate is executed outside
-        /// the context of such scope.
-        /// </summary>
-        /// <param name="container">The container for which the delegate gets created.</param>
-        /// <returns>A <see cref="Func{T}"/> delegate. This method never returns null.</returns>
-        protected internal override Func<Scope?> CreateCurrentScopeProvider(Container container)
-        {
-            throw new NotSupportedException(Error);
-        }
-    }
-#endif
 }
