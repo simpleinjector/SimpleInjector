@@ -10,7 +10,7 @@
     <repository type="git" url="https://github.com/simpleinjector/SimpleInjector" />
     <icon>simpleinjector.png</icon>
     <dependencies>
-      <dependency id="SimpleInjector" version="[{versionCore},6)" />
+      <dependency id="SimpleInjector" version="[{versionCore},7)" />
     </dependencies>
     <id>SimpleInjector.Integration.Wcf</id>
     <title>Simple Injector WCF Integration</title>
