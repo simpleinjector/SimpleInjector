@@ -687,32 +687,6 @@ namespace SimpleInjector
         /// when working in a multi-threaded environment.
         /// <b>NOTE:</b> Do note that instances supplied by this method <b>NEVER</b> get disposed by the
         /// container, since the instance is assumed to outlive this container instance. If disposing is
-        /// required, use the overload that accepts a <see cref="Func{T}"/> delegate.
-        /// </summary>
-        /// <typeparam name="TService">The interface or base type that can be used to retrieve the instance.</typeparam>
-        /// <param name="instance">The instance to register.</param>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when the
-        /// <typeparamref name="TService"/> has already been registered.</exception>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="instance"/> is a null reference.
-        /// </exception>
-        [Obsolete(
-            "Please use " + nameof(RegisterInstance) + "<TService>(TService) instead. " +
-            "Will be removed in version 6.0.",
-            error: true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public void RegisterSingleton<TService>(TService instance) where TService : class
-        {
-            this.RegisterInstance(instance);
-        }
-
-        /// <summary>
-        /// Registers a single instance that will be returned when an instance of type
-        /// <typeparamref name="TService"/> is requested. This <paramref name="instance"/> must be thread-safe
-        /// when working in a multi-threaded environment.
-        /// <b>NOTE:</b> Do note that instances supplied by this method <b>NEVER</b> get disposed by the
-        /// container, since the instance is assumed to outlive this container instance. If disposing is
         /// required, use
         /// <see cref="RegisterSingleton{TService}(Func{TService})">RegisterSingleton&lt;TService&gt;(Func&lt;TService&gt;)</see>.
         /// </summary>
@@ -735,31 +709,6 @@ namespace SimpleInjector
                 typeof(TService), implementationType, instance, this);
 
             this.AddRegistration(typeof(TService), registration);
-        }
-
-        /// <summary>
-        /// Registers a single instance that will be returned when an instance of type
-        /// <paramref name="serviceType"/> is requested. This <paramref name="instance"/> must be thread-safe
-        /// when working in a multi-threaded environment.
-        /// </summary>
-        /// <param name="serviceType">The base type or interface to register.</param>
-        /// <param name="instance">The instance to register.</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="serviceType"/> or
-        /// <paramref name="instance"/> are null references.</exception>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="instance"/> is
-        /// no sub type from <paramref name="serviceType"/>.</exception>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when this container instance is locked and can not be altered, or when an
-        /// the <paramref name="serviceType"/> has already been registered.
-        /// </exception>
-        [Obsolete(
-            "Please use " + nameof(RegisterInstance) + "(Type, object) instead. " +
-            "Will be removed in version 6.0.",
-            error: true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public void RegisterSingleton(Type serviceType, object instance)
-        {
-            this.RegisterInstance(serviceType, instance);
         }
 
         /// <summary>

@@ -140,42 +140,6 @@ namespace SimpleInjector
 
         /// <summary>
         /// <para>
-        /// Gets or sets a value indicating whether the container should use a loosened (i.e. less strict)
-        /// behavior for detecting lifestyle mismatches (see: https://simpleinjector.org/dialm). In short,
-        /// when <see cref="UseLoosenedLifestyleMismatchBehavior"/> is set to <b>true</b>
-        /// <see cref="Lifestyle.Transient"/> dependencies are allowed to be injected into
-        /// <see cref="Lifestyle.Scoped"/> components. When disabled, a warning would be given in that case.
-        /// The default value is <b>true</b>.
-        /// </para>
-        /// <para>
-        /// Simple Injector allows custom lifestyles to be created and this loosened behavior works on custom
-        /// lifestyles as well. The loosened behavior will ignore any lifestyle mismatch checks on any
-        /// component with a lifestyle that has a <see cref="Lifestyle.Length"/> that is equal or shorter than
-        /// the length of <see cref="Lifestyle.Scoped"/>.
-        /// </para>
-        /// </summary>
-        /// <value>
-        /// The value indicating whether the container uses loosened or strict behavior when validating
-        /// mismatches on  <see cref="Lifestyle.Scoped"/> components.
-        /// </value>
-        [Obsolete(
-            "Please use the UseStrictLifestyleMismatchBehavior property instead. Note that " +
-            "UseStrictLifestyleMismatchBehavior's behavior is negated. This means that if you're currently " +
-            "supplying 'false' to UseLoosenedLifestyleMismatchBehavior, you will have to supply 'true' to " +
-            "UseStrictLifestyleMismatchBehavior instead, and vise versa. Also note that 'loosened' behavior " +
-            "became the default in 5.0 — In case you are assigning UseLoosenedLifestyleMismatchBehavior to " +
-            "'true', the call can be removed safely. " +
-            "Will be removed in version 6.0.",
-            error: true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public bool UseLoosenedLifestyleMismatchBehavior
-        {
-            get => !this.UseStrictLifestyleMismatchBehavior;
-            set => this.UseStrictLifestyleMismatchBehavior = !value;
-        }
-
-        /// <summary>
-        /// <para>
         /// Gets or sets a value indicating whether the container should use a strict behavior for detecting
         /// lifestyle mismatches (see: https://simpleinjector.org/dialm). In short, when
         /// <see cref="UseStrictLifestyleMismatchBehavior"/> is set to <b>false</b>
@@ -435,24 +399,6 @@ namespace SimpleInjector
                 this.defaultScopedLifestyle = value;
             }
         }
-
-        /// <summary>
-        /// This property is obsolete and setting it has no effect. To use dynamic assembly compilation, set
-        /// the <see cref="ContainerOptions.ExpressionCompilationBehavior"/> property with the custom
-        /// <see cref="IExpressionCompilationBehavior"/> implementation from the
-        /// SimpleInjector.DynamicAssemblyCompilation package.
-        /// </summary>
-        /// <value>A boolean indicating whether the container should use a dynamic assembly for compilation.
-        /// </value>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [Obsolete(
-            "Changing this value to true has no effect. To use dynamic assembly compilation, set the " +
-            nameof(ExpressionCompilationBehavior) + " property with a new " +
-            "DynamicAssemblyExpressionCompilationBehavior instance that is located in the " +
-            "SimpleInjector.DynamicAssemblyCompilation package. " +
-            "Will be removed in version 6.0.",
-            error: true)]
-        public bool EnableDynamicAssemblyCompilation { get; set; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         internal int MaximumNumberOfNodesPerDelegate { get; set; } = 350;

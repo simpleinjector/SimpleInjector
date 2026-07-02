@@ -13,7 +13,7 @@ namespace SimpleInjector.Internals
 
         public FlowingContainerControlledCollection(
             Scope scope, ContainerControlledCollection<TService> definition)
-            : base(scope.Container!, definition)
+            : base(scope.Container, definition)
         {
             this.scope = scope;
         }
@@ -65,7 +65,7 @@ namespace SimpleInjector.Internals
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private  IDisposable? ApplyScoping()
         {
-            Container container = this.scope.Container!;
+            Container container = this.scope.Container;
 
             Scope? originalScope = container.CurrentThreadResolveScope;
             container.CurrentThreadResolveScope = this.scope;

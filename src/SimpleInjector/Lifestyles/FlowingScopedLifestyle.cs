@@ -30,6 +30,6 @@ namespace SimpleInjector.Lifestyles
             container.GetVerificationOrResolveScopeForCurrentThread();
 
         protected override void SetCurrentScopeCore(Scope scope) =>
-            scope.Container!.CurrentThreadResolveScope = scope;
+            scope.Container.CurrentThreadResolveScope = scope;
     }
 }

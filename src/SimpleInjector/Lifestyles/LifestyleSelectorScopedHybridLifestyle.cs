@@ -53,7 +53,7 @@ namespace SimpleInjector.Lifestyles
             this.CurrentLifestyle(container).GetCurrentScope(container);
 
         protected override void SetCurrentScopeCore(Scope scope) =>
-            this.CurrentLifestyle(scope.Container!).SetCurrentScope(scope);
+            this.CurrentLifestyle(scope.Container).SetCurrentScope(scope);
 
         private ScopedLifestyle CurrentLifestyle(Container container) =>
             this.selector(container) ? this.trueLifestyle : this.falseLifestyle;

@@ -47,16 +47,8 @@ namespace SimpleInjector.Decorators
         {
             if (!object.ReferenceEquals(container, scope.Container))
             {
-                if (scope.Container is null)
-                {
-                    throw new InvalidOperationException(
-                        StringResources.ScopeSuppliedToScopedDecorateeFactoryMustHaveAContainer<TService>());
-                }
-                else
-                {
-                    throw new InvalidOperationException(
-                        StringResources.ScopeSuppliedToScopedDecorateeFactoryMustBeForSameContainer<TService>());
-                }
+                throw new InvalidOperationException(
+                    StringResources.ScopeSuppliedToScopedDecorateeFactoryMustBeForSameContainer<TService>());
             }
 
             Scope? originalScope = container.CurrentThreadResolveScope;

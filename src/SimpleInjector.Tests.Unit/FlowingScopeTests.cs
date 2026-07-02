@@ -84,34 +84,6 @@
         }
 
         [TestMethod]
-        public void ScopedDecoratoreeFactory_SuppliedWithContainerlessScope_ThrowsDescriptiveException()
-        {
-            // Arrange
-            var container = new Container();
-            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
-
-            container.Register<IPlugin, PluginImpl>(Lifestyle.Scoped);
-            container.RegisterDecorator<IPlugin, ScopedPluginProxy>(Lifestyle.Singleton);
-
-            var proxy = (ScopedPluginProxy)container.GetInstance<IPlugin>();
-            Func<Scope, IPlugin> factory = proxy.Factory;
-
-            var containerlessScope = Activator.CreateInstance<Scope>();
-
-            // Act
-            Action action = () => factory(containerlessScope);
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "For scoped decoratee factories to function, they have to be supplied with a Scope " +
-                "instance that references the Container for which the object graph has been built. " +
-                "But the Scope instance, provided to this Func<Scope, IPlugin> delegate does not " +
-                "belong to any container. Please ensure the supplied Scope instance is created " +
-                "using the constructor overload that accepts a Container instance.",
-                action);
-        }
-
-        [TestMethod]
         public void ScopedDecoratoreeFactory_SuppliedWithScopeOfDifferentContainer_ThrowsDescriptiveException()
         {
             // Arrange

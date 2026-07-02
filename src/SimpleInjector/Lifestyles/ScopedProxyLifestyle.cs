@@ -33,7 +33,7 @@ namespace SimpleInjector.Lifestyles
             GetDefaultScopedLifestyle(container).GetCurrentScope(container);
 
         protected override void SetCurrentScopeCore(Scope scope) =>
-            GetDefaultScopedLifestyle(scope.Container!).SetCurrentScope(scope);
+            GetDefaultScopedLifestyle(scope.Container).SetCurrentScope(scope);
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static ScopedLifestyle GetDefaultScopedLifestyle(Container container) =>

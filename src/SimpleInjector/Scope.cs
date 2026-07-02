@@ -73,15 +73,6 @@ namespace SimpleInjector
         private int recursionDuringDisposalCounter;
 
         /// <summary>Initializes a new instance of the <see cref="Scope"/> class.</summary>
-        [Obsolete("Use the overloaded Scope(Container) constructor instead. " +
-            "Will be removed in version 6.0.",
-            error: true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public Scope()
-        {
-        }
-
-        /// <summary>Initializes a new instance of the <see cref="Scope"/> class.</summary>
         /// <param name="container">The container instance that the scope belongs to.</param>
         public Scope(Container container)
         {
@@ -107,7 +98,7 @@ namespace SimpleInjector
 
         /// <summary>Gets the container instance that this scope belongs to.</summary>
         /// <value>The <see cref="Container"/> instance.</value>
-        public Container? Container { get; }
+        public Container Container { get; }
 
         internal bool Disposed => this.state == DisposeState.Disposed;
 
@@ -118,7 +109,7 @@ namespace SimpleInjector
         private string DebugString =>
             "Scope #" + this.scopeId
             + (this.ParentScope is not null ? (" for Parent #" + this.ParentScope.scopeId) : "")
-            + (this.Container is not null ? (" for Container #" + this.Container!.ContainerId) : "");
+            + " for Container #" + this.Container.ContainerId;
 
         /// <summary>Gets an instance of the given <typeparamref name="TService"/> for the current scope.</summary>
         /// <typeparam name="TService">The type of the service to resolve.</typeparam>
@@ -137,13 +128,6 @@ namespace SimpleInjector
         public object GetInstance(Type serviceType)
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
-
-            if (this.Container is null)
-            {
-                throw new InvalidOperationException(
-                    "This method can only be called on Scope instances that are related to a Container. " +
-                    "Please use the overloaded constructor of Scope create an instance with a Container.");
-            }
 
             Scope? originalScope = this.Container.CurrentThreadResolveScope;
 
@@ -439,14 +423,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(serviceType, nameof(serviceType));
 
-            if (this.Container is null)
-            {
-                throw new InvalidOperationException(
-                    "This method can only be called on Scope instances that are related to a Container. " +
-                    "Please use the overloaded constructor of Scope create an instance with a Container.");
-            }
-
-            Scope? originalScope = this.Container!.CurrentThreadResolveScope;
+            Scope? originalScope = this.Container.CurrentThreadResolveScope;
 
             try
             {
@@ -481,7 +458,7 @@ namespace SimpleInjector
 
                 if (item is null)
                 {
-                    this.items[key] = item = valueFactory(this.Container!, key);
+                    this.items[key] = item = valueFactory(this.Container, key);
                 }
 
                 return (T)item!;
@@ -785,7 +762,7 @@ namespace SimpleInjector
         private void ThrowTypeOnlyImplementsIAsyncDisposable(object instance)
         {
             // Must first check for disposal because IsVerifying throws when the container is disposed of.
-            if (this.Container?.IsDisposed != true)
+            if (!this.Container.IsDisposed)
             {
                 // In case there is no active (ambient) scope, Verify creates and disposes of its own scope.
                 // Verify(), however, is completely synchronous and adding a Container.VerifyAsync() method
@@ -804,7 +781,7 @@ namespace SimpleInjector
                 // 1. Wrap the call to Verify() in a Scope
                 // 2. Skip the call to Verify() and rely on auto verification, which will typically be
                 //    executed within the context of an active scope.
-                if (this.Container?.IsVerifying != true)
+                if (!this.Container.IsVerifying)
                 {
                     throw new InvalidOperationException(
                         StringResources.TypeOnlyImplementsIAsyncDisposable(instance, this.IsContainerScope));

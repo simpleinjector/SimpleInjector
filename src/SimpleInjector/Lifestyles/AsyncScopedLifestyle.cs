@@ -93,7 +93,7 @@ namespace SimpleInjector.Lifestyles
         
         /// <inheritdoc />
         protected override void SetCurrentScopeCore(Scope scope) =>
-            GetScopeManager(scope.Container!).SetCurrentScope(scope);
+            GetScopeManager(scope.Container).SetCurrentScope(scope);
 
         private static ScopeManager GetScopeManager(Container c) => c.ContainerScope.GetOrSetItem(managerKey, CreateManager);
 
