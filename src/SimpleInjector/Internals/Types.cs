@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Simple Injector Contributors. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for license information.
 
-namespace SimpleInjector
+namespace SimpleInjector.Internals
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using System.Reflection;
+
+    using SimpleInjector;
     using SimpleInjector.Decorators;
 
     // Internal helper methods on System.Type.
@@ -102,12 +103,6 @@ namespace SimpleInjector
             && !serviceType.IsArray
             && serviceType != typeof(object)
             && !typeof(Delegate).IsAssignableFrom(serviceType);
-
-        internal static bool IsDecorator(Type serviceType, ConstructorInfo implementationConstructor) =>
-            DecoratorHelpers.DecoratesServiceType(serviceType, implementationConstructor);
-
-        internal static bool IsComposite(Type serviceType, ConstructorInfo implementationConstructor) =>
-            CompositeHelpers.ComposesServiceType(serviceType, implementationConstructor);
 
         internal static bool IsGenericCollectionType(Type serviceType)
         {

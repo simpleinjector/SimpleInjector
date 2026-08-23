@@ -6,6 +6,8 @@
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using SimpleInjector.Internals;
+
     /// <summary>Tests for testing registering open generic types.</summary>
     [TestClass]
     public partial class RegisterOpenGenericTests

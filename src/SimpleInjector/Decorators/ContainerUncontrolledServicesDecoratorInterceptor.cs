@@ -201,7 +201,7 @@ namespace SimpleInjector.Decorators
                 IEnumerable CreateCollection()
                 {
                     Array array = ToArray(this.registeredServiceType, decoratedCollection);
-                    return DecoratorHelpers.MakeReadOnly(this.registeredServiceType, array);
+                    return DecoratorUtilities.MakeReadOnly(this.registeredServiceType, array);
                 }
 
                 IEnumerable singleton = this.GetSingletonDecoratedCollection(CreateCollection);
@@ -217,7 +217,7 @@ namespace SimpleInjector.Decorators
         {
             // Build the query: from item in expression select wrapInstanceWithDecorator(item);
             var callExpression =
-                DecoratorHelpers.Select(expression, this.registeredServiceType, wrapInstanceWithDecorator);
+                DecoratorUtilities.Select(expression, this.registeredServiceType, wrapInstanceWithDecorator);
 
             if (this.Lifestyle == Lifestyle.Singleton)
             {
@@ -230,7 +230,7 @@ namespace SimpleInjector.Decorators
                     Delegate lambda = Expression.Lambda(funcType, callExpression).Compile();
                     var decoratedCollection = (IEnumerable)lambda.DynamicInvoke();
                     Array array = ToArray(this.registeredServiceType, decoratedCollection);
-                    return DecoratorHelpers.MakeReadOnly(this.registeredServiceType, array);
+                    return DecoratorUtilities.MakeReadOnly(this.registeredServiceType, array);
                 }
 
                 IEnumerable singleton = this.GetSingletonDecoratedCollection(CreateCollection);

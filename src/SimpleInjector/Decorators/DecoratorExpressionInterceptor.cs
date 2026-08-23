@@ -83,7 +83,7 @@ namespace SimpleInjector.Decorators
             if (e.DecoratorInfo is null)
             {
                 Type implementationType =
-                    DecoratorHelpers.DetermineImplementationType(originalExpression, e.InstanceProducer);
+                    DecoratorUtilities.DetermineImplementationType(originalExpression, e.InstanceProducer);
 
                 // The InstanceProducer created here is used to do correct diagnostics. We can't return the
                 // registeredProducer here, since the lifestyle of the original producer can change after

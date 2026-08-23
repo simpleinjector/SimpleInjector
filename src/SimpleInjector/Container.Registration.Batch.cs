@@ -8,6 +8,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Reflection;
     using SimpleInjector.Decorators;
+    using SimpleInjector.Internals;
 
 #if !PUBLISH
     /// <summary>Methods for batch registration.</summary>
@@ -511,8 +512,8 @@ namespace SimpleInjector
             where options.IncludeGenericTypeDefinitions || !type.IsGenericTypeDefinition()
             where Types.ServiceIsAssignableFromImplementation(serviceType, type)
             let ctor = this.SelectImplementationTypeConstructorOrNull(type)
-            where ctor is null || options.IncludeDecorators || !Types.IsDecorator(serviceType, ctor)
-            where ctor is null || options.IncludeComposites || !Types.IsComposite(serviceType, ctor)
+            where ctor is null || options.IncludeDecorators || !DecoratorHelpers.IsDecorator(serviceType, ctor)
+            where ctor is null || options.IncludeComposites || !CompositeHelpers.IsComposite(serviceType, ctor)
             select type;
 
         private NonGenericTypesToRegisterForOneToOneMappingResults
@@ -535,7 +536,7 @@ namespace SimpleInjector
         private bool IsDecorator(Type openGenericServiceType, Type implemenationType)
         {
             var ctor = this.SelectImplementationTypeConstructorOrNull(implemenationType);
-            return ctor != null && Types.IsDecorator(openGenericServiceType, ctor);
+            return ctor != null && DecoratorHelpers.IsDecorator(openGenericServiceType, ctor);
         }
 
         private ConstructorInfo? SelectImplementationTypeConstructorOrNull(Type implementationType)

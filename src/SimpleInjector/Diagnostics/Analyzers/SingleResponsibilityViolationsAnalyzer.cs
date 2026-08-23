@@ -8,6 +8,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
     using System.Globalization;
     using System.Linq;
 
+    using SimpleInjector.Internals;
+
     internal sealed class SingleResponsibilityViolationsAnalyzer : IContainerAnalyzer
     {
         private const int MaximumValidNumberOfDependencies = 7;

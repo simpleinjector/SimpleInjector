@@ -8,6 +8,7 @@ namespace SimpleInjector
     using System.Diagnostics;
     using System.Reflection;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Internals;
 
     /// <summary>
     /// Delegate that allows intercepting calls to <see cref="Container.GetInstance"/> and

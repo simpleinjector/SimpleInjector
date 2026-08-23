@@ -7,6 +7,8 @@ namespace SimpleInjector.Advanced
     using System.Diagnostics;
     using System.Reflection;
 
+    using SimpleInjector.Internals;
+
     [DebuggerDisplay(nameof(DefaultConstructorResolutionBehavior))]
     internal sealed class DefaultConstructorResolutionBehavior : IConstructorResolutionBehavior
     {

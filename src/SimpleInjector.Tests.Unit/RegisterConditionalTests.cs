@@ -7,6 +7,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Internals;
     using SimpleInjector.Lifestyles;
 
     /// <summary>Tests for testing conditional registrations.</summary>

@@ -369,8 +369,7 @@ namespace SimpleInjector
         private static void DecoratesServiceType(
             Type serviceType, ConstructorInfo decoratorConstructor, string? paramName)
         {
-            bool decoratesServiceType =
-                DecoratorHelpers.DecoratesServiceType(serviceType, decoratorConstructor);
+            bool decoratesServiceType = DecoratorHelpers.IsDecorator(serviceType, decoratorConstructor);
 
             if (!decoratesServiceType)
             {

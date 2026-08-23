@@ -8,6 +8,8 @@ namespace SimpleInjector.Internals
     using System.Diagnostics;
     using System.Linq;
 
+    using SimpleInjector.Internals;
+
     /// <summary>
     /// Helper class for building closed generic type for a given open generic type and a closed generic base.
     /// </summary>

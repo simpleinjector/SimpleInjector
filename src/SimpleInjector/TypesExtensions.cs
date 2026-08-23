@@ -9,6 +9,8 @@ namespace SimpleInjector
     using System.Collections.Generic;
     using System.Linq;
 
+    using SimpleInjector.Internals;
+
     /// <summary>Useful extensions on <see cref="Type"/>.</summary>
     public static class TypesExtensions
     {

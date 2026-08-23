@@ -7,9 +7,20 @@ namespace SimpleInjector.Decorators
     using System.Linq;
     using System.Reflection;
 
-    internal static class CompositeHelpers
+    using SimpleInjector.Internals;
+
+    /// <summary>Helper methods for working with composites.</summary>
+    public static class CompositeHelpers
     {
-        internal static bool ComposesServiceType(Type serviceType, ConstructorInfo constructor) =>
+        /// <summary>
+        /// Returns true when the supplied <paramref name="constructor"/> contains a parameter that makes the
+        /// constructor's type a composite for the <paramref name="serviceType"/> and can be used by Simple
+        /// Injector as a composite.
+        /// </summary>
+        /// <param name="serviceType">The service type that will be used to apply the composite to.</param>
+        /// <param name="constructor">The constructor used by Simple Injector</param>
+        /// <returns>True when composite; false otherwise.</returns>
+        public static bool IsComposite(Type serviceType, ConstructorInfo constructor) =>
             GetNumberOfCompositeServiceTypeDependencies(serviceType, constructor) > 0;
 
         private static int GetNumberOfCompositeServiceTypeDependencies(

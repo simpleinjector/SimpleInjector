@@ -5,6 +5,8 @@ namespace SimpleInjector.Diagnostics.Analyzers
 {
     using System;
 
+    using SimpleInjector.Internals;
+
     internal static class FriendlyTypeNameHelper
     {
         internal static string FriendlyName(this Type type) =>
