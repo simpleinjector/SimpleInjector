@@ -103,10 +103,8 @@ namespace SimpleInjector
             && serviceType != typeof(object)
             && !typeof(Delegate).IsAssignableFrom(serviceType);
 
-        // TODO: Find out if the call to DecoratesBaseTypes is needed (all tests pass without it).
         internal static bool IsDecorator(Type serviceType, ConstructorInfo implementationConstructor) =>
-            DecoratorHelpers.DecoratesServiceType(serviceType, implementationConstructor)
-            && DecoratorHelpers.DecoratesBaseTypes(serviceType, implementationConstructor);
+            DecoratorHelpers.DecoratesServiceType(serviceType, implementationConstructor);
 
         internal static bool IsComposite(Type serviceType, ConstructorInfo implementationConstructor) =>
             CompositeHelpers.ComposesServiceType(serviceType, implementationConstructor);

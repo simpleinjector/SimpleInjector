@@ -90,10 +90,11 @@ namespace SimpleInjector.Decorators
         {
             var abstractions = Types.GetBaseTypeCandidates(serviceType, decoratorConstructor.DeclaringType);
 
+            ParameterInfo[] constructorParameters = decoratorConstructor.GetParameters();
+
             var decoratorInterfaces =
                 from abstraction in abstractions
-                where decoratorConstructor.GetParameters()
-                    .Any(parameter => IsDecorateeParameter(parameter, abstraction))
+                where constructorParameters.Any(parameter => IsDecorateeParameter(parameter, abstraction))
                 select abstraction;
 
             return decoratorInterfaces.FirstOrDefault();
@@ -115,25 +116,6 @@ namespace SimpleInjector.Decorators
                 select parameter;
 
             return validServiceTypeArguments.Count();
-        }
-
-        internal static bool DecoratesBaseTypes(Type serviceType, ConstructorInfo decoratorConstructor)
-        {
-            var baseTypes = GetValidDecoratorConstructorArgumentTypes(serviceType, decoratorConstructor);
-
-            var constructorParameters = decoratorConstructor.GetParameters();
-
-            // For a type to be a decorator, one of its constructor parameter types must exactly match with
-            // one of the interfaces it implements or base types it inherits from.
-            var decoratorParameters =
-                from baseType in baseTypes
-                from parameter in constructorParameters
-                where parameter.ParameterType == baseType
-                    || (typeof(Func<>).IsGenericTypeDefinitionOf(parameter.ParameterType)
-                        && parameter.ParameterType == typeof(Func<>).MakeGenericType(baseType))
-                select parameter;
-
-            return decoratorParameters.Any();
         }
 
         internal static Type[] GetValidDecoratorConstructorArgumentTypes(
