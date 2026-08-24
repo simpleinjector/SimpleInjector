@@ -12,7 +12,7 @@ namespace SimpleInjector.Advanced
     /// </summary>
     [DebuggerDisplay(
         nameof(InstanceInitializationData) + " ({" + nameof(DebuggerDisplay) + ", nq})")]
-    public struct InstanceInitializationData : IEquatable<InstanceInitializationData>
+    public readonly struct InstanceInitializationData : IEquatable<InstanceInitializationData>
     {
         /// <summary>Initializes a new instance of the <see cref="InstanceInitializationData"/> struct.</summary>
         /// <param name="context">The <see cref="InitializerContext"/> that contains contextual information
