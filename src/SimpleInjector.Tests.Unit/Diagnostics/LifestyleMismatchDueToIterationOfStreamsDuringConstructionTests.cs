@@ -340,7 +340,7 @@
 
             // Assert
             // This call should fail as lifestyle mismatches are even reported during VerifyOnly
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(
                 "(Singleton) depends on ILogger implemented by NullLogger (Async Scoped).",
                 action);
         }

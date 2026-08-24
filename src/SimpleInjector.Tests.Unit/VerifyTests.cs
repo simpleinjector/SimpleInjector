@@ -96,7 +96,7 @@ namespace SimpleInjector.Tests.Unit
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.Throws<InvalidOperationException>(action,
+            AssertThat.Throws<VerificationException>(action,
                 "An exception was expected because the configuration is invalid without registering an IUserRepository.");
         }
 
@@ -312,7 +312,7 @@ namespace SimpleInjector.Tests.Unit
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(
                 expectedException, action);
         }
 
@@ -330,7 +330,7 @@ namespace SimpleInjector.Tests.Unit
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(@"
                 The registration for the collection of IPlugin (i.e. IEnumerable<IPlugin>) is supplied with
                 the abstract type PluginBase, which hasn't been registered explicitly, and wasn't resolved
                 using unregistered type resolution. For Simple Injector to be able to resolve this collection,
@@ -354,7 +354,7 @@ namespace SimpleInjector.Tests.Unit
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(@"
                 The registration for the collection of IPlugin (i.e. IEnumerable<IPlugin>) is supplied with
                 the abstract type IPlugin, which hasn't been registered explicitly"
                 .TrimInside(),
@@ -376,7 +376,7 @@ namespace SimpleInjector.Tests.Unit
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(@"
                 The registration for the collection of IEventHandler<AuditableEvent>
                 (i.e. IEnumerable<IEventHandler<AuditableEvent>>) is supplied with the abstract type
                 IEventHandler<TEvent>, which hasn't been registered explicitly"
@@ -546,13 +546,13 @@ namespace SimpleInjector.Tests.Unit
             // Arrange
             var container = ContainerFactory.New();
 
-            container.Collection.Register<IPlugin>(new[] { typeof(PluginWithBooleanDependency) });
+            container.Collection.Register<IPlugin>([typeof(PluginWithBooleanDependency)]);
 
             // Act
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(@"
                 contains parameter 'isInUserContext' of type bool, which can not be used for constructor
                 injection because it is a value type."
                 .TrimInside(),
@@ -648,7 +648,7 @@ namespace SimpleInjector.Tests.Unit
             Action action = () => container.Verify(VerificationOption.VerifyOnly);
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(
                 "lifestyle mismatch",
                 action);
         }
@@ -735,6 +735,33 @@ namespace SimpleInjector.Tests.Unit
         }
 
         [TestMethod]
+        public void VerifyWithShowAllErrors_TwoVerificationErrors_ReturnsTwoVerificationErrors()
+        {
+            // Arrange
+            var container = new Container();
+
+            // PluginImpl is missing
+            container.Register<ServiceWithDependency<PluginImpl>>(Lifestyle.Transient);
+            container.Register<AnotherServiceWithDependency<PluginImpl>>(Lifestyle.Transient);
+
+            try
+            {
+                // Act
+                container.Verify(VerificationOption.VerifyOnly, stopOnFirstError: false);
+
+                // Assert
+                Assert.Fail("Exception expected.");
+            }
+            catch (VerificationException ex)
+            {
+                Assert.AreEqual(2, ex.Errors.Count);
+
+                Assert.IsTrue(ex.Errors[0].Message.Contains("ServiceWithDependency<PluginImpl>"));
+                Assert.IsTrue(ex.Errors[1].Message.Contains("AnotherServiceWithDependency<PluginImpl>"));
+            }
+        }
+
+        [TestMethod]
         public void Verify_WithAsyncDisposableScopedRegistration_Succeeds()
         {
             // Arrange
@@ -793,12 +820,7 @@ namespace SimpleInjector.Tests.Unit
             }
         }
 
-        public class PluginWithBooleanDependency : IPlugin
-        {
-            public PluginWithBooleanDependency(bool isInUserContext)
-            {
-            }
-        }
+        public class PluginWithBooleanDependency(bool isInUserContext) : IPlugin;
 
         public sealed class FailingConstructorPluginDecorator : IPlugin
         {
@@ -808,12 +830,7 @@ namespace SimpleInjector.Tests.Unit
             }
         }
 
-        public sealed class PluginProxy : IPlugin
-        {
-            public PluginProxy(Func<IPlugin> pluginFactory)
-            {
-            }
-        }
+        public sealed class PluginProxy(Func<IPlugin> pluginFactory) : IPlugin;
 
         public sealed class FailingPlugin : IPlugin
         {
@@ -823,12 +840,7 @@ namespace SimpleInjector.Tests.Unit
             }
         }
 
-        private sealed class PluginDecorator : IPlugin
-        {
-            public PluginDecorator(IPlugin plugin)
-            {
-            }
-        }
+        private sealed class PluginDecorator(IPlugin plugin) : IPlugin;
 
         private sealed class FailingConstructorPlugin<TException> : IPlugin
             where TException : Exception, new()
@@ -854,11 +866,6 @@ namespace SimpleInjector.Tests.Unit
             }
         }
 
-        private sealed class PluginConsumer
-        {
-            public PluginConsumer(IPlugin plugin)
-            {
-            }
-        }
+        private sealed class PluginConsumer(IPlugin plugin);
     }
 }

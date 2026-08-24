@@ -27,6 +27,10 @@ namespace SimpleInjector
 
         internal static bool UseFullyQualifiedTypeNames { get; set; }
 
+        internal static string ViewTheErrorsPropertyForAllErrors() =>
+            $"Please view the exception's {nameof(VerificationException.Errors)} property for all " +
+            $"verification errors.";
+
         internal static string ContainerCanNotBeChangedAfterUse(string? stackTrace)
         {
             string message = Format(

@@ -1152,7 +1152,7 @@
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(@"
                 The constructor of type LoggingHandlerDecorator1<RealCommand>
                 contains the parameter with name 'logger' and type ILogger, but ILogger is not registered."
                 .TrimInside(),

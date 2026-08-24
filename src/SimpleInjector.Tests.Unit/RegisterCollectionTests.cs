@@ -1609,7 +1609,7 @@
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(
                 "For ILogger to be resolved, it must be registered in the container.",
                 action);
         }
@@ -1636,7 +1636,7 @@
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(
                 "For ILogger to be resolved, it must be registered in the container",
                 action);
         }
@@ -1661,7 +1661,7 @@
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(
                 "For ILogger to be resolved, it must be registered in the container.",
                 action);
         }
@@ -1688,7 +1688,7 @@
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(
                 "For IUserRepository to be resolved, it must be registered in the container",
                 action);
         }

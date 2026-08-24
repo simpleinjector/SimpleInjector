@@ -9,6 +9,7 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading;
+
     using SimpleInjector.Diagnostics;
     using SimpleInjector.Internals;
 
@@ -54,7 +55,7 @@ namespace SimpleInjector
         /// Verifies and diagnoses this <b>Container</b> instance. This method will call all registered
         /// delegates, iterate registered collections and throws an exception if there was an error.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown when the registration of instances was
+        /// <exception cref="VerificationException">Thrown when the registration of instances was
         /// invalid.</exception>
         public void Verify()
         {
@@ -66,12 +67,16 @@ namespace SimpleInjector
         /// iterate registered collections and throws an exception if there was an error.
         /// </summary>
         /// <param name="option">Specifies how the container should verify its configuration.</param>
+        /// <param name="stopOnFirstError">Specifies how the container should break as soon as possible when
+        /// verification fails. This is faster, but only returns the first error, rather than all errors.</param>
         /// <exception cref="InvalidOperationException">Thrown when the registration of instances was
         /// invalid.</exception>
         /// <exception cref="DiagnosticVerificationException">Thrown in case there are diagnostic errors and
         /// the <see cref="VerificationOption.VerifyAndDiagnose"/> option is supplied.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="option"/> has an invalid value.</exception>
-        public void Verify(VerificationOption option)
+        /// <exception cref="VerificationException">Thrown when the registration of instances was
+        /// invalid.</exception>
+        public void Verify(VerificationOption option, bool stopOnFirstError = true)
         {
             Requires.IsValidEnum(option, nameof(option));
 
@@ -79,7 +84,7 @@ namespace SimpleInjector
 
             bool diagnose = option == VerificationOption.VerifyAndDiagnose;
 
-            this.VerifyInternal(suppressLifestyleMismatchVerification: diagnose);
+            this.VerifyInternal(suppressLifestyleMismatchVerification: diagnose, stopOnFirstError);
 
             if (diagnose)
             {
@@ -118,8 +123,12 @@ namespace SimpleInjector
 
         internal void UseCurrentThreadResolveScope() => this.usingCurrentThreadResolveScope = true;
 
-        private void VerifyInternal(bool suppressLifestyleMismatchVerification)
+        private void VerifyInternal(bool suppressLifestyleMismatchVerification, bool stopOnFirstError)
         {
+            IVerificationRecorder recorder = stopOnFirstError
+                ? new StopOnFirstErrorRecorder()
+                : new MultipleErrorsRecorder();
+
             // Prevent multiple threads from starting verification at the same time. This could crash, because
             // the first thread could dispose the verification scope, while the other thread is still using it.
             lock (this.isVerifying)
@@ -151,8 +160,14 @@ namespace SimpleInjector
                     }
 
                     this.Verifying();
-                    this.VerifyThatAllExpressionsCanBeBuilt();
+                    this.VerifyThatAllExpressionsCanBeBuilt(recorder);
+
+                    recorder.StopOnErrors();
+
                     this.VerifyThatAllRootObjectsCanBeCreated(this.VerificationScope);
+
+                    recorder.StopOnErrors();
+
                     this.SuccesfullyVerified = true;
                 }
                 finally
@@ -182,11 +197,13 @@ namespace SimpleInjector
             }
         }
 
-        private void VerifyThatAllExpressionsCanBeBuilt()
+        private void VerifyThatAllExpressionsCanBeBuilt(IVerificationRecorder recorder)
         {
             int maximumNumberOfIterations = 10;
 
             InstanceProducer[] producersToVerify;
+
+            var verifiedProducers = new List<InstanceProducer>();
 
             // The process of building expressions can trigger the creation/registration of new instance
             // producers. Those new producers need to be checked as well. That's why we have a loop here. But
@@ -197,15 +214,15 @@ namespace SimpleInjector
             {
                 maximumNumberOfIterations--;
 
-                producersToVerify = this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true);
-
-                producersToVerify = (
-                    from producer in producersToVerify
-                    where !producer.IsExpressionCreated
-                    select producer)
+                producersToVerify =
+                    this.GetCurrentRegistrations(includeInvalidContainerRegisteredTypes: true)
+                    .Except(verifiedProducers)
+                    .Where(p => !p.IsExpressionCreated)
                     .ToArray();
 
-                VerifyThatAllExpressionsCanBeBuilt(producersToVerify);
+                VerifyThatAllExpressionsCanBeBuilt(producersToVerify, recorder);
+
+                verifiedProducers.AddRange(producersToVerify);
             }
             while (maximumNumberOfIterations > 0 && producersToVerify.Any());
         }
@@ -234,13 +251,21 @@ namespace SimpleInjector
                 select registration;
         }
 
-        private static void VerifyThatAllExpressionsCanBeBuilt(InstanceProducer[] producersToVerify)
+        private static void VerifyThatAllExpressionsCanBeBuilt(
+            InstanceProducer[] producersToVerify, IVerificationRecorder recorder)
         {
             foreach (var producer in producersToVerify)
             {
-                var expression = producer.VerifyExpressionBuilding();
+                try
+                {
+                    var expression = producer.VerifyExpressionBuilding();
 
-                VerifyInstanceProducersOfContainerControlledCollection(expression);
+                    VerifyInstanceProducersOfContainerControlledCollection(expression);
+                }
+                catch (Exception ex)
+                {
+                    recorder.Record(ex);
+                }
             }
         }
 
@@ -300,5 +325,43 @@ namespace SimpleInjector
             from result in Analyzer.Analyze(this)
             where result.Severity > DiagnosticSeverity.Information
             select result;
+
+
+        private interface IVerificationRecorder
+        {
+            void Record(Exception exception);
+            void StopOnErrors();
+        }
+
+        private sealed class StopOnFirstErrorRecorder : IVerificationRecorder
+        {
+            public void Record(Exception ex) => throw new VerificationException(ex.Message, ex);
+
+            public void StopOnErrors() { }
+        }
+
+        private sealed class MultipleErrorsRecorder : IVerificationRecorder
+        {
+            private readonly List<Exception> errors = [];
+
+            public void Record(Exception exception) => this.errors.Add(exception);
+
+            public void StopOnErrors()
+            {
+                switch (this.errors.Count)
+                {
+                    case 0:
+                        return;
+
+                    case 1:
+                        throw new VerificationException(this.errors[0].Message, this.errors);
+
+                    default:
+                        throw new VerificationException(
+                            $"{this.errors[0].Message} {StringResources.ViewTheErrorsPropertyForAllErrors()}",
+                            this.errors);
+                }
+            }
+        }
     }
 }

@@ -494,7 +494,7 @@
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(
                 "NodeOne is directly or indirectly depending on itself.",
                 action);
         }
@@ -595,7 +595,7 @@
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(
                 "The cyclic graph contains the following types: A -> B -> CyclicXDecorator3 -> A.",
                 action);
         }

@@ -233,7 +233,7 @@
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(@"
                 The constructor of type SimpleInjector.Tests.Unit.UserController "
                 .TrimInside(),
                 action);
@@ -255,7 +255,7 @@
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(@"
                 The constructor of type XDependingOn<UserController> contains the parameter with name 
                 'dependency' and type SimpleInjector.Tests.Unit.UserController, but UserController is not
                 registered."

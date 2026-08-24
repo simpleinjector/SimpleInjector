@@ -859,7 +859,7 @@
             Action action = () => container.Verify();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(@"
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>(@"
                 The constructor of type PluginWithDependency<ILogger> contains the parameter with name
                 'Dependency' and type ILogger, but ILogger is not registered."
                 .TrimInside(),
