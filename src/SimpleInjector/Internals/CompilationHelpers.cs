@@ -363,11 +363,9 @@ namespace SimpleInjector.Internals
             nameof(Count) + ": {" + nameof(Count) + "}, " +
             nameof(TreeSize) + ": {" + nameof(TreeSize) + "}, " +
             nameof(Node) + ": {" + nameof(Node) + "}")]
-        private sealed class ExpressionInfo
+        private sealed class ExpressionInfo(Expression node)
         {
-            public ExpressionInfo(Expression node) => this.Node = node;
-
-            public Expression Node { get; }
+            public Expression Node { get; } = node;
             public int Count { get; set; }
             public int TreeSize { get; set; }
             public int TotalCost => this.Count * this.TreeSize;

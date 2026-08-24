@@ -15,18 +15,10 @@ namespace SimpleInjector.Internals
     /// </summary>
     internal sealed class GenericTypeBuilder
     {
-        [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(" + nameof(closedServiceType) + "),nq}")]
         private readonly Type closedServiceType;
-
-        [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(" + nameof(implementation) + "),nq}")]
         private readonly Type implementation;
-
         private readonly Type openGenericImplementation;
-
-        [DebuggerDisplay("{(" + nameof(partialOpenGenericImplementation) + " == null ? \"null\" : " +
-            TypesExtensions.FriendlyName + "(" + nameof(partialOpenGenericImplementation) + ")),nq}")]
         private readonly Type? partialOpenGenericImplementation;
-
         private readonly bool isPartialOpenGenericImplementation;
 
         internal GenericTypeBuilder(Type closedServiceType, Type implementation)

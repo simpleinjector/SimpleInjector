@@ -55,7 +55,6 @@ namespace SimpleInjector.Advanced
 
         /// <summary>Gets the implementation type of the parent type of the relationship.</summary>
         /// <value>The implementation type of the parent type of the relationship.</value>
-        [DebuggerDisplay("{" + nameof(ImplementationTypeDebuggerDisplay) + ", nq}")]
         public Type ImplementationType { get; }
 
         /// <summary>Gets the lifestyle of the parent type of the relationship.</summary>

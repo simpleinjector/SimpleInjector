@@ -41,7 +41,6 @@ namespace SimpleInjector
 
         /// <summary>Gets the registered service type that is currently requested.</summary>
         /// <value>The registered service type that is currently requested.</value>
-        [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(" + nameof(RegisteredServiceType) + "), nq}")]
         public Type RegisteredServiceType { get; }
 
         /// <summary>Gets or sets the currently registered

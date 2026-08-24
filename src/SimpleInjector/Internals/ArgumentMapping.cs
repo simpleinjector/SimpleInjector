@@ -25,10 +25,8 @@ namespace SimpleInjector.Internals
             $"Argument: {this.Argument.ToFriendlyName()}, " +
             $"ConcreteType: {this.ConcreteType.ToFriendlyName()}";
 
-        [DebuggerDisplay("{Argument, nq}")]
         internal Type Argument { get; }
 
-        [DebuggerDisplay("{ConcreteType, nq}")]
         internal Type ConcreteType { get; }
 
         internal bool TypeConstraintsAreSatisfied => this.Validator.AreTypeConstraintsSatisfied();

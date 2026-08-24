@@ -41,17 +41,14 @@ namespace SimpleInjector.Diagnostics
         /// generic types.
         /// </summary>
         /// <value>The <see cref="Type"/>.</value>
-        [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(GroupType), nq}")]
         public Type GroupType { get; }
 
         /// <summary>Gets the friendly name of the group.</summary>
         /// <value>The name.</value>
-        [DebuggerDisplay("{Name, nq}")]
         public string Name { get; }
 
         /// <summary>Gets the description of the group.</summary>
         /// <value>The description.</value>
-        [DebuggerDisplay("{Description, nq}")]
         public string Description { get; }
 
         /// <summary>Gets the diagnostic type of all grouped <see cref="DiagnosticResult"/> instances.</summary>

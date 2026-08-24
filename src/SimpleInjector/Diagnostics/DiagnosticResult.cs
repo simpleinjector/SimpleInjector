@@ -37,17 +37,14 @@ namespace SimpleInjector.Diagnostics
 
         /// <summary>Gets the service type to which this warning is related.</summary>
         /// <value>A <see cref="Type"/>.</value>
-        [DebuggerDisplay("{" + TypesExtensions.FriendlyName + "(" + nameof(ServiceType) + "),nq}")]
         public Type ServiceType { get; }
 
         /// <summary>Gets the description of the diagnostic result.</summary>
         /// <value>A <see cref="string"/> with the description.</value>
-        [DebuggerDisplay("{" + nameof(Description) + ", nq}")]
         public string Description { get; }
 
         /// <summary>Gets the documentation URL of the diagnostic result.</summary>
         /// <value>A <see cref="string"/> with the URL.</value>
-        [DebuggerDisplay("{" + nameof(DocumentationUrl) + ", nq}")]
         public Uri DocumentationUrl =>
             DocumentationAttribute.GetDocumentationAttribute(this.DiagnosticType).DocumentationUrl;
 
