@@ -1160,7 +1160,7 @@ namespace SimpleInjector
             where TImplementation : class, TService
         {
             Requires.IsNotNull(lifestyle, nameof(lifestyle));
-
+            Requires.IsNotACOMObject(typeof(TImplementation), implementationTypeParamName);
             Requires.IsNotAnAmbiguousType(typeof(TService), serviceTypeParamName);
 
             this.ThrowArgumentExceptionWhenTypeIsNotConstructable(
@@ -1184,7 +1184,7 @@ namespace SimpleInjector
 
             Requires.IsReferenceType(serviceType, serviceTypeParamName);
             Requires.IsReferenceType(implementationType, implementationTypeParamName);
-
+            Requires.IsNotACOMObject(implementationType, implementationTypeParamName);
             Requires.IsNotAnAmbiguousType(serviceType, serviceTypeParamName);
 
             this.ThrowArgumentExceptionWhenTypeIsNotConstructable(

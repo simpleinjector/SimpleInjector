@@ -534,6 +534,14 @@ namespace SimpleInjector
                 ToTypeOCfSharpFriendlyList(types.Skip(1)),
                 CollectionsRegisterMethodName);
 
+        internal static string TypeIsCOMObject(Type comType) =>
+            Format(
+                "You are trying to register COM object {0}, which not supported. " +
+                "Instead of registering the COM object directly, prefer registering a class " +
+                "that wraps the COM object and inject the wrapper into your classes' constructors. " +
+                "Please see https://simpleinjector.org/com for more information.",
+                comType.TypeName());
+
         internal static string TypeIsAmbiguous(Type serviceType) =>
             Format(
                 "You are trying to register {0} as a service type, but registering this type is not " +

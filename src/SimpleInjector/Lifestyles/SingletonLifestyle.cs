@@ -88,18 +88,8 @@ namespace SimpleInjector.Lifestyles
             Type serviceType, Type implementationType, object instance, Container container)
         {
             Requires.IsNotNull(instance, nameof(instance));
-
-            // Fixes #589
-            // In case of a COM object, we override the implementation type, because otherwise our internal
-            // type checks (that call Type.IsAssignableFrom) would fail.
-            if (implementationType.IsCOMObject)
-            {
-                implementationType = serviceType;
-            }
-            else
-            {
-                Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), nameof(serviceType));
-            }
+            Requires.IsNotACOMObject(implementationType, nameof(implementationType));
+            Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), nameof(serviceType));
 
             return new SingletonInstanceRegistration(
                 serviceType, implementationType, instance, container);
@@ -154,15 +144,6 @@ namespace SimpleInjector.Lifestyles
 
         private static ConstantExpression BuildConstantExpression(object instance, Type implementationType)
         {
-            // Fixes #589
-            // Internally, Expression.Constant just does a simple Type.IsAssignableFrom check, which returns
-            // false for COM objects. Unfortunately, the IsCOMObject property is only available in .NET
-            // Standard 2.0 and up.
-            if (instance.GetType().IsCOMObject)
-            {
-                return Expression.Constant(instance);
-            }
-
             return Expression.Constant(instance, implementationType);
         }
 

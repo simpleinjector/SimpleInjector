@@ -3,7 +3,7 @@
     using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    // #589
+    // #987
     [TestClass]
     public sealed class ActiveXTests : IDisposable
     {
@@ -26,42 +26,28 @@
         }
 
         [TestMethod]
-        public void RegisterSingleton_RegisteringVerifyingAndResolvingAnActiveXObject_Succeeds()
+        public void RegisterInstance_RegisteringAnActiveXObject_Fails()
         {
             // Arrange
             var container = new Container();
 
             // Act
-            container.RegisterSingleton(() => this.comObject);
-            container.Verify();
-            var ie = container.GetInstance<SHDocVw.InternetExplorer>();
-            ie.ToolBar = 0;
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "You are trying to register COM object __ComObject, which not supported.",
+                () => container.RegisterInstance(this.comObject));
         }
 
+        // Registering COM objects is no longer supported in v6.
         [TestMethod]
-        public void RegisterInstanceGeneric_RegisteringVerifyingAndResolvingAnActiveXObject_Succeeds()
+        public void RegisterInstance_RegisteringAnActiveXObjectViaAnInterface_Fails()
         {
             // Arrange
             var container = new Container();
 
             // Act
-            container.RegisterInstance(this.comObject);
-            container.Verify();
-            var ie = container.GetInstance<SHDocVw.InternetExplorer>();
-            ie.ToolBar = 0;
-        }
-
-        [TestMethod]
-        public void RegisterInstance_RegisteringVerifyingAndResolvingAnActiveXObject_Succeeds()
-        {
-            // Arrange
-            var container = new Container();
-
-            // Act
-            container.RegisterInstance(typeof(SHDocVw.InternetExplorer), this.comObject);
-            container.Verify();
-            var ie = container.GetInstance<SHDocVw.InternetExplorer>();
-            ie.ToolBar = 0;
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>(
+                "You are trying to register COM object __ComObject, which not supported.",
+                () => container.RegisterInstance(typeof(SHDocVw.InternetExplorer), this.comObject));
         }
     }
 }

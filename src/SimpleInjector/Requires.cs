@@ -88,6 +88,15 @@ namespace SimpleInjector
         }
 
         [DebuggerStepThrough]
+        internal static void IsNotACOMObject(Type type, string paramName)
+        {
+            if (type.IsCOMObject)
+            {
+                throw new ArgumentException(StringResources.TypeIsCOMObject(type), paramName);
+            }
+        }
+
+        [DebuggerStepThrough]
         internal static void IsNotAnAmbiguousType(Type type, string paramName)
         {
             if (Types.IsAmbiguousType(type))
