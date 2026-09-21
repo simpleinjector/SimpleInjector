@@ -89,8 +89,8 @@ namespace SimpleInjector
 
         private static List<Type> GetClosedTypesOfInternal(Type type, Type genericTypeDefinition)
         {
-            Requires.IsNotNull(type, nameof(type));
-            Requires.IsNotNull(genericTypeDefinition, nameof(genericTypeDefinition));
+            Requires.IsNotNull(type);
+            Requires.IsNotNull(genericTypeDefinition);
             Requires.IsOpenGenericType(genericTypeDefinition, nameof(genericTypeDefinition));
 
             List<Type> assigableTypes = Types.GetTypeHierarchyFor(type);

@@ -20,13 +20,13 @@ namespace SimpleInjector
     {
         internal InjectionTargetInfo(ParameterInfo parameter)
         {
-            Requires.IsNotNull(parameter, nameof(parameter));
+            Requires.IsNotNull(parameter);
             this.Parameter = parameter;
         }
 
         internal InjectionTargetInfo(PropertyInfo property)
         {
-            Requires.IsNotNull(property, nameof(property));
+            Requires.IsNotNull(property);
             this.Property = property;
         }
 

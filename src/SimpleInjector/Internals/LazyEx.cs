@@ -32,19 +32,19 @@ namespace SimpleInjector.Internals
 
         public LazyEx(Func<T> valueFactory)
         {
-            Requires.IsNotNull(valueFactory, nameof(valueFactory));
+            Requires.IsNotNull(valueFactory);
 
             this.factory = valueFactory;
         }
 
         public LazyEx(T value)
         {
-            Requires.IsNotNull(value, nameof(value));
+            Requires.IsNotNull(value);
 
             this.value = value;
         }
 
-        public bool IsValueCreated => !(this.value is null);
+        public bool IsValueCreated => this.value is not null;
 
         public T Value
         {

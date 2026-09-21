@@ -22,6 +22,7 @@
                 from projectPath in ConventionValues.ProjectsUnderConvention
                 from csharpFile in projectPath.GetFiles("*.cs")
                 where !StringComparer.OrdinalIgnoreCase.Equals(csharpFile.Name, "AssemblyInfo.cs")
+                where !StringComparer.OrdinalIgnoreCase.Equals(csharpFile.Name, "CallerArgumentExpressionAttribute.cs")
                 select csharpFile;
 
             var csharpFilesWithIncorrectCopyrightHeader =

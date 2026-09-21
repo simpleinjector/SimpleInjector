@@ -76,14 +76,14 @@ namespace SimpleInjector
         /// <param name="container">The container instance that the scope belongs to.</param>
         public Scope(Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(container);
 
             this.Container = container;
         }
 
         internal Scope(Container container, ScopeManager manager, Scope? parentScope) : this(container)
         {
-            Requires.IsNotNull(manager, nameof(manager));
+            Requires.IsNotNull(manager);
 
             this.ParentScope = parentScope;
             this.manager = manager;
@@ -127,7 +127,7 @@ namespace SimpleInjector
         /// <returns>An instance of the given service type.</returns>
         public object GetInstance(Type serviceType)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(serviceType);
 
             Scope? originalScope = this.Container.CurrentThreadResolveScope;
 
@@ -162,7 +162,7 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public IEnumerable<object> GetAllInstances(Type serviceType)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(serviceType);
 
             return (IEnumerable<object>)this.GetInstance(typeof(IEnumerable<>).MakeGenericType(serviceType));
         }
@@ -191,7 +191,7 @@ namespace SimpleInjector
         /// <exception cref="ObjectDisposedException">Thrown when the scope has been disposed.</exception>
         public virtual void WhenScopeEnds(Action action)
         {
-            Requires.IsNotNull(action, nameof(action));
+            Requires.IsNotNull(action);
 
             lock (this.syncRoot)
             {
@@ -223,7 +223,7 @@ namespace SimpleInjector
         /// <exception cref="ObjectDisposedException">Thrown when the scope has been disposed.</exception>
         public void RegisterForDisposal(IDisposable disposable)
         {
-            Requires.IsNotNull(disposable, nameof(disposable));
+            Requires.IsNotNull(disposable);
 
             this.RegisterForDisposal((object)disposable);
         }
@@ -297,7 +297,7 @@ namespace SimpleInjector
         /// reference.</exception>
         public object? GetItem(object key)
         {
-            Requires.IsNotNull(key, nameof(key));
+            Requires.IsNotNull(key);
 
             lock (this.syncRoot)
             {
@@ -316,7 +316,7 @@ namespace SimpleInjector
         /// </exception>
         public void SetItem(object key, object? item)
         {
-            Requires.IsNotNull(key, nameof(key));
+            Requires.IsNotNull(key);
 
             lock (this.syncRoot)
             {
@@ -421,7 +421,7 @@ namespace SimpleInjector
         /// <returns>Try when the instance was retrieved; otherwise false.</returns>
         public bool TryGetInstance(Type serviceType, out object? instance)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(serviceType);
 
             Scope? originalScope = this.Container.CurrentThreadResolveScope;
 

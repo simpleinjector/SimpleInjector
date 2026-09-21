@@ -20,7 +20,7 @@ namespace SimpleInjector.Advanced
     {
         internal InitializerContext(Registration registration)
         {
-            Requires.IsNotNull(registration, nameof(registration));
+            Requires.IsNotNull(registration);
 
             this.Registration = registration;
         }

@@ -26,9 +26,9 @@ namespace SimpleInjector.Advanced
         /// <param name="dependency">The type that the parent depends on (it is injected into the parent).</param>
         public KnownRelationship(Type implementationType, Lifestyle lifestyle, InstanceProducer dependency)
         {
-            Requires.IsNotNull(implementationType, nameof(implementationType));
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
-            Requires.IsNotNull(dependency, nameof(dependency));
+            Requires.IsNotNull(implementationType);
+            Requires.IsNotNull(lifestyle);
+            Requires.IsNotNull(dependency);
 
             this.ImplementationType = implementationType;
             this.Lifestyle = lifestyle;
@@ -42,10 +42,10 @@ namespace SimpleInjector.Advanced
             InjectionConsumerInfo consumer,
             InstanceProducer dependency)
         {
-            Requires.IsNotNull(implementationType, nameof(implementationType));
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
-            Requires.IsNotNull(consumer, nameof(consumer));
-            Requires.IsNotNull(dependency, nameof(dependency));
+            Requires.IsNotNull(implementationType);
+            Requires.IsNotNull(lifestyle);
+            Requires.IsNotNull(consumer);
+            Requires.IsNotNull(dependency);
 
             this.ImplementationType = implementationType;
             this.Lifestyle = lifestyle;

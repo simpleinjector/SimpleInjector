@@ -20,7 +20,7 @@ namespace SimpleInjector.Internals
 
         internal void Add(T item)
         {
-            Requires.IsNotNull(item, nameof(item));
+            Requires.IsNotNull(item);
 
             lock (this.dictionary)
             {
@@ -42,7 +42,7 @@ namespace SimpleInjector.Internals
 
         internal void Remove(T item)
         {
-            Requires.IsNotNull(item, nameof(item));
+            Requires.IsNotNull(item);
 
             lock (this.dictionary)
             {

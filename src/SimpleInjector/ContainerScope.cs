@@ -109,8 +109,8 @@ namespace SimpleInjector
         /// </exception>
         public T GetOrSetItem<T>(object key, Func<Container, object, T> valueFactory)
         {
-            Requires.IsNotNull(key, nameof(key));
-            Requires.IsNotNull(valueFactory, nameof(valueFactory));
+            Requires.IsNotNull(key);
+            Requires.IsNotNull(valueFactory);
 
             return this.scope.GetOrSetItem(key, valueFactory);
         }

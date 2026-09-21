@@ -10,7 +10,7 @@ namespace SimpleInjector.Advanced
     {
         public Delegate Compile(Expression expression)
         {
-            Requires.IsNotNull(expression, nameof(expression));
+            Requires.IsNotNull(expression);
 
             // Turn the expression into a Lambda
             var lambda = expression as LambdaExpression

@@ -51,7 +51,7 @@ namespace SimpleInjector
         /// called this method for the same type.</exception>
         public void Register(Func<object> instanceCreator)
         {
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+            Requires.IsNotNull(instanceCreator);
 
             this.RequiresNotHandled();
 
@@ -81,7 +81,7 @@ namespace SimpleInjector
         /// called this method for the same type.</exception>
         public void Register(Expression expression)
         {
-            Requires.IsNotNull(expression, nameof(expression));
+            Requires.IsNotNull(expression);
             Requires.ServiceIsAssignableFromExpression(
                 this.UnregisteredServiceType, expression, nameof(expression));
 
@@ -111,7 +111,7 @@ namespace SimpleInjector
         /// called this method for the same type.</exception>
         public void Register(Registration registration)
         {
-            Requires.IsNotNull(registration, nameof(registration));
+            Requires.IsNotNull(registration);
             Requires.ServiceIsAssignableFromRegistration(
                 this.UnregisteredServiceType, registration, nameof(registration));
 

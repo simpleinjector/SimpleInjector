@@ -23,7 +23,7 @@ namespace SimpleInjector.Advanced
         {
             // producer will be null when a user calls Registration.BuildExpression() directly, instead of
             // calling InstanceProducer.BuildExpression() or InstanceProducer.GetInstance().
-            Requires.IsNotNull(registration, nameof(registration));
+            Requires.IsNotNull(registration);
 
             this.Producer = producer;
             this.Registration = registration;

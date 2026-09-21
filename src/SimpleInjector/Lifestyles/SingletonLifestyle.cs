@@ -43,9 +43,9 @@ namespace SimpleInjector.Lifestyles
         /// reference.</exception>
         public Registration CreateRegistration(Type instanceType, object instance, Container container)
         {
-            Requires.IsNotNull(instanceType, nameof(instanceType));
-            Requires.IsNotNull(instance, nameof(instance));
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(instanceType);
+            Requires.IsNotNull(instance);
+            Requires.IsNotNull(container);
 
             // The instance type check is done inside CreateSingleInstanceRegistration.
             return CreateSingleInstanceRegistration(
@@ -87,7 +87,7 @@ namespace SimpleInjector.Lifestyles
         internal static Registration CreateSingleInstanceRegistration(
             Type serviceType, Type implementationType, object instance, Container container)
         {
-            Requires.IsNotNull(instance, nameof(instance));
+            Requires.IsNotNull(instance);
             Requires.IsNotACOMObject(implementationType, nameof(implementationType));
             Requires.ServiceIsAssignableFromImplementation(serviceType, instance.GetType(), nameof(serviceType));
 
@@ -127,8 +127,8 @@ namespace SimpleInjector.Lifestyles
         /// <inheritdoc />
         protected internal override Registration CreateRegistrationCore(Type concreteType, Container container)
         {
-            Requires.IsNotNull(concreteType, nameof(concreteType));
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(concreteType);
+            Requires.IsNotNull(container);
 
             return new SingletonRegistration(container, concreteType);
         }
@@ -137,7 +137,7 @@ namespace SimpleInjector.Lifestyles
         protected internal override Registration CreateRegistrationCore<TService>(
             Func<TService> instanceCreator, Container container)
         {
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+            Requires.IsNotNull(instanceCreator);
 
             return new SingletonRegistration(container, typeof(TService), instanceCreator);
         }

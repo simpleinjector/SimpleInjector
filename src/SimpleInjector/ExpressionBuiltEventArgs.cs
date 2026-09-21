@@ -56,7 +56,7 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, nameof(value));
+                Requires.IsNotNull(value);
 
                 this.expression = value;
             }
@@ -73,7 +73,7 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, nameof(value));
+                Requires.IsNotNull(value);
 
                 this.lifestyle = value;
             }

@@ -15,7 +15,7 @@ namespace SimpleInjector.Advanced
 
         public bool VerifyDependency(InjectionConsumerInfo dependency, out string? errorMessage)
         {
-            Requires.IsNotNull(dependency, nameof(dependency));
+            Requires.IsNotNull(dependency);
 
             var valid = !HasValueTypeSemantics(dependency.Target.TargetType);
 
@@ -27,7 +27,7 @@ namespace SimpleInjector.Advanced
 
         public InstanceProducer? GetInstanceProducer(InjectionConsumerInfo dependency, bool throwOnFailure)
         {
-            Requires.IsNotNull(dependency, nameof(dependency));
+            Requires.IsNotNull(dependency);
 
             InjectionTargetInfo target = dependency.Target;
 

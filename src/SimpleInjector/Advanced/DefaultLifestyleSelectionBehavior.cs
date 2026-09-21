@@ -15,7 +15,7 @@ namespace SimpleInjector.Advanced
 
         public Lifestyle SelectLifestyle(Type implementationType)
         {
-            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(implementationType);
 
             return this.options.DefaultLifestyle;
         }

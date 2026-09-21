@@ -445,7 +445,7 @@ namespace SimpleInjector
             Lifestyle lifestyle,
             Predicate<DecoratorPredicateContext> predicate)
         {
-            Requires.IsNotNull(predicate, nameof(predicate));
+            Requires.IsNotNull(predicate);
 
             this.RegisterDecoratorCore(serviceType, decoratorType, predicate, lifestyle);
         }
@@ -531,10 +531,10 @@ namespace SimpleInjector
             Lifestyle lifestyle,
             Predicate<DecoratorPredicateContext> predicate)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(decoratorTypeFactory, nameof(decoratorTypeFactory));
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
-            Requires.IsNotNull(predicate, nameof(predicate));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(decoratorTypeFactory);
+            Requires.IsNotNull(lifestyle);
+            Requires.IsNotNull(predicate);
 
             var interceptor = new DecoratorInterceptor(
                 new DecoratorExpressionInterceptorData(
@@ -608,7 +608,7 @@ namespace SimpleInjector
         public void RegisterDecorator(
             Type serviceType, Type decoratorType, Predicate<DecoratorPredicateContext> predicate)
         {
-            Requires.IsNotNull(predicate, nameof(predicate));
+            Requires.IsNotNull(predicate);
 
             this.RegisterDecoratorCore(serviceType, decoratorType, predicate);
         }
@@ -619,8 +619,8 @@ namespace SimpleInjector
             Predicate<DecoratorPredicateContext>? predicate = null,
             Lifestyle? lifestyle = null)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(decoratorType, nameof(decoratorType));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(decoratorType);
 
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
             Requires.ServiceTypeIsNotClosedWhenImplementationIsOpen(serviceType, decoratorType);

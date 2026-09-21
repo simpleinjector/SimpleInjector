@@ -52,8 +52,8 @@ namespace SimpleInjector
         /// scope for the supplied <paramref name="container"/>.</exception>
         public void WhenScopeEnds(Container container, Action action)
         {
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(action, nameof(action));
+            Requires.IsNotNull(container);
+            Requires.IsNotNull(action);
 
             this.GetCurrentScopeOrThrow(container).WhenScopeEnds(action);
         }
@@ -70,8 +70,8 @@ namespace SimpleInjector
         /// scope for the supplied <paramref name="container"/>.</exception>
         public void RegisterForDisposal(Container container, IDisposable disposable)
         {
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(disposable, nameof(disposable));
+            Requires.IsNotNull(container);
+            Requires.IsNotNull(disposable);
 
             this.GetCurrentScopeOrThrow(container).RegisterForDisposal(disposable);
         }
@@ -84,7 +84,7 @@ namespace SimpleInjector
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
         public Scope? GetCurrentScope(Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(container);
 
             return this.GetCurrentScopeInternal(container);
         }
@@ -102,7 +102,7 @@ namespace SimpleInjector
         /// the current scope.</exception>
         public void SetCurrentScope(Scope scope)
         {
-            Requires.IsNotNull(scope, nameof(scope));
+            Requires.IsNotNull(scope);
 
             if (scope.Container is null)
             {
@@ -125,8 +125,8 @@ namespace SimpleInjector
         protected internal override Registration CreateRegistrationCore<TService>(
             Func<TService> instanceCreator, Container container)
         {
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(instanceCreator);
+            Requires.IsNotNull(container);
 
             return new ScopedRegistration(this, container, typeof(TService), instanceCreator);
         }
@@ -134,8 +134,8 @@ namespace SimpleInjector
         /// <inheritdoc />
         protected internal override Registration CreateRegistrationCore(Type concreteType, Container container)
         {
-            Requires.IsNotNull(concreteType, nameof(concreteType));
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(concreteType);
+            Requires.IsNotNull(container);
 
             return new ScopedRegistration(this, container, concreteType, null);
         }
@@ -153,7 +153,7 @@ namespace SimpleInjector
         /// <returns>A <see cref="Scope"/> instance or null when there is no scope active in this context.</returns>
         protected virtual Scope? GetCurrentScopeCore(Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(container);
 
             Func<Scope?> currentScopeProvider = this.CreateCurrentScopeProvider(container);
 

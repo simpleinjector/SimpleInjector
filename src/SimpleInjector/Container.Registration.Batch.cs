@@ -84,9 +84,9 @@ namespace SimpleInjector
         /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
         public void Register(Type openGenericServiceType, Assembly assembly, Lifestyle lifestyle)
         {
-            Requires.IsNotNull(assembly, nameof(assembly));
+            Requires.IsNotNull(assembly);
 
-            this.Register(openGenericServiceType, new[] { assembly }, lifestyle);
+            this.Register(openGenericServiceType, [assembly], lifestyle);
         }
 
         /// <summary>
@@ -111,9 +111,9 @@ namespace SimpleInjector
         public void Register(
             Type openGenericServiceType, IEnumerable<Assembly> assemblies, Lifestyle lifestyle)
         {
-            Requires.IsNotNull(openGenericServiceType, nameof(openGenericServiceType));
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
-            Requires.IsNotNull(assemblies, nameof(assemblies));
+            Requires.IsNotNull(openGenericServiceType);
+            Requires.IsNotNull(lifestyle);
+            Requires.IsNotNull(assemblies);
 
             Requires.IsGenericType(
                 openGenericServiceType,
@@ -174,9 +174,9 @@ namespace SimpleInjector
         public void Register(
             Type openGenericServiceType, IEnumerable<Type> implementationTypes, Lifestyle lifestyle)
         {
-            Requires.IsNotNull(openGenericServiceType, nameof(openGenericServiceType));
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
-            Requires.IsNotNull(implementationTypes, nameof(implementationTypes));
+            Requires.IsNotNull(openGenericServiceType);
+            Requires.IsNotNull(lifestyle);
+            Requires.IsNotNull(implementationTypes);
 
             Requires.IsGenericType(
                 openGenericServiceType,
@@ -495,9 +495,9 @@ namespace SimpleInjector
         public IEnumerable<Type> GetTypesToRegister(
             Type serviceType, IEnumerable<Assembly> assemblies, TypesToRegisterOptions options)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(assemblies, nameof(assemblies));
-            Requires.IsNotNull(options, nameof(options));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(assemblies);
+            Requires.IsNotNull(options);
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
 
             return this.GetTypesToRegisterInternal(serviceType, assemblies, options).ToArray();

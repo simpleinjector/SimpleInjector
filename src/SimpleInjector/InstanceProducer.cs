@@ -110,8 +110,8 @@ namespace SimpleInjector
 
         internal InstanceProducer(Type serviceType, Registration registration, bool registerExternalProducer)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(registration, nameof(registration));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(registration);
             Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
             Requires.ServiceIsAssignableFromImplementation(
                 serviceType, registration.ImplementationType, nameof(serviceType));
@@ -258,9 +258,9 @@ namespace SimpleInjector
         public static InstanceProducer FromExpression(
             Type serviceType, Expression expression, Container container)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(expression, nameof(expression));
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(expression);
+            Requires.IsNotNull(container);
 
             return new InstanceProducer(serviceType, expression, container);
         }
@@ -271,7 +271,7 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">When the instance could not be retrieved or is null.</exception>
         public object GetInstance(Scope scope)
         {
-            Requires.IsNotNull(scope, nameof(scope));
+            Requires.IsNotNull(scope);
 
             Scope? originalScope = this.Container.CurrentThreadResolveScope;
 
@@ -431,7 +431,7 @@ namespace SimpleInjector
         /// <exception cref="NullReferenceException">Thrown when options is null.</exception>
         public string VisualizeObjectGraph(VisualizationOptions options)
         {
-            Requires.IsNotNull(options, nameof(options));
+            Requires.IsNotNull(options);
 
             if (!this.IsExpressionCreated)
             {

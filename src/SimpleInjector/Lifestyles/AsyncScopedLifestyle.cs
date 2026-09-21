@@ -62,7 +62,7 @@ namespace SimpleInjector.Lifestyles
         /// </example>
         public static Scope BeginScope(Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(container);
 
             return GetScopeManager(container).BeginScope();
         }

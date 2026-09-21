@@ -65,8 +65,8 @@
         {
             public A(B b, C c)
             {
-                Requires.IsNotNull(b, nameof(b));
-                Requires.IsNotNull(c, nameof(c));
+                Requires.IsNotNull(b);
+                Requires.IsNotNull(c);
             }
         }
 
@@ -74,7 +74,7 @@
         {
             public B(C c)
             {
-                Requires.IsNotNull(c, nameof(c));
+                Requires.IsNotNull(c);
             }
         }
 
@@ -86,11 +86,11 @@
         {
             public T(T1 t1, T2 t2, A a, B b, C c)
             {
-                Requires.IsNotNull(t1, nameof(t1));
-                Requires.IsNotNull(t2, nameof(t2));
-                Requires.IsNotNull(a, nameof(a));
-                Requires.IsNotNull(b, nameof(b));
-                Requires.IsNotNull(c, nameof(c));
+                Requires.IsNotNull(t1);
+                Requires.IsNotNull(t2);
+                Requires.IsNotNull(a);
+                Requires.IsNotNull(b);
+                Requires.IsNotNull(c);
             }
         }
 

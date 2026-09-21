@@ -19,7 +19,7 @@ namespace SimpleInjector.Lifestyles
             Expression expression, Type implementationType, Lifestyle lifestyle, Container container)
             : base(lifestyle, container, implementationType)
         {
-            Requires.IsNotNull(expression, nameof(expression));
+            Requires.IsNotNull(expression);
 
             this.expression = expression;
         }

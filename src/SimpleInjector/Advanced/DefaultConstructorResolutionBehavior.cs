@@ -14,7 +14,7 @@ namespace SimpleInjector.Advanced
     {
         public ConstructorInfo? TryGetConstructor(Type implementationType, out string? errorMessage)
         {
-            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(implementationType);
 
             VerifyTypeIsConcrete(implementationType);
 

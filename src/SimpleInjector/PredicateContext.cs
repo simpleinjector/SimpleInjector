@@ -36,9 +36,9 @@ namespace SimpleInjector
         internal PredicateContext(
             Type serviceType, Type implementationType, InjectionConsumerInfo consumer, bool handled)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(implementationType, nameof(implementationType));
-            Requires.IsNotNull(consumer, nameof(consumer));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(implementationType);
+            Requires.IsNotNull(consumer);
 
             this.ServiceType = serviceType;
             this.implementationType = new LazyEx<Type>(implementationType);
@@ -52,9 +52,9 @@ namespace SimpleInjector
             InjectionConsumerInfo consumer,
             bool handled)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(implementationTypeProvider, nameof(implementationTypeProvider));
-            Requires.IsNotNull(consumer, nameof(consumer));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(implementationTypeProvider);
+            Requires.IsNotNull(consumer);
 
             this.ServiceType = serviceType;
 

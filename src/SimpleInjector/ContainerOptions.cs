@@ -70,7 +70,7 @@ namespace SimpleInjector
 
         internal ContainerOptions(Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(container);
 
             this.Container = container;
             this.resolutionBehavior = new DefaultConstructorResolutionBehavior();
@@ -237,7 +237,7 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, nameof(value));
+                Requires.IsNotNull(value);
 
                 this.ThrowWhenContainerHasRegistrations(nameof(this.ConstructorResolutionBehavior));
 
@@ -260,7 +260,7 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, nameof(value));
+                Requires.IsNotNull(value);
 
                 this.ThrowWhenContainerHasRegistrations(nameof(this.DependencyInjectionBehavior));
 
@@ -286,7 +286,7 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, nameof(value));
+                Requires.IsNotNull(value);
 
                 this.ThrowWhenContainerHasRegistrations(nameof(this.PropertySelectionBehavior));
 
@@ -311,7 +311,7 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, nameof(value));
+                Requires.IsNotNull(value);
 
                 this.ThrowWhenContainerHasRegistrations(nameof(this.LifestyleSelectionBehavior));
 
@@ -336,7 +336,7 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, nameof(value));
+                Requires.IsNotNull(value);
 
                 this.ThrowWhenContainerHasRegistrations(nameof(this.ExpressionCompilationBehavior));
 
@@ -361,7 +361,7 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, nameof(value));
+                Requires.IsNotNull(value);
 
                 this.ThrowWhenContainerHasRegistrations(nameof(this.DefaultLifestyle));
 
@@ -386,7 +386,7 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, nameof(value));
+                Requires.IsNotNull(value);
 
                 if (object.ReferenceEquals(value, Lifestyle.Scoped))
                 {
@@ -453,8 +453,8 @@ namespace SimpleInjector
         public void RegisterResolveInterceptor(
             ResolveInterceptor interceptor, Predicate<InitializationContext> predicate)
         {
-            Requires.IsNotNull(interceptor, nameof(interceptor));
-            Requires.IsNotNull(predicate, nameof(predicate));
+            Requires.IsNotNull(interceptor);
+            Requires.IsNotNull(predicate);
 
             this.Container.ThrowWhenContainerIsLockedOrDisposed();
 

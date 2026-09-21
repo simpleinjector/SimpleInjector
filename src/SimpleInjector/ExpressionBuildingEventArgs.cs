@@ -62,7 +62,7 @@ namespace SimpleInjector
 
             set
             {
-                Requires.IsNotNull(value, nameof(value));
+                Requires.IsNotNull(value);
 
                 if (!this.KnownImplementationType.IsAssignableFrom(value.Type))
                 {

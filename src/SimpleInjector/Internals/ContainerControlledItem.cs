@@ -19,7 +19,7 @@ namespace SimpleInjector.Internals
 
         private ContainerControlledItem(Registration registration)
         {
-            Requires.IsNotNull(registration, nameof(registration));
+            Requires.IsNotNull(registration);
 
             this.Registration = registration;
             this.ImplementationType = registration.ImplementationType;
@@ -28,7 +28,7 @@ namespace SimpleInjector.Internals
 
         private ContainerControlledItem(Type implementationType, Lifestyle? lifestyle)
         {
-            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(implementationType);
 
             this.ImplementationType = implementationType;
             this.Lifestyle = lifestyle;

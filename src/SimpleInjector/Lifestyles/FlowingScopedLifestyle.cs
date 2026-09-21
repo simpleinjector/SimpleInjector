@@ -18,7 +18,7 @@ namespace SimpleInjector.Lifestyles
 
         protected internal override Func<Scope?> CreateCurrentScopeProvider(Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(container);
 
             // Notify the container that we're using the thread-resolve scope.
             container.UseCurrentThreadResolveScope();

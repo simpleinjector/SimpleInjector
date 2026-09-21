@@ -73,7 +73,7 @@ namespace SimpleInjector
 
         private static string BuildMessage(IList<DiagnosticResult> errors)
         {
-            Requires.IsNotNull(errors, nameof(errors));
+            Requires.IsNotNull(errors);
             return StringResources.DiagnosticWarningsReported(errors);
         }
     }

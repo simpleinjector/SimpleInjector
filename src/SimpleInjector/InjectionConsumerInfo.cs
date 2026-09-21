@@ -27,7 +27,7 @@ namespace SimpleInjector
         /// <param name="parameter">The constructor parameter for the created component.</param>
         public InjectionConsumerInfo(ParameterInfo parameter)
         {
-            Requires.IsNotNull(parameter, nameof(parameter));
+            Requires.IsNotNull(parameter);
 
             this.target = new InjectionTargetInfo(parameter);
             this.implementationType = parameter.Member.DeclaringType;
@@ -38,8 +38,8 @@ namespace SimpleInjector
         /// <param name="property">The property for the created component.</param>
         public InjectionConsumerInfo(Type implementationType, PropertyInfo property)
         {
-            Requires.IsNotNull(implementationType, nameof(implementationType));
-            Requires.IsNotNull(property, nameof(property));
+            Requires.IsNotNull(implementationType);
+            Requires.IsNotNull(property);
 
             this.target = new InjectionTargetInfo(property);
             this.implementationType = implementationType;

@@ -20,8 +20,8 @@ namespace SimpleInjector.Advanced
         /// <param name="instance">The created instance.</param>
         public InstanceInitializationData(InitializerContext context, object instance)
         {
-            Requires.IsNotNull(context, nameof(context));
-            Requires.IsNotNull(instance, nameof(instance));
+            Requires.IsNotNull(context);
+            Requires.IsNotNull(instance);
 
             this.Context = context;
             this.Instance = instance;

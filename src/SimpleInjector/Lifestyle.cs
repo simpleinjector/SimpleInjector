@@ -193,8 +193,8 @@ namespace SimpleInjector
         /// </example>
         public static Lifestyle CreateHybrid(ScopedLifestyle defaultLifestyle, Lifestyle fallbackLifestyle)
         {
-            Requires.IsNotNull(defaultLifestyle, nameof(defaultLifestyle));
-            Requires.IsNotNull(fallbackLifestyle, nameof(fallbackLifestyle));
+            Requires.IsNotNull(defaultLifestyle);
+            Requires.IsNotNull(fallbackLifestyle);
 
             return new HybridLifestyle(
                 lifestyleSelector: container => defaultLifestyle.GetCurrentScope(container) != null,
@@ -252,8 +252,8 @@ namespace SimpleInjector
         public static ScopedLifestyle CreateHybrid(
             ScopedLifestyle defaultLifestyle, ScopedLifestyle fallbackLifestyle)
         {
-            Requires.IsNotNull(defaultLifestyle, nameof(defaultLifestyle));
-            Requires.IsNotNull(fallbackLifestyle, nameof(fallbackLifestyle));
+            Requires.IsNotNull(defaultLifestyle);
+            Requires.IsNotNull(fallbackLifestyle);
 
             return new DefaultFallbackScopedHybridLifestyle(
                 defaultLifestyle: defaultLifestyle,
@@ -317,9 +317,9 @@ namespace SimpleInjector
         public static Lifestyle CreateHybrid(
             Func<bool> lifestyleSelector, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
         {
-            Requires.IsNotNull(lifestyleSelector, nameof(lifestyleSelector));
-            Requires.IsNotNull(trueLifestyle, nameof(trueLifestyle));
-            Requires.IsNotNull(falseLifestyle, nameof(falseLifestyle));
+            Requires.IsNotNull(lifestyleSelector);
+            Requires.IsNotNull(trueLifestyle);
+            Requires.IsNotNull(falseLifestyle);
 
             return new HybridLifestyle(_ => lifestyleSelector(), trueLifestyle, falseLifestyle);
         }
@@ -362,9 +362,9 @@ namespace SimpleInjector
         public static ScopedLifestyle CreateHybrid(
             Func<bool> lifestyleSelector, ScopedLifestyle trueLifestyle, ScopedLifestyle falseLifestyle)
         {
-            Requires.IsNotNull(lifestyleSelector, nameof(lifestyleSelector));
-            Requires.IsNotNull(trueLifestyle, nameof(trueLifestyle));
-            Requires.IsNotNull(falseLifestyle, nameof(falseLifestyle));
+            Requires.IsNotNull(lifestyleSelector);
+            Requires.IsNotNull(trueLifestyle);
+            Requires.IsNotNull(falseLifestyle);
 
             return new LifestyleSelectorScopedHybridLifestyle(
                 _ => lifestyleSelector(), trueLifestyle, falseLifestyle);
@@ -434,8 +434,8 @@ namespace SimpleInjector
         /// </example>
         public static Lifestyle CreateCustom(string name, CreateLifestyleApplier lifestyleApplierFactory)
         {
+            Requires.IsNotNull(lifestyleApplierFactory);
             Requires.IsNotNullOrEmpty(name, nameof(name));
-            Requires.IsNotNull(lifestyleApplierFactory, nameof(lifestyleApplierFactory));
 
             return new CustomLifestyle(name, lifestyleApplierFactory);
         }
@@ -449,7 +449,7 @@ namespace SimpleInjector
         /// <b>IMPORTANT:</b> <see cref="InstanceProducer"/> function as a mini-container for a single
         /// registration. Creation and use of InstanceProducers has a big performance and memory overhead.
         /// Prefer creating a single InstanceProducer for a given registration, and cache that instance if
-        /// nessesary, rather than multiple or an infinite number of InstanceProducers. Created
+        /// necessary, rather than multiple or an infinite number of InstanceProducers. Created
         /// InstanceProducers also integrate in the verification process, which can cause Simple Injector to
         /// give verification warnings when it finds multiple InstanceProducers for the same implementation
         /// type.
@@ -477,7 +477,7 @@ namespace SimpleInjector
         /// <b>IMPORTANT:</b> <see cref="InstanceProducer"/> function as a mini-container for a single
         /// registration. Creation and use of InstanceProducers has a big performance and memory overhead.
         /// Prefer creating a single InstanceProducer for a given registration, and cache that instance if
-        /// nessesary, rather than multiple or an infinite number of InstanceProducers. Created
+        /// necessary, rather than multiple or an infinite number of InstanceProducers. Created
         /// InstanceProducers also integrate in the verification process, which can cause Simple Injector to
         /// give verification warnings when it finds multiple InstanceProducers for the same implementation
         /// type.
@@ -493,8 +493,8 @@ namespace SimpleInjector
             Type implementationType, Container container)
             where TService : class
         {
-            Requires.IsNotNull(implementationType, nameof(implementationType));
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(implementationType);
+            Requires.IsNotNull(container);
 
             Requires.IsNotOpenGenericType(implementationType, nameof(implementationType));
             Requires.ServiceIsAssignableFromImplementation(
@@ -512,7 +512,7 @@ namespace SimpleInjector
         /// <b>IMPORTANT:</b> <see cref="InstanceProducer"/> function as a mini-container for a single
         /// registration. Creation and use of InstanceProducers has a big performance and memory overhead.
         /// Prefer creating a single InstanceProducer for a given registration, and cache that instance if
-        /// nessesary, rather than multiple or an infinite number of InstanceProducers. Created
+        /// necessary, rather than multiple or an infinite number of InstanceProducers. Created
         /// InstanceProducers also integrate in the verification process, which can cause Simple Injector to
         /// give verification warnings when it finds multiple InstanceProducers for the same implementation
         /// type.
@@ -528,8 +528,8 @@ namespace SimpleInjector
         public InstanceProducer<TService> CreateProducer<TService>(Func<TService> instanceCreator,
             Container container) where TService : class
         {
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(instanceCreator);
+            Requires.IsNotNull(container);
 
             return new InstanceProducer<TService>(this.CreateRegistration(instanceCreator, container));
         }
@@ -543,7 +543,7 @@ namespace SimpleInjector
         /// <b>IMPORTANT:</b> <see cref="InstanceProducer"/> function as a mini-container for a single
         /// registration. Creation and use of InstanceProducers has a big performance and memory overhead.
         /// Prefer creating a single InstanceProducer for a given registration, and cache that instance if
-        /// nessesary, rather than multiple or an infinite number of InstanceProducers. Created
+        /// necessary, rather than multiple or an infinite number of InstanceProducers. Created
         /// InstanceProducers also integrate in the verification process, which can cause Simple Injector to
         /// give verification warnings when it finds multiple InstanceProducers for the same implementation
         /// type.
@@ -557,9 +557,9 @@ namespace SimpleInjector
         /// reference.</exception>
         public InstanceProducer CreateProducer(Type serviceType, Type implementationType, Container container)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(implementationType, nameof(implementationType));
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(implementationType);
+            Requires.IsNotNull(container);
             Requires.IsNotOpenGenericType(implementationType, nameof(implementationType));
 
             return new InstanceProducer(serviceType, this.CreateRegistration(implementationType, container));
@@ -580,7 +580,7 @@ namespace SimpleInjector
         public Registration CreateRegistration<TConcrete>(Container container)
             where TConcrete : class
         {
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(container);
 
             return this.CreateRegistrationInternal(typeof(TConcrete), container, preventTornLifestyles: true);
         }
@@ -601,8 +601,8 @@ namespace SimpleInjector
         public Registration CreateRegistration<TService>(Func<TService> instanceCreator, Container container)
             where TService : class
         {
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(instanceCreator);
+            Requires.IsNotNull(container);
 
             var registration = this.CreateRegistrationCore(instanceCreator, container);
 
@@ -627,8 +627,8 @@ namespace SimpleInjector
         /// reference.</exception>
         public Registration CreateRegistration(Type concreteType, Container container)
         {
-            Requires.IsNotNull(concreteType, nameof(concreteType));
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(concreteType);
+            Requires.IsNotNull(container);
 
             Requires.IsReferenceType(concreteType, nameof(concreteType));
 
@@ -652,9 +652,9 @@ namespace SimpleInjector
         public Registration CreateRegistration(
             Type serviceType, Func<object> instanceCreator, Container container)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(instanceCreator);
+            Requires.IsNotNull(container);
 
             Requires.IsReferenceType(serviceType, nameof(serviceType));
             Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
@@ -668,7 +668,7 @@ namespace SimpleInjector
                 var typeSafeInstanceCreator = ConvertDelegateToTypeSafeDelegate(serviceType, instanceCreator);
 
                 return (Registration)closedCreateRegistrationMethod.Invoke(this,
-                    new object[] { typeSafeInstanceCreator, container });
+                    [typeSafeInstanceCreator, container]);
             }
             catch (MemberAccessException ex)
             {

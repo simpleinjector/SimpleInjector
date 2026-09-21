@@ -33,7 +33,7 @@ namespace SimpleInjector.Diagnostics
         /// warnings and messages.</returns>
         public static DiagnosticResult[] Analyze(Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(container);
             RequiresContainerToBeVerified(container);
 
             var producersToAnalyze = container.GetProducersToAnalyze();

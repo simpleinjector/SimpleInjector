@@ -41,7 +41,7 @@ namespace SimpleInjector.Internals
             // ParameterType as well to compare two ParameterInfo objects.
             public int GetHashCode(ParameterInfo obj)
             {
-                Requires.IsNotNull(obj, nameof(obj));
+                Requires.IsNotNull(obj);
 
                 return Helpers.CombineHashes(
                     Helpers.Hash(obj.Name ?? string.Empty, obj.ParameterType),

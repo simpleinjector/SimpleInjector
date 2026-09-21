@@ -87,7 +87,7 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public IEnumerable<object> GetAllInstances(Type serviceType)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(serviceType);
 
             Type collectionType = typeof(IEnumerable<>).MakeGenericType(serviceType);
 
@@ -102,7 +102,7 @@ namespace SimpleInjector
         /// <returns>Try when the instance was retrieved; otherwise false.</returns>
         public bool TryGetInstance(Type serviceType, out object? instance)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(serviceType);
             this.ThrowWhenDisposed();
             this.LockContainer();
 
@@ -221,7 +221,7 @@ namespace SimpleInjector
         //// 7.1 DO NOT have public members that can either throw or not based on some option.
         public InstanceProducer? GetRegistration(Type serviceType, bool throwOnFailure)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
+            Requires.IsNotNull(serviceType);
 
             // GetRegistration might lock the container, but only when not-explicitly made registrations are
             // requested.

@@ -19,7 +19,7 @@ namespace SimpleInjector
     {
         internal ContainerCollectionRegistrator(Container container)
         {
-            Requires.IsNotNull(container, nameof(container));
+            Requires.IsNotNull(container);
 
             this.Container = container;
         }
@@ -69,7 +69,7 @@ namespace SimpleInjector
         public IList<TService> Create<TService>(IEnumerable<Assembly> assemblies)
             where TService : class
         {
-            Requires.IsNotNull(assemblies, nameof(assemblies));
+            Requires.IsNotNull(assemblies);
 
             var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };
             var types = this.Container.GetTypesToRegister(typeof(TService), assemblies, compositesExcluded);
@@ -230,7 +230,7 @@ namespace SimpleInjector
         public Registration CreateRegistration<TService>(IEnumerable<Assembly> assemblies)
             where TService : class
         {
-            Requires.IsNotNull(assemblies, nameof(assemblies));
+            Requires.IsNotNull(assemblies);
 
             var compositesExcluded = new TypesToRegisterOptions { IncludeComposites = false };
             var types = this.Container.GetTypesToRegister(typeof(TService), assemblies, compositesExcluded);
@@ -362,8 +362,8 @@ namespace SimpleInjector
         /// collection (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         public void Append(Type serviceType, Registration registration)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(registration, nameof(registration));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(registration);
 
             Requires.IsReferenceType(serviceType, nameof(serviceType));
             Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
@@ -373,7 +373,7 @@ namespace SimpleInjector
                 serviceType, registration.ImplementationType, nameof(registration));
 
             Requires.OpenGenericTypesDoNotContainUnresolvableTypeArguments(
-                serviceType, new[] { registration }, nameof(registration));
+                serviceType, [registration], nameof(registration));
 
             this.AppendToCollectionInternal(serviceType, registration);
         }
@@ -416,7 +416,7 @@ namespace SimpleInjector
             where TService : class
             where TImplementation : class, TService
         {
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(lifestyle);
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
             this.AppendToCollectionInternal(
@@ -441,8 +441,8 @@ namespace SimpleInjector
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         public void Append(Type serviceType, Type implementationType)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(implementationType);
 
             Requires.IsReferenceType(serviceType, nameof(serviceType));
             Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
@@ -475,9 +475,9 @@ namespace SimpleInjector
         /// (an <b>IEnumerable</b> or <b>IEnumerable&lt;TService&gt;</b>).</exception>
         public void Append(Type serviceType, Type implementationType, Lifestyle lifestyle)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(implementationType, nameof(implementationType));
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(implementationType);
+            Requires.IsNotNull(lifestyle);
 
             Requires.IsReferenceType(serviceType, nameof(serviceType));
             Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
@@ -520,8 +520,8 @@ namespace SimpleInjector
         public void Append<TService>(Func<TService> instanceCreator, Lifestyle lifestyle)
             where TService : class
         {
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(instanceCreator);
+            Requires.IsNotNull(lifestyle);
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
             this.AppendToCollectionInternal(
@@ -548,7 +548,7 @@ namespace SimpleInjector
         public void AppendInstance<TService>(TService instance)
             where TService : class
         {
-            Requires.IsNotNull(instance, nameof(instance));
+            Requires.IsNotNull(instance);
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
             this.AppendToCollectionInternal(
@@ -577,8 +577,8 @@ namespace SimpleInjector
         /// </exception>
         public void AppendInstance(Type serviceType, object instance)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(instance, nameof(instance));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(instance);
             Requires.IsReferenceType(serviceType, nameof(serviceType));
             Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
 
@@ -612,7 +612,7 @@ namespace SimpleInjector
             where TService : class
         {
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
-            Requires.IsNotNull(containerUncontrolledCollection, nameof(containerUncontrolledCollection));
+            Requires.IsNotNull(containerUncontrolledCollection);
 
             this.RegisterContainerUncontrolledCollection(typeof(TService), containerUncontrolledCollection);
         }
@@ -633,7 +633,7 @@ namespace SimpleInjector
         public void Register<TService>(params TService[] singletons)
             where TService : class
         {
-            Requires.IsNotNull(singletons, nameof(singletons));
+            Requires.IsNotNull(singletons);
             Requires.DoesNotContainNullValues(singletons, nameof(singletons));
 
             if (typeof(TService) == typeof(Type) && singletons.Length > 0)
@@ -776,8 +776,8 @@ namespace SimpleInjector
         /// </exception>
         public void Register(Type serviceType, IEnumerable<Type> serviceTypes)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(serviceTypes, nameof(serviceTypes));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(serviceTypes);
 
             // Make a copy for correctness and performance.
             serviceTypes = serviceTypes.ToArray();
@@ -821,9 +821,9 @@ namespace SimpleInjector
         /// </exception>
         public void Register(Type serviceType, IEnumerable<Type> serviceTypes, Lifestyle lifestyle)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(serviceTypes, nameof(serviceTypes));
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(serviceTypes);
+            Requires.IsNotNull(lifestyle);
 
             serviceTypes = serviceTypes.ToArray();
 
@@ -865,8 +865,8 @@ namespace SimpleInjector
         /// </exception>
         public void Register(Type serviceType, IEnumerable<Registration> registrations)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(registrations, nameof(registrations));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(registrations);
 
             // Make a copy for performance and correctness.
             registrations = registrations.ToArray();
@@ -896,8 +896,8 @@ namespace SimpleInjector
         /// open generic type.</exception>
         public void Register(Type serviceType, IEnumerable containerUncontrolledCollection)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(containerUncontrolledCollection, nameof(containerUncontrolledCollection));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(containerUncontrolledCollection);
             Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
             Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
 
@@ -1071,7 +1071,7 @@ namespace SimpleInjector
             where TService : class
         {
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
-            Requires.IsNotNull(serviceTypes, nameof(serviceTypes));
+            Requires.IsNotNull(serviceTypes);
 
             // Make a copy for correctness and performance.
             serviceTypes = serviceTypes.ToArray();
@@ -1098,7 +1098,7 @@ namespace SimpleInjector
             where TService : class
         {
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
-            Requires.IsNotNull(registrations, nameof(registrations));
+            Requires.IsNotNull(registrations);
 
             Requires.DoesNotContainNullValues(registrations, nameof(registrations));
             Requires.AreRegistrationsForThisContainer(this.Container, registrations, nameof(registrations));

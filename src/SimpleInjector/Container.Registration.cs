@@ -497,8 +497,8 @@ namespace SimpleInjector
         public void Register<TService>(Func<TService> instanceCreator, Lifestyle lifestyle)
             where TService : class
         {
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(instanceCreator);
+            Requires.IsNotNull(lifestyle);
 
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
@@ -643,9 +643,9 @@ namespace SimpleInjector
         /// Thrown when one of the supplied arguments is a null reference.</exception>
         public void Register(Type serviceType, Func<object> instanceCreator, Lifestyle lifestyle)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(instanceCreator);
+            Requires.IsNotNull(lifestyle);
 
             Requires.IsReferenceType(serviceType, nameof(serviceType));
             Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
@@ -700,7 +700,7 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterInstance<TService>(TService instance) where TService : class
         {
-            Requires.IsNotNull(instance, nameof(instance));
+            Requires.IsNotNull(instance);
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
             Type implementationType = instance.GetType();
@@ -732,8 +732,8 @@ namespace SimpleInjector
         /// </exception>
         public void RegisterInstance(Type serviceType, object instance)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(instance, nameof(instance));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(instance);
             Requires.IsNotAnAmbiguousType(serviceType, nameof(serviceType));
 
             // The instance type check is done inside CreateSingleInstanceRegistration.
@@ -812,7 +812,7 @@ namespace SimpleInjector
         /// null reference.</exception>
         public void RegisterSingleton<TService>(Func<TService> instanceCreator) where TService : class
         {
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+            Requires.IsNotNull(instanceCreator);
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
 
             this.Register(instanceCreator, Lifestyle.Singleton);
@@ -949,7 +949,7 @@ namespace SimpleInjector
         public void RegisterInitializer<TService>(Action<TService> instanceInitializer)
             where TService : class
         {
-            Requires.IsNotNull(instanceInitializer, nameof(instanceInitializer));
+            Requires.IsNotNull(instanceInitializer);
 
             this.ThrowWhenContainerIsLockedOrDisposed();
 
@@ -986,8 +986,8 @@ namespace SimpleInjector
             Action<InstanceInitializationData> instanceInitializer,
             Predicate<InitializerContext> predicate)
         {
-            Requires.IsNotNull(instanceInitializer, nameof(instanceInitializer));
-            Requires.IsNotNull(predicate, nameof(predicate));
+            Requires.IsNotNull(instanceInitializer);
+            Requires.IsNotNull(predicate);
 
             this.ThrowWhenContainerIsLockedOrDisposed();
 
@@ -1016,7 +1016,7 @@ namespace SimpleInjector
         /// </exception>
         public void AddRegistration<TService>(Registration registration) where TService : class
         {
-            Requires.IsNotNull(registration, nameof(registration));
+            Requires.IsNotNull(registration);
 
             this.AddRegistrationInternal(typeof(TService), registration);
         }
@@ -1125,8 +1125,8 @@ namespace SimpleInjector
         /// </exception>
         public void AddRegistration(Type serviceType, Registration registration)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(registration, nameof(registration));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(registration);
             Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
 
             this.AddRegistrationInternal(serviceType, registration);
@@ -1159,7 +1159,7 @@ namespace SimpleInjector
             where TService : class
             where TImplementation : class, TService
         {
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(lifestyle);
             Requires.IsNotACOMObject(typeof(TImplementation), implementationTypeParamName);
             Requires.IsNotAnAmbiguousType(typeof(TService), serviceTypeParamName);
 
@@ -1180,7 +1180,7 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(serviceType, serviceTypeParamName);
             Requires.IsNotNull(implementationType, implementationTypeParamName);
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
+            Requires.IsNotNull(lifestyle);
 
             Requires.IsReferenceType(serviceType, serviceTypeParamName);
             Requires.IsReferenceType(implementationType, implementationTypeParamName);

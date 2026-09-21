@@ -127,7 +127,7 @@ namespace SimpleInjector.Internals
 
         public virtual void CopyTo(TService[] array, int arrayIndex)
         {
-            Requires.IsNotNull(array, nameof(array));
+            Requires.IsNotNull(array);
 
             foreach (var producer in this.producers.Value)
             {

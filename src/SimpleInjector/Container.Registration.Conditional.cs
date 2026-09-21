@@ -142,10 +142,10 @@ namespace SimpleInjector
             Lifestyle lifestyle,
             Predicate<PredicateContext> predicate)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(implementationType, nameof(implementationType));
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
-            Requires.IsNotNull(predicate, nameof(predicate));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(implementationType);
+            Requires.IsNotNull(lifestyle);
+            Requires.IsNotNull(predicate);
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType), nameof(implementationType));
 
             Requires.ServiceOrItsGenericTypeDefinitionIsAssignableFromImplementation(
@@ -202,10 +202,10 @@ namespace SimpleInjector
             Lifestyle lifestyle,
             Predicate<PredicateContext> predicate)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(implementationTypeFactory, nameof(implementationTypeFactory));
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
-            Requires.IsNotNull(predicate, nameof(predicate));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(implementationTypeFactory);
+            Requires.IsNotNull(lifestyle);
+            Requires.IsNotNull(predicate);
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
 
             this.GetOrCreateRegistrationalEntry(serviceType)
@@ -262,9 +262,9 @@ namespace SimpleInjector
         public void RegisterConditional(
             Type serviceType, Registration registration, Predicate<PredicateContext> predicate)
         {
-            Requires.IsNotNull(serviceType, nameof(serviceType));
-            Requires.IsNotNull(registration, nameof(registration));
-            Requires.IsNotNull(predicate, nameof(predicate));
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(registration);
+            Requires.IsNotNull(predicate);
             Requires.IsNotOpenGenericType(serviceType, nameof(serviceType));
             Requires.ServiceIsAssignableFromImplementation(
                 serviceType, registration.ImplementationType, nameof(serviceType));

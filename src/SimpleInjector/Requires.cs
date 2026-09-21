@@ -9,18 +9,21 @@ namespace SimpleInjector
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
+
     using SimpleInjector.Decorators;
     using SimpleInjector.Internals;
 
     internal static class Requires
     {
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [DebuggerStepThrough]
-        internal static void IsNotNull(object? instance, string paramName)
+        internal static void IsNotNull(
+            object? instance, [CallerArgumentExpression(nameof(instance))] string? paramName = null)
         {
             if (instance is null)
             {
-                ThrowArgumentNullException(paramName);
+                ThrowArgumentNullException(paramName ?? "");
             }
         }
 

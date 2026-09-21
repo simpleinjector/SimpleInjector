@@ -71,14 +71,14 @@ namespace SimpleInjector.Internals
 
         internal static string ToCSharpFriendlyName(Type genericTypeDefinition, bool fullyQualifiedName)
         {
-            Requires.IsNotNull(genericTypeDefinition, nameof(genericTypeDefinition));
+            Requires.IsNotNull(genericTypeDefinition);
 
             return genericTypeDefinition.ToFriendlyName(fullyQualifiedName, CSharpFriendlyNameArgumentFormatter);
         }
 
         internal static string ToFriendlyName(this Type type, bool fullyQualifiedName)
         {
-            Requires.IsNotNull(type, nameof(type));
+            Requires.IsNotNull(type);
 
             return type.ToFriendlyName(
                 fullyQualifiedName,

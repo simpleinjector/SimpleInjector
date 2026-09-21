@@ -32,8 +32,8 @@ namespace SimpleInjector
             // reduce the pain for anyone using (calling) this interface. This extension method duplicates the
             // signature and behavior of the old method. This still makes the change binary incompatible, even
             // from perspective of the caller, but it would allow their code to keep compiling (in most cases).
-            Requires.IsNotNull(behavior, nameof(behavior));
-            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(behavior);
+            Requires.IsNotNull(implementationType);
 
             return behavior.TryGetConstructor(implementationType, out string? message)
                 ?? throw BuildActivationException(behavior, implementationType, message);

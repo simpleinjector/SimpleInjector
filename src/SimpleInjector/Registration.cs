@@ -61,9 +61,9 @@ namespace SimpleInjector
             Type implementationType,
             Func<object>? instanceCreator = null)
         {
-            Requires.IsNotNull(lifestyle, nameof(lifestyle));
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(implementationType, nameof(implementationType));
+            Requires.IsNotNull(lifestyle);
+            Requires.IsNotNull(container);
+            Requires.IsNotNull(implementationType);
 
             this.Lifestyle = lifestyle;
             this.Container = container;
@@ -136,7 +136,7 @@ namespace SimpleInjector
         /// of type <see cref="ImplementationType"/>.</exception>
         public void InitializeInstance(object instance)
         {
-            Requires.IsNotNull(instance, nameof(instance));
+            Requires.IsNotNull(instance);
             Requires.ServiceIsAssignableFromImplementation(
                 this.ImplementationType, instance.GetType(), nameof(instance));
 
@@ -201,7 +201,7 @@ namespace SimpleInjector
 
         internal void AddRelationship(KnownRelationship relationship)
         {
-            Requires.IsNotNull(relationship, nameof(relationship));
+            Requires.IsNotNull(relationship);
 
             lock (this.knownRelationships)
             {

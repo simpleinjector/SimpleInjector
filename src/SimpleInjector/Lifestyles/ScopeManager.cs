@@ -13,9 +13,9 @@ namespace SimpleInjector.Lifestyles
 
         internal ScopeManager(Container container, Func<Scope?> scopeRetriever, Action<Scope?> scopeReplacer)
         {
-            Requires.IsNotNull(container, nameof(container));
-            Requires.IsNotNull(scopeRetriever, nameof(scopeRetriever));
-            Requires.IsNotNull(scopeReplacer, nameof(scopeReplacer));
+            Requires.IsNotNull(container);
+            Requires.IsNotNull(scopeRetriever);
+            Requires.IsNotNull(scopeReplacer);
 
             this.container = container;
             this.scopeRetriever = scopeRetriever;

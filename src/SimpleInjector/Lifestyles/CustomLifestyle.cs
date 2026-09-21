@@ -6,16 +6,9 @@ namespace SimpleInjector.Lifestyles
     using System;
     using System.Linq.Expressions;
 
-    internal sealed class CustomLifestyle : Lifestyle
+    internal sealed class CustomLifestyle(string name, CreateLifestyleApplier lifestyleApplierFactory)
+        : Lifestyle(name)
     {
-        private readonly CreateLifestyleApplier lifestyleApplierFactory;
-
-        public CustomLifestyle(string name, CreateLifestyleApplier lifestyleApplierFactory)
-            : base(name)
-        {
-            this.lifestyleApplierFactory = lifestyleApplierFactory;
-        }
-
         public override int Length =>
             throw new NotSupportedException("The length property is not supported for this lifestyle.");
 
@@ -26,37 +19,30 @@ namespace SimpleInjector.Lifestyles
         internal override int DependencyLength(Container container) => Transient.DependencyLength(container);
 
         protected internal override Registration CreateRegistrationCore(Type concreteType, Container container) =>
-            new CustomRegistration(this.lifestyleApplierFactory, this, container, concreteType);
+            new CustomRegistration(lifestyleApplierFactory, this, container, concreteType);
 
         protected internal override Registration CreateRegistrationCore<TService>(
             Func<TService> instanceCreator, Container container)
         {
-            Requires.IsNotNull(instanceCreator, nameof(instanceCreator));
+            Requires.IsNotNull(instanceCreator);
 
             return new CustomRegistration(
-                this.lifestyleApplierFactory, this, container, typeof(TService), instanceCreator);
+                lifestyleApplierFactory, this, container, typeof(TService), instanceCreator);
         }
 
-        private sealed class CustomRegistration : Registration
+        private sealed class CustomRegistration(
+            CreateLifestyleApplier lifestyleApplierFactory,
+            Lifestyle lifestyle,
+            Container container,
+            Type implementationType,
+            Func<object>? instanceCreator = null)
+            : Registration(lifestyle, container, implementationType, instanceCreator)
         {
-            private readonly CreateLifestyleApplier lifestyleApplierFactory;
-
-            public CustomRegistration(
-                CreateLifestyleApplier lifestyleApplierFactory,
-                Lifestyle lifestyle,
-                Container container,
-                Type implementationType,
-                Func<object>? instanceCreator = null)
-                : base(lifestyle, container, implementationType, instanceCreator)
-            {
-                this.lifestyleApplierFactory = lifestyleApplierFactory;
-            }
-
             public override Expression BuildExpression()
             {
                 var creator = this.BuildTransientDelegate();
 
-                var lifestyleAppliedCreator = this.lifestyleApplierFactory(creator);
+                var lifestyleAppliedCreator = lifestyleApplierFactory(creator);
 
                 return
                     Expression.Convert(
