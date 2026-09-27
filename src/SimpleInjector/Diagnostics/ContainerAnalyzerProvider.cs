@@ -3,22 +3,22 @@
 
 namespace SimpleInjector.Diagnostics
 {
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
+
     using SimpleInjector.Diagnostics.Analyzers;
 
     internal static class ContainerAnalyzerProvider
     {
-        internal static readonly ReadOnlyCollection<IContainerAnalyzer> Analyzers =
-            new ReadOnlyCollection<IContainerAnalyzer>(new List<IContainerAnalyzer>
-            {
-                new LifestyleMismatchAnalyzer(),
-                new ShortCircuitedDependencyAnalyzer(),
-                new SingleResponsibilityViolationsAnalyzer(),
-                new ContainerRegisteredServiceAnalyzer(),
-                new TornLifestyleContainerAnalyzer(),
-                new DisposableTransientComponentAnalyzer(),
-                new AmbiguousLifestylesAnalyzer()
-            });
+        internal static readonly ReadOnlyCollection<IContainerAnalyzer> Analyzers = new(
+        [
+            new LifestyleMismatchAnalyzer(),
+            new ShortCircuitedDependencyAnalyzer(),
+            new SingleResponsibilityViolationsAnalyzer(),
+            new ContainerRegisteredServiceAnalyzer(),
+            new TornLifestyleContainerAnalyzer(),
+            new DisposableTransientComponentAnalyzer(),
+            new AmbiguousLifestylesAnalyzer(),
+            new UnusedConditionalRegistrationAnalyzer()
+        ]);
     }
 }

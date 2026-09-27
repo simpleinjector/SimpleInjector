@@ -73,7 +73,15 @@ namespace SimpleInjector.Diagnostics
         /// For more information, see: https://simpleinjector.org/diaal.
         /// </summary>
         [Documentation("Ambiguous Lifestyles", "https://simpleinjector.org/diaal")]
-        AmbiguousLifestyles = 6
+        AmbiguousLifestyles = 6,
+
+        /// <summary>
+        /// Diagnostic type that warns about conditional registrations that are never injected into any
+        /// consumer.
+        /// For more information, see: https://simpleinjector.org/TODO.
+        /// </summary>
+        [Documentation("Unused Conditional Registration", "https://simpleinjector.org/diaur")]
+        UnusedConditionalRegistration = 7,
     }
 
     [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
