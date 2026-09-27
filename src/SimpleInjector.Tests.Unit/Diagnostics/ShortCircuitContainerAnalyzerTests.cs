@@ -1,4 +1,5 @@
-﻿namespace SimpleInjector.Diagnostics.Tests.Unit
+﻿#pragma warning disable CS9113 // Parameter is unread.
+namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -7,17 +8,9 @@
     using SimpleInjector.Diagnostics.Debugger;
     using SimpleInjector.Tests.Unit;
 
-    public interface IUnitOfWork
-    {
-    }
-
-    public interface IService1
-    {
-    }
-
-    public interface IService2
-    {
-    }
+    public interface IUnitOfWork;
+    public interface IService1;
+    public interface IService2;
 
     [TestClass]
     public class ShortCircuitContainerAnalyzerTests
@@ -205,28 +198,9 @@
             "actual: " + string.Join(" - ", results.Select(r => r.Description));
     }
 
-    public class ImplementsBothInterfaces : IService1, IService2
-    {
-    }
-
-    public class Controller<T>
-    {
-        public Controller(ImplementsBothInterfaces concrete)
-        {
-        }
-    }
-
-    public class MyUnitOfWork : IUnitOfWork
-    {
-    }
-
-    public class HomeController
-    {
-        private readonly MyUnitOfWork uow;
-
-        public HomeController(MyUnitOfWork uow)
-        {
-            this.uow = uow;
-        }
-    }
+    public class ImplementsBothInterfaces : IService1, IService2;
+    public class Controller<T>(ImplementsBothInterfaces concrete);
+    public class MyUnitOfWork : IUnitOfWork;
+    public class HomeController(MyUnitOfWork uow);
 }
+#pragma warning restore CS9113 // Parameter is unread.

@@ -1,17 +1,15 @@
 ﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using SimpleInjector.Diagnostics.Analyzers;
     using SimpleInjector.Diagnostics.Debugger;
     using SimpleInjector.Diagnostics.Tests.Unit.Helpers;
-    using SimpleInjector.Tests.Unit;
 
-    public interface IGenericPlugin<T>
-    {
-    }
+    public interface IGenericPlugin<T>;
 
     [TestClass]
     public class SingleResponsibilityViolationsAnalyzerTests

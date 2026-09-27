@@ -1,42 +1,24 @@
-﻿namespace SimpleInjector.Diagnostics.Tests.Unit
+﻿#pragma warning disable CS9113 // Parameter is unread.
+namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
 
-    public interface IFoo
-    {
-    }
-
-    public interface IFooExt : IFoo
-    {
-    }
-
-    public interface IBar
-    {
-    }
-
-    public interface IBarExt : IBar
-    {
-    }
-
-    public interface IConcreteThing
-    {
-    }
+    public interface IFoo;
+    public interface IFooExt : IFoo;
+    public interface IBar;
+    public interface IBarExt : IBar;
+    public interface IConcreteThing;
 
     public interface ITimeProvider
     {
         DateTime Now { get; }
     }
 
-    public interface IPlugin
-    {
-    }
-
-    public interface IGeneric<T>
-    {
-    }
+    public interface IPlugin;
+    public interface IGeneric<T>;
 
     public interface IUserRepository
     {
@@ -67,48 +49,23 @@
         }
     }
 
-    public abstract class UserServiceBase
+    public abstract class UserServiceBase(IUserRepository repository)
     {
-        protected UserServiceBase(IUserRepository repository)
-        {
-            this.Repository = repository;
-        }
-
-        public IUserRepository Repository { get; }
+        public IUserRepository Repository { get; } = repository;
     }
 
-    public class RealUserService : UserServiceBase
-    {
-        public RealUserService(IUserRepository repository) : base(repository)
-        {
-        }
-    }
+    public class RealUserService(IUserRepository repository) : UserServiceBase(repository);
 
-    public class FakeUserService : UserServiceBase
-    {
-        public FakeUserService(IUserRepository repository) : base(repository)
-        {
-        }
-    }
+    public class FakeUserService(IUserRepository repository) : UserServiceBase(repository);
 
-    public class UserController
+    public class UserController(UserServiceBase userService)
     {
-        public UserController(UserServiceBase userService)
-        {
-            this.UserService = userService;
-        }
-
         public int UserKarmaOffset { get; set; }
 
-        public UserServiceBase UserService { get; }
+        public UserServiceBase UserService { get; } = userService;
     }
 
-    public class ConcreteTypeWithConcreteTypeConstructorArgument
-    {
-        public ConcreteTypeWithConcreteTypeConstructorArgument(RealUserService userService)
-        {
-        }
-    }
+    public class ConcreteTypeWithConcreteTypeConstructorArgument(RealUserService userService);
 
     public class ConcreteTypeWithMultiplePublicConstructors
     {
@@ -128,39 +85,20 @@
         }
     }
 
-    public class ComponentDependingOn<TDependency>
+    public class ComponentDependingOn<TDependency>(TDependency dependency);
+
+    public class PluginImpl : IPlugin;
+
+    public class PluginImpl2 : IPlugin;
+
+    public class PluginDecorator(IPlugin decoratee) : IPlugin
     {
-        public ComponentDependingOn(TDependency dependency)
-        {
-        }
+        public IPlugin Decoratee { get; } = decoratee;
     }
 
-    public class PluginImpl : IPlugin
+    public class PluginProxy(Func<IPlugin> decorateeFactory) : IPlugin
     {
-    }
-
-    public class PluginImpl2 : IPlugin
-    {
-    }
-
-    public class PluginDecorator : IPlugin
-    {
-        public PluginDecorator(IPlugin decoratee)
-        {
-            this.Decoratee = decoratee;
-        }
-
-        public IPlugin Decoratee { get; }
-    }
-
-    public class PluginProxy : IPlugin
-    {
-        public PluginProxy(Func<IPlugin> decorateeFactory)
-        {
-            this.DecorateeFactory = decorateeFactory;
-        }
-
-        public Func<IPlugin> DecorateeFactory { get; }
+        public Func<IPlugin> DecorateeFactory { get; } = decorateeFactory;
     }
 
     public class PluginWithDependencyOfType<TDependency> : IPlugin
@@ -168,48 +106,17 @@
         public TDependency Dependency { get; set; }
     }
 
-    public class PluginManager
+    public class PluginManager(IEnumerable<IPlugin> plugins)
     {
-        public PluginManager(IEnumerable<IPlugin> plugins)
-        {
-            this.Plugins = plugins.ToArray();
-        }
-
-        public IPlugin[] Plugins { get; }
+        public IPlugin[] Plugins { get; } = plugins.ToArray();
     }
 
-    public class ConcreteTypeWithValueTypeConstructorArgument
-    {
-        public ConcreteTypeWithValueTypeConstructorArgument(int intParam)
-        {
-        }
-    }
-
-    public class ConcreteTypeWithStringConstructorArgument
-    {
-        public ConcreteTypeWithStringConstructorArgument(string stringParam)
-        {
-        }
-    }
-
-    public class ServiceWithUnregisteredDependencies
-    {
-        public ServiceWithUnregisteredDependencies(IDisposable a, IComparable b)
-        {
-        }
-    }
-
-    public class ConcreteShizzle
-    {
-    }
-
-    public class ConcreteThing : IConcreteThing
-    {
-    }
-
-    public class SomePluginImpl : IPlugin
-    {
-    }
+    public class ConcreteTypeWithValueTypeConstructorArgument(int intParam);
+    public class ConcreteTypeWithStringConstructorArgument(string stringParam);
+    public class ServiceWithUnregisteredDependencies(IDisposable a, IComparable b);
+    public class ConcreteShizzle;
+    public class ConcreteThing : IConcreteThing;
+    public class SomePluginImpl : IPlugin;
 
     public class DisposablePlugin : IPlugin, IDisposable
     {
@@ -232,123 +139,69 @@
         public ValueTask DisposeAsync() => default;
     }
 
-    public class PluginWith7Dependencies : IPlugin
+    public class PluginWith7Dependencies(
+        IGeneric<int> dependency1,
+        IGeneric<byte> dependency2,
+        IGeneric<double> dependency3,
+        IGeneric<float> dependency4,
+        IGeneric<char> dependency5,
+        IGeneric<decimal> dependency6,
+        IGeneric<int?> dependency7) : IPlugin;
+
+    public class PluginWith8Dependencies(
+        IGeneric<int> dependency1,
+        IGeneric<byte> dependency2,
+        IGeneric<double> dependency3,
+        IGeneric<float> dependency4,
+        IGeneric<char> dependency5,
+        IGeneric<decimal> dependency6,
+        IGeneric<int?> dependency7,
+        IGeneric<decimal?> dependency8) : IPlugin;
+
+    public class AnotherPluginWith8Dependencies(
+        IGeneric<int> dependency1,
+        IGeneric<byte> dependency2,
+        IGeneric<double> dependency3,
+        IGeneric<float> dependency4,
+        IGeneric<char> dependency5,
+        IGeneric<decimal> dependency6,
+        IGeneric<int?> dependency7,
+        IGeneric<decimal?> dependency8) : IPlugin;
+
+    public class PluginDecoratorWith5Dependencies(
+        IPlugin decoratee,
+        IGeneric<byte> dependency2,
+        IGeneric<double> dependency3,
+        IGeneric<float> dependency4,
+        IGeneric<char> dependency5) : IPlugin;
+
+    public class PluginDecoratorWith8Dependencies(
+        IPlugin decoratee,
+        IGeneric<byte> dependency2,
+        IGeneric<double> dependency3,
+        IGeneric<float> dependency4,
+        IGeneric<char> dependency5,
+        IGeneric<decimal> dependency6,
+        IGeneric<int?> dependency7,
+        IGeneric<decimal?> dependency8) : IPlugin;
+
+    public class Consumer<TDependency>(TDependency dependency)
     {
-        public PluginWith7Dependencies(
-            IGeneric<int> dependency1,
-            IGeneric<byte> dependency2,
-            IGeneric<double> dependency3,
-            IGeneric<float> dependency4,
-            IGeneric<char> dependency5,
-            IGeneric<decimal> dependency6,
-            IGeneric<int?> dependency7)
-        {
-        }
+        public readonly TDependency Dependency = dependency;
     }
 
-    public class PluginWith8Dependencies : IPlugin
-    {
-        public PluginWith8Dependencies(
-            IGeneric<int> dependency1,
-            IGeneric<byte> dependency2,
-            IGeneric<double> dependency3,
-            IGeneric<float> dependency4,
-            IGeneric<char> dependency5,
-            IGeneric<decimal> dependency6,
-            IGeneric<int?> dependency7,
-            IGeneric<decimal?> dependency8)
-        {
-        }
-    }
+    public class GenericPluginWith6Dependencies<T>(
+        IGeneric<int> dependency1,
+        IGeneric<byte> dependency2,
+        IGeneric<double> dependency3,
+        IGeneric<float> dependency4,
+        IGeneric<char> dependency5,
+        IGeneric<decimal> dependency6) : IGenericPlugin<T>;
 
-    public class AnotherPluginWith8Dependencies : IPlugin
-    {
-        public AnotherPluginWith8Dependencies(
-            IGeneric<int> dependency1,
-            IGeneric<byte> dependency2,
-            IGeneric<double> dependency3,
-            IGeneric<float> dependency4,
-            IGeneric<char> dependency5,
-            IGeneric<decimal> dependency6,
-            IGeneric<int?> dependency7,
-            IGeneric<decimal?> dependency8)
-        {
-        }
-    }
-
-    public class PluginDecoratorWith5Dependencies : IPlugin
-    {
-        public PluginDecoratorWith5Dependencies(
-            IPlugin decoratee,
-            IGeneric<byte> dependency2,
-            IGeneric<double> dependency3,
-            IGeneric<float> dependency4,
-            IGeneric<char> dependency5)
-        {
-        }
-    }
-
-    public class PluginDecoratorWith8Dependencies : IPlugin
-    {
-        public PluginDecoratorWith8Dependencies(
-            IPlugin decoratee,
-            IGeneric<byte> dependency2,
-            IGeneric<double> dependency3,
-            IGeneric<float> dependency4,
-            IGeneric<char> dependency5,
-            IGeneric<decimal> dependency6,
-            IGeneric<int?> dependency7,
-            IGeneric<decimal?> dependency8)
-        {
-        }
-    }
-
-    public class Consumer<TDependency>
-    {
-        public readonly TDependency Dependency;
-
-        public Consumer(TDependency dependency)
-        {
-            this.Dependency = dependency;
-        }
-    }
-
-    public class GenericPluginWith6Dependencies<T> : IGenericPlugin<T>
-    {
-        public GenericPluginWith6Dependencies(
-            IGeneric<int> dependency1,
-            IGeneric<byte> dependency2,
-            IGeneric<double> dependency3,
-            IGeneric<float> dependency4,
-            IGeneric<char> dependency5,
-            IGeneric<decimal> dependency6)
-        {
-        }
-    }
-
-    public class FooBar : IFoo, IBar, IFooExt, IBarExt
-    {
-    }
-
-    public class FooBarSub : FooBar
-    {
-    }
-
-    public class ChocolateBar : IFoo, IBar, IFooExt, IBarExt
-    {
-    }
-
-    public class FooDecorator : IFoo
-    {
-        public FooDecorator(IFoo decoratee)
-        {
-        }
-    }
-
-    public class BarDecorator : IBar
-    {
-        public BarDecorator(IBar decoratee)
-        {
-        }
-    }
+    public class FooBar : IFoo, IBar, IFooExt, IBarExt;
+    public class FooBarSub : FooBar;
+    public class ChocolateBar : IFoo, IBar, IFooExt, IBarExt;
+    public class FooDecorator(IFoo decoratee) : IFoo;
+    public class BarDecorator(IBar decoratee) : IBar;
 }
+#pragma warning restore CS9113 // Parameter is unread.
