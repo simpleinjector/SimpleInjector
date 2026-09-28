@@ -8,7 +8,7 @@ namespace SimpleInjector.Internals
 
     // An Overridden parameter prevents the Registration class from calling back into the container to build
     // an expression for the given constructor parameter. Instead the Registration will
-    internal struct OverriddenParameter
+    internal readonly struct OverriddenParameter
     {
         // The parameter to ignore.
         internal readonly ParameterInfo Parameter;
@@ -37,7 +37,7 @@ namespace SimpleInjector.Internals
             // being processed twice by the ExpressionBuilding event (since we expect the supplied expressions
             // to already be processed). After the event has ran we replace the placeholders with the real
             // expressions again (using an ExpressionVisitor).
-            this.PlaceHolder = System.Linq.Expressions.Expression.Constant(null, parameter.ParameterType);
+            this.PlaceHolder = Expression.Constant(null, parameter.ParameterType);
         }
     }
 }

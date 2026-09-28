@@ -31,7 +31,7 @@ namespace SimpleInjector.Internals
 
         internal bool TypeConstraintsAreSatisfied => this.Validator.AreTypeConstraintsSatisfied();
 
-        private TypeConstraintValidator Validator => new TypeConstraintValidator(this);
+        private TypeConstraintValidator Validator => new(this);
 
         /// <summary>Implements equality. Needed for doing LINQ distinct operations.</summary>
         /// <param name="other">The other to compare to.</param>
@@ -46,8 +46,7 @@ namespace SimpleInjector.Internals
         public override bool Equals(object obj) =>
             obj is ArgumentMapping other && ((IEquatable<ArgumentMapping>)this).Equals(other);
 
-        internal static ArgumentMapping Create(Type argument, Type concreteType) =>
-            new ArgumentMapping(argument, concreteType);
+        internal static ArgumentMapping Create(Type argument, Type concreteType) => new(argument, concreteType);
 
         internal static ArgumentMapping[] Zip(Type[] arguments, Type[] concreteTypes) =>
             arguments.Zip(concreteTypes, Create).ToArray();

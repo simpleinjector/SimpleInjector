@@ -20,7 +20,7 @@ namespace SimpleInjector.Lifestyles
     public sealed class SingletonLifestyle : Lifestyle
     {
         // Oh, the irony. Here the Singleton Design Pattern is applied to the Singleton Lifestyle.
-        internal static readonly SingletonLifestyle Instance = new SingletonLifestyle();
+        internal static readonly SingletonLifestyle Instance = new();
 
         private SingletonLifestyle() : base("Singleton")
         {
@@ -147,24 +147,16 @@ namespace SimpleInjector.Lifestyles
             return Expression.Constant(instance, implementationType);
         }
 
-        private sealed class SingletonInstanceRegistration : Registration
+        private sealed class SingletonInstanceRegistration(
+            Type serviceType, Type implementationType, object instance, Container container)
+            : Registration(Lifestyle.Singleton, container, implementationType)
         {
-            private readonly object locker = new object();
-
-            private object instance;
+            private readonly object locker = new();
             private bool initialized;
-
-            internal SingletonInstanceRegistration(
-                Type serviceType, Type implementationType, object instance, Container container)
-                : base(Lifestyle.Singleton, container, implementationType)
-            {
-                this.instance = instance;
-                this.ServiceType = serviceType;
-            }
 
             internal override bool ResolvesExternallyOwnedInstance => true;
 
-            public Type ServiceType { get; }
+            public Type ServiceType { get; } = serviceType;
 
             public override Expression BuildExpression() =>
                 SingletonLifestyle.BuildConstantExpression(
@@ -178,14 +170,14 @@ namespace SimpleInjector.Lifestyles
                     {
                         if (!this.initialized)
                         {
-                            this.instance = this.GetInjectedInterceptedAndInitializedInstance();
+                            instance = this.GetInjectedInterceptedAndInitializedInstance();
 
                             this.initialized = true;
                         }
                     }
                 }
 
-                return this.instance;
+                return instance;
             }
 
             private object GetInjectedInterceptedAndInitializedInstance()
@@ -205,7 +197,7 @@ namespace SimpleInjector.Lifestyles
             private object GetInjectedInterceptedAndInitializedInstanceInternal()
             {
                 Expression expression =
-                    SingletonLifestyle.BuildConstantExpression(this.instance, this.ImplementationType);
+                    SingletonLifestyle.BuildConstantExpression(instance, this.ImplementationType);
 
                 // NOTE: We pass on producer.ServiceType as the implementation type for the following three
                 // methods. This will the initialization to be only done based on information of the service
@@ -235,17 +227,13 @@ namespace SimpleInjector.Lifestyles
             }
         }
 
-        private sealed class SingletonRegistration : Registration
+        private sealed class SingletonRegistration(
+            Container container, Type implementationType, Func<object>? instanceCreator = null)
+            : Registration(Lifestyle.Singleton, container, implementationType, instanceCreator)
         {
-            private readonly object locker = new object();
+            private readonly object locker = new();
 
             private object? interceptedInstance;
-
-            public SingletonRegistration(
-                Container container, Type implementationType, Func<object>? instanceCreator = null)
-                : base(Lifestyle.Singleton, container, implementationType, instanceCreator)
-            {
-            }
 
             public override Expression BuildExpression() =>
                 SingletonLifestyle.BuildConstantExpression(

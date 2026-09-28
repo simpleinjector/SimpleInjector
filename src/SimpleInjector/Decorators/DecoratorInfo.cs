@@ -5,15 +5,5 @@ namespace SimpleInjector.Decorators
 {
     using System;
 
-    internal sealed class DecoratorInfo
-    {
-        internal readonly Type DecoratorType;
-        internal readonly InstanceProducer DecoratorProducer;
-
-        internal DecoratorInfo(Type decoratorType, InstanceProducer decoratorProducer)
-        {
-            this.DecoratorType = decoratorType;
-            this.DecoratorProducer = decoratorProducer;
-        }
-    }
+    internal sealed record DecoratorInfo(Type DecoratorType, InstanceProducer DecoratorProducer);
 }

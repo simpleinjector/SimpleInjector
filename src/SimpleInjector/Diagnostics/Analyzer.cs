@@ -4,9 +4,7 @@
 namespace SimpleInjector.Diagnostics
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using SimpleInjector.Internals;
 
     /// <summary>
     /// Entry point for doing diagnostic analysis on <see cref="Container"/> instances.

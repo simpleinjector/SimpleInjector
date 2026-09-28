@@ -45,17 +45,17 @@ namespace SimpleInjector.Internals
                 : "Registration: <null>");
 
         public static ContainerControlledItem CreateFromRegistration(Registration registration) =>
-            new ContainerControlledItem(registration);
+            new(registration);
 
         public static ContainerControlledItem CreateFromType(Type implementationType) =>
-            new ContainerControlledItem(implementationType, null);
+            new(implementationType, null);
 
         public static ContainerControlledItem CreateFromType(Type implementationType, Lifestyle? lifestyle) =>
-            new ContainerControlledItem(implementationType, lifestyle);
+            new(implementationType, lifestyle);
 
         public static ContainerControlledItem CreateFromType(
             Type registeredImplementationType, Type closedImplementationType, Lifestyle? lifestyle) =>
-            new ContainerControlledItem(closedImplementationType, lifestyle)
+            new(closedImplementationType, lifestyle)
             {
                 RegisteredImplementationType = registeredImplementationType
             };

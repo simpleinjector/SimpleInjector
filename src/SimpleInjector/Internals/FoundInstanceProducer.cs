@@ -5,17 +5,8 @@ namespace SimpleInjector.Internals
 {
     using System;
 
-    internal struct FoundInstanceProducer
-    {
-        public readonly Type ServiceType;
-        public readonly Type ImplementationType;
-        public readonly InstanceProducer Producer;
-
-        public FoundInstanceProducer(Type serviceType, Type implementationType, InstanceProducer producer)
-        {
-            this.ServiceType = serviceType;
-            this.ImplementationType = implementationType;
-            this.Producer = producer;
-        }
-    }
+    internal record struct FoundInstanceProducer(
+        Type ServiceType,
+        Type ImplementationType,
+        InstanceProducer Producer);
 }

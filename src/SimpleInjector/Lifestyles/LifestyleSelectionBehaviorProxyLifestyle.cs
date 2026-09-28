@@ -9,16 +9,9 @@ namespace SimpleInjector.Lifestyles
     /// Forwards CreateRegistration calls to the lifestyle that is returned from the registered
     /// container.Options.LifestyleSelectionBehavior.
     /// </summary>
-    internal sealed class LifestyleSelectionBehaviorProxyLifestyle : Lifestyle
+    internal sealed class LifestyleSelectionBehaviorProxyLifestyle(ContainerOptions options)
+        : Lifestyle("Based On LifestyleSelectionBehavior")
     {
-        private readonly ContainerOptions options;
-
-        public LifestyleSelectionBehaviorProxyLifestyle(ContainerOptions options)
-            : base("Based On LifestyleSelectionBehavior")
-        {
-            this.options = options;
-        }
-
         public override int Length => throw new NotImplementedException();
 
         // TODO: CreateRegistrationCore calls into CreateRegistration of the selected lifestyle, but I'm
@@ -27,12 +20,12 @@ namespace SimpleInjector.Lifestyles
         // doesn't break a test, so we're clearly missing a test. Now the question becomes: what is the
         // correct behavior???
         protected internal override Registration CreateRegistrationCore(Type concreteType, Container container) =>
-            this.options.SelectLifestyle(concreteType)
+            options.SelectLifestyle(concreteType)
                 .CreateRegistration(concreteType, container);
 
         protected internal override Registration CreateRegistrationCore<TService>(
             Func<TService> instanceCreator, Container container) =>
-            this.options.SelectLifestyle(typeof(TService))
+            options.SelectLifestyle(typeof(TService))
                 .CreateRegistration(instanceCreator, container);
     }
 }

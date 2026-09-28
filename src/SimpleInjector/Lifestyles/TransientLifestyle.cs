@@ -26,14 +26,10 @@ namespace SimpleInjector.Lifestyles
             return new TransientRegistration(container, typeof(TService), instanceCreator);
         }
 
-        private sealed class TransientRegistration : Registration
+        private sealed class TransientRegistration(
+            Container container, Type implementationType, Func<object>? creator = null)
+            : Registration(Lifestyle.Transient, container, implementationType, creator)
         {
-            public TransientRegistration(
-                Container container, Type implementationType, Func<object>? creator = null)
-                : base(Lifestyle.Transient, container, implementationType, creator)
-            {
-            }
-
             public override Expression BuildExpression() => this.BuildTransientExpression();
         }
     }

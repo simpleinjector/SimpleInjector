@@ -75,7 +75,7 @@ namespace SimpleInjector.Diagnostics
                 groupType: closedType,
                 name: closedType.ToFriendlyName(),
                 description: this.analyzer.GetGroupDescription(results),
-                children: Enumerable.Empty<DiagnosticGroup>(),
+                children: [],
                 results: results);
 
         private static DiagnosticResult[] GetGroupResults(IEnumerable<DiagnosticResult> results, int level) => (

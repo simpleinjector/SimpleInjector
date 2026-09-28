@@ -8,7 +8,7 @@ namespace SimpleInjector.Decorators
     using System.Collections.Generic;
     using SimpleInjector.Internals;
 
-    internal class DecoratorInterceptor
+    internal class DecoratorInterceptor(DecoratorExpressionInterceptorData data)
     {
         // Cache for decorators when the decorator is registered as singleton. Since all decoration requests
         // for the registration of that decorator will go through the same instance, we can (or must)
@@ -16,24 +16,14 @@ namespace SimpleInjector.Decorators
         // registered.
         // So the Type is an closed generic version of the open generic service that is wrapped, the
         // registration is the registration for the closed generic decorator.
-        private readonly Dictionary<InstanceProducer, Registration> registrationsCache;
-        private readonly Dictionary<InstanceProducer, IEnumerable> singletonDecoratedCollectionsCache;
-
-        private readonly DecoratorExpressionInterceptorData data;
-
-        public DecoratorInterceptor(DecoratorExpressionInterceptorData data)
-        {
-            this.registrationsCache = new Dictionary<InstanceProducer, Registration>();
-            this.singletonDecoratedCollectionsCache = new Dictionary<InstanceProducer, IEnumerable>();
-
-            this.data = data;
-        }
+        private readonly Dictionary<InstanceProducer, Registration> registrationsCache = [];
+        private readonly Dictionary<InstanceProducer, IEnumerable> singletonDecoratedCollectionsCache = [];
 
         // The service type definition (possibly open generic).
-        protected Type ServiceTypeDefinition => this.data.ServiceType;
+        protected Type ServiceTypeDefinition => data.ServiceType;
 
         // The decorator type definition (possibly open generic).
-        protected Type? DecoratorTypeDefinition => this.data.DecoratorType;
+        protected Type? DecoratorTypeDefinition => data.DecoratorType;
 
         internal void ExpressionBuilt(object sender, ExpressionBuiltEventArgs e)
         {
@@ -46,11 +36,11 @@ namespace SimpleInjector.Decorators
             if (this.MustDecorate(e.RegisteredServiceType, out Type? closedDecoratorType))
             {
                 var decoratorInterceptor =
-                    new ServiceDecoratorExpressionInterceptor(this.data, this.registrationsCache, e);
+                    new ServiceDecoratorExpressionInterceptor(data, this.registrationsCache, e);
 
                 if (decoratorInterceptor.SatisfiesPredicate())
                 {
-                    if (this.data.DecoratorTypeFactory != null)
+                    if (data.DecoratorTypeFactory != null)
                     {
                         // Context gets set by SatisfiesPredicate
                         var context = decoratorInterceptor.Context!;
@@ -90,11 +80,11 @@ namespace SimpleInjector.Decorators
             var serviceType = e.RegisteredServiceType.GetGenericArguments()[0];
 
             var uncontrolledInterceptor = new ContainerUncontrolledServicesDecoratorInterceptor(
-                this.data, this.singletonDecoratedCollectionsCache, e, serviceType);
+                data, this.singletonDecoratedCollectionsCache, e, serviceType);
 
             if (uncontrolledInterceptor.SatisfiesPredicate())
             {
-                if (this.data.DecoratorTypeFactory != null)
+                if (data.DecoratorTypeFactory != null)
                 {
                     // Context gets set by SatisfiesPredicate
                     var context = uncontrolledInterceptor.Context!;
@@ -130,7 +120,7 @@ namespace SimpleInjector.Decorators
                 return false;
             }
 
-            if (this.data.DecoratorTypeFactory != null)
+            if (data.DecoratorTypeFactory != null)
             {
                 // Since a decorator type factory delegate has been registered, we must assume at this point
                 // that the decorator must be applied, because we can't call the factory at this point. The
@@ -153,7 +143,7 @@ namespace SimpleInjector.Decorators
         private Type? GetDecoratorTypeFromDecoratorFactory(
             Type requestedServiceType, DecoratorPredicateContext context)
         {
-            Type decoratorType = this.data.DecoratorTypeFactory!(context);
+            Type decoratorType = data.DecoratorTypeFactory!(context);
 
             if (decoratorType.ContainsGenericParameters())
             {
@@ -175,7 +165,7 @@ namespace SimpleInjector.Decorators
                 if (results.ClosedServiceTypeSatisfiesAllTypeConstraints)
                 {
                     Requires.HasFactoryCreatedDecorator(
-                        this.data.Container, requestedServiceType, results.ClosedGenericImplementation!);
+                        data.Container, requestedServiceType, results.ClosedGenericImplementation!);
 
                     return results.ClosedGenericImplementation;
                 }

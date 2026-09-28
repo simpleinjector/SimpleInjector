@@ -13,8 +13,7 @@ namespace SimpleInjector.Internals
 
         private static readonly Predicate<WeakReference> IsDead = reference => !reference.IsAlive;
 
-        private readonly Dictionary<int, List<WeakReference>> dictionary =
-            new Dictionary<int, List<WeakReference>>();
+        private readonly Dictionary<int, List<WeakReference>> dictionary = [];
 
         private int shrinkCount;
 
@@ -48,10 +47,7 @@ namespace SimpleInjector.Internals
             {
                 WeakReference? reference = this.GetWeakReferenceOrNull(item);
 
-                if (reference != null)
-                {
-                    reference.Target = null;
-                }
+                reference?.Target = null;
 
                 if ((++this.shrinkCount % ShrinkStepCount) == 0)
                 {
@@ -68,7 +64,7 @@ namespace SimpleInjector.Internals
                     from pair in this.dictionary
                     from reference in pair.Value
                     let target = reference.Target
-                    where !(target is null)
+                    where target is not null
                     select (T)target;
 
                 return producers.ToArray();

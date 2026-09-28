@@ -6,22 +6,15 @@ namespace SimpleInjector.Diagnostics.Debugger
     using System.Diagnostics;
 
     [DebuggerDisplay("{" + nameof(Description) + ", nq}", Name = "{" + nameof(Name) + ", nq}")]
-    internal class DebuggerViewItem
+    internal class DebuggerViewItem(string name, string description, object? value = null)
     {
-        internal DebuggerViewItem(string name, string description, object? value = null)
-        {
-            this.Name = name;
-            this.Description = description;
-            this.Value = value;
-        }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public string Description { get; } = description;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public string Description { get; }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public string Name { get; }
+        public string Name { get; } = name;
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        public object? Value { get; }
+        public object? Value { get; } = value;
     }
 }

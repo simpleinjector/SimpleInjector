@@ -57,7 +57,7 @@ namespace SimpleInjector.Internals
 
         private T InitializeAndReturn()
         {
-            // NOTE: Locking on 'this' is typically not adviced, but this type is internal, which means the
+            // NOTE: Locking on 'this' is typically not advised, but this type is internal, which means the
             // risk is minimal. Locking on 'this' allows us to safe some bytes for the extra lock object.
             // OPTIMIZATION: Because this is a very common code path, and very regularly part of a
             // user's stack trace, this code is inlined here to make the call stack shorter and more
@@ -66,12 +66,8 @@ namespace SimpleInjector.Internals
             {
                 if (this.value is null)
                 {
-                    this.value = this.factory!();
-
-                    if (this.value is null)
-                    {
-                        throw new InvalidOperationException("The valueFactory produced null.");
-                    }
+                    this.value = this.factory!()
+                        ?? throw new InvalidOperationException("The valueFactory produced null.");
 
                     // We don't need the factory any longer. It might now be eligible for garbage collection.
                     this.factory = null;

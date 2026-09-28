@@ -9,7 +9,7 @@ namespace SimpleInjector.Internals
 
     internal sealed class ReferenceEqualityComparer<T> : IEqualityComparer<T> where T : class
     {
-        internal static readonly ReferenceEqualityComparer<T> Instance = new ReferenceEqualityComparer<T>();
+        internal static readonly ReferenceEqualityComparer<T> Instance = new();
 
         [DebuggerStepThrough]
         public bool Equals(T x, T y) => object.ReferenceEquals(x, y);

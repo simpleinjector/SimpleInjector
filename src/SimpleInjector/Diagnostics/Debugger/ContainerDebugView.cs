@@ -31,13 +31,13 @@ namespace SimpleInjector.Diagnostics.Debugger
         {
             if (!this.container.SuccesfullyVerified)
             {
-                this.Items = new[]
-                {
+                this.Items =
+                [
                     new DebuggerViewItem(
                         name: "How To View Diagnostic Info",
                         description: "Analysis info is available in this debug view after Verify() is " +
                             "called on this container instance.")
-                };
+                ];
 
                 return;
             }
@@ -58,8 +58,8 @@ namespace SimpleInjector.Diagnostics.Debugger
 
             var rootRegistrations = this.container.GetRootRegistrations();
 
-            return new DebuggerViewItem[]
-            {
+            return
+            [
                 DebuggerGeneralWarningsContainerAnalyzer.Analyze(this.container),
                 new DebuggerViewItem(
                     name: "Registrations",
@@ -69,18 +69,18 @@ namespace SimpleInjector.Diagnostics.Debugger
                     name: "Root Registrations",
                     description: "Count = " + rootRegistrations.Length,
                     value: this.GroupProducers(rootRegistrations))
-            };
+            ];
         }
 
         private static DebuggerViewItem[] GetDebuggerTypeProxyFailureResults(Exception exception)
         {
-            return new[]
-            {
+            return
+            [
                 new DebuggerViewItem(
                     "Failure",
                     "We're so so sorry. The Debugger Type Proxy failed to initialize.",
                     exception)
-            };
+            ];
         }
 
         private object[] GroupProducers(IEnumerable<InstanceProducer> producers) =>
@@ -134,10 +134,9 @@ namespace SimpleInjector.Diagnostics.Debugger
         }
 
         private static DebuggerViewItem BuildNonGenericGroup(
-            Type closedType, InstanceProducer[] producersForGroup) =>
-            new DebuggerViewItem(
-                name: closedType.ToFriendlyName(),
-                description: "Count = " + producersForGroup.Length,
-                value: producersForGroup.ToArray());
+            Type closedType, InstanceProducer[] producersForGroup) => new(
+            name: closedType.ToFriendlyName(),
+            description: "Count = " + producersForGroup.Length,
+            value: producersForGroup.ToArray());
     }
 }

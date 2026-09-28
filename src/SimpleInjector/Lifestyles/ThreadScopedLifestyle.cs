@@ -48,7 +48,7 @@ namespace SimpleInjector.Lifestyles
     /// </example>
     public class ThreadScopedLifestyle : ScopedLifestyle
     {
-        private static readonly object ManagerKey = new object();
+        private static readonly object ManagerKey = new();
 
         /// <summary>Initializes a new instance of the <see cref="ThreadScopedLifestyle"/> class.
         /// The created and cached instance will be disposed when the created

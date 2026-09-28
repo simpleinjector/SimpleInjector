@@ -12,25 +12,17 @@ namespace SimpleInjector.Internals
     /// closed generic implementation of a given open generic implementation, based on on the concrete
     /// arguments of the given closed base type.
     /// </summary>
-    internal sealed class GenericArgumentFinder
+    internal sealed class GenericArgumentFinder(
+        Type serviceTypeDefinition,
+        Type serviceTypeToResolve,
+        Type implementationTypeDefinition,
+        Type? partialOpenGenericImplementation)
     {
-        private readonly IList<Type> serviceTypeDefinitionArguments;
-        private readonly Type[] serviceTypeToResolveArguments;
-        private readonly IList<Type> implementationTypeDefinitionArguments;
-        private readonly Type[] partialImplementationArguments;
-
-        public GenericArgumentFinder(
-            Type serviceTypeDefinition,
-            Type serviceTypeToResolve,
-            Type implementationTypeDefinition,
-            Type? partialOpenGenericImplementation)
-        {
-            this.serviceTypeDefinitionArguments = serviceTypeDefinition.GetGenericArguments();
-            this.serviceTypeToResolveArguments = serviceTypeToResolve.GetGenericArguments();
-            this.implementationTypeDefinitionArguments = implementationTypeDefinition.GetGenericArguments();
-            this.partialImplementationArguments =
+        private readonly IList<Type> serviceTypeDefinitionArguments = serviceTypeDefinition.GetGenericArguments();
+        private readonly Type[] serviceTypeToResolveArguments = serviceTypeToResolve.GetGenericArguments();
+        private readonly IList<Type> implementationTypeDefinitionArguments = implementationTypeDefinition.GetGenericArguments();
+        private readonly Type[] partialImplementationArguments =
                 (partialOpenGenericImplementation ?? implementationTypeDefinition).GetGenericArguments();
-        }
 
         internal Type[] GetConcreteTypeArgumentsForClosedImplementation() => (
             // The arguments must be in the same order as those of the open implementation.
@@ -136,7 +128,7 @@ namespace SimpleInjector.Internals
         private ArgumentMapping[] GetTypeConstraintArgumentMappingsRecursive(
             ArgumentMapping mapping, IList<Type> processedTypes)
         {
-            IEnumerable<Type> constraints = Enumerable.Empty<Type>();
+            IEnumerable<Type> constraints = [];
 
             if (mapping.Argument.IsGenericParameter)
             {
@@ -170,7 +162,7 @@ namespace SimpleInjector.Internals
             // things any further.
             if (mapping.ConcreteType.IsGenericParameter)
             {
-                return new ArgumentMapping[] { mapping };
+                return [mapping];
             }
 
             var argumentTypeDefinition = mapping.Argument.IsArray

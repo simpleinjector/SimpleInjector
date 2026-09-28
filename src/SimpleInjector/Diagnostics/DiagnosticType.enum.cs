@@ -85,16 +85,10 @@ namespace SimpleInjector.Diagnostics
     }
 
     [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
-    internal sealed class DocumentationAttribute : Attribute
+    internal sealed class DocumentationAttribute(string name, string documentationUrl) : Attribute
     {
-        public readonly string Name;
-        public readonly Uri DocumentationUrl;
-
-        public DocumentationAttribute(string name, string documentationUrl)
-        {
-            this.Name = name;
-            this.DocumentationUrl = new Uri(documentationUrl);
-        }
+        public readonly string Name = name;
+        public readonly Uri DocumentationUrl = new(documentationUrl);
 
         internal static DocumentationAttribute GetDocumentationAttribute(DiagnosticType value)
         {

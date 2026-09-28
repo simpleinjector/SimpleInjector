@@ -46,11 +46,10 @@ namespace SimpleInjector.Diagnostics.Analyzers
         }
 
         private static ContainerRegisteredServiceDiagnosticResult BuildDiagnosticResult(
-            InstanceProducer registration, KnownRelationship[] relationships) =>
-            new ContainerRegisteredServiceDiagnosticResult(
-                serviceType: registration.ServiceType,
-                description: BuildDescription(registration, relationships),
-                relationships: relationships);
+            InstanceProducer registration, KnownRelationship[] relationships) => new(
+            serviceType: registration.ServiceType,
+            description: BuildDescription(registration, relationships),
+            relationships: relationships);
 
         private static string BuildDescription(
             InstanceProducer registration, KnownRelationship[] relationships)

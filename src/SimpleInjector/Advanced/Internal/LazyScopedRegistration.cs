@@ -11,23 +11,15 @@ namespace SimpleInjector.Advanced.Internal
     /// version of the framework will break your code.
     /// </summary>
     /// <typeparam name="TImplementation">Implementation type.</typeparam>
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="LazyScopedRegistration{TImplementation}"/>
+    /// struct.</remarks>
+    /// <param name="registration">The registration.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct LazyScopedRegistration<TImplementation>
+    public struct LazyScopedRegistration<TImplementation>(Registration registration)
         where TImplementation : class
     {
-        private readonly Registration registration;
-
-        private TImplementation? instance;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LazyScopedRegistration{TImplementation}"/>
-        /// struct.</summary>
-        /// <param name="registration">The registration.</param>
-        public LazyScopedRegistration(Registration registration)
-        {
-            this.registration = registration;
-            this.instance = null;
-        }
+        private TImplementation? instance = null;
 
         /// <summary>
         /// Gets the lazily initialized instance for the of the current LazyScopedRegistration.
@@ -46,7 +38,7 @@ namespace SimpleInjector.Advanced.Internal
             if (this.instance is null)
             {
                 this.instance =
-                    Scope.GetInstance<TImplementation>((ScopedRegistration)this.registration, scope);
+                    Scope.GetInstance<TImplementation>((ScopedRegistration)registration, scope);
             }
 
             return this.instance;

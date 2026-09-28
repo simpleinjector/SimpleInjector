@@ -7,18 +7,10 @@ namespace SimpleInjector.Internals
 
     // Searches an expression for a specific sub expression and replaces that sub expression with a
     // different supplied expression.
-    internal sealed class SubExpressionReplacer : ExpressionVisitor
+    internal sealed class SubExpressionReplacer(
+        ConstantExpression subExpressionToFind, Expression replacementExpression)
+        : ExpressionVisitor
     {
-        private readonly ConstantExpression subExpressionToFind;
-        private readonly Expression replacementExpression;
-
-        private SubExpressionReplacer(ConstantExpression subExpressionToFind,
-            Expression replacementExpression)
-        {
-            this.subExpressionToFind = subExpressionToFind;
-            this.replacementExpression = replacementExpression;
-        }
-
         internal static Expression Replace(
             Expression expressionToAlter, ConstantExpression nodeToFind, Expression replacementNode)
         {
@@ -26,6 +18,6 @@ namespace SimpleInjector.Internals
         }
 
         protected override Expression VisitConstant(ConstantExpression node) =>
-            node == this.subExpressionToFind ? this.replacementExpression : base.VisitConstant(node);
+            node == subExpressionToFind ? replacementExpression : base.VisitConstant(node);
     }
 }

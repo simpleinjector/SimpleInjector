@@ -8,7 +8,7 @@ namespace SimpleInjector.Lifestyles
     // Lifestyle explicitly to allow resolve and inject a SimpleInjector.Scope itself.
     internal sealed class ScopedScopeLifestyle : ScopedLifestyle
     {
-        internal static readonly ScopedScopeLifestyle Instance = new ScopedScopeLifestyle();
+        internal static readonly ScopedScopeLifestyle Instance = new();
 
         internal ScopedScopeLifestyle() : base("Scoped")
         {

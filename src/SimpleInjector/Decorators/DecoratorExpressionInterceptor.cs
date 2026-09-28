@@ -15,31 +15,22 @@ namespace SimpleInjector.Decorators
     /// <summary>
     /// Hooks into the building process and adds a decorator if needed.
     /// </summary>
-    internal abstract class DecoratorExpressionInterceptor
+    internal abstract class DecoratorExpressionInterceptor(DecoratorExpressionInterceptorData data)
     {
         private static readonly MethodInfo ResolveWithinThreadResolveScopeMethod =
             typeof(DecoratorExpressionInterceptor).GetMethod(nameof(ResolveWithinThreadResolveScope));
 
-        private readonly DecoratorExpressionInterceptorData data;
-
-        protected DecoratorExpressionInterceptor(DecoratorExpressionInterceptorData data)
-        {
-            this.data = data;
-
-            this.Lifestyle = data.Lifestyle;
-        }
-
         // Must be set after construction.
         internal DecoratorPredicateContext? Context { get; set; }
 
-        protected Container Container => this.data.Container;
+        protected Container Container => data.Container;
 
-        protected Lifestyle Lifestyle { get; set; }
+        protected Lifestyle Lifestyle { get; set; } = data.Lifestyle;
 
         // The decorator type definition (possibly open generic).
-        protected Type? DecoratorTypeDefinition => this.data.DecoratorType;
+        protected Type? DecoratorTypeDefinition => data.DecoratorType;
 
-        protected Predicate<DecoratorPredicateContext>? Predicate => this.data.Predicate;
+        protected Predicate<DecoratorPredicateContext>? Predicate => data.Predicate;
 
         // NOTE: This method must be public for it to be callable through reflection when running in a sandbox.
         public static TService ResolveWithinThreadResolveScope<TService>(

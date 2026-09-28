@@ -8,7 +8,7 @@ namespace SimpleInjector.Lifestyles
 
     internal enum Disposability : byte { Always, Never, Maybe };
 
-    internal struct DisposabilityTypeInfo
+    internal readonly struct DisposabilityTypeInfo
     {
         public readonly Disposability Sync;
         public readonly Disposability Async;

@@ -273,19 +273,14 @@ namespace SimpleInjector.Internals
         }
 
         /// <summary>Result of the GenericTypeBuilder.</summary>
-        internal sealed class BuildResult
+        internal sealed class BuildResult(Type? closedGenericImplementation)
         {
-            internal static readonly BuildResult Invalid = new BuildResult(null);
-
-            private BuildResult(Type? closedGenericImplementation)
-            {
-                this.ClosedGenericImplementation = closedGenericImplementation;
-            }
+            internal static readonly BuildResult Invalid = new(null);
 
             internal bool ClosedServiceTypeSatisfiesAllTypeConstraints =>
                 this.ClosedGenericImplementation != null;
 
-            internal Type? ClosedGenericImplementation { get; }
+            internal Type? ClosedGenericImplementation { get; } = closedGenericImplementation;
 
             internal static BuildResult Valid(Type closedGenericImplementation)
             {
@@ -296,16 +291,10 @@ namespace SimpleInjector.Internals
         /// <summary>
         /// A open generic type with the concrete arguments that can be used to create a closed generic type.
         /// </summary>
-        private sealed class CandicateServiceType
+        private sealed class CandicateServiceType(Type serviceType, Type[] arguments)
         {
-            internal readonly Type ServiceType;
-            internal readonly Type[] Arguments;
-
-            public CandicateServiceType(Type serviceType, Type[] arguments)
-            {
-                this.ServiceType = serviceType;
-                this.Arguments = arguments;
-            }
+            internal readonly Type ServiceType = serviceType;
+            internal readonly Type[] Arguments = arguments;
 
 #if DEBUG
             // This is for our own debugging purposes. We don't use the DebuggerDisplayAttribute, because

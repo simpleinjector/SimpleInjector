@@ -13,8 +13,7 @@ namespace SimpleInjector.ProducerBuilders
     /// </summary>
     internal sealed class UnregisteredTypeResolutionInstanceProducerBuilder : IInstanceProducerBuilder
     {
-        private readonly Dictionary<Type, LazyEx<InstanceProducer>> resolveUnregisteredTypeRegistrations =
-            new Dictionary<Type, LazyEx<InstanceProducer>>();
+        private readonly Dictionary<Type, LazyEx<InstanceProducer>> resolveUnregisteredTypeRegistrations = [];
 
         private readonly Container container;
         private readonly Func<bool> shouldResolveUnregisteredTypes;

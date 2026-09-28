@@ -10,50 +10,39 @@ namespace SimpleInjector.Lifestyles
     using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
 
-    internal sealed class HybridRegistration : Registration
+    internal sealed class HybridRegistration(
+        Type implementationType,
+        Func<bool> test,
+        Registration trueRegistration,
+        Registration falseRegistration,
+        Lifestyle lifestyle,
+        Container container)
+        : Registration(lifestyle, container, implementationType)
     {
-        private readonly Func<bool> test;
-        private readonly Registration trueRegistration;
-        private readonly Registration falseRegistration;
-
-        public HybridRegistration(
-            Type implementationType,
-            Func<bool> test,
-            Registration trueRegistration,
-            Registration falseRegistration,
-            Lifestyle lifestyle,
-            Container container)
-            : base(lifestyle, container, implementationType)
-        {
-            this.test = test;
-            this.trueRegistration = trueRegistration;
-            this.falseRegistration = falseRegistration;
-        }
-
         public override Expression BuildExpression()
         {
-            Expression trueExpression = this.trueRegistration.BuildExpression();
-            Expression falseExpression = this.falseRegistration.BuildExpression();
+            Expression trueExpression = trueRegistration.BuildExpression();
+            Expression falseExpression = falseRegistration.BuildExpression();
 
             // Must be called after BuildExpression has been called.
             this.AddRelationships();
 
             return Expression.Condition(
-                test: Expression.Invoke(Expression.Constant(this.test)),
+                test: Expression.Invoke(Expression.Constant(test)),
                 ifTrue: Expression.Convert(trueExpression, this.ImplementationType),
                 ifFalse: Expression.Convert(falseExpression, this.ImplementationType));
         }
 
         internal override void SetParameterOverrides(IEnumerable<OverriddenParameter> overrides)
         {
-            this.trueRegistration.SetParameterOverrides(overrides);
-            this.falseRegistration.SetParameterOverrides(overrides);
+            trueRegistration.SetParameterOverrides(overrides);
+            falseRegistration.SetParameterOverrides(overrides);
         }
 
         private void AddRelationships()
         {
-            var trueRelationships = this.GetRelationshipsThisLifestyle(this.trueRegistration);
-            var falseRelationships = this.GetRelationshipsThisLifestyle(this.falseRegistration);
+            var trueRelationships = this.GetRelationshipsThisLifestyle(trueRegistration);
+            var falseRelationships = this.GetRelationshipsThisLifestyle(falseRegistration);
 
             foreach (var relationship in trueRelationships.Union(falseRelationships))
             {

@@ -129,12 +129,8 @@ namespace SimpleInjector.Advanced
 
         private static void VerifyProperty(PropertyInfo property)
         {
-            MethodInfo? setMethod = property.GetSetMethod(nonPublic: true);
-
-            if (setMethod is null)
-            {
-                throw new ActivationException(StringResources.PropertyHasNoSetter(property));
-            }
+            MethodInfo? setMethod = property.GetSetMethod(nonPublic: true)
+                ?? throw new ActivationException(StringResources.PropertyHasNoSetter(property));
 
             if (setMethod.IsStatic)
             {

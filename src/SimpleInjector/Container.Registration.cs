@@ -103,9 +103,9 @@ namespace SimpleInjector
         /// being called again for the exact same service type, preventing any performance penalties.
         /// </para>
         /// <para>
-        /// Please note that given example is just an uhhmm... example. In the case of the example the
+        /// Please note that given example is just for demonstration purposes. In the case of the example the
         /// <b>EmptyValidator&lt;T&gt;</b> can be better registered using of the built-in
-        /// <see cref="Register(System.Type, System.Type, Lifestyle)">Register</see> methods instead. These methods take
+        /// <see cref="Register(Type, Type, Lifestyle)">Register</see> methods instead. These methods take
         /// care of any given generic type constraint and allow the implementation to be integrated into the
         /// container's pipeline, which allows it to be intercepted using the <see cref="ExpressionBuilding"/>
         /// event and allow any registered <see cref="RegisterInitializer{TService}">initializers</see> to be
@@ -230,7 +230,7 @@ namespace SimpleInjector
         /// as an dependency.
         /// </para>
         /// <para>
-        /// Please note that given example is just an uhhmm... example. In the case of the example the
+        /// Please note that given example is just for demonstration purposes. In the case of the example the
         /// <b>MonitoringValidator&lt;T&gt;</b> is a decorator and instead of manually writing this code that
         /// many limitations, you can use one of the built-in
         /// <see cref="Container.RegisterDecorator(Type, Type, Lifestyle)">RegisterDecorator</see> methods instead.

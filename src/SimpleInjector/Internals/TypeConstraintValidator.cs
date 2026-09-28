@@ -10,11 +10,9 @@ namespace SimpleInjector.Internals
     /// <summary>
     /// Allows validating an ArgumentMapping.
     /// </summary>
-    internal sealed class TypeConstraintValidator
+    internal sealed class TypeConstraintValidator(ArgumentMapping mapping)
     {
-        public TypeConstraintValidator(ArgumentMapping mapping) => this.Mapping = mapping;
-
-        internal ArgumentMapping Mapping { get; }
+        internal ArgumentMapping Mapping { get; } = mapping;
 
         internal bool AreTypeConstraintsSatisfied() =>
             this.ParameterSatisfiesNotNullableValueTypeConstraint()

@@ -6,18 +6,10 @@ namespace SimpleInjector.Internals
     using System;
     using System.Collections.Generic;
 
-    internal sealed class FlowingContainerControlledCollection<TService>
-        : ContainerControlledCollection<TService>
+    internal sealed class FlowingContainerControlledCollection<TService>(
+        Scope scope, ContainerControlledCollection<TService> definition)
+        : ContainerControlledCollection<TService>(scope.Container, definition)
     {
-        private readonly Scope scope;
-
-        public FlowingContainerControlledCollection(
-            Scope scope, ContainerControlledCollection<TService> definition)
-            : base(scope.Container, definition)
-        {
-            this.scope = scope;
-        }
-
         public override TService this[int index]
         {
             get
@@ -65,27 +57,18 @@ namespace SimpleInjector.Internals
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private  IDisposable? ApplyScoping()
         {
-            Container container = this.scope.Container;
+            Container container = scope.Container;
 
             Scope? originalScope = container.CurrentThreadResolveScope;
-            container.CurrentThreadResolveScope = this.scope;
+            container.CurrentThreadResolveScope = scope;
 
             // TODO: If needed, this can be further optimized to prevent GC pressure.
             return new Scoper(originalScope, container);
         }
 
-        private sealed class Scoper : IDisposable
+        private sealed class Scoper(Scope? originalScope, Container container) : IDisposable
         {
-            private readonly Container container;
-            private readonly Scope? originalScope;
-
-            public Scoper(Scope? originalScope, Container container)
-            {
-                this.originalScope = originalScope;
-                this.container = container;
-            }
-
-            public void Dispose() => this.container.CurrentThreadResolveScope = this.originalScope;
+            public void Dispose() => container.CurrentThreadResolveScope = originalScope;
         }
     }
 }

@@ -9,7 +9,6 @@ namespace SimpleInjector.Internals
     using System.Linq;
     using System.Linq.Expressions;
     using SimpleInjector.Advanced;
-    using SimpleInjector.Diagnostics;
     using SimpleInjector.Lifestyles;
 
     // This class allows an ContainerControlledCollection<T> to notify about the creation of its wrapped items.
@@ -28,8 +27,7 @@ namespace SimpleInjector.Internals
         {
             lock (ServiceCreatedListenersLocker)
             {
-                var listeners = serviceCreatedListeners ??
-                    (serviceCreatedListeners = new List<Action<ServiceCreatedListenerArgs>>());
+                var listeners = serviceCreatedListeners ??= [];
 
                 listeners.Add(serviceCreated);
 
@@ -86,7 +84,7 @@ namespace SimpleInjector.Internals
         {
             var collection = Activator.CreateInstance(
                 typeof(ContainerControlledCollection<>).MakeGenericType(serviceType),
-                new object[] { container });
+                [container]);
 
             return (IContainerControlledCollection)collection;
         }

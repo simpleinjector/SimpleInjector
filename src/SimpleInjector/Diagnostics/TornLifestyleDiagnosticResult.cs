@@ -52,8 +52,8 @@ namespace SimpleInjector.Diagnostics
         private static DebuggerViewItem[] CreateDebugValue(
             Type implementationType, Lifestyle lifestyle, InstanceProducer[] affectedRegistrations)
         {
-            return new[]
-            {
+            return
+            [
                 new DebuggerViewItem(
                     name: "ImplementationType",
                     description: implementationType.ToFriendlyName(),
@@ -66,7 +66,7 @@ namespace SimpleInjector.Diagnostics
                     name: "Affected Registrations",
                     description: ToCommaSeparatedText(affectedRegistrations),
                     value: affectedRegistrations)
-            };
+            ];
         }
 
         private static string ToCommaSeparatedText(IEnumerable<InstanceProducer> producers) =>

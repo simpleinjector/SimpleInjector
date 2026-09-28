@@ -38,18 +38,9 @@ namespace SimpleInjector.Decorators
         private Func<DecoratorPredicateContext, Type> WrapInNullProtector(
             Func<DecoratorPredicateContext, Type> decoratorTypeFactory)
         {
-            return context =>
-            {
-                Type type = decoratorTypeFactory(context);
-
-                if (type is null)
-                {
-                    throw new InvalidOperationException(
-                        StringResources.DecoratorFactoryReturnedNull(this.ServiceType));
-                }
-
-                return type;
-            };
+            return context => decoratorTypeFactory(context)
+                ?? throw new InvalidOperationException(
+                    StringResources.DecoratorFactoryReturnedNull(this.ServiceType));
         }
     }
 }

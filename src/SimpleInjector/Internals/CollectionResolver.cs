@@ -11,10 +11,9 @@ namespace SimpleInjector.Internals
 
     internal abstract class CollectionResolver
     {
-        private readonly List<RegistrationGroup> registrationGroups = new List<RegistrationGroup>();
+        private readonly List<RegistrationGroup> registrationGroups = [];
 
-        private readonly Dictionary<Type, InstanceProducer> producerCache =
-            new Dictionary<Type, InstanceProducer>();
+        private readonly Dictionary<Type, InstanceProducer> producerCache = [];
 
         private bool verified;
 
@@ -162,14 +161,14 @@ namespace SimpleInjector.Internals
 
             internal static RegistrationGroup CreateForUncontrolledProducer(
                 Type serviceType, InstanceProducer producer) =>
-                new RegistrationGroup(serviceType, appended: false)
+                new(serviceType, appended: false)
                 {
                     UncontrolledProducer = producer
                 };
 
             internal static RegistrationGroup CreateForControlledItems(
                 Type serviceType, ContainerControlledItem[] items, bool appended) =>
-                new RegistrationGroup(serviceType, appended)
+                new(serviceType, appended)
                 {
                     ControlledItems = items,
                 };

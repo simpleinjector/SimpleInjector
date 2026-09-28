@@ -37,7 +37,7 @@ namespace SimpleInjector.Decorators
             var readOnlyCollection =
                 DecoratorHelpersReadOnlyCollectionMethod
                     .MakeGenericMethod(elementType)
-                    .Invoke(null, new object[] { collection });
+                    .Invoke(null, [collection]);
 
             return (IEnumerable)readOnlyCollection;
         }
@@ -66,7 +66,7 @@ namespace SimpleInjector.Decorators
         {
             var selectMethod = EnumerableSelectMethod.MakeGenericMethod(type, type);
 
-            return (IEnumerable)selectMethod.Invoke(null, new object[] { source, selector });
+            return (IEnumerable)selectMethod.Invoke(null, [source, selector]);
         }
 
         internal static MethodCallExpression Select(

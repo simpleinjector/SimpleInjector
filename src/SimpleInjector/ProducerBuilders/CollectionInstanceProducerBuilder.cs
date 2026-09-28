@@ -107,7 +107,7 @@ namespace SimpleInjector.ProducerBuilders
             {
                 // builds: new List<T>(collection)
                 var listConstructor = typeof(List<>).MakeGenericType(elementType)
-                    .GetConstructor(new[] { typeof(IEnumerable<>).MakeGenericType(elementType) });
+                    .GetConstructor([typeof(IEnumerable<>).MakeGenericType(elementType)]);
 
                 return Expression.New(listConstructor, streamExpression);
             }

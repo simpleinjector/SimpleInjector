@@ -54,8 +54,8 @@ namespace SimpleInjector.Diagnostics
             KnownRelationship actualDependency,
             InstanceProducer[] possibleSkippedRegistrations)
         {
-            return new[]
-            {
+            return
+            [
                 new DebuggerViewItem(
                     name: "Registration",
                     description: registration.ServiceType.ToFriendlyName(),
@@ -70,7 +70,7 @@ namespace SimpleInjector.Diagnostics
                     value: possibleSkippedRegistrations.Length == 1 ?
                         (object)possibleSkippedRegistrations[0] :
                         possibleSkippedRegistrations),
-            };
+            ];
         }
     }
 }

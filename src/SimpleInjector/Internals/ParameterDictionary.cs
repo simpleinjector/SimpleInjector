@@ -18,14 +18,13 @@ namespace SimpleInjector.Internals
             }
         }
 
-        public ParameterDictionary()
-            : base(ParameterInfoComparer.Instance)
+        public ParameterDictionary() : base(ParameterInfoComparer.Instance)
         {
         }
 
         private sealed class ParameterInfoComparer : IEqualityComparer<ParameterInfo>
         {
-            public static readonly ParameterInfoComparer Instance = new ParameterInfoComparer();
+            public static readonly ParameterInfoComparer Instance = new();
 
             // We compare ParameterInfo by its Name, Type and its member, since there is no guarantee that
             // there will be only one ParameterInfo instance per 'physical' parameter in the CLR.

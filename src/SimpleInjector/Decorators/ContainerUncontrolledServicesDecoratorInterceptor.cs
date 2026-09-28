@@ -17,46 +17,35 @@ namespace SimpleInjector.Decorators
     // -Collections.Register<TService>(IEnumerable<TService> uncontrolledCollection)
     // -Register<TService>(TService) (where TService is a IEnumerable<T>)
     // -Collections.Register(Type serviceType, IEnumerable uncontrolledCollection).
-    internal sealed class ContainerUncontrolledServicesDecoratorInterceptor : DecoratorExpressionInterceptor
+    internal sealed class ContainerUncontrolledServicesDecoratorInterceptor(
+        DecoratorExpressionInterceptorData data,
+        Dictionary<InstanceProducer, IEnumerable> singletonDecoratedCollectionsCache,
+        ExpressionBuiltEventArgs e,
+        Type registeredServiceType)
+        : DecoratorExpressionInterceptor(data)
     {
-        private readonly Dictionary<InstanceProducer, IEnumerable> singletonDecoratedCollectionsCache;
-        private readonly ExpressionBuiltEventArgs e;
-        private readonly Type registeredServiceType;
-
         private ConstructorInfo? decoratorConstructor;
         private Type? decoratorType;
-
-        public ContainerUncontrolledServicesDecoratorInterceptor(
-            DecoratorExpressionInterceptorData data,
-            Dictionary<InstanceProducer, IEnumerable> singletonDecoratedCollectionsCache,
-            ExpressionBuiltEventArgs e,
-            Type registeredServiceType)
-            : base(data)
-        {
-            this.singletonDecoratedCollectionsCache = singletonDecoratedCollectionsCache;
-            this.e = e;
-            this.registeredServiceType = registeredServiceType;
-        }
 
         internal bool SatisfiesPredicate()
         {
             // We don't have an expression at this point, since the instances are not created by the container.
             // Therefore we fake an expression so it can still be passed on to the predicate the user might
             // have defined.
-            var expression = Expression.Constant(null, this.registeredServiceType);
+            var expression = Expression.Constant(null, registeredServiceType);
 
             var registration = new ExpressionRegistration(
-                expression, this.registeredServiceType, Lifestyle.Unknown, this.Container);
+                expression, registeredServiceType, Lifestyle.Unknown, this.Container);
 
-            registration.ReplaceRelationships(this.e.InstanceProducer.GetRelationships());
+            registration.ReplaceRelationships(e.InstanceProducer.GetRelationships());
 
             var info = this.GetServiceTypeInfo(
-                this.e,
+                e,
                 originalExpression: expression,
                 originalRegistration: registration,
-                registeredServiceType: this.registeredServiceType);
+                registeredServiceType: registeredServiceType);
 
-            this.Context = this.CreatePredicateContext(this.registeredServiceType, expression, info);
+            this.Context = this.CreatePredicateContext(registeredServiceType, expression, info);
 
             return this.SatisfiesPredicate(this.Context);
         }
@@ -77,29 +66,29 @@ namespace SimpleInjector.Decorators
         internal void ApplyDecorator()
         {
             var registration = new ExpressionRegistration(
-                this.e.Expression, this.registeredServiceType, Lifestyle.Unknown, this.Container);
+                e.Expression, registeredServiceType, Lifestyle.Unknown, this.Container);
 
-            registration.ReplaceRelationships(this.e.InstanceProducer.GetRelationships());
+            registration.ReplaceRelationships(e.InstanceProducer.GetRelationships());
 
             var serviceTypeInfo = this.GetServiceTypeInfo(
-                this.e,
+                e,
                 originalRegistration: registration,
-                registeredServiceType: this.registeredServiceType);
+                registeredServiceType: registeredServiceType);
 
             var decoratedExpression = this.BuildDecoratorExpression(out Registration decoratorRegistration);
 
-            this.e.Expression = decoratedExpression;
+            e.Expression = decoratedExpression;
 
             // Add the decorator to the list of applied decorator. This way users can use this
             // information in the predicate of the next decorator they add.
             serviceTypeInfo.AddAppliedDecorator(
-                this.registeredServiceType,
+                registeredServiceType,
                 this.decoratorType!,
                 this.Container,
                 this.Lifestyle,
                 decoratedExpression);
 
-            this.e.KnownRelationships.AddRange(decoratorRegistration.GetRelationships());
+            e.KnownRelationships.AddRange(decoratorRegistration.GetRelationships());
         }
 
         private Expression BuildDecoratorExpression(out Registration decoratorRegistration)
@@ -109,7 +98,7 @@ namespace SimpleInjector.Decorators
             this.ThrowWhenDecoratorNeedsAFunc(decoratorTypeDefinition);
             this.ThrownWhenLifestyleIsNotSupported(decoratorTypeDefinition);
 
-            ParameterExpression parameter = Expression.Parameter(this.registeredServiceType, "decoratee");
+            ParameterExpression parameter = Expression.Parameter(registeredServiceType, "decoratee");
 
             decoratorRegistration = this.CreateRegistrationForUncontrolledCollection(parameter);
 
@@ -120,7 +109,7 @@ namespace SimpleInjector.Decorators
                 this.BuildDecoratorWrapper(parameter, parameterizedDecoratorExpression)
                 .Compile();
 
-            Expression originalEnumerableExpression = this.e.Expression;
+            Expression originalEnumerableExpression = e.Expression;
 
             if (originalEnumerableExpression is ConstantExpression constant)
             {
@@ -148,13 +137,13 @@ namespace SimpleInjector.Decorators
         private OverriddenParameter[] CreateOverriddenParameters(Expression decorateeExpression)
         {
             ParameterInfo decorateeParameter =
-                GetDecorateeParameter(this.registeredServiceType, this.decoratorConstructor!);
+                GetDecorateeParameter(registeredServiceType, this.decoratorConstructor!);
 
             decorateeExpression =
                 this.GetExpressionForDecorateeDependencyParameterOrNull(
-                    decorateeParameter, this.registeredServiceType, decorateeExpression)!;
+                    decorateeParameter, registeredServiceType, decorateeExpression)!;
 
-            var currentProducer = this.GetServiceTypeInfo(this.e).GetCurrentInstanceProducer();
+            var currentProducer = this.GetServiceTypeInfo(e).GetCurrentInstanceProducer();
 
             var decorateeOverriddenParameter =
                 new OverriddenParameter(decorateeParameter, decorateeExpression, currentProducer);
@@ -181,7 +170,7 @@ namespace SimpleInjector.Decorators
             ParameterExpression parameter, Expression decoratorExpression)
         {
             Type funcType =
-                typeof(Func<,>).MakeGenericType(this.registeredServiceType, this.registeredServiceType);
+                typeof(Func<,>).MakeGenericType(registeredServiceType, registeredServiceType);
 
             return Expression.Lambda(funcType, decoratorExpression, parameter);
         }
@@ -191,17 +180,17 @@ namespace SimpleInjector.Decorators
         {
             // Build the query: from item in collection select wrapInstanceWithDecorator(item);
             IEnumerable decoratedCollection =
-                collection.Select(this.registeredServiceType, wrapInstanceWithDecoratorDelegate);
+                collection.Select(registeredServiceType, wrapInstanceWithDecoratorDelegate);
 
             // Passing the enumerable type is needed when running in the Silverlight sandbox.
-            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(this.registeredServiceType);
+            Type enumerableServiceType = typeof(IEnumerable<>).MakeGenericType(registeredServiceType);
 
             if (this.Lifestyle == Lifestyle.Singleton)
             {
                 IEnumerable CreateCollection()
                 {
-                    Array array = ToArray(this.registeredServiceType, decoratedCollection);
-                    return DecoratorUtilities.MakeReadOnly(this.registeredServiceType, array);
+                    Array array = ToArray(registeredServiceType, decoratedCollection);
+                    return DecoratorUtilities.MakeReadOnly(registeredServiceType, array);
                 }
 
                 IEnumerable singleton = this.GetSingletonDecoratedCollection(CreateCollection);
@@ -217,20 +206,20 @@ namespace SimpleInjector.Decorators
         {
             // Build the query: from item in expression select wrapInstanceWithDecorator(item);
             var callExpression =
-                DecoratorUtilities.Select(expression, this.registeredServiceType, wrapInstanceWithDecorator);
+                DecoratorUtilities.Select(expression, registeredServiceType, wrapInstanceWithDecorator);
 
             if (this.Lifestyle == Lifestyle.Singleton)
             {
                 Type enumerableServiceType =
-                    typeof(IEnumerable<>).MakeGenericType(this.registeredServiceType);
+                    typeof(IEnumerable<>).MakeGenericType(registeredServiceType);
 
                 IEnumerable CreateCollection()
                 {
                     Type funcType = typeof(Func<>).MakeGenericType(enumerableServiceType);
                     Delegate lambda = Expression.Lambda(funcType, callExpression).Compile();
                     var decoratedCollection = (IEnumerable)lambda.DynamicInvoke();
-                    Array array = ToArray(this.registeredServiceType, decoratedCollection);
-                    return DecoratorUtilities.MakeReadOnly(this.registeredServiceType, array);
+                    Array array = ToArray(registeredServiceType, decoratedCollection);
+                    return DecoratorUtilities.MakeReadOnly(registeredServiceType, array);
                 }
 
                 IEnumerable singleton = this.GetSingletonDecoratedCollection(CreateCollection);
@@ -250,7 +239,7 @@ namespace SimpleInjector.Decorators
             {
                 // decoratorType is never null at this point
                 string message = StringResources.CantGenerateFuncForDecorator(
-                    this.registeredServiceType,
+                    registeredServiceType,
                     decorateeFactoryType,
                     decoratorTypeDefinition ?? this.decoratorType!);
 
@@ -261,9 +250,9 @@ namespace SimpleInjector.Decorators
         private Type GetDecorateeFactoryTypeOrNull() => (
             from parameter in this.decoratorConstructor!.GetParameters()
             where DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(
-                parameter.ParameterType, this.registeredServiceType)
+                parameter.ParameterType, registeredServiceType)
                 || DecoratorHelpers.IsScopeDecorateeFactoryDependencyParameter(
-                    parameter.ParameterType, this.registeredServiceType)
+                    parameter.ParameterType, registeredServiceType)
             select parameter.ParameterType)
             .FirstOrDefault();
 
@@ -281,20 +270,20 @@ namespace SimpleInjector.Decorators
                     StringResources.CanNotDecorateContainerUncontrolledCollectionWithThisLifestyle(
                         decoratorTypeDefinition ?? this.decoratorType!,
                         this.Lifestyle,
-                        this.registeredServiceType));
+                        registeredServiceType));
             }
         }
 
         private IEnumerable GetSingletonDecoratedCollection(Func<IEnumerable> collectionCreator)
         {
-            lock (this.singletonDecoratedCollectionsCache)
+            lock (singletonDecoratedCollectionsCache)
             {
-                if (!this.singletonDecoratedCollectionsCache.TryGetValue(
-                    this.e.InstanceProducer, out IEnumerable collection))
+                if (!singletonDecoratedCollectionsCache.TryGetValue(
+                    e.InstanceProducer, out IEnumerable collection))
                 {
                     collection = collectionCreator();
 
-                    this.singletonDecoratedCollectionsCache[this.e.InstanceProducer] = collection;
+                    singletonDecoratedCollectionsCache[e.InstanceProducer] = collection;
                 }
 
                 return collection;

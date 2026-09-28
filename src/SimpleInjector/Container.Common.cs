@@ -40,18 +40,18 @@ namespace SimpleInjector
     {
         private static long Counter;
 
-        internal readonly Dictionary<object, Dictionary<Type, WeakReference>> LifestyleRegistrationCache = new();
+        internal readonly Dictionary<object, Dictionary<Type, WeakReference>> LifestyleRegistrationCache = [];
         internal readonly long ContainerId;
 
         private readonly object locker = new();
-        private readonly List<IInstanceInitializer> instanceInitializers = new();
-        private readonly List<ContextualResolveInterceptor> resolveInterceptors = new();
+        private readonly List<IInstanceInitializer> instanceInitializers = [];
+        private readonly List<ContextualResolveInterceptor> resolveInterceptors = [];
 
         // Collection of (both conditional and unconditional) instance producers that are explicitly
         // registered by the user and implicitly registered through unregistered type resolution.
         private readonly Dictionary<Type, IRegistrationEntry> explicitRegistrations = new(64);
 
-        private readonly Dictionary<Type, CollectionResolver> collectionResolvers = new();
+        private readonly Dictionary<Type, CollectionResolver> collectionResolvers = [];
 
         // This list contains all instance producers that not yet have been explicitly registered in the container.
         private readonly ConditionalHashSet<InstanceProducer> externalProducers = new();
@@ -697,7 +697,7 @@ namespace SimpleInjector
         {
             if (!missingType.IsGenericType())
             {
-                return Enumerable.Empty<Type>();
+                return [];
             }
 
             Type missingTypeDef = missingType.GetGenericTypeDefinition();

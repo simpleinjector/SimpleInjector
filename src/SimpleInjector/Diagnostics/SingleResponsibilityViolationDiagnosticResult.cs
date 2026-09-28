@@ -43,11 +43,11 @@ namespace SimpleInjector.Diagnostics
 
         private static DebuggerViewItem[] GetDebugValue(Type implementationType, InstanceProducer[] dependencies)
         {
-            return new[]
-            {
+            return
+            [
                 new DebuggerViewItem("ImplementationType", implementationType.ToFriendlyName(), implementationType),
                 new DebuggerViewItem("Dependencies", dependencies.Length + " dependencies.", dependencies),
-            };
+            ];
         }
     }
 }

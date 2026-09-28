@@ -7,17 +7,9 @@ namespace SimpleInjector.Internals
     using System.Collections.Generic;
     using System.Linq;
 
-    internal sealed class NonGenericRegistrationEntry : IRegistrationEntry
+    internal sealed class NonGenericRegistrationEntry(Type nonGenericServiceType, Container container) : IRegistrationEntry
     {
-        private readonly List<IProducerProvider> providers = new List<IProducerProvider>(1);
-        private readonly Type nonGenericServiceType;
-        private readonly Container container;
-
-        public NonGenericRegistrationEntry(Type nonGenericServiceType, Container container)
-        {
-            this.nonGenericServiceType = nonGenericServiceType;
-            this.container = container;
-        }
+        private readonly List<IProducerProvider> providers = new(1);
 
         private interface IProducerProvider
         {
@@ -40,7 +32,7 @@ namespace SimpleInjector.Internals
 
         public void Add(InstanceProducer producer)
         {
-            this.container.ThrowWhenContainerIsLockedOrDisposed();
+            container.ThrowWhenContainerIsLockedOrDisposed();
             this.ThrowWhenConditionalAndUnconditionalAreMixed(producer);
             this.ThrowWhenConditionalIsRegisteredInOverridingMode(producer);
 
@@ -63,7 +55,7 @@ namespace SimpleInjector.Internals
         {
             Requires.IsNotNull(predicate, "only support conditional for now");
 
-            this.container.ThrowWhenContainerIsLockedOrDisposed();
+            container.ThrowWhenContainerIsLockedOrDisposed();
 
             if (this.UnconditionalProducers.Any())
             {
@@ -77,7 +69,7 @@ namespace SimpleInjector.Internals
                     implementationTypeFactory,
                     lifestyle,
                     predicate!,
-                    this.container));
+                    container));
         }
 
         public InstanceProducer? TryGetInstanceProducer(Type serviceType, InjectionConsumerInfo consumer)
@@ -121,10 +113,10 @@ namespace SimpleInjector.Internals
         {
             if (producer.IsUnconditional
                 && this.providers.Any()
-                && !this.container.Options.AllowOverridingRegistrations)
+                && !container.Options.AllowOverridingRegistrations)
             {
                 throw new InvalidOperationException(
-                    StringResources.TypeAlreadyRegistered(this.nonGenericServiceType));
+                    StringResources.TypeAlreadyRegistered(nonGenericServiceType));
             }
         }
 
@@ -136,7 +128,7 @@ namespace SimpleInjector.Internals
             var overlappingProducers = this.GetOverlappingProducers(producerToRegister);
 
             bool isReplacement =
-                producerToRegister.IsUnconditional && this.container.Options.AllowOverridingRegistrations;
+                producerToRegister.IsUnconditional && container.Options.AllowOverridingRegistrations;
 
             if (!isReplacement && overlappingProducers.Any())
             {
@@ -167,13 +159,13 @@ namespace SimpleInjector.Internals
             var producerInfos =
                 from producer in producers
                 select new FoundInstanceProducer(
-                    this.nonGenericServiceType,
+                    nonGenericServiceType,
                     producer.Registration.ImplementationType,
                     producer);
 
             return new ActivationException(
                 StringResources.MultipleApplicableRegistrationsFound(
-                    this.nonGenericServiceType, producerInfos.ToArray()));
+                    nonGenericServiceType, producerInfos.ToArray()));
         }
 
         private void ThrowWhenConditionalAndUnconditionalAreMixed(InstanceProducer producer)
@@ -190,7 +182,7 @@ namespace SimpleInjector.Internals
             // registrations for the same service type, it means the conditional is appended, and this is
             // completely safe.
             if (producer.IsConditional
-                && this.container.Options.AllowOverridingRegistrations
+                && container.Options.AllowOverridingRegistrations
                 && this.providers.Any())
             {
                 throw new NotSupportedException(
@@ -220,44 +212,25 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private sealed class SingleInstanceProducerProvider : IProducerProvider
+        private sealed class SingleInstanceProducerProvider(InstanceProducer producer) : IProducerProvider
         {
-            private readonly InstanceProducer producer;
-
-            public SingleInstanceProducerProvider(InstanceProducer producer) => this.producer = producer;
-
-            public IEnumerable<InstanceProducer> CurrentProducers => Enumerable.Repeat(this.producer, 1);
+            public IEnumerable<InstanceProducer> CurrentProducers => Enumerable.Repeat(producer, 1);
 
             public InstanceProducer? TryGetProducer(InjectionConsumerInfo consumer, bool handled) =>
-                this.producer.Predicate(new PredicateContext(this.producer, consumer, handled))
-                    ? this.producer
+                producer.Predicate(new PredicateContext(producer, consumer, handled))
+                    ? producer
                     : null;
         }
 
-        private class ImplementationTypeFactoryInstanceProducerProvider : IProducerProvider
+        private class ImplementationTypeFactoryInstanceProducerProvider(
+            Type serviceType,
+            Func<TypeFactoryContext, Type> implementationTypeFactory,
+            Lifestyle lifestyle,
+            Predicate<PredicateContext> predicate,
+            Container container)
+            : IProducerProvider
         {
-            private readonly Dictionary<Type, InstanceProducer> cache =
-                new Dictionary<Type, InstanceProducer>();
-
-            private readonly Func<TypeFactoryContext, Type> implementationTypeFactory;
-            private readonly Lifestyle lifestyle;
-            private readonly Predicate<PredicateContext> predicate;
-            private readonly Type serviceType;
-            private readonly Container container;
-
-            public ImplementationTypeFactoryInstanceProducerProvider(
-                Type serviceType,
-                Func<TypeFactoryContext, Type> implementationTypeFactory,
-                Lifestyle lifestyle,
-                Predicate<PredicateContext> predicate,
-                Container container)
-            {
-                this.serviceType = serviceType;
-                this.implementationTypeFactory = implementationTypeFactory;
-                this.lifestyle = lifestyle;
-                this.predicate = predicate;
-                this.container = container;
-            }
+            private readonly Dictionary<Type, InstanceProducer> cache = [];
 
             public IEnumerable<InstanceProducer> CurrentProducers
             {
@@ -275,35 +248,30 @@ namespace SimpleInjector.Internals
                 Type GetImplementationType() => this.GetImplementationTypeThroughFactory(consumer);
 
                 var context =
-                    new PredicateContext(this.serviceType, GetImplementationType, consumer, handled);
+                    new PredicateContext(serviceType, GetImplementationType, consumer, handled);
 
                 // NOTE: The producer should only get built after it matches the delegate, to prevent
                 // unneeded producers from being created, because this might cause diagnostic warnings,
                 // such as torn lifestyle warnings.
-                return this.predicate(context) ? this.GetProducer(context) : null;
+                return predicate(context) ? this.GetProducer(context) : null;
             }
 
             private Type GetImplementationTypeThroughFactory(InjectionConsumerInfo consumer)
             {
-                var context = new TypeFactoryContext(this.serviceType, consumer);
+                var context = new TypeFactoryContext(serviceType, consumer);
 
-                Type implementationType = this.implementationTypeFactory(context);
-
-                if (implementationType is null)
-                {
-                    throw new InvalidOperationException(
-                        StringResources.FactoryReturnedNull(this.serviceType));
-                }
+                Type implementationType = implementationTypeFactory(context)
+                    ?? throw new InvalidOperationException(StringResources.FactoryReturnedNull(serviceType));
 
                 if (implementationType.ContainsGenericParameters())
                 {
                     throw new ActivationException(
                         StringResources.TheTypeReturnedFromTheFactoryShouldNotBeOpenGeneric(
-                            this.serviceType, implementationType));
+                            serviceType, implementationType));
                 }
 
                 Requires.FactoryReturnsATypeThatIsAssignableFromServiceType(
-                    this.serviceType, implementationType);
+                    serviceType, implementationType);
 
                 return implementationType;
             }
@@ -329,11 +297,10 @@ namespace SimpleInjector.Internals
                 return producer;
             }
 
-            private InstanceProducer CreateNewProducerFor(Type concreteType) =>
-                new InstanceProducer(
-                    this.serviceType,
-                    this.lifestyle.CreateRegistration(concreteType, this.container),
-                    this.predicate);
+            private InstanceProducer CreateNewProducerFor(Type concreteType) => new(
+                serviceType,
+                lifestyle.CreateRegistration(concreteType, container),
+                predicate);
         }
     }
 }

@@ -8,21 +8,14 @@ namespace SimpleInjector.Internals
     using System.Linq;
     using System.Text;
 
-    internal sealed class ObjectGraphStringBuilder
+    internal sealed class ObjectGraphStringBuilder(VisualizationOptions visualizationOptions)
     {
         private const int IndentSize = 4;
 
-        private readonly StringBuilder builder = new StringBuilder();
-        private readonly Stack<ProducerEntry> producers = new Stack<ProducerEntry>();
-        private readonly VisualizationOptions visualizationOptions;
-
+        private readonly StringBuilder builder = new();
+        private readonly Stack<ProducerEntry> producers = new();
         private ProducerEntry? stillToWriteLifestyleEntry;
         private int indentingDepth;
-
-        public ObjectGraphStringBuilder(VisualizationOptions visualizationOptions)
-        {
-            this.visualizationOptions = visualizationOptions;
-        }
 
         public override string ToString() => this.builder.ToString();
 
@@ -38,7 +31,7 @@ namespace SimpleInjector.Internals
 
             this.Append(
                 producer.FinalImplementationType.ToFriendlyName(
-                    this.visualizationOptions.UseFullyQualifiedTypeNames));
+                    visualizationOptions.UseFullyQualifiedTypeNames));
 
             this.Append("(");
 
@@ -91,7 +84,7 @@ namespace SimpleInjector.Internals
 
         private void AppendLifestyle(ProducerEntry entry)
         {
-            if (this.visualizationOptions.IncludeLifestyleInformation && !entry.LifestyleWritten)
+            if (visualizationOptions.IncludeLifestyleInformation && !entry.LifestyleWritten)
             {
                 this.Append(" // ");
                 this.Append(entry.Producer.Lifestyle.Name);
@@ -109,14 +102,9 @@ namespace SimpleInjector.Internals
 
         private void Append(string value) => this.builder.Append(value);
 
-        private sealed class ProducerEntry
+        private sealed class ProducerEntry(InstanceProducer producer)
         {
-            public ProducerEntry(InstanceProducer producer)
-            {
-                this.Producer = producer;
-            }
-
-            public InstanceProducer Producer { get; }
+            public InstanceProducer Producer { get; } = producer;
             public bool LifestyleWritten { get; set; }
         }
     }

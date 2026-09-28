@@ -9,7 +9,7 @@ namespace SimpleInjector.Internals
     {
         internal static IRegistrationEntry Create(Type serviceType, Container container) =>
             serviceType.IsGenericType()
-                ? (IRegistrationEntry)new GenericRegistrationEntry(container)
-                : (IRegistrationEntry)new NonGenericRegistrationEntry(serviceType, container);
+                ? new GenericRegistrationEntry(container)
+                : new NonGenericRegistrationEntry(serviceType, container);
     }
 }

@@ -9,26 +9,17 @@ namespace SimpleInjector.Decorators
     using System.Reflection;
     using SimpleInjector.Advanced;
 
-    internal sealed class ServiceDecoratorExpressionInterceptor : DecoratorExpressionInterceptor
+    internal sealed class ServiceDecoratorExpressionInterceptor(
+        DecoratorExpressionInterceptorData data,
+        Dictionary<InstanceProducer, Registration> registrations,
+        ExpressionBuiltEventArgs e)
+        : DecoratorExpressionInterceptor(data)
     {
-        private readonly Dictionary<InstanceProducer, Registration> registrations;
-        private readonly ExpressionBuiltEventArgs e;
-        private readonly Type registeredServiceType;
-
-        public ServiceDecoratorExpressionInterceptor(
-            DecoratorExpressionInterceptorData data,
-            Dictionary<InstanceProducer, Registration> registrations,
-            ExpressionBuiltEventArgs e)
-            : base(data)
-        {
-            this.registrations = registrations;
-            this.e = e;
-            this.registeredServiceType = e.RegisteredServiceType;
-        }
+        private readonly Type registeredServiceType = e.RegisteredServiceType;
 
         internal bool SatisfiesPredicate()
         {
-            this.Context = this.CreatePredicateContext(this.e);
+            this.Context = this.CreatePredicateContext(e);
 
             return this.SatisfiesPredicate(this.Context);
         }
@@ -55,11 +46,11 @@ namespace SimpleInjector.Decorators
 
         private void ReplaceOriginalExpression(Registration decoratorRegistration)
         {
-            this.e.Expression = decoratorRegistration.BuildExpression();
+            e.Expression = decoratorRegistration.BuildExpression();
 
-            this.e.ReplacedRegistration = decoratorRegistration;
+            e.ReplacedRegistration = decoratorRegistration;
 
-            this.e.InstanceProducer.IsDecorated = true;
+            e.InstanceProducer.IsDecorated = true;
 
             // Must be called after calling BuildExpression, because otherwise we won't have any relationships
             this.MarkDecorateeFactoryRelationshipAsInstanceCreationDelegate(
@@ -79,7 +70,7 @@ namespace SimpleInjector.Decorators
         private IEnumerable<Registration> GetDecorateeFactoryDependencies(KnownRelationship[] relationships) =>
             from relationship in relationships
             where DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(
-                relationship.Dependency.ServiceType, this.e.RegisteredServiceType)
+                relationship.Dependency.ServiceType, e.RegisteredServiceType)
             select relationship.Dependency.Registration;
 
         private Registration CreateRegistrationForDecorator(ConstructorInfo decoratorConstructor)
@@ -89,18 +80,18 @@ namespace SimpleInjector.Decorators
             // Ensure that the registration for the decorator is created only once to prevent the possibility
             // of multiple instances being created when dealing lifestyles that cache an instance within the
             // Registration instance itself (such as the Singleton lifestyle does).
-            lock (this.registrations)
+            lock (registrations)
             {
-                if (!this.registrations.TryGetValue(this.e.InstanceProducer, out registration))
+                if (!registrations.TryGetValue(e.InstanceProducer, out registration))
                 {
                     registration = this.CreateRegistration(
                         this.registeredServiceType,
                         decoratorConstructor,
-                        this.e.Expression,
-                        this.e.InstanceProducer,
-                        this.GetServiceTypeInfo(this.e));
+                        e.Expression,
+                        e.InstanceProducer,
+                        this.GetServiceTypeInfo(e));
 
-                    this.registrations[this.e.InstanceProducer] = registration;
+                    registrations[e.InstanceProducer] = registration;
                 }
             }
 
@@ -110,16 +101,16 @@ namespace SimpleInjector.Decorators
         private void AddAppliedDecoratorToPredicateContext(
             IEnumerable<KnownRelationship> decoratorRelationships, ConstructorInfo decoratorConstructor)
         {
-            var info = this.GetServiceTypeInfo(this.e);
+            var info = this.GetServiceTypeInfo(e);
 
             // Add the decorator to the list of applied decorators. This way users can use this information in
             // the predicate of the next decorator they add.
             info.AddAppliedDecorator(
-                this.e.RegisteredServiceType,
+                e.RegisteredServiceType,
                 decoratorConstructor.DeclaringType,
                 this.Container,
                 this.Lifestyle,
-                this.e.Expression,
+                e.Expression,
                 decoratorRelationships);
         }
     }

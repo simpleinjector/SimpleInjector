@@ -29,15 +29,14 @@ namespace SimpleInjector.Lifestyles
     /// </example>
     public class AsyncScopedLifestyle : ScopedLifestyle
     {
-        private static readonly object managerKey = new object();
+        private static readonly object managerKey = new();
 
         /// <summary>Initializes a new instance of the <see cref="AsyncScopedLifestyle"/> class.
         /// The created and cached instance will be disposed when the created
         /// <see cref="Scope"/> instance gets disposed and when the created object implements
         /// <see cref="IDisposable"/>.
         /// </summary>
-        public AsyncScopedLifestyle()
-            : base("Async Scoped")
+        public AsyncScopedLifestyle() : base("Async Scoped")
         {
         }
 

@@ -220,7 +220,7 @@ namespace SimpleInjector.Internals
         }
 
         // TODO: There is some weird inconsistency in this method. In case supplied type derives directly
-        // from System.Object, typeof(object) is returned. But if the supplid type has a different base type,
+        // from System.Object, typeof(object) is returned. But if the supplied type has a different base type,
         // the result will not include typeof(object).
         private static IEnumerable<Type> GetBaseTypes(this Type type)
         {

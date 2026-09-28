@@ -11,19 +11,13 @@ namespace SimpleInjector.Decorators
     using SimpleInjector.Lifestyles;
 
     // A list of all decorators applied to a given service type.
-    internal sealed class ServiceTypeDecoratorInfo
+    internal sealed class ServiceTypeDecoratorInfo(Type implementationType, InstanceProducer originalProducer)
     {
-        private readonly List<DecoratorInfo> appliedDecorators = new List<DecoratorInfo>();
+        private readonly List<DecoratorInfo> appliedDecorators = [];
 
-        internal ServiceTypeDecoratorInfo(Type implementationType, InstanceProducer originalProducer)
-        {
-            this.ImplementationType = implementationType;
-            this.OriginalProducer = originalProducer;
-        }
+        internal Type ImplementationType { get; } = implementationType;
 
-        internal Type ImplementationType { get; }
-
-        internal InstanceProducer OriginalProducer { get; }
+        internal InstanceProducer OriginalProducer { get; } = originalProducer;
 
         internal IEnumerable<DecoratorInfo> AppliedDecorators => this.appliedDecorators;
 
@@ -43,10 +37,9 @@ namespace SimpleInjector.Decorators
             var registration = new ExpressionRegistration(
                 decoratedExpression, decoratorType, lifestyle, container);
 
-            registration.ReplaceRelationships(decoratorRelationships ?? Enumerable.Empty<KnownRelationship>());
+            registration.ReplaceRelationships(decoratorRelationships ?? []);
 
-            var producer = new InstanceProducer(serviceType, registration);
-            producer.IsDecorated = true;
+            var producer = new InstanceProducer(serviceType, registration) { IsDecorated = true };
 
             this.appliedDecorators.Add(new DecoratorInfo(decoratorType, producer));
         }

@@ -426,7 +426,7 @@ namespace SimpleInjector
         /// <summary>
         /// Appends a new registration of <paramref name="implementationType"/> to a collection of
         /// registrations for the given <paramref name="serviceType"/>. Calls to <b>Append</b> can both
-        /// preceed and follow a call to one of the
+        /// precede and follow a call to one of the
         /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see> overloads.
         /// </summary>
         /// <param name="serviceType">The service type of the collection.</param>
@@ -459,7 +459,7 @@ namespace SimpleInjector
         /// <summary>
         /// Appends a new registration of <paramref name="implementationType"/> to a collection of
         /// registrations for the given <paramref name="serviceType"/> using the supplied
-        /// <paramref name="lifestyle"/>. Calls to <b>Append</b> can both preceed and follow a call to one of
+        /// <paramref name="lifestyle"/>. Calls to <b>Append</b> can both precede and follow a call to one of
         /// the <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see> overloads.
         /// </summary>
         /// <param name="serviceType">The service type of the collection.</param>
@@ -503,7 +503,7 @@ namespace SimpleInjector
         /// <summary>
         /// Appends the specified delegate <paramref name="instanceCreator"/> to a collection of
         /// registrations for the given <typeparamref name="TService"/> using the supplied
-        /// <paramref name="lifestyle"/>. Calls to <b>Append</b> can both preceed and follow a call to one of
+        /// <paramref name="lifestyle"/>. Calls to <b>Append</b> can both precede and follow a call to one of
         /// the <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see> overloads.
         /// </summary>
         /// <typeparam name="TService">The element type of the collections to register.</typeparam>
@@ -530,7 +530,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Appends a single instance to a collection of registrations for the given
-        /// <typeparamref name="TService"/> . Calls to <b>AppendInstance</b> can both preceed and follow a
+        /// <typeparamref name="TService"/> . Calls to <b>AppendInstance</b> can both precede and follow a
         /// call to one of the
         /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see> overloads.
         /// This <paramref name="instance"/> must be thread-safe when working in a multi-threaded environment.
@@ -558,7 +558,7 @@ namespace SimpleInjector
 
         /// <summary>
         /// Appends a single instance to a collection of registrations for the given
-        /// <paramref name="serviceType"/>. Calls to <b>AppendInstance</b> can both preceed and follow a
+        /// <paramref name="serviceType"/>. Calls to <b>AppendInstance</b> can both precede and follow a
         /// call to one of the
         /// <see cref="Register(Type, IEnumerable{Type})">Container.Collections.Register</see> overloads.
         /// This <paramref name="instance"/> must be thread-safe when working in a multi-threaded environment.
@@ -1131,7 +1131,7 @@ namespace SimpleInjector
         {
             this.RegisterCollectionInternal(
                 itemType,
-                new[] { ContainerControlledItem.CreateFromRegistration(registration) },
+                [ContainerControlledItem.CreateFromRegistration(registration)],
                 appending: true);
         }
 
@@ -1142,7 +1142,7 @@ namespace SimpleInjector
             // abstract.
             this.RegisterCollectionInternal(
                 itemType,
-                new[] { ContainerControlledItem.CreateFromType(implementationType, lifestyle) },
+                [ContainerControlledItem.CreateFromType(implementationType, lifestyle)],
                 appending: true);
         }
 

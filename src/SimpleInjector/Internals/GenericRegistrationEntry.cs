@@ -7,21 +7,16 @@ namespace SimpleInjector.Internals
     using System.Collections.Generic;
     using System.Linq;
 
-    internal sealed class GenericRegistrationEntry : IRegistrationEntry
+    internal sealed class GenericRegistrationEntry(Container container) : IRegistrationEntry
     {
-        private readonly List<IProducerProvider> providers = new();
-        private readonly ContainerOptions options;
+        private readonly List<IProducerProvider> providers = [];
+        private readonly ContainerOptions options = container.Options;
 
         // PERF: #985 These two collections exist solely for performance optimizations. Registering many
         // closed-generic types of the same generic abstractions got exponentially slower with the number
         // of registrations. These two collections help optimize this.
         private Dictionary<Type, ClosedToInstanceProducerProviderDictionaryEntry>? closedProviders;
         private List<OpenGenericToInstanceProducerProvider>? openProviders;
-
-        internal GenericRegistrationEntry(Container container)
-        {
-            this.options = container.Options;
-        }
 
         private Container Container => this.options.Container;
         private bool AllowOverridingRegistrations => this.options.AllowOverridingRegistrations;
@@ -156,10 +151,7 @@ namespace SimpleInjector.Internals
         {
             this.providers.Add(provider);
 
-            if (this.openProviders is null)
-            {
-                this.openProviders = new List<OpenGenericToInstanceProducerProvider>();
-            }
+            this.openProviders ??= [];
 
             this.openProviders.Add(provider);
         }
@@ -316,7 +308,7 @@ namespace SimpleInjector.Internals
             bool isReplacement = this.AllowOverridingRegistrations
                 && providerToRegister.GetAppliesToAllClosedServiceTypes();
 
-            // A provider is a superset of the providerToRegister when it can be applied to ALL generic
+            // A provider is a super set of the providerToRegister when it can be applied to ALL generic
             // types that the providerToRegister can be applied to as well.
             var supersetProvider = this.GetFirstOrDefaultSupersetProvidersFor(providerImplementationType);
 
@@ -381,10 +373,7 @@ namespace SimpleInjector.Internals
 
                 if (producer != null)
                 {
-                    if (list is null)
-                    {
-                        list = new List<FoundInstanceProducer>(capacity: 1);
-                    }
+                    list ??= new List<FoundInstanceProducer>(capacity: 1);
 
                     list.Add(new FoundInstanceProducer(
                         provider.ServiceType,
@@ -398,34 +387,27 @@ namespace SimpleInjector.Internals
             return list;
         }
 
-        private sealed class ClosedToInstanceProducerProvider : IProducerProvider
+        private sealed class ClosedToInstanceProducerProvider(InstanceProducer producer) : IProducerProvider
         {
-            private readonly InstanceProducer producer;
-
-            public ClosedToInstanceProducerProvider(InstanceProducer producer)
-            {
-                this.producer = producer;
-            }
-
-            public bool IsConditional => this.producer.IsConditional;
+            public bool IsConditional => producer.IsConditional;
             public bool GetAppliesToAllClosedServiceTypes() => false;
-            public Type ServiceType => this.producer.ServiceType;
-            public Type? ImplementationType => this.producer.Registration.ImplementationType;
-            public IEnumerable<InstanceProducer> CurrentProducers => Enumerable.Repeat(this.producer, 1);
-            public bool MatchesServiceType(Type serviceType) => serviceType == this.producer.ServiceType;
+            public Type ServiceType => producer.ServiceType;
+            public Type? ImplementationType => producer.Registration.ImplementationType;
+            public IEnumerable<InstanceProducer> CurrentProducers => Enumerable.Repeat(producer, 1);
+            public bool MatchesServiceType(Type serviceType) => serviceType == producer.ServiceType;
 
             public bool OverlapsWith(InstanceProducer producerToCheck) =>
-                (this.producer.IsUnconditional || producerToCheck.IsUnconditional)
-                && this.producer.ServiceType == producerToCheck.ServiceType;
+                (producer.IsUnconditional || producerToCheck.IsUnconditional)
+                && producer.ServiceType == producerToCheck.ServiceType;
 
             public InstanceProducer? TryGetProducer(
                 Type serviceType, InjectionConsumerInfo consumer, bool handled) =>
                 this.MatchesServiceType(serviceType) && this.MatchesPredicate(consumer, handled)
-                    ? this.producer
+                    ? producer
                     : null;
 
             private bool MatchesPredicate(InjectionConsumerInfo consumer, bool handled) =>
-                this.producer.Predicate(new PredicateContext(this.producer, consumer, handled));
+                producer.Predicate(new PredicateContext(producer, consumer, handled));
         }
 
         private sealed class OpenGenericToInstanceProducerProvider : IProducerProvider
@@ -476,13 +458,10 @@ namespace SimpleInjector.Internals
             // a very costly operation (which can also throw first-chance exceptions).
             public bool GetAppliesToAllClosedServiceTypes()
             {
-                if (this.appliesToAllClosedServiceTypes is null)
-                {
-                    // We cache the result of this method. Not caching it can dramatically influence the
-                    // performance of the registration process.
-                    this.appliesToAllClosedServiceTypes =
-                        this.RegistrationAppliesToAllClosedServiceTypes(this.ImplementationType!);
-                }
+                // We cache the result of this method. Not caching it can dramatically influence the
+                // performance of the registration process.
+                this.appliesToAllClosedServiceTypes ??=
+                    this.RegistrationAppliesToAllClosedServiceTypes(this.ImplementationType!);
 
                 return this.appliesToAllClosedServiceTypes.Value;
             }
@@ -546,12 +525,8 @@ namespace SimpleInjector.Internals
             private Type? GetImplementationTypeThroughFactory(Type serviceType, InjectionConsumerInfo consumer)
             {
                 Type? implementationType =
-                    this.ImplementationTypeFactory(new TypeFactoryContext(serviceType, consumer));
-
-                if (implementationType is null)
-                {
-                    throw new InvalidOperationException(StringResources.FactoryReturnedNull(this.ServiceType));
-                }
+                    this.ImplementationTypeFactory(new TypeFactoryContext(serviceType, consumer))
+                    ?? throw new InvalidOperationException(StringResources.FactoryReturnedNull(this.ServiceType));
 
                 if (implementationType.ContainsGenericParameters())
                 {
@@ -633,16 +608,10 @@ namespace SimpleInjector.Internals
                     implementationType);
         }
 
-        private sealed class ClosedToInstanceProducerProviderDictionaryEntry
+        private sealed class ClosedToInstanceProducerProviderDictionaryEntry(
+            ClosedToInstanceProducerProvider firstProvider)
         {
-            private readonly ClosedToInstanceProducerProvider firstProvider;
-
             private List<ClosedToInstanceProducerProvider>? providers;
-
-            public ClosedToInstanceProducerProviderDictionaryEntry(ClosedToInstanceProducerProvider firstProvider)
-            {
-                this.firstProvider = firstProvider;
-            }
 
             public int Count => this.providers?.Count ?? 1;
 
@@ -650,11 +619,11 @@ namespace SimpleInjector.Internals
             {
                 if (this.providers is null)
                 {
-                    this.providers = new List<ClosedToInstanceProducerProvider>
-                    {
-                        this.firstProvider,
+                    this.providers =
+                    [
+                        firstProvider,
                         provider
-                    };
+                    ];
                 }
                 else
                 {
@@ -666,7 +635,7 @@ namespace SimpleInjector.Internals
             {
                 if (this.providers is null)
                 {
-                    return this.firstProvider.OverlapsWith(producerToRegister) ? this.firstProvider : null;
+                    return firstProvider.OverlapsWith(producerToRegister) ? firstProvider : null;
                 }
                 else
                 {

@@ -125,7 +125,7 @@ namespace SimpleInjector.Internals
                     .Concat(registrationInfos.Select(r => r.Variable)),
                 expressions: lifestyleAssigmentExpressions
                     .Concat(registrationAssignmentExpressions
-                        .Concat(new[] { optimizedExpression })));
+                        .Concat([optimizedExpression])));
         }
 
         private static NewExpression CreateNewLazyScopeExpression(
@@ -140,7 +140,7 @@ namespace SimpleInjector.Internals
             Type type = typeof(LazyScopedRegistration<>).MakeGenericType(registration.ImplementationType);
 
             return Expression.New(
-                type.GetConstructor(new[] { typeof(Registration) }),
+                type.GetConstructor([typeof(Registration)]),
                 Expression.Constant(registration, typeof(Registration)));
         }
 
@@ -233,8 +233,7 @@ namespace SimpleInjector.Internals
 
         private sealed class PerObjectGraphOptimizableRegistrationFinder : ExpressionVisitor
         {
-            private readonly List<OptimizableRegistrationInfo> perObjectGraphRegistrations =
-                new List<OptimizableRegistrationInfo>();
+            private readonly List<OptimizableRegistrationInfo> perObjectGraphRegistrations = [];
 
             private readonly Container container;
 
@@ -386,7 +385,7 @@ namespace SimpleInjector.Internals
         private sealed class NodeSizeCalculator : ExpressionVisitor
         {
             private readonly Dictionary<Expression, ExpressionInfo> nodes =
-                new Dictionary<Expression, ExpressionInfo>(ReferenceEqualityComparer<Expression>.Instance);
+                new(ReferenceEqualityComparer<Expression>.Instance);
 
             private int size;
 
