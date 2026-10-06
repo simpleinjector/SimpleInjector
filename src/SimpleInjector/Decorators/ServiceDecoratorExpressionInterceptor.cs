@@ -75,7 +75,7 @@ namespace SimpleInjector.Decorators
 
         private Registration CreateRegistrationForDecorator(ConstructorInfo decoratorConstructor)
         {
-            Registration registration;
+            Registration? registration;
 
             // Ensure that the registration for the decorator is created only once to prevent the possibility
             // of multiple instances being created when dealing lifestyles that cache an instance within the

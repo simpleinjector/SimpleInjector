@@ -217,7 +217,7 @@ namespace SimpleInjector.Decorators
                 {
                     Type funcType = typeof(Func<>).MakeGenericType(enumerableServiceType);
                     Delegate lambda = Expression.Lambda(funcType, callExpression).Compile();
-                    var decoratedCollection = (IEnumerable)lambda.DynamicInvoke();
+                    var decoratedCollection = (IEnumerable)lambda.DynamicInvoke()!;
                     Array array = ToArray(registeredServiceType, decoratedCollection);
                     return DecoratorUtilities.MakeReadOnly(registeredServiceType, array);
                 }
@@ -233,9 +233,9 @@ namespace SimpleInjector.Decorators
 
         private void ThrowWhenDecoratorNeedsAFunc(Type decoratorTypeDefinition)
         {
-            Type decorateeFactoryType = this.GetDecorateeFactoryTypeOrNull();
+            Type? decorateeFactoryType = this.GetDecorateeFactoryTypeOrNull();
 
-            if (decorateeFactoryType != null)
+            if (decorateeFactoryType is not null)
             {
                 // decoratorType is never null at this point
                 string message = StringResources.CantGenerateFuncForDecorator(
@@ -247,7 +247,7 @@ namespace SimpleInjector.Decorators
             }
         }
 
-        private Type GetDecorateeFactoryTypeOrNull() => (
+        private Type? GetDecorateeFactoryTypeOrNull() => (
             from parameter in this.decoratorConstructor!.GetParameters()
             where DecoratorHelpers.IsScopelessDecorateeFactoryDependencyType(
                 parameter.ParameterType, registeredServiceType)
@@ -279,7 +279,7 @@ namespace SimpleInjector.Decorators
             lock (singletonDecoratedCollectionsCache)
             {
                 if (!singletonDecoratedCollectionsCache.TryGetValue(
-                    e.InstanceProducer, out IEnumerable collection))
+                    e.InstanceProducer, out IEnumerable? collection))
                 {
                     collection = collectionCreator();
 

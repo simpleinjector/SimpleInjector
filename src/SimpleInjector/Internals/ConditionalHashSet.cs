@@ -27,9 +27,9 @@ namespace SimpleInjector.Internals
                 {
                     var weakReference = new WeakReference(item);
 
-                    int key = weakReference.Target.GetHashCode();
+                    int key = item.GetHashCode();
 
-                    if (!this.dictionary.TryGetValue(key, out List<WeakReference> bucket))
+                    if (!this.dictionary.TryGetValue(key, out List<WeakReference>? bucket))
                     {
                         this.dictionary[key] = bucket = new List<WeakReference>(capacity: 1);
                     }
@@ -73,7 +73,7 @@ namespace SimpleInjector.Internals
 
         private WeakReference? GetWeakReferenceOrNull(T item)
         {
-            if (this.dictionary.TryGetValue(item.GetHashCode(), out List<WeakReference> bucket))
+            if (this.dictionary.TryGetValue(item.GetHashCode(), out List<WeakReference>? bucket))
             {
                 foreach (var reference in bucket)
                 {

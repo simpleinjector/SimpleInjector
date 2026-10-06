@@ -14,7 +14,7 @@ namespace SimpleInjector.Decorators
     internal static class DecoratorUtilities
     {
         private static readonly MethodInfo EnumerableSelectMethod =
-            Helpers.GetGenericMethodDefinition(() => Enumerable.Select(null, (Func<int, int>?)null));
+            Helpers.GetGenericMethodDefinition(() => Enumerable.Select(null!, (Func<int, int>?)null!));
 
         private static readonly MethodInfo DecoratorHelpersReadOnlyCollectionMethod =
             Helpers.GetGenericMethodDefinition(() => ReadOnlyCollection<int>(null!));
@@ -39,7 +39,7 @@ namespace SimpleInjector.Decorators
                     .MakeGenericMethod(elementType)
                     .Invoke(null, [collection]);
 
-            return (IEnumerable)readOnlyCollection;
+            return (IEnumerable)readOnlyCollection!;
         }
 
         internal static Type DetermineImplementationType(Expression expression,
@@ -66,7 +66,7 @@ namespace SimpleInjector.Decorators
         {
             var selectMethod = EnumerableSelectMethod.MakeGenericMethod(type, type);
 
-            return (IEnumerable)selectMethod.Invoke(null, [source, selector]);
+            return (IEnumerable)selectMethod.Invoke(null, [source, selector])!;
         }
 
         internal static MethodCallExpression Select(

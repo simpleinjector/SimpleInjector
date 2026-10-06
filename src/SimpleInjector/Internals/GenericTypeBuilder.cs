@@ -46,7 +46,7 @@ namespace SimpleInjector.Internals
         {
             try
             {
-                return MakeClosedImplementation(openAbstraction, openImplementation) != null;
+                return MakeClosedImplementation(openAbstraction, openImplementation) is not null;
             }
             catch (InvalidOperationException)
             {
@@ -106,13 +106,13 @@ namespace SimpleInjector.Internals
             {
                 var serviceType = this.FindMatchingOpenGenericServiceType();
 
-                if (serviceType != null && this.SafisfiesPartialTypeArguments(serviceType))
+                if (serviceType is not null && this.SafisfiesPartialTypeArguments(serviceType))
                 {
                     Type? closedGenericImplementation =
                         this.BuildClosedGenericImplementationBasedOnMatchingServiceType(serviceType);
 
                     // closedGenericImplementation will be null when there was a mismatch on type constraints.
-                    if (closedGenericImplementation != null
+                    if (closedGenericImplementation is not null
                         && this.closedServiceType.IsAssignableFrom(closedGenericImplementation))
                     {
                         return BuildResult.Valid(closedGenericImplementation);
@@ -278,7 +278,7 @@ namespace SimpleInjector.Internals
             internal static readonly BuildResult Invalid = new(null);
 
             internal bool ClosedServiceTypeSatisfiesAllTypeConstraints =>
-                this.ClosedGenericImplementation != null;
+                this.ClosedGenericImplementation is not null;
 
             internal Type? ClosedGenericImplementation { get; } = closedGenericImplementation;
 

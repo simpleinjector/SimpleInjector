@@ -74,8 +74,8 @@ namespace SimpleInjector.Advanced
 
         internal string GetAdditionalInformation(DiagnosticType type)
         {
-            if (this.additionalInformation != null
-                && this.additionalInformation.TryGetValue(type, out string message))
+            if (this.additionalInformation is not null
+                && this.additionalInformation.TryGetValue(type, out string? message))
             {
                 return message;
             }
@@ -136,7 +136,7 @@ namespace SimpleInjector.Advanced
                 this.Consumer,
                 this.Dependency);
 
-            if (this.additionalInformation != null)
+            if (this.additionalInformation is not null)
             {
                 newRelationship.additionalInformation = this.additionalInformation.MakeCopy();
             }

@@ -94,7 +94,7 @@ namespace SimpleInjector
 
         /// <inheritdoc />
         public bool Equals(InjectionConsumerInfo? other) =>
-            other != null
+            other is not null
             && this.implementationType.Equals(other.implementationType)
             && this.target.Equals(other.target);
 

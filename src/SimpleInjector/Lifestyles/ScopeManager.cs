@@ -53,7 +53,7 @@ namespace SimpleInjector.Lifestyles
         {
             Scope? localScope = this.CurrentScopeInternal;
 
-            while (localScope != null)
+            while (localScope is not null)
             {
                 if (object.ReferenceEquals(scope, localScope))
                 {

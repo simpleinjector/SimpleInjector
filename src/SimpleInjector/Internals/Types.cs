@@ -188,7 +188,7 @@ namespace SimpleInjector.Internals
             // PERF: We don't call GetBaseTypes(), to prevent memory allocations.
             Type? baseType = implementation.BaseType() ?? (implementation != typeof(object) ? typeof(object) : null);
 
-            while (baseType != null)
+            while (baseType is not null)
             {
                 if (IsGenericImplementationOf(baseType, service))
                 {
@@ -226,7 +226,7 @@ namespace SimpleInjector.Internals
         {
             Type? baseType = type.BaseType() ?? (type != typeof(object) ? typeof(object) : null);
 
-            while (baseType != null)
+            while (baseType is not null)
             {
                 yield return baseType;
 

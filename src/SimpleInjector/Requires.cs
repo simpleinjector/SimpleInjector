@@ -149,9 +149,9 @@ namespace SimpleInjector
         {
             if (!serviceType.IsGenericType())
             {
-                Type openGenericType = serviceTypes.FirstOrDefault(t => t.ContainsGenericParameters());
+                Type? openGenericType = serviceTypes.FirstOrDefault(t => t.ContainsGenericParameters());
 
-                if (openGenericType != null)
+                if (openGenericType is not null)
                 {
                     throw new ArgumentException(
                         StringResources.SuppliedTypeIsAnOpenGenericTypeWhileTheServiceTypeIsNot(
@@ -201,7 +201,7 @@ namespace SimpleInjector
                 select type)
                 .FirstOrDefault();
 
-            if (invalidType != null)
+            if (invalidType is not null)
             {
                 throw new ArgumentException(
                     StringResources.SuppliedTypeDoesNotInheritFromOrImplement(serviceType, invalidType),

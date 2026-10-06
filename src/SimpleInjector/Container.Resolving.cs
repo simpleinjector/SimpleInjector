@@ -236,7 +236,7 @@ namespace SimpleInjector
                     producer = this.GetRegistrationEvenIfInvalid(
                         serviceType, InjectionConsumerInfo.Root, autoCreateConcreteTypes: true);
 
-                    if (producer != null)
+                    if (producer is not null)
                     {
                         // The producer is created implicitly. This forces us to lock the container. Such
                         // implicit registration could be done through in numerous ways (e.g. through
@@ -354,7 +354,7 @@ namespace SimpleInjector
             {
                 var producer = builder.TryBuild(serviceType);
 
-                if (producer != null)
+                if (producer is not null)
                 {
                     return producer;
                 }
@@ -375,7 +375,7 @@ namespace SimpleInjector
         {
             Helpers.InterlockedAddAndReplace(ref this.rootProducerCache, serviceType, rootProducer);
 
-            if (rootProducer != null)
+            if (rootProducer is not null)
             {
                 this.RemoveExternalProducer(rootProducer);
             }
@@ -383,7 +383,7 @@ namespace SimpleInjector
 
         private void ThrowInvalidRegistrationException(Type serviceType, InstanceProducer? producer)
         {
-            if (producer != null)
+            if (producer is not null)
             {
                 // Exception is never null in this context.
                 throw producer.Exception!;
@@ -427,7 +427,7 @@ namespace SimpleInjector
             && this.ContainsExplicitRegistrationFor(typeof(IEnumerable<>).MakeGenericType(serviceType));
 
         private bool ContainsExplicitRegistrationFor(Type serviceType) =>
-            this.GetRegistrationEvenIfInvalid(serviceType, InjectionConsumerInfo.Root, false) != null;
+            this.GetRegistrationEvenIfInvalid(serviceType, InjectionConsumerInfo.Root, false) is not null;
 
         private void ThrowNotConstructableException(Type concreteType)
         {

@@ -226,7 +226,7 @@ namespace SimpleInjector
 
         internal bool IsExpressionCreated => this.lazyExpression.IsValueCreated && !this.Registration.MustBeVerified;
 
-        internal bool MustBeExplicitlyVerified => this.verifiers != null;
+        internal bool MustBeExplicitlyVerified => this.verifiers is not null;
 
         internal bool InstanceSuccessfullyCreated { get; private set; }
 
@@ -392,7 +392,7 @@ namespace SimpleInjector
         /// <returns>An array of <see cref="KnownRelationship"/> instances.</returns>
         public KnownRelationship[] GetRelationships()
         {
-            if (this.knownRelationships != null)
+            if (this.knownRelationships is not null)
             {
                 return this.knownRelationships.ToArray();
             }
@@ -589,7 +589,7 @@ namespace SimpleInjector
                     .Cast<LifestyleMismatchDiagnosticResult>()
                     .FirstOrDefault();
 
-                if (error != null)
+                if (error is not null)
                 {
                     throw new DiagnosticVerificationException(
                         StringResources.LifestyleMismatchesReported(error), error);
@@ -605,7 +605,7 @@ namespace SimpleInjector
 
             ExpressionBuiltEventArgs? e = this.Container.OnExpressionBuilt(this, expression);
 
-            if (e != null)
+            if (e is not null)
             {
                 if (!object.ReferenceEquals(this.Registration, e.ReplacedRegistration))
                 {
@@ -682,7 +682,7 @@ namespace SimpleInjector
             // We first check for null, because this is faster. Every time we write, the CPU has to send
             // the new value to all the other CPUs. We only nullify the validator while using the GetInstance
             // method, because the BuildExpression will only be called a limited amount of time.
-            if (this.validator != null)
+            if (this.validator is not null)
             {
                 this.validator = null;
             }

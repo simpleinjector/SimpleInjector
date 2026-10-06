@@ -97,7 +97,7 @@ namespace SimpleInjector
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal Scope? GetVerificationOrResolveScopeForCurrentThread()
         {
-            if (this.VerificationScope != null && this.IsVerifying)
+            if (this.VerificationScope is not null && this.IsVerifying)
             {
                 return this.GetScopeWhileVerifying();
             }

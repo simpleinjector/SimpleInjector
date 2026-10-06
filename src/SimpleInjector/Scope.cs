@@ -521,7 +521,7 @@ namespace SimpleInjector
             {
                 if (!operatingInException)
                 {
-                    while (this.scopeEndActions != null)
+                    while (this.scopeEndActions is not null)
                     {
                         this.ExecuteAllRegisteredEndScopeActions();
                         this.recursionDuringDisposalCounter++;
@@ -560,7 +560,7 @@ namespace SimpleInjector
 
         private void ExecuteAllRegisteredEndScopeActions()
         {
-            if (this.scopeEndActions != null)
+            if (this.scopeEndActions is not null)
             {
                 var actions = this.scopeEndActions;
 
@@ -686,7 +686,7 @@ namespace SimpleInjector
 
         private void DisposeAllRegisteredDisposables()
         {
-            if (this.disposables != null)
+            if (this.disposables is not null)
             {
                 var instances = this.disposables;
 
@@ -825,7 +825,7 @@ namespace SimpleInjector
             {
                 if (!operatingInException)
                 {
-                    while (this.scopeEndActions != null)
+                    while (this.scopeEndActions is not null)
                     {
                         this.ExecuteAllRegisteredEndScopeActions();
                         this.recursionDuringDisposalCounter++;
@@ -864,7 +864,7 @@ namespace SimpleInjector
 
         private DisposeAsyncTask DisposeAllRegisteredDisposablesAsync()
         {
-            if (this.disposables != null)
+            if (this.disposables is not null)
             {
                 var instances = this.disposables;
 

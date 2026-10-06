@@ -56,7 +56,7 @@ namespace SimpleInjector.Internals
             if (!last)
             {
                 this.Append(",");
-                if (this.stillToWriteLifestyleEntry != null)
+                if (this.stillToWriteLifestyleEntry is not null)
                 {
                     this.AppendLifestyle(this.stillToWriteLifestyleEntry);
                     this.stillToWriteLifestyleEntry = null;

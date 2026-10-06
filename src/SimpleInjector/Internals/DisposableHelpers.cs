@@ -22,7 +22,7 @@ namespace SimpleInjector.Internals
         private static Type? AsyncDisposableInterface;
 #endif
 
-        internal static bool AsyncDisposableInterfaceFound => AsyncDisposableInterface != null;
+        internal static bool AsyncDisposableInterfaceFound => AsyncDisposableInterface is not null;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool IsAsyncOrAsyncDisposable(object instance) =>
@@ -42,7 +42,7 @@ namespace SimpleInjector.Internals
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool IsAsyncDisposableType(Type type) =>
-            AsyncDisposableInterface != null
+            AsyncDisposableInterface is not null
                 ? AsyncDisposableInterface.IsAssignableFrom(type)
                 : InitializeAsyncDisposableInterface(type);
 

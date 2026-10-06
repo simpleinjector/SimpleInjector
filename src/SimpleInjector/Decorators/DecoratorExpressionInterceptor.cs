@@ -239,7 +239,7 @@ namespace SimpleInjector.Decorators
             }
             else
             {
-                var scopedInstanceCreator = (Func<Scope, object>)value;
+                var scopedInstanceCreator = (Func<Scope, object>)value!;
 
                 return scope => scopedInstanceCreator(scope);
             }

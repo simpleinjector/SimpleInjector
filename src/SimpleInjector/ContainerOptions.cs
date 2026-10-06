@@ -518,7 +518,7 @@ namespace SimpleInjector
                         this.ConstructorResolutionBehavior, implementationType));
             }
 
-            if (constructor != null)
+            if (constructor is not null)
             {
                 errorMessage = this.DependencyInjectionBehavior.VerifyConstructor(constructor);
             }
@@ -550,7 +550,7 @@ namespace SimpleInjector
         {
             var locking = this.containerLocking;
 
-            if (locking != null)
+            if (locking is not null)
             {
                 // Prevent re-entry.
                 this.containerLocking = null;

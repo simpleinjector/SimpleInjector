@@ -536,7 +536,7 @@ namespace SimpleInjector
         private bool IsDecorator(Type openGenericServiceType, Type implemenationType)
         {
             var ctor = this.SelectImplementationTypeConstructorOrNull(implemenationType);
-            return ctor != null && DecoratorHelpers.IsDecorator(openGenericServiceType, ctor);
+            return ctor is not null && DecoratorHelpers.IsDecorator(openGenericServiceType, ctor);
         }
 
         private ConstructorInfo? SelectImplementationTypeConstructorOrNull(Type implementationType)
@@ -648,7 +648,7 @@ namespace SimpleInjector
 
                 var invalidRegistration = duplicateServiceTypes.FirstOrDefault();
 
-                if (invalidRegistration != null)
+                if (invalidRegistration is not null)
                 {
                     throw new InvalidOperationException(
                         StringResources.MultipleTypesThatRepresentClosedGenericType(

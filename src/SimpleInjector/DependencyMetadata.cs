@@ -63,7 +63,7 @@ namespace SimpleInjector
 
         /// <inheritdoc />
         public bool Equals(DependencyMetadata<TService>? other) =>
-            other != null
+            other is not null
             && this.Dependency.Equals(other.Dependency)
             && object.ReferenceEquals(this.scope, other.scope);
 

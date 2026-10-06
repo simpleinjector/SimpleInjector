@@ -201,7 +201,7 @@ namespace SimpleInjector.Internals
         }
 
         private LazyEx<InstanceProducer> ToLazyInstanceProducer(ContainerControlledItem item) =>
-            item.Registration != null
+            item.Registration is not null
                 ? ToLazyInstanceProducer(item.Registration)
                 : new LazyEx<InstanceProducer>(() => this.GetOrCreateInstanceProducer(item));
 
@@ -280,7 +280,7 @@ namespace SimpleInjector.Internals
         }
 
         private static bool AreAmbiguous(ContainerControlledItem item, InstanceProducer producer) =>
-            item.Lifestyle != null && producer.Registration.Lifestyle != item.Lifestyle;
+            item.Lifestyle is not null && producer.Registration.Lifestyle != item.Lifestyle;
 
         private InstanceProducer? GetExplicitRegisteredInstanceProducer(Type implementationType)
         {

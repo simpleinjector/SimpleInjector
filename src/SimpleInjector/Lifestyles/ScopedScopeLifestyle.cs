@@ -27,7 +27,7 @@ namespace SimpleInjector.Lifestyles
         {
             ScopedLifestyle? lifestyle = container.Options.DefaultScopedLifestyle;
 
-            if (lifestyle != null)
+            if (lifestyle is not null)
             {
                 return lifestyle.GetCurrentScope(container) ?? ThrowThereIsNoActiveScopeException();
             }

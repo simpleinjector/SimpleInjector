@@ -22,7 +22,7 @@ namespace SimpleInjector.Internals
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static Func<TResult> CreateConstantValueDelegate<TResult>(Expression expression)
         {
-            object value = ((ConstantExpression)expression).Value;
+            object value = ((ConstantExpression)expression).Value!;
 
             var singleton = (TResult)value;
 
@@ -265,7 +265,7 @@ namespace SimpleInjector.Internals
             {
                 ScopedRegistration? registration = ScopedRegistration.GetScopedRegistration(node);
 
-                if (registration != null && object.ReferenceEquals(registration.Container, this.container))
+                if (registration is not null && object.ReferenceEquals(registration.Container, this.container))
                 {
                     this.perObjectGraphRegistrations.Add(new OptimizableRegistrationInfo(registration, node));
                 }
@@ -295,7 +295,7 @@ namespace SimpleInjector.Internals
             {
                 var registration = Array.Find(this.registrationsToOptimize, r => r.OriginalExpression == node);
 
-                return registration != null
+                return registration is not null
                     ? registration.LazyScopeRegistrationGetInstanceExpression
                     : base.VisitMethodCall(node);
             }
@@ -399,7 +399,7 @@ namespace SimpleInjector.Internals
             public override Expression? Visit(Expression node)
             {
                 // Weird: node can be null: CallExpression.Object can be null.
-                if (node != null)
+                if (node is not null)
                 {
                     var info = this.GetInfo(node);
                     info.Count++;
@@ -425,7 +425,7 @@ namespace SimpleInjector.Internals
 
             private ExpressionInfo GetInfo(Expression node)
             {
-                if (this.nodes.TryGetValue(node, out ExpressionInfo info))
+                if (this.nodes.TryGetValue(node, out ExpressionInfo? info))
                 {
                     return info;
                 }

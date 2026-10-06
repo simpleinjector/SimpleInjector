@@ -51,7 +51,7 @@ namespace SimpleInjector.Internals
                 {
                     var producer = this.GetInstanceProducerFromCache(closedServiceType);
 
-                    if (producer != null)
+                    if (producer is not null)
                     {
                         e.Register(producer.Registration);
                     }
@@ -104,7 +104,7 @@ namespace SimpleInjector.Internals
         {
             lock (this.producerCache)
             {
-                if (!this.producerCache.TryGetValue(closedServiceType, out InstanceProducer producer))
+                if (!this.producerCache.TryGetValue(closedServiceType, out InstanceProducer? producer))
                 {
                     this.producerCache[closedServiceType] =
                         producer = this.BuildCollectionProducer(closedServiceType);

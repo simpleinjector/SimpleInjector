@@ -40,7 +40,7 @@ namespace SimpleInjector.Internals
 
         internal string DebuggerDisplay =>
             $"ImplementationType: {this.ImplementationType.ToFriendlyName()}, " + (
-            this.Registration != null
+            this.Registration is not null
                 ? $"Registration.ImplementationType: {this.Registration.ImplementationType.ToFriendlyName()}"
                 : "Registration: <null>");
 

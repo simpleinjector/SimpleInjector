@@ -25,7 +25,7 @@ namespace SimpleInjector.Lifestyles
 
             Disposability subTypable =
                 !registration.ImplementationType.IsSealed()
-                && (expressionIntercepted || registration.instanceCreator != null)
+                && (expressionIntercepted || registration.instanceCreator is not null)
                 ? Disposability.Maybe
                 : Disposability.Never;
 

@@ -239,7 +239,7 @@ namespace SimpleInjector
         {
             Action<object>? initializer = this.Container.GetInitializer(implementationType, this);
 
-            if (initializer != null)
+            if (initializer is not null)
             {
                 return Expression.Convert(
                     BuildExpressionWithInstanceInitializer(expression, initializer),
@@ -470,7 +470,7 @@ namespace SimpleInjector
 
         private Expression ReplacePlaceHoldersWithOverriddenParameters(Expression expression)
         {
-            if (this.overriddenParameters != null)
+            if (this.overriddenParameters is not null)
             {
                 foreach (var overriddenParameter in this.overriddenParameters.Values)
                 {
@@ -486,7 +486,7 @@ namespace SimpleInjector
 
         private OverriddenParameter GetOverriddenParameterFor(ParameterInfo parameter)
         {
-            if (this.overriddenParameters != null
+            if (this.overriddenParameters is not null
                 && this.overriddenParameters.TryGetValue(parameter, out OverriddenParameter p))
             {
                 return p;

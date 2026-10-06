@@ -197,7 +197,7 @@ namespace SimpleInjector
             Requires.IsNotNull(fallbackLifestyle);
 
             return new HybridLifestyle(
-                lifestyleSelector: container => defaultLifestyle.GetCurrentScope(container) != null,
+                lifestyleSelector: container => defaultLifestyle.GetCurrentScope(container) is not null,
                 trueLifestyle: defaultLifestyle,
                 falseLifestyle: fallbackLifestyle);
         }
@@ -741,7 +741,7 @@ namespace SimpleInjector
                 WeakReference weakRegistration =
                     this.GetLifestyleRegistrationEntryFromCache(concreteType, container);
 
-                var registration = (Registration)weakRegistration.Target;
+                var registration = (Registration?)weakRegistration.Target;
 
                 if (registration is null)
                 {
@@ -757,7 +757,7 @@ namespace SimpleInjector
         {
             var lifestyleCache = container.LifestyleRegistrationCache;
 
-            if (!lifestyleCache.TryGetValue(this.IdentificationKey, out Dictionary<Type, WeakReference> cache))
+            if (!lifestyleCache.TryGetValue(this.IdentificationKey, out Dictionary<Type, WeakReference>? cache))
             {
                 cache = new Dictionary<Type, WeakReference>(100);
                 lifestyleCache[this.IdentificationKey] = cache;
@@ -765,7 +765,7 @@ namespace SimpleInjector
 
             // The created Registration must be wrapped in a WeakReference, because these instances can
             // go out of scope, and holding a reference might cause a memory leak.
-            if (!cache.TryGetValue(concreteType, out WeakReference weakRegistration))
+            if (!cache.TryGetValue(concreteType, out WeakReference? weakRegistration))
             {
                 cache[concreteType] = weakRegistration = new WeakReference(null);
             }

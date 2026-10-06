@@ -60,7 +60,7 @@ namespace SimpleInjector.Internals
             {
                 this.ThrowWhenConditionalIsRegisteredInOverridingMode(producer);
 
-                if (this.closedProviders != null)
+                if (this.closedProviders is not null)
                 {
                     if (this.closedProviders.ContainsKey(serviceType))
                     {
@@ -192,7 +192,7 @@ namespace SimpleInjector.Internals
         {
             var overlappingProvider = this.GetFirstOverlappingProvider(producerToRegister);
 
-            if (overlappingProvider != null)
+            if (overlappingProvider is not null)
             {
                 if (overlappingProvider.ServiceType.IsGenericTypeDefinition())
                 {
@@ -223,7 +223,7 @@ namespace SimpleInjector.Internals
             ClosedToInstanceProducerProvider? firstOverlappingClosedProvider = null;
             OpenGenericToInstanceProducerProvider? firstOverlappingOpenProvider = null;
 
-            if (this.closedProviders != null)
+            if (this.closedProviders is not null)
             {
                 // PERF: Only closed providers exist. We can speed up the operation by going just through
                 // the closed providers for the given service type.
@@ -233,7 +233,7 @@ namespace SimpleInjector.Internals
                 }
             }
 
-            if (this.openProviders != null)
+            if (this.openProviders is not null)
             {
                 foreach (var openProvider in this.openProviders)
                 {
@@ -248,8 +248,8 @@ namespace SimpleInjector.Internals
             // PERF: Is most cases we can prevent going through the list when there's only one of the two
             // overlapping.
             if (firstOverlappingClosedProvider is null && firstOverlappingOpenProvider is null) return null;
-            if (firstOverlappingClosedProvider != null) return firstOverlappingClosedProvider;
-            if (firstOverlappingOpenProvider != null) return firstOverlappingOpenProvider;
+            if (firstOverlappingClosedProvider is not null) return firstOverlappingClosedProvider;
+            if (firstOverlappingOpenProvider is not null) return firstOverlappingOpenProvider;
 
             // To bad, there is both an overlapping open and a closed provider. Since we must report the first
             // first overlapping provider, we have to go through the list (again).
@@ -282,7 +282,7 @@ namespace SimpleInjector.Internals
                 && this.AllowOverridingRegistrations
                 && !provider.GetAppliesToAllClosedServiceTypes())
             {
-                if (provider.Predicate != null)
+                if (provider.Predicate is not null)
                 {
                     throw new NotSupportedException(
                         StringResources.MakingConditionalRegistrationsInOverridingModeIsNotSupported());
@@ -312,7 +312,7 @@ namespace SimpleInjector.Internals
             // types that the providerToRegister can be applied to as well.
             var supersetProvider = this.GetFirstOrDefaultSupersetProvidersFor(providerImplementationType);
 
-            bool overlaps = providerToRegisterIsSuperset || supersetProvider != null;
+            bool overlaps = providerToRegisterIsSuperset || supersetProvider is not null;
 
             if (!isReplacement && overlaps)
             {
@@ -334,7 +334,7 @@ namespace SimpleInjector.Internals
             {
                 foreach (var provider in this.providers)
                 {
-                    if (provider.ImplementationType != null)
+                    if (provider.ImplementationType is not null)
                     {
                         if (provider.ImplementationType == implementationType
                             || provider.GetAppliesToAllClosedServiceTypes())
@@ -371,7 +371,7 @@ namespace SimpleInjector.Internals
                 var producer =
                     provider.TryGetProducer(closedGenericServiceType, consumer, handled: handled);
 
-                if (producer != null)
+                if (producer is not null)
                 {
                     list ??= new List<FoundInstanceProducer>(capacity: 1);
 
@@ -452,7 +452,7 @@ namespace SimpleInjector.Internals
                 this.appliesToAllClosedServiceTypes = false;
             }
 
-            public bool IsConditional => this.Predicate != null;
+            public bool IsConditional => this.Predicate is not null;
 
             // I turned this former property into a method call to make it more obvious that this is can be
             // a very costly operation (which can also throw first-chance exceptions).
@@ -491,7 +491,7 @@ namespace SimpleInjector.Internals
             public InstanceProducer? TryGetProducer(
                 Type serviceType, InjectionConsumerInfo consumer, bool handled)
             {
-                Type? closedImplementation = this.ImplementationType != null
+                Type? closedImplementation = this.ImplementationType is not null
                     ? GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType)
                     : null;
 
@@ -499,7 +499,7 @@ namespace SimpleInjector.Internals
                 // * from ImplementationType due to type constraints
                 // * from the implementation returned from ImplementationTypeFactory due to type constraints,
                 //   as it can return partly closed types.
-                Type? GetImplementationType() => this.ImplementationType != null
+                Type? GetImplementationType() => this.ImplementationType is not null
                     ? closedImplementation
                     : this.GetImplementationTypeThroughFactory(serviceType, consumer);
 
@@ -509,9 +509,9 @@ namespace SimpleInjector.Internals
                 // unneeded producers from being created, because this might cause diagnostic warnings,
                 // such as torn lifestyle warnings.
                 var shouldBuildProducer =
-                    (this.ImplementationType is null || closedImplementation != null)
+                    (this.ImplementationType is null || closedImplementation is not null)
                     && this.MatchesPredicate(context)
-                    && context.ImplementationType != null;
+                    && context.ImplementationType is not null;
 
                 return shouldBuildProducer ? this.GetProducer(context) : null;
             }
@@ -520,7 +520,7 @@ namespace SimpleInjector.Internals
             // the service to be matching, since we can't (and should not) invoke the factory.
             public bool MatchesServiceType(Type serviceType) =>
                 this.ImplementationType is null
-                || GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType) != null;
+                || GenericTypeBuilder.MakeClosedImplementation(serviceType, this.ImplementationType) is not null;
 
             private Type? GetImplementationTypeThroughFactory(Type serviceType, InjectionConsumerInfo consumer)
             {

@@ -31,7 +31,7 @@ namespace SimpleInjector
         /// this instance.
         /// </summary>
         /// <value>The indication whether the event has been handled.</value>
-        public bool Handled => this.Expression != null || this.Registration != null;
+        public bool Handled => this.Expression is not null || this.Registration is not null;
 
         internal Expression? Expression { get; private set; }
 

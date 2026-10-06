@@ -54,7 +54,7 @@ namespace SimpleInjector.Internals
         {
             lock (ServiceCreatedListenersLocker)
             {
-                if (serviceCreatedListeners != null)
+                if (serviceCreatedListeners is not null)
                 {
                     var args = new ServiceCreatedListenerArgs(producer);
 
@@ -86,7 +86,7 @@ namespace SimpleInjector.Internals
                 typeof(ContainerControlledCollection<>).MakeGenericType(serviceType),
                 [container]);
 
-            return (IContainerControlledCollection)collection;
+            return (IContainerControlledCollection)collection!;
         }
 
         internal static InstanceProducer CreateInstanceProducer<TService>(

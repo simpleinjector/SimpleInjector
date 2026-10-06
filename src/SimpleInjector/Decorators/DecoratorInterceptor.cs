@@ -40,7 +40,7 @@ namespace SimpleInjector.Decorators
 
                 if (decoratorInterceptor.SatisfiesPredicate())
                 {
-                    if (data.DecoratorTypeFactory != null)
+                    if (data.DecoratorTypeFactory is not null)
                     {
                         // Context gets set by SatisfiesPredicate
                         var context = decoratorInterceptor.Context!;
@@ -49,7 +49,7 @@ namespace SimpleInjector.Decorators
                             e.RegisteredServiceType, context);
                     }
 
-                    if (closedDecoratorType != null)
+                    if (closedDecoratorType is not null)
                     {
                         decoratorInterceptor.ApplyDecorator(closedDecoratorType);
                     }
@@ -84,7 +84,7 @@ namespace SimpleInjector.Decorators
 
             if (uncontrolledInterceptor.SatisfiesPredicate())
             {
-                if (data.DecoratorTypeFactory != null)
+                if (data.DecoratorTypeFactory is not null)
                 {
                     // Context gets set by SatisfiesPredicate
                     var context = uncontrolledInterceptor.Context!;
@@ -93,7 +93,7 @@ namespace SimpleInjector.Decorators
                         serviceType, context);
                 }
 
-                if (decoratorType != null)
+                if (decoratorType is not null)
                 {
                     uncontrolledInterceptor.SetDecorator(decoratorType);
                     uncontrolledInterceptor.ApplyDecorator();
@@ -120,7 +120,7 @@ namespace SimpleInjector.Decorators
                 return false;
             }
 
-            if (data.DecoratorTypeFactory != null)
+            if (data.DecoratorTypeFactory is not null)
             {
                 // Since a decorator type factory delegate has been registered, we must assume at this point
                 // that the decorator must be applied, because we can't call the factory at this point. The

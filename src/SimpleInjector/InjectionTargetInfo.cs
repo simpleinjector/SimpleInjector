@@ -48,21 +48,21 @@ namespace SimpleInjector
 
         /// <summary>Gets the name of the target.</summary>
         /// <value>A string containing the name of the target.</value>
-        public string Name => this.Parameter != null ? this.Parameter.Name : this.Property!.Name;
+        public string Name => this.Parameter is not null ? this.Parameter.Name : this.Property!.Name;
 
         /// <summary>Gets the type of the target.</summary>
         /// <value>A <see cref="Type"/> containing the type of the target.</value>
         public Type TargetType =>
-            this.Parameter != null ? this.Parameter.ParameterType : this.Property!.PropertyType;
+            this.Parameter is not null ? this.Parameter.ParameterType : this.Property!.PropertyType;
 
         /// <summary>Gets the member of the target. This is either the constructor of the parameter, or in
         /// case the target is a property, the property itself will be returned.</summary>
         /// <value>A <see cref="TargetType"/> containing the type of the target.</value>
-        public MemberInfo Member => this.Parameter != null ? this.Parameter.Member : this.Property!;
+        public MemberInfo Member => this.Parameter is not null ? this.Parameter.Member : this.Property!;
 
         internal string DebuggerDisplay => string.Format(CultureInfo.InvariantCulture,
             "{0} {{ Name = \"{1}\", Type = {2} }}",
-            this.Parameter != null ? "Parameter" : "Property",
+            this.Parameter is not null ? "Parameter" : "Property",
             this.Name,
             this.TargetType.ToFriendlyName());
 
@@ -79,7 +79,7 @@ namespace SimpleInjector
         /// <exception cref="AmbiguousMatchException">There is more than one attribute of type attributeType
         /// defined on this member.</exception>
         public object[] GetCustomAttributes(bool inherit) =>
-            this.Parameter != null
+            this.Parameter is not null
                 ? this.Parameter.GetCustomAttributes(inherit).ToArray()
                 : this.Property!.GetCustomAttributes(inherit).ToArray();
 
@@ -94,7 +94,7 @@ namespace SimpleInjector
         /// <exception cref="TypeLoadException">The custom attribute type cannot be loaded.</exception>
         /// <exception cref="ArgumentNullException">Thrown when attributeType is null.</exception>
         public object[] GetCustomAttributes(Type attributeType, bool inherit) =>
-            this.Parameter != null
+            this.Parameter is not null
                 ? this.Parameter.GetCustomAttributes(attributeType, inherit).ToArray()
                 : this.Property!.GetCustomAttributes(attributeType, inherit).ToArray();
 
@@ -106,7 +106,7 @@ namespace SimpleInjector
         /// <param name="inherit">When true, look up the hierarchy chain for the inherited custom attribute.</param>
         /// <returns>true if the attributeType is defined on this member; false otherwise.</returns>
         public bool IsDefined(Type attributeType, bool inherit) =>
-            this.Parameter != null
+            this.Parameter is not null
                 ? this.Parameter.IsDefined(attributeType, inherit)
                 : this.Property!.IsDefined(attributeType, inherit);
 
@@ -125,7 +125,7 @@ namespace SimpleInjector
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
         /// <returns>A custom attribute that matches T, or null if no such attribute is found.</returns>
         public T GetCustomAttribute<T>(bool inherit) where T : Attribute =>
-            this.Parameter != null
+            this.Parameter is not null
                 ? this.Parameter.GetCustomAttribute<T>(inherit)
                 : this.Property!.GetCustomAttribute<T>(inherit);
 
@@ -147,7 +147,7 @@ namespace SimpleInjector
         /// <returns>A custom attribute matching attributeType, or null if no such attribute is found.
         /// </returns>
         public Attribute GetCustomAttribute(Type attributeType, bool inherit) =>
-            this.Parameter != null
+            this.Parameter is not null
                 ? this.Parameter.GetCustomAttribute(attributeType, inherit)
                 : this.Property!.GetCustomAttribute(attributeType, inherit);
 

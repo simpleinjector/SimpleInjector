@@ -101,7 +101,7 @@ namespace SimpleInjector.Internals
             {
                 InstanceProducer? producer = provider.TryGetProducer(consumer, handled);
 
-                if (producer != null)
+                if (producer is not null)
                 {
                     yield return producer;
                     handled = true;
@@ -146,7 +146,7 @@ namespace SimpleInjector.Internals
 
         private IEnumerable<InstanceProducer> GetOverlappingProducers(InstanceProducer producerToRegister) =>
             from producer in this.CurrentProducers
-            where producer.FinalImplementationType != null
+            where producer.FinalImplementationType is not null
             where !producer.Registration.WrapsInstanceCreationDelegate
             where !producerToRegister.Registration.WrapsInstanceCreationDelegate
             where !producer.Registration.ResolvesExternallyOwnedInstance
@@ -278,8 +278,6 @@ namespace SimpleInjector.Internals
 
             private InstanceProducer GetProducer(PredicateContext context)
             {
-                InstanceProducer producer;
-
                 // Never build a producer twice. This could cause components with a torn lifestyle.
                 lock (this.cache)
                 {
@@ -287,14 +285,14 @@ namespace SimpleInjector.Internals
                     Type implementationType = context.ImplementationType!;
 
                     // We need to cache on implementation, because service type is always the same.
-                    if (!this.cache.TryGetValue(implementationType, out producer))
+                    if (!this.cache.TryGetValue(implementationType, out var producer))
                     {
                         this.cache[implementationType] =
                             producer = this.CreateNewProducerFor(implementationType);
                     }
-                }
 
-                return producer;
+                    return producer;
+                }
             }
 
             private InstanceProducer CreateNewProducerFor(Type concreteType) => new(

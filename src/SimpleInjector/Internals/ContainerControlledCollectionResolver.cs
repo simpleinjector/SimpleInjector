@@ -81,7 +81,7 @@ namespace SimpleInjector.Internals
             let builder = new GenericTypeBuilder(closedGenericServiceType, openGenericImplementation)
             let result = builder.BuildClosedGenericImplementation()
             where result.ClosedServiceTypeSatisfiesAllTypeConstraints
-            select item.Registration != null
+            select item.Registration is not null
                 ? item
                 : ContainerControlledItem.CreateFromType(
                     openGenericImplementation, result.ClosedGenericImplementation!, item.Lifestyle))

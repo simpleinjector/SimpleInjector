@@ -24,7 +24,7 @@ namespace SimpleInjector.Advanced.Internal
         {
             get
             {
-                if (this.scopeFactory != null)
+                if (this.scopeFactory is not null)
                 {
                     this.value = container.GetVerificationOrResolveScopeForCurrentThread()
                         ?? this.scopeFactory.Invoke();

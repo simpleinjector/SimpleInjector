@@ -309,7 +309,7 @@ namespace SimpleInjector
 
         internal static string CollectionUsedDuringConstruction(
             Type consumer, InstanceProducer producer, KnownRelationship? relationship = null) =>
-            relationship != null && IsListOrArrayRelationship(relationship)
+            relationship is not null && IsListOrArrayRelationship(relationship)
                 ? CollectionUsedDuringConstructionByInjectingMutableCollection(consumer, producer, relationship!)
                 : CollectionUsedDuringConstructionByIteratingAStream(consumer, producer, relationship);
 
@@ -370,7 +370,7 @@ namespace SimpleInjector
             Type[] skippedDecorators,
             Type[] lookalikes)
         {
-            var formatString = target.Parameter != null
+            var formatString = target.Parameter is not null
                 ? "The constructor of type {0} contains the parameter "
                 : "Type {0} contains the property ";
 
@@ -419,7 +419,7 @@ namespace SimpleInjector
                 reason = " because it is a value type";
             }
 
-            if (invalidTarget.Parameter != null)
+            if (invalidTarget.Parameter is not null)
             {
                 return Format(
                     "The constructor of type {0} contains parameter '{1}' of type {2}, which can not be " +
@@ -670,7 +670,7 @@ namespace SimpleInjector
                     implementations[0],
                     implementations.Skip(1).ToArray());
 
-            return duplicateAssemblyLookalike != null
+            return duplicateAssemblyLookalike is not null
                 ? AssemblyLoadedMoreThanOnce(implementations[0], duplicateAssemblyLookalike)
                 : string.Empty;
         }
@@ -797,7 +797,7 @@ namespace SimpleInjector
 
         internal static string ThisOverloadDoesNotAllowOpenGenericsExample(
             Type openGenericServiceType, Type[] openGenericTypes, Type firstClosedAndNonGenericType) =>
-            firstClosedAndNonGenericType != null
+            firstClosedAndNonGenericType is not null
                 ? Format(
                     "As an example, the supplied type {0} can be used as implementation, because it " +
                     "implements the closed-generic service type {1}. The supplied open-generic {2}, " +
@@ -1072,7 +1072,7 @@ namespace SimpleInjector
                 producer.FinalImplementationType.ToFriendlyName(),
                 producer.ServiceType.ToFriendlyName(),
                 consumer.ToFriendlyName(),
-                relationship != null
+                relationship is not null
                     ? relationship.Dependency.ServiceType.ToFriendlyName()
                     : Format(
                         "collection of {0} services",
@@ -1261,7 +1261,7 @@ namespace SimpleInjector
             Type duplicateAssemblyLookalike =
                 GetDuplicateLoadedAssemblyLookalikeTypeOrNull(serviceType, lookalikes);
 
-            if (duplicateAssemblyLookalike != null)
+            if (duplicateAssemblyLookalike is not null)
             {
                 return AssemblyLoadedMoreThanOnce(serviceType, duplicateAssemblyLookalike);
             }
@@ -1376,7 +1376,7 @@ namespace SimpleInjector
             string? lookalikeLocation = GetAssemblyLocationOrNull(duplicateAssemblyLookalike);
 
             if (serviceTypeLocation != lookalikeLocation
-                && (lookalikeLocation != null || serviceTypeLocation != null))
+                && (lookalikeLocation is not null || serviceTypeLocation != null))
             {
                 return Format(
                     "The assembly of the requested type is located at {0}, while the " +

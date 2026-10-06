@@ -87,7 +87,7 @@ namespace SimpleInjector
                 new DependencyMetadataInstanceProducerBuilder(this),
                 new UnregisteredTypeResolutionInstanceProducerBuilder(
                     container: this,
-                    shouldResolveUnregisteredTypes: () => this.resolveUnregisteredType != null,
+                    shouldResolveUnregisteredTypes: () => this.resolveUnregisteredType is not null,
                     resolveUnregisteredType: e => this.resolveUnregisteredType?.Invoke(this, e)),
                 new CollectionInstanceProducerBuilder(this)
             ];
@@ -290,7 +290,7 @@ namespace SimpleInjector
             // Filter out the invalid registrations (see the IsValid property for more information).
             producers =
                 from producer in producers.Distinct(InstanceProducer.EqualityComparer)
-                where producer != null
+                where producer is not null
                 where includeInvalidContainerRegisteredTypes || producer.IsValid
                 select producer;
 
@@ -300,7 +300,7 @@ namespace SimpleInjector
         internal Expression OnExpressionBuilding(
             Registration registration, Type implementationType, Expression instanceCreatorExpression)
         {
-            if (this.expressionBuilding != null)
+            if (this.expressionBuilding is not null)
             {
                 var relationships = new KnownRelationshipCollection(registration.GetRelationships().ToList());
 
@@ -327,7 +327,7 @@ namespace SimpleInjector
         internal ExpressionBuiltEventArgs? OnExpressionBuilt(
             InstanceProducer instanceProducer, Expression expression)
         {
-            if (this.expressionBuilt != null)
+            if (this.expressionBuilt is not null)
             {
                 var relationships =
                     new KnownRelationshipCollection(instanceProducer.GetRelationships().ToList());
