@@ -33,7 +33,7 @@ namespace SimpleInjector.Lifestyles
 
         private static Type GetImplementationTypeFor(Expression expression) =>
             expression is NewExpression newExpression
-                ? newExpression.Constructor.DeclaringType
+                ? newExpression.Constructor!.DeclaringType!
                 : expression.Type;
     }
 }

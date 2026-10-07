@@ -68,7 +68,7 @@ namespace SimpleInjector
             && object.ReferenceEquals(this.scope, other.scope);
 
         /// <inheritdoc />
-        public override bool Equals(object obj) =>
+        public override bool Equals(object? obj) =>
             obj is DependencyMetadata<TService> other && this.Equals(other);
 
         /// <inheritdoc />

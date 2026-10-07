@@ -31,7 +31,7 @@ namespace SimpleInjector.Decorators
         internal static int GetNumberOfServiceTypeDependencies(
             Type serviceType, ConstructorInfo decoratorConstructor)
         {
-            Type decoratorType = GetDecoratingBaseType(serviceType, decoratorConstructor);
+            Type? decoratorType = GetDecoratingBaseType(serviceType, decoratorConstructor);
 
             if (decoratorType is null)
             {
@@ -66,9 +66,9 @@ namespace SimpleInjector.Decorators
 
         // Returns the base type of the decorator that can be used for decoration (because serviceType might
         // be open generic, while the base type might not be).
-        private static Type GetDecoratingBaseType(Type serviceType, ConstructorInfo decoratorConstructor)
+        private static Type? GetDecoratingBaseType(Type serviceType, ConstructorInfo decoratorConstructor)
         {
-            var abstractions = Types.GetBaseTypeCandidates(serviceType, decoratorConstructor.DeclaringType);
+            var abstractions = Types.GetBaseTypeCandidates(serviceType, decoratorConstructor.DeclaringType!);
 
             ParameterInfo[] constructorParameters = decoratorConstructor.GetParameters();
 

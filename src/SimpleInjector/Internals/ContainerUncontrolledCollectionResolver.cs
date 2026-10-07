@@ -39,7 +39,7 @@ namespace SimpleInjector.Internals
         internal override void RegisterUncontrolledCollection(Type serviceType, InstanceProducer producer) =>
             this.AddRegistrationGroup(RegistrationGroup.CreateForUncontrolledProducer(serviceType, producer));
 
-        protected override InstanceProducer BuildCollectionProducer(Type closedServiceType)
+        protected override InstanceProducer? BuildCollectionProducer(Type closedServiceType)
         {
             InstanceProducer[] producers = this.GetAssignableProducers(closedServiceType);
 

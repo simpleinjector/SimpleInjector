@@ -25,7 +25,7 @@ namespace SimpleInjector.Decorators
         // The decorator type definition (possibly open generic).
         protected Type? DecoratorTypeDefinition => data.DecoratorType;
 
-        internal void ExpressionBuilt(object sender, ExpressionBuiltEventArgs e)
+        internal void ExpressionBuilt(object? sender, ExpressionBuiltEventArgs e)
         {
             this.TryToApplyDecorator(e);
             this.TryToApplyDecoratorOnContainerUncontrolledCollections(e);

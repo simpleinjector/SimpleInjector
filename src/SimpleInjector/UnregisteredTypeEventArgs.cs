@@ -57,7 +57,7 @@ namespace SimpleInjector
 
             this.Expression =
                 Expression.Call(
-                    typeof(UnregisteredTypeEventArgsCallHelper).GetMethod("GetInstance")
+                    typeof(UnregisteredTypeEventArgsCallHelper).GetMethod("GetInstance")!
                         .MakeGenericMethod(this.UnregisteredServiceType),
                     Expression.Constant(instanceCreator));
         }
@@ -96,7 +96,7 @@ namespace SimpleInjector
         /// <summary>
         /// Registers a <see cref="Registration"/> that describes the creation of instances of the type
         /// expressed by the <see cref="UnregisteredServiceType"/> for this and future requests. The
-        /// registration will be cached and future requests will directly call unon that registration, the
+        /// registration will be cached and future requests will directly call upon that registration, the
         /// expression that it generates or the delegate that gets compiled from that expression.
         /// </summary>
         /// <param name="registration">The registration that describes the creation of instances according to

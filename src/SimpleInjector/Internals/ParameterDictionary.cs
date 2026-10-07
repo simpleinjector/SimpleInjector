@@ -29,10 +29,16 @@ namespace SimpleInjector.Internals
             // We compare ParameterInfo by its Name, Type and its member, since there is no guarantee that
             // there will be only one ParameterInfo instance per 'physical' parameter in the CLR.
             // This caused an actual bug (see #323) in Simple Injector.
-            public bool Equals(ParameterInfo x, ParameterInfo y) =>
-                x.Name == y.Name
-                && x.ParameterType == y.ParameterType
-                && Equals(x.Member, y.Member);
+            public bool Equals(ParameterInfo? x, ParameterInfo? y)
+            {
+                if (x is null && y is null) return true;
+                if (x is null) return false;
+                if (y is null) return false;
+
+                return x.Name == y.Name
+                    && x.ParameterType == y.ParameterType
+                    && Equals(x.Member, y.Member);
+            }
 
             // Note that it is valid for a ParameterInfo.Name to be null in the CLR (and Castle Dynamic proxy
             // actually spits out types with null parameter names), so we have to guard against this. Since
@@ -57,7 +63,7 @@ namespace SimpleInjector.Internals
 
             // The previous comment also holds for getting the hash code of MemberInfo.
             private static int GetHashCode(MemberInfo obj) =>
-                obj.DeclaringType.GetHashCode() ^ obj.Name.GetHashCode();
+                obj.DeclaringType!.GetHashCode() ^ obj.Name.GetHashCode();
         }
     }
 }

@@ -50,7 +50,7 @@ namespace SimpleInjector.Internals
 
         protected override Type[] GetAllKnownClosedServiceTypes() => (
             from registrationGroup in this.RegistrationGroups
-            from item in registrationGroup.ControlledItems
+            from item in registrationGroup.ControlledItems!
             let implementation = item.ImplementationType
             where !implementation.ContainsGenericParameters()
             from service in implementation.GetTypeBaseTypesAndInterfacesFor(this.ServiceType)
@@ -71,7 +71,7 @@ namespace SimpleInjector.Internals
             from registrationGroup in this.RegistrationGroups
             where registrationGroup.ServiceType.ContainsGenericParameters() ||
                 closedGenericServiceType.IsAssignableFrom(registrationGroup.ServiceType)
-            from item in registrationGroup.ControlledItems
+            from item in registrationGroup.ControlledItems!
             select item;
 
         private static ContainerControlledItem[] GetClosedGenericImplementationsFor(

@@ -401,7 +401,7 @@ namespace SimpleInjector
                 // confusing to the user.
                 // At this point we know that the decorator type implements an service type in some way
                 // (either open or closed), so we this call will return at least one record.
-                serviceType = Types.GetBaseTypeCandidates(serviceType, constructor.DeclaringType).First();
+                serviceType = Types.GetBaseTypeCandidates(serviceType, constructor.DeclaringType!).First();
 
                 ThrowMustContainTheServiceTypeAsArgument(serviceType, constructor, paramName);
             }
@@ -415,7 +415,7 @@ namespace SimpleInjector
             Type serviceType, ConstructorInfo decoratorConstructor, string? paramName)
         {
             string message = StringResources.TheConstructorOfTypeMustContainTheServiceTypeAsArgument(
-                decoratorConstructor.DeclaringType, serviceType);
+                decoratorConstructor.DeclaringType!, serviceType);
 
             throw new ArgumentException(message, paramName);
         }
@@ -425,7 +425,7 @@ namespace SimpleInjector
         {
             string message =
                 StringResources.TheConstructorOfTypeMustContainASingleInstanceOfTheServiceTypeAsArgument(
-                    decoratorConstructor.DeclaringType, serviceType);
+                    decoratorConstructor.DeclaringType!, serviceType);
 
             throw new ArgumentException(message, paramName);
         }

@@ -547,8 +547,6 @@ namespace SimpleInjector.Internals
 
             private InstanceProducer GetProducer(PredicateContext context)
             {
-                InstanceProducer producer;
-
                 // Never build a producer twice. This could cause components with a torn lifestyle.
                 lock (this.cache)
                 {
@@ -558,13 +556,13 @@ namespace SimpleInjector.Internals
                     // used for multiple services (implements multiple closed interfaces).
                     var key = new { context.ServiceType, context.ImplementationType };
 
-                    if (!this.cache.TryGetValue(key, out producer))
+                    if (!this.cache.TryGetValue(key, out var producer))
                     {
                         this.cache[key] = producer = this.CreateNewProducerFor(context);
                     }
-                }
 
-                return producer;
+                    return producer;
+                }
             }
 
             private InstanceProducer CreateNewProducerFor(PredicateContext context) =>
@@ -577,7 +575,7 @@ namespace SimpleInjector.Internals
 
                 // Never build a registration for a particular implementation type twice. This would break
                 // the promise of returning singletons.
-                if (!this.registrationCache.TryGetValue(key, out Registration registration))
+                if (!this.registrationCache.TryGetValue(key, out Registration? registration))
                 {
                     this.registrationCache[key] = registration = this.CreateNewRegistrationFor(key);
                 }

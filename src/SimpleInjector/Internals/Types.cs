@@ -257,7 +257,7 @@ namespace SimpleInjector.Internals
         {
             if (type.IsArray)
             {
-                return type.GetElementType().ToFriendlyName(fullyQualifiedName, argumentsFormatter) + "[]";
+                return type.GetElementType()!.ToFriendlyName(fullyQualifiedName, argumentsFormatter) + "[]";
             }
 
             if (!fullyQualifiedName && CSharpKeywordTypes.ContainsKey(type))
@@ -269,7 +269,7 @@ namespace SimpleInjector.Internals
 
             if (type.IsNested && !type.IsGenericParameter)
             {
-                name = type.DeclaringType.ToFriendlyName(fullyQualifiedName, argumentsFormatter) + "." + name;
+                name = type.DeclaringType!.ToFriendlyName(fullyQualifiedName, argumentsFormatter) + "." + name;
             }
 
             var genericArguments = GetGenericArguments(type);
@@ -288,7 +288,7 @@ namespace SimpleInjector.Internals
 
         private static Type[] GetGenericArguments(Type type) =>
             type.IsNested
-                ? type.GetGenericArguments().Skip(type.DeclaringType.GetGenericArguments().Length).ToArray()
+                ? type.GetGenericArguments().Skip(type.DeclaringType!.GetGenericArguments().Length).ToArray()
                 : type.GetGenericArguments();
     }
 }

@@ -13,7 +13,7 @@ namespace SimpleInjector.Advanced
     {
         /// <inheritdoc />
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override bool Equals(object obj) => base.Equals(obj);
+        public override bool Equals(object? obj) => base.Equals(obj);
 
         /// <inheritdoc />
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -21,7 +21,7 @@ namespace SimpleInjector.Advanced
 
         /// <inheritdoc />
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override string ToString() => base.ToString();
+        public override string? ToString() => base.ToString();
 
         /// <summary>Gets the <see cref="System.Type"/> of the current instance.</summary>
         /// <returns>The <see cref="System.Type"/> instance that represents the exact runtime

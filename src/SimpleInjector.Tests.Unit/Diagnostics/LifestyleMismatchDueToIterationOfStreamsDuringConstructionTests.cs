@@ -191,7 +191,7 @@
             AssertThat.ThrowsWithExceptionMessageContains<DiagnosticVerificationException>(
                 "ILogger[] is a mutable collection type. Simple Injector always creates the mutable " +
                 "collection types array and List<T> as transient, because a consumer can change the " +
-                "contents of such collection, which could break seemingly unrelated parts parts of your " +
+                "contents of such collection, which could break seemingly unrelated parts of your " +
                 "application if the collection was shared between consumers. Instead, either consider " +
                 "lowering the lifestyle of ServiceDependingOn<ILogger[]> or change " +
                 "ServiceDependingOn<ILogger[]>'s dependency from ILogger[] to one of the collection types " +

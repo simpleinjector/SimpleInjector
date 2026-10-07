@@ -43,7 +43,7 @@ namespace SimpleInjector.Advanced
         public override int GetHashCode() => Helpers.Hash(this.Context, this.Instance);
 
         /// <inheritdoc />
-        public override bool Equals(object obj) => obj is InstanceInitializationData d && this.Equals(d);
+        public override bool Equals(object? obj) => obj is InstanceInitializationData d && this.Equals(d);
 
         /// <inheritdoc />
         public bool Equals(InstanceInitializationData other) => this == other;

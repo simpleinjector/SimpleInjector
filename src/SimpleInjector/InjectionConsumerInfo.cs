@@ -30,7 +30,7 @@ namespace SimpleInjector
             Requires.IsNotNull(parameter);
 
             this.target = new InjectionTargetInfo(parameter);
-            this.implementationType = parameter.Member.DeclaringType;
+            this.implementationType = parameter.Member.DeclaringType!;
         }
 
         /// <summary>Initializes a new instance of the <see cref="InjectionConsumerInfo"/> class.</summary>
@@ -90,7 +90,7 @@ namespace SimpleInjector
         public override int GetHashCode() => Helpers.Hash(this.implementationType, this.target);
 
         /// <inheritdoc />
-        public override bool Equals(object obj) => this.Equals(obj as InjectionConsumerInfo);
+        public override bool Equals(object? obj) => this.Equals(obj as InjectionConsumerInfo);
 
         /// <inheritdoc />
         public bool Equals(InjectionConsumerInfo? other) =>

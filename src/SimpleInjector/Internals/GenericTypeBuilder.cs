@@ -123,7 +123,7 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private CandicateServiceType FindMatchingOpenGenericServiceType()
+        private CandicateServiceType? FindMatchingOpenGenericServiceType()
         {
             // There can be more than one service that exactly matches, but they will never have a different
             // set of generic type arguments; the type system ensures this.

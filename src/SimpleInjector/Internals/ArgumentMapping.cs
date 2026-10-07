@@ -36,14 +36,14 @@ namespace SimpleInjector.Internals
         /// <summary>Implements equality. Needed for doing LINQ distinct operations.</summary>
         /// <param name="other">The other to compare to.</param>
         /// <returns>True or false.</returns>
-        bool IEquatable<ArgumentMapping>.Equals(ArgumentMapping other) =>
-            this.Argument == other.Argument && this.ConcreteType == other.ConcreteType;
+        bool IEquatable<ArgumentMapping>.Equals(ArgumentMapping? other) =>
+            this.Argument == other?.Argument && this.ConcreteType == other?.ConcreteType;
 
         /// <inheritdoc />
         public override int GetHashCode() => Helpers.Hash(this.Argument, this.ConcreteType);
 
         /// <inheritdoc />
-        public override bool Equals(object obj) =>
+        public override bool Equals(object? obj) =>
             obj is ArgumentMapping other && ((IEquatable<ArgumentMapping>)this).Equals(other);
 
         internal static ArgumentMapping Create(Type argument, Type concreteType) => new(argument, concreteType);

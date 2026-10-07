@@ -179,7 +179,7 @@ namespace SimpleInjector.Internals
 
         private Type GetGenericArrayDefinition(Type type)
         {
-            var elementType = type.GetElementType();
+            var elementType = type.GetElementType()!;
 
             if (elementType.IsArray)
             {

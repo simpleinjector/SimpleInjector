@@ -216,14 +216,14 @@ namespace SimpleInjector.Lifestyles
                 // PERF: We don't need to compile a delegate in case all we have is a constant.
                 if (expression is ConstantExpression constantExpression)
                 {
-                    return constantExpression.Value;
+                    return constantExpression.Value!;
                 }
 
                 Delegate initializer = Expression.Lambda(expression).Compile();
 
                 // This delegate might return a different instance than the originalInstance (caused by a
                 // possible interceptor).
-                return initializer.DynamicInvoke();
+                return initializer.DynamicInvoke()!;
             }
         }
 
@@ -344,12 +344,12 @@ namespace SimpleInjector.Lifestyles
                 };
             }
 
-            private KnownRelationship FindMatchingCollectionRelationship(
+            private KnownRelationship? FindMatchingCollectionRelationship(
                 InstanceProducer collectionItemProducer) =>
                 this.FindMatchingControlledCollectionRelationship(collectionItemProducer)
                 ?? this.FindMatchingMutableCollectionRelationship(collectionItemProducer);
 
-            private KnownRelationship FindMatchingControlledCollectionRelationship(
+            private KnownRelationship? FindMatchingControlledCollectionRelationship(
                 InstanceProducer collectionItemProducer)
             {
                 return (
@@ -362,7 +362,7 @@ namespace SimpleInjector.Lifestyles
                     .FirstOrDefault();
             }
 
-            private KnownRelationship FindMatchingMutableCollectionRelationship(
+            private KnownRelationship? FindMatchingMutableCollectionRelationship(
                 InstanceProducer collectionItemProducer)
             {
                 return (

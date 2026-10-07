@@ -79,6 +79,7 @@ namespace SimpleInjector
         // with the copy.
         internal static void InterlockedAddAndReplace<TKey, TValue>(
             ref Dictionary<TKey, TValue> source, TKey key, TValue value)
+            where TKey : notnull
         {
             var snapshot = MakeCopy(source);
 
@@ -95,6 +96,7 @@ namespace SimpleInjector
         }
 
         internal static Dictionary<TKey, TValue> MakeCopy<TKey, TValue>(this Dictionary<TKey, TValue> source)
+            where TKey : notnull
         {
             // We pick an initial capacity of count + 1, because we'll typically be adding 1 item to this copy.
             int initialCapacity = source.Count + 1;
@@ -110,9 +112,10 @@ namespace SimpleInjector
         }
 
         [DebuggerStepThrough]
-        internal static TValue GetValueOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> source, TKey key)
+        internal static TValue? GetValueOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> source, TKey key)
+            where TKey : notnull
         {
-            source.TryGetValue(key, out TValue value);
+            source.TryGetValue(key, out TValue? value);
 
             return value;
         }
@@ -138,7 +141,7 @@ namespace SimpleInjector
             }
 
             // If we come here, the given T is most likely System.Object and this means that the caller needs
-            // an Action<object>, the instance that needs to be casted, so we we need to build the following
+            // an Action<object>, the instance that needs to be casted, so we need to build the following
             // delegate:
             // instance => action((actionArgumentType)instance);
             var parameter = Expression.Parameter(typeof(T), "instance");
@@ -158,9 +161,9 @@ namespace SimpleInjector
         {
             // The collection is not a IEnumerable<[ServiceType]>. We wrap it in a
             // CastEnumerator<[ServiceType]> to be able to supply it to the Collections.Register<T> method.
-            var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(resultType);
+            var castMethod = typeof(Enumerable).GetMethod("Cast")!.MakeGenericMethod(resultType);
 
-            return (IEnumerable)castMethod.Invoke(null, new[] { collection });
+            return (IEnumerable)castMethod.Invoke(null, [collection])!;
         }
 
         // Partitions a collection in two separate collections, based on the predicate.
@@ -192,7 +195,7 @@ namespace SimpleInjector
             GetMethod(methodCall).GetGenericMethodDefinition();
 
         internal static ConstructorInfo GetConstructor<T>(Expression<Func<T>> constructorCall) =>
-            ((NewExpression)constructorCall.Body).Constructor;
+            ((NewExpression)constructorCall.Body).Constructor!;
 
         private static IEnumerable<T> CreateReadOnlyCollection<T>(IEnumerable<T> collection) =>
             Collections_Register_Enumerable(collection);

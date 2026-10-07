@@ -107,7 +107,7 @@ namespace SimpleInjector.Decorators
             // the predicate of the next decorator they add.
             info.AddAppliedDecorator(
                 e.RegisteredServiceType,
-                decoratorConstructor.DeclaringType,
+                decoratorConstructor.DeclaringType!,
                 this.Container,
                 this.Lifestyle,
                 e.Expression,

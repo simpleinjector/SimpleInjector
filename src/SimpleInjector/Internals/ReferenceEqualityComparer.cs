@@ -12,7 +12,7 @@ namespace SimpleInjector.Internals
         internal static readonly ReferenceEqualityComparer<T> Instance = new();
 
         [DebuggerStepThrough]
-        public bool Equals(T x, T y) => object.ReferenceEquals(x, y);
+        public bool Equals(T? x, T? y) => object.ReferenceEquals(x, y);
 
         [DebuggerStepThrough]
         public int GetHashCode(T obj) => RuntimeHelpers.GetHashCode(obj);

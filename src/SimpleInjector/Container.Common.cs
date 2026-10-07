@@ -417,7 +417,8 @@ namespace SimpleInjector
                 StringResources.ParameterTypeMustBeRegistered(
                     container: this,
                     target: target,
-                    forceFullQualificationOfTarget: this.GetLookalikesForMissingType(target.Member.DeclaringType).Any(),
+                    forceFullQualificationOfTarget:
+                        this.GetLookalikesForMissingType(target.Member.DeclaringType!).Any(),
                     numberOfConditionals: this.GetNumberOfConditionalRegistrationsFor(type),
                     hasRelatedOneToOneMapping: this.ContainsOneToOneRegistrationForCollection(type),
                     collectionRegistrationDoesNotExists: this.IsCollectionButNoOneToToOneRegistrationExists(type),

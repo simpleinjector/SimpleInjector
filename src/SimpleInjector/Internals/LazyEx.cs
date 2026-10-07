@@ -52,7 +52,7 @@ namespace SimpleInjector.Internals
             get => this.value ?? this.InitializeAndReturn();
         }
 
-        public override string ToString() =>
+        public override string? ToString() =>
             !this.IsValueCreated ? "Value is not created." : this.Value.ToString();
 
         private T InitializeAndReturn()

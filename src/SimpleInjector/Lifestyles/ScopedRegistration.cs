@@ -52,7 +52,7 @@ namespace SimpleInjector.Lifestyles
 
             return Expression.Call(
                 instance: Expression.Constant(this),
-                method: this.GetType().GetMethod(nameof(this.GetInstance))
+                method: this.GetType().GetMethod(nameof(this.GetInstance))!
                     .MakeGenericMethod(this.ImplementationType));
         }
 

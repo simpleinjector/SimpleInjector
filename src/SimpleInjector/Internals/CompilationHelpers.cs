@@ -140,7 +140,7 @@ namespace SimpleInjector.Internals
             Type type = typeof(LazyScopedRegistration<>).MakeGenericType(registration.ImplementationType);
 
             return Expression.New(
-                type.GetConstructor([typeof(Registration)]),
+                type.GetConstructor([typeof(Registration)])!,
                 Expression.Constant(registration, typeof(Registration)));
         }
 
@@ -353,7 +353,7 @@ namespace SimpleInjector.Internals
             internal Expression LazyScopeRegistrationGetInstanceExpression =>
                 Expression.Call(
                     this.Variable,
-                    this.lazyScopeRegistrationType.GetMethod("GetInstance"),
+                    this.lazyScopeRegistrationType.GetMethod("GetInstance")!,
                     Expression.Property(this.LifestyleInfo!.Variable, "Value"));
         }
 
@@ -396,7 +396,7 @@ namespace SimpleInjector.Internals
                 return new NodeSizes(totalSize: calculator.size, nodes: calculator.nodes.Values);
             }
 
-            public override Expression? Visit(Expression node)
+            public override Expression? Visit(Expression? node)
             {
                 // Weird: node can be null: CallExpression.Object can be null.
                 if (node is not null)
@@ -438,22 +438,13 @@ namespace SimpleInjector.Internals
             }
         }
 
-        private sealed class NodeReplacer : ExpressionVisitor
+        private sealed class NodeReplacer(Expression oldNode, Expression newNode) : ExpressionVisitor
         {
-            private readonly Expression oldNode;
-            private readonly Expression newNode;
-
-            private NodeReplacer(Expression oldNode, Expression newNode)
-            {
-                this.oldNode = oldNode;
-                this.newNode = newNode;
-            }
-
             public static Expression Replace(Expression expression, Expression oldNode, Expression newNode) =>
-                new NodeReplacer(oldNode: oldNode, newNode: newNode).Visit(expression);
+                new NodeReplacer(oldNode: oldNode, newNode: newNode).Visit(expression)!;
 
-            public override Expression Visit(Expression node) =>
-                object.ReferenceEquals(node, this.oldNode) ? this.newNode : base.Visit(node);
+            public override Expression? Visit(Expression? node) =>
+                object.ReferenceEquals(node, oldNode) ? newNode : base.Visit(node);
         }
     }
 }

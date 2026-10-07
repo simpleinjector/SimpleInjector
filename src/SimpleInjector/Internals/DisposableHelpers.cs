@@ -61,7 +61,7 @@ namespace SimpleInjector.Internals
 
         private static Func<object, Task> CreateDisposer(Type asyncDisposableInterface)
         {
-            var DisposeAsync = asyncDisposableInterface.GetMethod("DisposeAsync");
+            var DisposeAsync = asyncDisposableInterface.GetMethod("DisposeAsync")!;
 
             var param = Expression.Parameter(typeof(object), "disposable");
 
@@ -70,7 +70,7 @@ namespace SimpleInjector.Internals
                 // ((IAsyncDisposable)instance).DisposeAsync();
                 var expression =
                     Expression.Call(
-                        instance: Expression.Convert(param, AsyncDisposableInterface),
+                        instance: Expression.Convert(param, AsyncDisposableInterface!),
                         method: DisposeAsync);
 
                 // We also allow for situations where the IAsyncDisposable.DisposeAsync() method returns a Task.
@@ -80,7 +80,7 @@ namespace SimpleInjector.Internals
                 if (DisposeAsync.ReturnType != typeof(Task))
                 {
                     // ((IAsyncDisposable)instance).DisposeAsync().AsTask();
-                    expression = Expression.Call(expression, DisposeAsync.ReturnType.GetMethod("AsTask"));
+                    expression = Expression.Call(expression, DisposeAsync.ReturnType.GetMethod("AsTask")!);
                 }
 
                 return Expression.Lambda<Func<object, Task>>(expression, param).Compile();

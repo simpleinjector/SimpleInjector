@@ -18,7 +18,7 @@ namespace SimpleInjector.Decorators
     internal abstract class DecoratorExpressionInterceptor(DecoratorExpressionInterceptorData data)
     {
         private static readonly MethodInfo ResolveWithinThreadResolveScopeMethod =
-            typeof(DecoratorExpressionInterceptor).GetMethod(nameof(ResolveWithinThreadResolveScope));
+            typeof(DecoratorExpressionInterceptor).GetMethod(nameof(ResolveWithinThreadResolveScope))!;
 
         // Must be set after construction.
         internal DecoratorPredicateContext? Context { get; set; }
@@ -100,7 +100,7 @@ namespace SimpleInjector.Decorators
                 serviceType, decoratorConstructor, decorateeExpression, realProducer, info);
 
             return this.Lifestyle.CreateDecoratorRegistration(
-                decoratorConstructor.DeclaringType, this.Container, overriddenParameters);
+                decoratorConstructor.DeclaringType!, this.Container, overriddenParameters);
         }
 
         protected DecoratorPredicateContext CreatePredicateContext(ExpressionBuiltEventArgs e)
@@ -143,7 +143,7 @@ namespace SimpleInjector.Decorators
             if (parameters.Length > 1)
             {
                 throw new ActivationException(
-                    StringResources.TypeDependsOnItself(decoratorConstructor.DeclaringType));
+                    StringResources.TypeDependsOnItself(decoratorConstructor.DeclaringType!));
             }
 
             return parameters.Single();

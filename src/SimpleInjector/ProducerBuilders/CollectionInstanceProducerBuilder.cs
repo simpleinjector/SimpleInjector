@@ -17,10 +17,10 @@ namespace SimpleInjector.ProducerBuilders
     internal sealed class CollectionInstanceProducerBuilder(Container container) : IInstanceProducerBuilder
     {
         private static readonly MethodInfo EnumerableToArrayMethod =
-            typeof(Enumerable).GetMethod(nameof(Enumerable.ToArray));
+            typeof(Enumerable).GetMethod(nameof(Enumerable.ToArray))!;
 
         private static readonly MethodInfo EnumerableToListMethod =
-            typeof(Enumerable).GetMethod(nameof(Enumerable.ToList));
+            typeof(Enumerable).GetMethod(nameof(Enumerable.ToList))!;
 
         private readonly Dictionary<Type, InstanceProducer?> emptyAndRedirectedCollectionRegistrationCache = new();
 
@@ -34,13 +34,13 @@ namespace SimpleInjector.ProducerBuilders
             {
                 return this.BuildInstanceProducerForMutableCollectionType(
                     serviceType,
-                    serviceType.GetElementType());
+                    serviceType.GetElementType()!);
             }
             else if (typeof(List<>).IsGenericTypeDefinitionOf(serviceType))
             {
                 return this.BuildInstanceProducerForMutableCollectionType(
                     serviceType,
-                    serviceType.GetGenericArguments().FirstOrDefault());
+                    serviceType.GetGenericArguments().First());
             }
             else
             {
@@ -107,7 +107,8 @@ namespace SimpleInjector.ProducerBuilders
             {
                 // builds: new List<T>(collection)
                 var listConstructor = typeof(List<>).MakeGenericType(elementType)
-                    .GetConstructor([typeof(IEnumerable<>).MakeGenericType(elementType)]);
+                    .GetConstructor([typeof(IEnumerable<>)
+                    .MakeGenericType(elementType)])!;
 
                 return Expression.New(listConstructor, streamExpression);
             }

@@ -291,14 +291,14 @@ namespace SimpleInjector
             Type dependencyType = relationship.Consumer.Target.TargetType;
 
             Type elementType =
-                dependencyType.GetGenericArguments().FirstOrDefault() ?? dependencyType.GetElementType();
+                dependencyType.GetGenericArguments().FirstOrDefault() ?? dependencyType.GetElementType()!;
 
-            // This message only uses unqualitified type names, because it is appended to a message that
+            // This message only uses unqualified type names, because it is appended to a message that
             // already contains the fully qualified names in case UseFullyQualifiedTypeNames is set.
             return Format(
                 "{0} is a mutable collection type. Simple Injector always creates the mutable collection " +
                 "types array and List<T> as transient, because a consumer can change the contents of such " +
-                "collection, which could break seemingly unrelated parts parts of your application if the " +
+                "collection, which could break seemingly unrelated parts of your application if the " +
                 "collection was shared between consumers. Instead, either consider lowering the lifestyle " +
                 "of {1} or change {1}'s dependency from {0} to one of the collection types that stream " +
                 "services (e.g. IEnumerable<{2}>, ICollection<{2}>, etc).",
@@ -389,7 +389,7 @@ namespace SimpleInjector
 
             return Format(
                 formatString,
-                target.Member.DeclaringType.TypeName(forceFullQualificationOfTarget),
+                target.Member.DeclaringType!.TypeName(forceFullQualificationOfTarget),
                 target.Name,
                 target.TargetType.TypeName(forceFullQualification: lookalikes.Any()),
                 target.TargetType.TypeName(),
@@ -424,7 +424,7 @@ namespace SimpleInjector
                 return Format(
                     "The constructor of type {0} contains parameter '{1}' of type {2}, which can not be " +
                     "used for constructor injection{3}.",
-                    invalidTarget.Member.DeclaringType.TypeName(),
+                    invalidTarget.Member.DeclaringType!.TypeName(),
                     invalidTarget.Name,
                     invalidTarget.TargetType.TypeName(),
                     reason);
@@ -434,7 +434,7 @@ namespace SimpleInjector
                 return Format(
                     "The type {0} contains property '{1}' of type {2}, which can not be used for property " +
                     "injection{3}.",
-                    invalidTarget.Member.DeclaringType.TypeName(),
+                    invalidTarget.Member.DeclaringType!.TypeName(),
                     invalidTarget.Name,
                     invalidTarget.TargetType.TypeName(),
                     reason);
@@ -665,7 +665,7 @@ namespace SimpleInjector
 
         private static string NoteAssemblyLoadedMoreThanOnceOnDuplicateTypes(Type[] implementations)
         {
-            Type duplicateAssemblyLookalike =
+            Type? duplicateAssemblyLookalike =
                 GetDuplicateLoadedAssemblyLookalikeTypeOrNull(
                     implementations[0],
                     implementations.Skip(1).ToArray());
@@ -767,7 +767,7 @@ namespace SimpleInjector
                 "injection, because it has no set method.",
                 property.Name,
                 property.PropertyType.TypeName(),
-                property.DeclaringType.TypeName());
+                property.DeclaringType!.TypeName());
 
         internal static string PropertyIsStatic(PropertyInfo property) =>
             Format(
@@ -796,7 +796,7 @@ namespace SimpleInjector
                 openGenericTypes.Select(TypeName).ToCommaSeparatedText());
 
         internal static string ThisOverloadDoesNotAllowOpenGenericsExample(
-            Type openGenericServiceType, Type[] openGenericTypes, Type firstClosedAndNonGenericType) =>
+            Type openGenericServiceType, Type[] openGenericTypes, Type? firstClosedAndNonGenericType) =>
             firstClosedAndNonGenericType is not null
                 ? Format(
                     "As an example, the supplied type {0} can be used as implementation, because it " +
@@ -1107,7 +1107,7 @@ namespace SimpleInjector
         private static string GetAdditionalInformationAboutExistingConditionalRegistrations(
             InjectionTargetInfo target, int numberOfConditionalRegistrations) =>
             GetAdditionalInformationAboutExistingConditionalRegistrations(
-                target.TargetType, target.Member.DeclaringType, numberOfConditionalRegistrations);
+                target.TargetType, target.Member.DeclaringType!, numberOfConditionalRegistrations);
 
         private static string GetAdditionalInformationAboutExistingConditionalRegistrations(
             Type serviceType, Type consumerImplementationType, int numberOfConditionalRegistrations)
@@ -1258,7 +1258,7 @@ namespace SimpleInjector
                 return string.Empty;
             }
 
-            Type duplicateAssemblyLookalike =
+            Type? duplicateAssemblyLookalike =
                 GetDuplicateLoadedAssemblyLookalikeTypeOrNull(serviceType, lookalikes);
 
             if (duplicateAssemblyLookalike is not null)
@@ -1393,7 +1393,7 @@ namespace SimpleInjector
                 ? type.GetAssembly().Location
                 : null;
 
-        private static Type GetDuplicateLoadedAssemblyLookalikeTypeOrNull(
+        private static Type? GetDuplicateLoadedAssemblyLookalikeTypeOrNull(
             Type serviceType, Type[] lookalikes) => (
             from lookalike in lookalikes
             where !object.ReferenceEquals(serviceType.GetAssembly(), lookalike.GetAssembly())

@@ -132,7 +132,7 @@ namespace SimpleInjector.Internals
 
             if (!isReplacement && overlappingProducers.Any())
             {
-                var overlappingProducer = overlappingProducers.FirstOrDefault();
+                var overlappingProducer = overlappingProducers.First();
 
                 throw new InvalidOperationException(
                     StringResources.AnOverlappingRegistrationExists(

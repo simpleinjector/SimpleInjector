@@ -26,7 +26,7 @@ namespace SimpleInjector.Decorators
         private static int GetNumberOfCompositeServiceTypeDependencies(
             Type serviceType, ConstructorInfo compositeConstructor)
         {
-            Type compositeServiceType = GetCompositeBaseType(serviceType, compositeConstructor);
+            Type? compositeServiceType = GetCompositeBaseType(serviceType, compositeConstructor);
 
             if (compositeServiceType is null)
             {
@@ -43,11 +43,11 @@ namespace SimpleInjector.Decorators
 
         // Returns the base type of the composite that can be used for decoration (because serviceType might
         // be open generic, while the base type might not be).
-        private static Type GetCompositeBaseType(Type serviceType, ConstructorInfo compositeConstructor)
+        private static Type? GetCompositeBaseType(Type serviceType, ConstructorInfo compositeConstructor)
         {
             // This list can only contain serviceType and closed and partially closed versions of serviceType.
             var baseTypeCandidates =
-                Types.GetBaseTypeCandidates(serviceType, compositeConstructor.DeclaringType);
+                Types.GetBaseTypeCandidates(serviceType, compositeConstructor.DeclaringType!);
 
             var compositeInterfaces =
                 from baseTypeCandidate in baseTypeCandidates

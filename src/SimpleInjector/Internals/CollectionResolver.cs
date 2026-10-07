@@ -13,7 +13,7 @@ namespace SimpleInjector.Internals
     {
         private readonly List<RegistrationGroup> registrationGroups = [];
 
-        private readonly Dictionary<Type, InstanceProducer> producerCache = [];
+        private readonly Dictionary<Type, InstanceProducer?> producerCache = [];
 
         private bool verified;
 
@@ -41,7 +41,7 @@ namespace SimpleInjector.Internals
                 ? this.GetInstanceProducerFromCache(elementType)
                 : null;
 
-        internal void ResolveUnregisteredType(object sender, UnregisteredTypeEventArgs e)
+        internal void ResolveUnregisteredType(object? sender, UnregisteredTypeEventArgs e)
         {
             if (typeof(IEnumerable<>).IsGenericTypeDefinitionOf(e.UnregisteredServiceType))
             {
@@ -83,7 +83,7 @@ namespace SimpleInjector.Internals
 
         protected abstract Type[] GetAllKnownClosedServiceTypes();
 
-        protected abstract InstanceProducer BuildCollectionProducer(Type closedServiceType);
+        protected abstract InstanceProducer? BuildCollectionProducer(Type closedServiceType);
 
         protected void AddRegistrationGroup(RegistrationGroup group)
         {
@@ -100,7 +100,7 @@ namespace SimpleInjector.Internals
             this.registrationGroups.Add(group);
         }
 
-        private InstanceProducer GetInstanceProducerFromCache(Type closedServiceType)
+        private InstanceProducer? GetInstanceProducerFromCache(Type closedServiceType)
         {
             lock (this.producerCache)
             {

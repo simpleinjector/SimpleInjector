@@ -48,7 +48,7 @@ namespace SimpleInjector
 
         /// <summary>Gets the name of the target.</summary>
         /// <value>A string containing the name of the target.</value>
-        public string Name => this.Parameter is not null ? this.Parameter.Name : this.Property!.Name;
+        public string Name => this.Parameter is not null ? this.Parameter.Name! : this.Property!.Name;
 
         /// <summary>Gets the type of the target.</summary>
         /// <value>A <see cref="Type"/> containing the type of the target.</value>
@@ -115,7 +115,7 @@ namespace SimpleInjector
         /// </summary>
         /// <typeparam name="T">The parameter to inspect.</typeparam>
         /// <returns>A custom attribute that matches T, or null if no such attribute is found.</returns>
-        public T GetCustomAttribute<T>() where T : Attribute => this.GetCustomAttribute<T>(inherit: true);
+        public T? GetCustomAttribute<T>() where T : Attribute => this.GetCustomAttribute<T>(inherit: true);
 
         /// <summary>
         /// Retrieves a custom attribute of a specified type that is applied to a specified parameter, and
@@ -124,7 +124,7 @@ namespace SimpleInjector
         /// <typeparam name="T">The parameter to inspect.The parameter to inspect.</typeparam>
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
         /// <returns>A custom attribute that matches T, or null if no such attribute is found.</returns>
-        public T GetCustomAttribute<T>(bool inherit) where T : Attribute =>
+        public T? GetCustomAttribute<T>(bool inherit) where T : Attribute =>
             this.Parameter is not null
                 ? this.Parameter.GetCustomAttribute<T>(inherit)
                 : this.Property!.GetCustomAttribute<T>(inherit);
@@ -135,7 +135,7 @@ namespace SimpleInjector
         /// <param name="attributeType">The type of attribute to search for.</param>
         /// <returns>A custom attribute that matches attributeType, or null if no such attribute is found.
         /// </returns>
-        public Attribute GetCustomAttribute(Type attributeType) =>
+        public Attribute? GetCustomAttribute(Type attributeType) =>
             this.GetCustomAttribute(attributeType, inherit: true);
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace SimpleInjector
         /// <param name="inherit">True to inspect the ancestors of element; otherwise, false.</param>
         /// <returns>A custom attribute matching attributeType, or null if no such attribute is found.
         /// </returns>
-        public Attribute GetCustomAttribute(Type attributeType, bool inherit) =>
+        public Attribute? GetCustomAttribute(Type attributeType, bool inherit) =>
             this.Parameter is not null
                 ? this.Parameter.GetCustomAttribute(attributeType, inherit)
                 : this.Property!.GetCustomAttribute(attributeType, inherit);
@@ -178,7 +178,7 @@ namespace SimpleInjector
         public override int GetHashCode() => Helpers.Hash(this.Target);
 
         /// <inheritdoc />
-        public override bool Equals(object obj) => obj is InjectionConsumerInfo info && this.Equals(info);
+        public override bool Equals(object? obj) => obj is InjectionConsumerInfo info && this.Equals(info);
 
         /// <inheritdoc />
         public bool Equals(InjectionTargetInfo? other) => this.Target.Equals(other?.Target);

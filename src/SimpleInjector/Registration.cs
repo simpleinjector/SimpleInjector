@@ -505,7 +505,7 @@ namespace SimpleInjector
                 let producer = dependency.Producer
                     ?? this.GetOverriddenParameterFor(dependency.Parameter).Producer
                 select new KnownRelationship(
-                    implementationType: constructor.DeclaringType,
+                    implementationType: constructor.DeclaringType!,
                     lifestyle: this.Lifestyle,
                     consumer: new InjectionConsumerInfo(dependency.Parameter),
                     dependency: producer);

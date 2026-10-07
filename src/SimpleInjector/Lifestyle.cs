@@ -668,7 +668,7 @@ namespace SimpleInjector
                 var typeSafeInstanceCreator = ConvertDelegateToTypeSafeDelegate(serviceType, instanceCreator);
 
                 return (Registration)closedCreateRegistrationMethod.Invoke(this,
-                    [typeSafeInstanceCreator, container]);
+                    [typeSafeInstanceCreator, container])!;
             }
             catch (MemberAccessException ex)
             {
