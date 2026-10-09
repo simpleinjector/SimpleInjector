@@ -4,7 +4,9 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using SimpleInjector.Advanced;
 
     /// <summary>Tests for property injection.</summary>
@@ -13,6 +15,42 @@
     {
         public interface IService
         {
+        }
+
+        [TestMethod]
+        public void CustomPropertySelectionBehavior_TypeHierarchy_GetsSuppliedWithCorrectSetOfProperties()
+        {
+            // This test explicitly tests which properties Simple Injector finds and checks if no properties
+            // are missing and if no duplicate properties (due to overriding) are returned.
+            string[] expectedProperties =
+            [
+                $"{nameof(BaseClass)}.Private",
+                $"{nameof(BaseClass)}.Internal",
+                $"{nameof(DerivedClass)}.ProtectedVirtual",
+                $"{nameof(DerivedClass)}.Private",
+                $"{nameof(FinalClass)}.Private",
+                $"{nameof(FinalClass)}.InternalAbstract",
+                $"{nameof(FinalClass)}.Internal",
+                $"{nameof(FinalClass)}.InternalVirtual",
+            ];
+
+            var properties = new ListPropertySelectionBehavior();
+            var container = new Container();
+            container.Options.PropertySelectionBehavior = properties;
+
+            container.Register<FinalClass>();
+
+            // Act
+            container.GetInstance<FinalClass>();
+
+            // Assert
+            var actualProperties =
+                from property in properties
+                select $"{property.DeclaringType.Name}.{property.Name}";
+
+            Assert.AreEqual(
+                expected: Environment.NewLine + string.Join(Environment.NewLine, expectedProperties.OrderBy(p => p)),
+                actual: Environment.NewLine + string.Join(Environment.NewLine, actualProperties.OrderBy(p => p)));
         }
 
         [TestMethod]
@@ -57,10 +95,8 @@
             var service = container.GetInstance<SubClassOfBaseClassWithPrivateProperty<ITimeProvider>>();
 
             // Assert
-            Assert.IsNull(service.GetBaseClassDependency(),
-                "Simple Injector does not inject this dependency, because it uses Type.GetRuntimeProperties()" +
-                "to get the dependencies. GetRuntimeProperties only returns properties that are accessible " +
-                "to the resolved component.");
+            Assert.IsNotNull(service.GetBaseClassDependency(),
+                "Simple Injector should inject this dependency. This behavior changed in v6.");
         }
 
         [TestMethod]
@@ -603,16 +639,44 @@
             internal TDependency Dependency { get; private set; }
         }
 
-        private class PredicatePropertySelectionBehavior : IPropertySelectionBehavior
+        public abstract class BaseClass
         {
-            private readonly Predicate<PropertyInfo> selector;
+            private ILogger Private { get; set; } // Returned
+            internal ILogger Internal { get; set; } // Returned
+            protected virtual ILogger ProtectedVirtual { get; set; } // Not returned because overridden by DerivedClass
+            internal abstract ILogger InternalAbstract { get; set; } // Not returned because overridden by FinalClass
+            internal virtual ILogger InternalVirtual { get; set; } // Not returned because overridden by FinalClass
+        }
 
-            public PredicatePropertySelectionBehavior(Predicate<PropertyInfo> selector)
+        public abstract class DerivedClass : BaseClass
+        {
+            protected override ILogger ProtectedVirtual { get => field; set => field = value; } // Returned
+            internal override ILogger InternalAbstract { get => field; set => field = value; } // Overridden
+            private ILogger Private { get; set; } // Returned
+        }
+
+        public sealed class FinalClass : DerivedClass
+        {
+            private ILogger Private { get; set; } // Returned because different from BaseClass.Property1
+            internal override ILogger InternalAbstract { get => base.InternalAbstract; set => base.InternalAbstract = value; }
+            internal new ILogger Internal { get; set; } // Returned
+            internal override ILogger InternalVirtual { get => field; set => field = value; } // Returned
+        }
+
+        private class PredicatePropertySelectionBehavior(Predicate<PropertyInfo> selector)
+            : IPropertySelectionBehavior
+        {
+            public bool SelectProperty(Type implementationType, PropertyInfo propertyInfo) =>
+                selector(propertyInfo);
+        }
+
+        public sealed class ListPropertySelectionBehavior : List<PropertyInfo>, IPropertySelectionBehavior
+        {
+            public bool SelectProperty(Type implementationType, PropertyInfo propertyInfo)
             {
-                this.selector = selector;
+                this.Add(propertyInfo);
+                return false;
             }
-
-            public bool SelectProperty(Type implementationType, PropertyInfo propertyInfo) => this.selector(propertyInfo);
         }
     }
 }

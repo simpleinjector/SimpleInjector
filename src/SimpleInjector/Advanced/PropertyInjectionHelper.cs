@@ -10,13 +10,13 @@ namespace SimpleInjector.Advanced
     using System.Linq.Expressions;
     using System.Reflection;
 
-    internal sealed class PropertyInjectionHelper
+    internal sealed class PropertyInjectionHelper(Container container, Type implementationType)
     {
         private const int MaximumNumberOfFuncArguments = 16;
         private const int MaximumNumberOfPropertiesPerDelegate = MaximumNumberOfFuncArguments - 1;
 
-        private static readonly ReadOnlyCollection<Type> FuncTypes = new ReadOnlyCollection<Type>(new Type[]
-            {
+        private static readonly ReadOnlyCollection<Type> FuncTypes = new(
+            [
                 typeof(Func<>),
                 typeof(Func<,>),
                 typeof(Func<,,>),
@@ -34,16 +34,7 @@ namespace SimpleInjector.Advanced
                 typeof(Func<,,,,,,,,,,,,,,>),
                 typeof(Func<,,,,,,,,,,,,,,,>),
                 typeof(Func<,,,,,,,,,,,,,,,,>),
-            });
-
-        private readonly Container container;
-        private readonly Type implementationType;
-
-        internal PropertyInjectionHelper(Container container, Type implementationType)
-        {
-            this.container = container;
-            this.implementationType = implementationType;
-        }
+            ]);
 
         internal static PropertyInjectionData BuildPropertyInjectionExpression(
             Container container,
@@ -56,9 +47,107 @@ namespace SimpleInjector.Advanced
             return helper.BuildPropertyInjectionExpression(expressionToWrap, properties);
         }
 
+        // #893: Behavior has changed in v6. It now returns private properties from base types (and internal
+        // properties from base types in different libraries) as well. In v5 these properties were skipped,
+        // but this lead to 'fail silent' behavior.
         internal static PropertyInfo[] GetCandidateInjectionPropertiesFor(Type implementationType)
         {
-            return implementationType.GetRuntimeProperties().ToArray();
+            List<PropertyWrapper> properties = [];
+
+            // Iterates the type hierarchy from deepest base type to current implementationType
+            foreach (var type in GetTypeHierarchy(implementationType))
+            {
+                AddPropertiesForTypeToList(type, properties);
+            }
+
+            return properties.Count == 0 ? [] : properties.Select(p => p.Property).ToArray();
+        }
+
+        private static void AddPropertiesForTypeToList(Type type, List<PropertyWrapper> properties)
+        {
+            IEnumerable<PropertyInfo> typeProperties = type.GetTypeInfo().DeclaredProperties;
+
+            foreach (var typeProperty in typeProperties)
+            {
+                if (IsPropertyOverride(typeProperty, out Type? overriddenFromType))
+                {
+                    // Remove the property that was overridden, because we shouldn't inject a
+                    // dependency twice into the same property.
+                    RemovePropertyFromList(properties, typeProperty.Name, overriddenFromType!);
+
+                    properties.Add(new PropertyWrapper(typeProperty, DeclaringBaseType: overriddenFromType!));
+                }
+                else
+                {
+                    properties.Add(new PropertyWrapper(typeProperty, DeclaringBaseType: type));
+                }
+            }
+        }
+
+        private static void RemovePropertyFromList(
+            List<PropertyWrapper> properties, string propertyName, Type declaringType)
+        {
+            int index = FindPropertyInList(properties, propertyName, declaringType);
+
+            properties.RemoveAt(index);
+        }
+
+        private static int FindPropertyInList(
+            List<PropertyWrapper> properties, string propertyName, Type declaringType)
+        {
+            for (int i = 0; i < properties.Count; i++)
+            {
+                if (properties[i].Name == propertyName
+                    && properties[i].DeclaringBaseType == declaringType)
+                {
+                    return i;
+                }
+            }
+
+            throw new InvalidOperationException(
+                $"Property {declaringType.Name}.{propertyName} not found. Actual items: " +
+                string.Join(" + ", properties.Select(p => $"{p.DeclaringBaseType}.{p.Name}")));
+        }
+
+        private static bool IsPropertyOverride(PropertyInfo property, out Type? overriddenFromType)
+        {
+            overriddenFromType = null;
+
+            var accessor = property.GetMethod ?? property.SetMethod;
+
+            if (accessor is null) return false;
+
+            // If the base definition is different, this accessor overrides a base accessor.
+            MethodInfo baseMethod = accessor.GetBaseDefinition();
+
+            if (baseMethod != accessor)
+            {
+                // The declaring type here will be the type that defined the property, not an intermediate
+                // type that overridden the property.
+                overriddenFromType = baseMethod.DeclaringType;
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // Returns the type hierarchy, skipping System.Object, starting with the deepest type and ending with
+        // the supplied type.
+        private static List<Type> GetTypeHierarchy(Type type)
+        {
+            if (type.BaseType is null || type.BaseType == typeof(object))
+            {
+                return [type];
+            }
+            else
+            {
+                var hierarchy = GetTypeHierarchy(type.BaseType);
+                hierarchy.Add(type);
+                return hierarchy;
+            }
         }
 
         internal static void VerifyProperties(PropertyInfo[] properties)
@@ -79,7 +168,7 @@ namespace SimpleInjector.Advanced
             {
                 // This happens when the user tries to resolve an internal type inside a (Silverlight) sandbox.
                 throw new ActivationException(
-                    StringResources.UnableToInjectPropertiesDueToSecurityConfiguration(this.implementationType,
+                    StringResources.UnableToInjectPropertiesDueToSecurityConfiguration(implementationType,
                         ex),
                     ex);
             }
@@ -87,7 +176,7 @@ namespace SimpleInjector.Advanced
 
         private Delegate BuildPropertyInjectionDelegateInternal(PropertyInfo[] properties)
         {
-            var targetParameter = Expression.Parameter(this.implementationType, this.implementationType.Name);
+            var targetParameter = Expression.Parameter(implementationType, implementationType.Name);
 
             var dependencyParameters = (
                 from property in properties
@@ -97,16 +186,16 @@ namespace SimpleInjector.Advanced
             var propertyInjectionExpressions =
                 this.BuildPropertyInjectionExpressions(targetParameter, properties, dependencyParameters);
 
-            Type funcType = GetFuncType(properties, this.implementationType);
+            Type funcType = GetFuncType(properties, implementationType);
 
-            var parameters = dependencyParameters.Concat(new[] { targetParameter });
+            var parameters = dependencyParameters.Concat([targetParameter]);
 
             var lambda = Expression.Lambda(
                 funcType,
-                Expression.Block(this.implementationType, propertyInjectionExpressions),
+                Expression.Block(implementationType, propertyInjectionExpressions),
                 parameters);
 
-            return this.container.Options.ExpressionCompilationBehavior.Compile(lambda);
+            return container.Options.ExpressionCompilationBehavior.Compile(lambda);
         }
 
         private List<Expression> BuildPropertyInjectionExpressions(ParameterExpression targetParameter,
@@ -119,10 +208,10 @@ namespace SimpleInjector.Advanced
                 .Cast<Expression>()
                 .ToList();
 
-            var returnTarget = Expression.Label(this.implementationType);
+            var returnTarget = Expression.Label(implementationType);
 
-            blockExpressions.Add(Expression.Return(returnTarget, targetParameter, this.implementationType));
-            blockExpressions.Add(Expression.Label(returnTarget, Expression.Constant(null, this.implementationType)));
+            blockExpressions.Add(Expression.Return(returnTarget, targetParameter, implementationType));
+            blockExpressions.Add(Expression.Label(returnTarget, Expression.Constant(null, implementationType)));
 
             return blockExpressions;
         }
@@ -164,14 +253,14 @@ namespace SimpleInjector.Advanced
 
             InstanceProducer[] producers = this.GetPropertyInstanceProducers(properties);
 
-            var arguments = producers.Select(p => p.BuildExpression()).Concat(new[] { data.Expression });
+            var arguments = producers.Select(p => p.BuildExpression()).Concat([data.Expression]);
 
             Delegate propertyInjectionDelegate = this.BuildPropertyInjectionDelegate(properties);
 
             return new PropertyInjectionData(
-                expression: Expression.Invoke(Expression.Constant(propertyInjectionDelegate), arguments),
-                producers: producers.Concat(data.Producers),
-                properties: properties.Concat(data.Properties));
+                Expression: Expression.Invoke(Expression.Constant(propertyInjectionDelegate), arguments),
+                Producers: producers.Concat(data.Producers),
+                Properties: properties.Concat(data.Properties));
         }
 
         private InstanceProducer[] GetPropertyInstanceProducers(PropertyInfo[] properties)
@@ -181,9 +270,9 @@ namespace SimpleInjector.Advanced
 
         private InstanceProducer GetPropertyExpression(PropertyInfo property)
         {
-            var consumer = new InjectionConsumerInfo(this.implementationType, property);
+            var consumer = new InjectionConsumerInfo(implementationType, property);
 
-            return this.container.Options.GetInstanceProducerFor(consumer);
+            return container.Options.GetInstanceProducerFor(consumer);
         }
 
         private static Type GetFuncType(PropertyInfo[] properties, Type injecteeType)
@@ -204,21 +293,17 @@ namespace SimpleInjector.Advanced
             return openGenericFuncType.MakeGenericType(genericTypeArguments.ToArray());
         }
 
-        internal struct PropertyInjectionData
+        internal readonly record struct PropertyInjectionData(
+            Expression Expression,
+            IEnumerable<InstanceProducer> Producers,
+            IEnumerable<PropertyInfo> Properties)
         {
-            public readonly Expression Expression;
-            public readonly IEnumerable<InstanceProducer> Producers;
-            public readonly IEnumerable<PropertyInfo> Properties;
+            public PropertyInjectionData(Expression expression) : this(expression, [], []) { }
+        }
 
-            public PropertyInjectionData(
-                Expression expression,
-                IEnumerable<InstanceProducer>? producers = null,
-                IEnumerable<PropertyInfo>? properties = null)
-            {
-                this.Expression = expression;
-                this.Producers = producers ?? Enumerable.Empty<InstanceProducer>();
-                this.Properties = properties ?? Enumerable.Empty<PropertyInfo>();
-            }
+        private readonly record struct PropertyWrapper(PropertyInfo Property, Type DeclaringBaseType)
+        {
+            public string Name => this.Property.Name;
         }
     }
 }
