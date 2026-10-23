@@ -51,6 +51,7 @@ namespace SimpleInjector
         /// <exception cref="ActivationException">Thrown when there are errors resolving the service instance.</exception>
         public object GetInstance(Type serviceType)
         {
+            Requires.IsNotNull(serviceType);
             this.ThrowWhenDisposed();
             this.LockContainer();
 

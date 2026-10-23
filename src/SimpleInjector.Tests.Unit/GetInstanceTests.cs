@@ -8,6 +8,19 @@
     public class GetInstanceTests
     {
         [TestMethod]
+        public void GetInstance_NullServiceType_ThrowsArgumentNullExceptionForServiceType()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.GetInstance((Type)null);
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("serviceType", action);
+        }
+
+        [TestMethod]
         public void GetInstanceByType_CalledOnUnregisteredInvalidServiceType_ThrowsActivationException()
         {
             // Arrange
