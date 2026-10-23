@@ -135,7 +135,8 @@ namespace SimpleInjector
             }
         }
 
-        internal static void DoesNotContainNullValues<T>(IEnumerable<T?> collection, string paramName)
+        internal static void DoesNotContainNullValues<T>(
+            IEnumerable<T?> collection, [CallerArgumentExpression(nameof(collection))] string? paramName = null)
             where T : class
         {
             if (collection?.Contains(null) == true)

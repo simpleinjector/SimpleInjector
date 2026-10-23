@@ -192,7 +192,7 @@ namespace SimpleInjector
 
             implementationTypes = implementationTypes.Distinct().ToArray();
 
-            Requires.DoesNotContainNullValues(implementationTypes, nameof(implementationTypes));
+            Requires.DoesNotContainNullValues(implementationTypes);
 
             Requires.ServiceIsAssignableFromImplementations(
                 openGenericServiceType,

@@ -634,7 +634,7 @@ namespace SimpleInjector
             where TService : class
         {
             Requires.IsNotNull(singletons);
-            Requires.DoesNotContainNullValues(singletons, nameof(singletons));
+            Requires.DoesNotContainNullValues(singletons);
 
             if (typeof(TService) == typeof(Type) && singletons.Length > 0)
             {
@@ -782,7 +782,7 @@ namespace SimpleInjector
             // Make a copy for correctness and performance.
             serviceTypes = serviceTypes.ToArray();
 
-            Requires.DoesNotContainNullValues(serviceTypes, nameof(serviceTypes));
+            Requires.DoesNotContainNullValues(serviceTypes);
             Requires.ServiceIsAssignableFromImplementations(
                 serviceType, serviceTypes, nameof(serviceTypes), typeCanBeServiceType: true);
             Requires.DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(
@@ -827,7 +827,7 @@ namespace SimpleInjector
 
             serviceTypes = serviceTypes.ToArray();
 
-            Requires.DoesNotContainNullValues(serviceTypes, nameof(serviceTypes));
+            Requires.DoesNotContainNullValues(serviceTypes);
             Requires.ServiceIsAssignableFromImplementations(
                 serviceType, serviceTypes, nameof(serviceTypes), typeCanBeServiceType: true);
             Requires.DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(
@@ -871,7 +871,7 @@ namespace SimpleInjector
             // Make a copy for performance and correctness.
             registrations = registrations.ToArray();
 
-            Requires.DoesNotContainNullValues(registrations, nameof(registrations));
+            Requires.DoesNotContainNullValues(registrations);
             Requires.AreRegistrationsForThisContainer(this.Container, registrations, nameof(registrations));
             Requires.ServiceIsAssignableFromImplementations(
                 serviceType, registrations, nameof(registrations), typeCanBeServiceType: true);
@@ -1076,7 +1076,7 @@ namespace SimpleInjector
             // Make a copy for correctness and performance.
             serviceTypes = serviceTypes.ToArray();
 
-            Requires.DoesNotContainNullValues(serviceTypes, nameof(serviceTypes));
+            Requires.DoesNotContainNullValues(serviceTypes);
             Requires.ServiceIsAssignableFromImplementations(
                 typeof(TService), serviceTypes, nameof(serviceTypes), typeCanBeServiceType: true);
             Requires.DoesNotContainOpenGenericTypesWhenServiceTypeIsNotGeneric(
@@ -1100,7 +1100,7 @@ namespace SimpleInjector
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
             Requires.IsNotNull(registrations);
 
-            Requires.DoesNotContainNullValues(registrations, nameof(registrations));
+            Requires.DoesNotContainNullValues(registrations);
             Requires.AreRegistrationsForThisContainer(this.Container, registrations, nameof(registrations));
             Requires.ServiceIsAssignableFromImplementations(
                 typeof(TService), registrations, nameof(registrations), typeCanBeServiceType: true);
