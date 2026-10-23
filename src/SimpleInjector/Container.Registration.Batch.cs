@@ -115,6 +115,11 @@ namespace SimpleInjector
             Requires.IsNotNull(lifestyle);
             Requires.IsNotNull(assemblies);
 
+            // Make a copy for correctness and performance.
+            assemblies = assemblies.ToArray();
+
+            Requires.DoesNotContainNullValues(assemblies);
+
             Requires.IsGenericType(
                 openGenericServiceType,
                 nameof(openGenericServiceType),
@@ -499,6 +504,11 @@ namespace SimpleInjector
             Requires.IsNotNull(assemblies);
             Requires.IsNotNull(options);
             Requires.IsNotPartiallyClosed(serviceType, nameof(serviceType));
+
+            // Make a copy for correctness and performance.
+            assemblies = assemblies.ToArray();
+
+            Requires.DoesNotContainNullValues(assemblies);
 
             return this.GetTypesToRegisterInternal(serviceType, assemblies, options).ToArray();
         }

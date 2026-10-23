@@ -196,6 +196,19 @@
                 "Excluded should have been: everything that's a decorator (also decorator-composites).");
         }
 
+        [TestMethod]
+        public void GetTypesToRegister_AssembliesContainingNull_ThrowsArgumentException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.GetTypesToRegister(typeof(ILogger), typeof(ILogger).Assembly, null);
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentException>("assemblies", action);
+        }
+
         private static Type[] GetTypesToRegister(Type serviceType, TypesToRegisterOptions options)
         {
             var container = new Container();

@@ -305,6 +305,19 @@
         }
 
         [TestMethod]
+        public void RegisterOpenGeneric_AssembliesContainingNull_ThrowsArgumentException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.Register(typeof(IFoo<>), [typeof(IFoo<>).Assembly, null]);
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentException>("assemblies", action);
+        }
+
+        [TestMethod]
         public void Register_WithNullAssemblyIEnumerableArgument_ThrowsException()
         {
             // Arrange

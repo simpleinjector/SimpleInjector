@@ -21,6 +21,19 @@
         private static readonly Assembly CurrentAssembly = typeof(RegisterCollectionTests).GetTypeInfo().Assembly;
 
         [TestMethod]
+        public void CollectionRegister_AssembliesContainingNull_ThrowsArgumentException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.Collection.Register<ILogger>(typeof(ILogger).Assembly, null);
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentException>("assemblies", action);
+        }
+
+        [TestMethod]
         public void RegisterCollectionTServiceAssemblyArray_RegisteringNonGenericServiceAndAssemblyWithMultipleImplementations_RegistersThoseImplementations()
         {
             // Arrange
