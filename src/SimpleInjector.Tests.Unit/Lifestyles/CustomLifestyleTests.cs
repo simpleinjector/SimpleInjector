@@ -1,9 +1,9 @@
 ﻿namespace SimpleInjector.Tests.Unit.Lifestyles
 {
     using System;
-    using System.Linq;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SimpleInjector.Diagnostics;
+
     using SimpleInjector.Diagnostics.Tests.Unit;
 
     [TestClass]
@@ -11,6 +11,64 @@
     {
         private static readonly Lifestyle CustomLifestyle =
             Lifestyle.CreateCustom("Custom", creator => () => creator());
+
+        [TestMethod]
+        public void GetInstance_ConsumerOfCustomLifestyleThatReturnsNull_ThrowsActivationException()
+        {
+            // Arrange
+            var lifestyle = Lifestyle.CreateCustom("Cache", instanceCreator => () => null);
+
+            var container = ContainerFactory.New();
+
+            container.Register<IUserRepository, SqlUserRepository>(lifestyle);
+            container.Register<RealUserService>();
+
+            // Act
+            Action action = () => container.GetInstance<RealUserService>();
+
+            // Assert
+            AssertThat.Throws<ActivationException>(action,
+                "Null should never be injected into a consumer.");
+        }
+
+        [TestMethod]
+        public void Verify_ConsumerOfCustomLifestyleThatReturnsNull_ThrowsException()
+        {
+            // Arrange
+            var lifestyle = Lifestyle.CreateCustom("Cache", instanceCreator => () => null);
+
+            var container = ContainerFactory.New();
+
+            container.Register<IUserRepository, SqlUserRepository>(lifestyle);
+            container.Register<RealUserService>();
+
+            // Act
+            Action action = () => container.Verify();
+
+            // Assert
+            AssertThat.Throws<InvalidOperationException>(action,
+                "Verify should detect that null is injected into FooConsumer.");
+        }
+
+        // When the custom lifestyle's applier factory itself returns null, the user currently gets "Expression
+        // of type 'System.Object' cannot be invoked", which doesn't mention the lifestyle at all.
+        [TestMethod]
+        public void GetInstance_CustomLifestyleWhoseApplierFactoryReturnsNull_ThrowsExceptionThatMentionsTheLifestyle()
+        {
+            // Arrange
+            var lifestyle = Lifestyle.CreateCustom("Cache", instanceCreator => null);
+
+            var container = ContainerFactory.New();
+
+            container.Register<IUserRepository, SqlUserRepository>(lifestyle);
+
+            // Act
+            Action action = () => container.GetInstance<IUserRepository>();
+
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "The custom lifestyle 'Cache' returned null from its supplied CreateLifestyleApplier",
+                action);
+        }
 
         [TestMethod]
         public void GetInstance_OnRegistrationWithCustomLifestyle_Succeeds()

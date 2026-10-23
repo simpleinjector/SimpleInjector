@@ -381,7 +381,7 @@ namespace SimpleInjector
             }
         }
 
-        private Expression BuildInvocationExpression(Func<object> instanceCreator)
+        internal Expression BuildInvocationExpression(Func<object> instanceCreator)
         {
             Expression expression = Expression.Invoke(Expression.Constant(instanceCreator));
 
@@ -526,7 +526,7 @@ namespace SimpleInjector
             Func<object> thrower = () => throw new ActivationException(
                 StringResources.DelegateForTypeReturnedNull(this.ImplementationType));
 
-            // Build the follwoing expression: "instanceCreator() ?? thrower()"
+            // Build the following expression: "instanceCreator() ?? thrower()"
             return Expression.Coalesce(
                 left: expression,
                 right: Expression.Convert(

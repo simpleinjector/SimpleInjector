@@ -42,13 +42,12 @@ namespace SimpleInjector.Lifestyles
             {
                 var creator = this.BuildTransientDelegate();
 
-                var lifestyleAppliedCreator = lifestyleApplierFactory(creator);
+                Func<object> lifestyleAppliedCreator = lifestyleApplierFactory(creator)
+                    ?? throw new ActivationException(
+                        $"The custom lifestyle '{this.Lifestyle.Name}' returned null from its supplied " +
+                        $"{nameof(CreateLifestyleApplier)}");
 
-                return
-                    Expression.Convert(
-                        Expression.Invoke(
-                            Expression.Constant(lifestyleAppliedCreator)),
-                        this.ImplementationType);
+                return this.BuildInvocationExpression(lifestyleAppliedCreator);
             }
         }
     }
