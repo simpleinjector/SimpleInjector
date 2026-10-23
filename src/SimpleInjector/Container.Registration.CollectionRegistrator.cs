@@ -1100,6 +1100,9 @@ namespace SimpleInjector
             Requires.IsNotAnAmbiguousType(typeof(TService), nameof(TService));
             Requires.IsNotNull(registrations);
 
+            // Make a copy for correctness and performance.
+            registrations = registrations.ToArray();
+
             Requires.DoesNotContainNullValues(registrations);
             Requires.AreRegistrationsForThisContainer(this.Container, registrations, nameof(registrations));
             Requires.ServiceIsAssignableFromImplementations(
