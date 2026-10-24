@@ -76,7 +76,7 @@ namespace SimpleInjector
         /// </summary>
         /// <remarks>
         /// <b>Thread-safety:</b> Calls to this method are thread-safe, but users should take proper
-        /// percussions when they call both <b>GetItem</b> and <see cref="SetItem"/>.
+        /// precautions when they call both <b>GetItem</b> and <see cref="SetItem"/>.
         /// </remarks>
         /// <param name="key">The key of the item to retrieve.</param>
         /// <returns>The stored item or null.</returns>
@@ -87,7 +87,7 @@ namespace SimpleInjector
         /// <summary>Stores an item by the given <paramref name="key"/> in the scope.</summary>
         /// <remarks>
         /// <b>Thread-safety:</b> Calls to this method are thread-safe, but users should take proper
-        /// percussions when they call both <see cref="GetItem"/> and <b>SetItem</b>. Instead,
+        /// precautions when they call both <see cref="GetItem"/> and <b>SetItem</b>. Instead,
         /// <see cref="GetOrSetItem"/> provides an atomic operation for getting and setting an item.
         /// </remarks>
         /// <param name="key">The key of the item to insert or override.</param>
