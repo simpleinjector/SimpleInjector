@@ -263,7 +263,7 @@ namespace SimpleInjector.Lifestyles
             {
                 if (!this.SuppressDisposal)
                 {
-                    if (DisposableHelpers.IsAsyncOrAsyncDisposable(instance))
+                    if (DisposableHelpers.IsDisposableOrAsyncDisposable(instance))
                     {
                         this.Container.ContainerScope.RegisterForDisposal(instance);
                     }
