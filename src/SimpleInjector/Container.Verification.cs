@@ -54,6 +54,8 @@ namespace SimpleInjector
         /// <summary>
         /// Verifies and diagnoses this <b>Container</b> instance. This method will call all registered
         /// delegates, iterate registered collections and throws an exception if there was an error.
+        /// Verify should be called during the startup path of the application, while no other threads access
+        /// the container concurrently.
         /// </summary>
         /// <exception cref="VerificationException">Thrown when the registration of instances was
         /// invalid.</exception>
@@ -65,6 +67,8 @@ namespace SimpleInjector
         /// <summary>
         /// Verifies the <b>Container</b>. This method will call all registered delegates,
         /// iterate registered collections and throws an exception if there was an error.
+        /// Verify should be called during the startup path of the application, while no other threads access
+        /// the container concurrently.
         /// </summary>
         /// <param name="option">Specifies how the container should verify its configuration.</param>
         /// <param name="stopOnFirstError">Specifies how the container should break as soon as possible when
