@@ -1040,9 +1040,9 @@ namespace SimpleInjector
         {
             string asyncDisposeMethod =
 #if NETSTANDARD2_1
-                nameof(Scope.DisposeAsync);
+                containerScope ? nameof(Container.DisposeAsync) : nameof(Scope.DisposeAsync);
 #else
-                nameof(Scope.DisposeScopeAsync);
+                containerScope ? nameof(Container.DisposeContainerAsync) : nameof(Scope.DisposeScopeAsync);
 #endif
 
             return Format(
