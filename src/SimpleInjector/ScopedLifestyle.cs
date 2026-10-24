@@ -155,7 +155,10 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(container);
 
-            Func<Scope?> currentScopeProvider = this.CreateCurrentScopeProvider(container);
+            Func<Scope?> currentScopeProvider = this.CreateCurrentScopeProvider(container)
+                ?? throw new InvalidOperationException(
+                    $"{this.GetType().ToFriendlyName()}.{nameof(this.CreateCurrentScopeProvider)} " +
+                    $"returned null.");
 
             return currentScopeProvider.Invoke();
         }

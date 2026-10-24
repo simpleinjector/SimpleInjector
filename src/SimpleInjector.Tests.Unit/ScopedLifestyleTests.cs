@@ -1067,6 +1067,34 @@
             Assert.AreSame(activeScope, injectedScope);
         }
 
+        [TestMethod]
+        public void GetCurrentScope_ScopedLifestyleWhoseScopeProviderIsNull_ThrowsExceptionThatMentionsTheLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            var lifestyle = new NullScopeProviderLifestyle();
+
+            // Act
+            Action action = () => lifestyle.GetCurrentScope(container);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                nameof(NullScopeProviderLifestyle), action);
+
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                nameof(ScopedLifestyle.CreateCurrentScopeProvider), action);
+        }
+
+        public sealed class NullScopeProviderLifestyle : ScopedLifestyle
+        {
+            public NullScopeProviderLifestyle() : base(nameof(NullScopeProviderLifestyle))
+            {
+            }
+
+            protected internal override Func<Scope> CreateCurrentScopeProvider(Container container) => null;
+        }
+
         private class DisposablePlugin : IPlugin, IDisposable
         {
             private readonly Action<DisposablePlugin> disposing;
