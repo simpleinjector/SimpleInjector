@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector.Advanced;
 
@@ -343,6 +345,25 @@
 
             // Assert
             Assert.AreEqual(expectedValue, actualValue);
+        }
+
+        [TestMethod]
+        public void InstanceProducerFromExpression_ValueTypeNewExpression_ThrowsExpectedException()
+        {
+            // Arrange
+            var producer = InstanceProducer.FromExpression(
+                serviceType: typeof(IComparable),
+                expression: Expression.New(typeof(int)),
+                container: ContainerFactory.New());
+
+            // Act
+            Action action = () => producer.GetInstance();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "Error occurred while trying to build a delegate for type IComparable using " +
+                "the expression 'new Int32()'",
+                action);
         }
 
         public class OneAndTwo : IOne, ITwo;
