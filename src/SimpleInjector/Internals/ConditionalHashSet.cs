@@ -35,6 +35,8 @@ namespace SimpleInjector.Internals
                     }
 
                     bucket.Add(weakReference);
+
+                    this.TryRemoveDeadItems();
                 }
             }
         }
@@ -49,10 +51,15 @@ namespace SimpleInjector.Internals
 
                 reference?.Target = null;
 
-                if ((++this.shrinkCount % ShrinkStepCount) == 0)
-                {
-                    this.RemoveDeadItems();
-                }
+                this.TryRemoveDeadItems();
+            }
+        }
+
+        private void TryRemoveDeadItems()
+        {
+            if ((++this.shrinkCount % ShrinkStepCount) == 0)
+            {
+                this.RemoveDeadItems();
             }
         }
 
