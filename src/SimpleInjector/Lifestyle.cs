@@ -604,7 +604,10 @@ namespace SimpleInjector
             Requires.IsNotNull(instanceCreator);
             Requires.IsNotNull(container);
 
-            var registration = this.CreateRegistrationCore(instanceCreator, container);
+            var registration = this.CreateRegistrationCore(instanceCreator, container)
+                ?? throw new InvalidOperationException(
+                    StringResources.CustomCreateRegistrationCoreOfTServiceReturnedNull(
+                        typeof(TService), this.GetType()));
 
             registration.WrapsInstanceCreationDelegate = true;
 
@@ -745,7 +748,9 @@ namespace SimpleInjector
 
                 if (registration is null)
                 {
-                    registration = this.CreateRegistrationCore(concreteType, container);
+                    registration = this.CreateRegistrationCore(concreteType, container)
+                        ?? throw new InvalidOperationException(
+                            StringResources.CustomCreateRegistrationCoreReturnedNull(this.GetType()));
                     weakRegistration.Target = registration;
                 }
 

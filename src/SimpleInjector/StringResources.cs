@@ -1044,6 +1044,21 @@ namespace SimpleInjector
                 asyncDisposeMethod);
         }
 
+        internal static string CustomCreateRegistrationCoreReturnedNull(
+            Type customLifestyleImplementation) => Format(
+            "The call to CreateRegistrationCore(Type, Container) implemented by the custom " +
+            "lifestyle {0} returned null, which is not allowed.",
+            // We return the fully qualified name of the custom lifestyle here, because the type might not
+            // originate from the user's code, but from a third-party library.
+            customLifestyleImplementation.ToFriendlyName(fullyQualifiedName: true));
+
+        internal static string CustomCreateRegistrationCoreOfTServiceReturnedNull(
+            Type serviceTypeParameter, Type customLifestyleImplementation) => Format(
+            "The call to CreateRegistrationCore<{0}>(Func<TService>, Container) implemented by the custom " +
+            "lifestyle {1} returned null, which is not allowed.",
+            serviceTypeParameter.ToFriendlyName(),
+            customLifestyleImplementation.ToFriendlyName(fullyQualifiedName: true));
+
         private static bool IsListOrArrayRelationship(KnownRelationship relationship) =>
             typeof(List<>).IsGenericTypeDefinitionOf(relationship.Consumer.Target.TargetType)
             || relationship.Consumer.Target.TargetType.IsArray;

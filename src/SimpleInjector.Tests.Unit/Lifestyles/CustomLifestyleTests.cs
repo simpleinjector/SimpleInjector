@@ -189,6 +189,51 @@
                 "completely differently.");
         }
 
+        [TestMethod]
+        public void Register_CustomLifestyleWhoseCreateRegistrationCoreReturnsNull_ThrowsExceptionThatMentionsTheLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.Register<IFoo, FooBar>(new NullRegistrationLifestyle());
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<Exception>(
+                nameof(NullRegistrationLifestyle),
+                action);
+        }
+
+        [TestMethod]
+        public void RegisterFunc_CustomLifestyleWhoseCreateRegistrationCoreReturnsNull_ThrowsExceptionThatMentionsTheLifestyle()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.Register<IFoo>(() => new FooBar(), new NullRegistrationLifestyle());
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<Exception>(
+                nameof(NullRegistrationLifestyle),
+                action);
+        }
+
+        public sealed class NullRegistrationLifestyle : Lifestyle
+        {
+            public NullRegistrationLifestyle() : base(nameof(NullRegistrationLifestyle))
+            {
+            }
+
+            public override int Length => 1;
+
+            protected internal override Registration CreateRegistrationCore(Type concreteType, Container container) =>
+                null;
+
+            protected internal override Registration CreateRegistrationCore<TService>(
+                Func<TService> instanceCreator, Container container) => null;
+        }
+
         public class ConcreteCommandHandler : ICommandHandler<ConcreteCommand>
         {
             public void Handle(ConcreteCommand command)
