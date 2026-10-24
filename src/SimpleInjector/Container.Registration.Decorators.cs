@@ -127,6 +127,8 @@ namespace SimpleInjector
             where TService : class
             where TDecorator : class, TService
         {
+            Requires.IsNotNull(lifestyle);
+
             this.RegisterDecoratorCore(typeof(TService), typeof(TDecorator), lifestyle: lifestyle);
         }
 
@@ -380,6 +382,8 @@ namespace SimpleInjector
         /// <paramref name="serviceType"/>.</exception>
         public void RegisterDecorator(Type serviceType, Type decoratorType, Lifestyle lifestyle)
         {
+            Requires.IsNotNull(lifestyle);
+
             this.RegisterDecoratorCore(serviceType, decoratorType, lifestyle: lifestyle);
         }
 

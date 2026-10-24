@@ -2557,6 +2557,34 @@
                 nameof(NotADecoratorForINonGenericService), action);
         }
 
+        [TestMethod]
+        public void RegisterDecoratorGeneric_NullLifestyle_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container
+            .RegisterDecorator<INonGenericService, NonGenericServiceDecorator>((Lifestyle)null);
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("lifestyle", action);
+        }
+
+        [TestMethod]
+        public void RegisterDecoratorNonGeneric_NullLifestyle_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            // Act
+            Action action = () => container.RegisterDecorator(
+                typeof(INonGenericService), typeof(NonGenericServiceDecorator), (Lifestyle)null);
+
+            // Assert
+            AssertThat.ThrowsWithParamName<ArgumentNullException>("lifestyle", action);
+        }
+
         private static KnownRelationship GetValidRelationship()
         {
             // Arrange
