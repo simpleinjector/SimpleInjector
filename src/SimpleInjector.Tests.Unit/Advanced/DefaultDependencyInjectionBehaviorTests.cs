@@ -6,6 +6,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SimpleInjector;
     using SimpleInjector.Advanced;
+    using SimpleInjector.Diagnostics.Tests.Unit;
 
     [TestClass]
     public class DefaultDependencyInjectionBehaviorTests
@@ -78,6 +79,27 @@
             }
         }
 
+        // #1032
+        [TestMethod]
+        public void Register_DependencyRejectedByBehaviorWithoutErrorMessage_ThrowsArgumentException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Options.DependencyInjectionBehavior =
+                new RejectFooWithoutMessageBehavior(container.Options.DependencyInjectionBehavior);
+
+            container.Register<IFoo, FooBar>();
+
+            // Act
+            Action action = () => container.Register<ServiceDependingOn<IFoo>>();
+
+            // Assert
+            AssertThat.Throws<ArgumentException>(action,
+                "The behavior rejected the IFoo dependency, so registration should fail, just like it does " +
+                "when the behavior supplies an error message.");
+        }
+
         [TestMethod]
         public void Verify_StringTypeParameter_ThrowsExpectedException()
         {
@@ -112,19 +134,9 @@
 
         private static ContainerOptions GetContainerOptions() => new Container().Options;
 
-        private class TypeWithSinglePublicConstructorWithValueTypeParameter
-        {
-            public TypeWithSinglePublicConstructorWithValueTypeParameter(int intArgument)
-            {
-            }
-        }
+        private class TypeWithSinglePublicConstructorWithValueTypeParameter(int intArgument);
 
-        private class TypeWithSinglePublicConstructorWithStringTypeParameter
-        {
-            public TypeWithSinglePublicConstructorWithStringTypeParameter(string stringArgument)
-            {
-            }
-        }
+        private class TypeWithSinglePublicConstructorWithStringTypeParameter(string stringArgument);
 
         private sealed class FakeDependencyInjectionBehavior : IDependencyInjectionBehavior
         {
@@ -138,6 +150,19 @@
                 errorMessage = null;
                 return true;
             }
+        }
+
+        private sealed class RejectFooWithoutMessageBehavior(IDependencyInjectionBehavior original)
+            : IDependencyInjectionBehavior
+        {
+            public bool VerifyDependency(InjectionConsumerInfo dependency, out string errorMessage)
+            {
+                errorMessage = null;
+                return dependency.Target.TargetType != typeof(IFoo);
+            }
+
+            public InstanceProducer GetInstanceProducer(InjectionConsumerInfo dependency, bool throwOnFailure) =>
+                original.GetInstanceProducer(dependency, throwOnFailure);
         }
     }
 }

@@ -511,35 +511,29 @@ namespace SimpleInjector
             var constructor =
                 this.ConstructorResolutionBehavior.TryGetConstructor(implementationType, out errorMessage);
 
-            if (constructor is null && errorMessage is null)
+            if (constructor is null)
             {
-                throw new InvalidOperationException(
-                    StringResources.TypeHasNoInjectableConstructorAccordingToCustomResolutionBehavior(
-                        this.ConstructorResolutionBehavior, implementationType));
+                if (errorMessage is null)
+                {
+                    throw new InvalidOperationException(
+                        StringResources.TypeHasNoInjectableConstructorAccordingToCustomResolutionBehavior(
+                            this.ConstructorResolutionBehavior, implementationType));
+                }
+                else
+                {
+                    return false;
+                }
             }
 
-            if (constructor is not null)
-            {
-                errorMessage = this.DependencyInjectionBehavior.VerifyConstructor(constructor);
-            }
-
-            return errorMessage is null;
+            return this.DependencyInjectionBehavior.VerifyConstructor(constructor, out errorMessage);
         }
 
-        internal InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer)
-        {
-            var producer = this.DependencyInjectionBehavior.GetInstanceProducer(consumer, throwOnFailure: true);
-
-            // Producer will only be null if a user created a custom IConstructorInjectionBehavior that
-            // returned null.
-            if (producer is null)
-            {
-                throw new ActivationException(StringResources.DependencyInjectionBehaviorReturnedNull(
+        // Producer will only be null if a user created a custom IConstructorInjectionBehavior that
+        // returned null.
+        internal InstanceProducer GetInstanceProducerFor(InjectionConsumerInfo consumer) =>
+            this.DependencyInjectionBehavior.GetInstanceProducer(consumer, throwOnFailure: true)
+                ?? throw new ActivationException(StringResources.DependencyInjectionBehaviorReturnedNull(
                     this.DependencyInjectionBehavior));
-            }
-
-            return producer;
-        }
 
         internal Lifestyle SelectLifestyle(Type implementationType) =>
             this.LifestyleSelectionBehavior.SelectLifestyle(implementationType)

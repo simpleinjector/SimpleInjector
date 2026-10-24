@@ -44,18 +44,19 @@ namespace SimpleInjector
             }
         }
 
-        internal static string? VerifyConstructor(
-            this IDependencyInjectionBehavior behavior, ConstructorInfo constructor)
+        internal static bool VerifyConstructor(
+            this IDependencyInjectionBehavior behavior, ConstructorInfo constructor, out string? errorMessage)
         {
             foreach (ParameterInfo parameter in constructor.GetParameters())
             {
-                if (!behavior.VerifyDependency(new InjectionConsumerInfo(parameter), out string? message))
+                if (!behavior.VerifyDependency(new InjectionConsumerInfo(parameter), out errorMessage))
                 {
-                    return message;
+                    return false;
                 }
             }
 
-            return null;
+            errorMessage = null;
+            return true;
         }
     }
 }
