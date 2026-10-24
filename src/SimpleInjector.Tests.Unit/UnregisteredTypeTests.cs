@@ -1,6 +1,8 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Linq.Expressions;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -349,6 +351,29 @@
                 // AssertThat.StringContains(typeof(IUserRepository).Name, ex.Message);
                 AssertThat.StringContains("Bla", ex.Message);
             }
+        }
+
+        [TestMethod]
+        public void GetInstance_UnregisteredTypeResolvedWithValueTypeNewExpression_ThrowsExpectedException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.ResolveUnregisteredType += (s, e) =>
+            {
+                if (e.UnregisteredServiceType == typeof(IComparable))
+                {
+                    e.Register(Expression.New(typeof(int)));
+                }
+            };
+
+            // Act
+            Action action = () => container.GetInstance<IComparable>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "Can't compile a Func<object> for expression 'new Int32()'",
+                action);
         }
     }
 }

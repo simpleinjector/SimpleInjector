@@ -44,7 +44,7 @@ namespace SimpleInjector.DynamicAssemblyCompilation
 
         protected override Expression VisitNew(NewExpression node)
         {
-            this.MayAccessExpression(node.Constructor.IsPublic && IsPublic(node.Constructor.DeclaringType));
+            this.MayAccessExpression(node.Constructor.IsPublic && IsPublic(node.Constructor?.DeclaringType ?? node.Type));
 
             return base.VisitNew(node);
         }

@@ -38,6 +38,13 @@ namespace SimpleInjector.Internals
                 return CreateConstantValueDelegate<TResult>(expression);
             }
 
+            if (expression.Type.IsValueType)
+            {
+                throw new InvalidOperationException(
+                    $"Can't compile a Func<{typeof(TResult).ToFriendlyName()}> for expression " +
+                    $"'{expression}', because the expression returns value type {expression.Type}.");
+            }
+
             return (Func<TResult>)CompileExpression(container, expression, null);
         }
 

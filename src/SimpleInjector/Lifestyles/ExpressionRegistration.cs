@@ -31,9 +31,11 @@ namespace SimpleInjector.Lifestyles
             expression is NewExpression ? Lifestyle.Transient :
             Lifestyle.Unknown;
 
-        private static Type GetImplementationTypeFor(Expression expression) =>
-            expression is NewExpression newExpression
-                ? newExpression.Constructor!.DeclaringType!
-                : expression.Type;
+        private static Type GetImplementationTypeFor(Expression expression)
+        {
+            if (expression is not NewExpression newExpression) return expression.Type;
+
+            return newExpression.Constructor?.DeclaringType ?? expression.Type;
+        }
     }
 }
