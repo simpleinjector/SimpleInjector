@@ -883,6 +883,13 @@ namespace SimpleInjector
         /// Thrown when this container instance is locked and can not be altered.</exception>
         /// <remarks>
         /// <para>
+        /// <b>WARNING:</b> In case an exception is thrown from a registered delegate, the resulting behavior
+        /// is undefined and the state of the scope in which the initialized service lives should be
+        /// considered corrupted. i.e. if the initialized service is registered as singleton, the whole
+        /// container should be considered corrupted, which typically means restarting the application. Do not
+        /// continue running the application as singleton instances might be created over and over again.
+        /// </para>
+        /// <para>
         /// Multiple <paramref name="instanceInitializer"/> delegates can be registered per
         /// <typeparamref name="TService"/> and multiple initializers can be applied on a created instance,
         /// before it is returned. For instance, when registering a <paramref name="instanceInitializer"/>
@@ -972,6 +979,13 @@ namespace SimpleInjector
         /// <exception cref="InvalidOperationException">
         /// Thrown when this container instance is locked and can not be altered.</exception>
         /// <remarks>
+        /// <para>
+        /// <b>WARNING:</b> In case an exception is thrown from a registered delegate, the resulting behavior
+        /// is undefined and the state of the scope in which the initialized service lives should be
+        /// considered corrupted. i.e. if the initialized service is registered as singleton, the whole
+        /// container should be considered corrupted, which typically means restarting the application. Do not
+        /// continue running the application as singleton instances might be created over and over again.
+        /// </para>
         /// <para>
         /// Note: Initializers are guaranteed to be executed in the order they are registered.
         /// </para>
