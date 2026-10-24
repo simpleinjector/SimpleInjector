@@ -20,8 +20,14 @@ namespace SimpleInjector.Decorators
         /// <param name="serviceType">The service type that will be used to apply the composite to.</param>
         /// <param name="constructor">The constructor used by Simple Injector</param>
         /// <returns>True when composite; false otherwise.</returns>
-        public static bool IsComposite(Type serviceType, ConstructorInfo constructor) =>
-            GetNumberOfCompositeServiceTypeDependencies(serviceType, constructor) > 0;
+        /// <exception cref="ArgumentNullException">When either one of the arguments is null.</exception>
+        public static bool IsComposite(Type serviceType, ConstructorInfo constructor)
+        {
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(constructor);
+
+            return GetNumberOfCompositeServiceTypeDependencies(serviceType, constructor) > 0;
+        }
 
         private static int GetNumberOfCompositeServiceTypeDependencies(
             Type serviceType, ConstructorInfo compositeConstructor)
