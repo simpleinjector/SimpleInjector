@@ -195,7 +195,7 @@ namespace SimpleInjector.Advanced
                 Expression.Block(implementationType, propertyInjectionExpressions),
                 parameters);
 
-            return container.Options.ExpressionCompilationBehavior.Compile(lambda);
+            return container.Options.CompileExpression(lambda);
         }
 
         private List<Expression> BuildPropertyInjectionExpressions(ParameterExpression targetParameter,

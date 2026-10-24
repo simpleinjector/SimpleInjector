@@ -8,6 +8,10 @@ namespace SimpleInjector.Advanced
 
     internal sealed class DefaultExpressionCompilationBehavior : IExpressionCompilationBehavior
     {
+        public static readonly DefaultExpressionCompilationBehavior Instance = new();
+
+        private DefaultExpressionCompilationBehavior() { }
+
         public Delegate Compile(Expression expression)
         {
             Requires.IsNotNull(expression);

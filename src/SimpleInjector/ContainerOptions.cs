@@ -6,6 +6,7 @@ namespace SimpleInjector
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq.Expressions;
     using System.Reflection;
     using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
@@ -77,7 +78,7 @@ namespace SimpleInjector
             this.injectionBehavior = new DefaultDependencyInjectionBehavior(container);
             this.propertyBehavior = new DefaultPropertySelectionBehavior();
             this.lifestyleBehavior = new DefaultLifestyleSelectionBehavior(this);
-            this.compilationBehavior = new DefaultExpressionCompilationBehavior();
+            this.compilationBehavior = DefaultExpressionCompilationBehavior.Instance;
         }
 
         /// <summary>
@@ -498,6 +499,14 @@ namespace SimpleInjector
             }
 
             return string.Join(", ", descriptions);
+        }
+
+        internal Delegate CompileExpression(Expression expression)
+        {
+            Requires.IsNotNull(expression);
+
+            return this.ExpressionCompilationBehavior.Compile(expression)
+                ?? DefaultExpressionCompilationBehavior.Instance.Compile(expression);
         }
 
         internal bool IsConstructableType(Type implementationType, out string? errorMessage)

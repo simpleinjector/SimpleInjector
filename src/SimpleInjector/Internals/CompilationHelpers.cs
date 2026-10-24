@@ -58,7 +58,7 @@ namespace SimpleInjector.Internals
 
             expression = OptimizeScopedRegistrationsInObjectGraph(container, expression);
 
-            return container.Options.ExpressionCompilationBehavior.Compile(expression);
+            return container.Options.CompileExpression(expression);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]

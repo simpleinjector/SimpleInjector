@@ -2,8 +2,9 @@
 {
     using System;
     using System.Linq;
-    using System.Reflection;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using SimpleInjector;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics.Tests.Unit;

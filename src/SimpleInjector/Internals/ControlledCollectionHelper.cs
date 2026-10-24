@@ -148,7 +148,7 @@ namespace SimpleInjector.Internals
                 container.Options.DefaultScopedLifestyle!,
                 container,
                 collectionType,
-                (Func<object>)container.Options.ExpressionCompilationBehavior.Compile(newCollectionExpression))
+                (Func<object>)container.Options.CompileExpression(newCollectionExpression))
             {
                 AdditionalInformationForLifestyleMismatchDiagnosticsProvider =
                     () => StringResources.FlowingCollectionIsScopedBecause(collectionType)

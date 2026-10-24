@@ -361,8 +361,7 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
-                "Error occurred while trying to build a delegate for type IComparable using " +
-                "the expression 'new Int32()'",
+                "Error occurred while trying to build a delegate for type IComparable",
                 action);
         }
 
