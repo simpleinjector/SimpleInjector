@@ -133,25 +133,26 @@ namespace SimpleInjector
             // the first thread could dispose the verification scope, while the other thread is still using it.
             lock (this.isVerifying)
             {
-                // Flag verifying before locking the container, because LockContainer otherwise triggers
-                // verification again causing a stack overflow.
-                this.IsVerifying = true;
-
-                this.LockContainer();
-
                 bool original = this.Options.SuppressLifestyleMismatchVerification;
-
-                var scope = this.Options.DefaultScopedLifestyle?.GetCurrentScope(this);
-
-                // If there is a current active scope, prefer using that scope for verification. This prevents
-                // this method from having to manage a verification scope, which means calling Dispose() which
-                // is problematic when there are IAsyncDisposable registrations. Downside of using the active
-                // scope is that those components could be kept alive much longer (depending on when the
-                // active scope is disposed of).
-                this.VerificationScope = scope ?? new ContainerVerificationScope(this);
 
                 try
                 {
+                    // Flag verifying before locking the container, because LockContainer otherwise triggers
+                    // verification again causing a stack overflow.
+                    this.IsVerifying = true;
+
+                    // Locking container triggers the ContainerLocking event and may run user code.
+                    this.LockContainer();
+
+                    var scope = this.Options.DefaultScopedLifestyle?.GetCurrentScope(this);
+
+                    // If there is a current active scope, prefer using that scope for verification. This
+                    // prevents this method from having to manage a verification scope, which means calling
+                    // Dispose() which is problematic when there are IAsyncDisposable registrations. Downside
+                    // of using the active scope is that those components could be kept alive much longer
+                    // (depending on when the active scope is disposed of).
+                    this.VerificationScope = scope ?? new ContainerVerificationScope(this);
+
                     // Temporarily suppress lifestyle mismatch verification, because that would cause a single
                     // diagnostic warning to be displayed instead of the complete list of found warnings.
                     if (suppressLifestyleMismatchVerification)
