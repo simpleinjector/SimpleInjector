@@ -895,6 +895,13 @@ namespace SimpleInjector
                 implementationType.TypeName(),
                 serviceType.TypeName());
 
+        internal static string TypeFactoryReturnedTypeThatIsNotADecorator(
+            Type serviceType, Type decoratorType) =>
+            Format(
+                "The registered type factory returned type {0} which is not a decorator for {1}.",
+                decoratorType.TypeName(),
+                serviceType.TypeName());
+
         internal static string RecursiveInstanceRegistrationDetected() =>
             "A recursive registration of Action or IDisposable instances was detected during disposal " +
             "of the scope. This is possibly caused by a component that is directly or indirectly " +

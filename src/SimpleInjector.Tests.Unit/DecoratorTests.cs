@@ -6,8 +6,11 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Linq.Expressions;
+
     using Castle.DynamicProxy;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using SimpleInjector.Advanced;
     using SimpleInjector.Lifestyles;
 
@@ -2531,6 +2534,29 @@
             Assert.AreEqual(expected: "\n" + expectedGraph + "\n", actual: "\n" + actualGraph + "\n");
         }
 
+        // #1034
+        [TestMethod]
+        public void GetInstance_DecoratorFactoryReturnsNonGenericTypeThatIsNoDecorator_ThrowsExpressiveException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.Register<INonGenericService, RealNonGenericService>();
+
+            container.RegisterDecorator(
+                serviceType: typeof(INonGenericService),
+                decoratorTypeFactory: c => typeof(NotADecoratorForINonGenericService),
+                lifestyle: Lifestyle.Transient,
+                predicate: c => true);
+
+            // Act
+            Action action = () => container.GetInstance<INonGenericService>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                nameof(NotADecoratorForINonGenericService), action);
+        }
+
         private static KnownRelationship GetValidRelationship()
         {
             // Arrange
@@ -2538,6 +2564,11 @@
 
             return new KnownRelationship(typeof(object), Lifestyle.Transient,
                 container.GetRegistration(typeof(Container)));
+        }
+
+        public class NotADecoratorForINonGenericService : INonGenericService
+        {
+            public void DoSomething() { }
         }
 
         public class DummyInterceptor : IInterceptor

@@ -146,6 +146,14 @@ namespace SimpleInjector.Decorators
                     StringResources.TypeDependsOnItself(decoratorConstructor.DeclaringType!));
             }
 
+            if (parameters.Length == 0)
+            {
+                throw new ActivationException(
+                    StringResources.TypeFactoryReturnedTypeThatIsNotADecorator(
+                        serviceType,
+                        decoratorConstructor.DeclaringType!));
+            }
+
             return parameters.Single();
         }
 
