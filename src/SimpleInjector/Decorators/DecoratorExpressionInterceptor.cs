@@ -36,6 +36,8 @@ namespace SimpleInjector.Decorators
         public static TService ResolveWithinThreadResolveScope<TService>(
             Scope scope, Func<TService> instanceCreator, Container container)
         {
+            Requires.IsNotNull(scope);
+
             if (!object.ReferenceEquals(container, scope.Container))
             {
                 throw new InvalidOperationException(
