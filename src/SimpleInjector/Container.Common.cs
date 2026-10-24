@@ -456,6 +456,7 @@ namespace SimpleInjector
                     {
                         this.disposed = true;
                         this.isVerifying.Dispose();
+                        this.resolveScope.Dispose();
                     }
                 }
             }

@@ -1,8 +1,6 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -71,6 +69,45 @@
             Assert_NoMemoryLeak(values);
         }
 
+        [TestMethod]
+        public void Dispose_ContainerAfterSettingFlowingScopeAsCurrentScope_ContainerCanBeGarbageCollected()
+        {
+            var values = new MemoryResults
+            {
+                NumberOfIterations = 1_000
+            };
+
+            // Warmup
+            BuildContainers(BuildContainerThatSetsFlowingScope, count: values.NumberOfIterations);
+            GetTotalMemory();
+            BuildContainers(BuildContainerThatSetsFlowingScope, count: values.NumberOfIterations);
+
+            values.InitialMemoryFootprint = GetTotalMemory();
+
+            // Act
+            BuildContainers(BuildContainerThatSetsFlowingScope, count: values.NumberOfIterations);
+
+            values.CurrentMemoryFootprint = GetTotalMemory();
+
+            // Assert
+            Assert_NoMemoryLeak(values);
+        }
+
+        private static void BuildContainerThatSetsFlowingScope()
+        {
+            var container = new Container();
+            container.Options.DefaultScopedLifestyle = ScopedLifestyle.Flowing;
+            container.Register<IUserRepository, DisposableUserRepository>(Lifestyle.Singleton);
+            container.GetInstance<IUserRepository>();
+
+            var scope = new Scope(container);
+
+            ScopedLifestyle.Flowing.SetCurrentScope(scope);
+
+            scope.Dispose();
+            container.Dispose();
+        }
+
         private static void BuildSimpleVerifiedContainerWithDecorator()
         {
             var container = new Container();
@@ -128,5 +165,7 @@
             public long CurrentMemoryFootprint { get; set; }
             public int NumberOfIterations { get; set; } = 1;
         }
+
+        private class DisposableUserRepository : IUserRepository;
     }
 }
