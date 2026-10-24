@@ -20,8 +20,12 @@ namespace SimpleInjector.Decorators
         /// <param name="serviceType">The service type the decorator should be wrapped around.</param>
         /// <param name="constructor">The constructor used by Simple Injector.</param>
         /// <returns>True when decorator; false otherwise.</returns>
+        /// <exception cref="ArgumentNullException">When either one of the arguments is null.</exception>
         public static bool IsDecorator(Type serviceType, ConstructorInfo constructor)
         {
+            Requires.IsNotNull(serviceType);
+            Requires.IsNotNull(constructor);
+
             int numberOfServiceTypeDependencies =
                 GetNumberOfServiceTypeDependencies(serviceType, constructor);
 
