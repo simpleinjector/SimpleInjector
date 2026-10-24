@@ -21,7 +21,7 @@ namespace SimpleInjector
     public abstract class ScopedLifestyle(string name) : Lifestyle(name)
     {
         /// <summary>
-        /// Gets the scoped lifestyle that allows Scoped registrations to be resolved direclty from the
+        /// Gets the scoped lifestyle that allows Scoped registrations to be resolved directly from the
         /// <see cref="Scope"/> by calling <see cref="Scope.GetInstance{TService}()"/>. This allows multiple
         /// scopes to be active and overlap within the same logical context, such as a single thread, or an
         /// asynchronous context.
