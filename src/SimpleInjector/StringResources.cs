@@ -983,7 +983,7 @@ namespace SimpleInjector
 
         internal static string AnOverlappingRegistrationExists(
             Type openGenericServiceType,
-            Type overlappingImplementationType,
+            Type? overlappingImplementationType, // null when registration is a factory
             bool isExistingRegistrationConditional,
             Type implementationTypeOfNewRegistration,
             bool isNewRegistrationConditional)
@@ -999,13 +999,15 @@ namespace SimpleInjector
             }
 
             return Format(
-                "There is already a {0}registration for {1} (with implementation {2}) that " +
+                "There is already a {0}registration for {1} ({2}) that " +
                 "overlaps with the {3}registration for {4} that you are trying to make. This new " +
                 "registration causes ambiguity, because both registrations would be used for the " +
                 "same closed service types. {5}",
                 isExistingRegistrationConditional ? "conditional " : string.Empty,
                 openGenericServiceType.TypeName(),
-                overlappingImplementationType.TypeName(),
+                overlappingImplementationType is null
+                    ? "with factory registration"
+                    : "with implementation " + overlappingImplementationType.TypeName(),
                 isNewRegistrationConditional ? "conditional " : string.Empty,
                 implementationTypeOfNewRegistration.TypeName(),
                 solution);

@@ -2003,9 +2003,28 @@
             Assert.AreEqual(2.0, doubleValue);
         }
 
-        // #836
-        interface IFoo { }
-        class Foo : IFoo { public bool Debug { get; set; } }
+        // #1033
+        [TestMethod]
+        public void RegisterOpenGeneric_OverlappingWithConditionalTypeFactoryRegistration_ThrowsOverlapException()
+        {
+            // Arrange
+            var container = ContainerFactory.New();
+
+            container.RegisterConditional(
+                typeof(IGeneric<>),
+                c => typeof(GenericType<>).MakeGenericType(c.ServiceType.GetGenericArguments()),
+                Lifestyle.Transient,
+                c => true);
+
+            // Act
+            Action action = () => container.Register(typeof(IGeneric<>), typeof(GenericType<>));
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
+                "There is already a conditional registration for IGeneric<T> (with factory registration) " +
+                "that overlaps with the registration for GenericType<T> that you are trying to make.",
+                action);
+        }
 
         [TestMethod]
         public void RegisteringConditional_WithDifferentInstancesOfSameTypeForSameService_Succeeds()
@@ -2056,5 +2075,8 @@
                 return true;
             }
         }
+
+        interface IFoo { }
+        class Foo : IFoo { public bool Debug { get; set; } }
     }
 }

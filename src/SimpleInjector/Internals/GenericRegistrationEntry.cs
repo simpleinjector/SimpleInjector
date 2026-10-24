@@ -352,9 +352,7 @@ namespace SimpleInjector.Internals
             IProducerProvider providerToRegister, IProducerProvider overlappingProvider) => new(
                 StringResources.AnOverlappingRegistrationExists(
                     providerToRegister.ServiceType,
-                    // ImplementationType will never be null, because providers can never be overlapping when they
-                    // have a factory instead of an implementation type.
-                    overlappingProvider.ImplementationType!,
+                    overlappingProvider.ImplementationType,
                     overlappingProvider.IsConditional,
                     providerToRegister.ImplementationType!,
                     providerToRegister.IsConditional));
