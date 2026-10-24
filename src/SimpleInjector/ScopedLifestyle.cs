@@ -104,11 +104,6 @@ namespace SimpleInjector
         {
             Requires.IsNotNull(scope);
 
-            if (scope.Container is null)
-            {
-                throw new ArgumentException("The scope has no related Container.", nameof(scope));
-            }
-
             this.SetCurrentScopeCore(scope);
         }
 
