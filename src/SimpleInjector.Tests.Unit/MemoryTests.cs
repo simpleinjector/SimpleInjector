@@ -1,6 +1,9 @@
 ﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>Tests that verify DI Container instance does not leak memory.</summary>
@@ -39,6 +42,11 @@
             Assert_NoMemoryLeak(values);
         }
 
+        private static void BuildEmptyContainer()
+        {
+            var container = new Container();
+        }
+
         [TestMethod]
         public void CreatingManyContainers_WithDecoratorRegistration_DoesNotIncreaseMemoryFootprint()
         {
@@ -63,19 +71,6 @@
             Assert_NoMemoryLeak(values);
         }
 
-        private static void BuildContainers(Action containerBuilder, int count = 10)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                containerBuilder();
-            }
-        }
-
-        private static void BuildEmptyContainer()
-        {
-            var container = new Container();
-        }
-
         private static void BuildSimpleVerifiedContainerWithDecorator()
         {
             var container = new Container();
@@ -86,6 +81,14 @@
             container.Verify();
 
             container.Dispose();
+        }
+
+        private static void BuildContainers(Action containerBuilder, int count = 10)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                containerBuilder();
+            }
         }
 
         private static void Assert_NoMemoryLeak(MemoryResults results)
