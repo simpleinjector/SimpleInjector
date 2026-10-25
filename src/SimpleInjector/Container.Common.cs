@@ -58,6 +58,7 @@ namespace SimpleInjector
 
         // Flag to signal that the container can't be altered by using any of the Register methods.
         private bool locked;
+        private volatile Thread? lockingThread;
         private string? stackTraceThatLockedTheContainer;
         private bool disposed;
         private string? stackTraceThatDisposedTheContainer;
@@ -156,7 +157,11 @@ namespace SimpleInjector
                 // immediately.
                 lock (this.locker)
                 {
-                    return this.locked;
+                    // The internal locked flag only gets switched -after- verification completed, which
+                    // allows us to block other threads. However, the IsLocked property exists for the end
+                    // user and it should also return while 'notify and lock' is running -or at least- not
+                    // checking this would be a breaking change, because that's the behavior we had pre v6.
+                    return this.locked || this.lockingThread is not null;
                 }
             }
         }
@@ -358,8 +363,16 @@ namespace SimpleInjector
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal void LockContainer()
         {
+            var id = Thread.CurrentThread.ManagedThreadId;
+
             if (!this.locked)
             {
+                // Prevent reentry. Important for thread-safety, because NotifyAndLock should only flip the
+                // locked switch -after- verification. Otherwise other concurrent threads would jump directly
+                // out of this method instead of calling NotifyAndLock and waiting on the verifying thread
+                // to finish.
+                if (this.lockingThread == Thread.CurrentThread) return;
+
                 // Performance optimization: The real locking is moved to another method to allow this method
                 // to be in-lined.
                 this.NotifyAndLock();
@@ -495,40 +508,68 @@ namespace SimpleInjector
                 {
                     this.stackTraceThatLockedTheContainer = GetStackTrace();
 
+                    this.lockingThread = Thread.CurrentThread;
+
+                    bool verificationSuccessful = true;
+
                     try
                     {
                         this.Options.RaiseContainerLockingAndReset();
+
+                        // By running auto verification before locking the container and inside the lock, we
+                        // force other threads to wait until verification completed. Otherwise, they would be
+                        // able to return unverified object graphs.
+                        if (this.Options.EnableAutoVerification && !this.IsVerifying)
+                        {
+                            verificationSuccessful = this.TryRunAutoVerification();
+                        }
                     }
                     finally
                     {
-                        this.locked = true;
+                        // Only lock the container when verification was successful. Keeping this 
+                        if (verificationSuccessful)
+                        {
+                            this.locked = true;
+                        }
+
+                        this.lockingThread = null;
                     }
                 }
             }
+        }
 
-            if (this.Options.EnableAutoVerification && !this.IsVerifying && !this.SuccesfullyVerified)
+        private bool TryRunAutoVerification()
+        {
+            // Here, we instead want to throw an ActivationException, as that would allow the same
+            // exception type to be thrown in that case, which is often what the user would expect.
+            try
             {
-                // Here, we instead want to throw an ActivationException, as that would allow the same
-                // exception type to be thrown in that case, which is often what the user would expect.
-                try
+                if (!this.SuccesfullyVerified)
                 {
-                    this.Verify();
+                    this.Verify(VerificationOption.VerifyOnly);
                 }
-                catch (VerificationException ex)
+
+                if (!this.SuccesfullyDiagnosed)
                 {
-                    throw new ActivationException(
-                        StringResources.EnableAutoVerificationIsEnabled(ex.Message), ex);
+                    this.ThrowOnDiagnosticWarnings();
                 }
-                catch (InvalidOperationException ex)
-                {
-                    throw new ActivationException(
-                        StringResources.EnableAutoVerificationIsEnabled(ex.Message), ex);
-                }
-                catch (DiagnosticVerificationException ex)
-                {
-                    throw new ActivationException(
-                        StringResources.EnableAutoVerificationIsEnabled(ex.Message), ex);
-                }
+
+                return true;
+            }
+            catch (VerificationException ex)
+            {
+                throw new ActivationException(
+                    StringResources.EnableAutoVerificationIsEnabled(ex.Message), ex);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new ActivationException(
+                    StringResources.EnableAutoVerificationIsEnabled(ex.Message), ex);
+            }
+            catch (DiagnosticVerificationException ex)
+            {
+                throw new ActivationException(
+                    StringResources.EnableAutoVerificationIsEnabled(ex.Message), ex);
             }
         }
 

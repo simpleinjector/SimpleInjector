@@ -7,7 +7,7 @@
     using SimpleInjector.Lifestyles;
 
     [TestClass]
-    public class AutoVerification
+    public class AutoVerificationTests
     {
         [TestMethod]
         public void BuildExpression_WithAutoVerificationEnabledOnAcyclicGraph_ShouldNotCauseACyclicGraphException()
@@ -119,13 +119,38 @@
                 action);
         }
 
-        public class CaptivatingCompositeLogger<TCollection> : ILogger
+        // #1038
+        [TestMethod]
+        public void GetInstance_InvalidConfigurationWithAutoVerificationEnabled_WillAlwaysThrowNotJustTheFirstTime()
+        {
+            // Arrange
+            var container = new Container();
+
+            // For clarity; will be true by default
+            container.Options.EnableAutoVerification = true;
+
+            container.Register<XDependingOn<PluginImpl>>(Lifestyle.Singleton);
+            container.Register<PluginImpl>(Lifestyle.Transient);
+
+            try
+            {
+                container.GetInstance<XDependingOn<PluginImpl>>();
+            }
+            catch { }
+
+            // Act
+            Action action = () => container.GetInstance<XDependingOn<PluginImpl>>();
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(
+                "A lifestyle mismatch has been detected",
+                action);
+        }
+
+        public class CaptivatingCompositeLogger<TCollection>(TCollection loggers) : ILogger
             where TCollection : IEnumerable<ILogger>
         {
-            private readonly List<ILogger> captiveLoggers;
-
-            public CaptivatingCompositeLogger(TCollection loggers) =>
-                this.captiveLoggers = loggers.ToList();
+            private readonly List<ILogger> captiveLoggers = loggers.ToList();
         }
     }
 }

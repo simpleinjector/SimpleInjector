@@ -28,6 +28,9 @@ namespace SimpleInjector
         // Flag to signal that the container's configuration has been verified (at least once).
         internal bool SuccesfullyVerified { get; private set; }
 
+        // Flag to signal that the container's configuration has been diagnosed (at least once).
+        internal bool SuccesfullyDiagnosed { get; private set; }
+
         internal Scope? VerificationScope { get; private set; }
 
         // Allows to resolve directly from a scope instead of relying on an ambient context.
@@ -324,6 +327,8 @@ namespace SimpleInjector
             {
                 throw new DiagnosticVerificationException(errors);
             }
+
+            this.SuccesfullyDiagnosed = true;
         }
 
         private IEnumerable<DiagnosticResult> GetDiagnosticWarnings() =>
