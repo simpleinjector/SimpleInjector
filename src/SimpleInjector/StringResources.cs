@@ -217,7 +217,8 @@ namespace SimpleInjector
 
             return Format(
                 "The configuration is invalid. The following diagnostic warnings were reported:{1}{0}{1}" +
-                "See the Error property for detailed information about the warnings. " +
+                $"See the {nameof(DiagnosticVerificationException.Errors)} property for detailed information " +
+                $"about the warnings. " +
                 "Please see https://simpleinjector.org/diagnostics how to fix problems and how to suppress " +
                 "individual warnings.",
                 string.Join(Environment.NewLine, descriptions.Distinct()),
