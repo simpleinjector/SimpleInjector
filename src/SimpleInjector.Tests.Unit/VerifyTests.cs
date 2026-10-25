@@ -6,7 +6,9 @@ namespace SimpleInjector.Tests.Unit
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using SimpleInjector.Lifestyles;
 
     [TestClass]
@@ -680,7 +682,7 @@ namespace SimpleInjector.Tests.Unit
             // Arrange
             string expected1 = "The following diagnostic warnings were reported";
             string expected2 = "ServiceWithDependency<IPlugin> (Singleton) depends on IPlugin";
-            string expected3 = "See the Error property for detailed information about the warnings.";
+            string expected3 = "See the Errors property for detailed information about the warnings.";
 
             var container = ContainerFactory.New();
 
