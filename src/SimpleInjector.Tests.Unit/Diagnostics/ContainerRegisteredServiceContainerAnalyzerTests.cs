@@ -1,5 +1,4 @@
-﻿#pragma warning disable 0618
-namespace SimpleInjector.Diagnostics.Tests.Unit
+﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -50,4 +49,3 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         }
     }
 }
-#pragma warning restore 0618

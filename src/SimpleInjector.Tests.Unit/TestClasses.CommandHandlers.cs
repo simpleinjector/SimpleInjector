@@ -35,19 +35,9 @@
         }
     }
 
-    public class NullCommandHandler<T> : ICommandHandler<T>
-    {
-        public void Handle(T command)
-        {
-        }
-    }
-
-    public class DefaultCommandHandler<T> : ICommandHandler<T>
-    {
-        public void Handle(T command)
-        {
-        }
-    }
+    public class NullCommandHandler<T> : ICommandHandler<T>;
+    
+    public class DefaultCommandHandler<T> : ICommandHandler<T>;
 
     public class GenericHandler<TCommand, TDependency>(TDependency dependency) : ICommandHandler<TCommand>;
 
@@ -82,18 +72,11 @@
     }
 
     // This is not a decorator, the class implements ICommandHandler<int> but wraps ICommandHandler<byte>
-    public class BadCommandHandlerDecorator1(ICommandHandler<byte> handler) : ICommandHandler<int>
-    {
-        public void Handle(int command)
-        {
-        }
-    }
+    public class BadCommandHandlerDecorator1(ICommandHandler<byte> handler) : ICommandHandler<int>;
 
     // This is not a decorator, the class takes 2 generic types but wraps ICommandHandler<T>
     public class CommandHandlerDecoratorWithUnresolvableArgument<T, TUnresolved>(ICommandHandler<T> handler)
-        : ICommandHandler<T>
-    {
-    }
+        : ICommandHandler<T>;
 
     public class StubCommandHandler : ICommandHandler<RealCommand>;
 
@@ -122,12 +105,7 @@
     }
 
     public class SpecialCommandHandlerDecorator<T>(ICommandHandler<T> decorated)
-        : ICommandHandler<T> where T : ISpecialCommand
-    {
-        public void Handle(T command)
-        {
-        }
-    }
+        : ICommandHandler<T> where T : ISpecialCommand;
 
     public class LogExceptionCommandHandlerDecorator<T>(ICommandHandler<T> decorated)
         : ICommandHandler<T>, ICommandHandlerDecorator<T>

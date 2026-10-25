@@ -1,5 +1,4 @@
-﻿#pragma warning disable 0618
-namespace SimpleInjector.Tests.Unit
+﻿namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Collections.Generic;
@@ -855,4 +854,3 @@ namespace SimpleInjector.Tests.Unit
         }
     }
 }
-#pragma warning restore 0618

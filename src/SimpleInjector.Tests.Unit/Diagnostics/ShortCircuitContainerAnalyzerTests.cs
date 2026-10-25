@@ -1,5 +1,4 @@
-﻿#pragma warning disable CS9113 // Parameter is unread.
-namespace SimpleInjector.Diagnostics.Tests.Unit
+﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -203,4 +202,3 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
     public class MyUnitOfWork : IUnitOfWork;
     public class HomeController(MyUnitOfWork uow);
 }
-#pragma warning restore CS9113 // Parameter is unread.

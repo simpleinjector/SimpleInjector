@@ -1,5 +1,4 @@
-﻿#pragma warning disable CS9113 // Parameter is unread.
-namespace SimpleInjector.Diagnostics.Tests.Unit
+﻿namespace SimpleInjector.Diagnostics.Tests.Unit
 {
     using System.Linq;
 
@@ -49,4 +48,3 @@ namespace SimpleInjector.Diagnostics.Tests.Unit
         }
     }
 }
-#pragma warning restore CS9113 // Parameter is unread.
