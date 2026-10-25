@@ -441,8 +441,9 @@
 
             // Assert
             AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                expectedMessage: "AsyncDisposable only implements IAsyncDisposable, but not IDisposable. " +
-                "Make sure to call Container.DisposeScopeAsync() instead of Container.Dispose().",
+                expectedMessage:
+                    "AsyncDisposable only implements IAsyncDisposable, but not IDisposable. " +
+                    "Make sure to call Container.DisposeContainerAsync() instead of Container.Dispose().",
                 action);
         }
 
