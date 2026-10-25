@@ -78,7 +78,7 @@ namespace SimpleInjector.Diagnostics
         /// <summary>
         /// Diagnostic type that warns about conditional registrations that are never injected into any
         /// consumer.
-        /// For more information, see: https://simpleinjector.org/TODO.
+        /// For more information, see: https://simpleinjector.org/diaur.
         /// </summary>
         [Documentation("Unused Conditional Registration", "https://simpleinjector.org/diaur")]
         UnusedConditionalRegistration = 7,
