@@ -23,7 +23,8 @@ namespace SimpleInjector
     /// <para>
     /// <b>Thread-safety:</b>
     /// Resolving instances can be done safely from multiple threads concurrently, but registration needs to
-    /// be done from one single thread.
+    /// be done from one single thread. Also disposing the container must be done (typically at application
+    /// shutdown) while no other threads are interacting with the container.
     /// </para>
     /// <para>
     /// It is therefore safe to call <see cref="GetInstance"/>, <see cref="GetAllInstances"/>,
