@@ -363,8 +363,6 @@ namespace SimpleInjector
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal void LockContainer()
         {
-            var id = Thread.CurrentThread.ManagedThreadId;
-
             if (!this.locked)
             {
                 // Prevent reentry. Important for thread-safety, because NotifyAndLock should only flip the
