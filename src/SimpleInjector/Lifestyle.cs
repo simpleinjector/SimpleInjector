@@ -388,6 +388,11 @@ namespace SimpleInjector
         /// <code>container.GetInstance&lt;TService&gt;</code> or when that service is injected into another
         /// type).
         /// </remarks>
+        /// <para>
+        /// <b>WARNING:</b> Simple Injector will <b>not</b> track instances from custom lifestyles for
+        /// disposal automatically. This has to be implemented by the caller. Please note that implementing
+        /// disposability correctly can be complicated depending on the implementation of your custom lifestyle.
+        /// </para>
         /// <param name="name">The name of the lifestyle to create. The name is used to display the lifestyle
         /// in the debugger.</param>
         /// <param name="lifestyleApplierFactory">A factory delegate that takes a <b>Func&lt;object&gt;</b> delegate
