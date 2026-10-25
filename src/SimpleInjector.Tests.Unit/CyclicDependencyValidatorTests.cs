@@ -753,43 +753,22 @@
         }
     }
 
-    public interface IX
+    public interface IX;
+    public interface IY;
+    public class A(B b);
+    public class B(IX x);
+    public class NonCyclicX : IX;
+    public class CyclicX(IX x) : IX; // Depending on itself
+    public class XDecorator1(IX x) : IX;
+    public class XDecorator2(IX x) : IX;
+    public class CyclicXDecorator3(IX x, A a) : IX;
+
+    public class ServiceDependingOn<TDependency>(TDependency dependency)
     {
+        public readonly TDependency Dependency = dependency;
     }
 
-    public interface IY
-    {
-    }
+    public class XDependingOn<TDependency>(TDependency dependency) : IX;
 
-    public class A { public A(B b) { } }
-    public class B { public B(IX x) { } }
-    public class NonCyclicX : IX { }
-    public class CyclicX : IX { public CyclicX(IX x) { } } // Depending on itself
-    public class XDecorator1 : IX { public XDecorator1(IX x) { } }
-    public class XDecorator2 : IX { public XDecorator2(IX x) { } }
-    public class CyclicXDecorator3 : IX { public CyclicXDecorator3(IX x, A a) { } }
-
-    public class ServiceDependingOn<TDependency>
-    {
-        public readonly TDependency Dependency;
-
-        public ServiceDependingOn(TDependency dependency)
-        {
-            this.Dependency = dependency;
-        }
-    }
-
-    public class XDependingOn<TDependency> : IX
-    {
-        public XDependingOn(TDependency dependency)
-        {
-        }
-    }
-
-    public class YDependingOn<TDependency> : IY
-    {
-        public YDependingOn(TDependency dependency)
-        {
-        }
-    }
+    public class YDependingOn<TDependency>(TDependency dependency) : IY;
 }
