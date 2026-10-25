@@ -5,7 +5,7 @@
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using Microsoft.CodeAnalysis;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -15,7 +15,7 @@
         private const string WillBeRemovedInVersionMessage = " Will be removed in version ";
         private const string TreatedAsErrorFromVersionMessage = " Will be treated as an error from version ";
 
-        private static readonly IEnumerable<Tuple<MemberInfo, ObsoleteAttribute>> ObsoletedTypesAndTypeMembers;
+        private static readonly IEnumerable<(MemberInfo Member, ObsoleteAttribute Attribute)> ObsoletedTypesAndTypeMembers;
 
         static ObsoleteConventionsTests()
         {
@@ -30,7 +30,7 @@
                 from type in exportedSimpleInjectorTypes
                 where type.GetCustomAttributes<ObsoleteAttribute>().Any()
                 let attribute = type.GetCustomAttributes<ObsoleteAttribute>().Single()
-                select Tuple.Create((MemberInfo)type, attribute);
+                select ((MemberInfo)type, attribute);
 
             var members = (
                 from type in exportedSimpleInjectorTypes
@@ -44,7 +44,7 @@
                 from member in members
                 where member.GetCustomAttributes<ObsoleteAttribute>().Any()
                 let attribute = member.GetCustomAttributes<ObsoleteAttribute>().Single()
-                select Tuple.Create(member, attribute);
+                select (member, attribute);
 
             ObsoletedTypesAndTypeMembers = (
                 from member in obsoletedTypes.Concat(obsoletedTypeMembers)
@@ -74,7 +74,7 @@
 
             var invalidMembers =
                 from member in ObsoletedTypesAndTypeMembers
-                where !MessageMatchesObsoleteConvention(member.Item2)
+                where !MessageMatchesObsoleteConvention(member.Attribute)
                 select member;
 
             if (invalidMembers.Any())
@@ -90,7 +90,10 @@
                     $"- The message should only contain the following phrase when error is false: {TreatedAsErrorFromVersionMessage}.{nl}" +
                     $"- The message should NOT contain the following phrases: {shouldNotContain}.{nl}{nl}" +
                     $"The following code elements do not adhere to the convention:{nl}" +
-                    string.Join(nl, invalidMembers.Select(m => $"- {GetMemberName(m.Item1)}")));
+                    string.Join(nl, invalidMembers.Select(m =>
+                        $"- {GetMemberName(m.Member)}, " +
+                            $"{m.Attribute.Message}, " +
+                            $"IsError = {m.Attribute.IsError}")));
             }
         }
 
