@@ -14,6 +14,10 @@
             {
                 action();
             }
+            catch (UnitTestAssertException)
+            {
+                throw;
+            }
             catch (TException ex)
             {
                 AssertThat.IsInstanceOfType(typeof(TException), ex, assertMessage);
@@ -219,8 +223,8 @@
 
             Assert.IsTrue(actualMessage != null && actualMessage.Contains(expectedMessage),
                 assertMessage +
-                " The string did not contain the expected value. " +
-                "Actual string:\n\n" + actualMessage + "\n\n\n" +
+                $" The exception (of type {actualException.GetType().Name}) did not contain the expected " +
+                $"message. Actual string:\n\n" + actualMessage + "\n\n\n" +
                 "Expected value to be in the string:\n\n" + expectedMessage + "\n\n" + Environment.NewLine +
                 stackTrace);
         }

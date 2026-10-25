@@ -3,6 +3,7 @@ namespace SimpleInjector.Tests.Unit
 {
     using System;
     using System.Collections.Generic;
+    
     using System.Linq;
     using System.Linq.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -114,13 +115,17 @@ namespace SimpleInjector.Tests.Unit
             // Arrange
             string expectedMessage = @"
                 No registration for type RealUserService could be found and an implicit registration could not
-                be made. The constructor of type RealUserService contains the parameter with name 'repository'
-                and type IUserRepository that is not registered. Please ensure IUserRepository
-                is registered, or change the constructor of RealUserService."
+                be made. 
+                The constructor of type RealUserService contains the parameter with name 'repository'
+                and type IUserRepository, but IUserRepository is not registered.
+                For IUserRepository to be resolved, it must be registered in the container."
                 .TrimInside();
 
             // We don't register the required IUserRepository dependency.
             var container = ContainerFactory.New();
+
+            // Register something to prevent the exception warning about an empty container.
+            container.Register<ILogger, FakeLogger>();
 
             // Act
             // RealUserService is a concrete class with a constructor with a single argument of type
@@ -128,7 +133,7 @@ namespace SimpleInjector.Tests.Unit
             Action action = () => container.GetInstance<RealUserService>();
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<Exception>(expectedMessage, action);
+            AssertThat.ThrowsWithExceptionMessageContains<ActivationException>(expectedMessage, action);
         }
 
         [TestMethod]

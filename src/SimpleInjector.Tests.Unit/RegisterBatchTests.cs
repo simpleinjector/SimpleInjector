@@ -279,14 +279,14 @@
 
             var serviceType = typeof(IService<,>);
             var validType = typeof(ServiceImpl<object, string>);
-            var invalidType = typeof(List<int>);
+            var invalidType = typeof(FakeLogger);
 
             // Act
-            Action action = () => container.Register(serviceType, new[] { validType, invalidType });
+            Action action = () => container.Register(serviceType, [validType, invalidType]);
 
             // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<Exception>("List<Int32>", action);
-            AssertThat.ThrowsWithExceptionMessageContains<Exception>("IService<TA, TB>", action);
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>("FakeLogger", action);
+            AssertThat.ThrowsWithExceptionMessageContains<ArgumentException>("IService<TA, TB>", action);
         }
 
         [TestMethod]
