@@ -333,58 +333,6 @@
         }
 
         [TestMethod]
-        public void GetInstance_ForHybridLifestyledRegistration_CallsInstanceCreated()
-        {
-            // Arrange
-            var actualContexts = new List<InstanceInitializationData>();
-
-            var container = ContainerFactory.New();
-
-            var hybrid = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Singleton);
-
-            container.Register<RealTimeProvider, RealTimeProvider>(hybrid);
-
-            container.RegisterInitializer(actualContexts.Add, TruePredicate);
-
-            // Act
-            container.GetInstance<RealTimeProvider>();
-
-            // Assert
-            Assert.AreEqual(2, actualContexts.Count,
-                "Both the singleton and transient instance should have been triggered.");
-
-            // Act
-            actualContexts.Clear();
-
-            container.GetInstance<RealTimeProvider>();
-
-            // Assert
-            Assert.AreEqual(1, actualContexts.Count, "A transient should have been created.");
-        }
-
-        [TestMethod]
-        public void GetInstance_ForCustomLifestyledRegistration_CallsInstanceCreated()
-        {
-            // Arrange
-            var actualContexts = new List<InstanceInitializationData>();
-
-            var container = ContainerFactory.New();
-
-            var custom =
-                Lifestyle.CreateCustom("Custom", transientInstanceCreator => transientInstanceCreator);
-
-            container.Register<RealTimeProvider, RealTimeProvider>(custom);
-
-            container.RegisterInitializer(actualContexts.Add, TruePredicate);
-
-            // Act
-            container.GetInstance<RealTimeProvider>();
-
-            // Assert
-            Assert.AreEqual(1, actualContexts.Count);
-        }
-
-        [TestMethod]
         public void GetInstance_OpenGenericRegistration_CallsInstanceCreated()
         {
             // Arrange

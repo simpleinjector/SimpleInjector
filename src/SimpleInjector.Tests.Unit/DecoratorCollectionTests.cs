@@ -1382,72 +1382,6 @@
         }
 
         [TestMethod]
-        public void GetAllInstances_DecoratingContainerControlledCollectionWithHybridLifestyle_AppliesLifestyleCorrectly()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            var typesToRegister = new[] { typeof(StubCommandHandler), typeof(RealCommandHandler) };
-
-            container.Collection.Register(typeof(ICommandHandler<RealCommand>),
-                from type in typesToRegister
-                select Lifestyle.Singleton.CreateRegistration(type, container));
-
-            var hybridLifestyle = Lifestyle.CreateHybrid(() => false, Lifestyle.Transient, Lifestyle.Singleton);
-
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator),
-                hybridLifestyle);
-
-            // Act
-            var instance1 = container.GetAllInstances<ICommandHandler<RealCommand>>().First();
-            var instance2 = container.GetAllInstances<ICommandHandler<RealCommand>>().First();
-
-            // Assert
-            AssertThat.IsInstanceOfType(typeof(RealCommandHandlerDecorator), instance1);
-            Assert.IsTrue(object.ReferenceEquals(instance1, instance2));
-        }
-
-        [TestMethod]
-        public void GetAllInstances_DecoratingContainerUncontrolledCollectionWithLifestyleOtherThanTransient_ThrowsExpectedException()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            IEnumerable<ICommandHandler<RealCommand>> containerUncontrolledCollection =
-                new ICommandHandler<RealCommand>[] { new StubCommandHandler(), new RealCommandHandler() };
-
-            container.Collection.Register<ICommandHandler<RealCommand>>(containerUncontrolledCollection);
-
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator),
-                Lifestyle.CreateHybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton));
-
-            try
-            {
-                // Act
-                container.GetAllInstances<ICommandHandler<RealCommand>>();
-
-                // Assert
-                Assert.Fail("Exception expected.");
-            }
-            catch (Exception ex)
-            {
-                AssertThat.ExceptionMessageContains(@"
-                    You are trying to apply the RealCommandHandlerDecorator decorator with the
-                    'Hybrid Singleton / Singleton' lifestyle to a collection of type
-                    ICommandHandler<RealCommand>, but the registered collection is not controlled by the
-                    container."
-                    .TrimInside(), ex);
-
-                AssertThat.ExceptionMessageContains(@"
-                    the number of returned items might change on each call, the decorator with this
-                    lifestyle cannot be applied to the collection. Instead, register the decorator with the
-                    Transient lifestyle, or use one of the Container.Collection.Register overloads that takes a collection of
-                    System.Type types."
-                    .TrimInside(), ex);
-            }
-        }
-
-        [TestMethod]
         public void GetRelationships_AddingRelationshipDuringBuildingOnDecoratorTypeForUncontrolledCollection_ContainsAddedRelationship()
         {
             // Arrange
@@ -1523,21 +1457,6 @@
                 "Any known relationships added to the decorator during the ExpressionBuilding event " +
                 "should be added to the registration of the service type. Current: " +
                 relationships.Select(r => r.ImplementationType).ToFriendlyNamesText());
-        }
-
-        [TestMethod]
-        public void GetAllInstances_DecoratingEmptyCollectionWithLifestyleOtherThanTransientAndSingleton_Succeeds()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-
-            container.Collection.Register(typeof(ICommandHandler<>), Type.EmptyTypes);
-
-            container.RegisterDecorator(typeof(ICommandHandler<>), typeof(RealCommandHandlerDecorator),
-                Lifestyle.CreateHybrid(() => true, Lifestyle.Singleton, Lifestyle.Singleton));
-
-            // Act
-            container.GetAllInstances<ICommandHandler<RealCommand>>().ToArray();
         }
 
         [TestMethod]

@@ -90,46 +90,6 @@
         }
 
         [TestMethod]
-        public void GetInstance_DefaultLifestyleWrappingTheOldLifestyle_RegistersTheInstanceUsingTheExpectedLifestyle()
-        {
-            // Arrange
-            var container = new Container();
-
-            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
-
-            var expectedLifestyle = Lifestyle.CreateHybrid(
-                () => true,
-                new CustomScopedLifestyle(new Scope(container)),
-                container.Options.DefaultScopedLifestyle);
-
-            container.Options.DefaultScopedLifestyle = expectedLifestyle;
-
-            container.Register<RealTimeProvider>(Lifestyle.Scoped);
-
-            // Act
-            var registration = container.GetRegistration(typeof(RealTimeProvider));
-
-            // Assert
-            Assert.AreSame(expectedLifestyle, registration.Lifestyle);
-        }
-
-        [TestMethod]
-        public void Verify_RegistrationWithHybridLifestyleContainingScoped_Succeeds()
-        {
-            // Arrange
-            var container = ContainerFactory.New();
-            container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
-            var hybridLifestyle = Lifestyle.CreateHybrid(() => true, Lifestyle.Transient, Lifestyle.Scoped);
-
-            // class RealUserService(IUserRepository)
-            container.Register<UserServiceBase, RealUserService>(hybridLifestyle);
-            container.Register<IUserRepository, SqlUserRepository>(Lifestyle.Singleton);
-
-            // Act
-            container.Verify();
-        }
-
-        [TestMethod]
         public void CustomBuiltDelegate_NestedDepenencyWithScopedLifestyle_ThrowsExpectedException()
         {
             // Arrange

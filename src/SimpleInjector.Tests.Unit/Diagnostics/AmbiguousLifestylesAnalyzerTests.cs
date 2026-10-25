@@ -295,33 +295,6 @@
         }
 
         [TestMethod]
-        public void Verify_TwoRegistrationsForDifferentCustomLifestyleButAndSameImplementation_CausesAmbiguousLifestyleWarning()
-        {
-            // Arrange
-            string expectedMessage = @"
-                The registration for IFoo (Custom1) maps to the same implementation (FooBar)
-                as the registration for IBar (Custom2) does"
-                .TrimInside();
-
-            var lifestyle1 = Lifestyle.CreateCustom("Custom1", creator => creator);
-            var lifestyle2 = Lifestyle.CreateCustom("Custom2", creator => creator);
-
-            var container = new Container();
-
-            container.Register<IFoo, FooBar>(lifestyle1);
-            container.Register<IBar, FooBar>(lifestyle2);
-
-            container.Verify(VerificationOption.VerifyOnly);
-
-            // Act
-            var results = Analyzer.Analyze(container);
-
-            // Assert
-            Assert_ContainsDescription(results, expectedMessage);
-            Assert_AllOfType<AmbiguousLifestylesDiagnosticResult>(results);
-        }
-
-        [TestMethod]
         public void Verify_AmbiquousLifestylesAcrossCollectionAppendAndNormalRegistration_CausesAmbiguousLifestyleWarning()
         {
             // Arrange
@@ -337,8 +310,8 @@
 
             container.Verify(VerificationOption.VerifyOnly);
 
-            Assert.AreEqual(1, container.GetAllInstances<IFoo>().Count(), "Test setuo failed");
-            Assert.IsInstanceOfType(container.GetInstance<IFoo>(), typeof(FooBar), "Test setuo failed");
+            Assert.AreEqual(1, container.GetAllInstances<IFoo>().Count(), "Test setup failed");
+            Assert.IsInstanceOfType(container.GetInstance<IFoo>(), typeof(FooBar), "Test setup failed");
 
             // Act
             var results = Analyzer.Analyze(container);

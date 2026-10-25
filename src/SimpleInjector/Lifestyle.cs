@@ -191,6 +191,7 @@ namespace SimpleInjector
         /// Transient.
         /// </para>
         /// </example>
+        [Obsolete("Use Lifestyle.Scoped instead. Will be removed in version 6.0.", error: true)]
         public static Lifestyle CreateHybrid(ScopedLifestyle defaultLifestyle, Lifestyle fallbackLifestyle)
         {
             Requires.IsNotNull(defaultLifestyle, nameof(defaultLifestyle));
@@ -249,6 +250,7 @@ namespace SimpleInjector
         /// Transient.
         /// </para>
         /// </example>
+        [Obsolete("Use Lifestyle.Scoped instead. Will be removed in version 6.0.", error: true)]
         public static ScopedLifestyle CreateHybrid(
             ScopedLifestyle defaultLifestyle, ScopedLifestyle fallbackLifestyle)
         {
@@ -314,6 +316,7 @@ namespace SimpleInjector
         /// Transient.
         /// </para>
         /// </example>
+        [Obsolete("Use Lifestyle.Scoped instead. Will be removed in version 6.0.", error: true)]
         public static Lifestyle CreateHybrid(
             Func<bool> lifestyleSelector, Lifestyle trueLifestyle, Lifestyle falseLifestyle)
         {
@@ -359,6 +362,7 @@ namespace SimpleInjector
         /// container.Register<ICustomerRepository, SqlCustomerRepository>(mixedScopeLifestyle);
         /// ]]></code>
         /// </example>
+        [Obsolete("Use Lifestyle.Scoped instead. Will be removed in version 6.0.", error: true)]
         public static ScopedLifestyle CreateHybrid(
             Func<bool> lifestyleSelector, ScopedLifestyle trueLifestyle, ScopedLifestyle falseLifestyle)
         {
@@ -432,6 +436,9 @@ namespace SimpleInjector
         /// container.Register<AnotherService, MeTwoService>(customLifestyle);
         /// ]]></code>
         /// </example>
+        [Obsolete(
+            "Use Lifestyle.Scope instead, or implement the caching outside the container pipeline. " +
+            "Will be removed in version 6.0.", error: true)]
         public static Lifestyle CreateCustom(string name, CreateLifestyleApplier lifestyleApplierFactory)
         {
             Requires.IsNotNullOrEmpty(name, nameof(name));

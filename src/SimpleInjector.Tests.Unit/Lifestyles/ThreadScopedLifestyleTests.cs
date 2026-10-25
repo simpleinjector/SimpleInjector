@@ -86,22 +86,6 @@
         }
 
         [TestMethod]
-        public void Verify_WithHybridLifetimeScopeRegistrationInOpenGenericAndWithoutExplicitlyEnablingLifetimeScoping_Succeeds()
-        {
-            // Arrange
-            var container = new Container();
-
-            var hybrid = Lifestyle.CreateHybrid(() => false, new ThreadScopedLifestyle(), new ThreadScopedLifestyle());
-
-            container.Register(typeof(IGeneric<>), typeof(Generic<>), hybrid);
-
-            container.Register<ClassDependingOn<IGeneric<int>>>();
-
-            // Act
-            container.Verify();
-        }
-
-        [TestMethod]
         public void GetCurrentLifetimeScope_InsideANestedLifetimeScope_ReturnsTheInnerMostScope()
         {
             // Arrange

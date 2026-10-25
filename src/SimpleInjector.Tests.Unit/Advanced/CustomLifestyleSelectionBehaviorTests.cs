@@ -262,80 +262,6 @@
         }
 
         [TestMethod]
-        public void RegisterConcreteWithLifestyle_WithCustomLifestyleSelectionBehavior_RegistersInstanceByWithSuppliedLifestyle()
-        {
-            RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
-                typeof(RealTimeProvider),
-                (container, lifestyle) => container.Register<RealTimeProvider>(lifestyle));
-        }
-
-        [TestMethod]
-        public void RegisterDelegateWithLifestyle_WithCustomLifestyleSelectionBehavior_RegistersInstanceByWithSuppliedLifestyle()
-        {
-            RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
-                typeof(ITimeProvider),
-                (container, lifestyle) => container.Register<ITimeProvider>(() => new RealTimeProvider(), lifestyle));
-        }
-
-        [TestMethod]
-        public void RegisterServiceToImplWithLifestyle_WithCustomLifestyleSelectionBehavior_RegistersInstanceByWithSuppliedLifestyle()
-        {
-            RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
-                typeof(ITimeProvider),
-                (container, lifestyle) => container.Register<ITimeProvider, RealTimeProvider>(lifestyle));
-        }
-
-        [TestMethod]
-        public void RegisterNonGenericConcreteWitLifestyle_WithCustomLifestyleSelectionBehavior_RegistersInstanceByWithSuppliedLifestyle()
-        {
-            RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
-                typeof(RealTimeProvider),
-                (container, lifestyle) => container.Register(typeof(RealTimeProvider), typeof(RealTimeProvider), lifestyle));
-        }
-
-        [TestMethod]
-        public void RegisterNonGenericDelegateWithLifestyle_WithCustomLifestyleSelectionBehavior_RegistersInstanceByWithSuppliedLifestyle()
-        {
-            RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
-                typeof(ITimeProvider),
-                (container, lifestyle) => container.Register(typeof(ITimeProvider), () => new RealTimeProvider(), lifestyle));
-        }
-
-        [TestMethod]
-        public void RegisterNonGenericServiceToImplWithLifestyle_WithCustomLifestyleSelectionBehavior_RegistersInstanceByWithSuppliedLifestyle()
-        {
-            RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
-                typeof(ITimeProvider),
-                (container, lifestyle) => container.Register(typeof(ITimeProvider), typeof(RealTimeProvider), lifestyle));
-        }
-
-        [TestMethod]
-        public void RegisterManyForOpenGenericWithLifestyle_WithCustomLifestyleSelectionBehavior_RegistersInstanceByWithSuppliedLifestyle()
-        {
-            RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
-                typeof(IService<double, decimal>),
-                (container, lifestyle) => container.Register(typeof(IService<,>), new[] { CurrentAssembly }, lifestyle));
-        }
-
-        [TestMethod]
-        public void RegisterManyForOpenGenericWithTypesWithLifestyle_WithCustomLifestyleSelectionBehavior_RegistersInstanceByWithSuppliedLifestyle()
-        {
-            RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
-                typeof(IService<double, decimal>),
-                (container, lifestyle) =>
-                    container.Register<IService<double, decimal>, ServiceForLifestyleSelectionBehaviorTests>(
-                        lifestyle));
-        }
-
-        [TestMethod]
-        public void RegisterOpenGenericWithLifestyle_WithCustomLifestyleSelectionBehavior_RegistersInstanceByWithSuppliedLifestyle()
-        {
-            RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
-                typeof(IValidate<object>),
-                (container, lifestyle) => container.Register(typeof(IValidate<>), typeof(NullValidator<>), lifestyle));
-        }
-
-        [TestMethod]
         public void RegisterDecorator_WithCustomLifestyleSelectionBehavior_RegistersTheDecoratorWithThatCustomLifestyle()
         {
             // Arrange
@@ -428,33 +354,6 @@
             container.Options.LifestyleSelectionBehavior = new CustomLifestyleSelectionBehavior(expectedLifestyle);
 
             registrationWithoutLifestyle(container);
-
-            // Act
-            var registration = container.GetRegistration(serviceType);
-
-            Assert.IsNotNull(registration, "Registration not found for type " + serviceType.ToFriendlyName());
-
-            Lifestyle actualLifestyle = registration.Lifestyle;
-
-            // Assert
-            Assert.AreSame(expectedLifestyle, actualLifestyle,
-                string.Format("{0} was expected, but {1} was registered.",
-                    expectedLifestyle.Name, actualLifestyle.Name));
-        }
-
-        private static void RegisterWithLifestyle_CustomerLifestyleSelectionBehavior_RegistersInstanceByThatLifestyle(
-            Type serviceType,
-            Action<Container, Lifestyle> registrationWithLifestyle)
-        {
-            // Arrange
-            var expectedLifestyle = Lifestyle.CreateCustom("Expected", creator => creator);
-            var notExpectedLifestyle = Lifestyle.CreateCustom("Not Expected", creator => creator);
-
-            var container = new Container();
-
-            container.Options.LifestyleSelectionBehavior = new CustomLifestyleSelectionBehavior(notExpectedLifestyle);
-
-            registrationWithLifestyle(container, expectedLifestyle);
 
             // Act
             var registration = container.GetRegistration(serviceType);

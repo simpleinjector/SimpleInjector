@@ -108,22 +108,6 @@
         }
 
         [TestMethod]
-        public void ContainerVerify_WithHybridAsyncScopedLifestyleRegistrationInOpenGeneric_Succeeds()
-        {
-            // Arrange
-            var container = new Container();
-
-            var hybrid = Lifestyle.CreateHybrid(() => false, new AsyncScopedLifestyle(), new AsyncScopedLifestyle());
-
-            container.Register(typeof(IGeneric<>), typeof(Generic<>), hybrid);
-
-            container.Register<ClassDependingOn<IGeneric<int>>>();
-
-            // Act
-            container.Verify();
-        }
-
-        [TestMethod]
         public void GetCurrentAsyncScopedLifestyle_InsideANestedAsyncScopedLifestyle_ReturnsTheInnerMostScope()
         {
             // Arrange
