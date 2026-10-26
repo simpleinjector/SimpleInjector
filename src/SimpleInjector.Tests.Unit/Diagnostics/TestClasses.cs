@@ -90,7 +90,14 @@
 
     public class PluginImpl2 : IPlugin;
 
+    public class PluginWithDependencyOf<TDependency>(TDependency dependency) : IPlugin;
+
     public class PluginDecorator(IPlugin decoratee) : IPlugin
+    {
+        public IPlugin Decoratee { get; } = decoratee;
+    }
+
+    public class PluginDecorator<T>(IPlugin decoratee) : IPlugin
     {
         public IPlugin Decoratee { get; } = decoratee;
     }

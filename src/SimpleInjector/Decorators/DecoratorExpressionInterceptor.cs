@@ -205,14 +205,14 @@ namespace SimpleInjector.Decorators
 
             var currentProducer = info.GetCurrentInstanceProducer();
 
+            // By adding the decoratee producer, we allow that object graph to be diagnosed.
+            realProducer.AddProducerToVerify(currentProducer);
+
             if (DecoratorHelpers.IsDecorateeFactoryDependencyType(decorateeParameter.ParameterType, serviceType))
             {
                 // Adding a verifier makes sure the graph for the decoratee gets created,
                 // which allows testing whether constructing the graph fails.
                 AddVerifierForDecorateeFactoryDependency(decorateeExpression, realProducer);
-
-                // By adding the decoratee producer, we allow that object graph to be diagnosed.
-                realProducer.AddProducerToVerify(currentProducer);
 
                 currentProducer = this.CreateDecorateeFactoryProducer(decorateeParameter, currentProducer);
             }

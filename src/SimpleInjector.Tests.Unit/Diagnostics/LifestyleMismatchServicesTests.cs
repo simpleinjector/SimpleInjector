@@ -6,6 +6,7 @@
     using SimpleInjector;
     using SimpleInjector.Advanced;
     using SimpleInjector.Diagnostics;
+    using SimpleInjector.Lifestyles;
     using SimpleInjector.Tests.Unit;
 
     [TestClass]
@@ -481,6 +482,49 @@
                 action);
         }
 
+        [TestMethod]
+        public void VerifyOnly_SingletonWithScopedDependency_ReportsLifestyleMismatch()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.EnableAutoVerification = false;
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<ILogger, FakeLogger>(Lifestyle.Scoped);
+            container.Register<IPlugin, PluginWithDependencyOf<ILogger>>(Lifestyle.Singleton);
+
+            // Act
+            Action action = () => container.Verify(VerificationOption.VerifyOnly);
+
+            // Assert
+            // "Verify() and Analyzer.Analyze() report this mismatch; VerifyOnly should too.
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>("lifestyle mismatch", action);
+        }
+
+        // #1040
+        [TestMethod]
+        public void VerifyOnly_SingletonInnerDecoratorWrappingScopedService_ReportsLifestyleMismatch()
+        {
+            // Arrange
+            var container = new Container();
+            container.Options.EnableAutoVerification = false;
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+            container.Register<IPlugin, PluginImpl>(Lifestyle.Scoped);
+
+            // Inner decorator: singleton around a scoped service. That is the mismatch.
+            container.RegisterDecorator<IPlugin, PluginDecorator<Inner>>(Lifestyle.Singleton);
+
+            // Outer decorator.
+            container.RegisterDecorator<IPlugin, PluginDecorator<Outer>>(Lifestyle.Transient);
+
+            // Act
+            Action action = () => container.Verify(VerificationOption.VerifyOnly);
+
+            // Assert
+            AssertThat.ThrowsWithExceptionMessageContains<VerificationException>("lifestyle mismatch", action);
+        }
+
         private static KnownRelationship CreateRelationship(Lifestyle parent, Lifestyle child) =>
             new KnownRelationship(
                 implementationType: typeof(RealTimeProvider),
@@ -507,13 +551,12 @@
             return container;
         }
 
-        private class DummyRegistration<TImplementation> : Registration
-        {
-            public DummyRegistration(Lifestyle lifestyle)
-                : base(lifestyle, new Container(), typeof(TImplementation))
-            {
-            }
+        class Inner;
+        class Outer;
 
+        private class DummyRegistration<TImplementation>(Lifestyle lifestyle)
+            : Registration(lifestyle, new Container(), typeof(TImplementation))
+        {
             public override Expression BuildExpression()
             {
                 throw new NotImplementedException();
