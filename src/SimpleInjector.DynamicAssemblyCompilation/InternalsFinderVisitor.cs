@@ -25,8 +25,6 @@ namespace SimpleInjector.DynamicAssemblyCompilation
             return visitor.needsAccessToInternals;
         }
 
-        public override Expression Visit(Expression node) => base.Visit(node);
-
         internal void MayAccessExpression(bool mayAccess)
         {
             if (!mayAccess)
@@ -44,14 +42,14 @@ namespace SimpleInjector.DynamicAssemblyCompilation
 
         protected override Expression VisitNew(NewExpression node)
         {
-            this.MayAccessExpression(node.Constructor.IsPublic && IsPublic(node.Constructor?.DeclaringType ?? node.Type));
+            this.MayAccessExpression(node.Constructor!.IsPublic && IsPublic(node.Constructor.DeclaringType ?? node.Type));
 
             return base.VisitNew(node);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            this.MayAccessExpression(node.Method.IsPublic && IsPublic(node.Method.DeclaringType));
+            this.MayAccessExpression(node.Method.IsPublic && IsPublic(node.Method.DeclaringType!));
 
             return base.VisitMethodCall(node);
         }
@@ -86,7 +84,7 @@ namespace SimpleInjector.DynamicAssemblyCompilation
                 bool canDoPublicAssign = this.partOfAssigmnent && property.GetSetMethod() != null;
                 bool canDoPublicRead = !this.partOfAssigmnent && property.GetGetMethod() != null;
 
-                this.MayAccessExpression(IsPublic(property.DeclaringType)
+                this.MayAccessExpression(IsPublic(property.DeclaringType!)
                     && (canDoPublicAssign || canDoPublicRead));
             }
 
