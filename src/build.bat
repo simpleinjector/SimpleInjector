@@ -39,8 +39,8 @@ IF "%inputOk%"=="false" (
 	rem That's why this build file must be called multiple times.
     echo Please provide both the version number and the number of the of the build step. Starting with 1.
 	echo Usage: "%0 [version] {-[prerelease postfix]} [step]
-	echo Example1: "%0 5.0.0 -beta1 1
-	echo Example2: "%0 5.0.0 1
+	echo Example1: "%0 6.0.0 -beta1 1
+	echo Example2: "%0 6.0.0 1
     goto :EOF
 )
 
@@ -293,13 +293,13 @@ IF %step%==3 (
 
 IF %step%==4 (
 	echo Running step 4: RESTORING VERSION NUMBERS
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj
-	%replace% /line "<VersionPrefix>" "    <VersionPrefix>5.0.0</VersionPrefix>" /source:SimpleInjector.Packaging\SimpleInjector.Packaging.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>6.0.0</VersionPrefix>" /source:SimpleInjector\SimpleInjector.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>6.0.0</VersionPrefix>" /source:SimpleInjector.DynamicAssemblyCompilation\SimpleInjector.DynamicAssemblyCompilation.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>6.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Wcf\SimpleInjector.Integration.Wcf.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>6.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Web\SimpleInjector.Integration.Web.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>6.0.0</VersionPrefix>" /source:SimpleInjector.Integration.Web.Mvc\SimpleInjector.Integration.Web.Mvc.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>6.0.0</VersionPrefix>" /source:SimpleInjector.Integration.WebApi\SimpleInjector.Integration.WebApi.csproj
+	%replace% /line "<VersionPrefix>" "    <VersionPrefix>6.0.0</VersionPrefix>" /source:SimpleInjector.Packaging\SimpleInjector.Packaging.csproj
 	
 	echo Done!
 	GOTO :EOF	
