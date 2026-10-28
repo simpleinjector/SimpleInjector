@@ -2,7 +2,7 @@
 
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net481</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsNotAsErrors>NU1901;NU1902;NU1903;NU1904;CS9113</WarningsNotAsErrors>
     <AssemblyName>SimpleInjector.Tests.Unit</AssemblyName>
@@ -27,7 +27,7 @@
   </ItemGroup>
 
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net481' ">
     <ProjectReference Include="..\PartialTrustTestRunner\PartialTrustTestRunner.csproj" />
     <Reference Include="System.Linq.Expressions" />
     <Reference Include="System" />

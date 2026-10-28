@@ -44,8 +44,6 @@ IF "%inputOk%"=="false" (
     goto :EOF
 )
 
-set /a nextMajorVersion=%version_major%+1
-
 set version_Core=%version%
 set version_DynamicAssemblyCompilation=%version_Core%
 set version_Packaging=%version_Core%
@@ -75,9 +73,6 @@ set nugetTemplatePath=%buildToolsPath%\NuGet
 
 rem replace.exe can replace one text for another in a given file
 set replace=%buildToolsPath%\replace.exe
-
-rem zipreplace.exe does what replace.exe does, but now inside a .zip file.
-set zipreplace=%buildToolsPath%\zipreplace.exe
 
 set compress=%systemroot%\System32\CScript.exe %buildToolsPath%\zip.vbs
 set configuration=Release
@@ -178,10 +173,6 @@ IF %step%==3 (
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector Releases\temp /E /H
 	%attrib% -r "%CD%\Releases\temp\*.*" /s /d
 	del Releases\temp\.gitignore /s /q	
-	copy SimpleInjector\bin\Release\net45\SimpleInjector.dll Releases\temp\lib\net45\SimpleInjector.dll
-	copy SimpleInjector\bin\Release\net45\SimpleInjector.xml Releases\temp\lib\net45\SimpleInjector.xml
-	copy SimpleInjector\bin\Release\net461\SimpleInjector.dll Releases\temp\lib\net461\SimpleInjector.dll
-	copy SimpleInjector\bin\Release\net461\SimpleInjector.xml Releases\temp\lib\net461\SimpleInjector.xml
 	copy SimpleInjector\bin\Release\netstandard2.0\SimpleInjector.dll "Releases\temp\lib\netstandard2.0\SimpleInjector.dll"
 	copy SimpleInjector\bin\Release\netstandard2.0\SimpleInjector.xml "Releases\temp\lib\netstandard2.0\SimpleInjector.xml"
 	copy SimpleInjector\bin\Release\netstandard2.1\SimpleInjector.dll "Releases\temp\lib\netstandard2.1\SimpleInjector.dll"
@@ -196,8 +187,6 @@ IF %step%==3 (
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector.Packaging Releases\temp /E /H
 	%attrib% -r "%CD%\Releases\temp\*.*" /s /d
 	del Releases\temp\.gitignore /s /q
-	copy SimpleInjector.Packaging\bin\Release\net45\SimpleInjector.Packaging.dll "Releases\temp\lib\net45\SimpleInjector.Packaging.dll"
-	copy SimpleInjector.Packaging\bin\Release\net45\SimpleInjector.Packaging.xml "Releases\temp\lib\net45\SimpleInjector.Packaging.xml"
 	copy SimpleInjector.Packaging\bin\Release\netstandard2.0\SimpleInjector.Packaging.dll "Releases\temp\lib\netstandard2.0\SimpleInjector.Packaging.dll"
 	copy SimpleInjector.Packaging\bin\Release\netstandard2.0\SimpleInjector.Packaging.xml "Releases\temp\lib\netstandard2.0\SimpleInjector.Packaging.xml"
 	%replace% /source:Releases\temp\SimpleInjector.Packaging.nuspec {version} %named_version_Packaging%
@@ -211,8 +200,8 @@ IF %step%==3 (
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web Releases\temp /E /H
 	%attrib% -r "%CD%\Releases\temp\*.*" /s /d
 	del Releases\temp\.gitignore /s /q
-	copy SimpleInjector.Integration.Web\bin\Release\net45\SimpleInjector.Integration.Web.dll Releases\temp\lib\net45\SimpleInjector.Integration.Web.dll
-	copy SimpleInjector.Integration.Web\bin\Release\net45\SimpleInjector.Integration.Web.xml Releases\temp\lib\net45\SimpleInjector.Integration.Web.xml
+	copy SimpleInjector.Integration.Web\bin\Release\net481\SimpleInjector.Integration.Web.dll Releases\temp\lib\net481\SimpleInjector.Integration.Web.dll
+	copy SimpleInjector.Integration.Web\bin\Release\net481\SimpleInjector.Integration.Web.xml Releases\temp\lib\net481\SimpleInjector.Integration.Web.xml
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {version} %named_version_Integration_Web%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {versionCore} %named_version_Core%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Web.nuspec {year} %copyrightYear%
@@ -224,8 +213,8 @@ IF %step%==3 (
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector.Integration.Web.Mvc Releases\temp /E /H
 	%attrib% -r "%CD%\Releases\temp\*.*" /s /d
 	del Releases\temp\.gitignore /s /q
-	copy SimpleInjector.Integration.Web.Mvc\bin\Release\net45\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\lib\net45\SimpleInjector.Integration.Web.Mvc.dll
-	copy SimpleInjector.Integration.Web.Mvc\bin\Release\net45\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\lib\net45\SimpleInjector.Integration.Web.Mvc.xml
+	copy SimpleInjector.Integration.Web.Mvc\bin\Release\net481\SimpleInjector.Integration.Web.Mvc.dll Releases\temp\lib\net481\SimpleInjector.Integration.Web.Mvc.dll
+	copy SimpleInjector.Integration.Web.Mvc\bin\Release\net481\SimpleInjector.Integration.Web.Mvc.xml Releases\temp\lib\net481\SimpleInjector.Integration.Web.Mvc.xml
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {version} %named_version_Integration_Mvc%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {versionCore} %named_version_Core%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Web.Mvc.nuspec {version_Integration_Web} %named_version_Integration_Web%
@@ -250,8 +239,8 @@ IF %step%==3 (
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector.Integration.Wcf Releases\temp /E /H
 	%attrib% -r "%CD%\Releases\temp\*.*" /s /d
 	del Releases\temp\.gitignore /s /q
-	copy SimpleInjector.Integration.Wcf\bin\Release\net45\SimpleInjector.Integration.Wcf.dll Releases\temp\lib\net45\SimpleInjector.Integration.Wcf.dll
-	copy SimpleInjector.Integration.Wcf\bin\Release\net45\SimpleInjector.Integration.Wcf.xml Releases\temp\lib\net45\SimpleInjector.Integration.Wcf.xml
+	copy SimpleInjector.Integration.Wcf\bin\Release\net481\SimpleInjector.Integration.Wcf.dll Releases\temp\lib\net481\SimpleInjector.Integration.Wcf.dll
+	copy SimpleInjector.Integration.Wcf\bin\Release\net481\SimpleInjector.Integration.Wcf.xml Releases\temp\lib\net481\SimpleInjector.Integration.Wcf.xml
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {version} %named_version_Integration_Wcf%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {versionCore} %named_version_Core%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.Wcf.nuspec {year} %copyrightYear%
@@ -275,8 +264,8 @@ IF %step%==3 (
 	%xcopy% %nugetTemplatePath%\.NET\SimpleInjector.Integration.WebApi Releases\temp /E /H
 	%attrib% -r "%CD%\Releases\temp\*.*" /s /d
 	del Releases\temp\.gitignore /s /q
-	copy SimpleInjector.Integration.WebApi\bin\Release\net45\SimpleInjector.Integration.WebApi.dll Releases\temp\lib\net45\SimpleInjector.Integration.WebApi.dll
-	copy SimpleInjector.Integration.WebApi\bin\Release\net45\SimpleInjector.Integration.WebApi.xml Releases\temp\lib\net45\SimpleInjector.Integration.WebApi.xml
+	copy SimpleInjector.Integration.WebApi\bin\Release\net481\SimpleInjector.Integration.WebApi.dll Releases\temp\lib\net481\SimpleInjector.Integration.WebApi.dll
+	copy SimpleInjector.Integration.WebApi\bin\Release\net481\SimpleInjector.Integration.WebApi.xml Releases\temp\lib\net481\SimpleInjector.Integration.WebApi.xml
 	%replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {version} %named_version_Integration_WebApi%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {versionCore} %named_version_Core%
 	%replace% /source:Releases\temp\SimpleInjector.Integration.WebApi.nuspec {year} %copyrightYear%
@@ -297,15 +286,7 @@ IF %step%==3 (
 	rmdir Releases\temp /s /q
 
 	ren "%CD%\Releases\v%named_version%\*.zip" "*.nupkg"
-
-	rem We need to reaplce the version number of the core library from 'named_version_Core >= version' to 'named_version_Core >= version < 5'
-	rem from the following .nupkg files, because ReferenceGenerator does not allow setting a version range of a dependency.
-	set coreLibraryNupkgDependencySearch="<dependency id=""SimpleInjector"" version=""%named_version_Core%"""
-	set coreLibraryNupkgDependencyReplace="<dependency id=""SimpleInjector"" version=""[%named_version_Core%,%nextMajorVersion%)"""
-
-	copy "SimpleInjector.DynamicAssemblyCompilation\bin\Release\SimpleInjector.DynamicAssemblyCompilation.%named_version_DynamicAssemblyCompilation%.nupkg" Releases\v%named_version%\
-	%zipreplace% /zipSource:Releases\v%named_version%\SimpleInjector.DynamicAssemblyCompilation.%named_version_DynamicAssemblyCompilation%.nupkg /sourceFile:SimpleInjector.DynamicAssemblyCompilation.nuspec /search:%coreLibraryNupkgDependencySearch% /replace:%coreLibraryNupkgDependencyReplace% /force
-
+	
     echo Please run step 4
     goto :EOF	
 )

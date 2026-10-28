@@ -11,7 +11,7 @@
     <icon>simpleinjector.png</icon>
     <dependencies>
       <dependency id="WebActivator" version="1.4.4" />
-      <dependency id="SimpleInjector.Integration.Wcf" version="{version_Integration_Wcf}" />
+      <dependency id="SimpleInjector.Integration.Wcf" version="[{version_Integration_Wcf},7)" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="Microsoft.Web.Infrastructure" targetFramework=".NETFramework4.5" />

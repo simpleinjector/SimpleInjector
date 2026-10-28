@@ -10,9 +10,9 @@
     <repository type="git" url="https://github.com/simpleinjector/SimpleInjector" />
     <icon>simpleinjector.png</icon>
     <dependencies>
-      <dependency id="SimpleInjector" version="[{versionCore},7)" />
+      <dependency id="SimpleInjector" version="{versionCore}" />
       <dependency id="SimpleInjector.Integration.Web" version="[{version_Integration_Web},7)" />
-      <dependency id="Microsoft.AspNet.Mvc" version="3.0.20105.1" />
+      <dependency id="Microsoft.AspNet.Mvc" version="5.3.0" />
     </dependencies>
     <id>SimpleInjector.Integration.Web.Mvc</id>
     <title>Simple Injector ASP.NET MVC Integration</title>

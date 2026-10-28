@@ -11,7 +11,7 @@
     <icon>simpleinjector.png</icon>
     <dependencies>
       <dependency id="WebActivator" version="1.4.4" />
-      <dependency id="SimpleInjector" version="[{versionCore},7)" />
+      <dependency id="SimpleInjector" version="{versionCore}" />
       <dependency id="SimpleInjector.Integration.Web.Mvc" version="[{version_Integration_Mvc},7)" />
     </dependencies>
     <frameworkAssemblies>

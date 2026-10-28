@@ -10,12 +10,9 @@
     <repository type="git" url="https://github.com/simpleinjector/SimpleInjector" />
     <icon>simpleinjector.png</icon>
     <dependencies>
-      <group targetFramework=".NETFramework4.6.1">
-        <dependency id="SimpleInjector" version="[{versionCore},7)" />
-      </group>
       <group targetFramework=".NETStandard2.0">
         <dependency id="System.Reflection" version="4.1.0" />
-        <dependency id="SimpleInjector" version="[{versionCore},7)" />
+        <dependency id="SimpleInjector" version="{versionCore}" />
       </group>
     </dependencies>
     <id>SimpleInjector.Packaging</id>

@@ -11,7 +11,7 @@
     <icon>simpleinjector.png</icon>
     <dependencies>
       <dependency id="SimpleInjector" version="{versionCore}" />
-      <dependency id="SimpleInjector.Integration.WebApi" version="{version_Integration_WebApi}" />
+      <dependency id="SimpleInjector.Integration.WebApi" version="[{version_Integration_WebApi},7)" />
     </dependencies>
     <frameworkAssemblies>
     </frameworkAssemblies>

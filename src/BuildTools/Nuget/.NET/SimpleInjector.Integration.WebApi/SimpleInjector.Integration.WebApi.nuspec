@@ -10,8 +10,8 @@
     <repository type="git" url="https://github.com/simpleinjector/SimpleInjector" />
     <icon>simpleinjector.png</icon>
     <dependencies>
-      <dependency id="SimpleInjector" version="[{versionCore},7)" />
-      <dependency id="Microsoft.AspNet.WebApi.Core" version="4.0.20710" />
+      <dependency id="SimpleInjector" version="{versionCore}" />
+      <dependency id="Microsoft.AspNet.WebApi.Core" version="5.3.0" />
     </dependencies>
     <id>SimpleInjector.Integration.WebApi</id>
     <title>Simple Injector ASP.NET Web API Integration</title>

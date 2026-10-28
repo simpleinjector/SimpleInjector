@@ -19,7 +19,6 @@
     <language>en-US</language>
     <tags>simpleinjector architecture dependency-injection DI Inversion-of-Control IOC</tags>
     <dependencies>
-      <group targetFramework=".NETFramework4.6.1" />
       <group targetFramework=".NETStandard2.0">
         <dependency id="System.ComponentModel" version="4.0.1" />
       </group>
