@@ -37,10 +37,6 @@ namespace SimpleInjector.Lifestyles
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static ScopedLifestyle GetDefaultScopedLifestyle(Container container) =>
-            container.Options.DefaultScopedLifestyle ?? ThrowDefaultScopeLifestyleIsNotSet();
-
-        private static ScopedLifestyle ThrowDefaultScopeLifestyleIsNotSet() =>
-            throw new InvalidOperationException(
-                StringResources.ScopePropertyCanOnlyBeUsedWhenDefaultScopedLifestyleIsConfigured());
+            container.Options.DefaultScopedLifestyle;
     }
 }

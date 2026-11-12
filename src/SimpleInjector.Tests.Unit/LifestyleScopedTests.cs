@@ -9,21 +9,15 @@
     public class LifestyleScopedTests
     {
         [TestMethod]
-        public void ContainerRegister_ContainerWithoutDefaultScopedLifestyle_ThrowsExpectedException()
+        public void ContainerRegister_ContainerWithDefaultScopedLifestyle_ThrowsExpectedException()
         {
             // Arrange
             var container = new Container();
 
             // Act
-            Action action = () => container.Register<RealTimeProvider>(Lifestyle.Scoped);
-
-            // Assert
-            AssertThat.ThrowsWithExceptionMessageContains<InvalidOperationException>(
-                "To be able to use the Lifestyle.Scoped property, please ensure that the container is " +
-                "configured with a default scoped lifestyle by setting the Container.Options." +
-                "DefaultScopedLifestyle property with the required scoped lifestyle for your type of " +
-                "application.",
-                action);
+            // This behavior changed in v6. In v5 this required the Container.Options.DefaultScopedLifestyle
+            // to be set, but in v6 this defaults to the AsyncScopedLifestyle.
+            container.Register<RealTimeProvider>(Lifestyle.Scoped);
         }
 
         [TestMethod]

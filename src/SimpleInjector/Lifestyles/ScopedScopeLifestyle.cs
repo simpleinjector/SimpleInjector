@@ -25,23 +25,10 @@ namespace SimpleInjector.Lifestyles
 
         private Scope GetScopeFromDefaultScopedLifestyle(Container container)
         {
-            ScopedLifestyle? lifestyle = container.Options.DefaultScopedLifestyle;
+            ScopedLifestyle lifestyle = container.Options.DefaultScopedLifestyle;
 
-            if (lifestyle is not null)
-            {
-                return lifestyle.GetCurrentScope(container) ?? ThrowThereIsNoActiveScopeException();
-            }
-
-            return container.GetVerificationOrResolveScopeForCurrentThread()
-                ?? ThrowResolveFromScopeOrRegisterDefaultScopedLifestyleException();
+            return lifestyle.GetCurrentScope(container) ?? ThrowThereIsNoActiveScopeException();
         }
-
-        private static Scope ThrowResolveFromScopeOrRegisterDefaultScopedLifestyleException() =>
-            throw new InvalidOperationException(
-                "To be able to resolve and inject Scope instances, you need to either resolve " +
-                "instances directly from the Scope using a Scope.GetInstance overload, or you will " +
-                "have to set the Container.Options.DefaultScopedLifestyle property with the required " +
-                "scoped lifestyle for your type of application.");
 
         private static Scope ThrowThereIsNoActiveScopeException() =>
             throw new InvalidOperationException("There is no active scope.");

@@ -10,6 +10,7 @@ namespace SimpleInjector
     using System.Reflection;
     using SimpleInjector.Advanced;
     using SimpleInjector.Internals;
+    using SimpleInjector.Lifestyles;
 
     /// <summary>
     /// Delegate that allows intercepting calls to <see cref="Container.GetInstance"/> and
@@ -61,7 +62,7 @@ namespace SimpleInjector
         private Lifestyle defaultLifestyle = Lifestyle.Transient;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private ScopedLifestyle? defaultScopedLifestyle;
+        private ScopedLifestyle defaultScopedLifestyle;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool resolveUnregisteredConcreteTypes;
@@ -79,6 +80,7 @@ namespace SimpleInjector
             this.propertyBehavior = new DefaultPropertySelectionBehavior();
             this.lifestyleBehavior = new DefaultLifestyleSelectionBehavior(this);
             this.compilationBehavior = DefaultExpressionCompilationBehavior.Instance;
+            this.defaultScopedLifestyle = new AsyncScopedLifestyle();
         }
 
         /// <summary>
@@ -372,13 +374,14 @@ namespace SimpleInjector
 
         /// <summary>
         /// Gets or sets the default scoped lifestyle that the container should use when a registration is
-        /// made using <see cref="Lifestyle.Scoped">Lifestyle.Scoped</see>.</summary>
+        /// made using <see cref="Lifestyle.Scoped">Lifestyle.Scoped</see>.
+        /// By default, this is the <see cref="AsyncScopedLifestyle"/>.</summary>
         /// <value>The default scoped lifestyle.</value>
         /// <exception cref="NullReferenceException">Thrown when the supplied value is a null reference.</exception>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the container already contains registrations.
         /// </exception>
-        public ScopedLifestyle? DefaultScopedLifestyle
+        public ScopedLifestyle DefaultScopedLifestyle
         {
             get
             {
