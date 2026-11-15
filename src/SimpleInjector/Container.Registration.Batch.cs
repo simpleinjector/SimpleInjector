@@ -62,7 +62,7 @@ namespace SimpleInjector
         {
             this.Register(openGenericServiceType, assemblies, this.SelectionBasedLifestyle);
         }
-
+   
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given
         /// <paramref name="assembly"/> that implement the given <paramref name="openGenericServiceType"/>
@@ -92,6 +92,33 @@ namespace SimpleInjector
         /// <summary>
         /// Registers all concrete, non-generic, public and internal types in the given set of
         /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>
+        /// with container's default lifestyle (which is transient by default).
+        /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
+        /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
+        /// will be excluded from registration, while
+        /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
+        /// </summary>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <param name="options">The options.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
+        /// reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the given set of
+        /// <paramref name="assemblies"/> contain multiple types that implement the same
+        /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
+        public void Register(
+            Type openGenericServiceType, IEnumerable<Assembly> assemblies, BatchRegistrationOptions options)
+        {
+            Requires.IsNotNull(options);
+
+            this.Register(openGenericServiceType, assemblies, this.SelectionBasedLifestyle, options);
+        }
+
+        /// <summary>
+        /// Registers all concrete, non-generic, public and internal types in the given set of
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>
         /// with the supplied <paramref name="lifestyle"/>.
         /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
         /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
@@ -111,9 +138,39 @@ namespace SimpleInjector
         public void Register(
             Type openGenericServiceType, IEnumerable<Assembly> assemblies, Lifestyle lifestyle)
         {
+            this.Register(openGenericServiceType, assemblies, lifestyle, BatchRegistrationOptions.Default);
+        }
+
+        /// <summary>
+        /// Registers all concrete, non-generic, public and internal types in the given set of
+        /// <paramref name="assemblies"/> that implement the given <paramref name="openGenericServiceType"/>
+        /// with the supplied <paramref name="lifestyle"/>.
+        /// <see cref="TypesToRegisterOptions.IncludeDecorators">Decorators</see> and
+        /// <see cref="TypesToRegisterOptions.IncludeGenericTypeDefinitions">generic type definitions</see>
+        /// will be excluded from registration, while
+        /// <see cref="TypesToRegisterOptions.IncludeComposites">composites</see> are included.
+        /// </summary>
+        /// <param name="openGenericServiceType">The definition of the open generic type.</param>
+        /// <param name="assemblies">A list of assemblies that will be searched.</param>
+        /// <param name="lifestyle">The lifestyle to register instances with.</param>
+        /// <param name="options">The options.</param>
+        /// <exception cref="ArgumentNullException">Thrown when one of the arguments contain a null
+        /// reference.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="openGenericServiceType"/> is not
+        /// an open generic type.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the given set of
+        /// <paramref name="assemblies"/> contain multiple types that implement the same
+        /// closed generic version of the given <paramref name="openGenericServiceType"/>.</exception>
+        public void Register(
+            Type openGenericServiceType,
+            IEnumerable<Assembly> assemblies,
+            Lifestyle lifestyle,
+            BatchRegistrationOptions options)
+        {
             Requires.IsNotNull(openGenericServiceType);
             Requires.IsNotNull(lifestyle);
             Requires.IsNotNull(assemblies);
+            Requires.IsNotNull(options);
 
             // Make a copy for correctness and performance.
             assemblies = assemblies.ToArray();
@@ -132,8 +189,8 @@ namespace SimpleInjector
                 nameof(openGenericServiceType),
                 guidance: StringResources.SuppliedTypeIsNotOpenGenericExplainingAlternativesWithAssemblies);
 
-            var results =
-                this.GetNonGenericTypesToRegisterForOneToOneMapping(openGenericServiceType, assemblies);
+            var results = this.GetNonGenericTypesToRegisterForOneToOneMapping(
+                openGenericServiceType, assemblies, options);
 
             this.Register(openGenericServiceType, results.ImplementationTypes, lifestyle);
 
@@ -528,12 +585,19 @@ namespace SimpleInjector
 
         private NonGenericTypesToRegisterForOneToOneMappingResults
             GetNonGenericTypesToRegisterForOneToOneMapping(
-                Type openGenericServiceType, IEnumerable<Assembly> assemblies)
+                Type openGenericServiceType, IEnumerable<Assembly> assemblies, BatchRegistrationOptions options)
         {
-            var options = new TypesToRegisterOptions { IncludeDecorators = true };
+            var registerOptions = new TypesToRegisterOptions 
+            {
+                IncludeGenericTypeDefinitions = options.IncludeGenericTypeDefinitions,
+                IncludeComposites = options.IncludeComposites,
+
+                // Decorators will be filtered out later and never registered.
+                IncludeDecorators = true
+            };
 
             Type[] typesIncludingDecorators =
-                this.GetTypesToRegisterInternal(openGenericServiceType, assemblies, options).ToArray();
+                this.GetTypesToRegisterInternal(openGenericServiceType, assemblies, registerOptions).ToArray();
 
             var partitions =
                 typesIncludingDecorators.Partition(type => !this.IsDecorator(openGenericServiceType, type));
@@ -576,7 +640,7 @@ namespace SimpleInjector
         {
             if (!this.skippedNonGenericDecorators.ContainsKey(openGenericServiceType))
             {
-                this.skippedNonGenericDecorators[openGenericServiceType] = new List<Type>();
+                this.skippedNonGenericDecorators[openGenericServiceType] = [];
             }
 
             this.skippedNonGenericDecorators[openGenericServiceType].AddRange(nonGenericDecorators);
